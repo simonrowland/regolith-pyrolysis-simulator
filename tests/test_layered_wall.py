@@ -26,6 +26,7 @@ from simulator.layered_wall import (
     COLLECTOR_STAGE_JOIN,
     HOT_DUCT_TRAIN_KEY,
     cylindrical_wall_conduction,
+    equilibrium_pressure_pa,
     flat_wall_conduction,
     flue_gas_energy_balance,
     in_situ_processing_cost_per_kg,
@@ -44,7 +45,9 @@ from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_versio
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
+    MBAR_PER_BAR,
     PA_PER_MBAR,
+    STEFAN_BOLTZMANN,
 )
 from simulator.recipe import CONDENSER_STAGE_AREA_KNOB_PATHS, RecipeSchema
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
@@ -977,3 +980,190 @@ def test_felt_dew_point_stays_refused_because_live_pressures_are_equilibrium() -
         }
         assert refused["species"][species]["family"] == family
         assert refused["species"][species]["reason"] == "equilibrium_not_pure_saturation"
+
+
+def test_radiative_outer_flux_matches_stefan_boltzmann() -> None:
+    report = shipped_design_report()
+    duct = report["interface_temperatures"]["hot_duct"]
+    boundary = duct["radiative_boundary"]
+    felt = next(layer for layer in duct["layers"] if layer["role"] == "insulation")
+    structure = next(layer for layer in duct["layers"] if layer["role"] == "structure")
+    expected = boundary["emissivity"] * STEFAN_BOLTZMANN * (
+        (felt["outer_temperature_C"] + CELSIUS_TO_KELVIN_OFFSET) ** 4
+        - (boundary["environment_temperature_C"] + CELSIUS_TO_KELVIN_OFFSET) ** 4
+    )
+
+    assert boundary["emissivity"] == pytest.approx(0.51)
+    assert boundary["emissivity_flag"] == "emissivity_stand_in_not_doloma_shell"
+    assert "NASA TP-1190" in boundary["citation"]
+    assert boundary["outer_flux_W_m2"] == pytest.approx(expected, rel=1e-6)
+    assert felt["outer_temperature_C"] != pytest.approx(
+        boundary["environment_temperature_C"]
+    )
+    assert "hot_face_above_max_operating" in felt["hot_face_flags"]
+    assert structure["conductivity_W_m_K"] is None
+    assert duct["conduction_status"] == "estimated_known_layers_only"
+
+
+def test_felt_limit_thickness_meets_continuous_service_and_keeps_five_millimetres() -> None:
+    catalog = load_wall_materials()["materials"]
+    report = shipped_design_report()
+    limit = catalog["kaowool_rcf_blanket"]["service_temp"]["continuous_C"]
+    alternatives = report["felt_overheat_alternatives"]
+    duct = alternatives["hot_duct"]
+    cr = alternatives["cr_stage2"]
+    parameters = cost_parameters_from_mapping()
+
+    assert duct["felt_overheats_at_shipped_thickness"] is True
+    assert cr["felt_overheats_at_shipped_thickness"] is True
+    assert duct["shipped_liner_thickness_m"] == pytest.approx(0.005)
+    assert parameters.layered_wall["layers"]["liner"]["thickness_m"] == pytest.approx(
+        0.005
+    )
+    for row in (duct, cr):
+        assert row["felt_inner_C_at_solved_thickness"] == pytest.approx(limit, abs=0.05)
+        assert row["minimum_liner_thickness_m"] > row["shipped_liner_thickness_m"]
+        assert row["thicker_liner_usd_per_m2"] > row["shipped_liner_usd_per_m2"]
+        assert row["cheaper_per_m2"] == "shipped_liner_is_cheaper_and_overheats"
+    assert alternatives["intermediate_dense_layer"]["reason"] == (
+        "intermediate_layer_uncited"
+    )
+    assert alternatives["sio_stage3"]["status"] == "not_applicable_no_insulation_layer"
+    assert alternatives["comparison"]["shipped_liner_unchanged"] is True
+
+
+def test_design_vapour_stream_uses_printed_sio_neighbors_not_pipe_capacity() -> None:
+    from simulator.overhead import (
+        ENGINEERING_DEFAULT_PIPE_LENGTH_M,
+        compressible_poiseuille_mass_flow,
+        gas_dynamic_viscosity_Pa_s,
+    )
+
+    document = load_table_document(TABLES_DIR / "O-012.yaml")
+    printed = {}
+    for row in document["table"]["values"]:
+        heat = row.get("heat_capacity")
+        temperature = row.get("temperature")
+        if not isinstance(heat, dict) or not isinstance(temperature, dict):
+            continue
+        if heat.get("value") is None:
+            continue
+        printed[float(temperature["value"])] = float(heat["value"])
+
+    report = shipped_design_report()
+    balance = next(
+        row for row in report["flue_gas_energy_balance"] if row["campaign"] == "C4"
+    )
+    stream = balance["design_vapour_stream"]
+    below = stream["cp_bounds"]["below"]
+    above = stream["cp_bounds"]["above"]
+    molar_mass = stream["cp_bounds"]["molar_mass_kg_mol"]
+    mass_flow = stream["mass_flow_kg_per_h"] / 3600.0
+    expected = {
+        name: mass_flow * (point["cp_J_per_mol_K"] / molar_mass) * stream["dT_K"]
+        for name, point in (("below", below), ("above", above))
+    }
+    temperature_K = 1670.0 + CELSIUS_TO_KELVIN_OFFSET
+    capacity = compressible_poiseuille_mass_flow(
+        0.5,
+        ENGINEERING_DEFAULT_PIPE_LENGTH_M,
+        CARRIER_GAS_PROPERTIES["N2"].molar_mass_kg_mol,
+        gas_dynamic_viscosity_Pa_s(temperature_K),
+        temperature_K,
+        5.0 * PA_PER_MBAR,
+        0.0,
+    )
+
+    assert stream["mass_flow_kg_per_h"] == pytest.approx(14.3763683197)
+    assert stream["cp_bounds"]["table_id"] == "O-012"
+    assert below["cp_J_per_mol_K"] == pytest.approx(printed[below["temperature_K"]])
+    assert above["cp_J_per_mol_K"] == pytest.approx(printed[above["temperature_K"]])
+    assert stream["dT_K"] == pytest.approx(1670.0 - 1600.0)
+    assert stream["stream_power_by_neighbor_W"]["below"] == pytest.approx(expected["below"])
+    assert stream["stream_power_by_neighbor_W"]["above"] == pytest.approx(expected["above"])
+    assert stream["stream_power_W"]["value"] == pytest.approx(min(expected.values()))
+    assert stream["verdict"] == "hot_face_not_held_by_design_vapour_stream"
+    assert balance["trace_heating_power_W_per_m"] > 0.0
+    assert stream["overhead_pipe_capacity"]["flag"] == "not_the_design_stream"
+    assert stream["overhead_pipe_capacity"]["kg_per_s"]["low_mbar"] == pytest.approx(
+        capacity
+    )
+    assert mass_flow != pytest.approx(capacity, rel=0.01)
+
+    colder = next(
+        row for row in report["flue_gas_energy_balance"] if row["campaign"] == "C6"
+    )
+    assert colder["design_vapour_stream"]["dT_K"] < 0.0
+    assert set(colder["design_vapour_stream"]["stream_power_by_neighbor_W"].values()) == {0.0}
+    assert colder["verdict"] == "hot_face_not_held_by_design_vapour_stream"
+
+
+def test_printed_duct_sio_dew_is_singular_and_alkali_partials_are_unprinted() -> None:
+    report = shipped_design_report()
+    dew = report["interface_temperatures"]["hot_duct"]["insulation_dew_point"]
+    flags = report["collector_stages"]["collector_stage_costs"]["fe_stage1"][
+        "failure_flags"
+    ]
+    gas = next(
+        flag for flag in flags if flag["code"] == "liner_gas_tightness_uncertified"
+    )
+    cao = next(
+        flag for flag in flags if flag["code"] == "cao_shell_not_behind_intact_liner"
+    )
+
+    assert dew["species"]["SiO"]["reason"] == "equilibrium_singular_at_zero_pO2"
+    assert dew["species"]["SiO"]["partial_pressure_Pa"] == pytest.approx(
+        10.902171990335434
+    )
+    assert dew["species"]["SiO"]["pO2_mbar"] == pytest.approx(0.0)
+    assert dew["species"]["Na"]["reason"] == "duct_inlet_partial_not_in_design_print"
+    assert dew["species"]["K"]["reason"] == "duct_inlet_partial_not_in_design_print"
+    assert (
+        report["interface_temperatures"]["sio_stage3"]["insulation_dew_point"]["status"]
+        == "not_applicable_no_insulation_layer"
+    )
+    assert "helium permeability" in gas["detail"]
+    assert "ASTM C20" in gas["detail"]
+    assert cao["status"] == "flagged"
+
+
+def test_dew_temperature_reevaluates_to_the_supplied_partial() -> None:
+    temperature_K = 1800.0
+    oxygen_bar = 1.0e-9
+    partial = equilibrium_pressure_pa(
+        "SiO",
+        temperature_K,
+        pO2_bar=oxygen_bar,
+        source_activity=1.0,
+    )
+    dew_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
+    found = insulation_vapour_dew_point(
+        dew_C + 100.0,
+        dew_C - 100.0,
+        species_partials={
+            "SiO": {
+                "printed": True,
+                "partial_pressure_Pa": partial,
+                "pO2_mbar": oxygen_bar * MBAR_PER_BAR,
+                "source_activity": 1.0,
+            },
+            "Na": {"printed": False},
+            "K": {"printed": False},
+        },
+        felt_thickness_m=0.025,
+        geometry="flat",
+    )
+    sio = found["species"]["SiO"]
+    again = equilibrium_pressure_pa(
+        "SiO",
+        sio["dew_temperature_K"],
+        pO2_bar=oxygen_bar,
+        source_activity=1.0,
+    )
+
+    assert sio["status"] == "ok"
+    assert sio["dew_temperature_K"] == pytest.approx(temperature_K, abs=1e-3)
+    assert again == pytest.approx(partial, rel=1e-6)
+    assert sio["depth_m"] == pytest.approx(0.0125, rel=1e-3)
+    assert sio["reason"] == "equilibrium_not_pure_saturation"
+    assert found["species"]["Na"]["reason"] == "duct_inlet_partial_not_in_design_print"

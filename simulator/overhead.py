@@ -559,6 +559,11 @@ def _species_molar_mass_g_mol(
     return numeric if math.isfinite(numeric) and numeric > 0.0 else None
 
 
+# Crucibles-to-first-condenser length assigned in OverheadGasModel.__init__.
+# Setpoints do not store a duct length. Not a certified pipe length.
+ENGINEERING_DEFAULT_PIPE_LENGTH_M = 1.0
+
+
 class OverheadGasModel:
     """
     Calculates gas composition and flow conditions above the melt.
@@ -599,7 +604,7 @@ class OverheadGasModel:
         # Pipe geometry (default for 1-tonne batch)
         self.initial_throat_area_m2 = DEFAULT_INITIAL_THROAT_AREA_M2  # m² — configurable throat cross-section
         self.pipe_diameter_m = self.throat_diameter_m  # m — throat-equivalent inner diameter
-        self.pipe_length_m = 1.0         # m — crucible-to-first-condenser pipe length
+        self.pipe_length_m = ENGINEERING_DEFAULT_PIPE_LENGTH_M  # m — crucible-to-first-condenser pipe length
         self.stage_area_ratios = dict(DEFAULT_CONDENSER_STAGE_AREA_RATIOS)  # legacy/design sizing basis
         self.stage_areas_m2: dict[str, float] = {}
         self.condenser_hydraulic_diameter_m = DEFAULT_PIPE_DIAMETER_M

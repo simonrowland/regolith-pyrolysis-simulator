@@ -28,6 +28,7 @@ from simulator.condensation_routing import (
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
+    MBAR_PER_BAR,
     PA_PER_MBAR,
     STEFAN_BOLTZMANN,
 )
@@ -106,6 +107,34 @@ _DOLOMA_COMPONENTS = (("CaO", "Ca-027"), ("MgO", "Mg-008"))
 _SILICA_COMPONENT = ("SiO2", "O-037")
 _THERMAL_EFFICIENCY = 1.0
 _EFFICIENCY_FLAG = "sensible_enthalpy_only_kiln_losses_not_cited"
+_SIO_TABLE_ID = "O-012"
+_SECONDS_PER_HOUR = 3600.0
+# NASA TP-1190, Curt H. Liebert, June 1978. Printed sentence: the
+# hemispherical total emittance at both the calculated temperature 1320 K
+# and the gas-side surface 1356 K is 0.51 (fig. 11 or eq. (10) with
+# coating thickness x = 0.020 cm). That surface is a thin YSZ
+# thermal-barrier coating, not a doloma brick. It is the radiating-face
+# stand-in while doloma conductivity and a doloma-shell emissivity are
+# uncited. It is not an optimizer knob and it is not stored on the priced
+# wall, so it does not enter the cost identity.
+_YSZ_TBC_EMISSIVITY = 0.51
+_YSZ_TBC_EMISSIVITY_CITATION = (
+    "NASA TP-1190, Liebert, June 1978, hemispherical total emittance 0.51 "
+    "at 1320 K and at a 1356 K gas-side surface, coating thickness 0.020 cm. "
+    "YSZ thermal-barrier coating, not a doloma shell."
+)
+# t-1884 design run, probe label with_mn_stage_fixed_point.
+# D452_PEAK SiO hour 107 incident_kg_hr, the peak the SiO area was sized
+# to. The same hour's duct window (duct:stage_0_to_stage_1) prints p_SiO
+# and pO2. Na and K are not in that print. Not a sum across hours.
+_DESIGN_SIO_PEAK_KG_PER_H = 14.3763683197
+_DESIGN_DUCT_SIO_PARTIAL_PA = 10.902171990335434
+_DESIGN_DUCT_PO2_MBAR = 0.0
+_DESIGN_POINT_LABEL = "with_mn_stage_fixed_point"
+_DESIGN_POINT_HOUR = 107
+_DESIGN_POINT_LOCATION = "duct:stage_0_to_stage_1"
+_FELT_LIMIT_THICKNESS_CAP_M = 5.0
+_VAPOUR_CATALOG: Any = None
 
 
 def normalize_layered_wall(raw: Mapping[str, Any]) -> dict[str, Any]:
@@ -453,12 +482,14 @@ def stack_failure_flags(
         flags.append({
             "code": "vapour_condensation_inside_insulation_unchecked",
             "status": "flagged",
-            "reason": "partial_pressure_unset",
+            "reason": "see_insulation_dew_point",
             "detail": (
-                "The stack has a porous felt. A dew point is not computed: "
-                "the wall has no vapour partial pressure, and the live SiO, "
-                "Na, and K catalog quantities are equilibrium pressures, not "
-                "pure-component saturation."
+                "The stack has a porous felt. Whether vapour condenses in "
+                "it is the insulation dew-point record. A missing partial, "
+                "a singular equilibrium, or a dew temperature inside the "
+                "felt stays flagged. An intact liner is not assumed. Live "
+                "SiO, Na, and K rows are equilibrium pressures, not pure "
+                "saturation."
             ),
             "citations": [],
         })
@@ -556,16 +587,25 @@ def flue_gas_energy_balance(
     layered_wall: Mapping[str, Any],
     campaign: str,
     materials: Mapping[str, Any] | None = None,
+    design_point: bool = False,
+    hold_temperature_C: float | None = None,
 ) -> dict[str, Any]:
-    """Compare duct loss with what the 5–15 mbar flue can be shown to carry.
+    """Compare duct loss with what the flue can be shown to carry.
 
-    Conductive loss uses the layered wall. Layers with no conductivity are
-    omitted and the result is an estimate, not a bound. The gas side uses
-    the ideal-gas density and the two printed JANAF Cp rows that bracket
-    the gas temperature. It does not interpolate Cp. Radiation delivered
-    to the liner is unavailable; σT^4 is only a ceiling. Stream power is
-    unavailable while the mass flow is unset, so no trace-heating wattage
-    is emitted.
+    Conductive loss uses the layered wall. A layer with no conductivity is
+    omitted and the last known face radiates to the enclosure. That loss
+    is an estimate, not a bound. The carrier side uses the ideal-gas
+    density and the two printed JANAF N2 Cp rows that bracket the gas
+    temperature. It does not interpolate Cp. σT^4 of a black surface is
+    only a ceiling.
+
+    When design_point is set, the stream is the printed t-1884 SiO peak,
+    not the overhead pipe capacity. Capacity at 5–15 mbar is reported
+    beside it and is not the verdict. The wall walk uses the duct-band
+    hot face when that hold temperature is supplied. dT is the campaign
+    gas temperature minus that face. The stream can surrender that
+    enthalpy once along the duct, so the per-metre figure divides by the
+    duct length.
     """
 
     wall = normalize_layered_wall(layered_wall)
@@ -579,20 +619,28 @@ def flue_gas_energy_balance(
     if temperature_K <= 0.0:
         raise ValueError("flue gas temperature must be above absolute zero")
     radius_m = diameter_m / 2.0
+    # The face the stream is supposed to hold is the duct band. The gas
+    # temperature stays the stream temperature. With no hold temperature
+    # the walk uses the gas temperature, which is the only face given.
+    if hold_temperature_C is None:
+        face_C = temperature_C
+    else:
+        face_C = _finite_number(hold_temperature_C, "hold_temperature_C")
     catalog = _catalog(materials)
     resolved = [
         resolve_layer_properties(
             layer,
             materials=catalog,
-            temperature_K=temperature_K,
+            temperature_K=face_C + CELSIUS_TO_KELVIN_OFFSET,
         )
         for layer in wall["layers"]
     ]
     conduction = _solve_wall_conduction(
         resolved,
-        temperature_C,
+        face_C,
         wall,
         radius_m=radius_m,
+        emissivity=_YSZ_TBC_EMISSIVITY,
     )
     # The campaign carrier token has to be N2 before the N2 table applies.
     # "pN2" is not that token.
@@ -623,13 +671,28 @@ def flue_gas_energy_balance(
     # Units: σ in W/(m²·K⁴), T in K, q in W/m².
     # Sanity limit: the flux is zero at 0 K and scales as the fourth power.
     black_body = STEFAN_BOLTZMANN * temperature_K ** 4
-    if conduction["status"] not in _CONDUCTION_WALK_STATUSES:
-        trace_reason = "conductive_loss_unavailable"
-    else:
-        # A walk exists, including the known-layer estimate. Stream power
-        # and view factor are still unset, so the wattage stays refused.
-        trace_reason = "mass_flow_unset"
     loss_vs_black_body = _loss_vs_black_body(conduction, radius_m, black_body)
+    if design_point:
+        stream = _design_vapour_stream(
+            gas_temperature_C=temperature_C,
+            hold_temperature_C=hold_temperature_C,
+            carrier_gas=carrier_gas,
+            pipe_diameter_m=diameter_m,
+            pressure_mbar_low=low_mbar,
+            pressure_mbar_high=high_mbar,
+            conduction=conduction,
+        )
+    else:
+        stream = {
+            "status": "unavailable",
+            "reason": "mass_flow_unset",
+            "stream_power_W": _unavailable("mass_flow_unset", "W"),
+            "trace_heating_power_W_per_m": _unavailable("mass_flow_unset", "W/m"),
+            "trace_heating_power_W": _unavailable("mass_flow_unset", "W"),
+            "trace_heating_verdict": "trace_heating_power_unavailable",
+            "verdict": "hot_face_hold_undetermined",
+            "pipe_length_status": "unset_in_setpoints",
+        }
     return {
         "campaign": campaign,
         "carrier_gas": carrier_gas,
@@ -638,12 +701,12 @@ def flue_gas_energy_balance(
         "pressure_mbar": [low_mbar, high_mbar],
         "pipe_diameter_m": diameter_m,
         "length_basis": "per_metre_of_duct",
-        "pipe_length_status": "unset_in_setpoints",
         "ideal_gas_density_kg_m3": densities,
         "n2_cp_bounds": cp_bounds,
         "volumetric_heat_J_per_m3_K": volumetric,
         "inventory_heat_J_per_m_K": _inventory_heat(volumetric, radius_m),
-        "stream_power_W": _unavailable("mass_flow_unset", "W"),
+        "stream_power_W": stream["stream_power_W"],
+        "design_vapour_stream": stream,
         "conductive_loss": conduction,
         "radiation_delivered_W_m2": _unavailable("view_factor_unset", "W/m2"),
         "black_body_flux_W_m2": {
@@ -657,9 +720,16 @@ def flue_gas_energy_balance(
             ),
         },
         "loss_vs_black_body": loss_vs_black_body,
-        "verdict": "hot_face_hold_undetermined",
-        "trace_heating_power_W_per_m": _unavailable(trace_reason, "W/m"),
-        "trace_heating_verdict": "trace_heating_power_unavailable",
+        "verdict": stream["verdict"],
+        "trace_heating_power_W_per_m": stream["trace_heating_power_W_per_m"],
+        "trace_heating_power_W": stream["trace_heating_power_W"],
+        "trace_heating_verdict": stream.get(
+            "trace_heating_verdict", "trace_heating_power_unavailable"
+        ),
+        "pipe_length_m": stream.get("pipe_length_m"),
+        "pipe_length_status": stream.get(
+            "pipe_length_status", "unset_in_setpoints"
+        ),
     }
 
 
@@ -699,6 +769,7 @@ def shipped_design_report(
             parameters.layered_wall,
             bands,
             materials=catalog,
+            duct_radius_m=_sweep_diameter(setpoints) / 2.0,
         ),
         "flue_gas_energy_balance": [
             flue_gas_energy_balance(
@@ -710,9 +781,18 @@ def shipped_design_report(
                 layered_wall=parameters.layered_wall,
                 campaign=row["campaign"],
                 materials=catalog,
+                design_point=True,
+                hold_temperature_C=bands[HOT_DUCT_TRAIN_KEY][1],
             )
             for row in _continuum_sweeps(setpoints)
         ],
+        "felt_overheat_alternatives": felt_overheat_alternatives(
+            parameters.layered_wall,
+            bands,
+            duct_radius_m=_sweep_diameter(setpoints) / 2.0,
+            import_delivery_cost_per_kg=parameters.import_delivery_cost_per_kg,
+            materials=catalog,
+        ),
         "pressure_bands_without_flue_state": _bare_pressure_bands(setpoints),
         "in_situ_bootstrap_cost_per_kg": parameters.in_situ_bootstrap_cost_per_kg,
         "in_situ_cost_derivation": {
@@ -731,6 +811,7 @@ def interface_temperature_table(
     bands_C: Mapping[str, tuple[float, float]],
     *,
     materials: Mapping[str, Any] | None = None,
+    duct_radius_m: float | None = None,
 ) -> dict[str, Any]:
     """Hot-face band against cited service, and interfaces when k exists."""
 
@@ -745,6 +826,8 @@ def interface_temperature_table(
         wall,
         product=None,
         materials=catalog,
+        radius_m=duct_radius_m,
+        design_dew=True,
     )
     for area_key, _number, train_key in COLLECTOR_STAGE_JOIN:
         product = None
@@ -1591,13 +1674,23 @@ def _gas_tight_flags(
     )
     record = facing.get("gas_tight") if isinstance(facing, Mapping) else None
     if not isinstance(record, Mapping) or not record.get("certified"):
+        if product_surface:
+            detail = (
+                "The wall catalog has no gas_tight or permeability_m2 value "
+                "for the gas-facing surface."
+            )
+        else:
+            detail = (
+                "The wall catalog has no gas_tight or permeability_m2 value "
+                "for the gas-facing liner. Bulk density does not certify "
+                "gas tightness. The measurement that would clear this flag "
+                "is the open porosity (ASTM C20) or the helium permeability "
+                "of the dense 10YSZ tile compared with plasma-sprayed YSZ."
+            )
         return [{
             "code": code,
             "status": "flagged",
-            "detail": (
-                "The wall catalog has no gas_tight or permeability_m2 value "
-                "for the gas-facing surface."
-            ),
+            "detail": detail,
             "citations": [],
         }]
     if record.get("gas_tight") is False:
@@ -1679,6 +1772,8 @@ def _interface_row(
     *,
     product: Mapping[str, Any] | None,
     materials: Mapping[str, Any],
+    radius_m: float | None = None,
+    design_dew: bool = False,
 ) -> dict[str, Any]:
     hot_face = float(band[1])
     if product is not None:
@@ -1725,7 +1820,13 @@ def _interface_row(
         )
         for layer in wall["layers"]
     ]
-    conduction = _solve_wall_conduction(evaluated, hot_face, wall)
+    conduction = _solve_wall_conduction(
+        evaluated,
+        hot_face,
+        wall,
+        radius_m=radius_m,
+        emissivity=_YSZ_TBC_EMISSIVITY,
+    )
     walk = conduction["status"] in _CONDUCTION_WALK_STATUSES
     temperatures = _temperatures_by_role(conduction) if walk else {}
     layer_rows = []
@@ -1786,6 +1887,7 @@ def _interface_row(
         felt_outer = felt_inner
     else:
         felt_inner, felt_outer = felt_pair
+    felt_radius = _felt_inner_radius_m(evaluated, radius_m)
     return {
         "stage": name,
         "train_key": train_key,
@@ -1803,7 +1905,16 @@ def _interface_row(
         "layers_omitted": conduction.get("layers_omitted"),
         "boundary_temperature_C": conduction.get("boundary_temperature_C"),
         "boundary_basis": conduction.get("boundary_basis"),
-        "insulation_dew_point": insulation_vapour_dew_point(felt_inner, felt_outer),
+        "radiative_boundary": conduction.get("radiative_boundary"),
+        "conduction_geometry": conduction.get("geometry"),
+        "insulation_dew_point": insulation_vapour_dew_point(
+            felt_inner,
+            felt_outer,
+            species_partials=_design_duct_partials() if design_dew else None,
+            felt_thickness_m=_felt_thickness_m(evaluated),
+            geometry="cylindrical" if felt_radius is not None else "flat",
+            inner_radius_m=felt_radius,
+        ),
         "failure_flags": stack_failure_flags(evaluated),
     }
 
@@ -1814,13 +1925,18 @@ def _solve_wall_conduction(
     wall: Mapping[str, Any],
     *,
     radius_m: float | None = None,
+    emissivity: float | None = None,
 ) -> dict[str, Any]:
     """Full series walk, or a known-layer estimate when a suffix has no k.
 
-    Dropping a layer with no conductivity and pinning the last known face
-    to the enclosure temperature is an estimate. It is not an upper bound:
-    an off-grid conductivity can be either high or low. A non-positive
-    conductivity or a gap that is not a suffix still refuses.
+    A suffix with no conductivity is omitted. When an emissivity is
+    supplied, the last known face radiates to the enclosure instead of
+    being pinned at the enclosure temperature. That estimate is not an
+    upper bound: an off-grid conductivity can be either high or low, and
+    a missing outer shell would add resistance. A non-positive
+    conductivity or a gap that is not a suffix still refuses. An owner
+    outer temperature is the shell outer, so it is used only when every
+    layer has a conductivity.
     """
 
     prefix = _known_conduction_prefix(layers)
@@ -1832,16 +1948,39 @@ def _solve_wall_conduction(
         reasons = [item["reason"] for item in omitted] or ["thermal_conductivity_missing"]
         return _conduction_unavailable(reasons)
     partial = bool(omitted)
-    boundary, basis = _conduction_boundary(wall, partial=partial)
-    if boundary is None:
-        return _conduction_unavailable(["outer_temperature_unset"])
-    if radius_m is None:
-        result = flat_wall_conduction(known, t_in_C, boundary)
+    radiate = emissivity is not None and (
+        partial or wall.get("outer_temperature_C") is None
+    )
+    if radiate:
+        enclosure = wall.get("enclosure_temperature_C")
+        if enclosure is None:
+            return _conduction_unavailable(["outer_temperature_unset"])
+        try:
+            emissivity_value = _finite_number(emissivity, "emissivity")
+        except (TypeError, ValueError):
+            return _conduction_unavailable(["emissivity_invalid"])
+        if not 0.0 < emissivity_value <= 1.0:
+            return _conduction_unavailable(["emissivity_invalid"])
+        result = _radiative_conduction(
+            known,
+            t_in_C,
+            float(enclosure),
+            emissivity_value,
+            radius_m,
+        )
+        basis = "radiative_equilibrium"
     else:
-        result = cylindrical_wall_conduction(known, radius_m, t_in_C, boundary)
+        boundary, basis = _conduction_boundary(wall, partial=partial)
+        if boundary is None:
+            return _conduction_unavailable(["outer_temperature_unset"])
+        if radius_m is None:
+            result = flat_wall_conduction(known, t_in_C, boundary)
+        else:
+            result = cylindrical_wall_conduction(known, radius_m, t_in_C, boundary)
+        if result["status"] == "ok":
+            result["boundary_temperature_C"] = boundary
     if result["status"] != "ok":
         return result
-    result["boundary_temperature_C"] = boundary
     result["boundary_basis"] = basis
     result["known_roles"] = [str(layer["role"]) for layer in known]
     result["k_evaluation"] = "k_evaluated_at_hot_face"
@@ -1855,6 +1994,106 @@ def _solve_wall_conduction(
         result["layers_omitted"] = []
         result["not_an_upper_bound"] = False
     return result
+
+
+def _radiative_conduction(
+    layers: Sequence[Mapping[str, Any]],
+    t_in_C: float,
+    t_env_C: float,
+    emissivity: float,
+    radius_m: float | None,
+) -> dict[str, Any]:
+    """Gray-body outer face in radiative equilibrium with the enclosure.
+
+    Premise: steady state, no generation, and the heat conducted through
+    the known layers leaves the last known face by radiation to a large
+    enclosure. The face is gray. The cited emissivity is a YSZ coating
+    stand-in, not a doloma shell.
+
+    Algebra: q_outer = ε σ (T_outer^4 - T_env^4). On a flat wall q_outer
+    is the series flux. On a cylinder q_outer = Q' / (2 π r_outer). One
+    root lies between the enclosure and the hot face because conduction
+    falls as the outer face warms and radiation rises.
+
+    Units: σ in W/(m²·K⁴), temperatures in K, flux in W/m². A Celsius
+    difference equals the same difference in kelvin.
+
+    Sanity: emissivity of zero is adiabatic and is refused. The flux is
+    zero when the outer face is at the enclosure temperature. The root
+    is re-checked against ε σ (T^4 - T_env^4) before it is returned.
+    """
+
+    t_in = _finite_number(t_in_C, "t_in_C")
+    t_env = _finite_number(t_env_C, "enclosure_temperature_C")
+    if t_in <= t_env:
+        result = _conduct_known(layers, t_in, t_in, radius_m)
+        if result["status"] != "ok":
+            return result
+        solved = t_in
+        flux = 0.0
+    else:
+        lo = t_env
+        hi = t_in
+        result = _conduct_known(layers, t_in, t_env, radius_m)
+        for _ in range(80):
+            mid = (lo + hi) / 2.0
+            result = _conduct_known(layers, t_in, mid, radius_m)
+            if result["status"] != "ok":
+                return result
+            flux = _outer_surface_flux(result)
+            radiant = _gray_body_flux(emissivity, mid, t_env)
+            if flux > radiant:
+                lo = mid
+            else:
+                hi = mid
+        solved = (lo + hi) / 2.0
+        result = _conduct_known(layers, t_in, solved, radius_m)
+        if result["status"] != "ok":
+            return result
+        flux = _outer_surface_flux(result)
+        radiant = _gray_body_flux(emissivity, solved, t_env)
+        scale = max(abs(flux), abs(radiant), 1.0)
+        if abs(flux - radiant) > 1e-6 * scale:
+            raise RuntimeError("radiative equilibrium residual")
+    result["boundary_temperature_C"] = solved
+    result["radiative_boundary"] = {
+        "emissivity": emissivity,
+        "emissivity_status": "cited_stand_in",
+        "emissivity_flag": "emissivity_stand_in_not_doloma_shell",
+        "citation": _YSZ_TBC_EMISSIVITY_CITATION,
+        "environment_temperature_C": t_env,
+        "environment_basis": "enclosure_temperature",
+        "radiating_role": str(layers[-1].get("role")),
+        "structure_k_status": "doloma_k_uncited",
+        "outer_flux_W_m2": flux,
+        "outer_flux_law": "epsilon_sigma_T4",
+    }
+    return result
+
+
+def _conduct_known(
+    layers: Sequence[Mapping[str, Any]],
+    t_in_C: float,
+    t_out_C: float,
+    radius_m: float | None,
+) -> dict[str, Any]:
+    if radius_m is None:
+        return flat_wall_conduction(layers, t_in_C, t_out_C)
+    return cylindrical_wall_conduction(layers, radius_m, t_in_C, t_out_C)
+
+
+def _outer_surface_flux(conduction: Mapping[str, Any]) -> float:
+    if conduction.get("geometry") == "cylindrical":
+        return float(conduction["heat_flow_W_per_m"]) / (
+            2.0 * math.pi * float(conduction["outer_radius_m"])
+        )
+    return float(conduction["heat_flux_W_m2"])
+
+
+def _gray_body_flux(emissivity: float, t_surface_C: float, t_env_C: float) -> float:
+    surface_K = t_surface_C + CELSIUS_TO_KELVIN_OFFSET
+    env_K = t_env_C + CELSIUS_TO_KELVIN_OFFSET
+    return emissivity * STEFAN_BOLTZMANN * (surface_K ** 4 - env_K ** 4)
 
 
 def _known_conduction_prefix(
@@ -1984,37 +2223,859 @@ def _loss_vs_black_body(
 def insulation_vapour_dew_point(
     felt_inner_temperature_C: Any,
     felt_outer_temperature_C: Any,
+    *,
+    species_partials: Mapping[str, Any] | None = None,
+    felt_thickness_m: float | None = None,
+    geometry: str = "flat",
+    inner_radius_m: float | None = None,
 ) -> dict[str, Any]:
-    """Refuse a felt dew point. The wall has no vapour partial pressure.
+    """Felt dew point from equilibrium partials, or a typed refusal.
 
-    Live SiO, Na, and K catalog rows are equilibrium pressures of oxide
-    reactions, not pure-component saturation. The felt temperatures are
-    returned beside the refusal. No Antoine coefficients are evaluated.
+    Live SiO, Na, and K rows are equilibrium pressures of oxide reactions,
+    not pure-component saturation. With no partials, nothing is inverted.
+    A supplied partial is inverted with the vapour-rail evaluator. pO2 of
+    zero makes an oxygen-dependent equilibrium singular. Depth uses the
+    walked felt profile: linear in thickness on a flat wall, linear in
+    ln(r) on a cylinder.
     """
 
+    species = {
+        "SiO": _dew_species_shell("oxide_vapors_sio_family"),
+        "Na": _dew_species_shell("metals_na_family"),
+        "K": _dew_species_shell("metals_k_family"),
+    }
+    if species_partials is None:
+        return {
+            "status": "unavailable",
+            "reason": "partial_pressure_unset",
+            "felt_inner_temperature_C": felt_inner_temperature_C,
+            "felt_outer_temperature_C": felt_outer_temperature_C,
+            "species": species,
+        }
+    for name in species:
+        supplied = species_partials.get(name)
+        species[name].update(
+            _invert_design_partial(
+                name,
+                supplied if isinstance(supplied, Mapping) else None,
+                felt_inner_temperature_C,
+                felt_outer_temperature_C,
+                felt_thickness_m=felt_thickness_m,
+                geometry=geometry,
+                inner_radius_m=inner_radius_m,
+            )
+        )
     return {
-        "status": "unavailable",
-        "reason": "partial_pressure_unset",
+        "status": "design_point",
+        "reason": "design_point_equilibrium_partial",
+        "pressure_kind": "equilibrium_partial_pressure",
         "felt_inner_temperature_C": felt_inner_temperature_C,
         "felt_outer_temperature_C": felt_outer_temperature_C,
-        "species": {
-            "SiO": {
-                "family": "oxide_vapors_sio_family",
-                "pressure_kind": "equilibrium_partial_pressure",
-                "reason": "equilibrium_not_pure_saturation",
-            },
-            "Na": {
-                "family": "metals_na_family",
-                "pressure_kind": "equilibrium_partial_pressure",
-                "reason": "equilibrium_not_pure_saturation",
-            },
-            "K": {
-                "family": "metals_k_family",
-                "pressure_kind": "equilibrium_partial_pressure",
-                "reason": "equilibrium_not_pure_saturation",
-            },
-        },
+        "species": species,
     }
+
+
+def equilibrium_pressure_pa(
+    species_id: str,
+    temperature_K: float,
+    *,
+    pO2_bar: float,
+    source_activity: float,
+) -> float:
+    """Equilibrium partial from the vapour-rail catalog, in pascals."""
+
+    evaluator = _vapour_catalog().evaluator_for(species_id)
+    return float(
+        evaluator.evaluate(
+            temperature_K,
+            source_activity=source_activity,
+            pO2_bar=pO2_bar,
+        ).pressure_pa
+    )
+
+
+def felt_overheat_alternatives(
+    layered_wall: Mapping[str, Any],
+    bands_C: Mapping[str, tuple[float, float]],
+    *,
+    duct_radius_m: float | None,
+    import_delivery_cost_per_kg: float,
+    materials: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """YSZ thickness that holds the felt at its continuous limit.
+
+    The shipped 5 mm liner is not changed. An intermediate dense layer is
+    not priced: no crop-verified conductivity and density for a
+    high-alumina castable or fireclay is stored. The USD/m² quote is the
+    flat areal identity thickness × density × import price. The duct
+    temperature walk is cylindrical.
+    """
+
+    wall = normalize_layered_wall(layered_wall)
+    catalog = _catalog(materials)
+    rate = _finite_number(
+        import_delivery_cost_per_kg, "import_delivery_cost_per_kg"
+    )
+    rows: dict[str, Any] = {}
+    rows["hot_duct"] = _felt_limit_row(
+        wall,
+        float(bands_C[HOT_DUCT_TRAIN_KEY][1]),
+        radius_m=duct_radius_m,
+        import_rate=rate,
+        materials=catalog,
+    )
+    for area_key, _number, train_key in COLLECTOR_STAGE_JOIN:
+        if area_key == _STAGE3_AREA_KEY:
+            rows[area_key] = {
+                "status": "not_applicable_no_insulation_layer",
+                "reason": "product_baffle_has_no_insulation_layer",
+            }
+            continue
+        rows[area_key] = _felt_limit_row(
+            wall,
+            float(bands_C[train_key][1]),
+            radius_m=None,
+            import_rate=rate,
+            materials=catalog,
+        )
+    rows["intermediate_dense_layer"] = {
+        "status": "unavailable",
+        "reason": "intermediate_layer_uncited",
+        "usd_per_m2": None,
+        "detail": (
+            "No crop-verified thermal conductivity and density for a "
+            "high-alumina castable or fireclay was stored. A rendered "
+            "crop of that table would clear the price. The layer is not "
+            "inserted into the shipped wall."
+        ),
+    }
+    rows["comparison"] = {
+        "status": "comparison_incomplete",
+        "reason": "intermediate_layer_uncited",
+        "priced_alternative": "thicker_ysz_liner",
+        "shipped_liner_unchanged": True,
+        "detail": (
+            "The shipped liner thickness is unchanged and is flagged "
+            "where the felt exceeds its continuous-service limit. The "
+            "thicker YSZ liner is the only priced alternative that "
+            "meets that limit. It costs more per square metre than the "
+            "shipped liner. The intermediate layer was not priced."
+        ),
+    }
+    return rows
+
+
+def _dew_species_shell(family: str) -> dict[str, Any]:
+    return {
+        "family": family,
+        "pressure_kind": "equilibrium_partial_pressure",
+        "reason": "equilibrium_not_pure_saturation",
+    }
+
+
+def _design_duct_partials() -> dict[str, Any]:
+    return {
+        "SiO": {
+            "printed": True,
+            "partial_pressure_Pa": _DESIGN_DUCT_SIO_PARTIAL_PA,
+            "pO2_mbar": _DESIGN_DUCT_PO2_MBAR,
+            "hour": _DESIGN_POINT_HOUR,
+            "location": _DESIGN_POINT_LOCATION,
+            "label": _DESIGN_POINT_LABEL,
+            "source_activity": None,
+        },
+        "Na": {"printed": False},
+        "K": {"printed": False},
+    }
+
+
+def _felt_inner_radius_m(
+    layers: Sequence[Mapping[str, Any]],
+    gas_radius_m: float | None,
+) -> float | None:
+    if gas_radius_m is None:
+        return None
+    cursor = gas_radius_m
+    for layer in layers:
+        if layer.get("role") == "insulation":
+            return cursor
+        thickness = layer.get("thickness_m")
+        if not isinstance(thickness, (int, float)) or isinstance(thickness, bool):
+            return None
+        cursor += float(thickness)
+    return None
+
+
+def _felt_thickness_m(layers: Sequence[Mapping[str, Any]]) -> float | None:
+    for layer in layers:
+        if layer.get("role") == "insulation":
+            thickness = layer.get("thickness_m")
+            if isinstance(thickness, (int, float)) and not isinstance(thickness, bool):
+                return float(thickness)
+    return None
+
+
+def _invert_design_partial(
+    species_id: str,
+    supplied: Mapping[str, Any] | None,
+    felt_inner_C: Any,
+    felt_outer_C: Any,
+    *,
+    felt_thickness_m: float | None,
+    geometry: str,
+    inner_radius_m: float | None,
+) -> dict[str, Any]:
+    if supplied is None or not supplied.get("printed"):
+        return {
+            "status": "unavailable",
+            "reason": "duct_inlet_partial_not_in_design_print",
+            "dew_temperature_C": None,
+            "depth_m": None,
+            "clearing_print": (
+                f"duct-inlet partial pressure of {species_id} at "
+                f"{_DESIGN_POINT_LABEL} hour {_DESIGN_POINT_HOUR}"
+            ),
+        }
+    partial = supplied.get("partial_pressure_Pa")
+    pO2_mbar = supplied.get("pO2_mbar")
+    if not isinstance(partial, (int, float)) or isinstance(partial, bool):
+        return {"status": "unavailable", "reason": "partial_pressure_unset"}
+    if not isinstance(pO2_mbar, (int, float)) or isinstance(pO2_mbar, bool):
+        return {"status": "unavailable", "reason": "pO2_unset"}
+    if float(partial) <= 0.0:
+        return {"status": "unavailable", "reason": "partial_pressure_invalid"}
+    evaluator = _vapour_catalog().evaluator_for(species_id)
+    oxygen_dependent = abs(float(evaluator.pO2_exponent)) > 0.0 or (
+        evaluator.o2_channel_term is not None
+    )
+    if oxygen_dependent and float(pO2_mbar) <= 0.0:
+        return {
+            "status": "unavailable",
+            "reason": "equilibrium_singular_at_zero_pO2",
+            "partial_pressure_Pa": float(partial),
+            "pO2_mbar": float(pO2_mbar),
+            "pO2_exponent": float(evaluator.pO2_exponent),
+            "hour": supplied.get("hour"),
+            "location": supplied.get("location"),
+            "label": supplied.get("label"),
+            "flag": "design_point",
+            "dew_temperature_C": None,
+            "depth_m": None,
+            "clearing_print": (
+                "a non-zero pO2_mbar on the same duct-inlet row as the "
+                f"{species_id} partial"
+            ),
+        }
+    activity = supplied.get("source_activity")
+    activity_flag = None
+    if activity is None:
+        activity = 1.0
+        activity_flag = "raoultian_pure_endmember_not_a_measured_melt_activity"
+    found = _invert_equilibrium_temperature(
+        evaluator,
+        float(partial),
+        pO2_bar=float(pO2_mbar) / MBAR_PER_BAR,
+        source_activity=float(activity),
+    )
+    if found["status"] != "ok":
+        return found
+    depth = _dew_depth_m(
+        found["dew_temperature_C"],
+        felt_inner_C,
+        felt_outer_C,
+        felt_thickness_m=felt_thickness_m,
+        geometry=geometry,
+        inner_radius_m=inner_radius_m,
+    )
+    found["depth_m"] = depth["depth_m"]
+    found["depth_status"] = depth["status"]
+    found["depth_reason"] = depth.get("reason")
+    found["activity_flag"] = activity_flag
+    found["source_activity"] = float(activity)
+    found["flag"] = "design_point"
+    found["reason"] = "equilibrium_not_pure_saturation"
+    found["pressure_kind"] = "equilibrium_partial_pressure"
+    return found
+
+
+def _invert_equilibrium_temperature(
+    evaluator: Any,
+    partial_pressure_Pa: float,
+    *,
+    pO2_bar: float,
+    source_activity: float,
+) -> dict[str, Any]:
+    low, high = evaluator.valid_temperature_K
+
+    def pressure_at(temperature_K: float) -> float:
+        return float(
+            evaluator.evaluate(
+                temperature_K,
+                source_activity=source_activity,
+                pO2_bar=pO2_bar,
+            ).pressure_pa
+        )
+
+    p_low = pressure_at(float(low))
+    p_high = pressure_at(float(high))
+    if p_high == p_low:
+        return {
+            "status": "unavailable",
+            "reason": "equilibrium_pressure_not_monotone",
+        }
+    increasing = p_high > p_low
+    if increasing and not p_low <= partial_pressure_Pa <= p_high:
+        return _dew_outside_domain(p_low, p_high, low, high)
+    if not increasing and not p_high <= partial_pressure_Pa <= p_low:
+        return _dew_outside_domain(p_low, p_high, low, high)
+    lo = float(low)
+    hi = float(high)
+    for _ in range(80):
+        mid = (lo + hi) / 2.0
+        pressure = pressure_at(mid)
+        if (pressure < partial_pressure_Pa) == increasing:
+            lo = mid
+        else:
+            hi = mid
+    dew_K = (lo + hi) / 2.0
+    return {
+        "status": "ok",
+        "reason": None,
+        "dew_temperature_K": dew_K,
+        "dew_temperature_C": dew_K - CELSIUS_TO_KELVIN_OFFSET,
+        "partial_pressure_Pa": partial_pressure_Pa,
+        "pO2_bar": pO2_bar,
+        "valid_temperature_K": [float(low), float(high)],
+    }
+
+
+def _dew_outside_domain(
+    p_low: float,
+    p_high: float,
+    low: float,
+    high: float,
+) -> dict[str, Any]:
+    return {
+        "status": "unavailable",
+        "reason": "partial_outside_catalog_domain",
+        "domain_pressure_Pa": [p_low, p_high],
+        "valid_temperature_K": [float(low), float(high)],
+        "dew_temperature_C": None,
+        "depth_m": None,
+    }
+
+
+def _dew_depth_m(
+    dew_C: float,
+    felt_inner_C: Any,
+    felt_outer_C: Any,
+    *,
+    felt_thickness_m: float | None,
+    geometry: str,
+    inner_radius_m: float | None,
+) -> dict[str, Any]:
+    """Where the dew temperature sits in the felt.
+
+    Premise: conductivity is uniform through the felt, so temperature is
+    linear in depth on a flat wall and linear in ln(r) on a cylinder.
+    Algebra, flat: depth = t (T_inner - T_dew) / (T_inner - T_outer).
+    Cylinder: the same fraction is ln(r / r_in) / ln(r_out / r_in).
+    Units: temperatures in °C, depth in m. Sanity: the dew face is at
+    the inner face when T_dew = T_inner and at the outer face when
+    T_dew = T_outer.
+    """
+
+    if (
+        not isinstance(felt_inner_C, (int, float))
+        or not isinstance(felt_outer_C, (int, float))
+        or isinstance(felt_inner_C, bool)
+        or isinstance(felt_outer_C, bool)
+        or felt_thickness_m is None
+    ):
+        return {"status": "unavailable", "reason": "felt_profile_unset", "depth_m": None}
+    span = float(felt_inner_C) - float(felt_outer_C)
+    if span == 0.0:
+        return {"status": "unavailable", "reason": "felt_isothermal", "depth_m": None}
+    fraction = (float(felt_inner_C) - dew_C) / span
+    if fraction < 0.0:
+        return {
+            "status": "hotter_than_felt_inner_face",
+            "reason": "dew_before_the_felt",
+            "depth_m": None,
+        }
+    if fraction > 1.0:
+        return {
+            "status": "colder_than_felt_outer_face",
+            "reason": "dew_outside_the_felt",
+            "depth_m": None,
+        }
+    if geometry == "cylindrical":
+        if inner_radius_m is None or inner_radius_m <= 0.0:
+            return {"status": "unavailable", "reason": "inner_radius_unset", "depth_m": None}
+        outer = inner_radius_m + felt_thickness_m
+        radius = inner_radius_m * (outer / inner_radius_m) ** fraction
+        depth = radius - inner_radius_m
+    else:
+        depth = felt_thickness_m * fraction
+    return {"status": "inside_felt", "depth_m": depth}
+
+
+def _vapour_catalog() -> Any:
+    global _VAPOUR_CATALOG
+    if _VAPOUR_CATALOG is None:
+        from simulator.corpus_version import repo_root
+        from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+        from simulator.yaml_cache import load_cached_safe_yaml
+
+        payload = load_cached_safe_yaml(
+            (repo_root() / "data" / "vapor_pressures.yaml").read_text(encoding="utf-8")
+        )
+        _VAPOUR_CATALOG = compile_vapour_rail_catalog(
+            payload,
+            emit_u0_request_rules=False,
+        )
+    return _VAPOUR_CATALOG
+
+
+def _felt_limit_row(
+    wall: Mapping[str, Any],
+    hot_face_C: float,
+    *,
+    radius_m: float | None,
+    import_rate: float,
+    materials: Mapping[str, Any],
+) -> dict[str, Any]:
+    evaluated = [
+        resolve_layer_properties(
+            layer,
+            materials=materials,
+            temperature_K=hot_face_C + CELSIUS_TO_KELVIN_OFFSET,
+        )
+        for layer in wall["layers"]
+    ]
+    shipped = _solve_wall_conduction(
+        evaluated,
+        hot_face_C,
+        wall,
+        radius_m=radius_m,
+        emissivity=_YSZ_TBC_EMISSIVITY,
+    )
+    felt = next(layer for layer in evaluated if layer["role"] == "insulation")
+    liner = next(layer for layer in evaluated if layer["role"] == "liner")
+    continuous = felt["service"].get("continuous_C")
+    shipped_inner = _felt_inner_C(shipped)
+    shipped_price = _liner_areal_price(liner, import_rate)
+    base = {
+        "hot_face_C": hot_face_C,
+        "geometry": "cylindrical" if radius_m is not None else "flat",
+        "shipped_liner_thickness_m": liner.get("thickness_m"),
+        "shipped_felt_inner_C": shipped_inner,
+        "felt_continuous_service_C": continuous,
+        "shipped_liner_usd_per_m2": shipped_price,
+        "usd_per_m2_basis": "flat_areal_thickness_times_density_times_import_price",
+        "intermediate_layer_reason": "intermediate_layer_uncited",
+        "radiative_boundary": shipped.get("radiative_boundary"),
+    }
+    if continuous is None:
+        base.update(status="unavailable", reason="felt_continuous_service_unset")
+        return base
+    if shipped["status"] not in _CONDUCTION_WALK_STATUSES or shipped_inner is None:
+        base.update(
+            status="unavailable",
+            reason=_reason_of(shipped) if shipped["status"] == "unavailable" else "felt_temperature_unchecked",
+        )
+        return base
+    if shipped_inner <= float(continuous):
+        base.update(
+            status="within_continuous_service",
+            felt_overheats_at_shipped_thickness=False,
+        )
+        return base
+    solved = _minimum_liner_thickness(
+        evaluated,
+        hot_face_C,
+        wall,
+        radius_m=radius_m,
+        limit_C=float(continuous),
+        shipped_thickness_m=float(liner["thickness_m"]),
+    )
+    base["felt_overheats_at_shipped_thickness"] = True
+    base["status"] = solved["status"]
+    base["reason"] = solved.get("reason")
+    if solved["status"] != "ok":
+        return base
+    priced = dict(liner)
+    priced["thickness_m"] = solved["thickness_m"]
+    base.update(
+        minimum_liner_thickness_m=solved["thickness_m"],
+        felt_inner_C_at_solved_thickness=solved["felt_inner_C"],
+        thicker_liner_usd_per_m2=_liner_areal_price(priced, import_rate),
+        cheaper_per_m2="shipped_liner_is_cheaper_and_overheats",
+    )
+    if radius_m is not None:
+        base["thicker_liner_usd_per_m"] = _cylindrical_liner_usd_per_m(
+            priced, radius_m, import_rate
+        )
+        shipped_cyl = dict(liner)
+        base["shipped_liner_usd_per_m"] = _cylindrical_liner_usd_per_m(
+            shipped_cyl, radius_m, import_rate
+        )
+    return base
+
+
+def _felt_inner_C(conduction: Mapping[str, Any]) -> float | None:
+    pair = _temperatures_by_role(conduction).get("insulation")
+    if pair is None:
+        return None
+    return pair[0]
+
+
+def _minimum_liner_thickness(
+    layers: Sequence[Mapping[str, Any]],
+    hot_face_C: float,
+    wall: Mapping[str, Any],
+    *,
+    radius_m: float | None,
+    limit_C: float,
+    shipped_thickness_m: float,
+) -> dict[str, Any]:
+    """Thinnest liner whose felt inner face is at or below the limit.
+
+    Premise: the felt inner face is the hot face minus the drop in the
+    liner. A thicker liner takes more of that drop, so the felt cools.
+    Resistance added outside the felt does the opposite. The outer
+    temperature is the radiative root, so the thickness is the production
+    walk's root, not a pinned-wall closed form.
+
+    Algebra of one trial: the walk in _solve_wall_conduction. The search
+    keeps a too-thin bracket and a thick-enough bracket.
+    Units: thickness in m, temperature in °C.
+    Sanity: a liner thin enough that the felt is still over the limit is
+    rejected; the returned walk is re-read and must sit on the limit.
+    """
+
+    hi = max(shipped_thickness_m, 1e-4)
+    probe = _felt_inner_at_thickness(
+        layers, hi, hot_face_C, wall, radius_m
+    )
+    if probe is None:
+        return {"status": "unavailable", "reason": "felt_temperature_unchecked"}
+    while probe > limit_C:
+        hi *= 2.0
+        if hi > _FELT_LIMIT_THICKNESS_CAP_M:
+            return {
+                "status": "unavailable",
+                "reason": "liner_thickness_does_not_reach_felt_limit",
+                "thickness_cap_m": _FELT_LIMIT_THICKNESS_CAP_M,
+            }
+        probe = _felt_inner_at_thickness(layers, hi, hot_face_C, wall, radius_m)
+        if probe is None:
+            return {"status": "unavailable", "reason": "felt_temperature_unchecked"}
+    lo = 0.0
+    for _ in range(60):
+        mid = (lo + hi) / 2.0
+        inner = _felt_inner_at_thickness(
+            layers, mid, hot_face_C, wall, radius_m
+        )
+        if inner is None:
+            return {"status": "unavailable", "reason": "felt_temperature_unchecked"}
+        if inner > limit_C:
+            lo = mid
+        else:
+            hi = mid
+    inner = _felt_inner_at_thickness(layers, hi, hot_face_C, wall, radius_m)
+    if inner is None or abs(inner - limit_C) > 0.05:
+        return {"status": "unavailable", "reason": "felt_limit_search_residual"}
+    return {"status": "ok", "thickness_m": hi, "felt_inner_C": inner}
+
+
+def _felt_inner_at_thickness(
+    layers: Sequence[Mapping[str, Any]],
+    thickness_m: float,
+    hot_face_C: float,
+    wall: Mapping[str, Any],
+    radius_m: float | None,
+) -> float | None:
+    edited = []
+    for layer in layers:
+        row = dict(layer)
+        if row.get("role") == "liner":
+            row["thickness_m"] = thickness_m
+        edited.append(row)
+    walked = _solve_wall_conduction(
+        edited,
+        hot_face_C,
+        wall,
+        radius_m=radius_m,
+        emissivity=_YSZ_TBC_EMISSIVITY,
+    )
+    if walked["status"] not in _CONDUCTION_WALK_STATUSES:
+        return None
+    return _felt_inner_C(walked)
+
+
+def _liner_areal_price(liner: Mapping[str, Any], import_rate: float) -> Any:
+    thickness = liner.get("thickness_m")
+    density = liner.get("density_kg_m3")
+    if liner.get("source") != "imported":
+        return _unavailable("liner_source_not_imported", "USD/m2")
+    if thickness is None or density is None:
+        return _unavailable("liner_mass_unset", "USD/m2")
+    # kg/m² = m × kg/m³. USD/m² = kg/m² × USD/kg.
+    return float(thickness) * float(density) * import_rate
+
+
+def _cylindrical_liner_usd_per_m(
+    liner: Mapping[str, Any],
+    radius_m: float,
+    import_rate: float,
+) -> Any:
+    rows, _outer = _cylindrical_masses([liner], radius_m, 1.0)
+    mass = rows[0]["mass_kg"]
+    if _is_unavailable(mass):
+        return mass
+    return _price_known_mass(float(mass), import_rate, "cost_rate_unset")
+
+
+def _design_vapour_stream(
+    *,
+    gas_temperature_C: float,
+    hold_temperature_C: float | None,
+    carrier_gas: str,
+    pipe_diameter_m: float,
+    pressure_mbar_low: float,
+    pressure_mbar_high: float,
+    conduction: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Sensible heat of the printed SiO peak versus the duct loss.
+
+    Premise: the gas may cool from the campaign gas temperature to the
+    duct-band hot face it is supposed to hold. That enthalpy can be given
+    up once along the duct, not once per metre. dT is that difference in
+    kelvin. Per-metre trace heat divides the once-only stream power by
+    the engineering-default duct length and subtracts it from the
+    conductive loss per metre.
+
+    Algebra: P = m_dot cp dT, with m_dot in kg/s and cp in J/(kg·K).
+    cp is a printed JANAF neighbor of SiO(g), not an interpolation and
+    not the N2 table. The overhead Poiseuille capacity is a different
+    number and is not m_dot.
+
+    Units: (kg/s) × J/(kg·K) × K = W. Sanity: a zero temperature drop
+    leaves no stream power, and a campaign gas colder than the hold
+    cannot heat the face.
+    """
+
+    from simulator.overhead import (
+        ENGINEERING_DEFAULT_PIPE_LENGTH_M,
+        compressible_poiseuille_mass_flow,
+        gas_dynamic_viscosity_Pa_s,
+    )
+
+    length_m = float(ENGINEERING_DEFAULT_PIPE_LENGTH_M)
+    length_status = "engineering_default_not_in_setpoints"
+    capacity = _overhead_capacity(
+        carrier_gas=carrier_gas,
+        pipe_diameter_m=pipe_diameter_m,
+        length_m=length_m,
+        gas_temperature_C=gas_temperature_C,
+        pressure_mbar_low=pressure_mbar_low,
+        pressure_mbar_high=pressure_mbar_high,
+        viscosity=gas_dynamic_viscosity_Pa_s,
+        mass_flow=compressible_poiseuille_mass_flow,
+    )
+    loss = _loss_W_per_m(conduction, pipe_diameter_m / 2.0)
+    common = {
+        "status": "design_point_single_species_peak",
+        "species": "SiO",
+        "mass_flow_kg_per_h": _DESIGN_SIO_PEAK_KG_PER_H,
+        "mass_flow_flag": "design_point_not_a_simultaneous_sum",
+        "label": _DESIGN_POINT_LABEL,
+        "hour": _DESIGN_POINT_HOUR,
+        "pipe_length_m": length_m,
+        "pipe_length_status": length_status,
+        "length_certified": False,
+        "overhead_pipe_capacity": capacity,
+        "dt_premise": (
+            "campaign gas temperature minus the duct-band hot face; "
+            "the stream surrenders that enthalpy once along the duct"
+        ),
+    }
+    if hold_temperature_C is None:
+        refused = _unavailable("hold_temperature_unset", "W")
+        common.update(
+            status="unavailable",
+            reason="hold_temperature_unset",
+            stream_power_W=refused,
+            trace_heating_power_W_per_m=refused,
+            trace_heating_power_W=refused,
+            trace_heating_verdict="trace_heating_power_unavailable",
+            verdict="hot_face_hold_undetermined",
+        )
+        return common
+    hold = _finite_number(hold_temperature_C, "hold_temperature_C")
+    delta = gas_temperature_C - hold
+    cp_bounds = _sio_cp_bounds(gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET)
+    common["hold_temperature_C"] = hold
+    common["gas_temperature_C"] = gas_temperature_C
+    common["dT_K"] = delta
+    common["cp_bounds"] = cp_bounds
+    if _is_unavailable(cp_bounds) or "molar_mass_kg_mol" not in cp_bounds:
+        refused = _unavailable(
+            _reason_of(cp_bounds) if _is_unavailable(cp_bounds) else "sio_cp_unset",
+            "W",
+        )
+        common.update(
+            stream_power_W=refused,
+            trace_heating_power_W_per_m=refused,
+            trace_heating_power_W=refused,
+            trace_heating_verdict="trace_heating_power_unavailable",
+            verdict="hot_face_hold_undetermined",
+        )
+        return common
+    powers = _stream_powers_W(cp_bounds, _DESIGN_SIO_PEAK_KG_PER_H, delta)
+    common["stream_power_by_neighbor_W"] = powers
+    if loss is None:
+        refused = _unavailable("conductive_loss_unavailable", "W/m")
+        common.update(
+            stream_power_W=_unavailable("conductive_loss_unavailable", "W"),
+            trace_heating_power_W_per_m=refused,
+            trace_heating_power_W=refused,
+            trace_heating_verdict="trace_heating_power_unavailable",
+            verdict="hot_face_hold_undetermined",
+        )
+        return common
+    # The lower neighbor is the smaller claim that the gas can carry.
+    lower = min(powers.values())
+    upper = max(powers.values())
+    loss_total = loss * length_m
+    deficit_lower = loss_total - lower
+    deficit_upper = loss_total - upper
+    common["conductive_loss_W_per_m"] = loss
+    common["conductive_loss_W"] = loss_total
+    common["stream_power_W"] = {
+        "value": lower,
+        "status": "lower_printed_cp_neighbor",
+        "units": "W",
+    }
+    if deficit_lower <= 0.0 and deficit_upper <= 0.0:
+        verdict = "hot_face_held_by_design_vapour_stream"
+        trace_total = 0.0
+    elif deficit_lower > 0.0 and deficit_upper > 0.0:
+        verdict = "hot_face_not_held_by_design_vapour_stream"
+        trace_total = deficit_lower
+    else:
+        verdict = "hot_face_hold_bracketed_by_cp_neighbors"
+        trace_total = max(deficit_lower, 0.0)
+    common["verdict"] = verdict
+    common["trace_heating_power_W"] = trace_total
+    common["trace_heating_power_W_per_m"] = trace_total / length_m
+    common["trace_heating_verdict"] = (
+        "trace_heating_required"
+        if trace_total > 0.0
+        else "design_stream_covers_estimated_loss"
+    )
+    common["trace_basis"] = (
+        "known_layer_radiative_loss_minus_lower_neighbor_stream_power"
+    )
+    common["not_a_certified_deficit"] = True
+    return common
+
+
+def _stream_powers_W(
+    cp_bounds: Mapping[str, Any],
+    mass_flow_kg_per_h: float,
+    delta_K: float,
+) -> dict[str, float]:
+    molar_mass = float(cp_bounds["molar_mass_kg_mol"])
+    mass_flow = mass_flow_kg_per_h / _SECONDS_PER_HOUR
+    points = (
+        [("exact", cp_bounds["exact"])]
+        if "exact" in cp_bounds
+        else [("below", cp_bounds["below"]), ("above", cp_bounds["above"])]
+    )
+    powers = {}
+    for name, point in points:
+        if delta_K <= 0.0:
+            powers[name] = 0.0
+            continue
+        cp_per_kg = float(point["cp_J_per_mol_K"]) / molar_mass
+        powers[name] = mass_flow * cp_per_kg * delta_K
+    return powers
+
+
+def _loss_W_per_m(conduction: Mapping[str, Any], radius_m: float) -> float | None:
+    if conduction.get("status") not in _CONDUCTION_WALK_STATUSES:
+        return None
+    heat_flow = conduction.get("heat_flow_W_per_m")
+    if isinstance(heat_flow, (int, float)) and not isinstance(heat_flow, bool):
+        return float(heat_flow)
+    heat_flux = conduction.get("heat_flux_W_m2")
+    if isinstance(heat_flux, (int, float)) and not isinstance(heat_flux, bool):
+        return float(heat_flux) * 2.0 * math.pi * radius_m
+    return None
+
+
+def _overhead_capacity(
+    *,
+    carrier_gas: str,
+    pipe_diameter_m: float,
+    length_m: float,
+    gas_temperature_C: float,
+    pressure_mbar_low: float,
+    pressure_mbar_high: float,
+    viscosity: Any,
+    mass_flow: Any,
+) -> dict[str, Any]:
+    """Pipe capacity at the sweep pressure against vacuum.
+
+    This is the overhead Poiseuille law, not a metered carrier injection.
+    Downstream pressure is zero, which is an upper capacity, and the
+    length is the engineering default. The design verdict does not use it.
+    """
+
+    if carrier_gas != "N2":
+        return _unavailable(f"carrier_cp_table_refused:{carrier_gas}", "kg/s")
+    from simulator.transport_constants import CARRIER_GAS_PROPERTIES
+
+    temperature_K = gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    molar_mass = CARRIER_GAS_PROPERTIES["N2"].molar_mass_kg_mol
+    eta = viscosity(temperature_K)
+    rows = {}
+    for name, pressure_mbar in (
+        ("low_mbar", pressure_mbar_low),
+        ("high_mbar", pressure_mbar_high),
+    ):
+        rows[name] = mass_flow(
+            pipe_diameter_m,
+            length_m,
+            molar_mass,
+            eta,
+            temperature_K,
+            pressure_mbar * PA_PER_MBAR,
+            0.0,
+        )
+    return {
+        "status": "overhead_pipe_capacity_against_vacuum",
+        "flag": "not_the_design_stream",
+        "length_status": "engineering_default_not_in_setpoints",
+        "downstream_pressure_Pa": 0.0,
+        "kg_per_s": rows,
+    }
+
+
+def _sio_cp_bounds(temperature_K: float) -> dict[str, Any]:
+    bounds = _janaf_cp_bounds(
+        _SIO_TABLE_ID,
+        temperature_K,
+        expected_phase="g",
+    )
+    if _is_unavailable(bounds):
+        return bounds
+    bounds["molar_mass_kg_mol"] = _molar_mass_g_per_mol("SiO") / 1000.0
+    bounds["molar_mass_owner"] = "simulator.accounting.formulas.resolve_species_formula"
+    bounds["species"] = "SiO"
+    return bounds
 
 
 def in_situ_processing_cost_per_kg(
@@ -2342,17 +3403,38 @@ def _service_flags(temperature_C: float, service: Mapping[str, Any]) -> list[str
 
 
 def _n2_cp_bounds(temperature_K: float) -> dict[str, Any]:
-    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
     from simulator.transport_constants import CARRIER_GAS_PROPERTIES
 
-    document = load_table_document(TABLES_DIR / f"{_N2_TABLE_ID}.yaml")
+    bounds = _janaf_cp_bounds(
+        _N2_TABLE_ID,
+        temperature_K,
+        expected_phase="ref",
+    )
+    if _is_unavailable(bounds):
+        return bounds
+    bounds["molar_mass_kg_mol"] = CARRIER_GAS_PROPERTIES["N2"].molar_mass_kg_mol
+    bounds["molar_mass_owner"] = "simulator.transport_constants.CARRIER_GAS_PROPERTIES"
+    return bounds
+
+
+def _janaf_cp_bounds(
+    table_id: str,
+    temperature_K: float,
+    *,
+    expected_phase: str,
+) -> dict[str, Any]:
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
     table = document["table"]
-    if table.get("table_id") != _N2_TABLE_ID:
-        raise ValueError("N-023 table_id mismatch")
+    if table.get("table_id") != table_id:
+        raise ValueError(f"{table_id} table_id mismatch")
     phase = table.get("index_entry", {}).get("state")
-    if phase != "ref":
-        return _unavailable(f"n2_table_phase_unexpected:{phase}", "J/(mol·K)")
-    rows = []
+    if phase != expected_phase:
+        return _unavailable(f"janaf_table_phase_unexpected:{table_id}:{phase}", "J/(mol·K)")
+    below = None
+    above = None
+    exact = None
     for row in table["values"]:
         heat = row.get("heat_capacity")
         temperature = row.get("temperature")
@@ -2360,27 +3442,17 @@ def _n2_cp_bounds(temperature_K: float) -> dict[str, Any]:
             continue
         if heat.get("value") is None or heat.get("as_published") == "INFINITE":
             continue
-        rows.append((
-            float(temperature["value"]),
-            float(heat["value"]),
-            heat.get("locator"),
-        ))
-    below = None
-    above = None
-    exact = None
-    for printed_t, cp, locator in rows:
+        printed_t = float(temperature["value"])
+        point = (printed_t, float(heat["value"]), heat.get("locator"))
         if printed_t == temperature_K:
-            exact = (printed_t, cp, locator)
+            exact = point
         elif printed_t < temperature_K and (below is None or printed_t > below[0]):
-            below = (printed_t, cp, locator)
+            below = point
         elif printed_t > temperature_K and (above is None or printed_t < above[0]):
-            above = (printed_t, cp, locator)
-    molar_mass = CARRIER_GAS_PROPERTIES["N2"].molar_mass_kg_mol
+            above = point
     payload = {
-        "table_id": _N2_TABLE_ID,
+        "table_id": table_id,
         "phase": phase,
-        "molar_mass_kg_mol": molar_mass,
-        "molar_mass_owner": "simulator.transport_constants.CARRIER_GAS_PROPERTIES",
         "gas_temperature_K": temperature_K,
         "cp_temperature_status": (
             "on_printed_grid"
