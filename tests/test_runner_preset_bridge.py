@@ -333,25 +333,14 @@ def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
             )
             assert [point["value"] for point in normalized[
                 "chamber_pressure_mbar"
-            ]] == [pytest.approx(1.0), pytest.approx(1.0)]
-            assert sim.campaign_mgr.lab_schedule_notices == [
-                {
-                    "code": "knob_defaulted",
-                    "path": "lab_schedule.chamber_pressure_mbar",
-                    "value": pytest.approx(1.0),
-                    "unit": "mbar",
-                    "default_source": "campaigns.C0.p_total_mbar_default",
-                    "out_of_domain": True,
-                }
-            ]
+            ]] == [pytest.approx(1.0e-3), pytest.approx(1.0e-2)]
+            assert sim.campaign_mgr.lab_schedule_notices == []
             result = run._run_session(session)
             runtime_notices = {
                 notice["path"]: notice
                 for notice in result["run_metadata"]["notices"]
             }
-            assert runtime_notices[
-                "lab_schedule.chamber_pressure_mbar"
-            ]["out_of_domain"] is True
+            assert "lab_schedule.chamber_pressure_mbar" not in runtime_notices
             assert runtime_notices[
                 "lab_geometry.surfaces.quartz_window.temperature_C"
             ]["value"] == pytest.approx(0.0)

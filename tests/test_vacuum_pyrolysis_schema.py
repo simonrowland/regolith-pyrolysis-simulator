@@ -71,6 +71,10 @@ ROBINOT_EAC1_ELEMENTAL_WT_PCT = {
 }
 SESKO_PRESSURE_REPORTED_MIN_MBAR = pytest.approx(1.0e-7)
 SESKO_PRESSURE_REPORTED_MAX_MBAR = pytest.approx(1.0e-2)
+SESKO_PRESSURE_RUNTIME_FLOOR_MBAR = pytest.approx(1.0e-3)
+SESKO_PRESSURE_RUNTIME_DELTA_ID = (
+    "pressure_floor_delta_reported_uhv_min_to_runtime_floor"
+)
 SESKO_TEMP_MIN_C = pytest.approx(1476.85)
 SESKO_TEMP_MAX_C = pytest.approx(1626.85)
 SESKO_SAMPLE_MASS_G = pytest.approx(10.0)
@@ -578,6 +582,61 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     assert "lab_geometry.surfaces.crucible_wall.temperature_C" not in mutated_notices
 
 
+def test_runtime_pressure_stays_within_each_printed_preset_range() -> None:
+    ranged_presets = 0
+    rejected_mutations = 0
+
+    def require_pressure_within_range(
+        points: list[dict], reported_min: float, reported_max: float
+    ) -> None:
+        assert points, "printed pressure range has no runtime pressure points"
+        for point in points:
+            value = float(point["value"])
+            assert reported_min <= value <= reported_max, (
+                f"runtime pressure {value} mbar is outside printed range "
+                f"{reported_min}..{reported_max} mbar"
+            )
+
+    for preset_path in sorted(PRESET_DIR.glob("*.yaml")):
+        source_schedule = load_yaml(preset_path)["lab_schedule"]
+        reported_profile = source_schedule.get("reported_exposure_profile", {})
+        reported_pressure = reported_profile.get("pressure_mbar", {})
+        if not {
+            "reported_min_value",
+            "reported_max_value",
+        } <= set(reported_pressure):
+            continue
+
+        ranged_presets += 1
+        reported_min = float(reported_pressure["reported_min_value"])
+        reported_max = float(reported_pressure["reported_max_value"])
+        runtime_schedule = runner_module._load_vacuum_preset_run_spec(
+            preset_path, "faithful"
+        ).lab_schedule
+        require_pressure_within_range(
+            runtime_schedule["chamber_pressure_mbar"],
+            reported_min,
+            reported_max,
+        )
+
+        if not reported_min <= 1.0 <= reported_max:
+            mutated_points = copy.deepcopy(
+                runtime_schedule["chamber_pressure_mbar"]
+            )
+            for point in mutated_points:
+                point["value"] = 1.0
+            with pytest.raises(
+                AssertionError, match="outside printed range"
+            ):
+                require_pressure_within_range(
+                    mutated_points, reported_min, reported_max
+                )
+            rejected_mutations += 1
+
+    assert ranged_presets > 0
+    assert rejected_mutations > 0
+
+
 @pytest.mark.parametrize(
     ("preset_path", "backend_name"),
     [
@@ -653,25 +712,14 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert reported_pressure["reported_max_value"] == (
             SESKO_PRESSURE_REPORTED_MAX_MBAR
         )
-        expected_pressure_mbar = runner_module.CampaignManager(
-            bundle.setpoints
-        )._pressure_config_float(
-            runner_module.CampaignPhase.C0,
-            "p_total_mbar",
-            "p_total_mbar_default",
-        )
-        assert expected_pressure_mbar == pytest.approx(1.0)
         assert [
             point["value"]
             for point in preset.lab_schedule["chamber_pressure_mbar"]
-        ] == [expected_pressure_mbar, expected_pressure_mbar]
-        pressure_notice = next(
-            notice
+        ] == [SESKO_PRESSURE_RUNTIME_FLOOR_MBAR, SESKO_PRESSURE_REPORTED_MAX_MBAR]
+        assert not any(
+            notice["path"] == "lab_schedule.chamber_pressure_mbar"
             for notice in preset.provenance["notices"]
-            if notice["path"] == "lab_schedule.chamber_pressure_mbar"
         )
-        assert pressure_notice["value"] == pytest.approx(expected_pressure_mbar)
-        assert pressure_notice["out_of_domain"] is True
         surface_notices = [
             notice
             for notice in preset.provenance["notices"]
@@ -896,12 +944,28 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
     assert schedule["melt_temperature_C"][-1]["value"] == SESKO_TEMP_MAX_C
     assert schedule["melt_temperature_C"][0]["unit"] == "C"
-    assert "chamber_pressure_mbar" not in schedule
-    assert "runtime_schedule_annotations" not in schedule
+    assert (
+        schedule["chamber_pressure_mbar"][0]["value"]
+        == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+    )
+    assert (
+        schedule["chamber_pressure_mbar"][0]["runtime_delta_annotation_id"]
+        == SESKO_PRESSURE_RUNTIME_DELTA_ID
+    )
+    assert (
+        schedule["chamber_pressure_mbar"][-1]["value"]
+        == SESKO_PRESSURE_REPORTED_MAX_MBAR
+    )
     reported_profile = schedule["reported_exposure_profile"]["pressure_mbar"]
     assert reported_profile["reported_min_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
     assert reported_profile["reported_max_value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
     assert reported_profile["qualifier"] == "oscillating_range"
+    runtime_delta = {
+        row["id"]: row for row in schedule["runtime_schedule_annotations"]
+    }[SESKO_PRESSURE_RUNTIME_DELTA_ID]
+    assert runtime_delta["reported_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
+    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+    assert runtime_delta["reason"] == "normalize_lab_schedule_floor"
     assert schedule["gas_boundary"]["background_gas"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["imposed_flow"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["pressure_control"]["mode"] == "pumped_dynamic_uhv_exposure"
