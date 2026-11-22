@@ -2279,7 +2279,29 @@ def test_same_hour_live_pin_survives_memo_admission_rejection(
             },
         },
     )
-    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+    from simulator.engine_binding_admission import (
+        GateCurveEvidence,
+        write_gate_curve_memo_record,
+    )
+
+    calls = []
+    record = write_gate_curve_memo_record(
+        sim,
+        {
+            'source': 'test_live_gate_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
+        },
+        evidence=GateCurveEvidence('a' * 64, False),
+        provider_outcome='produced',
+    )
+
+    def live_record(**_kwargs):
+        calls.append(None)
+        return record
+
+    monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_record', live_record)
     monkeypatch.setattr(
         sim,
         '_melt_redox_gate_record_is_admitted',
@@ -2290,10 +2312,10 @@ def test_same_hour_live_pin_survives_memo_admission_rejection(
     authority = sim._melt_redox_gate_authority_this_tick
     assert isinstance(authority, dict)
     assert curve is authority['curve']
-    assert len(trace['provider_diagnostics']) == 1
+    assert calls == [None]
 
     assert sim._resolved_melt_redox_gate_authority() is curve
-    assert len(trace['provider_diagnostics']) == 1
+    assert calls == [None]
 
 
 @pytest.mark.parametrize("failure_mode", ("success", "timeout", "failed"))
