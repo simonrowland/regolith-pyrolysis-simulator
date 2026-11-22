@@ -508,11 +508,16 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     cleared_hours = []
     establishment_states = []
     resolution_states = []
+    pin_match_states = []
+    curve_call_simulators = []
     simulator_type = validation_map.PyrolysisSimulator
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
     )
     original_resolve = simulator_type._resolved_melt_redox_gate_authority
+    original_pin_matches = (
+        simulator_type._melt_redox_gate_pin_verdicts_match
+    )
     original_clear = (
         simulator_type._clear_melt_redox_gate_authority_for_completed_hour
     )
@@ -561,6 +566,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 provider_outcome="produced",
             )
         curve_calls += 1
+        curve_call_simulators.append(id(self))
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
         curve = add_current_domain_diagnostic({
@@ -588,6 +594,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         )
         establishment_states.append(
             (
+                id(self),
                 type(authority).__name__,
                 getattr(self, '_melt_redox_gate_authority_tick_hour', None),
                 type(tick_authority).__name__,
@@ -623,6 +630,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             if len(resolution_states) < 6:
                 resolution_states.append(
                     (
+                        id(self),
                         authority_argument,
                         getattr(
                             self,
@@ -634,6 +642,28 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                     )
                 )
         return authority
+
+    def record_pin_matches(
+        current_verdict,
+        pinned_verdict,
+        *,
+        submitted_bulk_passes,
+    ):
+        result = original_pin_matches(
+            current_verdict,
+            pinned_verdict,
+            submitted_bulk_passes=submitted_bulk_passes,
+        )
+        if len(pin_match_states) < 12:
+            pin_match_states.append(
+                (
+                    repr(current_verdict),
+                    repr(pinned_verdict),
+                    submitted_bulk_passes,
+                    result,
+                )
+            )
+        return result
 
     def record_clear(self, completed_hour):
         nonlocal pin_window
@@ -659,6 +689,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
     monkeypatch.setattr(
         simulator_type,
+        '_melt_redox_gate_pin_verdicts_match',
+        staticmethod(record_pin_matches),
+    )
+    monkeypatch.setattr(
+        simulator_type,
         '_clear_melt_redox_gate_authority_for_completed_hour',
         record_clear,
     )
@@ -677,7 +712,9 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     assert row['row_passes_base_integrity'] is True
     assert curve_calls == 1, (
         f'curve_calls={curve_calls}; establishment_states='
-        f'{establishment_states!r}; resolution_states={resolution_states!r}'
+        f'{establishment_states!r}; resolution_states={resolution_states!r}; '
+        f'pin_match_states={pin_match_states!r}; '
+        f'curve_call_simulators={curve_call_simulators!r}'
     )
     assert len(established) == 1
     assert resolved
