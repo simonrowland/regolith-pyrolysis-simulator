@@ -578,9 +578,11 @@ def species_from_natural_key(key: bytes) -> frozenset[str] | None:
     """Species packed in a natural key.
 
     None means the key is the blake2b fallback (flag 0xff). The payload is
-    not recoverable. Callers store no species rows, so expire --species does
-    not match them. --all and prune still do. An empty frozenset is a real
-    request that named no species; it is not this case.
+    not recoverable, so a migrated row has no species record. expire --species
+    treats that row as species-unknown and deletes it: the species it served
+    cannot be shown to be unaffected. --all and prune still delete it too.
+    An empty frozenset is a real request that named no species; it is not
+    this case, and expire --species leaves it in place.
     """
 
     if len(key) < _ENGINE_CACHE_KEY_PREFIX_BYTES:
@@ -2437,9 +2439,11 @@ def expire_cache_file(
 ) -> dict[str, Any]:
     """Delete one engine's rows whose recorded inputs include a named species.
 
-    Dry-run unless ``apply``. ``all_rows`` deletes every row of that engine,
-    including rows with no recorded species. Nothing on the read or write
-    path calls this.
+    Dry-run unless ``apply``. A blake2b key with no species rows is included
+    for any species list: its inputs are unknown, so a superseded species
+    would otherwise keep being served. A natural key that named no species
+    is not that case. ``all_rows`` deletes every row of that engine.
+    Nothing on the read or write path calls this.
     """
 
     if engine not in ENGINE_CHEMISTRY_VERSION:
@@ -2471,6 +2475,13 @@ def expire_cache_file(
                 (engine, *names),
             ).fetchall()
         pairs = [(str(source_box), int(row_seq)) for source_box, row_seq in matched]
+        # A pre-migration digest key has no species rows. Any --species on
+        # its engine expires it. A natural key with no names is not unknown.
+        unknown_pairs: list[tuple[str, int]] = []
+        if not all_rows:
+            unknown_pairs = _species_unknown_pairs(connection, engine)
+            already = set(pairs)
+            pairs.extend(pair for pair in unknown_pairs if pair not in already)
         if apply and pairs:
             connection.execute("BEGIN IMMEDIATE")
             try:
@@ -2498,9 +2509,35 @@ def expire_cache_file(
                 name: (count if apply else 0) for name, count in matched_by_engine.items()
             },
             "vacuumed": bool(apply and pairs),
+            "species_unknown_rows": None if all_rows else len(unknown_pairs),
         }
     finally:
         connection.close()
+
+
+def _species_unknown_pairs(
+    connection: sqlite3.Connection, engine: str
+) -> list[tuple[str, int]]:
+    """Digest keys of one engine that recorded no species.
+
+    ``species_from_natural_key`` returns None only for the blake2b fallback.
+    Migrate uses that same result to count digest keys and to skip species
+    rows. A natural key that named no species returns an empty set and stays.
+    A key this code cannot classify raises, so expire does not leave it.
+    """
+
+    rows = connection.execute(
+        f"SELECT e.source_box, e.row_seq, e.key FROM {_TABLE} e "
+        f"WHERE e.engine=? AND NOT EXISTS ("
+        f"SELECT 1 FROM {_SPECIES_TABLE} s "
+        "WHERE s.source_box=e.source_box AND s.row_seq=e.row_seq)",
+        (engine,),
+    ).fetchall()
+    found: list[tuple[str, int]] = []
+    for source_box, row_seq, key in rows:
+        if species_from_natural_key(bytes(key)) is None:
+            found.append((str(source_box), int(row_seq)))
+    return found
 
 
 def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]:

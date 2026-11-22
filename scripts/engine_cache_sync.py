@@ -108,6 +108,9 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, sqlite3.Error, ValueError, cache.EngineCacheSchemaMismatch) as exc:
         print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
         return 1
+    unknown = result.get("species_unknown_rows") if isinstance(result, dict) else None
+    if args.command == "expire" and unknown is not None:
+        print(f"species-unknown rows: {unknown}", file=sys.stderr)
     print(json.dumps(result, sort_keys=True))
     return 2 if args.command == "merge" and args.strict and result["conflicts"] else 0
 

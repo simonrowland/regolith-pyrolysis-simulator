@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import io
 import math
 import sqlite3
 import zlib
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 import pytest
@@ -456,6 +458,67 @@ def test_migrate_keeps_every_hot_and_cold_value(tmp_path) -> None:
             for (row_seq,) in cold.execute("SELECT row_seq FROM engine_values")
         }
     assert left == {first + 1, orphan_seq}
+
+
+def test_expire_species_drops_migrated_digest_keys(tmp_path) -> None:
+    """A blake2b row with no species record is unknown for every species name.
+
+    A natural key that names a different species stays. So does a natural key
+    that named no species, and a digest key of another engine.
+    """
+
+    path = tmp_path / "digest-unknown.sqlite"
+    natural_request = {"composition_wt_pct": {"MgO": 40.0}, "temperature_K": 1700.0}
+    empty_request = {"temperature_K": 1800.0}
+    digest_request = {
+        "composition_mol": {f"Ox{index}": float(index + 1) for index in range(40)}
+    }
+    natural_key = engine_cache.engine_cache_key("openimcc", 1, natural_request)
+    empty_key = engine_cache.engine_cache_key("openimcc", 1, empty_request)
+    digest_key = engine_cache.engine_cache_key("openimcc", 1, digest_request)
+    other_key = engine_cache.engine_cache_key("magemin", 4, digest_request)
+    assert digest_key[3] == 0xFF
+    assert other_key[3] == 0xFF
+    first = engine_cache.ENGINE_CACHE_BOX_RANGES["laptop"][0]
+    with _schema_v3(path) as connection:
+        rows = (
+            (natural_key, "openimcc", "1", first),
+            (empty_key, "openimcc", "1", first + 1),
+            (digest_key, "openimcc", "1", first + 2),
+            (other_key, "magemin", "4", first + 3),
+        )
+        for key, engine, version, row_seq in rows:
+            connection.execute(
+                "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+                (key, pack({"answer": row_seq}), engine, version, "laptop", row_seq, 0),
+            )
+        connection.execute(
+            "INSERT INTO box_sequences VALUES (?,?)", ("laptop", first + 4)
+        )
+    engine_cache.migrate_cache_file(path)
+
+    dry = engine_cache.expire_cache_file(path, engine="openimcc", species=("SiO2",))
+    assert dry["dry_run"] is True
+    assert dry["species_unknown_rows"] == 1
+    assert dry["matched_by_engine"]["openimcc"] == 1
+    assert dry["deleted_by_engine"]["openimcc"] == 0
+    assert len(_output_rows(path)) == 4
+
+    from scripts.engine_cache_sync import main
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stderr):
+        assert main(["expire", str(path), "--engine", "openimcc", "--species", "SiO2"]) == 0
+    assert stderr.getvalue() == "species-unknown rows: 1\n"
+    assert len(_output_rows(path)) == 4
+
+    applied = engine_cache.expire_cache_file(
+        path, engine="openimcc", species=("SiO2",), apply=True
+    )
+    assert applied["deleted_by_engine"]["openimcc"] == 1
+    assert applied["species_unknown_rows"] == 1
+    left = {bytes(key) for _engine, _seq, key in _output_rows(path)}
+    assert left == {natural_key, empty_key, other_key}
 
 
 def test_migrate_refuses_user_version_2(tmp_path) -> None:
