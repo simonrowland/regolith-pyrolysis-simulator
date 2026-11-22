@@ -68,8 +68,10 @@ def _default_stage_bulk_densities() -> Mapping[str, float]:
         "values"
     ]
     return {
-        str(stage): _finite_positive(
-            entry["value"], f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}"
+        str(stage): _finite_nonnegative(
+            entry["value"],
+            f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}",
+            positive=True,
         )
         for stage, entry in rows.items()
     }
@@ -148,9 +150,10 @@ class CostParameters:
             MappingProxyType(carrier_prices),
         )
         densities = {
-            str(stage): _finite_positive(
+            str(stage): _finite_nonnegative(
                 value,
                 f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}",
+                positive=True,
             )
             for stage, value in dict(
                 self.condenser_stage_bulk_density_kg_m3
@@ -323,8 +326,10 @@ def normalize_cost_parameters(
                 for key, item in stage_entry.items()
                 if key != "value"
             },
-            "value": _finite_positive(
-                value, f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}"
+            "value": _finite_nonnegative(
+                value,
+                f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}",
+                positive=True,
             ),
         }
     parameters[_STAGE_BULK_DENSITY_PARAMETER] = {
@@ -375,8 +380,10 @@ def cost_parameter_values(payload: Mapping[str, Any] | None = None) -> dict[str,
     }
     stage_densities = raw_parameters[_STAGE_BULK_DENSITY_PARAMETER]["values"]
     values[_STAGE_BULK_DENSITY_PARAMETER] = {
-        stage: _finite_positive(
-            entry["value"], f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}"
+        stage: _finite_nonnegative(
+            entry["value"],
+            f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}",
+            positive=True,
         )
         for stage, entry in sorted(stage_densities.items())
     }
@@ -652,7 +659,12 @@ def _validated_scalar_parameter(value: Any, name: str) -> float:
     return number
 
 
-def _finite_nonnegative(value: Any, name: str) -> float:
+def _finite_nonnegative(
+    value: Any,
+    name: str,
+    *,
+    positive: bool = False,
+) -> float:
     if isinstance(value, bool):
         raise TypeError(f"{name} must be numeric")
     try:
@@ -661,12 +673,7 @@ def _finite_nonnegative(value: Any, name: str) -> float:
         raise TypeError(f"{name} must be numeric") from exc
     if not math.isfinite(number) or number < 0.0:
         raise ValueError(f"{name} must be finite and non-negative")
-    return number
-
-
-def _finite_positive(value: Any, name: str) -> float:
-    number = _finite_nonnegative(value, name)
-    if number <= 0.0:
+    if positive and number <= 0.0:
         raise ValueError(f"{name} must be positive")
     return number
 
