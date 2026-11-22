@@ -6,6 +6,10 @@ import pytest
 
 from simulator import condensation
 from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+)
 from simulator.state import (
     CondensationStage,
     CondensationTrain,
@@ -72,6 +76,53 @@ def test_missing_collector_area_refuses_capture_quantity_without_aborting_route(
                for item in missing_area)
     assert result.retained_in_source_by_species.get("SiO", 0.0) == 0.0
     assert result.remaining_by_species["SiO"] == pytest.approx(1.0)
+    cyclone = next(
+        stage for stage in model.train.stages
+        if stage.stage_key == NA_COLLECTOR_STAGE_KEY
+    )
+    trap = next(
+        stage for stage in model.train.stages
+        if stage.stage_key == K_TRAP_STAGE_KEY
+    )
+    stage3 = next(
+        stage for stage in model.train.stages
+        if stage.stage_number == 3 and int(stage.sub_order) == 0
+    )
+    cyclone_refusals = [
+        item for item in outcomes
+        if (item.get("stage_number"), item.get("stage_key"))
+        == (cyclone.stage_number, cyclone.stage_key)
+    ]
+    trap_rows = [
+        item for item in outcomes
+        if (item.get("stage_number"), item.get("stage_key"))
+        == (trap.stage_number, trap.stage_key)
+    ]
+    stage3_refusals = [
+        item for item in missing_area
+        if item.get("stage_number") == stage3.stage_number
+    ]
+    assert cyclone_refusals
+    assert trap_rows
+    assert stage3_refusals
+    assert all(
+        item["status"] == "refused"
+        and item["sub_order"] == int(cyclone.sub_order)
+        and item["eta"] is None
+        for item in cyclone_refusals
+    )
+    assert all(
+        item["status"] == "pass_through"
+        and item["reason"] == "no_configured_capture_area"
+        and item["eta"] == 0.0
+        and item["sub_order"] == int(trap.sub_order)
+        for item in trap_rows
+    )
+    # Stage 3 has no stage_key on the stage. The stamp does not invent one.
+    assert all(
+        "stage_key" not in item and item["sub_order"] == int(stage3.sub_order)
+        for item in stage3_refusals
+    )
 
 
 @pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
