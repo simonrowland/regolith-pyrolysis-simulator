@@ -1450,11 +1450,75 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    # t-1217: full first-wall capture leaves no separate high-supersaturation source class.
-    assert notice["source_classes"] == [
-        "fail_closed_no_direct_sticking_coefficient",
-        "solid_film_growth_proxy_not_evaporation_evidence",
-    ]
+    # The 900 C test wall is 1173.15 K, inside the SiO Arrhenius band, so the
+    # ducts do not take the cold-wall class. The notice also copies every
+    # stage alpha record the parcel reaches (condensation.route, after the
+    # wall records). Stage areas are zero and the wall budget above is below
+    # the 1 kg/hr supply, so the parcel reaches the stages whose midpoint is
+    # below the SiO validity floor. Those stages resolve the Pound cold-wall
+    # override. The fused-silica duct keeps its own fail-closed entry. The
+    # in-band ducts keep the species sidecar class. The set is those records,
+    # not a pasted gate list.
+    from simulator.condensation import (
+        CELSIUS_TO_KELVIN_OFFSET,
+        _cold_wall_condensation_spec,
+        _stage_alpha_record,
+        _stage_alpha_surface_key,
+        _stage_isolation_blocks,
+        _stage_midpoint_temperature_K,
+        _sticking_species_entry,
+        _wall_alpha_record,
+    )
+
+    sio_entry = _sticking_species_entry("SiO")
+    floor_K = float(sio_entry["value"]["valid_range_K"][0])
+    cold_class = str(_cold_wall_condensation_spec("SiO")["source_class"])
+    proxy_class = str(sio_entry["source_class"])
+    assert all(
+        float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET >= floor_K
+        for segment in model.pipe_segments
+    )
+    wall_records = {
+        segment.name: _wall_alpha_record(
+            "SiO", model.materials, segment=segment,
+        )
+        for segment in model.pipe_segments
+    }
+    stage_records = {}
+    cold_stage_keys = []
+    for stage in model.train.stages:
+        if _stage_isolation_blocks(stage, "SiO"):
+            continue
+        surface_key = _stage_alpha_surface_key(stage)
+        record = _stage_alpha_record(stage, "SiO", model.materials)
+        stage_records[surface_key] = record
+        if _stage_midpoint_temperature_K(stage) < floor_K:
+            cold_stage_keys.append(surface_key)
+            assert record["source_class"] == cold_class
+            assert record["alpha_s_cold_wall_condensation"] is True
+            assert record["alpha_s"] == pytest.approx(
+                float(_cold_wall_condensation_spec("SiO")["value"])
+            )
+    assert "stage_4" in cold_stage_keys
+    assert "stage_4b_k_trap" in cold_stage_keys
+    assert wall_records["stage_0_to_stage_1"]["source_class"] == proxy_class
+    fused_class = wall_records["stage_2_to_stage_3"]["source_class"]
+    assert fused_class != proxy_class
+    assert fused_class != cold_class
+    expected_classes = sorted({
+        str(record["source_class"])
+        for record in (*wall_records.values(), *stage_records.values())
+        if record.get("source_class")
+    })
+    assert cold_class in expected_classes
+    assert proxy_class in expected_classes
+    assert fused_class in expected_classes
+    assert notice["source_classes"] == expected_classes
+    provenance = notice["alpha_s_provenance_by_species"]["SiO"]
+    assert provenance["stage_4"]["source_class"] == cold_class
+    assert provenance["stage_4b_k_trap"]["source_class"] == cold_class
+    assert provenance["stage_2_to_stage_3"]["source_class"] == fused_class
+    assert provenance["stage_0_to_stage_1"]["source_class"] == proxy_class
     assert notice["species"] == ["SiO"]
     assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
         0.022481955557451427

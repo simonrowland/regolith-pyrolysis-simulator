@@ -1996,11 +1996,76 @@ def _nested_total_kg(values: dict[str, dict[str, float]]) -> float:
     )
 
 
+def _p6a_inlet_driving_pressures_pa(snapshot, overhead) -> list[tuple[str, float]]:
+    """Driving pressure on the P6a liner for this hour's evolved flux.
+
+    The duct is visited before its collector. P6a sets every duct to
+    ``sio_liner_temperature_c``. Partial pressure is the production
+    Poiseuille projection of this snapshot's evolved flux through the
+    stored throat, the same law ``species_partial_pressures`` applies
+    to the inlet mixture. A refused wall saturation pressure is no
+    deposit. Returned pairs are species whose driving pressure is positive.
+    """
+
+    from simulator.condensation import (
+        CELSIUS_TO_KELVIN_OFFSET,
+        WallSaturationPressureRefusal,
+        _species_condensation_temperature_C,
+        _wall_deposition_driving_pressure_pa,
+        reactive_product_backstop_enabled,
+    )
+    flux = snapshot.evap_flux
+    if float(flux.total_kg_hr) <= 0.0:
+        return []
+    diameter_m = float(snapshot.overhead.throat_diameter_m)
+    assert diameter_m > 0.0, snapshot.hour
+    vapor_mbar = overhead._vapor_pressure_mbar_from_flux(
+        float(flux.total_kg_hr) / 3600.0,
+        float(snapshot.temperature_C),
+        p_downstream_bar=float(snapshot.overhead.p_downstream_bar),
+        species_kg_for_M_avg=flux.species_kg_hr,
+        diameter_m=diameter_m,
+    )
+    partials_mbar = overhead.species_partial_pressures(flux, vapor_mbar)
+    liner_c = float(VPR_P6A_TRACE_CONTROLS["sio_liner_temperature_c"])
+    wall_k = liner_c + CELSIUS_TO_KELVIN_OFFSET
+    sticky: list[tuple[str, float]] = []
+    for species, partial_mbar in partials_mbar.items():
+        try:
+            condensation_c = _species_condensation_temperature_C(species)
+        except ValueError:
+            continue
+        backstop = reactive_product_backstop_enabled(
+            species,
+            liner_c,
+            condensation_c,
+        )
+        diagnostic: dict = {}
+        try:
+            driving_pa = _wall_deposition_driving_pressure_pa(
+                species,
+                float(partial_mbar) * 100.0,
+                wall_k,
+                reactive_product_backstop=backstop,
+                diagnostic_out=diagnostic,
+            )
+        except WallSaturationPressureRefusal:
+            driving_pa = 0.0
+        if driving_pa > 0.0:
+            sticky.append((str(species), float(driving_pa)))
+    return sticky
+
+
 def _assert_p6a_payload_matches_trace(payload: dict, trace) -> None:
     cumulative = defaultdict(float)
     saw_wall_delta = False
     saw_vapor = False
     saw_kn = False
+    saw_stage_capture = False
+    sticky_without_wall: list[tuple[int, str, float]] = []
+    from simulator.overhead import OverheadGasModel
+
+    overhead_model = OverheadGasModel()
 
     assert len(payload["per_hour_summary"]) == len(trace.snapshots)
     for entry, snapshot, wall_delta in zip(
@@ -2019,6 +2084,17 @@ def _assert_p6a_payload_matches_trace(payload: dict, trace) -> None:
         expected_delta = _nested_wall_deposit_kg(wall_delta)
         _assert_nested_kg_close(entry["wall_deposit_delta_kg"], expected_delta)
         saw_wall_delta = saw_wall_delta or bool(expected_delta)
+        saw_stage_capture = saw_stage_capture or any(
+            abs(float(kg)) > 1.0e-12
+            for kg in snapshot.condensed_by_stage_species_delta.values()
+        )
+        if not expected_delta:
+            for species, driving_pa in _p6a_inlet_driving_pressures_pa(
+                snapshot, overhead_model,
+            ):
+                sticky_without_wall.append(
+                    (int(snapshot.hour), species, driving_pa)
+                )
 
         for key, kg in wall_delta.items():
             cumulative[key] += float(kg)
@@ -2043,7 +2119,14 @@ def _assert_p6a_payload_matches_trace(payload: dict, trace) -> None:
             assert entry["regime"] == ""
         assert entry["transport_formula_id"] == NOT_APPLICABLE_UNTIL_P0
 
-    assert saw_wall_delta
+    # The duct is upstream of its collector. At the P6a liner temperature
+    # the production driving pressure of this trace's evolved mixture is
+    # zero, so the duct credits nothing and the design-area collectors are
+    # the sink. A positive driving pressure with an empty wall delta is
+    # still a failure: that hour has a species the duct can stick.
+    assert sticky_without_wall == []
+    if not saw_wall_delta:
+        assert saw_stage_capture
     assert saw_vapor
     assert saw_kn
     _assert_nested_kg_close(

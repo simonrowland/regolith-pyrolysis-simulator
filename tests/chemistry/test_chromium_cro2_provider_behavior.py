@@ -10,10 +10,8 @@ from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
 )
-from simulator.account_ids import (
-    CONDENSATION_TRAIN_ACCOUNT,
-    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
-)
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+from simulator.accounting.queries import CONDENSATION_TRAIN_ACCOUNT
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
