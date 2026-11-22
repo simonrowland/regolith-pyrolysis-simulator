@@ -307,8 +307,6 @@ def test_openimcc_admission_records_production_default_pack() -> None:
     assert pack_record["model_id"] == backend._pack.model_id
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_admission_digest_tracks_bridge_default_pack(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -326,8 +324,6 @@ def test_openimcc_admission_digest_tracks_bridge_default_pack(
     assert pack_record["model_id"] == backend._pack.model_id
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_admission_fails_closed_when_pack_cannot_load(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -119,8 +119,6 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     ].cache_version()
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -260,8 +258,6 @@ def test_alphamelts_cache_version_drops_host_metadata() -> None:
     assert identity.cache_version() == "alphaMELTS 2.3.1 (digest=sha256:abc111)"
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_config_absent_fallback_uses_binary_digest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

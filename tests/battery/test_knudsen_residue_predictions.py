@@ -268,8 +268,6 @@ def test_step_hold_and_linear_are_distinct_temperature_paths():
     assert any(2000 < t < 2100 for t in seen)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_extent_comparison_preserves_ordinary_identity_guards(extent_point):
     from simulator.battery.enums import IdentityEqualKind
     from simulator.battery.identity import identity_equal, _same_row_knudsen_residue_identity_equal

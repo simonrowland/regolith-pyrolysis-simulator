@@ -3200,8 +3200,6 @@ def test_magemin_subprocess_argument_vector_matches_golden():
     assert (buffer_name, buffer_n) == ('nno', 0.0)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_magemin_pure_phase_probe_argument_vector_is_preserved(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

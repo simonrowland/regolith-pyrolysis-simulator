@@ -30,8 +30,6 @@ COMPOSITION_MOL = {
 }
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_pack_load_failure_stays_a_diagnostic_refusal(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -179,8 +177,6 @@ def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:
     )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) -> None:
     import simulator.melt_backend.openimcc_bridge as bridge
 

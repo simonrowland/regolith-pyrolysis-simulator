@@ -1014,12 +1014,25 @@ def _configured_cache_mode() -> str:
     return mode
 
 
+def _expanded_cache_path(path: str | os.PathLike[str]) -> Path:
+    """Expand ``~`` for a str or a Path. Do not resolve.
+
+    Environment values, relative spellings, and symlinks arrive as ``str``.
+    ``str`` has no ``expanduser``. ``os.path.expanduser`` accepts both.
+    Identity comparison uses ``_cache_path_identity`` (``os.path.realpath``),
+    not ``Path.resolve``.
+    """
+
+    return Path(os.path.expanduser(os.fspath(path)))
+
+
 def _cache_path_identity(path: str | os.PathLike[str] | None) -> str | None:
     """Canonical path for runner-file identity.
 
     Symlinks and relative spellings are the same file. ``os.path.realpath``
     (not ``Path.resolve``) so the comparison does not follow pathlib's
-    strict flag. Expand ``~`` first. Empty is not a file.
+    strict flag. Expand ``~`` first, through ``_expanded_cache_path``, so a
+    ``str`` and a ``Path`` name the same file. Empty is not a file.
     """
 
     if path is None:
@@ -1027,7 +1040,7 @@ def _cache_path_identity(path: str | os.PathLike[str] | None) -> str | None:
     text = os.fspath(path).strip()
     if not text:
         return None
-    return os.path.realpath(os.path.expanduser(text))
+    return os.path.realpath(os.fspath(_expanded_cache_path(text)))
 
 
 def _runner_cache_identity() -> str | None:
@@ -1915,7 +1928,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts["hits"] += 1
             return result
 
-    path = Path(path_value).expanduser()
+    path = _expanded_cache_path(path_value)
     try:
         connection = _connect(path, readonly=readonly)
     except (sqlite3.Error, OSError):
@@ -2060,7 +2073,7 @@ def load_cache_rows(
     path: str | Path,
     rows: Iterable[tuple[bytes, Any, str, str | int, str, int]],
 ) -> int:
-    database = Path(path).expanduser()
+    database = _expanded_cache_path(path)
     connection = _connect(database, readonly=False)
     assert connection is not None
     values = []
@@ -2188,9 +2201,11 @@ def engine_cache_stats(path: Path) -> dict[str, Any]:
         }
 
 
-def snapshot_cache(live: Path, out: Path) -> dict[str, Any]:
+def snapshot_cache(
+    live: str | os.PathLike[str], out: str | os.PathLike[str]
+) -> dict[str, Any]:
     """Back up a live HOT/COLD pair into exclusively new, standalone files."""
-    live, out = live.expanduser(), out.expanduser()
+    live, out = _expanded_cache_path(live), _expanded_cache_path(out)
     # Sync and seed both call this. The live file is opened read-write to
     # take its lock, and the destination is created. Either one being the
     # runner file in read-only mode refuses before any open.
@@ -2225,10 +2240,15 @@ def snapshot_cache(live: Path, out: Path) -> dict[str, Any]:
     return engine_cache_stats(out)
 
 
-def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -> dict[str, Any]:
+def merge_cache_files(
+    into: str | os.PathLike[str],
+    inputs: list[str | os.PathLike[str]],
+    *,
+    vacuum: bool = False,
+) -> dict[str, Any]:
     """Accumulate new per-box sequences without replacing a natural-key value."""
-    into = into.expanduser()
-    inputs = [path.expanduser() for path in inputs]
+    into = _expanded_cache_path(into)
+    inputs = [_expanded_cache_path(path) for path in inputs]
     # Reading an input, including the runner file, stays allowed. Writing
     # the runner file in read-only mode refuses before mkdir or sqlite open.
     _refuse_runner_readonly_write(into)
@@ -2325,7 +2345,7 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     path_value = _configured_engine_cache_path()
     if not path_value:
         return 0
-    path = Path(path_value).expanduser()
+    path = _expanded_cache_path(path_value)
     connection = _connect(path, readonly=False)
     assert connection is not None
     cursor = connection.execute(

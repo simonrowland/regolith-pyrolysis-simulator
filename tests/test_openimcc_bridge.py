@@ -634,8 +634,6 @@ def test_pack_digest_refuses_missing_binding_digest(pack) -> None:
     assert "install the recorded pin" in str(exc_info.value)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -658,8 +656,6 @@ def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
         _cleaned_melt_projection({'SiO2': 1.0})
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypatch) -> None:
     from simulator.accounting.exceptions import UnknownSpeciesError
     from simulator.melt_backend import openimcc_bridge
@@ -675,8 +671,6 @@ def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypa
     assert 'unknown test oxide' in str(exc_info.value)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_gas_solver_missing_binding_carries_attribute_error_detail(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -697,8 +691,6 @@ def test_gas_solver_missing_binding_carries_attribute_error_detail(monkeypatch) 
     assert 'evaluate_gas_oxygen_balance' in str(exc_info.value)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_binding_identity_only_converts_external_call_failures(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -791,8 +783,6 @@ def test_engine_binding_identity_ignores_table_paths(tmp_path: Path) -> None:
     ) == openimcc_bridge.engine_binding_identity(melt_pack, packaged_gas)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("owner_mode", ("missing", "raising"))
 def test_engine_binding_identity_refuses_without_path_fallback(
     owner_mode: str,

@@ -2685,8 +2685,6 @@ def test_provider_provenance_records_typed_refusal(
     )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("invalid_value", "invalid_reason"),
     (

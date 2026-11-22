@@ -202,7 +202,11 @@ def test_inherited_cache_is_neither_read_nor_written_by_fake_worker(tmp_path, mo
     engine_cache.cached_engine_call("internal-analytical", {}, lambda: {"pressure": 1.0})
     with sqlite3.connect(path) as connection:
         before = connection.execute("SELECT * FROM engine_outputs").fetchall()
-    conftest._box_for_test_owned_engine_caches.__wrapped__(monkeypatch)
+    # This module opts out. Re-apply that after seeding, the same env change
+    # the autouse fixture makes, so the fake worker neither reads nor writes
+    # the inherited file. The fixture itself is a generator and needs the
+    # pytest request; calling it would not run the body.
+    conftest.apply_test_engine_cache_env(monkeypatch, cache_off=True)
     calls = []
 
     def fake():

@@ -572,8 +572,6 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert handle.identity["pack"] == backend._pack_name
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_battery_reports_runtime_backend_pack(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend

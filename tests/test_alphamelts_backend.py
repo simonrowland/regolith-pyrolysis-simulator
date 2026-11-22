@@ -4511,8 +4511,6 @@ def test_alphamelts_timeout_documents_escaped_descendant_out_of_scope(
                 pass
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_alphamelts_cleanup_reaps_launcher_after_retry_kill(monkeypatch):
     events = []
 
