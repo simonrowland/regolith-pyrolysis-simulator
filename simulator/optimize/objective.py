@@ -6139,9 +6139,9 @@ def _marginal_extraction_cost_summary(
     return MappingProxyType({
         "schema_version": "optimizer-marginal-cost-v1",
         "accounting_principle": (
-            "candidate installed collector, hot-duct, and shared-train hardware "
-            "+ variable energy + carrier makeup/recycle + reagent consumption "
-            "+ per-run depreciation"
+            "candidate collector and hot-duct wall mass split by imported and "
+            "in-situ source + shared-train hardware + variable energy + "
+            "carrier makeup/recycle + reagent consumption + per-run depreciation"
         ),
         "marginal_cost_usd": total,
         "energy_electrical_kWh": electrical_kWh,
@@ -6165,7 +6165,9 @@ def _collector_stage_hardware_cost_summary(
     *,
     cost_parameters: CostParameters,
 ) -> Mapping[str, Any]:
-    """Price absolute collector stage area using configured liner mass."""
+    """Price collector area through the layered-wall owner."""
+
+    from simulator.layered_wall import price_collector_stages
 
     condensation_model = getattr(sim, "condensation_model", None)
     stage_areas = getattr(condensation_model, "stage_area_m2_by_stage", None)
@@ -6179,11 +6181,8 @@ def _collector_stage_hardware_cost_summary(
             "hardware_capital_cost_usd": unavailable,
             "reason": unavailable["reason"],
         })
-    collector_rows: dict[str, Mapping[str, float]] = {}
-    collector_stage_cost_usd = 0.0
-    for stage_key, density_kg_m3 in sorted(
-        cost_parameters.condenser_stage_bulk_density_kg_m3.items()
-    ):
+    validated: dict[str, float] = {}
+    for stage_key in sorted(cost_parameters.condenser_stage_bulk_density_kg_m3):
         if stage_key not in stage_areas:
             unavailable = unavailable_quantity(
                 reason=f"collector_stage_area_missing:{stage_key}",
@@ -6207,32 +6206,18 @@ def _collector_stage_hardware_cost_summary(
                 "hardware_capital_cost_usd": unavailable,
                 "reason": unavailable["reason"],
             })
-        # Collector wall mass = area [m²] × thickness [m] × bulk density
-        # [kg/m³], giving kg; multiply by the owner-ratified delivery price
-        # [USD/kg] for installed collector area cost.
-        mass_kg = (
-            area_m2
-            * cost_parameters.condenser_stage_wall_thickness_m
-            * density_kg_m3
-        )
-        stage_cost_usd = mass_kg * cost_parameters.import_delivery_cost_per_kg
-        collector_stage_cost_usd += stage_cost_usd
-        collector_rows[stage_key] = MappingProxyType({
-            "area_m2": area_m2,
-            "bulk_density_kg_m3": density_kg_m3,
-            "wall_thickness_m": cost_parameters.condenser_stage_wall_thickness_m,
-            "mass_kg": mass_kg,
-            "cost_usd": stage_cost_usd,
-        })
-    return MappingProxyType({
-        "status": "ok",
-        "collector_stage_costs": MappingProxyType(collector_rows),
-        "collector_stage_cost_usd": collector_stage_cost_usd,
-        "collector_stage_cost_source_status": (
-            "FLAGGED provisional d-283 material mass; d-389 delivery cost ratified"
+        validated[stage_key] = area_m2
+    priced = price_collector_stages(
+        validated,
+        layered_wall=cost_parameters.layered_wall,
+        import_delivery_cost_per_kg=cost_parameters.import_delivery_cost_per_kg,
+        in_situ_bootstrap_cost_per_kg=(
+            cost_parameters.in_situ_bootstrap_cost_per_kg
         ),
-        "hardware_capital_cost_usd": collector_stage_cost_usd,
-    })
+        stage_wall_thickness_m=cost_parameters.condenser_stage_wall_thickness_m,
+        stage_bulk_density_kg_m3=cost_parameters.condenser_stage_bulk_density_kg_m3,
+    )
+    return MappingProxyType(priced)
 
 
 def _duct_and_shared_train_hardware_cost_summary(
@@ -6297,9 +6282,13 @@ def _duct_and_shared_train_hardware_cost_summary(
             "reason": unavailable["reason"],
         })
 
-    # The hot duct's shell area is circumference × length. Shared-train
-    # capacity is n times the larger of average per-furnace flow and one
-    # furnace's peak divided across n furnaces: max(n*average, peak).
+    # Shared-train capacity is n times the larger of average per-furnace
+    # flow and one furnace's peak divided across n furnaces:
+    # max(n*average, peak). The hot-duct wall is the layered cylindrical
+    # shell. hot_duct_cost_per_m2_usd stays on the cost block so saved
+    # recipes still normalize; it is not this price.
+    from simulator.layered_wall import price_duct_wall
+
     hot_duct_area_m2 = math.pi * diameter_m * length_m
     per_furnace_train_share_kg_hr = max(
         average_flow_kg_hr,
@@ -6309,30 +6298,50 @@ def _duct_and_shared_train_hardware_cost_summary(
         per_furnace_train_share_kg_hr
         * cost_parameters.furnaces_per_shared_train
     )
-    hot_duct_cost_usd = (
-        hot_duct_area_m2 * cost_parameters.hot_duct_cost_per_m2_usd
+    duct_wall = price_duct_wall(
+        diameter_m=diameter_m,
+        length_m=length_m,
+        layered_wall=cost_parameters.layered_wall,
+        import_delivery_cost_per_kg=cost_parameters.import_delivery_cost_per_kg,
+        in_situ_bootstrap_cost_per_kg=(
+            cost_parameters.in_situ_bootstrap_cost_per_kg
+        ),
     )
+    hot_duct_cost_usd = duct_wall["cost_usd"]
     condenser_train_cost_usd = (
         train_sizing_flow_kg_hr
         * cost_parameters.shared_condenser_train_cost_per_kg_hr_usd
     )
+    if is_unavailable_quantity(hot_duct_cost_usd):
+        hardware_cost = unavailable_quantity(
+            reason=unavailable_reason_of(hot_duct_cost_usd),
+            units="USD",
+        )
+        status = "unavailable"
+    else:
+        hardware_cost = float(hot_duct_cost_usd) + condenser_train_cost_usd
+        status = "ok"
     return MappingProxyType({
-        "status": "ok",
+        "status": status,
         "maximum_throat_diameter_m": diameter_m,
         "hot_duct_length_m": length_m,
         "hot_duct_lateral_area_m2": hot_duct_area_m2,
         "hot_duct_cost_usd": hot_duct_cost_usd,
+        "hot_duct_wall": duct_wall,
         "train_peak_mass_flow_kg_hr": peak_flow_kg_hr,
         "train_time_averaged_mass_flow_kg_hr": average_flow_kg_hr,
         "furnaces_per_shared_train": cost_parameters.furnaces_per_shared_train,
         "per_furnace_train_share_kg_hr": per_furnace_train_share_kg_hr,
         "train_sizing_flow_kg_hr": train_sizing_flow_kg_hr,
         "condenser_train_cost_usd": condenser_train_cost_usd,
-        "hardware_capital_cost_usd": (
-            hot_duct_cost_usd + condenser_train_cost_usd
+        "hardware_capital_cost_usd": hardware_cost,
+        "pricing_source_status": (
+            "t-1911 layered cylindrical duct; shared train remains the "
+            "FLAGGED d-452 capacity price; hot_duct_cost_per_m2_usd is not applied"
         ),
-        "pricing_source_status": "FLAGGED provisional (d-452)",
     })
+
+
 def _reagent_consumption_cost_summary(
     sim: Any,
     product_ledger: Mapping[str, float],

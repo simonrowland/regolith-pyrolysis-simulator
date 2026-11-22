@@ -92,8 +92,46 @@ parameters:
   hot_duct_cost_per_m2_usd:
     value: 25000.0
     units: USD/m2
-    rationale: "FLAGGED design-study placeholder for hot-duct shell and refractory area; no vendor quote is available. Applied to lateral area pi*d*L."
-    source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification"
+    rationale: "Retained so saved v1 recipes still normalize. Not applied: the hot duct is priced as a layered cylindrical shell (t-1911). No vendor quote exists for this leftover placeholder."
+    source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification; not the t-1911 duct price"
+
+  # Operator setting, not an optimizer knob (t-472). Null properties stay
+  # null: the loader must not invent a conductivity, density, thickness,
+  # felt source, or in-situ USD/kg.
+  in_situ_bootstrap_cost_per_kg:
+    value: null
+    units: USD/kg
+    status: owner_unset
+    rationale: "Owner-settable in-situ/bootstrap cost for rump ceramic and in-situ silica. No number is ratified."
+    source_tag: "FLAGGED t-1911: owner-settable; unset until the owner names a USD/kg. Not zero."
+
+  layered_wall:
+    source_tag: "FLAGGED t-1911 operator setting; not an optimizer knob (t-472)"
+    outer_temperature_C: null
+    outer_temperature_status: owner_unset
+    layers:
+      liner:
+        role: liner
+        material_id: bulk_zirconia_ysz
+        source: imported
+        thickness_m: null
+      felt:
+        role: insulation
+        material_id: null
+        intended_material: "ceramic felt"
+        catalog_status: absent_from_wall_materials
+        source: null
+        thickness_m: null
+      structure:
+        role: structure
+        material_id: doloma
+        source: in_situ
+        thickness_m: null
+    stage_bulk:
+      sio_stage3:
+        kind: in_situ_product_bulk
+        material_id: fused_silica
+        source: in_situ
 
   shared_condenser_train_cost_per_kg_hr_usd:
     value: 2000.0

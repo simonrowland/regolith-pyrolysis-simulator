@@ -89,6 +89,10 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
         "k_stage4b": pytest.approx(3210.0),
     }
     assert values["hot_duct_cost_per_m2_usd"] == pytest.approx(25000.0)
+    assert values["in_situ_bootstrap_cost_per_kg"] is None
+    assert values["layered_wall"]["stage_bulk"]["sio_stage3"]["source"] == "in_situ"
+    assert values["layered_wall"]["layers"][0]["material_id"] == "bulk_zirconia_ysz"
+    assert values["layered_wall"]["layers"][1]["material_id"] is None
     assert values["shared_condenser_train_cost_per_kg_hr_usd"] == pytest.approx(
         2000.0
     )
@@ -168,6 +172,8 @@ def test_older_v1_recipe_cost_block_gets_new_carrier_cost_defaults() -> None:
         "carrier_makeup_loss_fraction_per_run",
         "condenser_stage_wall_thickness_m",
         "condenser_stage_bulk_density_kg_m3",
+        "in_situ_bootstrap_cost_per_kg",
+        "layered_wall",
     ):
         older["parameters"].pop(name)
 
