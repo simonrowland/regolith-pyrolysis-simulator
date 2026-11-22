@@ -366,21 +366,15 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
         "Na", 0.0
     ) == pytest.approx(0.0)
-    # d-137's 250 C Na/Mg collector is colder than the former 350 C interface,
-    # so a small extra share of this Na flux condenses before the overhead
-    # account. The production value falls from 2.0217140897425274 to
-    # 1.9976229793240146 kg: delta = old - new = 0.0240911104185128 kg and
-    # delta/old = 0.0119 (1.19%, dimensionless). In the non-condensing
-    # hot-wall limit, this overhead tends back to the full 2.0217140897425274 kg flux.
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
-        "Na"
-    ] == pytest.approx(1.9976229793240146)
-    # The same 0.0240911104185125 kg moves into the condenser: capture rises
-    # from 0.31316216606196157 to 0.3372532764804741 kg, exactly balancing the
-    # overhead decrease to the displayed precision. Faraday input is unchanged.
-    assert sim.atom_ledger.kg_by_account("process.condensation_train")[
-        "Na"
-    ] == pytest.approx(0.3372532764804741)
+    # t-1884 Stage-4 area moves this Na from overhead into the Stage-4
+    # train: overhead 1.9976229793240146 -> 0.1556118362797614 kg and
+    # train 0.3372532764804741 -> 2.1792644195247273 kg. The sum with the
+    # wall is 2.3348762558044887 kg at both, and the ledger still balances.
+    # Oxygen, melt Na2O, and metal Na are the same step.
+    overhead_na_kg = sim.atom_ledger.kg_by_account("process.overhead_gas")["Na"]
+    train_na_kg = sim.atom_ledger.kg_by_account("process.condensation_train")["Na"]
+    assert overhead_na_kg == pytest.approx(0.1556118362797614)
+    assert train_na_kg == pytest.approx(2.1792644195247273)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
@@ -388,6 +382,9 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     # The same partial-pressure cap makes every hot wall segment
     # undersaturated; the former wall inventory is therefore exactly zero.
     assert wall_na_kg == pytest.approx(0.0)
+    assert overhead_na_kg + train_na_kg + wall_na_kg == pytest.approx(
+        2.3348762558044887
+    )
     mre_oxygen = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_mre_anode_stored"
     )["O2"]

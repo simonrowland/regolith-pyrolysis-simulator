@@ -216,11 +216,15 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # This test asserts Fe reduction and Na2O pins, not extraction success.
     # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
     # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    # d-329 (owner 2026-11-03, all three approved): the d-137 capture law
-    # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
-    # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
-    # is the production value (train rpp nightly and the laptop run agree).
-    assert na2o_left == pytest.approx(0.07626529983087423, abs=1e-6)
+    # t-1884 Stage-4 area (106.44 m2 vs green 0.051 m2) restores the Stage-4
+    # Na harvest. The zero-dose C3 shuttle credits that Na2O to
+    # process.spent_reductant_residue (metallothermic_step.py), not
+    # process.cleaned_melt. C4 evaporation's depletion cap and ledger debit
+    # read only cleaned_melt (evaporation.py), so the residue stays in the
+    # composition_kg projection (core.py) and does not re-evaporate. This
+    # pin is that C5-entry residual and it carries the pre-existing defect
+    # b-1281. FeO reduction is unchanged.
+    assert na2o_left == pytest.approx(2.670007811193671, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
