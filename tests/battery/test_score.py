@@ -7833,8 +7833,32 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
         "not computed: reference phase not printed; binding has no CaO(cr) K at 1933 K"
         in report
     )
-    assert "not computed: no binding K° for CaO(cr) -> Ca(g) + O(g)" in report
-    assert "not computed: no binding K° for Al2O3(cr) -> 2 Al(g) + 3 O(g)" in report
+    # bae51f7's JANAF crystal fallback computes the Table 3 CaO(cr) row.
+    # Fig2 rows still refuse, now because no same-T pressure pair exists.
+    # Al2O3(cr) Table 3 also computes, near -3.0 dex. That level is a real
+    # E15 disagreement with Stolyarova 1996's absolute-pressure scale
+    # (ion-current a(Al2O3) versus absolute p(Al)/p(O)), a certification
+    # flag, not a target value. Investigation:
+    # /Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-11-22-pin-bae51f7/e15al2o3-report.tail
+    assert (
+        "stolyarova_1996_table3_cao_activity_column_1_1933k | method 1 | "
+        "CaO(cr) -> Ca(g) + O(g) | -0.227 ± 0.380 |"
+    ) in report
+    assert (
+        "stolyarova_1996_fig2_A_cao_series1_digitized | method 1 | "
+        "CaO(cr) -> Ca(g) + O(g) | not computed: no same-T "
+        "composition/run pressure pair for CaO(cr) -> Ca(g) + O(g) |"
+    ) in report
+    assert (
+        "stolyarova_1996_fig2_E_al2o3_series1_digitized | method 1 | "
+        "Al2O3(cr) -> 2 Al(g) + 3 O(g) | not computed: no same-T "
+        "composition/run pressure pair for Al2O3(cr) -> 2 Al(g) + 3 O(g) |"
+    ) in report
+    assert (
+        "stolyarova_1996_fig2_E_al2o3_series1_digitized | method 2 | "
+        "Al2O3(cr) -> 2 AlO(g) + O(g) | not computed: no same-T "
+        "composition/run pressure pair for Al2O3(cr) -> 2 AlO(g) + O(g) |"
+    ) in report
 
 
 @pytest.mark.parametrize(
