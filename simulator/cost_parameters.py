@@ -54,12 +54,27 @@ _SHUTTLE_PARAMETER = "shuttle_reagent_replacement_cost_per_kg"
 _CARRIER_PRICE_PARAMETER = "carrier_gas_earth_price_per_kg"
 _CARRIER_PRICE_SPECIES = frozenset({"Ar", "Kr", "N2"})
 _STAGE_BULK_DENSITY_PARAMETER = "condenser_stage_bulk_density_kg_m3"
+_IN_SITU_COST_PARAMETER = "in_situ_bootstrap_cost_per_kg"
+_LAYERED_WALL_PARAMETER = "layered_wall"
 
 
 def _default_stage_wall_thickness_m() -> float:
     return _parameter_value(
         load_cost_parameters()["parameters"],
         "condenser_stage_wall_thickness_m",
+    )
+
+
+def _default_in_situ_bootstrap_cost_per_kg() -> float | None:
+    entry = load_cost_parameters()["parameters"][_IN_SITU_COST_PARAMETER]
+    return _optional_nonnegative(entry.get("value"), _IN_SITU_COST_PARAMETER)
+
+
+def _default_layered_wall() -> dict[str, Any]:
+    from simulator.layered_wall import normalize_layered_wall
+
+    return normalize_layered_wall(
+        load_cost_parameters()["parameters"][_LAYERED_WALL_PARAMETER]
     )
 
 
@@ -105,6 +120,10 @@ class CostParameters:
         DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD
     )
     furnaces_per_shared_train: float = DEFAULT_FURNACES_PER_SHARED_TRAIN
+    in_situ_bootstrap_cost_per_kg: float | None = field(
+        default_factory=_default_in_situ_bootstrap_cost_per_kg
+    )
+    layered_wall: Mapping[str, Any] = field(default_factory=_default_layered_wall)
 
     def __post_init__(self) -> None:
         for field_name in _REQUIRED_SCALAR_PARAMETERS:
@@ -167,6 +186,21 @@ class CostParameters:
             self,
             "condenser_stage_bulk_density_kg_m3",
             MappingProxyType(densities),
+        )
+        from simulator.layered_wall import normalize_layered_wall
+
+        object.__setattr__(
+            self,
+            "in_situ_bootstrap_cost_per_kg",
+            _optional_nonnegative(
+                self.in_situ_bootstrap_cost_per_kg,
+                _IN_SITU_COST_PARAMETER,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "layered_wall",
+            normalize_layered_wall(self.layered_wall),
         )
 
     def reagent_cost_per_kg(self, species: str) -> float:
@@ -240,10 +274,12 @@ def normalize_cost_parameters(
     raw_parameters = payload.get("parameters")
     if not isinstance(raw_parameters, Mapping):
         raise ValueError("cost parameter payload missing parameters mapping")
-    raw_parameters = _with_missing_stage_cost_defaults(
-        _with_missing_hardware_cost_defaults(
-            _with_missing_carrier_cost_defaults(
-                _with_missing_solar_heat_default(raw_parameters)
+    raw_parameters = _with_missing_layered_wall_defaults(
+        _with_missing_stage_cost_defaults(
+            _with_missing_hardware_cost_defaults(
+                _with_missing_carrier_cost_defaults(
+                    _with_missing_solar_heat_default(raw_parameters)
+                )
             )
         )
     )
@@ -341,6 +377,25 @@ def normalize_cost_parameters(
         "values": stage_densities,
     }
 
+    in_situ_entry = _parameter_entry(raw_parameters, _IN_SITU_COST_PARAMETER)
+    parameters[_IN_SITU_COST_PARAMETER] = {
+        **{
+            str(key): copy.deepcopy(value)
+            for key, value in in_situ_entry.items()
+            if key != "value"
+        },
+        "value": _optional_nonnegative(
+            in_situ_entry.get("value"),
+            _IN_SITU_COST_PARAMETER,
+        ),
+    }
+    from simulator.layered_wall import normalize_layered_wall
+
+    layered_wall = raw_parameters.get(_LAYERED_WALL_PARAMETER)
+    if not isinstance(layered_wall, Mapping):
+        raise ValueError("layered_wall must be a mapping")
+    parameters[_LAYERED_WALL_PARAMETER] = normalize_layered_wall(layered_wall)
+
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,
         "parameters": parameters,
@@ -387,6 +442,15 @@ def cost_parameter_values(payload: Mapping[str, Any] | None = None) -> dict[str,
         )
         for stage, entry in sorted(stage_densities.items())
     }
+    values[_IN_SITU_COST_PARAMETER] = _optional_nonnegative(
+        raw_parameters[_IN_SITU_COST_PARAMETER].get("value"),
+        _IN_SITU_COST_PARAMETER,
+    )
+    from simulator.layered_wall import normalize_layered_wall
+
+    values[_LAYERED_WALL_PARAMETER] = normalize_layered_wall(
+        raw_parameters[_LAYERED_WALL_PARAMETER]
+    )
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,
         "parameters": values,
@@ -430,6 +494,8 @@ def cost_parameters_from_mapping(payload: Mapping[str, Any] | None = None) -> Co
             "shared_condenser_train_cost_per_kg_hr_usd"
         ],
         furnaces_per_shared_train=values["furnaces_per_shared_train"],
+        in_situ_bootstrap_cost_per_kg=values[_IN_SITU_COST_PARAMETER],
+        layered_wall=values[_LAYERED_WALL_PARAMETER],
     )
 
 
@@ -580,6 +646,20 @@ def _with_missing_stage_cost_defaults(
     return result
 
 
+def _with_missing_layered_wall_defaults(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep saved v1 recipe cost blocks usable as the layered wall lands."""
+
+    result = dict(parameters)
+    missing = (_IN_SITU_COST_PARAMETER, _LAYERED_WALL_PARAMETER)
+    if any(name not in result for name in missing):
+        defaults = load_cost_parameters()["parameters"]
+        for name in missing:
+            result.setdefault(name, copy.deepcopy(defaults[name]))
+    return result
+
+
 def _with_missing_hardware_cost_defaults(
     parameters: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -657,6 +737,12 @@ def _validated_scalar_parameter(value: Any, name: str) -> float:
     if not math.isfinite(number) or number <= 0.0:
         raise ValueError("min_fouling_penalty must be positive")
     return number
+
+
+def _optional_nonnegative(value: Any, name: str) -> float | None:
+    if value is None:
+        return None
+    return _finite_nonnegative(value, name)
 
 
 def _finite_nonnegative(

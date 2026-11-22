@@ -10,7 +10,7 @@ from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.optimize import study
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
-from simulator.cost_parameters import CostParameters
+from simulator.cost_parameters import CostParameters, default_cost_parameters_block
 from simulator.optimize.evaluate import RunReference, ScoredResult, _run_reference
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
@@ -88,6 +88,74 @@ def _zero_collector_area_map() -> dict[str, float]:
         "alkali_stage4": 0.0,
         "k_stage4b": 0.0,
     }
+
+
+def _priceable_layered_wall() -> dict:
+    """Assumed thicknesses and properties for tests that need a finite total.
+
+    These numbers are not catalog values and are not written to the shipped
+    cost file.
+    """
+
+    def layer(role, material_id, source, thickness, density, conductivity):
+        return {
+            "role": role,
+            "material_id": material_id,
+            "source": source,
+            "thickness_m": thickness,
+            "density_kg_m3": density,
+            "density_status": "assumed",
+            "conductivity_W_m_K": conductivity,
+            "conductivity_status": "assumed",
+        }
+
+    return {
+        "source_tag": "test-only assumed wall; not a catalog value",
+        "outer_temperature_C": 40.0,
+        "layers": {
+            "liner": layer(
+                "liner", "bulk_zirconia_ysz", "imported", 0.001, 6000.0, 2.0
+            ),
+            "felt": layer("insulation", None, "imported", 0.01, 200.0, 0.2),
+            "structure": layer("structure", "doloma", "in_situ", 0.02, 3300.0, 3.0),
+        },
+        "stage_bulk": {
+            "sio_stage3": {
+                "kind": "in_situ_product_bulk",
+                "material_id": "fused_silica",
+                "source": "in_situ",
+            }
+        },
+    }
+
+
+def _priceable_cost_parameters(**overrides) -> CostParameters:
+    electricity = overrides.pop("electricity_cost_per_kWh", 1.0)
+    return CostParameters(
+        electricity_cost_per_kWh=electricity,
+        furnace_resinter_cost_usd=overrides.pop("furnace_resinter_cost_usd", 1.0),
+        depreciation_expense_per_run=overrides.pop(
+            "depreciation_expense_per_run", 1.0
+        ),
+        generic_reagent_cost_per_kg=overrides.pop("generic_reagent_cost_per_kg", 1.0),
+        shuttle_reagent_replacement_cost_per_kg=overrides.pop(
+            "shuttle_reagent_replacement_cost_per_kg",
+            {"Na": 1.0, "K": 1.0, "Mg": 1.0, "Ca": 1.0},
+        ),
+        solar_heat_cost_per_kWh=overrides.pop("solar_heat_cost_per_kWh", 0.05),
+        in_situ_bootstrap_cost_per_kg=overrides.pop(
+            "in_situ_bootstrap_cost_per_kg", 50.0
+        ),
+        layered_wall=_priceable_layered_wall(),
+        **overrides,
+    )
+
+
+def _priceable_cost_block() -> dict:
+    block = default_cost_parameters_block()
+    block["parameters"]["in_situ_bootstrap_cost_per_kg"]["value"] = 50.0
+    block["parameters"]["layered_wall"] = _priceable_layered_wall()
+    return block
 
 
 def test_dominates_requires_strict_improvement() -> None:
@@ -666,7 +734,7 @@ def test_unavailable_pumping_energy_is_not_ranked_as_zero() -> None:
 
 def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch) -> None:
     monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 2.0)
-    cost_parameters = CostParameters(
+    cost_parameters = _priceable_cost_parameters(
         electricity_cost_per_kWh=2.0,
         furnace_resinter_cost_usd=100.0,
         depreciation_expense_per_run=7.0,
@@ -729,6 +797,14 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         product_classes,
         run_execution=run_execution,
     ) == pytest.approx(6.0)
+    hardware = objective_module._duct_and_shared_train_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    collector = objective_module._collector_stage_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
     assert _metric_value(
         "throughput_cost_owner_ratify_usd",
         sim,
@@ -736,7 +812,11 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         product_classes,
         run_execution=run_execution,
         cost_parameters=cost_parameters,
-    ) == pytest.approx(42.5 + math.pi * 0.12 * 25000.0)
+    ) == pytest.approx(
+        42.5
+        + collector["hardware_capital_cost_usd"]
+        + hardware["hardware_capital_cost_usd"]
+    )
     sim.melt = SimpleNamespace(
         background_gas_species="Kr",
         initial_mass_kg=1.0,
@@ -764,7 +844,10 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         cost_parameters=cost_parameters,
         profile=carrier_profile,
     ) == pytest.approx(
-        42.5 + math.pi * 0.12 * 25000.0 + carrier_cost["carrier_cost_usd"]
+        42.5
+        + collector["hardware_capital_cost_usd"]
+        + hardware["hardware_capital_cost_usd"]
+        + carrier_cost["carrier_cost_usd"]
     )
     assert _metric_value(
         "furnace_lifespan_consumed_fraction",
@@ -796,7 +879,11 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
             }
         ],
     }
-    computed = compute_objectives(objective_profile, run_execution)
+    computed = compute_objectives(
+        objective_profile,
+        run_execution,
+        cost_parameters=_priceable_cost_block(),
+    )
     evidence = computed.evidence["throughput_cost_owner_ratify_usd"]
     assert evidence["energy_cost_usd"] == pytest.approx(
         evidence["electrical_cost_usd"] + evidence["solar_heat_cost_usd"]
@@ -821,7 +908,11 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
 
     sim.melt.background_gas_species = "He"
     sim.overhead.composition = {"He": 10.0}
-    helium_computed = compute_objectives(objective_profile, run_execution)
+    helium_computed = compute_objectives(
+        objective_profile,
+        run_execution,
+        cost_parameters=_priceable_cost_block(),
+    )
     helium_evidence = helium_computed.evidence["throughput_cost_owner_ratify_usd"]
     helium_score = helium_computed.as_mapping()["throughput_cost_owner_ratify_usd"]
 
@@ -959,7 +1050,7 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
 
 
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
-    cost_parameters = CostParameters(
+    cost_parameters = _priceable_cost_parameters(
         electricity_cost_per_kWh=7.0,
         furnace_resinter_cost_usd=999.0,
         depreciation_expense_per_run=11.0,
@@ -998,6 +1089,10 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
         sim,
         cost_parameters=cost_parameters,
     )
+    duct_hardware = objective_module._duct_and_shared_train_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
     assert _metric_value(
         "throughput_cost_owner_ratify_usd",
         sim,
@@ -1011,12 +1106,12 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
     ) == pytest.approx(
         67.0
         + collector_hardware["hardware_capital_cost_usd"]
-        + math.pi * 0.12 * 25000.0
+        + duct_hardware["hardware_capital_cost_usd"]
     )
 
 
 def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() -> None:
-    cost_parameters = CostParameters(
+    cost_parameters = _priceable_cost_parameters(
         electricity_cost_per_kWh=10.0,
         solar_heat_cost_per_kWh=4.0,
         furnace_resinter_cost_usd=0.0,
@@ -1045,6 +1140,10 @@ def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() ->
         record=SimpleNamespace(cost_rollup={}),
     )
 
+    hardware = objective_module._duct_and_shared_train_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
     assert _metric_value(
         "throughput_cost_owner_ratify_usd",
         sim,
@@ -1052,33 +1151,42 @@ def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() ->
         {},
         run_execution=SimpleNamespace(simulator=sim),
         cost_parameters=cost_parameters,
-    ) == pytest.approx(32.0 + math.pi * 0.12 * 25000.0)
+    ) == pytest.approx(32.0 + hardware["hardware_capital_cost_usd"])
 
 
 def test_hardware_cost_prices_hot_duct_and_shared_train_capacity() -> None:
-    summary = objective_module._duct_and_shared_train_hardware_cost_summary(
-        SimpleNamespace(
-            overhead_model=SimpleNamespace(
-                pipe_diameter_m=0.5,
-                pipe_length_m=2.0,
-            ),
-            overhead=SimpleNamespace(
-                train_peak_mass_flow_kg_hr=100.0,
-                train_time_averaged_mass_flow_kg_hr=6.0,
-            ),
+    sim = SimpleNamespace(
+        overhead_model=SimpleNamespace(
+            pipe_diameter_m=0.5,
+            pipe_length_m=2.0,
         ),
+        overhead=SimpleNamespace(
+            train_peak_mass_flow_kg_hr=100.0,
+            train_time_averaged_mass_flow_kg_hr=6.0,
+        ),
+    )
+    shipped = objective_module._duct_and_shared_train_hardware_cost_summary(
+        sim,
         cost_parameters=_furnace_test_cost_parameters(),
     )
+    priced = objective_module._duct_and_shared_train_hardware_cost_summary(
+        sim,
+        cost_parameters=_priceable_cost_parameters(),
+    )
 
-    assert summary["status"] == "ok"
-    assert summary["hot_duct_lateral_area_m2"] == pytest.approx(math.pi)
-    assert summary["hot_duct_cost_usd"] == pytest.approx(math.pi * 25000.0)
-    assert summary["furnaces_per_shared_train"] == pytest.approx(10.0)
-    assert summary["per_furnace_train_share_kg_hr"] == pytest.approx(10.0)
-    assert summary["train_sizing_flow_kg_hr"] == pytest.approx(100.0)
-    assert summary["condenser_train_cost_usd"] == pytest.approx(200000.0)
-    assert summary["hardware_capital_cost_usd"] == pytest.approx(
-        math.pi * 25000.0 + 200000.0
+    assert shipped["condenser_train_cost_usd"] == pytest.approx(200000.0)
+    assert shipped["furnaces_per_shared_train"] == pytest.approx(10.0)
+    assert shipped["per_furnace_train_share_kg_hr"] == pytest.approx(10.0)
+    assert shipped["train_sizing_flow_kg_hr"] == pytest.approx(100.0)
+    assert shipped["hot_duct_cost_usd"]["status"] == "unavailable"
+    assert shipped["hardware_capital_cost_usd"]["status"] == "unavailable"
+    assert shipped["status"] == "unavailable"
+    assert priced["status"] == "ok"
+    assert priced["hot_duct_lateral_area_m2"] == pytest.approx(math.pi)
+    assert priced["condenser_train_cost_usd"] == pytest.approx(200000.0)
+    assert priced["hot_duct_wall"]["hot_duct_area_price_applied"] is False
+    assert priced["hardware_capital_cost_usd"] == pytest.approx(
+        priced["hot_duct_cost_usd"] + priced["condenser_train_cost_usd"]
     )
 
 
@@ -1096,29 +1204,35 @@ def test_hardware_cost_refuses_missing_sizing_inputs() -> None:
 
 
 def test_collector_hardware_cost_scales_with_configured_area() -> None:
-    areas = {
-        "fe_stage1": 0.2,
-        "cr_stage2": 0.1,
-        "sio_stage3": 0.3,
-        "alkali_stage4": 0.05,
-        "k_stage4b": 0.04,
-    }
+    areas = _zero_collector_area_map()
+    areas["sio_stage3"] = 2.0
     sim = SimpleNamespace(
         condensation_model=SimpleNamespace(stage_area_m2_by_stage=areas),
     )
+    parameters = _furnace_test_cost_parameters()
     before = objective_module._collector_stage_hardware_cost_summary(
         sim,
-        cost_parameters=_furnace_test_cost_parameters(),
+        cost_parameters=parameters,
     )
-    fe_cost = before["collector_stage_costs"]["fe_stage1"]["cost_usd"]
-    areas["fe_stage1"] *= 2.0
+    areas["sio_stage3"] = 4.0
     after = objective_module._collector_stage_hardware_cost_summary(
         sim,
-        cost_parameters=_furnace_test_cost_parameters(),
+        cost_parameters=parameters,
     )
+    before_stage = before["collector_stage_costs"]["sio_stage3"]
+    after_stage = after["collector_stage_costs"]["sio_stage3"]
 
-    assert after["collector_stage_cost_usd"] == pytest.approx(
-        before["collector_stage_cost_usd"] + fe_cost
+    assert before_stage["pricing"] == "in_situ_product_bulk"
+    assert before_stage["imported_kg"] == 0.0
+    assert before_stage["imported_usd"] == 0.0
+    assert before_stage["in_situ_usd"]["status"] == "unavailable"
+    assert "in_situ_cost_unset" in before_stage["in_situ_usd"]["reason"]
+    assert after_stage["in_situ_kg"] == pytest.approx(before_stage["in_situ_kg"] * 2.0)
+    assert before_stage["wall_thickness_m"] == (
+        parameters.condenser_stage_wall_thickness_m
+    )
+    assert before_stage["bulk_density_kg_m3"] == (
+        parameters.condenser_stage_bulk_density_kg_m3["sio_stage3"]
     )
 
 
@@ -1138,25 +1252,23 @@ def test_collector_hardware_cost_refuses_missing_stage_area() -> None:
     )
 
 
-def test_single_wall_import_cost_hex_pin() -> None:
-    """Pin the t-1884 single-wall import price before the layered replacement.
+def test_stage3_in_situ_bulk_replaces_single_wall_import_price() -> None:
+    """The pinned single-wall import price is replaced by source-split mass.
 
-    The hex strings are this function's output at the pin commit. They are
-    not a second copy of the pricing rule for later tests to keep.
+    Stage 3 keeps the existing thickness and density slots and is in-situ
+    silica. Its dollars stay unavailable while the owner rate is unset.
+    The shipped duct no longer multiplies lateral area by the placeholder.
     """
 
-    areas = {
-        "fe_stage1": 0.2,
-        "cr_stage2": 0.0,
-        "sio_stage3": 466.975203985,
-        "alkali_stage4": 0.0,
-        "k_stage4b": 0.0,
-    }
+    areas = _zero_collector_area_map()
+    areas["fe_stage1"] = 0.2
+    areas["sio_stage3"] = 466.975203985
+    parameters = _furnace_test_cost_parameters()
     collector = objective_module._collector_stage_hardware_cost_summary(
         SimpleNamespace(
             condensation_model=SimpleNamespace(stage_area_m2_by_stage=areas),
         ),
-        cost_parameters=_furnace_test_cost_parameters(),
+        cost_parameters=parameters,
     )
     duct = objective_module._duct_and_shared_train_hardware_cost_summary(
         SimpleNamespace(
@@ -1169,16 +1281,18 @@ def test_single_wall_import_cost_hex_pin() -> None:
                 train_time_averaged_mass_flow_kg_hr=0.0,
             ),
         ),
-        cost_parameters=_furnace_test_cost_parameters(),
+        cost_parameters=parameters,
     )
+    stage3 = collector["collector_stage_costs"]["sio_stage3"]
 
-    assert collector["collector_stage_costs"]["fe_stage1"]["cost_usd"].hex() == (
-        "0x1.5f90000000000p+16"
-    )
-    assert collector["collector_stage_costs"]["sio_stage3"]["cost_usd"].hex() == (
-        "0x1.87e6b4381bda6p+26"
-    )
-    assert duct["hot_duct_cost_usd"].hex() == "0x1.268639437ef07p+13"
+    assert stage3["source"] == "in_situ"
+    assert stage3["imported_kg"] == 0.0
+    assert stage3["imported_usd"] == 0.0
+    assert stage3["in_situ_usd"]["status"] == "unavailable"
+    assert stage3["in_situ_usd"]["value"] is None
+    assert collector["hardware_capital_cost_usd"]["status"] == "unavailable"
+    assert duct["hot_duct_cost_usd"]["status"] == "unavailable"
+    assert duct["hot_duct_wall"]["duct_price_basis"] == "layered_cylindrical_mass"
 
 
 def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
@@ -1191,7 +1305,7 @@ def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
         ),
     )
 
-    cost_parameters = CostParameters(
+    cost_parameters = _priceable_cost_parameters(
         electricity_cost_per_kWh=1.0,
         furnace_resinter_cost_usd=0.0,
         depreciation_expense_per_run=0.0,
