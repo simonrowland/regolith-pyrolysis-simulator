@@ -7,7 +7,7 @@ value is the engine's answer. CI uses the cache read-only by default. The
 key is engine + version + request; do not add to it. A species-local
 chemistry change (e.g. a re-pin that adds or fixes some species) does NOT
 bump the version: the superseded species' rows are expired and re-warmed
-(engine_cache_sync.py expire --species, t-1915). Bump the chemistry version
+(expire --species, t-1915). Bump the chemistry version
 only for a change that moves every output of the engine. The cache
 accumulates; never expire rows that do not need it.
 """
@@ -823,6 +823,19 @@ class EngineCacheAliasError(ValueError):
     """A synchronization output aliases an input or another output."""
 
 
+class EngineCacheReadonlyError(ValueError):
+    """A write targeted the runner cache while that file is read-only.
+
+    CI opens the runner file read-only by default so shared engine results
+    are reused, never rewritten. Store stays a counted no-op. Every other
+    write API refuses here, before it creates or opens the file.
+    """
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+        super().__init__(f"engine cache is read-only: refusing write to {path}")
+
+
 class EngineCacheSettingsError(ValueError):
     """Engine cache settings do not contain the normalized projection inputs."""
 
@@ -1001,14 +1014,77 @@ def _configured_cache_mode() -> str:
     return mode
 
 
+def _cache_path_identity(path: str | os.PathLike[str] | None) -> str | None:
+    """Canonical path for runner-file identity.
+
+    Symlinks and relative spellings are the same file. ``os.path.realpath``
+    (not ``Path.resolve``) so the comparison does not follow pathlib's
+    strict flag. Expand ``~`` first. Empty is not a file.
+    """
+
+    if path is None:
+        return None
+    text = os.fspath(path).strip()
+    if not text:
+        return None
+    return os.path.realpath(os.path.expanduser(text))
+
+
+def _runner_cache_identity() -> str | None:
+    """The runner file, or None when this process has no runner cache.
+
+    Outside pytest the runner file is ``REGOLITH_ENGINE_CACHE``. A pytest
+    snapshot with an empty path (``engine_cache_off``) has no runner file,
+    so a test-owned cache stays writable. An empty snapshot path is not
+    the runner file.
+    """
+
+    snapshot = _RUNNER_CACHE_SNAPSHOT
+    if snapshot is None:
+        configured = _cache_environment_setting("REGOLITH_ENGINE_CACHE") or None
+        return _cache_path_identity(configured)
+    if not snapshot[0]:
+        return None
+    return _cache_path_identity(snapshot[0])
+
+
+def _refuse_runner_readonly_write(path: str | os.PathLike[str]) -> None:
+    """Refuse every write of the runner file while it is read-only.
+
+    One owner for the rule. ``_connect`` (drop and load), ``merge_cache_files``,
+    and ``snapshot_cache`` (sync and seed) call this before they create or
+    open the target. Store does not: a store attempt stays a counted no-op.
+    A different file is not the runner file, so a sync into another master
+    still writes, and a test-owned cache does not inherit this refusal.
+    """
+
+    runner = _runner_cache_identity()
+    if runner is None or _cache_path_identity(path) != runner:
+        return
+    if _configured_cache_mode() != "readonly":
+        return
+    raise EngineCacheReadonlyError(runner)
+
+
 def _active_cache_is_runner_file(active_path: str) -> bool:
+    """True when this lookup is the snapshotted runner file.
+
+    Identity is ``os.path.realpath`` after ``expanduser``, so a symlink or
+    a relative spelling is still the runner file. Outside pytest the
+    snapshot is unset and this stays false: the double check is a test
+    seam, and read-only writes use ``_runner_cache_identity`` instead.
+    """
+
     snapshot = _RUNNER_CACHE_SNAPSHOT
     if snapshot is None or not snapshot[0]:
         return False
+    runner = _cache_path_identity(snapshot[0])
+    if runner is None:
+        return False
     override = _ENGINE_CACHE_PATH_OVERRIDE.get()
     if override is not _ENGINE_CACHE_PATH_UNSET:
-        return (override or None) == snapshot[0]
-    return active_path == snapshot[0]
+        return _cache_path_identity(override) == runner
+    return _cache_path_identity(active_path) == runner
 
 
 def _engine_cache_is_readonly(active_path: str) -> bool:
@@ -1579,6 +1655,10 @@ def _initialize_cache(connection: sqlite3.Connection) -> None:
 
 def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     global _CONNECTION_PID, _CONNECTION_PATH, _CONNECTION_READONLY
+    # Read-only is enforced here, before mkdir or a writable sqlite open.
+    # The store path passes readonly=True and stays a counted no-op.
+    if not readonly:
+        _refuse_runner_readonly_write(path)
     pid = os.getpid()
     if _CONNECTION_PID != pid:
         _close_connections()
@@ -1806,9 +1886,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         # One check, before lookup. A double is a mock, a test-module
         # callable, or an adapter method that is no longer the class-body
         # function. Real adapter functions are compiled from their packages,
-        # so this cannot flag them. Do not serve or store such a solve in
-        # the runner file. A test-owned file is unchanged: cache tests store
-        # synthetic solves there.
+        # so this cannot flag them. The check stops at the outer function:
+        # a monkeypatch of a dependency that solve calls (engines,
+        # melt_backend, openimcc) is not walked. Those tests opt out with
+        # engine_cache_off so a warm runner row cannot hide the patch.
+        # Do not serve or store a double in the runner file. A test-owned
+        # file is unchanged: cache tests store synthetic solves there.
         with _LOCK:
             counts = _counter_bucket(engine_id)
             counts["misses"] += 1
@@ -2108,6 +2191,11 @@ def engine_cache_stats(path: Path) -> dict[str, Any]:
 def snapshot_cache(live: Path, out: Path) -> dict[str, Any]:
     """Back up a live HOT/COLD pair into exclusively new, standalone files."""
     live, out = live.expanduser(), out.expanduser()
+    # Sync and seed both call this. The live file is opened read-write to
+    # take its lock, and the destination is created. Either one being the
+    # runner file in read-only mode refuses before any open.
+    _refuse_runner_readonly_write(live)
+    _refuse_runner_readonly_write(out)
     _refuse_cache_aliases(_cache_pair(out), _cache_pair(live))
     for path in _cache_pair(out):
         if path.exists() or path.is_symlink():
@@ -2141,6 +2229,9 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
     """Accumulate new per-box sequences without replacing a natural-key value."""
     into = into.expanduser()
     inputs = [path.expanduser() for path in inputs]
+    # Reading an input, including the runner file, stays allowed. Writing
+    # the runner file in read-only mode refuses before mkdir or sqlite open.
+    _refuse_runner_readonly_write(into)
     report_path = Path(str(into) + ".conflicts.jsonl")
     _refuse_cache_aliases((*_cache_pair(into), report_path),
                          [part for path in inputs for part in _cache_pair(path)])

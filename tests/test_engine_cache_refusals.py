@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import threading
 
@@ -626,3 +627,253 @@ def test_path_scope_overrides_runner_readonly(tmp_path, monkeypatch) -> None:
     assert not runner.exists()
     with sqlite3.connect(owned) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
+
+
+def _row_count(path) -> int:
+    if not os.path.exists(path):
+        return 0
+    with sqlite3.connect(path) as connection:
+        return connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0]
+
+
+def _one_cache_row(engine: str, request: dict, answer: dict, seq: int):
+    key = engine_cache.engine_cache_key(engine, "1", request)
+    return (key, answer, engine, "1", "laptop", seq)
+
+
+def _expect_readonly(callback, path) -> None:
+    with pytest.raises(engine_cache.EngineCacheReadonlyError) as caught:
+        callback()
+    assert caught.value.path == engine_cache._cache_path_identity(path)
+
+
+def test_runner_readonly_refuses_every_write_api(tmp_path, monkeypatch) -> None:
+    """Drop, load, merge, and snapshot/seed refuse on the runner file.
+
+    Store stays a counted no-op. The typed error is raised before the
+    shared file is created or changed. A pytest snapshot and a production
+    snapshot of None both identify that file.
+    """
+
+    runner = tmp_path / "runner.sqlite"
+    donor = tmp_path / "donor.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(runner))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    with engine_cache.runner_engine_cache_snapshot(str(runner), ""):
+        assert engine_cache.load_cache_rows(
+            runner, [_one_cache_row("magemin", {"n": 1}, {"answer": 1}, 1)]
+        ) == 1
+        assert engine_cache.load_cache_rows(
+            donor, [_one_cache_row("magemin", {"n": 2}, {"answer": 2}, 2)]
+        ) == 1
+    before = runner.read_bytes()
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache._MEMORY_CACHE[(str(runner), b"k", True)] = {"answer": "mem"}
+
+    with engine_cache.runner_engine_cache_snapshot(str(runner), "readonly"):
+        _expect_readonly(lambda: engine_cache.drop_chemistry_version("magemin", "1"), runner)
+        _expect_readonly(lambda: engine_cache.load_cache_rows(
+            runner, [_one_cache_row("magemin", {"n": 9}, {"answer": 9}, 9)]
+        ), runner)
+        _expect_readonly(lambda: engine_cache.merge_cache_files(runner, [donor]), runner)
+        _expect_readonly(
+            lambda: engine_cache.snapshot_cache(runner, tmp_path / "snap.sqlite"), runner
+        )
+        _expect_readonly(lambda: engine_cache.snapshot_cache(donor, runner), runner)
+    assert runner.read_bytes() == before
+    assert _row_count(runner) == 1
+    assert not (tmp_path / "snap.sqlite").exists()
+    assert engine_cache._MEMORY_CACHE[(str(runner), b"k", True)] == {"answer": "mem"}
+
+    fresh = tmp_path / "fresh-runner.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(fresh))
+    engine_cache._close_connections()
+    previous = engine_cache._RUNNER_CACHE_SNAPSHOT
+    engine_cache._RUNNER_CACHE_SNAPSHOT = None
+    try:
+        _expect_readonly(lambda: engine_cache.drop_chemistry_version("magemin", "1"), fresh)
+        _expect_readonly(lambda: engine_cache.load_cache_rows(
+            fresh, [_one_cache_row("magemin", {"n": 3}, {"answer": 3}, 3)]
+        ), fresh)
+        _expect_readonly(lambda: engine_cache.merge_cache_files(fresh, [donor]), fresh)
+        _expect_readonly(lambda: engine_cache.snapshot_cache(donor, fresh), fresh)
+        _expect_readonly(
+            lambda: engine_cache.snapshot_cache(fresh, tmp_path / "out.sqlite"), fresh
+        )
+        other = tmp_path / "other-master.sqlite"
+        assert engine_cache.merge_cache_files(other, [donor])["inserted"] == 1
+    finally:
+        engine_cache._RUNNER_CACHE_SNAPSHOT = previous
+        engine_cache._close_connections()
+    assert not fresh.exists()
+    assert not (tmp_path / "out.sqlite").exists()
+    assert _row_count(other) == 1
+
+
+def test_owned_cache_stays_writable_while_the_runner_is_readonly(
+    tmp_path, monkeypatch
+) -> None:
+    runner = tmp_path / "runner.sqlite"
+    owned = tmp_path / "owned.sqlite"
+    donor = tmp_path / "donor.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(donor))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    with engine_cache.runner_engine_cache_snapshot(None, ""):
+        assert engine_cache.load_cache_rows(
+            runner, [_one_cache_row("magemin", {"n": 1}, {"answer": 1}, 1)]
+        ) == 1
+        assert engine_cache.load_cache_rows(
+            donor, [_one_cache_row("magemin", {"n": 2}, {"answer": 2}, 2)]
+        ) == 1
+    runner_bytes = runner.read_bytes()
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(owned))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    with engine_cache.runner_engine_cache_snapshot(str(runner), "readonly"):
+        assert engine_cache.load_cache_rows(
+            owned, [_one_cache_row("magemin", {"n": 4}, {"answer": 4}, 4)]
+        ) == 1
+        assert engine_cache.drop_chemistry_version("magemin", "1") == 1
+        master = tmp_path / "master.sqlite"
+        assert engine_cache.merge_cache_files(master, [donor])["inserted"] == 1
+        copy = tmp_path / "copy.sqlite"
+        engine_cache.snapshot_cache(donor, copy)
+    assert runner.read_bytes() == runner_bytes
+    assert _row_count(owned) == 0
+    assert copy.exists()
+    with engine_cache.runner_engine_cache_snapshot(None, ""):
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(owned))
+        engine_cache._close_connections()
+        engine_cache._MEMORY_CACHE.clear()
+        engine_cache.engine_cache_counters(reset=True)
+        assert engine_cache.load_cache_rows(
+            owned, [_one_cache_row("magemin", {"n": 5}, {"answer": 5}, 5)]
+        ) == 1
+        assert engine_cache.drop_chemistry_version("magemin", "1") == 1
+        assert engine_cache.cached_engine_call(
+            "magemin", {"n": 6}, lambda: {"answer": 6}
+        ) == {"answer": 6}
+    counts = engine_cache.engine_cache_counters()["magemin"]
+    assert counts["stores"] == 0
+    assert counts["not_stored:readonly"] == 1
+    assert _row_count(owned) == 0
+
+
+def test_symlink_and_relative_runner_paths_stay_readonly(tmp_path, monkeypatch) -> None:
+    runner = tmp_path / "runner.sqlite"
+    link = tmp_path / "runner-link.sqlite"
+    link.symlink_to(runner)
+    relative = os.path.relpath(runner)
+    relative_link = os.path.relpath(link)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(runner))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    namespace = dict(engine_cache.__dict__)
+    namespace["_probe_calls"] = []
+    real_seed = _compile_adapter_solve(
+        "def _adapter_solve():\n"
+        "    _probe_calls.append('seed')\n"
+        "    return {'answer': 'cached'}\n",
+        namespace,
+    )
+    with engine_cache.runner_engine_cache_snapshot(str(runner), ""):
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 1}, real_seed
+        ) == {"answer": "cached"}
+    assert _row_count(runner) == 1
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+
+    spellings = (
+        ("symlink-env", str(link), str(runner)),
+        ("relative-env", relative, str(runner)),
+        ("relative-snapshot", str(runner), relative),
+        ("link-snapshot", str(runner), relative_link),
+    )
+    for label, env_path, snapshot_path in spellings:
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE", env_path)
+        engine_cache._close_connections()
+        engine_cache._MEMORY_CACHE.clear()
+        engine_cache.engine_cache_counters(reset=True)
+        namespace["_probe_calls"] = []
+        calls: list[str] = []
+
+        def double() -> dict[str, str]:
+            calls.append("double")
+            return {"answer": "live"}
+
+        real_hit = _compile_adapter_solve(
+            "def _adapter_solve():\n"
+            "    _probe_calls.append('hit')\n"
+            "    return {'answer': 'live'}\n",
+            namespace,
+        )
+        real_miss = _compile_adapter_solve(
+            "def _adapter_solve():\n"
+            f"    _probe_calls.append({label!r})\n"
+            "    return {'answer': 'new'}\n",
+            namespace,
+        )
+        with engine_cache.runner_engine_cache_snapshot(snapshot_path, "readonly"):
+            assert engine_cache.cached_engine_call(
+                "openimcc", {"request": 1}, double
+            ) == {"answer": "live"}
+            assert engine_cache.cached_engine_call(
+                "openimcc", {"request": 1}, real_hit
+            ) == {"answer": "cached"}
+            assert engine_cache.cached_engine_call(
+                "openimcc", {"request": label}, real_miss
+            ) == {"answer": "new"}
+            _expect_readonly(
+                lambda: engine_cache.drop_chemistry_version("openimcc", "1"), env_path
+            )
+            _expect_readonly(
+                lambda: engine_cache.load_cache_rows(
+                    env_path,
+                    [_one_cache_row("openimcc", {"request": 9}, {"answer": 9}, 9)],
+                ),
+                env_path,
+            )
+            _expect_readonly(
+                lambda: engine_cache.merge_cache_files(env_path, [runner]), env_path
+            )
+            _expect_readonly(
+                lambda: engine_cache.snapshot_cache(
+                    env_path, tmp_path / f"{label}-out.sqlite"
+                ),
+                env_path,
+            )
+        assert calls == ["double"]
+        assert namespace["_probe_calls"] == [label]
+        assert _row_count(runner) == 1
+        counts = engine_cache.engine_cache_counters()["openimcc"]
+        assert counts["hits"] == 1
+        assert counts["stores"] == 0
+        assert counts["not_stored:double"] == 1
+        assert counts["not_stored:readonly"] == 1
+        assert not (tmp_path / f"{label}-out.sqlite").exists()
+
+    owned = tmp_path / "owned.sqlite"
+    owned_link = tmp_path / "owned-link.sqlite"
+    owned_link.symlink_to(owned)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(owned_link))
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    with engine_cache.runner_engine_cache_snapshot(str(link), "readonly"):
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 1}, lambda: {"answer": 1}
+        ) == {"answer": 1}
+    assert _row_count(runner) == 1
+    assert _row_count(owned) == 1
+    assert engine_cache.engine_cache_counters()["openimcc"]["stores"] == 1

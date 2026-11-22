@@ -640,6 +640,8 @@ def test_autodetect_alphamelts_available_picks_alphamelts(
                for line in captured_logs)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_autodetect_alphamelts_wins_even_when_vaporock_and_magemin_report_available(
         monkeypatch, captured_logs):
     """VapoRock / MAGEMin is_available() flags are irrelevant to selection."""
@@ -671,6 +673,8 @@ def test_autodetect_alphamelts_wins_even_when_vaporock_and_magemin_report_availa
     assert isinstance(backend, _FakeAlphaMELTS)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_autodetect_with_vaporock_or_magemin_available_still_picks_internal_analytical(
         monkeypatch, captured_logs):
     """VapoRock/MAGEMin is_available()=True must not influence selection."""

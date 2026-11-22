@@ -196,6 +196,8 @@ def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
     assert "MgO" not in cleaned_mol
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -216,6 +218,8 @@ def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
     assert result.bridge.envelope_status == "inside"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     "composition_mol",
     (
@@ -273,6 +277,8 @@ def test_cleaned_melt_omits_absent_parent_activity() -> None:
     assert "Na2O" not in result.single_cation_activities
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("composition_mol", "expected"),
     (
@@ -303,6 +309,8 @@ def test_cleaned_melt_preserves_feo_equivalent_moles(
     assert observed[-1]["composition_mol"] == expected
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_cleaned_melt_refuses_missing_present_parent_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -336,6 +344,8 @@ def test_cleaned_melt_refuses_missing_present_parent_activity(
     assert "Na2O" in str(refusal)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("invalid_activity", (0.0, -1.0, float("nan")))
 def test_cleaned_melt_refuses_invalid_present_parent_activity(
     monkeypatch: pytest.MonkeyPatch,
@@ -374,6 +384,8 @@ def test_cleaned_melt_refuses_invalid_present_parent_activity(
     assert repr(invalid_activity) in str(refusal)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) -> None:
     import simulator.melt_backend.openimcc_bridge as bridge
 
@@ -622,6 +634,8 @@ def test_pack_digest_refuses_missing_binding_digest(pack) -> None:
     assert "install the recorded pin" in str(exc_info.value)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -644,6 +658,8 @@ def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
         _cleaned_melt_projection({'SiO2': 1.0})
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypatch) -> None:
     from simulator.accounting.exceptions import UnknownSpeciesError
     from simulator.melt_backend import openimcc_bridge
@@ -659,6 +675,8 @@ def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypa
     assert 'unknown test oxide' in str(exc_info.value)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_gas_solver_missing_binding_carries_attribute_error_detail(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -679,6 +697,8 @@ def test_gas_solver_missing_binding_carries_attribute_error_detail(monkeypatch) 
     assert 'evaluate_gas_oxygen_balance' in str(exc_info.value)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_binding_identity_only_converts_external_call_failures(monkeypatch) -> None:
     from simulator.melt_backend import openimcc_bridge
 
@@ -771,6 +791,8 @@ def test_engine_binding_identity_ignores_table_paths(tmp_path: Path) -> None:
     ) == openimcc_bridge.engine_binding_identity(melt_pack, packaged_gas)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("owner_mode", ("missing", "raising"))
 def test_engine_binding_identity_refuses_without_path_fallback(
     owner_mode: str,
@@ -1356,6 +1378,8 @@ def test_imported_openimcc_commit_matches_recorded_pin_when_importable() -> None
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
     _openimcc_or_skip()
     from simulator.melt_backend import openimcc_bridge
@@ -1370,6 +1394,8 @@ def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
     assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None:
     from simulator import engine_cache
     from simulator.melt_backend import openimcc_bridge
@@ -1403,6 +1429,8 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert requests[0][1]["pack"] == "published-ext"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_redox_result_keeps_its_type_across_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1455,6 +1483,8 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
     }
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_candidate_redox_pack_keeps_the_raw_valence_amounts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

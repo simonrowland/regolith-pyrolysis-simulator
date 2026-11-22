@@ -157,6 +157,8 @@ def test_liquidus_ignores_refusal_attributes_on_generic_exception() -> None:
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_initialize_preserves_execution_failure_and_real_absence(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -253,6 +255,8 @@ def test_initialize_propagates_local_model_resolution_error(
         ThermoEngineBackend().initialize({})
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_initialize_health_return_preserves_solver_failure_reason(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

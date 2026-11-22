@@ -551,6 +551,8 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
         backend.close()
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(('error_type', 'error_number'), [
     (BlockingIOError, errno.EAGAIN),
     (ConnectionResetError, errno.ECONNRESET),
