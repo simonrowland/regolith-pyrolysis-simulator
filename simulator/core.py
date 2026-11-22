@@ -8916,8 +8916,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # pressure gate, not published against an empty account.
         # A coupled leg below the floor is still posted. The
         # condenser is configured on this flux, so a posted species
-        # is added first. An above-floor endpoint is replaced only
-        # when the integral exceeds it by more than the floor.
+        # is added first. The floor does not sit between an
+        # above-floor endpoint and a larger integral. That integral
+        # is the posted rate, and the overhead oxygen follows it.
         source_kg = None
         post_subfloor_species: list[str] = []
         if solved is not None:
@@ -9000,7 +9001,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         available_kg,
                     )
                 )
-                if posted > current + rate_floor_kg_hr:
+                # Premise: overhead oxygen is O2_per times the posted
+                # rate. The solve added the integral. An above-floor
+                # endpoint is that rate only when the integral does
+                # not exceed it. A larger integral is posted, and the
+                # floor is not a gap that keeps the endpoint.
+                # Algebra: adopt when posted > current and the
+                # endpoint is above the floor, or when the integral
+                # clears the endpoint by more than the floor. A
+                # smaller subfloor integral stays on the else branch.
+                # Unit check: both sides are kilograms this hour.
+                # Limit: posted <= current leaves the endpoint. That
+                # rate is the reaction extent the projector
+                # integrated. source_kg stays the integral, the vapour
+                # still in the headspace after capture.
+                if (
+                    (posted > current and current > rate_floor_kg_hr)
+                    or posted > current + rate_floor_kg_hr
+                ):
                     parent_blocks = (
                         bool(parent)
                         and oxide_per > 0.0
