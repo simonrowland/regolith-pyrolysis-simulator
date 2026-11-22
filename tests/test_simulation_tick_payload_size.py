@@ -173,10 +173,12 @@ def _assert_campaign_hourly_payload_is_bounded(
     consecutive pair — a campaign boundary, and both hours of a run
     shorter than three — is capped at ``CAMPAIGN_UNCHECKED_STEP_BYTES``.
     The net rise from the first sample to the last is capped at
-    ``CAMPAIGN_WINDOW_NET_RISE_BYTES``, so a chain of one-hour campaigns
-    cannot stair-step under the per-step cap. Those caps leave room for
-    one more block of the measured size. They do not tell a fixed block
-    from a history; the slope gate and the every-hour tick gate do.
+    ``CAMPAIGN_WINDOW_NET_RISE_BYTES``. That bounds the total a staircase
+    of one-hour campaigns can add across the window. It does not forbid
+    a staircase under the cap: ten steps of +199 sum to 1990 and pass.
+    Those caps leave room for one more block of the measured size. They
+    do not tell a fixed block from a history; the slope gate and the
+    every-hour tick gate do.
 
     Hours 5–12 at df8da164a1 are one C0 point (6204), C0B
     (6406, 6428, 6406), then C2A_STAGED (7192, 7198, 7193, 7200).
@@ -897,6 +899,28 @@ def test_hourly_payload_gate_rejects_one_hour_campaign_staircase() -> None:
                 ("C0B", 2, 2_999),
                 ("C2A", 3, 4_998),
                 ("C3", 4, 6_997),
+            ],
+        )
+
+
+def test_hourly_payload_gate_rejects_step_the_net_cap_misses() -> None:
+    """This is the step-cap witness.
+
+    The ten-step +202 series is the net-cap witness. The internal A
+    step is +1600, above ``CAMPAIGN_UNCHECKED_STEP_BYTES`` (1572). The
+    window net is 2700 - 1000 = 1700, under
+    ``CAMPAIGN_WINDOW_NET_RISE_BYTES`` (1992). Deleting the step assert
+    would let this series pass. The 49000-byte short run and the +1999
+    staircase also exceed the net cap, so they are not this witness.
+    """
+    with pytest.raises(AssertionError, match="stepped 1600 bytes"):
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            [
+                ("A", 1, 1_000),
+                ("A", 2, 2_600),
+                ("B", 3, 2_600),
+                ("B", 4, 2_700),
             ],
         )
 
