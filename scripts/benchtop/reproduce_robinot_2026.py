@@ -58,6 +58,7 @@ from simulator.thermal_budget import (
     FACE_FULL_SIDE,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
+    reported_temperature_observations,
 )
 
 
@@ -234,7 +235,9 @@ def _run_case(
     face_set: str | None = None,
     solar_absorptance: float | None = None,
     pressure_driver: str = DRIVER_IMPOSED,
+    variant: str,
 ) -> dict[str, Any]:
+    print(f"Robinot reproduction: starting {variant}", flush=True)
     schedule = deepcopy(dict(spec.lab_schedule))
     geometry = deepcopy(dict(spec.lab_geometry))
     driver = schedule[FURNACE_POWER_DRIVER_KEY]
@@ -655,10 +658,32 @@ def _compare_trajectory(
     return records
 
 
+def _reported_pyrometer_observation(
+    spec: PresetRunSpec,
+) -> tuple[Mapping[str, Any] | None, str | None]:
+    points = reported_temperature_observations(
+        spec.lab_schedule.get("melt_temperature_C")
+    )
+    peak_points = [
+        point
+        for point in points
+        if str(point.get("qualifier") or "") == "approximate_peak"
+    ]
+    if not peak_points:
+        return None, "missing_reported_pyrometer_observation"
+    if len(peak_points) != 1:
+        return None, "ambiguous_reported_pyrometer_observation"
+    point = peak_points[0]
+    if point.get("value") is None:
+        return None, "incomplete_reported_pyrometer_observation"
+    return point, None
+
+
 def _pyrometer_record(
     run_data: Mapping[str, Any],
     *,
-    published_temperature_C: float,
+    observation: Mapping[str, Any] | None,
+    unavailable_reason: str | None,
     mode: str,
 ) -> dict[str, Any]:
     predictions = [
@@ -666,28 +691,74 @@ def _pyrometer_record(
         for record in run_data["power_temperature_records"]
         if record.get("temperature_C") is not None
     ]
+    source_locator = (
+        None
+        if observation is None
+        else {
+            "preset_field": "lab_schedule.melt_temperature_C",
+            "source_ref": observation.get("source_ref"),
+            "citation_id": observation.get("citation_id"),
+            "source_class": observation.get("source_class"),
+            "t_h": observation.get("t_h"),
+        }
+    )
     if not predictions:
         return {
             "t": None,
             "observable": "robinot_pyrometer_peak_temperature_C",
-            "published": published_temperature_C,
+            "published": (
+                None if observation is None else float(observation["value"])
+            ),
             "simulated": None,
             "residual": None,
-            "flags": ["power_temperature_prediction_unavailable"],
+            "flags": [
+                "power_temperature_prediction_unavailable",
+                *(
+                    []
+                    if observation is not None
+                    else ["comparison_observation_unavailable", unavailable_reason]
+                ),
+            ],
+            "comparison_status": "typed_unavailable",
+            "unavailable_reason": "power_temperature_prediction_unavailable",
+            "published_qualifier": (
+                None if observation is None else observation.get("qualifier")
+            ),
+            "source_locator": source_locator,
             "mode": mode,
             "units": "degC",
         }
     peak = max(predictions, key=lambda item: float(item["temperature_C"]))
     simulated = float(peak["temperature_C"])
+    if observation is None:
+        return {
+            "t": None,
+            "prediction_time_min": peak.get("time_min"),
+            "observable": "robinot_pyrometer_peak_temperature_C",
+            "published": None,
+            "simulated": simulated,
+            "residual": None,
+            "flags": ["comparison_observation_unavailable", unavailable_reason],
+            "comparison_status": "typed_unavailable",
+            "unavailable_reason": unavailable_reason,
+            "mode": mode,
+            "units": "degC",
+            "source_locator": None,
+        }
+    published_temperature_C = float(observation["value"])
     return {
         "t": None,
         "prediction_time_min": peak.get("time_min"),
+        "observation_time_h": observation.get("t_h"),
         "observable": "robinot_pyrometer_peak_temperature_C",
         "published": published_temperature_C,
         "simulated": simulated,
         "residual": simulated - published_temperature_C,
+        "comparison_status": "available",
+        "published_qualifier": observation.get("qualifier"),
+        "source_locator": source_locator,
         "flags": [
-            "observed_peak_time_not_reported",
+            "approximate_peak_observation",
             "prediction_not_scored_as_observed_temperature",
         ],
         "mode": mode,
@@ -1015,22 +1086,28 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
     lines.extend(["", "## Melt-temperature prediction and pyrometer observation", ""])
     lines.extend(
         [
-            "| Mode | t (min) | Predicted melt temperature (C) | Printed pyrometer observation (C) |",
-            "|---|---:|---:|---:|",
+            "| Mode | Predicted peak (C) | Pyrometer observation (C) | Qualifier | "
+            "Comparison status | Source locator | Flags |",
+            "|---|---:|---:|---|---|---|---|",
         ]
     )
     for record in summary["records"]:
-        if record.get("observable") == "predicted_melt_temperature_C":
-            lines.append(
-                f"| {record['mode']} | {float(record['t']):.6g} | "
-                f"{float(record['simulated']):.6g} | - |"
-            )
-    for record in summary["records"]:
         if record.get("observable") == "robinot_pyrometer_peak_temperature_C":
             lines.append(
-                f"| {record['mode']} | peak | "
-                f"{format_value(record.get('simulated'))} | "
-                f"{format_value(record.get('published'))} |"
+                "| {mode} | {predicted} | {observed} | {qualifier} | {status} | "
+                "{locator} | {flags} |".format(
+                    mode=record["mode"],
+                    predicted=format_value(record.get("simulated")),
+                    observed=format_value(record.get("published")),
+                    qualifier=record.get("published_qualifier") or "-",
+                    status=record.get("comparison_status", "typed_unavailable"),
+                    locator=(
+                        "-"
+                        if record.get("source_locator") is None
+                        else json.dumps(record["source_locator"], sort_keys=True)
+                    ),
+                    flags=", ".join(record.get("flags") or ()),
+                )
             )
     lines.extend(["", "## Notices and flags", ""])
     notices = summary["notices_and_flags"]
@@ -1066,27 +1143,14 @@ def run_reproduction(
         spec.document["comparison_contract"]["observation_sidecar_path"]
     )
     observations = load_vacuum_pyrolysis_observations(observation_sidecar)
-    measurement = observations.get("measurements", {}).get(
-        str(spec.document["measurement_id"]),
-        {},
+    pyrometer_observation, pyrometer_unavailable_reason = (
+        _reported_pyrometer_observation(spec)
     )
-    reported_peak_temperature = next(
-        (
-            float(point["reported_value"])
-            for point in measurement.get("numerically_extractable_from_markdown", ())
-            if point.get("observable") == "peak_temperature"
-            and point.get("reported_unit") == "degC"
-        ),
-        None,
-    )
-    if reported_peak_temperature is None:
-        raise RobinotReproductionError(
-            "the observation sidecar does not define Robinot's peak pyrometer value"
-        )
     imposed_run = _run_case(
         spec=spec,
         corpus=corpus,
         max_steps=max_steps,
+        variant=DRIVER_IMPOSED,
     )
     limiting_mode = "limiting_case_unrestricted_conductance"
     limiting_run = _run_case(
@@ -1094,6 +1158,7 @@ def run_reproduction(
         corpus=corpus,
         max_steps=max_steps,
         pressure_driver=DRIVER_APPARATUS,
+        variant=limiting_mode,
     )
     records = _compare_trajectory(
         spec=spec,
@@ -1114,14 +1179,16 @@ def run_reproduction(
     records.append(
         _pyrometer_record(
             imposed_run,
-            published_temperature_C=reported_peak_temperature,
+            observation=pyrometer_observation,
+            unavailable_reason=pyrometer_unavailable_reason,
             mode=DRIVER_IMPOSED,
         )
     )
     records.append(
         _pyrometer_record(
             limiting_run,
-            published_temperature_C=reported_peak_temperature,
+            observation=pyrometer_observation,
+            unavailable_reason=pyrometer_unavailable_reason,
             mode=limiting_mode,
         )
     )
@@ -1149,18 +1216,21 @@ def run_reproduction(
             corpus=corpus,
             max_steps=max_steps,
             face_set=FACE_FULL_SIDE,
+            variant="imposed_full_side_default",
         )
         sensitivity_runs["imposed_hot_upper_alpha_0.669"] = _run_case(
             spec=spec,
             corpus=corpus,
             max_steps=max_steps,
             solar_absorptance=GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
+            variant="imposed_hot_upper_alpha_0.669",
         )
         sensitivity_runs["imposed_hot_upper_alpha_0.906"] = _run_case(
             spec=spec,
             corpus=corpus,
             max_steps=max_steps,
             solar_absorptance=GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
+            variant="imposed_hot_upper_alpha_0.906",
         )
     sensitivity_cases = {
         name: _sensitivity_metrics(run_data)
@@ -1308,18 +1378,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (RobinotReproductionError, ValueError, OSError) as exc:
         print(f"Robinot reproduction refused: {exc}", file=sys.stderr)
         return 2
-    args.out.mkdir(parents=True, exist_ok=True)
-    json_path = args.out / "robinot_2026_reproduction.json"
-    markdown_path = args.out / "robinot_2026_reproduction.md"
+    json_path, markdown_path = _write_outputs(summary, args.out)
+    print(f"Wrote {json_path}")
+    print(f"Wrote {markdown_path}")
+    return 0
+
+
+def _write_outputs(
+    summary: Mapping[str, Any],
+    output_dir: Path,
+) -> tuple[Path, Path]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = output_dir / "robinot_2026_reproduction.json"
+    markdown_path = output_dir / "robinot_2026_reproduction.md"
     json_path.write_text(
         json.dumps(summary, ensure_ascii=True, allow_nan=False, indent=2, sort_keys=True)
         + "\n",
         encoding="utf-8",
     )
     markdown_path.write_text(_markdown_report(summary), encoding="utf-8")
-    print(f"Wrote {json_path}")
-    print(f"Wrote {markdown_path}")
-    return 0
+    return json_path, markdown_path
 
 
 if __name__ == "__main__":
