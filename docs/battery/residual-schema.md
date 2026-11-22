@@ -50,10 +50,9 @@ fit quantity share a series id, so the grid is one flagged series rather than
 independent measurements. NASA-9 comparison JSONL rows serialize these notices
 in `notices`.
 
-Policy (d-460): predict outside-range fit temperatures and attach
-`out_of_certified_band` naming the range. Until scorer-gates task t-1922 lands,
-out-of-range fit temperatures are not scored. Engine-polynomial extrapolation
-with `out_of_certified_band` is handled by
+Out-of-range fit temperatures are not scored. Predicting them with
+`out_of_certified_band` is d-460 policy and is not in t-1922a, t-1922b, or
+t-1923. Engine-polynomial extrapolation with `out_of_certified_band` is handled by
 `compilation_tier._nasa_cea_9_state`, a different path.
 
 ## Composition and liquidus storage rules

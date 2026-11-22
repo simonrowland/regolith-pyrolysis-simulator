@@ -42,17 +42,26 @@ The migrator never invents a value: an unprinted pressure, phase or method stays
 the store. Absence is never stored as a measured zero, and no scorer default is written back
 into the extract. Policy (d-460): when a row is otherwise callable, use a stated default with
 a typed flag naming the default and original reason, and report its prediction in the flagged
-tier. Policy (d-451) calls for unstated pressure to use 1 atm with an assumed-pressure flag;
-current code only assumes 1 bar for crystal pure-standard H, Cp and S, with an
-`out_of_certified_band` notice whose reason is `standard-pressure-assumed`. The battery scorer
-still refuses missing total pressure as `identity_incomplete`, except for the Borisov 2018
-compilation, which is a 1 atm dataset. Policy (d-456) calls for an unprinted apparatus knob to
-use the simulator default with `knob_defaulted`; until t-1922b lands, missing apparatus
-determinants still refuse as `underdetermined_apparatus`, and no `knob_defaulted` notice exists.
-An unsourced evaporation coefficient should use α = 1, the Hertz–Knudsen upper bound, with a
-typed flag under d-460. Until t-1922b lands, the battery scorer still refuses
-`alpha_not_sourced` and `evaporation_coefficients_not_sourced`; these refusals are d-460 debt
-in the refusal census.
+tier. The general d-460 policy is that an otherwise callable observation with unstated pressure
+is predicted using a stated default and a typed flag; no car implements the general 1 atm default
+yet. Decision d-451 assumes a total pressure for liquidus/solidus `transition_temperature` rows
+whose source prints none, with a typed assumed-pressure flag, and does not extend to other
+quantities, Knudsen/KEMS cells, or oxygen. The note on d-451 says follow d-280: 1 bar, and
+high-pressure apparatus still refuses. That scorer default is not implemented.
+`identity.assumed_crystal_standard_pressure_Pa` assumes 1 bar (100000 Pa) for crystal
+pure-standard H, Cp, and S and records `out_of_certified_band` with reason prefix
+`standard-pressure-assumed` and band `1 bar`. When an experiment carries
+`ambient_pressure_evidence` and total pressure is unprinted, `migrate` stores 101325 Pa with
+`total_pressure_ambient_open_furnace`. `score._fe_redox_pressure` uses 1 atm for source
+`borisov-2018-compilation` and refuses every other missing total pressure as
+`identity_incomplete`. Do not assign that refusal to t-1922; the coverage plan puts unstated
+`total_pressure_Pa` in W3 (t-1924), and no briefed car implements it. Policy (d-456) calls for an
+unprinted apparatus knob to use the simulator default with `knob_defaulted`; until t-1922b lands,
+missing apparatus determinants still refuse as `underdetermined_apparatus`, and no
+`knob_defaulted` notice exists. An unsourced evaporation coefficient should use α = 1, the
+Hertz–Knudsen upper bound, with a typed flag under d-460. Until t-1922b lands, the battery scorer
+still refuses `alpha_not_sourced` and `evaporation_coefficients_not_sourced`; these refusals are
+d-460 debt in the refusal census.
 
 ## Quoted records and inherited values
 
@@ -229,7 +238,7 @@ flag other unknowns using stated defaults. Current code still refuses method and
 failures (`method_unknown`, `effusion_regime_unverified`; t-1922a), missing apparatus and unsourced
 evaporation coefficients (`underdetermined_apparatus`, `alpha_not_sourced`,
 `evaporation_coefficients_not_sourced`; t-1922b), missing total pressure (`identity_incomplete`;
-t-1922), and liquidus quantities without a predictor (`quantity_not_predicted`; t-1923). Until
+W3 / t-1924), and liquidus quantities without a predictor (`quantity_not_predicted`; t-1923). Until
 those tasks land, these refusals are d-460 debt counted by reason in the refusal census. A refusal
 is a diagnostic: the report's refusal census counts every reason, marking where data or
 certification is still needed.

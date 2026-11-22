@@ -425,16 +425,20 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
   `α = 0.13` (envelope 0.10–0.16); it does not inherit the sodium ceiling.
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
   conflicting-proxy envelope. These are labelled as proxies, not regolith-melt measurements.
-- **No grounded coefficient.** Chromium, manganese, and the chromium-oxide vapor have no grounded
-  coefficient (`evaporation_alpha_policy.policy = fail_loud_missing_alpha`; no stored alpha).
-  `evaporation._load_evaporation_alpha_by_species` omits them. The flux publisher's
-  `publisher_effective_alpha` then uses α = 1, the Hertz–Knudsen upper bound, with status
-  `analytical_upper_bound` and a warning naming the species. That is the flux publisher, not the
-  battery scorer, and it is not the battery flagged tier. Species with a cited
-  `evaporation_alpha` keep that coefficient. Policy (d-460): the battery scorer should predict an
-  unsourced coefficient as α = 1 with a typed flag in the flagged tier. Until t-1922b lands,
-  battery rows still refuse `alpha_not_sourced` and `evaporation_coefficients_not_sourced`; those
-  refusals are d-460 debt in the refusal census.
+- **No grounded coefficient.** Chromium metal stores a cited coefficient, Pound 1972, value 0.9,
+  tier 1 (`families.metals_cr_family`). Manganese stores an owner-ratified monoatomic-class proxy,
+  value 1.0, tier 2, tag `proxy` (`families.metals_mn_family`); that is a stored coefficient, and
+  the source text says no Mn-specific measurement exists. CrO, CrO2, and CrO3 store proxy
+  coefficients of 0.9 inherited from the chromium-metal family.
+  `evaporation._load_evaporation_alpha_by_species` keeps a species that has an
+  `evaporation_alpha` key. `publisher_effective_alpha` uses `_DEFAULT_EVAPORATION_ALPHA` (1.0,
+  status `analytical_upper_bound`) when the species and the `*` wildcard are both absent from the
+  loaded map. `fail_loud_missing_alpha` is not a policy token in `data/vapor_pressures.yaml`.
+  Rows with `evaporation_alpha.status: no_data` (NaF uses `policy: refuse_nonzero_flux`) are the
+  omission path. Species with a stored `evaporation_alpha` keep that coefficient. Policy (d-460):
+  the battery scorer should predict an unsourced coefficient as α = 1 with a typed flag in the
+  flagged tier. Until t-1922b lands, battery mass-loss rows still refuse `alpha_not_sourced` and
+  `evaporation_coefficients_not_sourced`.
 <!-- impl: §4.2 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:800 — alpha fallback policy -->
 
 SiO is treated specially because the hot-source and cold-wall interfaces are physically different.
