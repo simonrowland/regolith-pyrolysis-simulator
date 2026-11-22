@@ -71,7 +71,13 @@ def _without_certified_counts(text: str) -> str:
     census_heading = "## Eligibility conjunct failure census"
     if census_heading in text:
         before, _separator, after = text.partition(census_heading)
-        next_headings = ("## Measured tier", "## Per rail × engine headline")
+        # Coverage is inserted after the eligibility census. Stop there so
+        # the pin keeps the coverage block and still drops the census.
+        next_headings = (
+            "## Coverage",
+            "## Measured tier",
+            "## Per rail × engine headline",
+        )
         next_heading = min(
             (heading for heading in next_headings if heading in after),
             key=after.index,
@@ -275,6 +281,33 @@ PIN_SUMMARY_JSON = """\
     "label": "assumed band — literature method precision; confidence not stated",
     "records": [],
     "refusal_counts": {}
+  },
+  "capability_matrix": {
+    "cross_product_total": 2,
+    "engines": [
+      "internal-analytical"
+    ],
+    "n_candidate_observations": 2,
+    "n_quantity_unknown": 0,
+    "quantities_no_engine_predicts": [],
+    "rows": [
+      {
+        "covered": true,
+        "engine": "internal-analytical",
+        "n_observations": 2,
+        "quantity": "p_sat",
+        "rail": "vapour"
+      }
+    ],
+    "uncovered_pair_total": 0
+  },
+  "coverage": {
+    "callable_observations": 2,
+    "coverage": "0.500",
+    "n_records": 2,
+    "n_refused_records": 1,
+    "n_scored_observations": 1,
+    "n_scored_records": 1
   },
   "kind": "battery_headline_summary",
   "records": [
@@ -957,6 +990,22 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 |---|---|---|---|---:|---:|---:|
 | vapour | internal-analytical | quantity_unknown | dex | 1 | 0.5 | — |
 
+## Coverage
+
+Coverage is observations with a numeric residual from at least one
+scoring engine, divided by callable comparison candidates. Callable
+means the quantity is in at least one scoring engine's declared
+capability set. A quantity no declared engine predicts is a
+capability-matrix cell, not a refusal, and is outside this ratio.
+The candidate population is the live candidate census, not the
+residual ledger.
+
+| scored observations | callable observations | coverage |
+|---|---:|---:|
+| 1 | 2 | 0.500 |
+
+Per-record diagnostic (residual rows, not observations): n_records=2 n_scored=1 n_refused=1.
+
 ## Measured tier
 
 Numeric measured rows stay visible. score_eligible and inside-band counts are reported separately. Compilation rows are not in this table.
@@ -1032,6 +1081,29 @@ Measured tier only. Compilation refusals are in the compilation table.
 |---|---:|
 | `unsupported:fixture_unavailable` | 1 |
 
+Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0.
+
+## Capability matrix
+
+Engine × quantity × rail for comparison candidates. A cell this
+engine does not cover is not a residual. The uncovered pair total
+is the cross-product records this report's engine list does not
+emit. Quantities no declared engine predicts are listed with their
+observation count. Residue quantities are outside this table; a
+bound residue adapter still emits a residual.
+
+Matrix total (candidate observations × engines): 2. Uncovered pairs: 0. Quantity unknown, not a matrix cell: 0.
+
+| engine | quantity | rail | n observations | covered |
+|---|---|---|---:|---|
+| internal-analytical | p_sat | vapour | 2 | yes |
+
+### Quantities no engine predicts
+
+| quantity | rail | n observations |
+|---|---|---:|
+| (none) | — | 0 |
+
 ## Admission
 
 score_eligible requires canonical admission admitted. Pending rows
@@ -1080,6 +1152,33 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
     "label": "assumed band — literature method precision; confidence not stated",
     "records": [],
     "refusal_counts": {}
+  },
+  "capability_matrix": {
+    "cross_product_total": 2,
+    "engines": [
+      "internal-analytical"
+    ],
+    "n_candidate_observations": 2,
+    "n_quantity_unknown": 0,
+    "quantities_no_engine_predicts": [],
+    "rows": [
+      {
+        "covered": true,
+        "engine": "internal-analytical",
+        "n_observations": 2,
+        "quantity": "p_sat",
+        "rail": "vapour"
+      }
+    ],
+    "uncovered_pair_total": 0
+  },
+  "coverage": {
+    "callable_observations": 2,
+    "coverage": "0.500",
+    "n_records": 2,
+    "n_refused_records": 1,
+    "n_scored_observations": 1,
+    "n_scored_records": 1
   },
   "kind": "battery_headline_summary",
   "records": [
@@ -1715,6 +1814,22 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 |---|---|---|---|---:|---:|---:|
 | vapour | internal-analytical | quantity_unknown | dex | 1 | 0.5 | — |
 
+## Coverage
+
+Coverage is observations with a numeric residual from at least one
+scoring engine, divided by callable comparison candidates. Callable
+means the quantity is in at least one scoring engine's declared
+capability set. A quantity no declared engine predicts is a
+capability-matrix cell, not a refusal, and is outside this ratio.
+The candidate population is the live candidate census, not the
+residual ledger.
+
+| scored observations | callable observations | coverage |
+|---|---:|---:|
+| 1 | 2 | 0.500 |
+
+Per-record diagnostic (residual rows, not observations): n_records=2 n_scored=1 n_refused=1.
+
 ## Measured tier
 
 Numeric measured rows stay visible. score_eligible and inside-band counts are reported separately.
@@ -1780,6 +1895,29 @@ Measured tier only. Compilation refusals are in the compilation table.
 | reason | n |
 |---|---:|
 | `unsupported:fixture_unavailable` | 1 |
+
+Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0.
+
+## Capability matrix
+
+Engine × quantity × rail for comparison candidates. A cell this
+engine does not cover is not a residual. The uncovered pair total
+is the cross-product records this report's engine list does not
+emit. Quantities no declared engine predicts are listed with their
+observation count. Residue quantities are outside this table; a
+bound residue adapter still emits a residual.
+
+Matrix total (candidate observations × engines): 2. Uncovered pairs: 0. Quantity unknown, not a matrix cell: 0.
+
+| engine | quantity | rail | n observations | covered |
+|---|---|---|---:|---|
+| internal-analytical | p_sat | vapour | 2 | yes |
+
+### Quantities no engine predicts
+
+| quantity | rail | n observations |
+|---|---|---:|
+| (none) | — | 0 |
 
 ## Admission
 

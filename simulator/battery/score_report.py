@@ -14,7 +14,6 @@ from typing import Iterable, Mapping, Protocol, Sequence
 from simulator.battery.enums import Engine
 from simulator.battery.records import Observation
 from simulator.battery.score_report_data import (
-    DefaultPolicyCensus,
     ElementRetentionReportData,
     EligibilityFailureCensus,
     Nasa9FitComparisonData,
@@ -24,26 +23,93 @@ from simulator.battery.score_report_data import (
 REPORT_HEADING = "# Battery score report (schema v2.1)"
 
 
-def format_default_policy_census_report(
-    report: str, census: DefaultPolicyCensus
-) -> str:
-    lines = [
+def coverage_markdown_lines(coverage: Mapping[str, object]) -> list[str]:
+    """Per-observation coverage. The caller computed the counts."""
+
+    return [
+        "## Coverage",
         "",
-        "## Default policy census",
+        "Coverage is observations with a numeric residual from at least one",
+        "scoring engine, divided by callable comparison candidates. Callable",
+        "means the quantity is in at least one scoring engine's declared",
+        "capability set. A quantity no declared engine predicts is a",
+        "capability-matrix cell, not a refusal, and is outside this ratio.",
+        "The candidate population is the live candidate census, not the",
+        "residual ledger.",
         "",
-        "Numeric flagged residuals, grouped by the applied policy id and status.",
+        "| scored observations | callable observations | coverage |",
+        "|---|---:|---:|",
+        (
+            f"| {coverage['n_scored_observations']} | "
+            f"{coverage['callable_observations']} | {coverage['coverage']} |"
+        ),
         "",
-        "| policy_id | status | flagged residuals |",
-        "|---|---|---:|",
+        "Per-record diagnostic (residual rows, not observations): "
+        f"n_records={coverage['n_records']} "
+        f"n_scored={coverage['n_scored_records']} "
+        f"n_refused={coverage['n_refused_records']}.",
     ]
-    if not census.rows:
+
+
+def capability_matrix_total_line(matrix: Mapping[str, object]) -> str:
+    return (
+        "Capability-matrix total (candidate observations × engines in this report): "
+        f"{matrix['cross_product_total']}. "
+        "Uncovered pairs not emitted as residuals: "
+        f"{matrix['uncovered_pair_total']}."
+    )
+
+
+def capability_matrix_markdown_lines(matrix: Mapping[str, object]) -> list[str]:
+    """Format an already-counted engine × quantity × rail matrix."""
+
+    lines = [
+        "## Capability matrix",
+        "",
+        "Engine × quantity × rail for comparison candidates. A cell this",
+        "engine does not cover is not a residual. The uncovered pair total",
+        "is the cross-product records this report's engine list does not",
+        "emit. Quantities no declared engine predicts are listed with their",
+        "observation count. Residue quantities are outside this table; a",
+        "bound residue adapter still emits a residual.",
+        "",
+        (
+            f"Matrix total (candidate observations × engines): {matrix['cross_product_total']}. "
+            f"Uncovered pairs: {matrix['uncovered_pair_total']}. "
+            f"Quantity unknown, not a matrix cell: {matrix['n_quantity_unknown']}."
+        ),
+        "",
+        "| engine | quantity | rail | n observations | covered |",
+        "|---|---|---|---:|---|",
+    ]
+    rows = matrix["rows"]
+    if not rows:
+        lines.append("| (none) | — | — | 0 | — |")
+    else:
+        for row in rows:
+            covered = "yes" if row["covered"] else "no"
+            lines.append(
+                f"| {row['engine']} | {row['quantity']} | {row['rail']} | "
+                f"{row['n_observations']} | {covered} |"
+            )
+    lines.extend(
+        [
+            "",
+            "### Quantities no engine predicts",
+            "",
+            "| quantity | rail | n observations |",
+            "|---|---|---:|",
+        ]
+    )
+    missing = matrix["quantities_no_engine_predicts"]
+    if not missing:
         lines.append("| (none) | — | 0 |")
     else:
-        lines.extend(
-            f"| {policy_id} | {status} | {count} |"
-            for policy_id, status, count in census.rows
-        )
-    return report.rstrip() + "\n" + "\n".join(lines) + "\n"
+        for row in missing:
+            lines.append(
+                f"| {row['quantity']} | {row['rail']} | {row['n_observations']} |"
+            )
+    return lines
 
 
 def format_assumed_band_report(report: str, data: Mapping[str, object]) -> str:
@@ -493,6 +559,8 @@ def render_legacy_score_report_markdown(
     status_diff: Sequence[Mapping[str, object]],
     unmapped_legacy_keys: Sequence[str],
     circularity_warning: str,
+    coverage: Mapping[str, object] | None = None,
+    capability_matrix: Mapping[str, object] | None = None,
 ) -> str:
     lines: list[str] = [
         REPORT_HEADING,
@@ -566,6 +634,8 @@ def render_legacy_score_report_markdown(
             *_eligibility_failure_census_lines(eligibility_census),
         ]
     )
+    if coverage is not None:
+        lines.extend(["", *coverage_markdown_lines(coverage)])
     lines.extend(
         [
             "",
@@ -655,6 +725,15 @@ def render_legacy_score_report_markdown(
         else:
             for reason, n in census.items():
                 lines.append(f"| `{reason}` | {n} |")
+    if capability_matrix is not None:
+        lines.extend(
+            [
+                "",
+                capability_matrix_total_line(capability_matrix),
+                "",
+                *capability_matrix_markdown_lines(capability_matrix),
+            ]
+        )
     admit = {
         "residuals_with_admission_exclusion": admission_with,
         "residuals_admission_alone": admission_alone,
@@ -776,6 +855,8 @@ def render_payload_score_report_markdown(
     status_diff: Sequence[Mapping[str, object]],
     unmapped_legacy_keys: Sequence[str],
     circularity_warning: str,
+    coverage: Mapping[str, object] | None = None,
+    capability_matrix: Mapping[str, object] | None = None,
 ) -> str:
     lines: list[str] = [
         REPORT_HEADING,
@@ -806,6 +887,8 @@ def render_payload_score_report_markdown(
             *_eligibility_failure_census_lines(eligibility_census),
         ]
     )
+    if coverage is not None:
+        lines.extend(["", *coverage_markdown_lines(coverage)])
     lines.extend(
         [
             "",
@@ -890,6 +973,15 @@ def render_payload_score_report_markdown(
     else:
         for reason, n in refusal_counts.items():
             lines.append(f"| `{reason}` | {n} |")
+    if capability_matrix is not None:
+        lines.extend(
+            [
+                "",
+                capability_matrix_total_line(capability_matrix),
+                "",
+                *capability_matrix_markdown_lines(capability_matrix),
+            ]
+        )
     lines.extend(
         [
             "",
