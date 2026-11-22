@@ -158,8 +158,20 @@ def _engine_models():
     openimcc_channels, _ = _openimcc_gas_channels_and_omission_notices(
         openimcc_state.parent_oxides, gas_pack
     )
+    from openimcc.gas import gas_channel_metadata
+    from simulator.accounting.formulas import resolve_species_formula
+
+    openimcc_metadata = gas_channel_metadata(
+        openimcc_state.parent_oxide_activities,
+        temperature_K,
+        gas_pack,
+        parent_oxides=openimcc_state.parent_oxides,
+    )
     openimcc_channel_rows: list[_VacuumOxygenChannel] = []
     for species, (parent, _gas_molecules, _oxygen_molecules) in openimcc_channels:
+        source = openimcc_metadata[species]
+        if not source.available or source.neutral_pO2_exponent is None:
+            continue
         if species in {"O", "O2"}:
             is_active = True
             alpha_source = _OXYGEN_GAS_ALPHA_SOURCE
@@ -169,12 +181,23 @@ def _engine_models():
             ) <= 0.0:
                 continue
             match = _catalog_match(catalog_rows, species, parent)
-            assert match is not None, f"runtime catalog has no {species}/{parent} channel"
-            catalog_name, row = match
-            is_active = row.get("flux_dormant") is not True
-            alpha_source = _alpha_source_for_catalog_row(catalog_name, row)
-        channel = _species_metadata(
-            species, parent or None, alpha=_OXYGEN_GAS_ALPHA
+            if match is None:
+                is_active = True
+                alpha_source = f"common-unity sensitivity; no runtime row for {species}"
+            else:
+                catalog_name, row = match
+                is_active = row.get("flux_dormant") is not True
+                alpha_source = _alpha_source_for_catalog_row(catalog_name, row)
+        channel = _VacuumOxygenChannel(
+            species=species,
+            molar_mass_kg_per_mol=(
+                resolve_species_formula(species).molar_mass_kg_per_mol()
+            ),
+            oxygen_atoms=float(source.oxygen_atoms),
+            parent_oxygen_demand=float(source.parent_oxygen_demand),
+            pO2_exponent=float(source.neutral_pO2_exponent),
+            alpha=_OXYGEN_GAS_ALPHA,
+            alpha_source=alpha_source,
         )
         openimcc_channel_rows.append(
             replace(
@@ -484,22 +507,22 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
             unity.pO2_bar, rel=1.0e-9
         )
 
-    # openimcc 4fe8eaf refit the CaO(l) continuation used by this Hashimoto
-    # probe; at 30c51c8 the alpha=1 and 0.25 results are 0.8286161505495706 Pa
-    # and 0.3003449996328013 Pa, respectively.
-    # The two engines still use their own melt channel pressures for both arms.
-    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.160995d98f6e4p-17"
+    # At 9c327c2 the OpenIMCC alpha=1 and 0.25 results are 0.9211160035391689
+    # Pa and 0.3351602002897091 Pa after adding Si2O2(g). The internal
+    # analytical pressure model uses the package's O(g) coproduct factor, so
+    # its corresponding values move with that packaged gas table as well.
+    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.35134320e147dp-17"
     assert (
         solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
-    ).hex() == "0x1.a8406047187bap-1"
+    ).hex() == "0x1.d79c844e0bc03p-1"
     assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.3003449996328013, rel=2.0e-5
+        0.3351602002897091, rel=2.0e-5
     )
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        1.025329, rel=2.0e-5
+        0.9588653772116605, rel=2.0e-5
     )
     assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.374487, rel=2.0e-5
+        0.3493939413217713, rel=2.0e-5
     )
 
     # Replacing either engine's root by the other's does not close that engine's
@@ -611,6 +634,120 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
     _assert_residue_atoms_close(
         starting, dict(result.residue_mol), dict(result.evaporated_mol)
     )
+
+
+def test_openimcc_mixed_gas_channels_debit_all_parents_and_close_atoms() -> None:
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+    from openimcc.gas import gas_channel_metadata
+    from simulator.battery.residue import (
+        _channel_terms,
+        _openimcc_residue_channel,
+        _residue_oxygen_channels,
+        integrate_residue_inventory,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
+
+    parent_oxides = ("Al2O3", "SiO2")
+    activities = {parent: 1.0 for parent in parent_oxides}
+    gas_pack = load_gas_datapack()
+    raw_channels, _notices = _openimcc_gas_channels_and_omission_notices(
+        parent_oxides, gas_pack
+    )
+    reactions = {
+        species: reaction for species, reaction in raw_channels
+        if species in {"AlSiO", "Si2O2"}
+    }
+    assert set(reactions) == {"AlSiO", "Si2O2"}
+    metadata = gas_channel_metadata(
+        activities, 2000.0, gas_pack, parent_oxides=parent_oxides
+    )
+    channels = tuple(
+        _openimcc_residue_channel(
+            species, reaction[0], 1.0, "test common-unity channel"
+        )
+        for species, reaction in reactions.items()
+    )
+    terms = {
+        term.source.species: term
+        for term in _channel_terms(channels, require_oxygen_channels=False)
+    }
+    assert terms["AlSiO"].parent_moles_per_product == {
+        "Al2O3": 0.5,
+        "SiO2": 1.0,
+    }
+    assert terms["Si2O2"].parent_moles_per_product == {"SiO2": 2.0}
+    oxygen_terms = {
+        term.species: term
+        for term in _residue_oxygen_channels(
+            tuple(terms.values()), {"Al2O3": 1.0e-3, "SiO2": 1.0e-3}
+        )
+    }
+    for species in ("AlSiO", "Si2O2"):
+        assert oxygen_terms[species].oxygen_atoms == metadata[species].oxygen_atoms
+        assert oxygen_terms[species].parent_oxygen_demand == (
+            metadata[species].parent_oxygen_demand
+        )
+        assert oxygen_terms[species].pO2_exponent == (
+            metadata[species].neutral_pO2_exponent
+        )
+
+    result = integrate_residue_inventory(
+        {"Al2O3": 1.0e-3, "SiO2": 1.0e-3},
+        channels,
+        lambda _inventory, _logp: {"AlSiO": 1.0e5, "Si2O2": 1.0e5},
+        temperature_K=2000.0,
+        duration_s=1.0,
+        area_evolution_m2=(1.0,),
+        buffered_fO2_log=-10.0,
+    )
+    assert result.evaporated_mol["AlSiO"] > 0.0
+    assert result.evaporated_mol["Si2O2"] > 0.0
+    assert all(value >= 0.0 for value in result.residue_mol.values())
+    assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-12
+
+
+def test_internal_analytical_omits_only_unavailable_openimcc_gas_channels() -> None:
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.residue import _openimcc_residue_channel_set
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
+
+    raw_channels, source_notices = _openimcc_gas_channels_and_omission_notices(
+        ("Al2O3", "SiO2"), load_gas_datapack()
+    )
+    accepted, channels, omissions = _openimcc_residue_channel_set(
+        raw_channels,
+        source_notices,
+        engine="internal-analytical",
+        alpha=1.0,
+        alpha_source="test common-unity channel",
+    )
+
+    omitted = {
+        notice["channel"]: notice
+        for notice in omissions
+        if "channel" in notice
+    }
+    assert {"AlSiO", "Si2O2"} <= set(omitted)
+    assert all(
+        notice["kind"] == NoticeKind.INPUT_OMITTED.value
+        and notice["reason"] == "internal_analytical_vapor_pressure_catalog_missing"
+        for species, notice in omitted.items()
+        if species in {"AlSiO", "Si2O2"}
+    )
+    assert {species for species, _reaction in accepted} == {
+        channel.species for channel in channels
+    }
+    assert {"AlSiO", "Si2O2"}.isdisjoint(
+        {species for species, _reaction in accepted}
+    )
+    assert channels
 
 
 def test_residue_integrator_refuses_root_above_bracket_without_floor_evaporation() -> None:

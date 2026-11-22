@@ -121,6 +121,17 @@ from simulator.battery.validity import (
 from simulator.reference_data.janaf import formula_composition
 
 _PAREN_GROUP_RE = re.compile(r"\(([A-Za-z0-9]+)\)(\d*)")
+_CANONICAL_DOI_SOURCE_RE = re.compile(r"doi:10\.\d{4,9}/[^\s]+")
+
+
+def _canonical_doi_source(source: str | None) -> str | None:
+    if (
+        not isinstance(source, str)
+        or source != source.lower()
+        or _CANONICAL_DOI_SOURCE_RE.fullmatch(source) is None
+    ):
+        return None
+    return source
 
 
 @dataclass(frozen=True)
@@ -1944,6 +1955,8 @@ def _work_file_indexes(
     # Direct work ids take precedence over source and file aliases.
     work_by_alias.update(works)
     for work in works.values():
+        if work.doi:
+            work_by_alias.setdefault(f"doi:{work.doi}", work)
         for source_id in work.source_ids:
             work_by_alias.setdefault(source_id, work)
         for asset in work.source_files.files:
@@ -2101,7 +2114,9 @@ def _inputs_for_work(
         if membership is not None:
             return membership
     assert experiments is not None
-    ids: set[str] = set()
+    grouped = obs_by_work.get(work.work_id, ())
+    # Work identity is part of DOI ancestry, with or without loaded extracts.
+    ids = {work.work_id}
     # The corpus registry, when the caller has one. A single-work caller
     # still has only that work's files. Unknown strings are not assets.
     registered = (
@@ -2112,7 +2127,9 @@ def _inputs_for_work(
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
             ids.add(asset.asset_id)
-    for obs in obs_by_work.get(work.work_id, ()):
+    if not grouped:
+        return Ancestry.of(ids)
+    for obs in grouped:
         nested = _observation_lineage(
             obs.observation_id,
             observations,
@@ -2439,18 +2456,24 @@ def _resolve_coefficient_sources(
             nested = Ancestry.of({src})
         else:
             work = indexes.work_by_alias.get(src)
-            if work is None:
+            if work is not None:
+                nested = _inputs_registered_under_work(
+                    work,
+                    observations,
+                    experiments,
+                    indexes.table_ids,
+                    indexes.asset_ids,
+                    _indexes=indexes,
+                )
+            elif _canonical_doi_source(src) is not None:
+                # A DOI is a terminal source root only when this context has
+                # no registered Work for it. A registered Work contributes
+                # its complete member ancestry through the branch above.
+                nested = Ancestry.of({src})
+            else:
                 result = Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
                 indexes.coefficient_source_lineages[source_key] = result
                 return result
-            nested = _inputs_registered_under_work(
-                work,
-                observations,
-                experiments,
-                indexes.table_ids,
-                indexes.asset_ids,
-                _indexes=indexes,
-            )
         if not nested.complete:
             indexes.coefficient_source_lineages[source_key] = nested
             return nested

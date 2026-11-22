@@ -56,24 +56,28 @@ _SCORE_SOURCES = (
 @pytest.fixture(scope="module")
 def _score_context():
     return load_score_context(_ROOT, sources=_SCORE_SOURCES)
-# value, solved pO2 bar. Costa's internal-analytical species pressure uses the
-# offer 20 r8 vapour route at the same solved pO2.
+# value, solved pO2 bar. OpenIMCC 9c327c2 / d-436 adds AlSiO and Si2O2 to the
+# shared oxygen balance. The prior pins were Costa IA 0.13890413464807302 and
+# OpenIMCC 0.03760095446103834 at 2.74738410411159e-10 bar; Stolyarova IA
+# 0.00007054458263120522 and OpenIMCC 0.00042677717378297335 at
+# 1.99531976228266e-08 bar. Costa's internal-analytical species pressure uses
+# the offer 20 r8 vapour route at the same solved pO2.
 _PIN = {
     (_COSTA, Engine.INTERNAL_ANALYTICAL): (
-        Decimal("0.13890413464807302"),
-        2.74738410411159e-10,
+        Decimal("0.12231894444587403"),
+        3.359797621738036e-10,
     ),
     (_COSTA, Engine.OPENIMCC): (
-        Decimal("0.03760095446103834"),
-        2.74738410411159e-10,
+        Decimal("0.057062022734512496"),
+        3.359797621738036e-10,
     ),
     (_STOLYAROVA, Engine.INTERNAL_ANALYTICAL): (
-        Decimal("0.00007054458263120522"),
-        1.99531976228266e-08,
+        Decimal("0.00007043647136654996"),
+        1.9947503129802354e-08,
     ),
     (_STOLYAROVA, Engine.OPENIMCC): (
-        Decimal("0.00042677717378297335"),
-        1.99531976228266e-08,
+        Decimal("0.0004261206864828858"),
+        1.9947503129802354e-08,
     ),
 }
 

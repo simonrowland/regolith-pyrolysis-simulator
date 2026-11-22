@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    Rail,
     AdmissionStatus,
     RefusalReason,
     ResidualStatus,
@@ -26,6 +27,7 @@ from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Species, State, Value
 from simulator.battery import score as battery_score
 from simulator.battery.score import predict_with_engine
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPot,
     PO2_COMMANDED,
@@ -33,6 +35,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _InternalAnalyticalInputRefusal,
     _new_internal_analytical_core,
     _internal_analytical_vapor_pressure_adapter,
+    close_battery_engine_handle,
     composition_kg_and_mol,
     equilibrate_cell,
     open_battery_engine,
@@ -880,3 +883,381 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
     assert shadow_calls == shadow_call_count
     assert catalog_compiles == catalog_compile_count
     assert residue_prediction.vapor_pressures_Pa == with_shadow.vapor_pressures_Pa
+
+
+def _magemin_gate_backend(core):
+    assert core._liquid_fraction_provider == 'magemin'
+    core._register_freeze_gate_liquid_fraction_providers()
+    gate_provider = core._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert gate_provider is not None
+    return gate_provider._ensure_backend()
+
+
+def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
+    request,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    handle = open_battery_engine('internal-analytical')
+    request.addfinalizer(lambda: close_battery_engine_handle(handle))
+    core = handle.backend._core
+    magemin = _magemin_gate_backend(core)
+    if magemin is None or not magemin.is_available():
+        pytest.skip('MAGEMin backend unavailable after initialization')
+    request.addfinalizer(magemin.close)
+
+    pot = BinaryPot(
+        pot_id='internal-analytical-liquid-phase-contract',
+        kato_1993_table4_system=None,
+        why='real freeze-gate phase basis through equilibrate_cell',
+        composition_wt_pct={
+            'SiO2': 47.0,
+            'Al2O3': 14.0,
+            'FeO': 10.0,
+            'MgO': 9.0,
+            'CaO': 11.0,
+            'Na2O': 3.0,
+            'K2O': 1.0,
+            'TiO2': 2.0,
+            'Cr2O3': 1.0,
+            'MnO': 1.0,
+            'P2O5': 1.0,
+        },
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1800.0,
+        po2=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        timeout_s=60.0,
+        isolated=False,
+    )
+
+    authority = core._last_high_t_melt_activity
+    assert cell.status == 'ok'
+    assert authority["vapour_channel_phase_basis"] == "liquid"
+    assert authority["phase_basis_source"] == (
+        "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow:"
+        "composition_projected"
+    )
+    phase_notice = authority['phase_basis_notice']
+    assert phase_notice['authority'] == 'extrapolated'
+    assert {
+        row['component'] for row in phase_notice['dropped_components']
+    } == {'MnO', 'P2O5'}
+    assert authority["vapour_channel_switch_K"] == (
+        openimcc_bridge._temperature_domain_K()[0]
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "source_id",
+        "observation_id",
+        "expected_basis",
+        "expected_switch",
+        "expected_notice",
+        "expected_sio_source",
+        "expected_gate_reason",
+    ),
+    [
+        pytest.param(
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pSiO_1933k::T=1933.00:h=0bf22dda389c",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "silicate_window",
+            id="stolyarova-magemin-silicate-window-refusal",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "magemin_mode_vector_mass_deficit",
+            id="wollastonite-high-temperature-provider-refusal",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_03",
+            "missing",
+            1950.0,
+            "openimcc_vapour_phase_signal_missing",
+            "builtin_authoritative",
+            "magemin_mode_vector_mass_deficit",
+            id="wollastonite-lower-temperature-provider-refusal",
+        ),
+        pytest.param(
+            "shornikov-2026-wollastonite-kems",
+            "shornikov-2026-wollastonite-kems::shornikov_2026_SiO_partial_pressure_table3_row_09",
+            "liquid",
+            None,
+            "openimcc_liquid_sio_below_1950K_band",
+            "openimcc",
+            None,
+            marks=pytest.mark.skip(
+                reason=(
+                    "0 of 55 measured in-window composition groups yield a "
+                    "MAGEMin ig liquid curve (studio probe 2026-11-15)"
+                ),
+            ),
+            id="no-measured-magemin-liquid-group",
+        ),
+    ],
+)
+def test_internal_analytical_battery_score_records_vapour_phase_basis(
+    tmp_path: Path,
+    request,
+    source_id: str,
+    observation_id: str,
+    expected_basis: str,
+    expected_switch: float | None,
+    expected_notice: str | None,
+    expected_sio_source: str,
+    expected_gate_reason: str | None,
+) -> None:
+    parent_core = _new_internal_analytical_core()
+    parent_magemin = _magemin_gate_backend(parent_core)
+    if parent_magemin is None or not parent_magemin.is_available():
+        pytest.skip("MAGEMin backend unavailable in the scorer parent")
+    request.addfinalizer(parent_magemin.close)
+
+    root = Path(__file__).resolve().parents[2]
+    context = battery_score.load_score_context(root, sources=(source_id,))
+    observation = context.observations[observation_id]
+    scoped_context = replace(
+        context,
+        observations={observation_id: observation},
+        origins={observation_id: context.origins.get(observation_id, "")},
+    )
+    output_path = tmp_path / "phase-basis.jsonl"
+    written, _metadata = battery_score._score_store_to_jsonl(
+        scoped_context,
+        output_path,
+        root=root,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.SIO_EVOLUTION,
+        workers=1,
+    )
+    scored_rows = [
+        json.loads(line)
+        for line in output_path.with_name(output_path.name + ".partial")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip()
+    ]
+    assert written == 1
+    scored_row = next(
+        (row for row in scored_rows if row.get("reference") == observation_id),
+        None,
+    )
+    assert scored_row is not None
+    assert scored_row["status"] == "no_band", scored_row.get("refusal")
+    candidate = scored_row["candidate_observation"]
+    assert isinstance(candidate, dict)
+    engine = candidate["engine"]
+    record = json.loads(engine["version"])
+    assert record["phase_basis"] == expected_basis
+    assert record["phase_basis_source"]
+    if expected_basis == "liquid":
+        assert record["phase_basis_source"].startswith(
+            "freeze_gate_authority:gate_liquid_fraction:fallback:magemin-shadow"
+        )
+    if expected_switch is None:
+        from simulator.melt_backend import openimcc_bridge
+
+        expected_switch = openimcc_bridge._temperature_domain_K()[0]
+    assert record["applied_vapour_switch_K"] == expected_switch
+    assert record["vapor_pressures_source"]["SiO"].startswith(
+        expected_sio_source
+    )
+    scored_notices = json.dumps(candidate.get("notices") or ())
+    if expected_notice is not None:
+        assert any(
+            notice["code"] == expected_notice for notice in record["notices"]
+        )
+        assert expected_notice in scored_notices
+    if expected_basis == "liquid":
+        assert not any(
+            notice.get("source") == "vaporock"
+            and notice.get("destination") == "antoine_fallback"
+            for notice in candidate.get("notices") or ()
+        )
+    if expected_basis == "missing":
+        assert (
+            record["phase_basis_source"]
+            == "freeze_gate_authority_fallback_or_projected"
+        )
+        phase_detail = record["phase_basis_detail"]
+        assert phase_detail["code"] == "gate_curve_source_not_authoritative"
+        assert phase_detail["provider_outcome"] == "stable_refusal"
+        gate_evidence = phase_detail["diagnostic"]
+        assert gate_evidence["provider"] == "magemin"
+        assert gate_evidence["status"] == "out_of_domain"
+        assert expected_gate_reason is not None
+        assert expected_gate_reason in str(gate_evidence["reason"])
+
+
+def test_internal_analytical_timeout_kills_magemin_descendants(
+    monkeypatch,
+    request,
+    tmp_path: Path,
+) -> None:
+    import os
+    import signal
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    parent_core = _new_internal_analytical_core()
+    parent_magemin = _magemin_gate_backend(parent_core)
+    if (
+        parent_magemin is None
+        or not parent_magemin.is_available()
+        or parent_magemin._bridge != "subprocess"
+    ):
+        pytest.skip("MAGEMin subprocess backend unavailable in the parent")
+    request.addfinalizer(parent_magemin.close)
+
+    monkeypatch.setenv("REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP", "0")
+    monkeypatch.delenv("REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP")
+    trace_path = tmp_path / "magemin-processes.jsonl"
+    sitecustomize_path = tmp_path / "sitecustomize.py"
+    sitecustomize_path.write_text(
+        "\n".join(
+            (
+                "import json",
+                "import os",
+                "import signal",
+                "import subprocess",
+                "_trace = os.environ.get('D207_MAGEMIN_PROCESS_TRACE')",
+                "if _trace:",
+                "    _popen = subprocess.Popen",
+                "    class _TraceMageminPopen(_popen):",
+                "        def __init__(self, args, *positional, **keywords):",
+                "            super().__init__(args, *positional, **keywords)",
+                "            command = (args[0] if isinstance(args, (tuple, list)) "
+                "else args)",
+                "            if 'magemin' not in os.path.basename("
+                "os.fsdecode(command)).lower():",
+                "                return",
+                "            os.kill(self.pid, signal.SIGSTOP)",
+                "            event = {",
+                "                'launcher_pid': os.getpid(),",
+                "                'launcher_pgid': os.getpgrp(),",
+                "                'binary_pid': self.pid,",
+                "                'binary_pgid': os.getpgid(self.pid),",
+                "            }",
+                "            descriptor = os.open(",
+                "                _trace, os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600",
+                "            )",
+                "            try:",
+                "                os.write(descriptor, (json.dumps(event) + '\\n').encode())",
+                "            finally:",
+                "                os.close(descriptor)",
+                "    subprocess.Popen = _TraceMageminPopen",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    old_pythonpath = os.environ.get("PYTHONPATH")
+    pythonpath = [str(tmp_path)]
+    if old_pythonpath:
+        pythonpath.append(old_pythonpath)
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(pythonpath))
+    monkeypatch.setenv("D207_MAGEMIN_PROCESS_TRACE", str(trace_path))
+
+    worker = battery._IsolatedCellWorker("internal-analytical")
+    cell_pid = None
+    nested_events = []
+    future = None
+    executor = ThreadPoolExecutor(max_workers=1)
+
+    def read_events():
+        if not trace_path.exists():
+            return []
+        return [
+            json.loads(line)
+            for line in trace_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+
+    try:
+        future = executor.submit(
+            worker.request,
+            {
+                "pot_id": "d207-magemin-timeout",
+                "why": "real isolated-cell MAGEMin descendant cleanup",
+                "composition_wt_pct": {"CaO": 48.28, "SiO2": 51.72},
+                "temperature_K": 1933.0,
+                "engine": "internal-analytical",
+                "po2": {"mode": PO2_COMMANDED, "po2_bar": 1.0e-9},
+                "timeout_s": 120.0,
+            },
+            timeout_s=120.0,
+        )
+        startup_deadline = time.monotonic() + 60.0
+        while time.monotonic() < startup_deadline:
+            process = worker._worker.process
+            if process is not None and process.pid is not None:
+                cell_pid = int(process.pid)
+                break
+            if future.done():
+                future.result()
+            time.sleep(0.02)
+        assert cell_pid is not None, "isolated internal-analytical cell did not start"
+
+        magemin_deadline = time.monotonic() + 90.0
+        while time.monotonic() < magemin_deadline:
+            nested_events = read_events()
+            if nested_events:
+                break
+            if future.done():
+                future.result()
+            time.sleep(0.02)
+        assert nested_events, "isolated cell did not launch the MAGEMin binary"
+        event = nested_events[0]
+        assert event["launcher_pid"] != cell_pid
+        assert event["launcher_pgid"] == cell_pid
+        assert event["binary_pgid"] == cell_pid
+
+        os.kill(cell_pid, signal.SIGPROF)
+        with pytest.raises(battery._IsolatedCellWorkerFailure) as raised:
+            future.result(timeout=45.0)
+        assert raised.value.timed_out is True
+        worker.close()
+
+        for pid in (event["launcher_pid"], event["binary_pid"]):
+            gone_deadline = time.monotonic() + 5.0
+            while time.monotonic() < gone_deadline:
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(0.02)
+            else:
+                pytest.fail(f"MAGEMin descendant {pid} survived cell timeout")
+    finally:
+        process_groups = {int(cell_pid)} if cell_pid is not None else set()
+        for event in read_events():
+            process_groups.add(int(event["launcher_pgid"]))
+        for process_group in process_groups:
+            try:
+                os.killpg(process_group, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        if future is not None:
+            try:
+                future.result(timeout=45.0)
+            except BaseException:
+                pass
+        worker.close()
+        executor.shutdown(wait=True)

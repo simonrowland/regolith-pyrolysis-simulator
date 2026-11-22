@@ -591,8 +591,8 @@ def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
-        "date": "2026-11-08",
+        "identity": "commit:bae51f7301155798b62e2bf41307bccfbbe7fad8",
+        "date": "2026-11-22",
     },
     "internal-analytical": {
         "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
@@ -616,7 +616,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
 }
 
-OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
+OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2bec587e444805a7bd6ec091308c00c88840357191d2e3d27dfee37fc99581af"
 
 _TABLE = "engine_outputs"
 _CACHE_SCHEMA_VERSION = 3

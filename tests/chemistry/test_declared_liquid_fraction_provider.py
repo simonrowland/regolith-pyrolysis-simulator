@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 import pytest
 
+from engines.domain_reason import OutOfDomainReason
 from engines.magemin import MAGEMinShadowProvider
 from engines.alphamelts import AlphaMELTSProvider
 from simulator.chemistry.kernel import normalize_chemistry_kernel_config
@@ -62,6 +63,207 @@ def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
     return _build_sim(
         'lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints,
     )
+
+
+def _projected_gate_provider_diagnostic():
+    return {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': OutOfDomainReason.COMPOSITION_PROJECTED.value,
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'kernel_fallback_used': 'magemin-shadow',
+        'backend_diagnostics': {
+            'backend_status_reason': (
+                OutOfDomainReason.COMPOSITION_PROJECTED.value
+            ),
+            'input_composition_projection': {
+                'reason': OutOfDomainReason.INPUT_COMPOSITION_PROJECTED.value,
+                'magemin_database': 'ig',
+                'magemin_bulk_order': ['SiO2', 'MgO'],
+                'composition_projected': {
+                    'dropped_components': ['MnO'],
+                    'dropped_component_mass_fractions': {'MnO': 0.01},
+                },
+            },
+            'projected_liquidus_status': 'ok',
+            'projected_liquidus_diagnostics': {},
+        },
+    }
+
+
+def _projected_gate_phase_reader_result(
+    sim, monkeypatch, tmp_path, diagnostic, *, status,
+):
+    from simulator.engine_binding_admission import BindingIdentity
+    from tests.binding_admission_fixtures import (
+        install_synthetic_binding_receipt,
+        register_synthetic_gate_curve_producer,
+    )
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess',
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
+    register_synthetic_gate_curve_producer(sim)
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status=status, diagnostic=diagnostic, warnings=(),
+        ),
+    )
+    record = sim._freeze_gate_curve_record()
+    assert sim._melt_redox_gate_record_is_admitted(record)
+    return record['curve'], sim._vapor_pressure_freeze_gate_phase_fraction()
+
+
+def test_projected_gate_dispatch_admits_projection_only_refusal(
+    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
+    setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    diagnostic = _projected_gate_provider_diagnostic()
+    sim.melt.temperature_C = 1150.0
+    curve, phase = _projected_gate_phase_reader_result(
+        sim, monkeypatch, tmp_path, diagnostic, status='out_of_domain',
+    )
+
+    assert curve['source'] == (
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
+    )
+    assert curve['composition_projected_notice']['dropped_components'] == [
+        {'component': 'MnO', 'mass_fraction': 0.01},
+    ]
+    assert curve['original_bulk_refusal']['status'] == 'out_of_domain'
+    assert set(curve['original_bulk_refusal']['reasons']) == {
+        OutOfDomainReason.COMPOSITION_PROJECTED.value,
+    }
+    assert 'gate_provider_refusal' not in curve
+    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+    assert phase[0] == pytest.approx(0.5)
+    assert phase[1] == f"freeze_gate_authority:{curve['source']}"
+    assert phase[3] == curve['composition_projected_notice']
+
+
+def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
+    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
+    setpoints_data,
+):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.temperature_C = 1150.0
+    diagnostic = _projected_gate_provider_diagnostic()
+    diagnostic['backend_failure_reason_code'] = (
+        OutOfDomainReason.SILICATE_WINDOW.value
+    )
+    curve, phase = _projected_gate_phase_reader_result(
+        sim, monkeypatch, tmp_path, diagnostic, status='out_of_domain',
+    )
+    assert curve['source'].endswith(':composition_projected')
+    assert set(curve['original_bulk_refusal']['reasons']) == {
+        OutOfDomainReason.COMPOSITION_PROJECTED.value,
+        OutOfDomainReason.SILICATE_WINDOW.value,
+    }
+    assert phase[0] is None
+    assert phase[1] == 'freeze_gate_authority_fallback_or_projected'
+
+    melt_redox_fraction = sim._melt_redox_liquid_fraction_factor(
+        sim.melt.temperature_C + 273.15,
+    )
+    assert melt_redox_fraction == pytest.approx(0.5)
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
+        curve['source']
+    )
+    assert sim._last_melt_redox_liquidus_gate_diagnostic == {
+        'status': 'ok',
+        'source': curve['source'],
+        'solidus_T_C': curve['solidus_T_C'],
+        'liquidus_T_C': curve['liquidus_T_C'],
+        'composition_projected_notice': curve['composition_projected_notice'],
+    }
+    assert sim._last_melt_redox_liquid_fraction_diagnostic == {
+        'status': 'ok',
+        'source': curve['source'],
+        'liquid_fraction': 0.5,
+        'solidus_T_C': curve['solidus_T_C'],
+        'liquidus_T_C': curve['liquidus_T_C'],
+        'composition_projected_notice': curve['composition_projected_notice'],
+    }
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(0.5)
+    assert sim._last_freeze_gate_diagnostic == {
+        'enabled': True,
+        'source': curve['source'],
+        'solidus_T_C': curve['solidus_T_C'],
+        'liquidus_T_C': curve['liquidus_T_C'],
+        'liquid_fraction': 0.5,
+        'composition_projected_notice': curve['composition_projected_notice'],
+    }
+    from simulator.reduced_real_determinism import _curve_payload
+
+    assert set(_curve_payload(curve)) == {
+        'source',
+        'solidus_T_C',
+        'liquidus_T_C',
+        'path',
+        'composition_projected_notice',
+    }
+
+    vapor_result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={'process.cleaned_melt': {
+                    'SiO2': 5.0, 'FeO': 1.0, 'MgO': 1.0,
+                }},
+                species_formula_registry={},
+            ),
+            temperature_C=1800.0 - 273.15,
+            pressure_bar=1e-6,
+            control_inputs={
+                'pO2_bar': 1e-9,
+                'intrinsic_fO2_log': -9.0,
+                'phase_basis_source': phase[1],
+            },
+        )
+    )
+    authority = vapor_result.diagnostic['high_t_melt_activity']
+    assert authority['vapour_channel_phase_basis'] == 'missing'
+    assert authority['phase_basis_source'] == phase[1]
+    assert any(
+        notice['code'] == 'openimcc_vapour_phase_signal_missing'
+        and notice['type'] == 'typed_notice'
+        for notice in authority['notices']
+    )
+
+
+def test_projected_gate_dispatch_requires_projection_refusal_status(
+    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
+    setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    diagnostic = _projected_gate_provider_diagnostic()
+    diagnostic['backend_status'] = 'refused'
+    sim.melt.temperature_C = 1150.0
+    curve, phase = _projected_gate_phase_reader_result(
+        sim, monkeypatch, tmp_path, diagnostic, status='refused',
+    )
+
+    assert curve['source'].endswith(':composition_projected')
+    assert curve['original_bulk_refusal']['status'] == 'refused'
+    assert phase[0] is None
+    assert phase[1] == 'freeze_gate_authority_fallback_or_projected'
 
 
 def _injected_launch_exception(name):

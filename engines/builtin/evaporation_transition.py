@@ -101,21 +101,21 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
     name = "builtin-evaporation-transition"
 
-    DECLARED_ACCOUNTS = frozenset({
-        "process.cleaned_melt",
-        "process.overhead_gas",
-        "process.condensation_train",
-        "reservoir.fo2_buffer",
-    })
-
     def capability_profile(self) -> CapabilityProfile:
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
+
         return CapabilityProfile(
             provider_id="builtin-evaporation-transition",
             intents=frozenset({ChemistryIntent.EVAPORATION_TRANSITION}),
             is_authoritative_for=frozenset(
                 {ChemistryIntent.EVAPORATION_TRANSITION}
             ),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=frozenset({
+                "process.cleaned_melt",
+                "process.overhead_gas",
+                "process.condensation_train",
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+            }),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -124,6 +124,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # init -- see engines/builtin/__init__.py for the cycle
         # description.
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.EVAPORATION_TRANSITION
@@ -184,7 +185,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
         if oxygen_destination and oxygen_destination not in {
             "process.overhead_gas",
-            "reservoir.fo2_buffer",
+            OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
         }:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
@@ -336,13 +337,13 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
             if (
-                oxygen_destination == "reservoir.fo2_buffer"
+                oxygen_destination == OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
                 or (
                     not oxygen_destination
                     and vapor_oxygen_atoms <= 0.0
                 )
             ):
-                credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
+                credits[OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT] = {"O2": o2_mol}
             else:
                 overhead_credit["O2"] = o2_mol
         if overhead_credit:

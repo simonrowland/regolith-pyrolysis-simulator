@@ -59,6 +59,7 @@ OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT = (
 )
 OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT = "terminal.oxygen_melt_offgas_captured"
 OXYGEN_MRE_ANODE_ACCOUNT = "terminal.oxygen_mre_anode_stored"
+OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT = (
     "reservoir.oxygen_cistern_liquid_inventory"
 )
