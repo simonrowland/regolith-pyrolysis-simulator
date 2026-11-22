@@ -109,8 +109,9 @@ class CapacityShadowRefusal:
     # Solve path of the hour that refused: fast_root, explicit_euler,
     # explicit_ladder, midpoint, radau_fallback, or backward_euler.
     # None when the refusal is raised before a path is chosen.
-    # The inventory refusal also carries the per-species balance and
-    # the overhead-O2 writes. Other refusals leave those unset.
+    # The inventory refusal, headspace_negative_bleed, and
+    # headspace_balance_nonconvergence carry the per-species balance
+    # and the O2 writes. Other refusals leave those unset.
     # Plain dicts and lists, so vars() serialises.
     path: str | None = None
     species_balance: dict[str, dict[str, Any]] | None = None

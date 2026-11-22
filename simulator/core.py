@@ -3300,18 +3300,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species=OXYGEN_SPECIES,
         )
         # Actual ledger destination outranks carrier class. A coproduct
-        # released to overhead is reducing. An oxidative debit is the
-        # fO2 buffer's, and that uptake is oxidising. This reader sums
-        # the oxygen the transition posted. It does not choose the account.
-        # Algebra: source = overhead_debit + buffer_debit - overhead_credit.
+        # released to overhead is reducing. Oxygen that leaves the fO2
+        # buffer to oxidise a vapour leaves the melt redox reservoir, so
+        # the melt is more reducing and fO2 falls. An overhead debit keeps
+        # the oxidising sign it had when that debit was overhead gas.
+        # This reader sums the oxygen the transition posted. It does not
+        # choose the account. The apply step divides this source by C_m.
+        # Algebra: source = overhead_debit - buffer_debit - overhead_credit.
         # Unit: mol O2. Limit: a posting inside the noop is not a source.
         # Sanity: Na/K credit the buffer and keep the metal-loss branch.
         # TiO2(g) posts no O2 and has no source. A buffer credit is not
-        # this debit.
+        # this debit. A buffer debit of 1 mol at 1 mol/ln lowers fO2 by 1 ln.
         net_posted_o2_mol = (
             overhead_o2_credit_mol
             - overhead_o2_debit_mol
-            - buffer_o2_debit_mol
+            + buffer_o2_debit_mol
         )
         if abs(net_posted_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
             return {
@@ -4568,15 +4571,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._headspace_balance_terms = terms
 
     def _record_overhead_o2_write(self, *, transition=None, lot=None) -> None:
-        # One row per overhead O2 lot. Other lots return before the stack
-        # walk. Signed mol: a credit is positive, a debit is negative.
+        # One row per O2 lot on the overhead or the fO2 buffer. Other
+        # lots return before the stack walk. Signed mol: a credit is
+        # positive, a debit is negative. The ledger has already applied
+        # the lots. The buffer balance after this write is the account
+        # now, and the balance before it is that minus the signed buffer
+        # oxygen in this write. A lot that does not touch the buffer
+        # records the same balance on both sides.
         sink = getattr(self, "_headspace_overhead_o2_writes", None)
         if not isinstance(sink, list):
             return
         registry = self.atom_ledger.registry
+        watched = {"process.overhead_gas", FO2_BUFFER_ACCOUNT}
 
-        def o2_mol(item) -> float | None:
-            if str(item.account) != "process.overhead_gas":
+        def o2_mol(item) -> tuple[str, float] | None:
+            account = str(item.account)
+            if account not in watched:
                 return None
             moles = item.species_moles_for(registry)
             if OXYGEN_SPECIES not in moles:
@@ -4584,9 +4594,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             amount = float(moles[OXYGEN_SPECIES])
             if amount == 0.0:
                 return None
-            return amount
+            return account, amount
 
-        rows: list[tuple[str, float]] = []
+        rows: list[tuple[str, str, float]] = []
         if transition is not None:
             source = str(transition.name)
             for sign, lots in (
@@ -4594,14 +4604,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 (-1.0, transition.debits),
             ):
                 for item in lots:
-                    amount = o2_mol(item)
-                    if amount is None:
+                    parsed = o2_mol(item)
+                    if parsed is None:
                         continue
-                    rows.append((source, sign * amount))
+                    account, amount = parsed
+                    rows.append((source, account, sign * amount))
         elif lot is not None:
-            amount = o2_mol(lot)
-            if amount is not None:
-                rows.append((str(lot.source or "load_external"), amount))
+            parsed = o2_mol(lot)
+            if parsed is not None:
+                account, amount = parsed
+                rows.append((
+                    str(lot.source or "load_external"),
+                    account,
+                    amount,
+                ))
         if not rows:
             return
         import traceback
@@ -4620,19 +4636,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"{filename.rsplit('/', 1)[-1]}:{frame.lineno}:{frame.name}"
             )
             break
-        for source, amount in rows:
+        after = float(
+            self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+            or 0.0
+        )
+        net = math.fsum(
+            amount
+            for _source, account, amount in rows
+            if account == FO2_BUFFER_ACCOUNT
+        )
+        running = after - net
+        for source, account, amount in rows:
+            before = running
+            if account == FO2_BUFFER_ACCOUNT:
+                running = before + amount
             sink.append({
                 "source": source,
+                "account": account,
                 "mol": amount,
                 "call_site": site,
+                "buffer_o2_mol_before": before,
+                "buffer_o2_mol_after": running,
             })
 
-    def _headspace_inventory_mismatch_refusal(self):
-        # Attached only on this refusal. Success hours do not read it.
-        # Plain dicts and lists, so vars() and a dataclass field walker
-        # both serialise. None is an integral the solve did not stash.
+    def _headspace_diagnostic_parts(
+        self,
+        *,
+        commit_bleed: bool,
+    ) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]], str | None, int]:
+        # Shared by the inventory refusal and the two balance refusals.
+        # Success hours do not read it. Plain dicts and lists, so vars()
+        # serialises. None is an integral the solve did not stash. A
+        # negative bleed is recorded raw: calling the bleed booker again
+        # would replace this refusal with headspace_negative_bleed.
         from simulator.capacity_coupling import (
-            CapacityShadowRefusal,
+            CapacityCouplingRefusalError,
             headspace_committed_bleed_mol,
         )
         from simulator.physical_constants import GAS_CONSTANT as R_CODATA
@@ -4680,20 +4721,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result = getattr(self, "_headspace_capacity_result", None)
         bled = getattr(result, "bled_species_mol", None)
         if isinstance(bled, Mapping):
-            volume_m3 = self._headspace_volume_m3()
-            temperature_K = self._headspace_temperature_K()
-            pa_per_mol = (
-                R_CODATA * temperature_K / volume_m3
-                if volume_m3 > 0.0 and temperature_K > 0.0
-                else math.nan
-            )
-            booked, _extra = headspace_committed_bleed_mol(
-                bled,
-                pa_per_mol=pa_per_mol,
-            )
-            bleed = {
-                str(species): float(mol) for species, mol in booked.items()
+            raw_bled = {
+                str(species): float(mol)
+                for species, mol in dict(bled).items()
             }
+            if commit_bleed:
+                volume_m3 = self._headspace_volume_m3()
+                temperature_K = self._headspace_temperature_K()
+                pa_per_mol = (
+                    R_CODATA * temperature_K / volume_m3
+                    if volume_m3 > 0.0 and temperature_K > 0.0
+                    else math.nan
+                )
+                try:
+                    booked, _extra = headspace_committed_bleed_mol(
+                        bled,
+                        pa_per_mol=pa_per_mol,
+                    )
+                except CapacityCouplingRefusalError as exc:
+                    if exc.refusal.reason != "headspace_negative_bleed":
+                        raise
+                    bleed = raw_bled
+                else:
+                    bleed = {
+                        str(species): float(mol)
+                        for species, mol in booked.items()
+                    }
+            else:
+                bleed = raw_bled
         names = set(published) | set(ledger) | set(credits) | set(bleed)
         if terms is not None:
             for block in ("n0_mol", "A_mol", "B_mol", "R_mol", "G_kg"):
@@ -4736,8 +4791,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 continue
             writes.append({
                 "source": str(row.get("source", "")),
+                "account": str(row.get("account", "")),
                 "mol": float(row.get("mol", 0.0)),
                 "call_site": str(row.get("call_site", "")),
+                "buffer_o2_mol_before": float(
+                    row.get("buffer_o2_mol_before", 0.0)
+                ),
+                "buffer_o2_mol_after": float(
+                    row.get("buffer_o2_mol_after", 0.0)
+                ),
             })
         path = None
         iterations = 0
@@ -4750,6 +4812,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raw_iterations, bool
             ):
                 iterations = raw_iterations
+        return balance, writes, path, iterations
+
+    def _headspace_diagnostic_refusal(self, refusal):
+        # Attach the inventory payload. A refusal that already carries
+        # it, or a reason outside the two balance refusals, is unchanged.
+        # A path the solver set wins over the stashed terms. A bare
+        # negative bleed has no path; the terms the solve wrote supply it.
+        from simulator.capacity_coupling import CapacityShadowRefusal
+
+        if refusal.reason not in {
+            "headspace_negative_bleed",
+            "headspace_balance_nonconvergence",
+        }:
+            return refusal
+        if (
+            refusal.species_balance is not None
+            or refusal.overhead_o2_writes is not None
+        ):
+            return refusal
+        balance, writes, path, iterations = self._headspace_diagnostic_parts(
+            commit_bleed=refusal.reason != "headspace_negative_bleed",
+        )
+        if refusal.path is not None:
+            path = refusal.path
+            iterations = refusal.iterations
+        self.atom_ledger._overhead_o2_write_listener = None
+        return CapacityShadowRefusal(
+            refusal.reason,
+            iterations,
+            authoritative=refusal.authoritative,
+            cap=refusal.cap,
+            flux_evaluations=refusal.flux_evaluations,
+            integrator_evaluations=refusal.integrator_evaluations,
+            path=path,
+            species_balance=balance,
+            overhead_o2_writes=writes,
+        )
+
+    def _headspace_inventory_mismatch_refusal(self):
+        from simulator.capacity_coupling import CapacityShadowRefusal
+
+        balance, writes, path, iterations = self._headspace_diagnostic_parts(
+            commit_bleed=True,
+        )
         self.atom_ledger._overhead_o2_write_listener = None
         return CapacityShadowRefusal(
             "headspace_published_pressure_not_inventory",
@@ -8804,7 +8910,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         if isinstance(solved, CapacityShadowRefusal):
             if solved.reason != 'headspace_balance_no_species':
-                raise CapacityCouplingRefusalError(solved)
+                self._remember_headspace_balance_terms(
+                    state.get('extent_holder')
+                )
+                raise CapacityCouplingRefusalError(
+                    self._headspace_diagnostic_refusal(solved)
+                )
             solved = None
         elif not solved.authoritative:
             raise CapacityCouplingRefusalError(
@@ -8821,7 +8932,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # same three-pass bound, and it is not a capture failure.
             def _require_root(result):
                 if isinstance(result, CapacityShadowRefusal):
-                    raise CapacityCouplingRefusalError(result)
+                    self._remember_headspace_balance_terms(
+                        state.get('extent_holder')
+                    )
+                    raise CapacityCouplingRefusalError(
+                        self._headspace_diagnostic_refusal(result)
+                    )
                 if not result.authoritative:
                     raise CapacityCouplingRefusalError(
                         CapacityShadowRefusal(
@@ -18193,7 +18309,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         self._compute_capacity_coupling_shadow(equilibrium)
                     )
                     if isinstance(capacity_result, CapacityShadowRefusal):
-                        raise CapacityCouplingRefusalError(capacity_result)
+                        raise CapacityCouplingRefusalError(
+                            self._headspace_diagnostic_refusal(capacity_result)
+                        )
             if capacity_result is not None:
                 live_raw_flux = self._calculate_evaporation(
                     equilibrium,
@@ -18364,6 +18482,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # Unit check: mol * Pa/mol = Pa.
                 # Limit: a non-negative drain is copied.
                 from simulator.capacity_coupling import (
+                    CapacityCouplingRefusalError,
                     headspace_committed_bleed_mol,
                 )
                 from simulator.physical_constants import (
@@ -18377,12 +18496,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if volume_m3 > 0.0 and temperature_K > 0.0
                     else math.nan
                 )
-                solved_bled_mol, bleed_extra_pa = (
-                    headspace_committed_bleed_mol(
-                        capacity_result.bled_species_mol,
-                        pa_per_mol=pa_per_mol,
+                try:
+                    solved_bled_mol, bleed_extra_pa = (
+                        headspace_committed_bleed_mol(
+                            capacity_result.bled_species_mol,
+                            pa_per_mol=pa_per_mol,
+                        )
                     )
-                )
+                except CapacityCouplingRefusalError as exc:
+                    if exc.refusal.reason != "headspace_negative_bleed":
+                        raise
+                    raise CapacityCouplingRefusalError(
+                        self._headspace_diagnostic_refusal(exc.refusal)
+                    ) from exc
             bleed_result = self._dispatch_overhead_bleed(
                 capacity_result=capacity_result,
                 effective_transport_capacity=effective_transport_capacity,

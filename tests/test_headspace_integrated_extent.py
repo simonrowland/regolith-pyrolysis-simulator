@@ -15,8 +15,10 @@ from dataclasses import dataclass, replace
 
 from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.lots import MaterialLot
 from simulator.capacity_coupling import (
     DEFAULT_ABS_TOL_PA,
+    CapacityShadowRefusal,
     headspace_integral_added_kg,
 )
 from simulator.chemistry.kernel.dto import IntentResult
@@ -771,10 +773,12 @@ def test_open_hour_counts_oxidative_oxygen_with_its_return():
         abs(buffer_move), abs(posted_buffer), 1.0
     )
     redox_terms = sim._evaporative_redox_source_terms_from_transition(cro3)
-    oxidising = float(
+    # The buffer debit is reducing. `debit` is the signed posting.
+    reducing = float(
         redox_terms["redox_source:evaporative_oxygen_loss"]
     )
-    assert abs(oxidising - (-debit)) <= 1.0e-15 * max(abs(oxidising), abs(debit))
+    assert reducing < 0.0
+    assert abs(reducing - debit) <= 1.0e-15 * max(abs(reducing), abs(debit))
     stored = dict(
         sim.melt.oxygen_reservoir.redox_source_terms_mol_o2_equiv or {}
     )
@@ -946,12 +950,89 @@ def test_empty_buffer_forms_no_cro2_or_cro3():
     return hour
 
 
-def test_buffer_debit_is_the_redox_the_next_hour_reads():
-    """A CrO3 debit reduces the buffer and moves the melt fO2.
+def test_empty_buffer_drops_a_subfloor_oxidative_rate():
+    """A CrO3 rate at or below 1e-12 kg/h still sees an empty buffer.
 
-    The capacity is one mol per ln, so the source is applied. The
-    next hour reads ``_current_melt_redox_fO2_log`` and the buffer
-    kilograms the clip freezes.
+    The parent floor leaves the rate out of the debit map. The supply
+    map used to keep it, and the headspace posted it onto a buffer the
+    policy allows down to -1e15 kg. The empty-buffer gate now zeros
+    that supply. A draw whose mass this step exceeds a positive stock
+    is the same zero. A covered sub-floor rate stays the supply.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 0.0)
+    melt_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    covered: dict[str, float] = {}
+    covered_rates = sim._analytic_evaporation_depletion_rates(
+        {"CrO3": 5.0e-13},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg=melt_kg,
+        available_o2_kg=1.0e-3,
+        supply_out=covered,
+    )
+    assert "CrO3" not in covered_rates
+    assert covered["CrO3"] == 5.0e-13
+    empty_supply: dict[str, float] = {}
+    empty_rates = sim._analytic_evaporation_depletion_rates(
+        {"CrO3": 5.0e-13},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg=melt_kg,
+        available_o2_kg=0.0,
+        supply_out=empty_supply,
+    )
+    assert "CrO3" not in empty_rates
+    assert empty_supply["CrO3"] == 0.0
+    # draw_kg/h * dt_h exceeds 2e-12 kg. The rate is not posted.
+    over_supply: dict[str, float] = {}
+    over_rates = sim._analytic_evaporation_depletion_rates(
+        {"CrO3": 5.0e-13},
+        dt_hr=1.0e6,
+        phase_scalar=1.0,
+        cleaned_melt_kg=melt_kg,
+        available_o2_kg=2.0e-12,
+        supply_out=over_supply,
+    )
+    assert "CrO3" not in over_rates
+    assert over_supply["CrO3"] == 0.0
+
+    opening_kg = float(
+        sim.atom_ledger.kg_by_account(FO2_BUFFER_ACCOUNT).get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    assert opening_kg <= 1.0e-12, opening_kg
+    _seed_pa(sim, OXYGEN_SPECIES, 15.456162335355332, "subfloor empty buffer")
+
+    def law(_partials):
+        return {"CrO3": 5.0e-13}
+
+    hour = _step(sim, law, lambda _species: 0.0)
+    assert hour.shut_path is None
+    assert sim._headspace_balance_terms["path"] == "fast_root"
+    names = {str(transition.name) for transition in sim.atom_ledger.transitions}
+    assert "evaporate_CrO3" not in names
+    end_buffer_mol = float(
+        sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    assert end_buffer_mol >= 0.0
+    assert end_buffer_mol > -1.0e-15
+    return hour
+
+
+def test_buffer_debit_is_the_redox_the_next_hour_reads():
+    """A CrO3 debit reduces the buffer and lowers the melt fO2.
+
+    The capacity is one mol per ln, below the gas-pressure ceiling,
+    so the source is applied. Oxygen leaving the redox reservoir
+    makes the melt more reducing. The next hour reads
+    ``_current_melt_redox_fO2_log`` and the buffer kilograms the
+    clip freezes.
     """
 
     from simulator.evaporation import _oxidative_vapour_o2_available_kg
@@ -990,14 +1071,16 @@ def test_buffer_debit_is_the_redox_the_next_hour_reads():
     debit_mol = before_mol - after_mol
     assert debit_mol > 0.0, (before_mol, after_mol)
     terms = sim._evaporative_redox_source_terms_from_transition(transition)
-    oxidising = float(terms["redox_source:evaporative_oxygen_loss"])
-    assert abs(oxidising - debit_mol) <= 1.0e-15 * debit_mol
+    reducing = float(terms["redox_source:evaporative_oxygen_loss"])
+    assert reducing < 0.0
+    assert abs(reducing - (-debit_mol)) <= 1.0e-15 * debit_mol
     after_f = sim._current_melt_redox_fO2_log()
     # The reservoir stores ln, then the log10 round trip. The next
     # hour reads the log10 figure. The gap is that round trip.
+    # fO2 falls by the debit per mol of capacity.
     delta_ln = (after_f - before_f) * math.log(10.0)
-    assert after_f > before_f
-    assert abs(delta_ln - debit_mol) <= 1.0e-9 * debit_mol, (
+    assert after_f < before_f
+    assert abs(delta_ln - (-debit_mol)) <= 1.0e-9 * debit_mol, (
         before_f,
         after_f,
         delta_ln,
@@ -1008,4 +1091,133 @@ def test_buffer_debit_is_the_redox_the_next_hour_reads():
             OXYGEN_SPECIES, 0.0
         )
         or 0.0
+    )
+
+
+def test_balance_refusals_carry_the_buffer_write_log():
+    """Negative bleed and nonconvergence carry the inventory payload.
+
+    The write log records overhead O2 and fO2-buffer O2. Each row has
+    the buffer balance before and after that lot. The solver's path
+    wins when it set one. A bare negative bleed takes the path the
+    solve stashed. The inventory reason is not replaced when the bleed
+    booker would itself refuse.
+    """
+
+    from types import SimpleNamespace
+
+    sim = _sim(CampaignPhase.C4, 1250.0, 0.0)
+    _seed(sim, FO2_BUFFER_ACCOUNT, {OXYGEN_SPECIES: 1.0e-2}, "diagnostic buffer")
+    before = float(
+        sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT)[OXYGEN_SPECIES]
+    )
+    moved = 1.0e-3
+    mass = resolve_species_formula(
+        OXYGEN_SPECIES,
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    sim._headspace_overhead_o2_writes = []
+    sim.atom_ledger._overhead_o2_write_listener = sim._record_overhead_o2_write
+    sim.atom_ledger.transfer(
+        "oxygen_reservoir_exchange",
+        debits=(
+            MaterialLot(
+                FO2_BUFFER_ACCOUNT,
+                {OXYGEN_SPECIES: moved * mass},
+                source="diagnostic exchange",
+            ),
+        ),
+        credits=(
+            MaterialLot(
+                "process.overhead_gas",
+                {OXYGEN_SPECIES: moved * mass},
+                source="diagnostic exchange",
+            ),
+        ),
+        reason="diagnostic exchange",
+    )
+    after = float(
+        sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT)[OXYGEN_SPECIES]
+    )
+    assert abs((before - after) - moved) <= 1.0e-12 * moved
+    writes = list(sim._headspace_overhead_o2_writes)
+    accounts = {row["account"] for row in writes}
+    assert accounts == {"process.overhead_gas", FO2_BUFFER_ACCOUNT}
+    buffer_rows = [
+        row for row in writes if row["account"] == FO2_BUFFER_ACCOUNT
+    ]
+    assert len(buffer_rows) == 1
+    assert buffer_rows[0]["mol"] < 0.0
+    assert abs(buffer_rows[0]["buffer_o2_mol_before"] - before) <= 1.0e-12
+    assert abs(buffer_rows[0]["buffer_o2_mol_after"] - after) <= 1.0e-12
+    overhead_rows = [
+        row for row in writes if row["account"] == "process.overhead_gas"
+    ]
+    assert overhead_rows[0]["mol"] > 0.0
+    assert abs(overhead_rows[0]["buffer_o2_mol_before"] - before) <= 1.0e-12
+    assert (
+        overhead_rows[0]["buffer_o2_mol_before"]
+        == overhead_rows[0]["buffer_o2_mol_after"]
+    )
+
+    sim._headspace_capacity_result = SimpleNamespace(
+        bled_species_mol={OXYGEN_SPECIES: -1.0},
+    )
+    sim._headspace_balance_terms = {
+        "path": "fast_root",
+        "iterations": 7,
+        "n0_mol": {OXYGEN_SPECIES: before},
+        "A_mol": {OXYGEN_SPECIES: 0.0},
+        "B_mol": {OXYGEN_SPECIES: -1.0},
+        "R_mol": {OXYGEN_SPECIES: 0.0},
+        "G_kg": {},
+    }
+    negative = sim._headspace_diagnostic_refusal(
+        CapacityShadowRefusal("headspace_negative_bleed", 0)
+    )
+    assert negative.reason == "headspace_negative_bleed"
+    assert negative.path == "fast_root"
+    assert negative.iterations == 7
+    assert negative.species_balance[OXYGEN_SPECIES]["bleed_posted_mol"] == -1.0
+    assert negative.species_balance[OXYGEN_SPECIES]["n0_mol"] == before
+    overhead_mol = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    assert negative.species_balance[OXYGEN_SPECIES]["ledger_mol"] == overhead_mol
+    logged = negative.overhead_o2_writes
+    assert logged[0]["buffer_o2_mol_before"] == writes[0]["buffer_o2_mol_before"]
+    assert any(row["account"] == FO2_BUFFER_ACCOUNT for row in logged)
+
+    nonconvergence = sim._headspace_diagnostic_refusal(
+        CapacityShadowRefusal(
+            "headspace_balance_nonconvergence",
+            4,
+            path="radau_fallback",
+            cap="integrator",
+            flux_evaluations=3,
+            integrator_evaluations=4,
+        )
+    )
+    assert nonconvergence.reason == "headspace_balance_nonconvergence"
+    assert nonconvergence.path == "radau_fallback"
+    assert nonconvergence.iterations == 4
+    assert nonconvergence.cap == "integrator"
+    assert nonconvergence.flux_evaluations == 3
+    assert nonconvergence.integrator_evaluations == 4
+    assert nonconvergence.species_balance is not None
+    assert nonconvergence.overhead_o2_writes
+
+    bare = CapacityShadowRefusal("headspace_trial_committed", 0)
+    assert sim._headspace_diagnostic_refusal(bare) is bare
+
+    inventory = sim._headspace_inventory_mismatch_refusal()
+    assert inventory.reason == "headspace_published_pressure_not_inventory"
+    assert inventory.species_balance[OXYGEN_SPECIES]["bleed_posted_mol"] == -1.0
+    assert inventory.path == "fast_root"
+    assert any(
+        row["account"] == FO2_BUFFER_ACCOUNT
+        for row in inventory.overhead_o2_writes
     )

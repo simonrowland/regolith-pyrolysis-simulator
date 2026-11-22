@@ -5716,11 +5716,12 @@ class EvaporationMixin:
     ) -> None:
         """Fold post-depletion rates into the computed supply map.
 
-        Subthreshold rates never enter the debit, so depletion does not
-        see them. They take the same phase scale the debit rates took.
-        ``supply_out`` is already phase-scaled and overwrites those
-        species, including a positive rate the debit floor then dropped
-        and an explicit zero where the parent or oxygen inventory is gone.
+        Subthreshold rates never enter the debit map. The oxygen gate
+        can still zero an oxidative one. They take the same phase scale
+        the debit rates took. ``supply_out`` is already phase-scaled
+        and overwrites those species, including a positive rate the
+        debit floor then dropped and an explicit zero where the parent
+        or oxygen inventory is gone.
         """
 
         scale = 1.0 if phase_scale is None else float(phase_scale)
@@ -5814,6 +5815,11 @@ class EvaporationMixin:
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
         parent_groups: dict[str, list[dict]] = defaultdict(list)
+        # Oxidative products the parent floor did not admit. The supply
+        # map still carries them, and the headspace posts that supply.
+        # Their oxygen draw is (species, kg/h). The debit map does not
+        # gain them.
+        subfloor_oxidative: list[tuple[str, float]] = []
 
         for species in sorted(raw_rates_kg_hr):
             raw_rate_kg_hr = (
@@ -5823,6 +5829,20 @@ class EvaporationMixin:
             if raw_rate_kg_hr <= 1e-12:
                 # Debit floor. The computed rate is still the supply.
                 _note(species, raw_rate_kg_hr if raw_rate_kg_hr > 0.0 else 0.0)
+                if raw_rate_kg_hr > 0.0:
+                    sp_data = metals_data.get(species, {})
+                    if not sp_data:
+                        sp_data = oxide_vapors_data.get(species, {})
+                    if sp_data.get('parent_oxide'):
+                        stoich = self._evaporation_stoich(species, sp_data)
+                        o2_per = float(
+                            stoich.get('O2_per_product_kg', 0.0) or 0.0
+                        )
+                        if o2_per < -1e-12:
+                            subfloor_oxidative.append((
+                                str(species),
+                                raw_rate_kg_hr * abs(o2_per),
+                            ))
                 continue
             sp_data = metals_data.get(species, {})
             if not sp_data:
@@ -5891,14 +5911,31 @@ class EvaporationMixin:
                 if rate_kg_hr > 1e-12 and O2_per_product_kg < -1e-12:
                     o2_draws.append(
                         (species, rate_kg_hr * abs(O2_per_product_kg)))
-        total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
-        if total_o2_draw_kg_hr <= 1e-12:
-            return effective_rates
 
-        if available_o2_kg <= 1e-12:
-            for species, _draw in o2_draws:
+        def _drop_oxidative_supply(draws: list[tuple[str, float]]) -> None:
+            for species, _draw in draws:
                 effective_rates.pop(species, None)
                 _note(species, 0.0)
+
+        # The empty-buffer gate is this drop. It covers every oxidative
+        # rate, including one the parent floor left in the supply.
+        # Algebra: mass = draw_kg/h * dt_h. A mass above the stock
+        # would post a negative buffer, so that supply is dropped too.
+        # Unit check: (kg/h) * h = kg. Limit: available oxygen at or
+        # below 1e-12 kg drops every oxidative rate. A non-oxidative
+        # rate below the parent floor is not in either list.
+        subfloor_mass_kg = math.fsum(
+            draw * dt_hr for _species, draw in subfloor_oxidative
+        )
+        if available_o2_kg <= 1e-12 and (o2_draws or subfloor_oxidative):
+            _drop_oxidative_supply(o2_draws)
+            _drop_oxidative_supply(subfloor_oxidative)
+            return effective_rates
+        if subfloor_oxidative and subfloor_mass_kg > available_o2_kg:
+            _drop_oxidative_supply(subfloor_oxidative)
+
+        total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
+        if total_o2_draw_kg_hr <= 1e-12:
             return effective_rates
 
         max_fraction = math.nextafter(1.0, 0.0)
