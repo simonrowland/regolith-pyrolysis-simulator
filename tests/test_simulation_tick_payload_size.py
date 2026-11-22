@@ -102,13 +102,22 @@ def _force_internal_analytical(monkeypatch) -> list:
 # payloads that made runs unusable.
 SAWTOOTH_SLOPE_BYTES_PER_HOUR = 100.0
 
-# One campaign change may add a fixed per-hour block. The measured
-# C0B -> C2A_STAGED wire step at df8da164a1 is +786 bytes: evap_plane
-# selectivity stays present (~580 bytes, five keys) instead of dropping
-# out, and c2a_staged_gas adds ~257 bytes. 2000 bytes is the next round
-# kilobyte above that step. A multi-kilobyte history copied onto the row
-# at the boundary still fails. This cap is not the slope bound.
-CAMPAIGN_BOUNDARY_STEP_BYTES = 2000
+# df8da164a1 per_hour_summary hours 5-12:
+#   C0 6204; C0B 6406, 6428, 6406; C2A_STAGED 7192, 7198, 7193, 7200.
+# Junctions: hour 5->6 is +202, hour 8->9 is +786. Net rise is
+# 7200 - 6204 = +996.
+# Flat-run spans (max - min) are C0B 22 and C2A_STAGED 8. That span is
+# the numeric-text wobble of scalar fields on a row that is not gaining
+# a block. The margin is those two spans added, one for each endpoint.
+_C0_TO_C0B_STEP = 202
+_C0B_TO_C2A_STEP = 786
+_WINDOW_NET_RISE = 996
+_C0B_FLAT_SPAN = 6428 - 6406
+_C2A_FLAT_SPAN = 7200 - 7192
+_ENDPOINT_MARGIN = _C0B_FLAT_SPAN + _C2A_FLAT_SPAN
+CAMPAIGN_UNCHECKED_STEP_BYTES = _C0B_TO_C2A_STEP + _ENDPOINT_MARGIN
+CAMPAIGN_WINDOW_NET_RISE_BYTES = _WINDOW_NET_RISE + _ENDPOINT_MARGIN
+assert _C0_TO_C0B_STEP <= CAMPAIGN_UNCHECKED_STEP_BYTES
 
 
 def _assert_hourly_payload_slope_is_bounded(
@@ -159,31 +168,30 @@ def _assert_campaign_hourly_payload_is_bounded(
 ) -> None:
     """Bound hour-count growth without folding in a campaign-start block.
 
-    ``samples`` are ``(campaign, hour, size)`` in emit order. Inside each
-    contiguous run of one campaign the ordinary slope gate applies, so a
-    list that lengthens every hour still fails at 100 bytes/hour (and a
-    strictly rising series fails below that). A size jump is allowed only
-    where the campaign label changes, and only up to
-    ``CAMPAIGN_BOUNDARY_STEP_BYTES``.
+    ``samples`` are ``(campaign, hour, size)`` in emit order. A contiguous
+    run of three or more hours uses the ordinary slope gate, so a list
+    that lengthens every hour still fails at 100 bytes/hour. Every other
+    consecutive pair — a campaign boundary, and both hours of a run
+    shorter than three — is capped at ``CAMPAIGN_UNCHECKED_STEP_BYTES``.
+    The net rise from the first sample to the last is capped at
+    ``CAMPAIGN_WINDOW_NET_RISE_BYTES``, so a chain of one-hour campaigns
+    cannot stair-step under the per-step cap.
 
-    The whole-window slope does not do this. At df8da164a1 the hours 5–12
-    per_hour_summary sizes are flat inside C0B and inside C2A_STAGED, with
-    one +786 byte step between them, and the least-squares slope across
-    that window is 166.7. The same window at 919a36a964 alternates, because
-    ``evap_plane_selectivity`` is absent on the no-flux hours (10 and 12)
-    and present on the hours that have vapour-target flux (9 and 11). The
-    runner omits that block when ``target_species`` is empty, and the
-    diagnostic leaves ``target_species`` unset when total flux is at or
-    below the selectivity epsilon. t-1884 keeps a non-zero target flux on
-    every C2A hour, so the block stays (581–584 bytes, span 5, not a
-    lengthening list) and the window slope crosses 100. The drain, throat,
-    vane, and train-flow fields added with it are scalars. Their byte
-    counts jitter with numeric text; none is a per-hour history.
-    ``fixed_pressure_holdup_notice`` is one fixed string on the C0B hours
-    and absent outside them.
+    Hours 5–12 at df8da164a1 are one C0 point (6204), C0B
+    (6406, 6428, 6406), then C2A_STAGED (7192, 7198, 7193, 7200).
+    Hour 5→6 is +202. Hour 8→9 is +786, where the evaporation block
+    appears at C2A start (``evap_plane_selectivity`` about 581 bytes and
+    ``c2a_staged_gas`` 257). The least-squares slope across that whole
+    window is 166.7. Green's alternation is inside C2A, not at that
+    junction: hours 10 and 12 omit ``evap_plane_selectivity`` because
+    ``target_species`` is empty. The drain, throat, vane, and train-flow
+    fields are scalars. ``fixed_pressure_holdup_notice`` is one
+    interpolated string emitted whenever
+    ``fixed_pressure_holdup_nonphysical`` is set; it is not tied to C0B.
     """
     assert len(samples) >= 3, (event, samples)
     runs: list[tuple[str, list[tuple[int, int]]]] = []
+    run_of_sample: list[int] = []
     for campaign, hour, size in samples:
         assert isinstance(campaign, str) and campaign, (
             event,
@@ -194,23 +202,38 @@ def _assert_campaign_hourly_payload_is_bounded(
             runs[-1][1].append(point)
         else:
             runs.append((campaign, [point]))
-    for campaign, points in runs:
-        if len(points) < 3:
-            continue
+        run_of_sample.append(len(runs) - 1)
+    slope_checked = {
+        index
+        for index, (_campaign, points) in enumerate(runs)
+        if len(points) >= 3
+    }
+    for index in slope_checked:
+        campaign, points = runs[index]
         _assert_hourly_payload_slope_is_bounded(
             f"{event}[{campaign}]",
             points,
         )
-    for (left_name, left_points), (right_name, right_points) in zip(
-        runs, runs[1:]
-    ):
-        step = right_points[0][1] - left_points[-1][1]
-        assert abs(step) <= CAMPAIGN_BOUNDARY_STEP_BYTES, (
-            f"{event} campaign boundary {left_name}->{right_name} "
+    for left, right in zip(range(len(samples) - 1), range(1, len(samples))):
+        if (
+            run_of_sample[left] == run_of_sample[right]
+            and run_of_sample[left] in slope_checked
+        ):
+            continue
+        step = samples[right][2] - samples[left][2]
+        assert abs(step) <= CAMPAIGN_UNCHECKED_STEP_BYTES, (
+            f"{event} unchecked step "
+            f"{samples[left][0]}->{samples[right][0]} "
             f"stepped {step} bytes "
-            f"(bound {CAMPAIGN_BOUNDARY_STEP_BYTES}); "
-            f"from {left_points[-1]} to {right_points[0]}"
+            f"(bound {CAMPAIGN_UNCHECKED_STEP_BYTES}); "
+            f"from {samples[left][1:]} to {samples[right][1:]}"
         )
+    net = samples[-1][2] - samples[0][2]
+    assert abs(net) <= CAMPAIGN_WINDOW_NET_RISE_BYTES, (
+        f"{event} net rise {net} bytes "
+        f"(bound {CAMPAIGN_WINDOW_NET_RISE_BYTES}); "
+        f"from {samples[0][1:]} to {samples[-1][1:]}"
+    )
 
 
 def _assert_consecutive_growth_is_bounded(
@@ -591,13 +614,13 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             tick_samples_by_campaign.setdefault(campaign, []).append(
                 (int(tick["hour"]), _nbytes(tick))
             )
-        # Drop each campaign's first and last tick. Those hours carry
-        # entry and exit content. The step inside the remaining C0 window
-        # is not that. At df8da164a1 the steady C0 ticks are
-        # (2, 14586), (3, 15115), (4, 15121): evaporation state turns on
-        # at hour 3 and stays. Least-squares calls that 267.5 bytes/hour.
-        # Gate on a rise every consecutive hour instead. See
-        # _assert_consecutive_growth_is_bounded.
+        # Drop each campaign's first and last tick. The dropped C0 edge
+        # from hour 4 to hour 5 is overlap_evaporation gaining K
+        # (+175 bytes), not a generic exit block. The steady window that
+        # remains is (2, 14586), (3, 15115), (4, 15121): evaporation
+        # state turns on at hour 3 and stays. Least-squares calls that
+        # 267.5 bytes/hour. Gate on a rise every consecutive hour
+        # instead. See _assert_consecutive_growth_is_bounded.
         steady_samples_by_campaign = {
             campaign: sorted(samples)[1:-1]
             for campaign, samples in tick_samples_by_campaign.items()
@@ -830,8 +853,8 @@ def test_hourly_payload_gate_rejects_cumulative_growth_within_one_campaign() -> 
         )
 
 
-def test_hourly_payload_gate_rejects_campaign_boundary_step_over_2kb() -> None:
-    """The boundary allowance is a cap, not an open door."""
+def test_hourly_payload_gate_rejects_unchecked_step_above_measured_cap() -> None:
+    """A 3000 byte jump at a campaign boundary is above the measured cap."""
     with pytest.raises(AssertionError, match="stepped 3000 bytes"):
         _assert_campaign_hourly_payload_is_bounded(
             "per_hour_summary",
@@ -846,17 +869,64 @@ def test_hourly_payload_gate_rejects_campaign_boundary_step_over_2kb() -> None:
         )
 
 
-def test_hourly_payload_gate_allows_bounded_campaign_boundary_step() -> None:
-    """The df8da164a1 C0B and C2A rows are flat, with one step between them.
+def test_hourly_payload_gate_rejects_jump_inside_a_short_campaign_run() -> None:
+    """A two-hour run is not slope-checked, so its own step must be capped."""
+    with pytest.raises(AssertionError, match="stepped 49000 bytes"):
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            [
+                ("A", 1, 1_000),
+                ("A", 2, 50_000),
+                ("B", 3, 51_000),
+                ("B", 4, 100_000),
+            ],
+        )
 
-    The failing window was hours 5-12, slope 166.7 bytes/hour. These
-    seven samples are that window without the single C0 hour: inside
-    each campaign the slope is jitter (0.0 and 1.9), and the
-    C0B -> C2A_STAGED step is +786 bytes.
+
+def test_hourly_payload_gate_rejects_one_hour_campaign_staircase() -> None:
+    """Steps of +1999 used to hide under a 2000 byte cap.
+
+    Each step is now above ``CAMPAIGN_UNCHECKED_STEP_BYTES`` as well.
+    """
+    with pytest.raises(AssertionError, match="stepped 1999 bytes"):
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            [
+                ("C0", 1, 1_000),
+                ("C0B", 2, 2_999),
+                ("C2A", 3, 4_998),
+                ("C3", 4, 6_997),
+            ],
+        )
+
+
+def test_hourly_payload_gate_rejects_net_rise_of_legal_steps() -> None:
+    """Each step is the measured +202 junction. The net rise is not.
+
+    Six such steps sum to 1212, above the window net cap, so deleting
+    the net check would let this staircase pass.
+    """
+    with pytest.raises(AssertionError, match="net rise 1212 bytes"):
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            [
+                (f"C{index}", index, _C0_TO_C0B_STEP * index)
+                for index in range(7)
+            ],
+        )
+
+
+def test_hourly_payload_gate_allows_bounded_campaign_boundary_step() -> None:
+    """Hours 5-12 at df8da164a1: one C0 point, flat C0B, then C2A.
+
+    The whole-window slope is 166.7 bytes/hour. Inside C0B and C2A the
+    slopes are 0.0 and 1.9. Hour 5→6 is +202 and hour 8→9 is +786.
+    The net rise is +996.
     """
     _assert_campaign_hourly_payload_is_bounded(
         "per_hour_summary",
         [
+            ("C0", 5, 6_204),
             ("C0B", 6, 6_406),
             ("C0B", 7, 6_428),
             ("C0B", 8, 6_406),
