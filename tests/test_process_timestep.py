@@ -1088,7 +1088,9 @@ def test_metal_phase_native_fe_condensation_debits_the_step_mass():
         material_origin="feedstock",
     )
 
-    def _route(_flux, _melt):
+    def _route(_flux, _melt, *, dt_h):
+        # Step kilograms are labeled kg/h. The clip stays on the hour.
+        assert dt_h == 1.0
         return SimpleNamespace(
             remaining_by_species={"Fe": 0.0},
             wall_deposit_fraction_by_species={"Fe": 0.0},
@@ -1121,7 +1123,8 @@ def test_metal_phase_native_fe_condensation_debits_the_step_mass():
 def _partial_species_route(species: str, fraction: float):
     from types import SimpleNamespace
 
-    def _route(flux, _melt):
+    def _route(flux, _melt, *, dt_h):
+        _route.dt_h.append(dt_h)
         rate_kg_hr = float(flux.species_kg_hr[species])
         return SimpleNamespace(
             remaining_by_species={species: fraction * rate_kg_hr},
@@ -1137,6 +1140,7 @@ def _partial_species_route(species: str, fraction: float):
             stage3_reactive_alkali_by_species={},
         )
 
+    _route.dt_h = []
     return _route
 
 
@@ -1168,11 +1172,13 @@ def test_cleaned_melt_uncondensed_moles_match_the_overhead_left():
     molar_mass = formula.molar_mass_kg_per_mol()
     rate_kg_hr = vapor_mol * molar_mass / dt_h
     remaining_kg_hr = fraction * rate_kg_hr
-    sim.condensation_model.route = _partial_species_route("Fe", fraction)
+    cleaned_route = _partial_species_route("Fe", fraction)
+    sim.condensation_model.route = cleaned_route
     result = sim._route_native_fe_vapor_to_condensation(
         vapor_mol,
         source_account="process.cleaned_melt",
     )
+    assert cleaned_route.dt_h == [pytest.approx(dt_h)]
     committed_mol = float(result["native_fe_vapor_mol"])
     uncondensed_mol = float(result["native_fe_uncondensed_mol"])
     overhead_kg = sim.atom_ledger.kg_by_account(
@@ -1197,8 +1203,10 @@ def test_cleaned_melt_uncondensed_moles_match_the_overhead_left():
     partitioned.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     partitioned._sync_oxygen_reservoir_mirror()
     partitioned.melt.melt_surface_area_m2 = 1.0e6
-    partitioned.condensation_model.route = _partial_species_route("Fe", fraction)
+    partition_route = _partial_species_route("Fe", fraction)
+    partitioned.condensation_model.route = partition_route
     partitioned._apply_native_fe_saturation_split()
+    assert partition_route.dt_h == [pytest.approx(dt_h)]
     partition = partitioned._last_native_fe_partition_diagnostic
     partition_vapor = float(partition["native_fe_vapor_mol"])
     partition_uncondensed = float(partition["native_fe_uncondensed_mol"])
@@ -1214,11 +1222,13 @@ def test_cleaned_melt_uncondensed_moles_match_the_overhead_left():
 
     hourly = _loaded_sim()
     hourly.process_timestep = resolve_process_timestep(3600.0)
-    hourly.condensation_model.route = _partial_species_route("Fe", fraction)
+    hourly_route = _partial_species_route("Fe", fraction)
+    hourly.condensation_model.route = hourly_route
     hourly_result = hourly._route_native_fe_vapor_to_condensation(
         vapor_mol,
         source_account="process.cleaned_melt",
     )
+    assert hourly_route.dt_h == [pytest.approx(1.0)]
     assert float(hourly_result["native_fe_uncondensed_mol"]) == pytest.approx(
         fraction * vapor_mol, rel=1e-9,
     )
@@ -1231,11 +1241,13 @@ def test_cleaned_melt_uncondensed_moles_match_the_overhead_left():
         {"Fe": step_kg},
         material_origin="feedstock",
     )
-    metal.condensation_model.route = _partial_species_route("Fe", fraction)
+    metal_route = _partial_species_route("Fe", fraction)
+    metal.condensation_model.route = metal_route
     metal_result = metal._route_native_fe_vapor_to_condensation(
         vapor_mol,
         source_account="process.metal_phase",
     )
+    assert metal_route.dt_h == [pytest.approx(1.0)]
     assert float(metal_result["native_fe_uncondensed_mol"]) == pytest.approx(
         fraction * vapor_mol, rel=1e-9,
     )
@@ -1266,7 +1278,8 @@ def test_short_step_residual_flux_is_kilograms_per_hour():
     short = _loaded_sim()
     short.process_timestep = resolve_process_timestep(900.0)
     short.condensation_model._knudsen_policy_configured = True
-    short.condensation_model.route = _partial_species_route("K", fraction)
+    short_route = _partial_species_route("K", fraction)
+    short.condensation_model.route = short_route
     before_kg = short.atom_ledger.kg_by_account(
         "process.overhead_gas"
     ).get("K", 0.0)
@@ -1280,6 +1293,7 @@ def test_short_step_residual_flux_is_kilograms_per_hour():
         ledger_kg / dt_h, rel=1e-9,
     )
     assert residual.total_kg_hr == pytest.approx(ledger_kg / dt_h, rel=1e-9)
+    assert short_route.dt_h == [pytest.approx(dt_h)]
     assert residual.species_kg_hr["K"] == pytest.approx(
         remaining_kg_hr, rel=1e-9,
     )
@@ -1288,7 +1302,8 @@ def test_short_step_residual_flux_is_kilograms_per_hour():
     hourly = _loaded_sim()
     hourly.process_timestep = resolve_process_timestep(3600.0)
     hourly.condensation_model._knudsen_policy_configured = True
-    hourly.condensation_model.route = _partial_species_route("K", fraction)
+    hourly_route = _partial_species_route("K", fraction)
+    hourly.condensation_model.route = hourly_route
     hourly_before = hourly.atom_ledger.kg_by_account(
         "process.overhead_gas"
     ).get("K", 0.0)
@@ -1298,6 +1313,7 @@ def test_short_step_residual_flux_is_kilograms_per_hour():
     ).get("K", 0.0)
     hourly_ledger_kg = hourly_after - hourly_before
     assert hourly_ledger_kg == pytest.approx(remaining_kg_hr, rel=1e-9)
+    assert hourly_route.dt_h == [pytest.approx(1.0)]
     assert hourly_residual.species_kg_hr["K"] == pytest.approx(
         hourly_ledger_kg, rel=1e-9,
     )
@@ -1468,6 +1484,10 @@ class TestShortStepOxygenClip:
     Mutation: leave the clip comparing inventory mol with mol/h, then
     multiply by dt. The short SiO case books 1/30 mol of vapour, not
     1 mol. The short alkali case books 1/60 mol of O2, not 1 mol.
+
+    The SiO flux goes through ``_flux``, so ``total_kg_hr`` is the
+    species rate. A zero total makes the wall-partial fixture project
+    nothing, and the route then refuses the missing SiO partial.
     """
 
     @pytest.mark.usefixtures("production_configured_condensation_route")
@@ -1476,9 +1496,7 @@ class TestShortStepOxygenClip:
         model = _sio_oxygen_model(_OXYGEN_INVENTORY_MOL)
         _isolate_capture_surface(monkeypatch, model, surface)
         route = model.route(
-            EvaporationFlux(species_kg_hr={
-                "SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H),
-            }),
+            _flux({"SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H)}),
             MeltState(temperature_C=1600.0),
             dt_h=_SHORT_DT_H,
         )
@@ -1494,9 +1512,7 @@ class TestShortStepOxygenClip:
         model = _sio_oxygen_model(1000.0)
         _isolate_capture_surface(monkeypatch, model, surface)
         route = model.route(
-            EvaporationFlux(species_kg_hr={
-                "SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H),
-            }),
+            _flux({"SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H)}),
             MeltState(temperature_C=1600.0),
             dt_h=_SHORT_DT_H,
         )
@@ -1510,9 +1526,7 @@ class TestShortStepOxygenClip:
         model = _sio_oxygen_model(_OXYGEN_INVENTORY_MOL)
         _isolate_capture_surface(monkeypatch, model, surface)
         route = model.route(
-            EvaporationFlux(species_kg_hr={
-                "SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H),
-            }),
+            _flux({"SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H)}),
             MeltState(temperature_C=1600.0),
             dt_h=1.0,
         )
