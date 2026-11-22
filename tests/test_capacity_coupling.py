@@ -3655,6 +3655,7 @@ def test_error_test_rejection_names_the_component():
     from scipy.integrate import solve_ivp
 
     original_norm = radau.norm
+    original_collocation = radau.solve_collocation_system
     recorder = capacity_coupling._StiffnessRecord(("O2",), ("n",))
     calls = {"n": 0}
 
@@ -3677,6 +3678,7 @@ def test_error_test_rejection_names_the_component():
     except RuntimeError as exc:
         assert str(exc) == "stop"
     assert radau.norm is original_norm
+    assert radau.solve_collocation_system is original_collocation
     assert recorder.rejected >= 1
     payload = recorder.payload()
     assert payload["rejected_steps"] == recorder.rejected
@@ -3755,6 +3757,142 @@ def test_downstream_switch_publishes_inside_the_cap():
     _publish(
         {"O2": opening_o2_pa / factor},
         lambda _partials: {"O2": 0.0},
+    )
+
+
+def test_quasi_steady_fixed_point_publishes_the_stalled_hour():
+    """A steep source inside the kink band holds the open fixed point.
+
+    The opening is the walked second-C4 state, a trace above 20 Pa.
+    Potassium matches the pure-K pipe at 1e-7 Pa above the switch and
+    then falls across 1e-8 Pa, so the implicit stages straddle that
+    corner. Newton misses, the accepted step stays above 1 ms, and
+    the error test accepts. The melt is frozen for the hour, so the
+    fixed point is the rest of the interval. The held source and the
+    held outflow are the same total. n = n0 + A − B exactly. S is 0,
+    so R stays 0. A constant gross is the whole hour.
+    """
+
+    temperature_K = 1170.0 + 273.15
+    downstream_pa = 20.0
+    factor = GAS_CONSTANT * temperature_K / _HS_V_M3
+    oxygen = _o2_molar_mass_kg()
+    potassium = MOLAR_MASS["K"] / 1000.0
+    masses = {"O2": oxygen, "K": potassium}
+    gross_k_kg_h = 3.6e-6
+    pure_k = pipe_species_outflow_mol_s(
+        downstream_pa + 1.0e-7,
+        downstream_pa,
+        temperature_K,
+        {"K": (downstream_pa + 1.0e-7) / factor},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol={"K": potassium},
+    )
+    matched_kg_h = float(pure_k.species_mol_s["K"]) * potassium * 3600.0
+    holder: dict = {}
+
+    def steep(partials: dict[str, float]) -> dict[str, float]:
+        holder["gross_kg_hr"] = {"O2": 0.0, "K": gross_k_kg_h}
+        total = math.fsum(partials.values())
+        if partials.get("O2", 0.0) > 1.0 and partials.get("K", 0.0) > 1.0e-6:
+            rate = matched_kg_h * math.exp(
+                -max(total - (downstream_pa + 1.0e-7), 0.0) / 1.0e-8
+            )
+            return {"O2": 0.0, "K": rate}
+        return {"O2": 0.0, "K": 0.0}
+
+    result = solve_capacity_shadow(
+        pre_holdup_mol={
+            "O2": 19.999582680051606 / factor,
+            "K": 0.00041738395728921866 / factor,
+        },
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=steep,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        extent_holder=holder,
+        authoritative=True,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.authoritative
+    terms = holder["_balance_terms"]
+    assert terms["path"] == "radau_fallback"
+    assert result.iterations < capacity_coupling._MAX_INTEGRATOR_EVALUATIONS
+    notices = [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "quasi_steady_fixed_point"
+    ]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice["species"] == "headspace"
+    assert notice["tau_s"] > 0.0
+    assert notice["t_rem_s"] > 3600.0 - 1.0
+    assert notice["tau_over_t_rem"] == notice["tau_s"] / notice["t_rem_s"]
+    assert (
+        notice["tau_over_t_rem"]
+        <= capacity_coupling._QUASI_STEADY_MAX_TAU_FRACTION
+    )
+    assert 0.0 <= notice["abs_pressure_gap_Pa"] <= capacity_coupling._KINK_BAND_PA
+    total = math.fsum(result.partial_pressures_Pa.values())
+    assert downstream_pa < total
+    assert total - downstream_pa <= capacity_coupling._KINK_BAND_PA
+    for name, n0 in terms["n0_mol"].items():
+        identity = n0 + terms["A_mol"][name] - terms["B_mol"][name]
+        assert result.partial_pressures_Pa[name] == identity * factor
+    outflow = pipe_species_outflow_mol_s(
+        total,
+        downstream_pa,
+        temperature_K,
+        {
+            name: result.partial_pressures_Pa[name] / factor
+            for name in masses
+        },
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol=masses,
+    )
+    inflow = {
+        name: steep(result.partial_pressures_Pa).get(name, 0.0)
+        / masses[name]
+        / 3600.0
+        for name in masses
+    }
+    removed = {
+        name: float(outflow.species_mol_s.get(name, 0.0)) for name in masses
+    }
+    held_source = math.fsum(
+        inflow[name] * notice["t_rem_s"] for name in masses
+    )
+    held_outflow = math.fsum(
+        removed[name] * notice["t_rem_s"] for name in masses
+    )
+    assert held_source == pytest.approx(held_outflow, abs=1.0e-12)
+    for name in masses:
+        assert terms["A_mol"][name] == pytest.approx(
+            inflow[name] * notice["t_rem_s"],
+            abs=1.0e-9,
+        )
+    assert terms["R_mol"]["K"] == 0.0
+    assert terms["R_mol"]["O2"] == 0.0
+    assert terms["G_kg"]["K"] == pytest.approx(
+        gross_k_kg_h / 3600.0 * 3600.0,
+        abs=1.0e-15,
+    )
+    assert terms["G_kg"]["O2"] == pytest.approx(0.0, abs=1.0e-15)
+    assert not any(
+        notice.get("reason") == "shut_path" for notice in result.species_notices
     )
 
 

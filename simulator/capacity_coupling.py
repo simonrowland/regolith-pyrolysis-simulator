@@ -924,6 +924,21 @@ _MAX_INTEGRATOR_EVALUATIONS = 100_000
 # the full count. These bounds are the payload, not a step-size knob.
 _STIFFNESS_STEPS = 200
 _STIFFNESS_REJECTIONS = 16
+# The pipe kink. Q is 0 at and below P_down, and dQ/dP jumps from 0
+# to a finite slope on the open side. Radau's stages straddle that
+# corner, Newton rejects the step, and h collapses. The stall this
+# catches sits inside the band above P_down. An approach from tens of
+# pascals is outside it and keeps integrating.
+# 1e-4 Pa times the tau fraction below is 1e-6 Pa, the partial floor.
+_KINK_BAND_PA = 1.0e-4
+_KINK_STEP_S = 1.0e-3
+# The first Newton miss often refreshes the Jacobian. The second is
+# the step being halved onto the kink.
+_KINK_NEWTON_FAILS = 2
+# tau / t_rem. The held-interval pressure error is about
+# |P_stall − P*| times this. At the band edge that product is the
+# 1e-6 Pa floor, so a larger fraction is not this shortcut.
+_QUASI_STEADY_MAX_TAU_FRACTION = 1.0e-2
 
 
 class _BalanceRefused(Exception):
@@ -940,6 +955,14 @@ class _BalanceRefused(Exception):
         self.flux_evaluations = flux_evaluations
         self.integrator_evaluations = integrator_evaluations
         super().__init__(reason)
+
+
+class _QuasiSteadyStall(Exception):
+    """The open integral stopped. The step is already booked."""
+
+    def __init__(self, step: "_HeadspaceStep") -> None:
+        self.step = step
+        super().__init__("quasi_steady_fixed_point")
 
 
 def _shadow_from_balance(
@@ -1254,6 +1277,10 @@ class _HeadspaceLaw:
         self.accepted_capture_fractions: dict[str, float] | None = None
         # Slow-path tape. Set only when a work cap fires inside Radau.
         self.stiffness_diagnostic: dict[str, Any] | None = None
+        # This hour already declined the fixed-point hold. A later
+        # step in the same band must not try again: the integrator
+        # is the remaining engine, and the work cap is its refusal.
+        self._quasi_steady_declined = False
         self._last_pipe_piece: tuple | None = None
         self.paired_redox_mol_s: dict[str, float] | None = None
         self.accepted_flux_partials: dict[str, float] | None = None
@@ -2295,6 +2322,10 @@ _RADAU_NORM = None
 _RADAU_STEP_CODE = None
 _RADAU_ERROR_LINES: tuple[int, int] | None = None
 _RADAU_ERROR_LINES_READY = False
+# The unwrapped collocation solver. Newton misses are counted through
+# the active recorder. The headspace step decides whether that count
+# is a stall. This name is never a copy of Radau's Newton loop.
+_RADAU_COLLOCATION = None
 
 
 def _prepare_radau_error_lines() -> tuple[int, int] | None:
@@ -2308,6 +2339,7 @@ def _prepare_radau_error_lines() -> tuple[int, int] | None:
 
     global _RADAU_NORM, _RADAU_STEP_CODE, _RADAU_ERROR_LINES
     global _RADAU_ERROR_LINES_READY
+    _remember_radau_collocation()
     if _RADAU_ERROR_LINES_READY:
         return _RADAU_ERROR_LINES
     _RADAU_ERROR_LINES_READY = True
@@ -2342,6 +2374,41 @@ def _prepare_radau_error_lines() -> tuple[int, int] | None:
     return _RADAU_ERROR_LINES
 
 
+def _remember_radau_collocation() -> None:
+    """Keep the original collocation solver so the count can wrap it."""
+
+    global _RADAU_COLLOCATION
+    if _RADAU_COLLOCATION is not None:
+        return
+    import scipy.integrate._ivp.radau as radau
+
+    current = radau.solve_collocation_system
+    if current is _stiffness_collocation:
+        return
+    _RADAU_COLLOCATION = current
+
+
+def _stiffness_collocation(*args, **kwargs):
+    """radau.solve_collocation_system while a slow solve is counting.
+
+    A false converged flag is one Newton miss. The wrapper does not
+    change the step and does not decide the stall. Nested solves share
+    this one wrapper; the context variable selects the recorder, so a
+    miss is counted once.
+    """
+
+    result = _RADAU_COLLOCATION(*args, **kwargs)
+    recorder = _ACTIVE_STIFFNESS.get()
+    if (
+        recorder is not None
+        and isinstance(result, tuple)
+        and result
+        and result[0] is False
+    ):
+        recorder.newton_failures += 1
+    return result
+
+
 def _stiffness_norm(vector):
     """radau.norm while a slow solve is recording error tests.
 
@@ -2367,14 +2434,18 @@ class _RadauNormTape:
         self._recorder = recorder
         self._token = None
         self._previous = None
+        self._previous_collocation = None
 
     def __enter__(self) -> "_RadauNormTape":
         import scipy.integrate._ivp.radau as radau
 
         _prepare_radau_error_lines()
         self._previous = radau.norm
+        self._previous_collocation = radau.solve_collocation_system
         self._token = _ACTIVE_STIFFNESS.set(self._recorder)
         radau.norm = _stiffness_norm
+        if _RADAU_COLLOCATION is not None:
+            radau.solve_collocation_system = _stiffness_collocation
         return self
 
     def __exit__(self, exc_type, exc, tb) -> bool:
@@ -2382,6 +2453,8 @@ class _RadauNormTape:
 
         if self._previous is not None:
             radau.norm = self._previous
+        if self._previous_collocation is not None:
+            radau.solve_collocation_system = self._previous_collocation
         if self._token is not None:
             _ACTIVE_STIFFNESS.reset(self._token)
         return False
@@ -2398,6 +2471,7 @@ class _StiffnessRecord:
         self.dominators: deque = deque(maxlen=_STIFFNESS_REJECTIONS)
         self.rejected = 0
         self.last_y = None
+        self.newton_failures = 0
         self._pending = False
         self._failed = False
         self._lines = _prepare_radau_error_lines()
@@ -2562,20 +2636,351 @@ def _store_stiffness(law, recorder: _StiffnessRecord, jacobian) -> None:
     law.stiffness_diagnostic = diagnostic
 
 
-def _recording_radau(recorder: _StiffnessRecord):
-    """Radau that keeps each accepted step on this solve's tape."""
+def _recording_radau(recorder: _StiffnessRecord, on_step=None):
+    """Radau that keeps each accepted step on this solve's tape.
+
+    on_step, when passed, runs after the accept is recorded and may
+    raise. The one-argument call records only. Newton misses are not
+    decided here.
+    """
 
     from scipy.integrate._ivp.radau import Radau
 
     class _RecordingRadau(Radau):
         def _step_impl(self):
             recorder.begin_step()
+            fails_before = recorder.newton_failures
             accepted, message = Radau._step_impl(self)
             if accepted:
                 recorder.accept(float(self.t - self.t_old), self.y)
+            if on_step is not None:
+                on_step(self, accepted, fails_before, message)
             return accepted, message
 
     return _RecordingRadau
+
+
+def _open_or_shut_fixed_point(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+) -> tuple[str | None, float | None]:
+    """Bracket q + S − Q on the stall composition.
+
+    ("shut", None) when the net source at P_down is <= 0: the fixed
+    point is the shut branch. ("open", P*) is the one crossing with
+    P* > P_down. (None, None) is not a bracket this hour can hold.
+    Two roots raised by the scan propagate. The fast-root admission
+    test is not this decision: a root the sweep will not admit is
+    still the fixed point of the autonomous hour.
+    """
+
+    downstream = law.downstream_pa
+    if len(law.species) == 1:
+        def value_at(pressure: float) -> float:
+            return law._scalar_g(pressure)
+
+        def piece_at(pressure: float) -> tuple:
+            return law.piece_at(pressure)
+
+        samples = law.g_samples()
+    else:
+        def value_at(pressure: float) -> float:
+            return _mixture_g(law, fractions, pressure)
+
+        def piece_at(pressure: float) -> tuple:
+            return _mixture_piece(law, fractions, pressure)
+
+        samples = _ray_samples(law, fractions)
+    if value_at(downstream) <= 0.0:
+        return "shut", None
+    open_crossings = [
+        crossing
+        for crossing in _crossings(samples)
+        if max(crossing[1], crossing[2]) > downstream
+    ]
+    if len(open_crossings) != 1:
+        return None, None
+    root, _iterations = _solve_bracket(
+        value_at,
+        piece_at,
+        open_crossings[0],
+        downstream,
+    )
+    if not math.isfinite(root) or root <= downstream:
+        return None, None
+    return "open", float(root)
+
+
+def _quasi_steady_tau(jacobian, state) -> float | None:
+    """tau = 1/|λ|_max. Unset when the spectrum is not a relaxation."""
+
+    span = _jacobian_abs_eigenvalue_span(jacobian, state)
+    if span is None:
+        return None
+    lam_max = span[1]
+    if not math.isfinite(lam_max) or lam_max <= 0.0:
+        return None
+    return 1.0 / lam_max
+
+
+def _finish_downstream_remainder(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    landed: Mapping[str, float],
+    added: Mapping[str, float],
+    bled: Mapping[str, float],
+    extent_kwargs: dict,
+    t_hit: float,
+    open_iterations: int,
+    *,
+    track_extent: bool,
+) -> _HeadspaceStep:
+    """Book the open prefix and finish the hour on the shut path.
+
+    The event landing and a stall whose fixed point is shut share
+    this tail. A source that would open the pipe again is not clamped
+    onto the switch: the shut path returns None and the open integral
+    continues from the landed holdup.
+    """
+
+    remain = float(dt_s) - float(t_hit)
+    if remain <= 0.0:
+        _mark_balance_path(law, "radau_fallback")
+        _remember_balance_iterations(law, open_iterations)
+        return law.step_from_moles(
+            n0,
+            dt_s,
+            landed,
+            open_iterations,
+            _SLOW_ATOL_PA,
+            added_mol=added,
+            bled_mol_in=bled,
+            **extent_kwargs,
+        )
+    shut = _closed_pipe_accumulation(law, landed, remain)
+    if shut is None:
+        rest = _slow_converge(law, landed, remain)
+    else:
+        rest = shut
+    return _join_switch_remainder(
+        law,
+        n0,
+        dt_s,
+        landed,
+        added,
+        bled,
+        extent_kwargs,
+        rest,
+        open_iterations,
+        track_extent=track_extent,
+    )
+
+
+def _hold_shut_fixed_point(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    state,
+    t_stall: float,
+    *,
+    track_extent: bool,
+) -> _HeadspaceStep | None:
+    """Scale the stall onto P_down and hand the remainder to the shut path.
+
+    The event's projection refuses a root farther than 1e-6 Pa. A
+    stall inside the kink band can be 1e-4 Pa out, so the moles are
+    scaled onto P_down first. The projection then rewrites the bleed
+    and keeps n = n0 + A − B. No quasi-steady notice: this is the
+    shut handoff the event already publishes.
+    """
+
+    end, added, _bled, extent_kwargs = _integrated_holdup(
+        law,
+        n0,
+        state,
+        track_extent=track_extent,
+    )
+    target = law.downstream_pa
+    pressure = law.pressure_of(end)
+    if pressure != target:
+        if (
+            not math.isfinite(pressure)
+            or pressure <= 0.0
+            or abs(pressure - target) > _KINK_BAND_PA
+        ):
+            return None
+        scale = target / pressure
+        end = {name: float(end[name]) * scale for name in law.species}
+    try:
+        landed, bled = _project_onto_downstream(law, n0, end, added)
+    except _BalanceRefused:
+        return None
+    return _finish_downstream_remainder(
+        law,
+        n0,
+        dt_s,
+        landed,
+        added,
+        bled,
+        extent_kwargs,
+        t_stall,
+        max(int(law.integrator_evaluations), 1),
+        track_extent=track_extent,
+    )
+
+
+def _hold_open_fixed_point(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    state,
+    t_stall: float,
+    pressure: float,
+    root: float,
+    tau: float,
+    fractions: Mapping[str, float],
+    *,
+    track_extent: bool,
+) -> _HeadspaceStep | None:
+    """Hold the open fixed point for the rest of the hour.
+
+    The hour's source is a frozen melt, so
+    dn/dt = q(P) + S(P) − Q(P) is autonomous. A stable fixed point
+    P* is the exact continuation: n stays at n(P*), and inflow equals
+    outflow. The approach is exponential with time constant
+    tau = 1/|λ|_max. Stopping at P_stall and holding P* for the
+    remaining time t_rem errs by about (P_stall − P*) * tau / t_rem.
+
+    Algebra: A += (q + S)(P*) t_rem and n_end = n(P*) on the stall
+    composition. B = n0 + A − n_end, so the inventory identity holds
+    by construction. Only the totals of (q + S) and Q match at the
+    root; a species whose source is not its own outflow would make
+    per-species B = Q_i t_rem drop the identity. R and G take their
+    own rates times t_rem and do not enter the identity.
+    Unit check: (mol/s)·s = mol and (kg/s)·s = kg.
+    Limit: a bleed below −1e-6 Pa is not this identity. The caller
+    keeps integrating, and the work cap remains the refusal.
+    """
+
+    t_rem = float(dt_s) - float(t_stall)
+    if not math.isfinite(t_rem) or t_rem <= 0.0:
+        return None
+    _end, added_prefix, _bled_prefix, extent_prefix = _integrated_holdup(
+        law,
+        n0,
+        state,
+        track_extent=track_extent,
+    )
+    n_star = _moles_along(law, fractions, root)
+    partials = law.partials_of(n_star)
+    source, outflow, _binding, _piece = law._flows(partials)
+    redox = law._redox_rates(partials)
+    pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+    added: dict[str, float] = {}
+    bled: dict[str, float] = {}
+    for name in law.species:
+        inflow = source[name] + redox[name]
+        if not math.isfinite(inflow) or not math.isfinite(outflow[name]):
+            return None
+        grown = float(added_prefix[name]) + inflow * t_rem
+        bleed = float(n0[name]) + grown - n_star[name]
+        if bleed < 0.0:
+            if -bleed * pa_per_mol > DEFAULT_ABS_TOL_PA:
+                return None
+            bleed = 0.0
+        # n is the identity, not the pre-snap composition. Rebuilding
+        # it from n0 + A − B keeps the published partial on that triple.
+        n_star[name] = float(n0[name]) + grown - bleed
+        added[name] = grown
+        bled[name] = bleed
+    extent_kwargs: dict = {}
+    if track_extent:
+        gross_prefix = extent_prefix["vapour_extent_kg"]
+        redox_prefix = extent_prefix["redox_added_mol"]
+        vapour: dict[str, float] = {}
+        redox_added: dict[str, float] = {}
+        for name in law.species:
+            gross_rate = float(law._last_gross_kg_s.get(name, 0.0))
+            redox_rate = float(redox[name])
+            if not math.isfinite(gross_rate) or not math.isfinite(redox_rate):
+                return None
+            vapour[name] = float(gross_prefix[name]) + gross_rate * t_rem
+            redox_added[name] = float(redox_prefix[name]) + redox_rate * t_rem
+        extent_kwargs = {
+            "vapour_extent_kg": vapour,
+            "redox_added_mol": redox_added,
+        }
+    gap = abs(float(root) - float(pressure))
+    law._remember_species_notices((
+        {
+            "species": "headspace",
+            "reason": "quasi_steady_fixed_point",
+            "tau_s": float(tau),
+            "t_rem_s": t_rem,
+            "abs_pressure_gap_Pa": gap,
+            "tau_over_t_rem": float(tau) / t_rem,
+        },
+    ))
+    iterations = max(int(law.integrator_evaluations), 1)
+    _mark_balance_path(law, "radau_fallback")
+    _remember_balance_iterations(law, iterations)
+    return law.step_from_moles(
+        n0,
+        dt_s,
+        n_star,
+        iterations,
+        gap,
+        added_mol=added,
+        bled_mol_in=bled,
+        **extent_kwargs,
+    )
+
+
+def _hold_fixed_point(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    state,
+    t_stall: float,
+    pressure: float,
+    kind: str,
+    root: float | None,
+    tau: float,
+    fractions: Mapping[str, float],
+    *,
+    track_extent: bool,
+) -> _HeadspaceStep | None:
+    """Book the fixed point. A later step of this hour does not retry.
+
+    The latch is set before the shut remainder, which may integrate.
+    That remainder is at P_down and is not another open stall.
+    """
+
+    law._quasi_steady_declined = True
+    if kind == "shut":
+        return _hold_shut_fixed_point(
+            law,
+            n0,
+            dt_s,
+            state,
+            t_stall,
+            track_extent=track_extent,
+        )
+    if root is None:
+        return None
+    return _hold_open_fixed_point(
+        law,
+        n0,
+        dt_s,
+        state,
+        t_stall,
+        pressure,
+        root,
+        tau,
+        fractions,
+        track_extent=track_extent,
+    )
 
 
 def _slow_converge(
@@ -2856,9 +3261,85 @@ def _slow_converge(
         events = downstream_switch
 
     recorder = _StiffnessRecord(species, block_names)
+
+    def _on_radau_step(solver, accepted, fails_before, _message) -> None:
+        # A stalled step inside the kink band is not another rejected
+        # error test. Newton has already halved h, or the accepted
+        # step itself is below 1e-3 s, and the pressure is still just
+        # above P_down. The fixed point of the autonomous hour then
+        # finishes the interval. No bracket, or a relaxation that is
+        # not fast beside t_rem, leaves the latch set and the
+        # integrator running. The work cap is still the refusal.
+        if law._quasi_steady_declined:
+            return
+        if law.diameter_m is None or not law.downstream_pa > 0.0:
+            return
+        fails = recorder.newton_failures - fails_before
+        step_s = float(solver.t - solver.t_old) if accepted else None
+        tiny = (
+            step_s is not None
+            and math.isfinite(step_s)
+            and 0.0 < step_s < _KINK_STEP_S
+        )
+        if not tiny and fails < _KINK_NEWTON_FAILS:
+            return
+        t_stall = float(solver.t)
+        if not math.isfinite(t_stall) or float(dt_s) - t_stall <= 0.0:
+            return
+        moles = moles_of(solver.y)
+        pressure = law.pressure_of(moles)
+        above = pressure - law.downstream_pa
+        if not (math.isfinite(above) and 0.0 < above <= _KINK_BAND_PA):
+            return
+        fractions = _fractions_of(law, moles)
+        if fractions is None:
+            law._quasi_steady_declined = True
+            return
+        try:
+            kind, root = _open_or_shut_fixed_point(law, fractions)
+        except _BalanceRefused as refused:
+            if refused.reason in (
+                "headspace_balance_multiple_roots",
+                "headspace_balance_work_cap",
+            ):
+                raise
+            law._quasi_steady_declined = True
+            return
+        if kind is None:
+            law._quasi_steady_declined = True
+            return
+        try:
+            tau = _quasi_steady_tau(jacobian, solver.y)
+        except _BalanceRefused:
+            raise
+        except Exception:
+            tau = None
+        if (
+            tau is None
+            or tau / (float(dt_s) - t_stall) > _QUASI_STEADY_MAX_TAU_FRACTION
+        ):
+            law._quasi_steady_declined = True
+            return
+        step = _hold_fixed_point(
+            law,
+            n0,
+            dt_s,
+            solver.y,
+            t_stall,
+            pressure,
+            kind,
+            root,
+            tau,
+            fractions,
+            track_extent=track_extent,
+        )
+        if step is None:
+            return
+        raise _QuasiSteadyStall(step)
+
     try:
         solver_kwargs = {
-            "method": _recording_radau(recorder),
+            "method": _recording_radau(recorder, _on_radau_step),
             "rtol": _SLOW_RTOL,
             "atol": atol,
             "jac": jacobian,
@@ -2872,6 +3353,8 @@ def _slow_converge(
                 y0,
                 **solver_kwargs,
             )
+    except _QuasiSteadyStall as stalled:
+        return stalled.step
     except _BalanceRefused as refused:
         # The cap fired inside the right-hand side, so nfev is not
         # back. The rhs counter is how far this attempt got. The tape
@@ -3163,26 +3646,7 @@ def _land_open_pipe_on_downstream(
         track_extent=track_extent,
     )
     landed, bled = _project_onto_downstream(law, n0, end, added)
-    remain = float(dt_s) - float(t_hit)
-    if remain <= 0.0:
-        _mark_balance_path(law, "radau_fallback")
-        _remember_balance_iterations(law, open_iterations)
-        return law.step_from_moles(
-            n0,
-            dt_s,
-            landed,
-            open_iterations,
-            _SLOW_ATOL_PA,
-            added_mol=added,
-            bled_mol_in=bled,
-            **extent_kwargs,
-        )
-    shut = _closed_pipe_accumulation(law, landed, remain)
-    if shut is None:
-        rest = _slow_converge(law, landed, remain)
-    else:
-        rest = shut
-    return _join_switch_remainder(
+    return _finish_downstream_remainder(
         law,
         n0,
         dt_s,
@@ -3190,7 +3654,7 @@ def _land_open_pipe_on_downstream(
         added,
         bled,
         extent_kwargs,
-        rest,
+        t_hit,
         open_iterations,
         track_extent=track_extent,
     )
@@ -4123,6 +4587,27 @@ def _fractions_of(
     }
 
 
+def _moles_along(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+) -> dict[str, float]:
+    """n_i = max(y_i, 0) * max(P, 0) * V / (R T).
+
+    The fast-root seed and the quasi-steady hold both place one
+    composition at one total pressure. Unit check:
+    Pa * m^3 / (J/(mol·K) * K) = mol. Limit: P <= 0 is an empty holdup.
+    """
+
+    if pressure <= 0.0:
+        return {species: 0.0 for species in law.species}
+    per_pascal = law.volume_m3 / (GAS_CONSTANT * law.temperature_K)
+    return {
+        species: pressure * max(0.0, fractions[species]) * per_pascal
+        for species in law.species
+    }
+
+
 def _state_slope(law: _HeadspaceLaw, moles: Mapping[str, float]) -> float | None:
     """dQ_kg/dm at fixed composition. None when the stencil crosses a kink.
 
@@ -4257,15 +4742,7 @@ def _commit_many(
             crossings[0],
             law.pressure_of(n0),
         )
-        per_pascal = law.volume_m3 / (GAS_CONSTANT * law.temperature_K)
-        seed = {
-            species: (
-                max(0.0, root_pressure)
-                * max(0.0, fractions[species])
-                * per_pascal
-            )
-            for species in law.species
-        }
+        seed = _moles_along(law, fractions, root_pressure)
         # A fast sweep that finds no bracket, or misses its tolerance,
         # is a state the slow branch can still solve. Two roots already
         # raised above. Any other refusal still propagates.
