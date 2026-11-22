@@ -294,17 +294,24 @@ def metal_saturation_pressure_Pa(
 
     This is *not* oxide-dissociation ``P_eff``. C7's Ca product is metal
     vapor; the metallothermic vapor term needs condensed-metal ``P_sat``. The
-    wall-condensation selector preserves the pure-metal sidecar when a melt
-    source reaction also declares an Antoine reference.
+    wall-condensation selector preserves the pure-metal Antoine sidecar when a
+    melt source reaction also declares an Antoine reference. Sodium has no
+    such sidecar: its elemental rail is the Browning-Potter block owned by
+    :mod:`engines.builtin.sodium_saturation`.
 
     Fail-closed categories (same three-way rule as
     :func:`_antoine_reference_pressure_Pa`):
-    (1) unknown metal, missing/corrupt Antoine: raise
+    (1) unknown metal, missing/corrupt saturation record: raise
         :class:`EllinghamPressureRefusal` (missing input — not a zero).
-    (2) out-of-domain T with evaluable coefficients: compute.
+    (2) out-of-domain T with an evaluable record: compute.
     (3) catalog ``consumer_status=inactive``: return ``0.0`` (proven zero).
     """
 
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
     from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
 
     data = _resolve_vapor_pressure_data(vapor_pressure_data)
@@ -317,6 +324,23 @@ def metal_saturation_pressure_Pa(
     sp_data = metals[species] or {}
     if str(sp_data.get("consumer_status", "")).lower() == "inactive":
         return 0.0
+    # Na's legacy row carries pure_component_saturation and no
+    # pure_component_antoine. The wall selector then returns an empty
+    # Antoine block, and treating that as missing saturation refuses Na
+    # at every temperature. The saturation block is the elemental rail.
+    saturation_block = sodium_saturation_block(sp_data)
+    if saturation_block is not None:
+        try:
+            return sodium_saturation_pressure(
+                saturation_block, float(temperature_K)
+            ).pressure_pa
+        except SodiumSaturationError as exc:
+            raise EllinghamPressureRefusal(
+                f"elemental saturation pressure unavailable for {species!r} "
+                f"at T_K={temperature_K!r}; refusing P_sat=0.0 "
+                f"(missing/corrupt saturation record is not proof of "
+                f"nonvolatility)"
+            ) from exc
     antoine, _src = wall_condensation_antoine_coefficients(
         sp_data,
         temperature_K=float(temperature_K),

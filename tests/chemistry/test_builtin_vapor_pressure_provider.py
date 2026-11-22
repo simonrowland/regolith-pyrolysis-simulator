@@ -3461,9 +3461,11 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
     for _, melt in species_melts:
         melt.melt_fO2_log = -28.0
 
-    # At unit oxide activity (100 wt% single oxide) and pO2=1e-28 bar, the
-    # Na and K reactions give raw pressures ~5.05e8 Pa and ~9.47e9 Pa. Their
-    # independent pure-metal Antoine caps are ~3.98e5 Pa and ~1.64e6 Pa.
+    # At unit oxide activity and pO2=1e-28 bar the raw Na and K equilibrium
+    # pressures sit above their pure-metal caps, so the published pressure is
+    # the cap. Na's cap is sodium_saturation_pressure of
+    # pure_component_saturation. K's cap is the pure_component_antoine sidecar.
+    # The comparison uses those production pressures.
     for species, melt in species_melts:
         result = _LegacyInternalAnalyticalModel(
             vapor_pressure_data,

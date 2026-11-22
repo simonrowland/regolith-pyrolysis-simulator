@@ -155,11 +155,48 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
             assert notice["was_clamped"] is False
 
 
+def test_every_catalog_metal_saturation_pressure_resolves(
+    vapor_pressure_data,
+) -> None:
+    """Every metals-catalog row must yield a saturation pressure.
+
+    The elemental cap calls this for whichever metal the melt reaction
+    emits. A row whose pure-component rail is not an Antoine sidecar must
+    still resolve. Sodium is that row: the expected pressure is the
+    Browning-Potter owner, not a second evaluation of its formula.
+    """
+
+    from engines.builtin.sodium_saturation import (
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+
+    temperature_K = 1423.15
+    metals = vapor_pressure_data["metals"]
+    assert "Na" in metals
+    for species, row in metals.items():
+        pressure = ellingham_graph.metal_saturation_pressure_Pa(
+            species,
+            temperature_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        assert math.isfinite(pressure) and pressure >= 0.0, species
+        block = sodium_saturation_block(row)
+        if block is not None:
+            assert pressure == sodium_saturation_pressure(
+                block, temperature_K
+            ).pressure_pa
+
+
 @pytest.mark.parametrize("species", ("Mg", "Na", "K"))
 def test_elemental_metal_pressure_is_capped_at_pure_saturation(
     vapor_pressure_data,
     species,
 ) -> None:
+    from engines.builtin.sodium_saturation import (
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
     from engines.builtin.vapor_pressure import (
         COEFF_BLOCK_PURE_COMPONENT,
         vapor_pressure_antoine_coefficients,
@@ -173,26 +210,48 @@ def test_elemental_metal_pressure_is_capped_at_pure_saturation(
         1e-28,
         vapor_pressure_data=vapor_pressure_data,
     )
+    row = vapor_pressure_data["metals"][species]
     pure_metal_saturation = ellingham_graph.metal_saturation_pressure_Pa(
         species,
         temperature_K,
         vapor_pressure_data=vapor_pressure_data,
     )
-    pure_antoine, coefficient_block = wall_condensation_antoine_coefficients(
-        vapor_pressure_data["metals"][species], temperature_K,
-    )
-    if species in {"Na", "K"}:
-        runtime_antoine, runtime_block = vapor_pressure_antoine_coefficients(
-            vapor_pressure_data["metals"][species], temperature_K,
+    saturation_block = sodium_saturation_block(row)
+    if saturation_block is not None:
+        # The wall selector's pure_component_antoine block is empty: the
+        # Rodebush sidecar was retired. Elemental Na is the saturation owner.
+        assert pure_metal_saturation == sodium_saturation_pressure(
+            saturation_block, temperature_K
+        ).pressure_pa
+        runtime_antoine, _runtime_block = vapor_pressure_antoine_coefficients(
+            row, temperature_K,
         )
-        assert runtime_block != coefficient_block
-        assert runtime_antoine != pure_antoine
-
-    assert coefficient_block == COEFF_BLOCK_PURE_COMPONENT
-    assert pure_metal_saturation == ellingham_graph._antoine_reference_pressure_Pa(
-        pure_antoine,
-        temperature_K,
-    )
+        melt_pref = ellingham_graph._antoine_reference_pressure_Pa(
+            runtime_antoine, temperature_K,
+        )
+        assert melt_pref != pytest.approx(pure_metal_saturation)
+        wall_antoine, wall_block = wall_condensation_antoine_coefficients(
+            row, temperature_K,
+        )
+        assert wall_block == COEFF_BLOCK_PURE_COMPONENT
+        assert ellingham_graph._antoine_reference_pressure_Pa(
+            wall_antoine, temperature_K,
+        ) is None
+    else:
+        pure_antoine, coefficient_block = wall_condensation_antoine_coefficients(
+            row, temperature_K,
+        )
+        if species == "K":
+            runtime_antoine, runtime_block = vapor_pressure_antoine_coefficients(
+                row, temperature_K,
+            )
+            assert runtime_block != coefficient_block
+            assert runtime_antoine != pure_antoine
+        assert coefficient_block == COEFF_BLOCK_PURE_COMPONENT
+        assert pure_metal_saturation == ellingham_graph._antoine_reference_pressure_Pa(
+            pure_antoine,
+            temperature_K,
+        )
     if species == "Mg":
         # The JANAF Mg(g)/MgO fit gives ΔG≈−877 kJ/mol O2 at 1423.15 K,
         # hence K≈6.4e-33 bar. At pO2=1e-28 bar, a_M=sqrt(K/pO2)≈0.008
