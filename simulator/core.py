@@ -8571,17 +8571,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 projector_gross,
                 stoich,
             )
+            # Signed. A positive coproduct, the oxidative debit, and
+            # the condensation return are one net. Dropping a
+            # non-positive net leaves q without the vapour oxygen
+            # the ledger still posts.
+            # Algebra: n = n_projector + n_returned, kg/h = n * M.
+            # Unit check: mol/h * kg/mol = kg/h.
+            # Limit: a zero net publishes no oxygen rate.
             o2_mol_hr = (
                 float(overhead.get(OXYGEN_SPECIES, 0.0) or 0.0)
                 + returned_o2_mol_hr
             )
-            if o2_mol_hr > 0.0:
-                source[OXYGEN_SPECIES] = (
-                    source.get(OXYGEN_SPECIES, 0.0)
-                    + o2_mol_hr * OXYGEN_MOLAR_MASS_KG_PER_MOL
-                )
-            else:
-                source[OXYGEN_SPECIES] = source.get(OXYGEN_SPECIES, 0.0)
+            source[OXYGEN_SPECIES] = (
+                o2_mol_hr * OXYGEN_MOLAR_MASS_KG_PER_MOL
+            )
             return source
 
         # Deep free-molecular reference. At 1 Pa on this train the

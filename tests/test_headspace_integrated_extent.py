@@ -1,6 +1,6 @@
 """The headspace ledger posts the solve's integrated additions.
 
-Five constructed hours, each driven through ``_step_one_hour``. The
+Six constructed hours, each driven through ``_step_one_hour``. The
 vapour reaction extent is the integrated gross. The vapour still in
 the headspace is the integral of q. The redox parcel is the integral
 of S. The endpoint is recorded and not posted. The pressure gate on
@@ -619,6 +619,114 @@ def test_open_hour_counts_vapour_coproduct_once():
     assert hour.credit_accounts["Na2"][OXYGEN_SPECIES] == FO2_BUFFER_ACCOUNT
     assert hour.credit_accounts["SiO"][OXYGEN_SPECIES] == "process.overhead_gas"
     assert buffer_mol > 1.0e-9, buffer_mol
+    assert exchanged > 1.0e-9, exchanged
+    return hour
+
+
+def test_open_hour_counts_oxidative_oxygen_with_its_return():
+    """CrO3 consumes overhead oxygen and condensation returns part of it.
+
+    The capture is one half, so the return is not the debit. SiO and
+    CrO still release a coproduct, CrO2's captured pair cancels, and
+    Na2 is a buffer excess on the same open hour. The solve's O2
+    addition is the ledger's addition. Dropping a non-positive net
+    leaves that vapour oxygen out of q, and the gap is the net.
+    """
+
+    sim = _sim(CampaignPhase.C4, 1250.0, 0.0)
+    sim.melt.oxygen_reservoir.melt_redox_capacity_mol_per_ln_fO2 = 0.0
+    assert sim._evaporative_redox_is_saturated(internal_o2_capacity_mol=1.0)
+    # The consumers draw overhead oxygen. An empty holdup drops them
+    # before the source sees the debit. Downstream vacuum admits the
+    # fast root, and the end holdup still covers the net, so a dropped
+    # debit remains in the published moles.
+    _seed(sim, "process.overhead_gas", {OXYGEN_SPECIES: 1.0e-5}, "oxidative carrier")
+
+    def law(_partials):
+        return {
+            "SiO": 1.0e-11,
+            "CrO": 1.0e-11,
+            "CrO2": 1.0e-9,
+            "CrO3": 1.0e-10,
+            "Na2": 1.0e-6,
+        }
+
+    def fraction(species):
+        if species == "CrO2":
+            return 1.0
+        if species == "CrO3":
+            return 0.5
+        return 0.0
+
+    hour = _step(sim, law, fraction)
+    assert hour.shut_path is None
+    assert hour.pipe > 0.0
+    assert sim._headspace_balance_terms["path"] == "fast_root"
+    _assert_closed(hour)
+
+    terms = sim._headspace_balance_terms
+    added = float(terms["A_mol"][OXYGEN_SPECIES])
+    opening = float(terms["n0_mol"][OXYGEN_SPECIES])
+    bled = float(terms["B_mol"][OXYGEN_SPECIES])
+    redox = float(terms["R_mol"][OXYGEN_SPECIES])
+    ledger = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    ledger_addition = ledger - opening + bled
+    scale = max(abs(added), abs(ledger_addition))
+    assert scale > 0.0
+    assert abs(added - ledger_addition) <= 1.0e-15 * scale, (
+        added,
+        ledger_addition,
+        added - ledger_addition,
+    )
+
+    debit = 0.0
+    returned = 0.0
+    vapour_net = 0.0
+    exchanged = 0.0
+    for transition in sim.atom_ledger.transitions:
+        name = str(transition.name)
+        signed = _signed_account_o2_mol(
+            sim, transition, "process.overhead_gas"
+        )
+        if name == "evaporate_CrO3":
+            debit += signed
+        elif name == "condense_CrO3":
+            returned += signed
+        if name in {
+            "evaporate_SiO",
+            "evaporate_CrO",
+            "evaporate_CrO2",
+            "condense_CrO2",
+            "evaporate_CrO3",
+            "condense_CrO3",
+        }:
+            vapour_net += signed
+        elif name == "oxygen_reservoir_exchange":
+            exchanged += signed
+    per_mol = (
+        GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    # Half the CrO3 debit comes back. The remainder is wider than the
+    # inventory gate, so zeroing the net is the refusal.
+    assert debit < 0.0, debit
+    assert returned > 0.0, returned
+    assert abs(debit + returned) * per_mol > DEFAULT_ABS_TOL_PA, (
+        debit,
+        returned,
+    )
+    assert abs(vapour_net) * per_mol > DEFAULT_ABS_TOL_PA, vapour_net
+    # The buffer excess is the exchange. R is that excess, so the
+    # vapour net is the part of A the exchange does not carry.
+    assert abs(redox - exchanged) <= 1.0e-15 * max(abs(redox), abs(exchanged))
+    assert hour.credit_accounts["Na2"][OXYGEN_SPECIES] == FO2_BUFFER_ACCOUNT
+    assert hour.credit_accounts["SiO"][OXYGEN_SPECIES] == "process.overhead_gas"
     assert exchanged > 1.0e-9, exchanged
     return hour
 
