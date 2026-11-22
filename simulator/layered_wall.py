@@ -1991,6 +1991,7 @@ def _interface_row(
             felt_thickness_m=_felt_thickness_m(evaluated),
             geometry="cylindrical" if felt_radius is not None else "flat",
             inner_radius_m=felt_radius,
+            hot_face_C=hot_face if design_dew else None,
         ),
         "failure_flags": stack_failure_flags(evaluated),
     }
@@ -2305,15 +2306,18 @@ def insulation_vapour_dew_point(
     felt_thickness_m: float | None = None,
     geometry: str = "flat",
     inner_radius_m: float | None = None,
+    hot_face_C: float | None = None,
 ) -> dict[str, Any]:
     """Felt dew point from equilibrium partials, or a typed refusal.
 
     Live SiO, Na, and K rows are equilibrium pressures of oxide reactions,
     not pure-component saturation. With no partials, nothing is inverted.
     A supplied partial is inverted with the vapour-rail evaluator. pO2 of
-    zero makes an oxygen-dependent equilibrium singular. Depth uses the
-    walked felt profile: linear in thickness on a flat wall, linear in
-    ln(r) on a cylinder.
+    zero makes an oxygen-dependent equilibrium singular. A positive floor
+    on that zero is an upper bound, so the one temperature at the floor
+    is the ceiling of a band, not the dew. Depth uses the walked felt
+    profile: linear in thickness on a flat wall, linear in ln(r) on a
+    cylinder.
     """
 
     species = {
@@ -2340,6 +2344,7 @@ def insulation_vapour_dew_point(
                 felt_thickness_m=felt_thickness_m,
                 geometry=geometry,
                 inner_radius_m=inner_radius_m,
+                hot_face_C=hot_face_C,
             )
         )
     return {
@@ -3001,6 +3006,7 @@ def _attach_doloma_interlayer(
                 felt_thickness_m=_felt_thickness_m(stack_layers or []),
                 geometry="cylindrical",
                 inner_radius_m=felt_radius,
+                hot_face_C=duct_hold,
             )
         bound["trace_heating"] = _trace_for_stack(
             conduction,
@@ -3058,6 +3064,18 @@ def _attach_doloma_interlayer(
         "shipped_duct_resistance_share": _resistance_share(shipped_duct_walk),
         "collector_totals": totals,
         "areas_basis": "setpoint_stage_areas_m2",
+        "k_at_layer_mean_temperature": {
+            "status": "not_done",
+            "reason": "k_resolved_once_at_the_hot_face",
+            "flag": "k_evaluated_at_hot_face",
+            "detail": (
+                "Each layer uses one nearest cited conductivity, resolved "
+                "at the hot face before the radiative root. A mean-temperature "
+                "fixed point would nest inside that root and inside the "
+                "thickness search. The hot-end felt point is the least "
+                "insulating sheet value, so the interlayer search errs thin."
+            ),
+        },
     }
     rows["comparison"] = {
         "status": "in_situ_doloma_interlayer_priced",
@@ -3230,6 +3248,215 @@ def _felt_thickness_m(layers: Sequence[Mapping[str, Any]]) -> float | None:
     return None
 
 
+def _dew_row_at(
+    evaluator: Any,
+    partial_pressure_Pa: float,
+    pO2_bar: float,
+    source_activity: float,
+    felt_inner_C: Any,
+    felt_outer_C: Any,
+    *,
+    felt_thickness_m: float | None,
+    geometry: str,
+    inner_radius_m: float | None,
+) -> dict[str, Any]:
+    found = _invert_equilibrium_temperature(
+        evaluator,
+        partial_pressure_Pa,
+        pO2_bar=pO2_bar,
+        source_activity=source_activity,
+    )
+    found["pO2_bar"] = pO2_bar
+    found["source_activity"] = source_activity
+    if found["status"] != "ok":
+        found["depth_m"] = None
+        return found
+    depth = _dew_depth_m(
+        found["dew_temperature_C"],
+        felt_inner_C,
+        felt_outer_C,
+        felt_thickness_m=felt_thickness_m,
+        geometry=geometry,
+        inner_radius_m=inner_radius_m,
+    )
+    found["depth_m"] = depth["depth_m"]
+    found["depth_status"] = depth["status"]
+    found["depth_reason"] = depth.get("reason")
+    return found
+
+
+def _crossing_pO2_bar(
+    evaluator: Any,
+    partial_pressure_Pa: float,
+    source_activity: float,
+    hot_face_C: float,
+    ceiling_pO2_bar: float,
+) -> dict[str, Any]:
+    """pO2 where the dew temperature equals the duct hot face.
+
+    Premise: at fixed partial and activity, SiO equilibrium pressure
+    falls as pO2 falls, so the dew temperature falls. The ceiling pO2
+    is the hottest dew. The face is above that dew only on the cold
+    side of the root.
+
+    Algebra: bisection in ln(pO2). A decade search finds a bracket
+    where the dew crosses the face, then 60 steps close it.
+    Units: pO2 in bar, temperature in °C.
+    Sanity: the returned dew is re-read and must sit on the face.
+    """
+
+    def dew_at(pO2_bar: float) -> float | None:
+        found = _invert_equilibrium_temperature(
+            evaluator,
+            partial_pressure_Pa,
+            pO2_bar=pO2_bar,
+            source_activity=source_activity,
+        )
+        if found["status"] != "ok":
+            return None
+        return float(found["dew_temperature_C"])
+
+    dew_hi = dew_at(ceiling_pO2_bar)
+    if dew_hi is None:
+        return {"status": "unavailable", "reason": "ceiling_dew_unset"}
+    if dew_hi <= hot_face_C:
+        return {
+            "status": "unavailable",
+            "reason": "face_already_above_dew_at_pO2_ceiling",
+            "dew_at_ceiling_C": dew_hi,
+        }
+    lo = ceiling_pO2_bar
+    dew_lo = dew_hi
+    for _ in range(8):
+        lo = lo / 10.0
+        dew_lo = dew_at(lo)
+        if dew_lo is None:
+            return {"status": "unavailable", "reason": "crossing_inversion_failed"}
+        if dew_lo <= hot_face_C:
+            break
+    else:
+        return {
+            "status": "unavailable",
+            "reason": "crossing_not_in_searched_decades",
+            "lowest_pO2_bar": lo,
+            "dew_at_lowest_C": dew_lo,
+        }
+    log_lo = math.log(lo)
+    log_hi = math.log(ceiling_pO2_bar)
+    for _ in range(60):
+        mid = math.exp((log_lo + log_hi) / 2.0)
+        dew_mid = dew_at(mid)
+        if dew_mid is None:
+            return {"status": "unavailable", "reason": "crossing_inversion_failed"}
+        if dew_mid > hot_face_C:
+            log_hi = math.log(mid)
+        else:
+            log_lo = math.log(mid)
+    pO2_bar = math.exp((log_lo + log_hi) / 2.0)
+    dew = dew_at(pO2_bar)
+    if dew is None or abs(dew - hot_face_C) > 0.05:
+        return {"status": "unavailable", "reason": "crossing_residual"}
+    return {
+        "status": "ok",
+        "pO2_bar": pO2_bar,
+        "dew_temperature_C": dew,
+        "hot_face_C": hot_face_C,
+    }
+
+
+def _pO2_dew_band(
+    evaluator: Any,
+    partial_pressure_Pa: float,
+    ceiling_pO2_bar: float,
+    *,
+    activity_columns: Sequence[tuple[float, str | None, bool]],
+    felt_inner_C: Any,
+    felt_outer_C: Any,
+    felt_thickness_m: float | None,
+    geometry: str,
+    inner_radius_m: float | None,
+    hot_face_C: float | None,
+) -> dict[str, Any]:
+    """Dew temperatures below a pO2 upper bound. The bound is the ceiling."""
+
+    rows = []
+    pO2_bar = ceiling_pO2_bar
+    for decade in range(4):
+        for activity, flag, printed in activity_columns:
+            row = _dew_row_at(
+                evaluator,
+                partial_pressure_Pa,
+                pO2_bar,
+                activity,
+                felt_inner_C,
+                felt_outer_C,
+                felt_thickness_m=felt_thickness_m,
+                geometry=geometry,
+                inner_radius_m=inner_radius_m,
+            )
+            row["activity_flag"] = flag
+            row["activity_printed"] = printed
+            row["grid"] = "pO2_ceiling" if decade == 0 else "decade_below_ceiling"
+            rows.append(row)
+        pO2_bar = pO2_bar / 10.0
+    crossing_rows = []
+    for activity, flag, printed in activity_columns:
+        if hot_face_C is None:
+            crossing_rows.append({
+                "status": "unavailable",
+                "reason": "hot_face_unset",
+                "source_activity": activity,
+                "activity_printed": printed,
+            })
+            continue
+        crossed = _crossing_pO2_bar(
+            evaluator,
+            partial_pressure_Pa,
+            activity,
+            float(hot_face_C),
+            ceiling_pO2_bar,
+        )
+        crossed["source_activity"] = activity
+        crossed["activity_flag"] = flag
+        crossed["activity_printed"] = printed
+        if crossed.get("status") == "ok":
+            depth = _dew_depth_m(
+                crossed["dew_temperature_C"],
+                felt_inner_C,
+                felt_outer_C,
+                felt_thickness_m=felt_thickness_m,
+                geometry=geometry,
+                inner_radius_m=inner_radius_m,
+            )
+            crossed["depth_m"] = depth["depth_m"]
+            crossed["depth_status"] = depth["status"]
+            crossed["depth_reason"] = depth.get("reason")
+            crossed["face_versus_dew"] = (
+                "the duct face stays above the SiO dew only if pO2 < "
+                f"{crossed['pO2_bar']}"
+            )
+        crossing_rows.append(crossed)
+    unit = next(
+        (row for row in crossing_rows if row.get("source_activity") == 1.0),
+        crossing_rows[0] if crossing_rows else None,
+    )
+    return {
+        "status": "pO2_upper_bound_is_the_dew_ceiling",
+        "partial_pressure_Pa": partial_pressure_Pa,
+        "ceiling_pO2_bar": ceiling_pO2_bar,
+        "pO2_floor_flag": "setpoint_upper_bound_used_as_floor",
+        "rows": rows,
+        "crossings": crossing_rows,
+        "unit_activity_crossing": unit,
+        "melt_activity_printed": any(printed for _a, _f, printed in activity_columns),
+        "melt_activity_clearing": (
+            "The hour-107 purity row at with_mn_stage_fixed_point prints "
+            "activity as species booleans (Si true, SiO2 true), not a "
+            "numeric melt activity. No second activity column is stored."
+        ),
+    }
+
+
 def _invert_design_partial(
     species_id: str,
     supplied: Mapping[str, Any] | None,
@@ -3239,6 +3466,7 @@ def _invert_design_partial(
     felt_thickness_m: float | None,
     geometry: str,
     inner_radius_m: float | None,
+    hot_face_C: float | None = None,
 ) -> dict[str, Any]:
     if supplied is None or not supplied.get("printed"):
         return {
@@ -3332,6 +3560,42 @@ def _invert_design_partial(
     found["flag"] = "design_point"
     found["reason"] = "equilibrium_not_pure_saturation"
     found["pressure_kind"] = "equilibrium_partial_pressure"
+    if floor_used:
+        printed_activity = supplied.get("source_activity")
+        activity_printed = (
+            isinstance(printed_activity, (int, float))
+            and not isinstance(printed_activity, bool)
+            and float(printed_activity) > 0.0
+        )
+        if activity_printed and float(printed_activity) != 1.0:
+            columns = [
+                (1.0, "raoultian_pure_endmember_not_a_measured_melt_activity", False),
+                (float(printed_activity), None, True),
+            ]
+        elif activity_printed:
+            columns = [(1.0, None, True)]
+        else:
+            columns = [(
+                1.0,
+                "raoultian_pure_endmember_not_a_measured_melt_activity",
+                False,
+            )]
+        face = hot_face_C
+        if isinstance(face, bool) or not isinstance(face, (int, float)):
+            face = None
+        found["dew_is_pO2_ceiling"] = True
+        found["dew_band"] = _pO2_dew_band(
+            evaluator,
+            float(partial),
+            float(pO2_mbar) / MBAR_PER_BAR,
+            activity_columns=columns,
+            felt_inner_C=felt_inner_C,
+            felt_outer_C=felt_outer_C,
+            felt_thickness_m=felt_thickness_m,
+            geometry=geometry,
+            inner_radius_m=inner_radius_m,
+            hot_face_C=None if face is None else float(face),
+        )
     return found
 
 
