@@ -23,7 +23,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.campaigns import CampaignManager
-from simulator.core import PyrolysisSimulator
+from simulator.core import OXYGEN_MOLAR_MASS_KG_PER_MOL, PyrolysisSimulator
 from simulator.diagnostic_helpers.reproduction_compare import (
     TimeSeriesComparisonRefusal,
     _interpolate_runtime_sample,
@@ -399,6 +399,8 @@ def _run_case(
     per_step: list[dict[str, Any]] = []
     rate_samples = [{"time_min": 0.0, "o2_release_mol_min": 0.0}]
     cumulative_samples = [{"time_min": 0.0, "value": 0.0}]
+    previous_oxygen_kg = 0.0
+    step_min = float(spec.process_dt_s) / 60.0
     for index, snapshot in enumerate(execution.snapshots, start=1):
         time_min = _time_min(index, spec.process_dt_s)
         summary = (
@@ -412,19 +414,22 @@ def _run_case(
             if pressure_bar is None
             else float(pressure_bar) * PA_PER_BAR / PA_PER_MBAR
         )
+        cumulative_mg, release_mol_min = _booked_o2_step_observables(
+            float(snapshot.oxygen_produced_kg),
+            previous_kg=previous_oxygen_kg,
+            step_min=step_min,
+        )
+        previous_oxygen_kg = float(snapshot.oxygen_produced_kg)
         rate_samples.append(
             {
                 "time_min": time_min,
-                "o2_release_mol_min": (
-                    float(snapshot.melt_offgas_O2_mol_hr)
-                    / (float(PROCESS_HOUR_S) / 60.0)
-                ),
+                "o2_release_mol_min": release_mol_min,
             }
         )
         cumulative_samples.append(
             {
                 "time_min": time_min,
-                "value": float(snapshot.oxygen_produced_kg) * 1_000_000.0,
+                "value": cumulative_mg,
             }
         )
         per_step.append(
@@ -1023,6 +1028,62 @@ def _run_notices_and_flags(
     return found
 
 
+def _booked_o2_step_observables(
+    oxygen_produced_kg: float,
+    *,
+    previous_kg: float,
+    step_min: float,
+) -> tuple[float, float]:
+    """Return ``(cumulative_mg, release_mol_per_min)`` for one O2 stock.
+
+    ``oxygen_produced_kg`` is the terminal-partition total (stored + vented
+    + captured free O2), kilograms. Both observables are that stock.
+
+    Cumulative mass, milligrams::
+
+        mg = kg * 1e6
+
+    Molar flow of the same stock. ``M_O2`` is the ledger molar mass in
+    kg/mol and the step length is in minutes::
+
+        n_dot_O2 = ((kg - previous_kg) / M_O2) / step_min
+
+    ppm consumes that flow and the printed argon flow at 0 °C and 1 atm
+    (``o2_release_molar_flow_to_ppm``)::
+
+        n_dot_Ar = (NL/min) / 22.414 mol/min
+        x_O2 = n_dot_O2 / (n_dot_Ar + n_dot_O2)
+        ppm = x_O2 * 1e6
+
+    Integrating ``n_dot_O2 * M_O2`` over the steps recovers the cumulative
+    mass. A one-minute step's mole increment is already mol/min; dividing
+    it by 60 would report a different series from this stock.
+    """
+
+    if not math.isfinite(step_min) or step_min <= 0.0:
+        raise RobinotReproductionError(
+            f"O2 step length must be a positive number of minutes, got {step_min!r}"
+        )
+    stock_kg = float(oxygen_produced_kg)
+    previous = float(previous_kg)
+    if not math.isfinite(stock_kg) or not math.isfinite(previous):
+        raise RobinotReproductionError("booked O2 stock must be finite")
+    released_kg = stock_kg - previous
+    # Dust below the kilogram floor is not a release and not a reversal.
+    if released_kg < 0.0:
+        if released_kg < -1.0e-12:
+            raise RobinotReproductionError(
+                "booked O2 stock decreased by "
+                f"{-released_kg:.12g} kg; the molar flow is the increment "
+                "of the cumulative stock"
+            )
+        released_kg = 0.0
+    release_mol_min = (
+        released_kg / OXYGEN_MOLAR_MASS_KG_PER_MOL
+    ) / step_min
+    return stock_kg * 1_000_000.0, release_mol_min
+
+
 def _sensitivity_metrics(run_data: Mapping[str, Any]) -> dict[str, Any]:
     temperatures = [
         float(record["temperature_C"])
@@ -1034,9 +1095,13 @@ def _sensitivity_metrics(run_data: Mapping[str, Any]) -> dict[str, Any]:
         if run_data["per_step"]
         else None
     )
+    runtime = run_data["runtime"]
     return {
-        "status": run_data["runtime"]["status"],
-        "steps_completed": run_data["runtime"]["steps_completed"],
+        "status": runtime["status"],
+        "reason": runtime["reason"],
+        "steps_completed": runtime["steps_completed"],
+        "steps_requested": runtime["steps_requested"],
+        "duration_completed_min": runtime["duration_completed_min"],
         "exposed_melt_area_m2": run_data["geometry_assumptions"][
             "exposed_melt_area_m2"
         ],
@@ -1098,10 +1163,13 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
             "Equal-volume molten-bead area uses the printed cylinder volume: "
             "`V = π(D/2)^2 H`; `A_bead = 4π(3V/(4π))^(2/3)`. This is an "
             "assumption sensitivity; the deck keeps the top-face area for its "
-            "baseline melt-area input.",
+            "baseline melt-area input. Final O2 is the cumulative at that "
+            "variant's own end. steps_completed below steps_requested means "
+            "the run stopped before the shared bracket.",
             "",
-            "| Variant | Melt area (m²) | Area basis | Peak T (°C) | Final O₂ (mg) |",
-            "|---|---:|---|---:|---:|",
+            "| Variant | Melt area (m²) | Area basis | Peak T (°C) | End (min) | "
+            "Steps | Reason | Final O₂ (mg) |",
+            "|---|---:|---|---:|---:|---:|---|---:|",
         ]
     )
     for name, case in summary["sensitivity"]["cases"].items():
@@ -1109,6 +1177,9 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
             f"| {name} | {format_value(case['exposed_melt_area_m2'])} | "
             f"{case['exposed_melt_area_basis']} | "
             f"{format_value(case['peak_predicted_temperature_C'])} | "
+            f"{format_value(case['duration_completed_min'])} | "
+            f"{case['steps_completed']}/{case['steps_requested']} | "
+            f"`{case['reason']}` | "
             f"{format_value(case['last_cumulative_o2_mg'])} |"
         )
     lines.extend(

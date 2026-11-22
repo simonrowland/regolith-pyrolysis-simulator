@@ -356,6 +356,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 EMPTY_KG_TOLERANCE,
             )
         )
+        # Snapshot before the baffle fold. A fold adds moles onto a solid
+        # that is still there; it is not a rollback. The folded solid's
+        # oxygen stays on the baffle debit. A later all-or-nothing compare
+        # would see the extra moles and drop every wall account's oxygen.
+        wall_oxygen_debit_mol, wall_oxygen_credit_mol = (
+            self._surviving_wall_oxygen_mol(booking, wall_plan)
+            if isinstance(booking, Mapping)
+            else (0.0, 0.0)
+        )
 
         credits = self._credits_by_product_account(
             condensed_product_mol,
@@ -524,12 +533,13 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if reactive_mol > 0.0:
             debits['process.overhead_gas']['O2'] = oxygen_mol
         if isinstance(booking, Mapping):
-            wall_survived = self._booked_wall_products_survived(booking, wall_plan)
+            # Baffle oxygen belongs to the baffle solids, including a
+            # sub-floor solid folded onto a wall. Wall oxygen was snapshotted
+            # per surviving account before that fold.
             o2_debit = float(booking.get("baffle_oxygen_debit_mol") or 0.0)
             o2_credit = float(booking.get("baffle_oxygen_credit_mol") or 0.0)
-            if wall_survived:
-                o2_debit += float(booking.get("wall_oxygen_debit_mol") or 0.0)
-                o2_credit += float(booking.get("wall_oxygen_credit_mol") or 0.0)
+            o2_debit += wall_oxygen_debit_mol
+            o2_credit += wall_oxygen_credit_mol
             if o2_debit > 0.0:
                 overhead = debits['process.overhead_gas']
                 overhead['O2'] = overhead.get('O2', 0.0) + o2_debit
@@ -868,6 +878,79 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 if abs(mol - other[product]) > 1.0e-12:
                     return False
         return True
+
+    def _surviving_wall_oxygen_mol(
+        self,
+        booking: Mapping[str, Any],
+        wall_plan: Mapping[str, Any],
+    ) -> tuple[float, float]:
+        """Oxygen still owed by wall solids present in ``wall_plan``.
+
+        The booking stores one wall oxygen debit for every account. Gating
+        that scalar on every account matching drops the debit for accounts
+        whose oxide is still credited when one sibling account rolls back
+        to unchanged vapour. Sum the legs of the accounts whose products
+        are still the booked solids. A booking with no wall legs keeps the
+        old all-or-nothing scalar.
+        """
+
+        surviving = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+                if float(mol) > 0.0
+            }
+            for account, species_mol in dict(
+                wall_plan.get("product_mol_by_account") or {}
+            ).items()
+        }
+        booked = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+                if float(mol) > 0.0
+            }
+            for account, species_mol in dict(
+                booking.get("wall_products_mol_by_account") or {}
+            ).items()
+        }
+        wall_legs = [
+            leg
+            for leg in booking.get("reaction_legs") or ()
+            if isinstance(leg, Mapping)
+            and str(leg.get("surface") or "") == "wall"
+        ]
+        if not wall_legs:
+            if not self._booked_wall_products_survived(booking, wall_plan):
+                return 0.0, 0.0
+            return (
+                float(booking.get("wall_oxygen_debit_mol") or 0.0),
+                float(booking.get("wall_oxygen_credit_mol") or 0.0),
+            )
+        debit = 0.0
+        credit = 0.0
+        for leg in wall_legs:
+            account = str(leg.get("account") or "")
+            if not self._wall_product_maps_match(
+                booked.get(account) or {},
+                surviving.get(account) or {},
+            ):
+                continue
+            debit += float(leg.get("oxygen_debit_mol") or 0.0)
+            credit += float(leg.get("oxygen_credit_mol") or 0.0)
+        return debit, credit
+
+    @staticmethod
+    def _wall_product_maps_match(
+        booked: Mapping[str, float],
+        surviving: Mapping[str, float],
+    ) -> bool:
+        if set(booked) != set(surviving):
+            return False
+        return all(
+            abs(float(mol) - float(surviving[product])) <= 1.0e-12
+            for product, mol in booked.items()
+        )
 
     def _booked_wall_plan(self, booking: Mapping[str, Any]) -> dict[str, Any]:
         """Wall-account products from the same winning reactions as the baffle.

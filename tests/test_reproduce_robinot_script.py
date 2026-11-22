@@ -26,6 +26,35 @@ RECORD_FIELDS = {
 }
 
 
+def test_booked_o2_molar_flow_is_the_cumulative_stock_increment() -> None:
+    step_min = 1.0
+    stock_kg = 38.91358227877225e-6
+    cumulative_mg, rate = reproduction._booked_o2_step_observables(
+        stock_kg,
+        previous_kg=0.0,
+        step_min=step_min,
+    )
+
+    assert cumulative_mg == pytest.approx(stock_kg * 1_000_000.0)
+    recovered_mg = (
+        rate
+        * step_min
+        * reproduction.OXYGEN_MOLAR_MASS_KG_PER_MOL
+        * 1_000_000.0
+    )
+    assert recovered_mg == pytest.approx(cumulative_mg)
+    hour_scaled = (
+        stock_kg / reproduction.OXYGEN_MOLAR_MASS_KG_PER_MOL
+    ) / 60.0
+    assert rate == pytest.approx(hour_scaled * 60.0)
+    with pytest.raises(reproduction.RobinotReproductionError):
+        reproduction._booked_o2_step_observables(
+            0.0,
+            previous_kg=1.0e-6,
+            step_min=step_min,
+        )
+
+
 def test_robinot_step_budget_is_one_hour_of_process_steps() -> None:
     spec = reproduction._preset_spec()
 

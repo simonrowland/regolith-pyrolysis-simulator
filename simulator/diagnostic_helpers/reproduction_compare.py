@@ -253,6 +253,9 @@ def o2_release_molar_flow_to_ppm(
     # The Robinot preset supplies 0.3 NL/min Ar; at 0 °C and 1 atm,
     # n_dot_Ar = 0.3 / 22.414 mol/min. With both outlet streams in mol/min,
     # x_O2 = n_dot_O2 / (n_dot_Ar + n_dot_O2), and ppm = x_O2 * 1e6.
+    # n_dot_O2 is the per-minute increment of the same booked O2 mass the
+    # cumulative series reports: n_dot_O2 = (Δkg / M_O2) / Δt_min, and
+    # cumulative_mg = kg * 1e6, so Δmg = n_dot_O2 * M_O2 * Δt_min * 1e6.
     n_dot_ar = argon_flow / STANDARD_MOLAR_VOLUME_L_PER_MOL
     x_o2 = o2_rate / (n_dot_ar + o2_rate)
     return x_o2 * 1_000_000.0

@@ -48,7 +48,7 @@ from simulator.core import (
     MeltState,
     PyrolysisSimulator,
 )
-from simulator.state import MOLAR_MASS
+from simulator.state import MOLAR_MASS, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
 from simulator.vapour_rail.wall_saturation import (
     ranked_wall_saturations,
@@ -118,7 +118,8 @@ def _atom_net(proposal, registry) -> dict[str, float]:
 
 
 def _dispatch_booking(registry, species: str, booking: dict, condensed_kg: float, *,
-                      wall_fraction: float = 0.0):
+                      wall_fraction: float = 0.0,
+                      wall_account_fractions: dict | None = None):
     provider = BuiltinCondensationRouteProvider()
     controls = {
         "species": species,
@@ -129,7 +130,11 @@ def _dispatch_booking(registry, species: str, booking: dict, condensed_kg: float
     }
     if wall_fraction > 0.0:
         controls["wall_deposit_fraction"] = wall_fraction
-        controls["wall_deposit_account_fractions"] = {WALL_DEPOSIT_ACCOUNT: 1.0}
+        controls["wall_deposit_account_fractions"] = (
+            dict(wall_account_fractions)
+            if wall_account_fractions is not None
+            else {WALL_DEPOSIT_ACCOUNT: 1.0}
+        )
     request = IntentRequest(
         intent=ChemistryIntent.CONDENSATION_ROUTE,
         account_view=ProviderAccountView(
@@ -968,3 +973,116 @@ def test_zero_flow_route_counts_na_closure_without_deposit() -> None:
             "relative_error": None,
         }
     assert history["no_advective_parcel_count"] == len(walls) + len(stages)
+
+
+def test_folded_subfloor_baffle_keeps_the_wall_oxygen_debit(formula_registry) -> None:
+    """A sub-floor baffle oxide folded onto the wall must not drop the debit.
+
+    The fold changes the wall product moles. Treating that as a rollback
+    used to omit the whole wall oxygen debit while the oxide stayed credited.
+    """
+
+    sio = resolve_species_formula("SiO", formula_registry)
+    sio2 = resolve_species_formula("SiO2", formula_registry)
+    fold_kg = 5.0e-13
+    fold_mol = fold_kg / sio2.molar_mass_kg_per_mol()
+    assert fold_mol > 1.0e-12
+    wall_mol = 1.0
+    vapour_mol = wall_mol + fold_mol
+    booking = {
+        "baffle_products_mol": {"SiO2": fold_mol},
+        "baffle_oxygen_debit_mol": 0.5 * fold_mol,
+        "baffle_oxygen_credit_mol": 0.0,
+        "wall_products_mol_by_account": {
+            WALL_DEPOSIT_ACCOUNT: {"SiO2": wall_mol},
+        },
+        "wall_oxygen_debit_mol": 0.5 * wall_mol,
+        "wall_oxygen_credit_mol": 0.0,
+        "reaction_legs": [
+            {
+                "surface": "baffle",
+                "account": None,
+                "products_mol": {"SiO2": fold_mol},
+                "oxygen_debit_mol": 0.5 * fold_mol,
+                "oxygen_credit_mol": 0.0,
+                "vapour_mol": fold_mol,
+            },
+            {
+                "surface": "wall",
+                "account": WALL_DEPOSIT_ACCOUNT,
+                "products_mol": {"SiO2": wall_mol},
+                "oxygen_debit_mol": 0.5 * wall_mol,
+                "oxygen_credit_mol": 0.0,
+                "vapour_mol": wall_mol,
+            },
+        ],
+    }
+    proposal = _dispatch_booking(
+        formula_registry,
+        "SiO",
+        booking,
+        vapour_mol * sio.molar_mass_kg_per_mol(),
+    )
+    for element, net in _atom_net(proposal, formula_registry).items():
+        assert abs(net) < 1.0e-9, f"{element} net {net}"
+    assert proposal.debits[_OVERHEAD]["O2"] == pytest.approx(
+        0.5 * vapour_mol, rel=1e-12,
+    )
+
+
+def test_one_rolled_back_wall_account_keeps_the_sibling_oxygen_debit(
+    formula_registry,
+) -> None:
+    """A sub-floor solid on one wall rolls that account back to vapour.
+
+    The sibling account's oxide stays. Its oxygen debit stays with it.
+    """
+
+    kept = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]
+    rolled = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[1]
+    sio = resolve_species_formula("SiO", formula_registry)
+    kept_mol = 0.8
+    rolled_arrival_mol = 0.2
+    rolled_product_mol = 1.0e-11
+    booking = {
+        "baffle_products_mol": {},
+        "baffle_oxygen_debit_mol": 0.0,
+        "baffle_oxygen_credit_mol": 0.0,
+        "wall_products_mol_by_account": {
+            kept: {"SiO2": kept_mol},
+            rolled: {"SiO2": rolled_product_mol},
+        },
+        "wall_oxygen_debit_mol": 0.5 * (kept_mol + rolled_product_mol),
+        "wall_oxygen_credit_mol": 0.0,
+        "reaction_legs": [
+            {
+                "surface": "wall",
+                "account": kept,
+                "products_mol": {"SiO2": kept_mol},
+                "oxygen_debit_mol": 0.5 * kept_mol,
+                "oxygen_credit_mol": 0.0,
+                "vapour_mol": kept_mol,
+            },
+            {
+                "surface": "wall",
+                "account": rolled,
+                "products_mol": {"SiO2": rolled_product_mol},
+                "oxygen_debit_mol": 0.5 * rolled_product_mol,
+                "oxygen_credit_mol": 0.0,
+                "vapour_mol": rolled_product_mol,
+            },
+        ],
+    }
+    proposal = _dispatch_booking(
+        formula_registry,
+        "SiO",
+        booking,
+        (kept_mol + rolled_arrival_mol) * sio.molar_mass_kg_per_mol(),
+        wall_fraction=1.0,
+        wall_account_fractions={kept: kept_mol, rolled: rolled_arrival_mol},
+    )
+    for element, net in _atom_net(proposal, formula_registry).items():
+        assert abs(net) < 1.0e-9, f"{element} net {net}"
+    assert proposal.debits[_OVERHEAD]["O2"] == pytest.approx(0.5 * kept_mol)
+    assert proposal.credits[kept]["SiO2"] == pytest.approx(kept_mol)
+    assert proposal.credits[rolled]["SiO"] == pytest.approx(rolled_arrival_mol)
