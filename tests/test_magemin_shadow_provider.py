@@ -858,10 +858,25 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
             None,
             None,
         ),
+        (
+            {'SiO2': 29.999, 'MgO': 60.001, 'Fe2O3': 10.0},
+            'extrapolated',
+            {'sio2_wt_pct': [30.0, 80.0]},
+        ),
+        (
+            {'SiO2': 30.001, 'MgO': 59.999, 'Fe2O3': 10.0},
+            None,
+            None,
+        ),
     ),
-    ids=('evaluated-above-certified-band', 'evaluated-in-certified-band'),
+    ids=(
+        'mno-evaluated-above-certified-band',
+        'mno-evaluated-in-certified-band',
+        'ferric-evaluated-below-certified-band',
+        'ferric-evaluated-in-certified-band',
+    ),
 )
-def test_equilibrium_provider_qualifies_evaluated_bulk_after_mn_drop(
+def test_equilibrium_provider_qualifies_exact_evaluated_bulk(
     monkeypatch,
     composition_wt_pct,
     expected_authority,

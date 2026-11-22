@@ -300,6 +300,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 request.account_view.species_formula_registry
             ),
             composition_mol_by_account=True,
+            _fold_ferric_split=False,
         ) or {}
         if not domain_diagnostic:
             gate_warnings = [
@@ -363,6 +364,17 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             }
             if backend_domain_diagnostic:
                 evaluated_domain_diagnostic = backend_domain_diagnostic
+        elif (
+            request.intent is ChemistryIntent.SILICATE_EQUILIBRIUM
+            and 'projection_threshold_verdict' in equilibrium_diagnostics
+        ):
+            # Direct equilibrate() has already classified the exact bulk it
+            # projected. Prefer that shared verdict over the engine-free
+            # preflight projection above.
+            evaluated_domain_diagnostic = {
+                field: equilibrium_diagnostics.get(field)
+                for field in ('authority', 'certified_band')
+            }
         projected_diagnostics = equilibrium_diagnostics.get(
             'projected_liquidus_diagnostics'
         )
@@ -385,6 +397,11 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             backend_warnings=tuple(gate_warnings) + diagnostics.backend_warnings,
             **evaluated_domain_diagnostic,
         )
+        if (
+            request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
+            and diagnostics.backend_status == 'ok'
+        ):
+            diagnostics = replace(diagnostics, magemin_sourced=True)
 
         # Hand the adapter's status to the vocabulary owner unchanged.
         #

@@ -63,6 +63,7 @@ class MAGEMinShadowDiagnostics:
     backend_status_reason: Optional[str] = None
     authority: Optional[str] = None
     certified_band: Optional[Mapping[str, Any]] = None
+    magemin_sourced: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -107,6 +108,8 @@ class MAGEMinShadowDiagnostics:
         object.__setattr__(self, 'mode', str(self.mode))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
         object.__setattr__(self, 'backend_status', str(self.backend_status))
+        if type(self.magemin_sourced) is not bool:
+            raise TypeError('magemin_sourced must be a boolean')
         if self.backend_status_reason is not None:
             object.__setattr__(
                 self, 'backend_status_reason', str(self.backend_status_reason)
@@ -130,6 +133,8 @@ class MAGEMinShadowDiagnostics:
         ``LiquidusSolidusResult.diagnostics`` shape.
         """
         payload = asdict(self)
+        if not self.magemin_sourced:
+            payload.pop('magemin_sourced', None)
         if self.authority is None:
             payload.pop('authority', None)
         if self.certified_band is None:

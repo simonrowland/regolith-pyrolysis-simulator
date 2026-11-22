@@ -2104,6 +2104,74 @@ def test_equilibrium_cache_hits_refresh_feo_liquidus_qualification(
     )
 
 
+def test_equilibrium_capture_strips_read_time_feo_qualification(
+    tmp_path: Path,
+):
+    from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+    store = PT0DeterminismStore(
+        'capture',
+        db_path=tmp_path / 'equilibrium-feo-capture-domain.sqlite',
+    )
+    sim, result = _pt0_equilibrium_capture_context(store)
+    sim._liquid_fraction_provider = 'alphamelts'
+    temperature_K = float(result.temperature_C) + 273.15
+    measured_curve = {
+        'source': 'liquidus_solidus:alphamelts:test',
+        'solidus_T_C': float(result.temperature_C) - 100.0,
+        'liquidus_T_C': float(result.temperature_C) + 100.0,
+        'path': (),
+        'is_liquidus_floor': False,
+    }
+    sim._melt_redox_gate_authority_this_tick = {
+        'disposition': 'live',
+        'curve': measured_curve,
+    }
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._melt_redox_gate_authority_tick_verdict_identity = None
+
+    def capture_with_current_domain():
+        domain = sim.liquid_feo_domain_at(temperature_K)
+        result.diagnostics = {
+            'a_FeO_calphad': calphad_ferrous_feo_activity_diagnostic(
+                comp_wt=sim.melt.composition_wt_pct(),
+                fO2_log=float(sim._compute_intrinsic_melt_fO2()),
+                T_K=temperature_K,
+                pressure_bar=float(result.pressure_bar),
+                liquid_domain=domain,
+            ),
+        }
+        payload = rrd.equilibrium_payload(sim, result)
+        store.capture_equilibrium(sim, result)
+        return payload
+
+    measured_payload = capture_with_current_domain()
+    measured_notices = result.diagnostics['a_FeO_calphad']['notices']
+    assert measured_notices
+    for name in (
+        '_liquid_feo_resolved_curve_hour',
+        '_liquid_feo_resolved_curve',
+        '_liquid_feo_resolved_curve_domain_identity',
+    ):
+        if hasattr(sim, name):
+            delattr(sim, name)
+    sim._melt_redox_gate_authority_tick_hour = None
+    sim._melt_redox_gate_authority_this_tick = object()
+
+    unknown_payload = capture_with_current_domain()
+    unknown_notices = result.diagnostics['a_FeO_calphad']['notices']
+    assert [notice['kind'] for notice in unknown_notices] == [
+        'liquidus_unknown',
+    ]
+    assert rrd._sha256(rrd.canonical_json_bytes(measured_payload)) == (
+        rrd._sha256(rrd.canonical_json_bytes(unknown_payload))
+    )
+    stored_diagnostic = unknown_payload['equilibrium_result']['diagnostics'][
+        'a_FeO_calphad'
+    ]
+    assert 'notices' not in stored_diagnostic
+
+
 def test_unset_alphamelts_fo2_fields_do_not_change_other_cache_payloads():
     result = EquilibriumResult(
         temperature_C=1600.0,
@@ -4418,26 +4486,66 @@ def test_pt0_gate_curve_decoder_refuses_markerless_rows(
         'liquidus_T_C': 1630.0,
         'path': (),
     })['is_liquidus_floor'] is False
+    markerless_payload = {
+        'curve': {
+            'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+            'solidus_T_C': 1200.0,
+            'liquidus_T_C': 1200.000001,
+            'path': [],
+        },
+    }
+    markerless_disclosure = {
+        'law_id': 'markerless-test',
+        'provenance': 'test',
+        'authority': 'extrapolated',
+        'certified_band_K': [1200.0, 1600.0],
+        'anchor_gaps_dex': {},
+        'closer': 'test',
+        'certification_route': [],
+        'evaluation_count': 1,
+    }
     store._store(
         'freeze_gate_curve',
         key,
-        {
-            'curve': {
-                'source': 'gate_liquid_fraction:fallback:magemin-shadow',
-                'solidus_T_C': 1200.0,
-                'liquidus_T_C': 1200.000001,
-                'path': [],
-            },
+        markerless_payload,
+        law_disclosures=[markerless_disclosure],
+    )
+    alternate_key = dict(key)
+    alternate_key['pressure_bar'] = float(key['pressure_bar']) + 0.01
+    valid_payload = {
+        'curve': {
+            'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+            'solidus_T_C': 1200.0,
+            'liquidus_T_C': 1200.000001,
+            'path': [],
+            'is_liquidus_floor': True,
         },
+    }
+    store._store(
+        'freeze_gate_curve',
+        alternate_key,
+        valid_payload,
         law_disclosures=[],
     )
 
     replay = PT0DeterminismStore('replay', db_path=db_path)
+    accepted = []
+    original_accept = replay._accept_cached_hit
+
+    def record_accepted(entry, *, owner=None):
+        accepted.append(entry)
+        return original_accept(entry, owner=owner)
+
+    replay._accept_cached_hit = record_accepted
     payload = replay._lookup_first_available(
-        'freeze_gate_curve', (key,),
+        'freeze_gate_curve', (key, alternate_key),
     )
-    with pytest.raises(PT0CacheMiss, match='cached replay miss'):
-        rrd._curve_from_payload(payload['curve'])
+    assert payload == valid_payload
+    assert replay.hits == 1
+    assert len(accepted) == 1
+    assert accepted[0]['key'] == alternate_key
+    assert replay._accepted_hit_disclosures == []
+    assert replay.replay_sequence[-1]['key'] == alternate_key
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(

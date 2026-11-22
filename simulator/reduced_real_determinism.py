@@ -1271,9 +1271,8 @@ class PT0DeterminismStore:
                 continue
             if artifact == "freeze_gate_curve":
                 curve_payload = (entry.get("payload") or {}).get("curve")
-                # Markerless rows reach the decoder, which rejects them.
                 if not isinstance(curve_payload, Mapping) or not (
-                    _curve_floor_marker_is_valid(curve_payload, require_present=False)
+                    _curve_floor_marker_is_valid(curve_payload, require_present=True)
                 ):
                     continue
             if require_gate_curve_domain_diagnostic:
@@ -4000,16 +3999,26 @@ def canonical_replay_output_projection(
         )
     intent = _equilibrium_payload_intent(sim)
     temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+    result_diagnostics = dict(getattr(result, "diagnostics", {}) or {})
+    feo_activity = result_diagnostics.get("a_FeO_calphad")
+    if isinstance(feo_activity, Mapping):
+        captured_feo_activity = dict(feo_activity)
+        captured_feo_activity.pop("notices", None)
+        result_diagnostics["a_FeO_calphad"] = captured_feo_activity
     payload = {
         "authority": _equilibrium_record_authority(sim, intent),
         "equilibrium_result": {
             field.name: (
                 _cache_payload_diagnostic(
-                    getattr(result, field.name),
+                    (
+                        result_diagnostics
+                        if field.name == "diagnostics"
+                        else getattr(result, field.name)
+                    ),
                     temperature_K=temperature_K,
                 )
                 if field.name == "diagnostics"
-                and isinstance(getattr(result, field.name), Mapping)
+                and isinstance(result_diagnostics, Mapping)
                 else _json_ready(getattr(result, field.name))
             )
             for field in dataclasses.fields(EquilibriumResult)

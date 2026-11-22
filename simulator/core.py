@@ -6238,12 +6238,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquidus_unknown=True,
             )
         source = str(curve.get("source") or "liquidus_solidus")
-        resolved_provider = getattr(self, '_liquid_fraction_provider', None)
+        magemin_sourced = (
+            getattr(self, '_liquid_fraction_provider', None) == 'magemin'
+        )
         if isinstance(step_down, Mapping):
-            realized_provider = step_down.get('realized_provider')
-            if isinstance(realized_provider, str) and realized_provider:
-                resolved_provider = realized_provider
-        if resolved_provider != 'magemin':
+            magemin_sourced = step_down.get('magemin_sourced') is True
+        if not magemin_sourced:
             domain_identity = not_applicable_identity
         liquidus_unknown = curve.get('is_liquidus_floor') is True
         # Valid at and above the silicate liquidus. The Kress91 floor

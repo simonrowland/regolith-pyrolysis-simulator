@@ -283,3 +283,92 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         )
         assert repeated_state['native_fe_activity'] == plain_activity
         assert repeated_state.get('notices', []) == notices
+
+
+def test_timeout_then_magemin_retry_keeps_extrapolated_feo_qualification(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.engine_pool import EngineWorkerTimeout
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=admission_module.BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess',
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_version': {
+                'tag': 'value',
+                'value': 'MAGEMin fixture runtime',
+                'reason': None,
+            },
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
+    _install_magemin_subprocess_gate(sim, monkeypatch)
+    monkeypatch.setattr(sim, '_pt0_store', lambda: None, raising=False)
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    backend = provider._backend
+    original_call_magemin = backend._call_magemin
+    engine_calls = 0
+
+    def timeout_then_magemin(**kwargs):
+        nonlocal engine_calls
+        engine_calls += 1
+        if engine_calls == 1:
+            raise EngineWorkerTimeout(
+                'MAGEMin worker', 0.01, phase='job',
+            )
+        return original_call_magemin(**kwargs)
+
+    monkeypatch.setattr(backend, '_call_magemin', timeout_then_magemin)
+    composition = _liquid_feo_bulk(sim, 80.001)
+    authority = sim._establish_melt_redox_gate_authority_for_current_hour()
+    curve = authority['curve']
+
+    assert engine_calls >= 2
+    assert curve['gate_provider_step_down']['realized_provider'] == (
+        'magemin-shadow'
+    )
+    assert curve['gate_provider_step_down']['magemin_sourced'] is True
+    temperature_C = 1800.0
+    temperature_K = temperature_C + 273.15
+    domain = sim.liquid_feo_domain_at(temperature_K)
+    assert domain.domain_identity.silica_verdict == 'extrapolated'
+    assert domain.domain_identity.certified_band == (30.0, 80.0)
+
+    activity = sim._native_fe_saturation_state(
+        composition,
+        fe3_over_sigma_fe=0.1,
+        T_K=temperature_K,
+        pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=float(sim._current_melt_redox_fO2_log()),
+    )
+    identity_notices = [
+        notice for notice in activity.get('notices', ())
+        if notice.get('kind') == 'magemin_domain_identity'
+    ]
+    assert len(identity_notices) == 1
+    assert identity_notices[0]['silica_verdict'] == 'extrapolated'
+    assert identity_notices[0]['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }

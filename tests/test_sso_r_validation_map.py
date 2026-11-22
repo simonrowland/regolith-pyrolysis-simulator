@@ -619,6 +619,113 @@ def test_run_row_provider_failure_then_recovery_uses_one_pin(monkeypatch):
     assert cleared_hours == [0]
 
 
+def test_run_row_establishes_one_production_authority_pin(monkeypatch):
+    setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+    curve_calls = 0
+    pin_window = False
+    established = []
+    resolved = []
+    cleared_hours = []
+    simulator_type = validation_map.PyrolysisSimulator
+    original_establish = (
+        simulator_type._establish_melt_redox_gate_authority_for_current_hour
+    )
+    original_resolve = simulator_type._resolved_melt_redox_gate_authority
+    original_clear = (
+        simulator_type._clear_melt_redox_gate_authority_for_completed_hour
+    )
+
+    def fail_then_recover(self):
+        from simulator.engine_binding_admission import write_gate_curve_memo_record
+
+        nonlocal curve_calls
+        if not pin_window:
+            curve = {
+                'source': 'test_setup_real_curve',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1700.0,
+                'path': ((1000.0, 0.0), (1700.0, 1.0)),
+            }
+            return write_gate_curve_memo_record(
+                self,
+                curve,
+                provider_outcome="produced",
+            )
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError('validation row pin failure')
+        curve = {
+            'source': 'test_recovered_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
+        }
+        return write_gate_curve_memo_record(
+            self,
+            curve,
+            provider_outcome="produced",
+        )
+
+    def record_establish(self):
+        nonlocal pin_window
+        pin_window = True
+        authority = original_establish(self)
+        established.append(authority)
+        return authority
+
+    def record_resolve(self, *args, **kwargs):
+        authority = original_resolve(self, *args, **kwargs)
+        if pin_window:
+            resolved.append(authority)
+        return authority
+
+    def record_clear(self, completed_hour):
+        nonlocal pin_window
+        cleared_hours.append(int(completed_hour))
+        result = original_clear(self, completed_hour)
+        pin_window = False
+        return result
+
+    monkeypatch.setattr(
+        simulator_type,
+        '_freeze_gate_curve_record',
+        fail_then_recover,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_establish_melt_redox_gate_authority_for_current_hour',
+        record_establish,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_resolved_melt_redox_gate_authority',
+        record_resolve,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_clear_melt_redox_gate_authority_for_completed_hour',
+        record_clear,
+    )
+
+    row = validation_map.run_row(
+        1650.0,
+        validation_map.GasPoint(1.0e-6, 10.0, 'n2_carrier'),
+        1.0,
+        calibration,
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+    )
+
+    assert row['row_passes_base_integrity'] is True
+    assert curve_calls == 1
+    assert len(established) == 1
+    assert resolved
+    assert all(authority is established[0] for authority in resolved)
+    assert cleared_hours == [0]
+
+
 @pytest.mark.parametrize(
     (
         'provider_failure',
@@ -630,7 +737,7 @@ def test_run_row_provider_failure_then_recovery_uses_one_pin(monkeypatch):
         (
             False,
             True,
-            2,
+            1,
             (
                 ('in_band', 'clear', None),
                 ('in_band', 'clear', None),
@@ -649,7 +756,7 @@ def test_run_row_provider_failure_then_recovery_uses_one_pin(monkeypatch):
     ),
     ids=('live-authority', 'typed-provider-fallback'),
 )
-def test_run_row_establishes_one_production_authority_pin(
+def test_run_row_domain_identity_cases_establish_provider_pin(
     monkeypatch,
     provider_failure,
     row_integrity,

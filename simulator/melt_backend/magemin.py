@@ -1756,27 +1756,42 @@ def magemin_domain_identity_from_evaluated_bulk(
     )
 
 
+_MAGEMIN_ENGINE_INPUT_BASIS: Tuple[str, ...] = tuple(dict.fromkeys((
+    *OXIDE_SPECIES,
+    'FeOt',
+    'O',
+    'H2O',
+    'S',
+)))
+
+
 def _evaluated_magemin_oxide_bulk(
     bulk: Mapping[str, Any],
     database: str,
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
+    _fold_ferric_split: bool = True,
 ) -> Dict[str, float] | None:
     """Return the exact oxide bulk evaluated by MAGEMin without the engine."""
 
     if composition_mol_by_account:
-        _kg, _mol, folded_accounts = _liquidus_inputs_on_feo_total_iron_basis(
-            composition_kg=None,
-            composition_mol=None,
-            composition_mol_by_account=bulk,
-        )
-        if folded_accounts is None:
+        accounts = bulk
+        if _fold_ferric_split:
+            _kg, _mol, accounts = _liquidus_inputs_on_feo_total_iron_basis(
+                composition_kg=None,
+                composition_mol=None,
+                composition_mol_by_account=bulk,
+            )
+        if accounts is None:
+            return None
+        melt_moles = accounts.get(CLEANED_MELT_ACCOUNT)
+        if not isinstance(melt_moles, Mapping):
             return None
         source_projection = project_melt_to_oxide_projection(
             composition_kg=None,
-            composition_mol=folded_accounts.get(CLEANED_MELT_ACCOUNT),
-            oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+            composition_mol=melt_moles,
+            oxide_basis=_MAGEMIN_ENGINE_INPUT_BASIS,
             species_formula_registry=species_formula_registry,
         )
         oxide_bulk = source_projection.oxide_wt_pct
@@ -1794,7 +1809,7 @@ def _evaluated_magemin_oxide_bulk(
     evaluated_projection = project_melt_to_oxide_projection(
         composition_kg=evaluated_oxides,
         composition_mol=None,
-        oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+        oxide_basis=_MAGEMIN_ENGINE_INPUT_BASIS,
         species_formula_registry=species_formula_registry,
     )
     return dict(evaluated_projection.oxide_wt_pct)
@@ -1806,14 +1821,15 @@ def evaluated_silica_verdict(
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
+    _fold_ferric_split: bool = True,
 ) -> Dict[str, object] | None:
     """Classify SiO2 on the exact projected bulk MAGEMin evaluates.
 
-    ``bulk`` is either the submitted oxide wt% mapping or, when
-    ``composition_mol_by_account`` is true, the liquidus finder's account
-    mapping. The latter follows the same Fe2O3-to-FeO_T mole fold as the live
-    liquidus path before applying the database projection. This is a pure
-    projection: it does not initialize or call the engine.
+    ``bulk`` is either the submitted oxide wt% mapping or an account mapping.
+    Account mappings use the liquidus iron fold by default; equilibrium
+    callers pass ``_fold_ferric_split=False`` to preserve the closed oxygen
+    budget used by direct ``equilibrate``. This is a pure projection: it does
+    not initialize or call the engine.
     """
     from engines.magemin.domain import MAGEMinDomainGate
 
@@ -1822,6 +1838,7 @@ def evaluated_silica_verdict(
         database,
         species_formula_registry=species_formula_registry,
         composition_mol_by_account=composition_mol_by_account,
+        _fold_ferric_split=_fold_ferric_split,
     )
     if evaluated_bulk is None:
         return None
@@ -3353,13 +3370,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         'ig': ('FeOt', 'O'),
     }
     _IG_BULK_ORDER: Tuple[str, ...] = _DB_BULK_ORDERS['ig']
-    _MAGEMIN_INPUT_BASIS: Tuple[str, ...] = tuple(dict.fromkeys((
-        *OXIDE_SPECIES,
-        'FeOt',
-        'O',
-        'H2O',
-        'S',
-    )))
+    _MAGEMIN_INPUT_BASIS: Tuple[str, ...] = _MAGEMIN_ENGINE_INPUT_BASIS
     # Current standard atomic weights used for FeOt total-iron conversion.
     # The shared accounting table is rounded for legacy kg<->mol tests.
     _FE_MOLAR_MASS_G_PER_MOL = 55.845

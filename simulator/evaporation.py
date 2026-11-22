@@ -3563,12 +3563,9 @@ class EvaporationMixin:
         if self._liquid_fraction_provider != 'magemin':
             return False
         step_down = curve.get('gate_provider_step_down')
-        realized_provider = (
-            step_down.get('realized_provider')
-            if isinstance(step_down, Mapping)
-            else None
-        )
-        return realized_provider != 'alphamelts-diagnostic'
+        if not isinstance(step_down, Mapping):
+            return True
+        return step_down.get('magemin_sourced') is True
 
     def _hold_freeze_gate_provider_curve(
         self,
@@ -4656,6 +4653,10 @@ class EvaporationMixin:
                 **step_down,
                 'failed_providers': failed_providers,
                 'realized_provider': fallback_provider if status == 'ok' else None,
+                'magemin_sourced': (
+                    status == 'ok'
+                    and diagnostic.get('magemin_sourced') is True
+                ),
             }
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
