@@ -575,6 +575,8 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 for frame in traceback.extract_stack(limit=12)
             )
         )
+        if curve_calls == 1:
+            raise ProviderUnavailableError('validation row pin failure')
         curve = add_current_domain_diagnostic({
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
