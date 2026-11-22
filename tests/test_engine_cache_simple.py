@@ -319,7 +319,14 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-        assert tables == [("engine_outputs",), ("provenance",), ("box_sequences",)]
+        # Species rows live in this file. They name the stored HOT request.
+        # A separate file would be written for a value that has no cold part.
+        assert tables == [
+            ("engine_outputs",),
+            ("provenance",),
+            ("box_sequences",),
+            ("engine_output_species",),
+        ]
         columns = connection.execute("PRAGMA table_info(engine_outputs)").fetchall()
         assert [column[1] for column in columns] == [
             "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"
@@ -347,7 +354,12 @@ def test_engine_cache_writes_only_the_hot_database(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-    assert tables == [("engine_outputs",), ("provenance",), ("box_sequences",)]
+    assert tables == [
+        ("engine_outputs",),
+        ("provenance",),
+        ("box_sequences",),
+        ("engine_output_species",),
+    ]
 
 
 def test_schema_mismatch_refuses_without_deleting_rows(

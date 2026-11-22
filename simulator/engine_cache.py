@@ -1496,7 +1496,7 @@ def _insert_cache_row_if_absent(
     *,
     provenance: bytes = b"",
     species: frozenset[str] | None = None,
-) -> tuple[bool, bool, int | None]:
+) -> tuple[bool, bool]:
     """Insert one output only when absent; report whether existing bytes conflict.
 
     ``species`` is recorded only for a new row. None leaves the side table
@@ -1508,7 +1508,7 @@ def _insert_cache_row_if_absent(
     ).fetchone()
     if row is not None:
         existing_provenance = _read_provenance(connection, row[1])
-        return False, bytes(row[0]) != bytes(value) or existing_provenance != provenance, None
+        return False, bytes(row[0]) != bytes(value) or existing_provenance != provenance
     provenance_id = 0
     if provenance:
         connection.execute("INSERT OR IGNORE INTO provenance(value) VALUES (?)", (provenance,))
@@ -1533,7 +1533,7 @@ def _insert_cache_row_if_absent(
     )
     if species:
         _write_output_species(connection, source_box, row_seq, species)
-    return True, False, row_seq
+    return True, False
 
 
 def _write_output_species(
@@ -1808,7 +1808,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     try:
         with _LOCK:
             connection.execute("BEGIN IMMEDIATE")
-            inserted, conflict, row_seq = _insert_cache_row_if_absent(
+            inserted, conflict = _insert_cache_row_if_absent(
                 connection,
                 cache_key,
                 hot_value,
@@ -1820,11 +1820,20 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             )
             if inserted:
                 cold_values = solved.cold if isinstance(solved, EngineCacheValue) else {}
-                if row_seq is None:
-                    raise EngineCacheSpeciesError("row_seq", "a new row did not receive a sequence")
+                # The insert result stays (inserted, conflict). Callers that
+                # stub an already-present row return that pair, and the miss
+                # counter below depends on the unpack succeeding. The sequence
+                # is on the row just written.
+                stored_seq = connection.execute(
+                    f"SELECT row_seq FROM {_TABLE} WHERE key=?", (cache_key,)
+                ).fetchone()
+                if stored_seq is None:
+                    raise EngineCacheSpeciesError(
+                        "row_seq", "a new row did not receive a sequence"
+                    )
                 # Build id is forensic only and is written with the COLD value.
                 # The hit path above returns before this call.
-                _store_cold(connection, path, row_seq, cold_values, engine_id)
+                _store_cold(connection, path, int(stored_seq[0]), cold_values, engine_id)
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
@@ -1903,7 +1912,7 @@ def load_cache_rows(
     try:
         for digest, value, engine, version, source_box, row_seq, provenance in values:
             decoded = species_from_natural_key(digest)
-            inserted, conflict, _stored_seq = _insert_cache_row_if_absent(
+            inserted, conflict = _insert_cache_row_if_absent(
                 connection,
                 digest,
                 value,
@@ -2089,7 +2098,7 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                             raise EngineCacheSchemaMismatch(
                                 "cold.engine_builds", ("engine", "identity"), ()
                             )
-                        inserted, conflict, _stored_seq = _insert_cache_row_if_absent(
+                        inserted, conflict = _insert_cache_row_if_absent(
                             destination, key, value, engine, version, box, seq, provenance=provenance,
                         )
                         kept_box, kept_seq = destination.execute(
