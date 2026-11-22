@@ -33,9 +33,13 @@ from simulator.transport_constants import (
     FREE_MOLECULAR_KNUDSEN_MIN,
     VISCOUS_KNUDSEN_MAX,
 )
+from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
 from tests.chemistry.conftest import _build_sim
 from tests.chemistry.test_evaporation_freeze_gate import _freeze_gate_curve_with_outcome
-from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+from tests.studio_pin_support import (
+    TWELVE_CM_INITIAL_THROAT_AREA_M2,
+    set_legacy_capacity_throat,
+)
 
 
 SIO_CLOSURE_MAX_REL_PCT = 5e-12
@@ -254,34 +258,26 @@ def _assert_transitional_steps_are_flagged(diagnostics: list[dict]) -> None:
                 for notice in notices
             ), f"out-of-domain species {species} at step {step_number} lacked a notice"
 
-    # d-452 sizes the collection throat to the owner 0.5 m aperture
-    # (data/setpoints.yaml initial_throat_area_m2; green was 0.12 m).
-    # Kn = λ/D, so the same mean free path is 0.12/0.5 of the 12 cm value
-    # and this campaign stays below VISCOUS_KNUDSEN_MAX. The closure
-    # tolerances after this helper are unchanged. A transitional step, if
-    # one appears, is still required to carry the extrapolation notice.
-    weighted_knudsen_numbers = []
-    for diagnostic in diagnostics:
-        series = diagnostic.get("evaporation_series_resistance", {}) or {}
-        for species_diagnostic in series.values():
-            if not isinstance(species_diagnostic, dict):
-                continue
-            if species_diagnostic.get("gas_resistance_weight", 0.0) <= 0.0:
-                continue
-            knudsen_number = species_diagnostic.get("knudsen_number")
-            if isinstance(knudsen_number, (int, float)):
-                weighted_knudsen_numbers.append(float(knudsen_number))
-    assert weighted_knudsen_numbers, (
-        "the run must record in-domain gas-resistance Knudsen numbers"
+    assert out_of_domain_steps, "the run must reach out-of-domain transport"
+
+
+def _pin_transitional_throat(setpoints: dict) -> dict:
+    """Pin the production throat knob to the 12 cm aperture.
+
+    The shipped aperture is 0.5 m. Kn = λ/D then stays below
+    VISCOUS_KNUDSEN_MAX, so these closures never reach the out-of-domain
+    band they exist to close through. ``initial_throat_area_m2`` is the
+    knob EquipmentDesigner and the overhead model both read.
+    """
+
+    return set_legacy_capacity_throat(setpoints)
+
+
+def _assert_pinned_transitional_throat(sim) -> None:
+    assert sim.overhead_model.initial_throat_area_m2 == pytest.approx(
+        TWELVE_CM_INITIAL_THROAT_AREA_M2
     )
-    assert all(
-        knudsen_number < VISCOUS_KNUDSEN_MAX
-        for knudsen_number in weighted_knudsen_numbers
-    ), (
-        "owner 0.5 m throat must keep this campaign below the viscous "
-        f"Knudsen ceiling {VISCOUS_KNUDSEN_MAX}; "
-        f"got {weighted_knudsen_numbers}"
-    )
+    assert sim.overhead_model.throat_diameter_m == pytest.approx(0.12)
 
 
 def _run_c2a_staged_to_completion(
@@ -592,9 +588,11 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     freeze_gate_enabled,
 ):
     feedstocks = _load_data_yaml("feedstocks.yaml")
-    setpoints = _set_freeze_gate(
-        _load_data_yaml("setpoints.yaml"),
-        enabled=freeze_gate_enabled,
+    setpoints = _pin_transitional_throat(
+        _set_freeze_gate(
+            _load_data_yaml("setpoints.yaml"),
+            enabled=freeze_gate_enabled,
+        )
     )
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
     sim = _build_sim(
@@ -604,6 +602,7 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         setpoints,
         additives_kg={"K": 26.0, "Na": 12.0},
     )
+    _assert_pinned_transitional_throat(sim)
     _install_liquidus_stub(sim)
     post_mg_c2a_hold_limit = _capture_post_mg_c2a_hold_limit(
         monkeypatch,
@@ -685,11 +684,13 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal(
     kernel_config["allow_fallback_vapor"] = True
     kernel_config["allow_unmeasured_alpha_fallback"] = True
     setpoints["chemistry_kernel"] = kernel_config
+    setpoints = _pin_transitional_throat(setpoints)
 
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    _assert_pinned_transitional_throat(sim)
     sim.start_campaign(CampaignPhase.C0)
     post_mg_c2a_hold_limit = _capture_post_mg_c2a_hold_limit(
         monkeypatch,

@@ -14,7 +14,12 @@ TWELVE_CM_INITIAL_THROAT_AREA_M2 = 0.011309733552923255
 
 
 def set_legacy_capacity_throat(setpoints: dict) -> dict:
-    """Pin capacity-only tests to the historical 12 cm throat input."""
+    """Pin ``condenser_geometry.initial_throat_area_m2`` to the 12 cm aperture.
+
+    Capacity tests keep Poiseuille scaling on that aperture. The
+    transitional mass-balance closures use the same production knob so
+    Kn = λ/D still enters the out-of-domain band.
+    """
     geometry = dict(setpoints.get("condenser_geometry", {}) or {})
     geometry["initial_throat_area_m2"] = TWELVE_CM_INITIAL_THROAT_AREA_M2
     setpoints["condenser_geometry"] = geometry
