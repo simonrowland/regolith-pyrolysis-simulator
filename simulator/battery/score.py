@@ -16898,6 +16898,57 @@ def _sample_catalog_run_identity(observation: Observation) -> str | None:
     return composition.proxy_source
 
 
+_STORED_ROW_RUN = re.compile(r":row=([^:]+)")
+
+
+def _stored_row_run(observation: Observation) -> str | None:
+    """Sample run already stored in the observation id's row coordinate."""
+
+    match = _STORED_ROW_RUN.search(observation.observation_id)
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _resolves_to_physical_run(
+    observation: Observation, run: str, experiment_id: str
+) -> bool:
+    stored = _stored_row_run(observation)
+    if stored is not None:
+        return stored == run
+    return run == experiment_id
+
+
+def _single_physical_run(
+    observations: Iterable[Observation], experiment_id: str
+) -> str | None:
+    """The one run this experiment positively declares, or None.
+
+    A catalog marker does not declare that run. Grouped experiments carry
+    zero, one, or many of them, and an ion trace cannot carry one. Distinct
+    row labels already stored on observation ids are separate sample runs.
+    With no marker and no row label, the experiment id is the one run.
+    """
+
+    rows = [
+        observation
+        for observation in observations
+        if observation.experiment_id == experiment_id
+    ]
+    if any(_sample_catalog_run_identity(observation) is not None for observation in rows):
+        return None
+    row_runs: set[str] = set()
+    for observation in rows:
+        stored = _stored_row_run(observation)
+        if stored is not None:
+            row_runs.add(stored)
+    if len(row_runs) > 1:
+        return None
+    if len(row_runs) == 1:
+        return next(iter(row_runs))
+    return experiment_id
+
+
 def _model_oxygen_control_lineage(
     context: ScoreContext,
     indexes: _ValidationIndexes,
@@ -16969,6 +17020,7 @@ def _score_relative_qms_series(
 ) -> RelativeSeriesComparison:
     """Bind trace and model oxygen inputs before the pure series comparator."""
 
+    from simulator.battery.fo2_ladder import printed_fo2_from_point
     from simulator.battery.score_metrics import (
         _relative_series_model_oxygen_unavailable_reason,
         relative_channel_point_residuals,
@@ -16989,7 +17041,6 @@ def _score_relative_qms_series(
             context.observations.get(source_trace.observation_id) != source_trace
             or source_trace.source_id != reference.source_id
             or source_trace.experiment_id != reference.experiment_id
-            or {point.run_id for point in observed_series} != {source_trace.experiment_id}
             or any(
                 point.observation_id != source_trace.observation_id
                 for point in observed_series
@@ -17001,24 +17052,17 @@ def _score_relative_qms_series(
         ):
             return unavailable(RelativeSeriesUnavailableReason.SOURCE_TRACE_UNAVAILABLE)
 
-        sample_run_identities = {
-            _sample_catalog_run_identity(observation)
-            for observation in rows
-            if observation.source_id == reference.source_id
-            and observation.experiment_id == reference.experiment_id
-        }
-        sample_run_identities.discard(None)
-        if len(sample_run_identities) > 1:
-            reference_run = _sample_catalog_run_identity(reference)
-            trace_run = _sample_catalog_run_identity(source_trace)
-            if (
-                reference_run is None
-                or trace_run is None
-                or reference_run != trace_run
-            ):
-                return unavailable(
-                    RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
-                )
+        declared_run = _single_physical_run(rows, reference.experiment_id)
+        if (
+            declared_run is None
+            or {point.run_id for point in observed_series} != {declared_run}
+            or not _resolves_to_physical_run(
+                reference, declared_run, reference.experiment_id
+            )
+        ):
+            return unavailable(
+                RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+            )
 
         experiment = context.experiments.get(reference.experiment_id)
         if experiment is None:
@@ -17036,8 +17080,8 @@ def _score_relative_qms_series(
             _cache=validation_indexes.observation_lineages,
         )
         model_inputs = evidence.model_oxygen_input_observation_ids
-        if _has_printed_fo2(reference, reference.identity):
-            control_point = oxygen_pressure_point(reference)
+        control_point = oxygen_pressure_point(reference)
+        if printed_fo2_from_point(reference, reference.identity, control_point):
             control_inputs = (
                 ()
                 if control_point is None or control_point.inference is None
@@ -17085,6 +17129,18 @@ def _score_relative_qms_series(
             oxygen = resolve_source_oxygen(reference, rows, bench)
             if not isinstance(oxygen, SourceOxygenCondition):
                 return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+            if any(
+                item not in context.observations
+                or not _resolves_to_physical_run(
+                    context.observations[item],
+                    declared_run,
+                    reference.experiment_id,
+                )
+                for item in oxygen.used_observations
+            ):
+                return unavailable(
+                    RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+                )
             # used_observations stops at partial-pressure rows. Walk those
             # selected rows outward so a current named only on the pressure
             # cannot validate itself.

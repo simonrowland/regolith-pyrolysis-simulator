@@ -53,6 +53,7 @@ from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
     Composition,
     Experiment,
+    Located,
     Notice,
     Observation,
     Value,
@@ -165,18 +166,14 @@ def engine_intrinsic_fo2_notice(quantity: Quantity) -> Notice:
     )
 
 
-def derived_fo2_condition(observation: Observation) -> bool:
-    """True when the row's oxygen is derived rather than printed.
+def derived_fo2_from_point(observation: Observation, point: Located | None) -> bool:
+    """True when this already-read oxygen point is derived rather than printed.
 
     A pure pressure-unit conversion stays printed (d-216, source_oxygen).
     """
 
-    from simulator.battery.source_oxygen import (
-        oxygen_pressure_point,
-        pressure_has_only_unit_conversion,
-    )
+    from simulator.battery.source_oxygen import pressure_has_only_unit_conversion
 
-    point = oxygen_pressure_point(observation)
     if point is not None:
         if point.inference is not None and not pressure_has_only_unit_conversion(point):
             return True
@@ -191,20 +188,40 @@ def derived_fo2_condition(observation: Observation) -> bool:
     )
 
 
-def has_printed_fo2(observation: Observation, identity: Identity) -> bool:
-    from simulator.battery.source_oxygen import printed_source_pressure
+def derived_fo2_condition(observation: Observation) -> bool:
+    """True when the row's oxygen is derived rather than printed."""
+
+    from simulator.battery.source_oxygen import oxygen_pressure_point
+
+    return derived_fo2_from_point(observation, oxygen_pressure_point(observation))
+
+
+def printed_fo2_from_point(
+    observation: Observation, identity: Identity, point: Located | None
+) -> bool:
+    """Printed oxygen from an already-read point. Does not read it again."""
+
+    from simulator.battery.source_oxygen import pressure_value_from_point
 
     if _rys_oxygen_measurement_status(observation, None) not in {
         None,
         "measured_independent",
     }:
         return False
-    if derived_fo2_condition(observation):
+    if derived_fo2_from_point(observation, point):
         return False
     fo2 = identity.fO2_Pa
     if fo2 is not None and fo2.is_value and fo2.value is not None:
         return True
-    return printed_source_pressure(observation) is not None
+    return pressure_value_from_point(point) is not None
+
+
+def has_printed_fo2(observation: Observation, identity: Identity) -> bool:
+    from simulator.battery.source_oxygen import oxygen_pressure_point
+
+    return printed_fo2_from_point(
+        observation, identity, oxygen_pressure_point(observation)
+    )
 
 
 def resolve_row_fo2(

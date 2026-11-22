@@ -61,14 +61,20 @@ def pressure_has_only_unit_conversion(point: Located) -> bool:
     return value == original.state.value * factor.state.value
 
 
-def printed_source_pressure(row: Observation) -> Decimal | None:
-    point = oxygen_pressure_point(row)
-    if point is not None and pressure_has_only_unit_conversion(point):
-        value = point.state.value
-        value = value.point if isinstance(value, Value) else value
-        if isinstance(value, Decimal) and value.is_finite() and value > 0:
-            return value
+def pressure_value_from_point(point: Located | None) -> Decimal | None:
+    """Positive printed pressure on a point the caller already read."""
+
+    if point is None or not pressure_has_only_unit_conversion(point):
+        return None
+    value = point.state.value
+    value = value.point if isinstance(value, Value) else value
+    if isinstance(value, Decimal) and value.is_finite() and value > 0:
+        return value
     return None
+
+
+def printed_source_pressure(row: Observation) -> Decimal | None:
+    return pressure_value_from_point(oxygen_pressure_point(row))
 
 
 @dataclass(frozen=True)

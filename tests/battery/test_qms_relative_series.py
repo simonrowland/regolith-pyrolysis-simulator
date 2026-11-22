@@ -234,16 +234,38 @@ def _called_names(function: ast.FunctionDef) -> list[str]:
     return names
 
 
-def test_qms_channel_rules_have_one_owner():
-    """One model-run refusal, and one read of the printed control inputs.
+def _definitions(*trees: ast.AST) -> dict[str, ast.FunctionDef]:
+    found: dict[str, ast.FunctionDef] = {}
+    for tree in trees:
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                found[node.name] = node
+    return found
 
-    A second MIXED_MODEL_RUNS return, or a second oxygen_pressure_point read
-    in the printed-control path, splits the rule the reviews closed.
+
+def _lookup_count(name: str, definitions: dict[str, ast.FunctionDef], seen: set[str]) -> int:
+    if name in seen or name not in definitions:
+        return 0
+    seen.add(name)
+    called = _called_names(definitions[name])
+    return called.count("oxygen_pressure_point") + sum(
+        _lookup_count(callee, definitions, seen) for callee in called
+    )
+
+
+def test_qms_channel_rules_have_one_owner():
+    """One model-run refusal, and one read of the printed control point.
+
+    A second MIXED_MODEL_RUNS return, a second direct oxygen_pressure_point
+    read, or a lookup hidden inside the printed-control predicate splits
+    the rule the reviews closed.
     """
 
     root = Path(relative_channel_point_residuals.__code__.co_filename).parent
     metrics_tree = ast.parse((root / "score_metrics.py").read_text(encoding="utf-8"))
     score_tree = ast.parse((root / "score.py").read_text(encoding="utf-8"))
+    ladder_tree = ast.parse((root / "fo2_ladder.py").read_text(encoding="utf-8"))
+    oxygen_tree = ast.parse((root / "source_oxygen.py").read_text(encoding="utf-8"))
     mixed_owners = [
         node.name
         for node in ast.walk(metrics_tree)
@@ -282,8 +304,14 @@ def test_qms_channel_rules_have_one_owner():
 
     walker = _function(score_tree, "_model_oxygen_control_lineage")
     scorer = _function(score_tree, "_score_relative_qms_series")
+    scorer_calls = _called_names(scorer)
     assert _called_names(walker).count("oxygen_pressure_point") == 0
-    assert _called_names(scorer).count("oxygen_pressure_point") == 1
+    assert scorer_calls.count("oxygen_pressure_point") == 1
+    assert "printed_fo2_from_point" in scorer_calls
+    assert "_has_printed_fo2" not in scorer_calls
+    assert "has_printed_fo2" not in scorer_calls
+    definitions = _definitions(score_tree, ladder_tree, oxygen_tree)
+    assert _lookup_count("printed_fo2_from_point", definitions, set()) == 0
 
 
 @pytest.mark.parametrize(
