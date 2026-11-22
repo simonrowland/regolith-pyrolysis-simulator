@@ -135,6 +135,68 @@ _DESIGN_POINT_HOUR = 107
 _DESIGN_POINT_LOCATION = "duct:stage_0_to_stage_1"
 _FELT_LIMIT_THICKNESS_CAP_M = 5.0
 _VAPOUR_CATALOG: Any = None
+# Slifka, Filla, and Phelps, J. Res. Natl. Inst. Stand. Technol. 103
+# (1998) 357, Table 2, printed page 362. Literature column. The paper
+# says these are Touloukian, TPRC Data Series Vol. 2, pp. 158-167,
+# corrected to 93% of the theoretical density 3.581 g/cm³. The
+# Touloukian volume itself was not opened. Blank literature cells in
+# the 50 K experimental grid are not filled in.
+_MGO_TPRC_LITERATURE_W_M_K = (
+    (400.0, 33.0),
+    (500.0, 24.9),
+    (600.0, 19.2),
+    (700.0, 15.3),
+    (800.0, 12.5),
+    (900.0, 10.4),
+    (1000.0, 9.1),
+    (1100.0, 7.9),
+    (1200.0, 7.2),
+    (1300.0, 6.8),
+)
+_MGO_ENDMEMBER_CITATION = (
+    "Slifka, Filla, and Phelps, J. Res. Natl. Inst. Stand. Technol. "
+    "103 (1998) 357, Table 2 literature column, printed page 362. "
+    "Polycrystalline MgO at 93% of 3.581 g/cm3. The paper attributes "
+    "the column to Touloukian TPRC Vol. 2 pp. 158-167 after that "
+    "density correction. The Touloukian volume was not opened."
+)
+# Annaratone, Engineering Heat Transfer, Springer, 2010, Appendix A
+# Table A.4, printed page 258. The caption prints "According to R.W.
+# Powel". Powell's own table was not opened. The row does not print a
+# density. This is not a Touloukian crop. Temperatures are °C.
+_CAO_POWELL_REPRINT_C = (
+    (100.0, 15.5),
+    (200.0, 11.2),
+    (300.0, 9.54),
+    (400.0, 8.79),
+    (500.0, 8.37),
+    (600.0, 8.14),
+    (700.0, 7.91),
+    (800.0, 7.79),
+    (900.0, 7.79),
+    (1000.0, 7.74),
+)
+_CAO_ENDMEMBER_CITATION = (
+    "Annaratone, Engineering Heat Transfer, Springer, 2010, Appendix A "
+    "Table A.4, printed page 258, CaO row. Caption: According to R.W. "
+    "Powel (printed spelling). Not Touloukian. Specimen density is not "
+    "printed on the row. Powell's table was not opened."
+)
+# data/setpoints.yaml prints pO2_bar: "<1e-8" on both C2A campaigns.
+# campaigns.py writes pO2_mbar_default 0.0 because pO2_mbar is null.
+# The hour-107 duct print is 0.0 mbar, so the run is not C2B (1.5),
+# C4 (0.2), or C6 (0.2). The string is an upper bound. It is used as a
+# positive floor only because the SiO equilibrium is singular at the
+# printed zero. It is not MELT_DISSOCIATION_PO2_MIN_BAR.
+_C2A_PO2_BAR_UPPER_BOUND = 1.0e-8
+_C2A_PO2_FLOOR_CITATION = (
+    "data/setpoints.yaml campaigns.C2A_continuous.pO2_bar and "
+    "campaigns.C2A_staged.pO2_bar print \"<1e-8\". "
+    "simulator/campaigns.py _pressure_config_float writes "
+    "pO2_mbar_default 0.0. The hour-107 duct print is 0.0 mbar. "
+    "C2B pO2_mbar_default 1.5 was not used. "
+    "MELT_DISSOCIATION_PO2_MIN_BAR was not used."
+)
 
 
 def normalize_layered_wall(raw: Mapping[str, Any]) -> dict[str, Any]:
@@ -440,9 +502,15 @@ def resolve_layer_properties(
     )
     service = _service_record(entry)
     gas_tight = _gas_tight_record(entry)
+    # dict.get evaluates its default, so an explicit key must be read
+    # before the shipped-role table. The priced doloma interlayer is
+    # not a shipped role and carries its own key.
+    key = layer.get("key")
+    if key is None:
+        key = _KEY_BY_ROLE[layer["role"]]
     return {
         "role": layer["role"],
-        "key": layer.get("key", _KEY_BY_ROLE[layer["role"]]),
+        "key": key,
         "material_id": material_id,
         "source": layer.get("source"),
         "source_status": layer.get("source_status"),
@@ -792,6 +860,10 @@ def shipped_design_report(
             duct_radius_m=_sweep_diameter(setpoints) / 2.0,
             import_delivery_cost_per_kg=parameters.import_delivery_cost_per_kg,
             materials=catalog,
+            in_situ_bootstrap_cost_per_kg=parameters.in_situ_bootstrap_cost_per_kg,
+            stage_areas_m2=areas,
+            shipped_collector_costs=priced["collector_stage_costs"],
+            continuum_sweeps=_continuum_sweeps(setpoints),
         ),
         "pressure_bands_without_flue_state": _bare_pressure_bands(setpoints),
         "in_situ_bootstrap_cost_per_kg": parameters.in_situ_bootstrap_cost_per_kg,
@@ -1531,6 +1603,11 @@ def _resolve_conductivity(
             catalog_scalar = entry.get("thermal_conductivity_W_m_K")
         catalog_curve = entry.get("thermal_conductivity")
         extension = entry.get("conductivity_extension")
+    if extension is None:
+        # A report-built layer can name the same nearest-point rule the
+        # catalog uses. The shipped wall does not set this field, and a
+        # catalog flag still wins when both are present.
+        extension = layer.get("conductivity_extension")
     has_override = override_scalar is not None or override_curve is not None
     if has_override and status == "assumed":
         if override_curve is not None:
@@ -2294,6 +2371,750 @@ def equilibrium_pressure_pa(
     )
 
 
+def cited_oxide_endmember_conductivity() -> dict[str, Any]:
+    """Cited dense MgO and dense CaO k(T). Doloma itself has no measured k.
+
+    The brief calls the lower-k walk conservative and the higher-k walk
+    optimistic. Thickness is resistance times conductivity, so the
+    higher-k walk is the thicker build. The thinner layer does not keep
+    the felt at its limit if the material is the higher-k endmember.
+    Neither curve is written onto the shipped doloma catalog row.
+    """
+
+    return {
+        "mixture": "doloma",
+        "mixture_k_status": "uncited_endmember_bound",
+        "doloma_k_stored": False,
+        "lower_k_walk_label": "conservative_per_brief",
+        "higher_k_walk_label": "optimistic_per_brief",
+        "thickness_relation": "higher_k_needs_more_thickness",
+        "endmembers": {
+            "MgO": _mgo_endmember(),
+            "CaO": _cao_endmember(),
+        },
+    }
+
+
+def _conductivity_points(
+    points: Sequence[tuple[float, float]],
+    citation: str,
+    *,
+    celsius: bool,
+) -> list[dict[str, Any]]:
+    rows = []
+    for temperature, value in points:
+        temperature_K = float(temperature)
+        if celsius:
+            temperature_K += CELSIUS_TO_KELVIN_OFFSET
+        rows.append({
+            "temperature_K": temperature_K,
+            "value_W_m_K": float(value),
+            "citation": citation,
+        })
+    return rows
+
+
+def _mgo_endmember() -> dict[str, Any]:
+    return {
+        "oxide": "MgO",
+        "citation": _MGO_ENDMEMBER_CITATION,
+        "density_status": "93_percent_of_3.581_g_cm3",
+        "theoretical_density_g_cm3": 3.581,
+        "density_fraction": 0.93,
+        "touloukian_volume_opened": False,
+        "not_pore_free": True,
+        "mass_density_used": "doloma_catalog_not_this_specimen",
+        "thermal_conductivity": _conductivity_points(
+            _MGO_TPRC_LITERATURE_W_M_K,
+            _MGO_ENDMEMBER_CITATION,
+            celsius=False,
+        ),
+    }
+
+
+def _cao_endmember() -> dict[str, Any]:
+    return {
+        "oxide": "CaO",
+        "citation": _CAO_ENDMEMBER_CITATION,
+        "density_status": "unprinted",
+        "touloukian_volume_opened": False,
+        "not_touloukian": True,
+        "mass_density_used": "doloma_catalog_not_this_specimen",
+        "thermal_conductivity": _conductivity_points(
+            _CAO_POWELL_REPRINT_C,
+            _CAO_ENDMEMBER_CITATION,
+            celsius=True,
+        ),
+    }
+
+
+def _interlayer_resolved(
+    endmember: Mapping[str, Any],
+    materials: Mapping[str, Any],
+    hot_face_C: float,
+) -> dict[str, Any]:
+    resolved = resolve_layer_properties(
+        {
+            "role": "dense_interlayer",
+            "key": "dense_interlayer",
+            "material_id": "doloma",
+            "source": "in_situ",
+            "source_status": "cited",
+            "thickness_m": 0.001,
+            "conductivity_status": "cited",
+            "conductivity_extension": "nearest_cited_point",
+            "thermal_conductivity": endmember["thermal_conductivity"],
+            "intended_material": "doloma_mgo_cao_mixture_bound",
+        },
+        materials=materials,
+        temperature_K=hot_face_C + CELSIUS_TO_KELVIN_OFFSET,
+    )
+    resolved["endmember_oxide"] = endmember["oxide"]
+    resolved["endmember_citation"] = endmember["citation"]
+    resolved["k_is_mixture_bound"] = True
+    resolved["doloma_k_measured"] = False
+    resolved["specimen_density_status"] = endmember["density_status"]
+    return resolved
+
+
+def _stack_with_interlayer(
+    layers: Sequence[Mapping[str, Any]],
+    interlayer: Mapping[str, Any],
+) -> list[dict[str, Any]] | None:
+    edited: list[dict[str, Any]] = []
+    placed = False
+    for layer in layers:
+        if layer.get("role") == "insulation" and not placed:
+            edited.append(dict(interlayer))
+            placed = True
+        edited.append(dict(layer))
+    if not placed:
+        return None
+    return edited
+
+
+def _sheet_split(
+    layers: Sequence[Mapping[str, Any]],
+    area_m2: float,
+    import_rate: float,
+    in_situ_rate: float | None,
+) -> dict[str, Any]:
+    rows = []
+    for layer in layers:
+        reasons = _layer_mass_reasons(layer)
+        mass = None
+        if not reasons:
+            mass = (
+                area_m2
+                * float(layer["thickness_m"])
+                * float(layer["density_kg_m3"])
+            )
+        rows.append(_layer_mass_row(layer, mass, reasons))
+    return _source_split(
+        rows,
+        import_delivery_cost_per_kg=import_rate,
+        in_situ_bootstrap_cost_per_kg=in_situ_rate,
+    )
+
+
+def _cylinder_split(
+    layers: Sequence[Mapping[str, Any]],
+    radius_m: float,
+    import_rate: float,
+    in_situ_rate: float | None,
+) -> dict[str, Any]:
+    rows, outer = _cylindrical_masses(layers, radius_m, 1.0)
+    split = _source_split(
+        rows,
+        import_delivery_cost_per_kg=import_rate,
+        in_situ_bootstrap_cost_per_kg=in_situ_rate,
+    )
+    split["outer_radius_m"] = outer
+    split["length_basis"] = "per_metre"
+    return split
+
+
+def _resistance_share(conduction: Mapping[str, Any]) -> dict[str, Any]:
+    """Felt share of the production layer resistances. No second R = t/k."""
+
+    roles = [str(role) for role in conduction.get("known_roles") or []]
+    if "layer_resistance_K_m_W" in conduction:
+        values = list(conduction["layer_resistance_K_m_W"])
+        units = "K·m/W"
+    elif "layer_resistance_m2_K_W" in conduction:
+        values = list(conduction["layer_resistance_m2_K_W"])
+        units = "m2·K/W"
+    else:
+        return {"status": "unavailable", "reason": "layer_resistance_unset"}
+    if len(values) != len(roles) or not values:
+        return {"status": "unavailable", "reason": "layer_resistance_unset"}
+    total = sum(float(value) for value in values)
+    if total == 0.0:
+        return {"status": "unavailable", "reason": "resistance_zero"}
+    by_role = {
+        role: float(value) / total
+        for role, value in zip(roles, values, strict=True)
+    }
+    return {
+        "status": "ok",
+        "units": units,
+        "by_role": by_role,
+        "felt_share": by_role.get("insulation"),
+        "dense_interlayer_share": by_role.get("dense_interlayer"),
+    }
+
+
+def _walk_interfaces(conduction: Mapping[str, Any]) -> list[dict[str, Any]]:
+    roles = [str(role) for role in conduction.get("known_roles") or []]
+    interfaces = conduction.get("interface_temperatures_C") or []
+    if len(interfaces) != len(roles) + 1:
+        return []
+    return [
+        {
+            "role": role,
+            "inner_temperature_C": float(interfaces[index]["temperature_C"]),
+            "outer_temperature_C": float(interfaces[index + 1]["temperature_C"]),
+        }
+        for index, role in enumerate(roles)
+    ]
+
+
+def _minimum_interlayer_thickness(
+    base_layers: Sequence[Mapping[str, Any]],
+    template: Mapping[str, Any],
+    hot_face_C: float,
+    wall: Mapping[str, Any],
+    *,
+    radius_m: float | None,
+    limit_C: float,
+) -> dict[str, Any]:
+    """Thinnest dense interlayer that puts the felt inner face on the limit.
+
+    Premise: the interlayer sits between the 5 mm liner and the felt.
+    Its conductivity is an endmember bound, already resolved at the hot
+    face. A thicker layer takes more of the drop, so the felt cools.
+    The outer face is the radiative root, so the thickness is that
+    walk's root.
+
+    Algebra of one trial: the walk in _solve_wall_conduction. The
+    search keeps a too-thin bracket and a thick-enough bracket.
+    Units: thickness in m, temperature in °C.
+    Sanity: a thickness that still leaves the felt over the limit is
+    rejected, and the returned walk is re-read onto the limit.
+    """
+
+    def felt_at(thickness_m: float) -> tuple[float | None, dict[str, Any]]:
+        row = dict(template)
+        row["thickness_m"] = thickness_m
+        stack = _stack_with_interlayer(base_layers, row)
+        if stack is None:
+            return None, {"status": "unavailable", "reason": "insulation_layer_missing"}
+        walked = _solve_wall_conduction(
+            stack,
+            hot_face_C,
+            wall,
+            radius_m=radius_m,
+            emissivity=_YSZ_TBC_EMISSIVITY,
+        )
+        if walked["status"] not in _CONDUCTION_WALK_STATUSES:
+            return None, walked
+        return _felt_inner_C(walked), walked
+
+    hi = 1.0e-4
+    inner, walked = felt_at(hi)
+    if inner is None:
+        return {
+            "status": "unavailable",
+            "reason": _reason_of(walked) if walked.get("status") == "unavailable" else "felt_temperature_unchecked",
+        }
+    while inner > limit_C:
+        hi *= 2.0
+        if hi > _FELT_LIMIT_THICKNESS_CAP_M:
+            return {
+                "status": "unavailable",
+                "reason": "interlayer_thickness_does_not_reach_felt_limit",
+                "thickness_cap_m": _FELT_LIMIT_THICKNESS_CAP_M,
+            }
+        inner, walked = felt_at(hi)
+        if inner is None:
+            return {
+                "status": "unavailable",
+                "reason": "felt_temperature_unchecked",
+            }
+    lo = 0.0
+    for _ in range(60):
+        mid = (lo + hi) / 2.0
+        inner, walked = felt_at(mid)
+        if inner is None:
+            return {"status": "unavailable", "reason": "felt_temperature_unchecked"}
+        if inner > limit_C:
+            lo = mid
+        else:
+            hi = mid
+    inner, walked = felt_at(hi)
+    if inner is None or abs(inner - limit_C) > 0.05:
+        return {"status": "unavailable", "reason": "felt_limit_search_residual"}
+    return {
+        "status": "ok",
+        "thickness_m": hi,
+        "felt_inner_C": inner,
+        "conduction": walked,
+        "stack": _stack_with_interlayer(
+            base_layers,
+            {**dict(template), "thickness_m": hi},
+        ),
+    }
+
+
+def _loss_value(conduction: Mapping[str, Any]) -> float | None:
+    heat_flow = conduction.get("heat_flow_W_per_m")
+    if isinstance(heat_flow, (int, float)) and not isinstance(heat_flow, bool):
+        return float(heat_flow)
+    heat_flux = conduction.get("heat_flux_W_m2")
+    if isinstance(heat_flux, (int, float)) and not isinstance(heat_flux, bool):
+        return float(heat_flux)
+    return None
+
+
+def _trace_for_stack(
+    conduction: Mapping[str, Any],
+    sweeps: Sequence[Mapping[str, Any]] | None,
+    *,
+    pipe_diameter_m: float | None,
+    hold_temperature_C: float,
+) -> list[dict[str, Any]]:
+    """Stream verdict on a walk that was already solved at the hold face."""
+
+    if not sweeps or pipe_diameter_m is None:
+        return []
+    rows = []
+    for sweep in sweeps:
+        stream = _design_vapour_stream(
+            gas_temperature_C=_finite_number(
+                sweep["gas_temperature_C"], "gas_temperature_C"
+            ),
+            hold_temperature_C=hold_temperature_C,
+            carrier_gas=str(sweep["carrier_gas"]),
+            pipe_diameter_m=float(pipe_diameter_m),
+            pressure_mbar_low=float(sweep["pressure_mbar"][0]),
+            pressure_mbar_high=float(sweep["pressure_mbar"][1]),
+            conduction=conduction,
+        )
+        rows.append({
+            "campaign": sweep.get("campaign"),
+            "conductive_loss_W_per_m": stream.get("conductive_loss_W_per_m"),
+            "trace_heating_power_W_per_m": stream.get("trace_heating_power_W_per_m"),
+            "trace_heating_power_W": stream.get("trace_heating_power_W"),
+            "verdict": stream.get("verdict"),
+            "stream_power_W": stream.get("stream_power_W"),
+            "dT_K": stream.get("dT_K"),
+        })
+    return rows
+
+
+def _resolved_shipped_layers(
+    wall: Mapping[str, Any],
+    hot_face_C: float,
+    materials: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    return [
+        resolve_layer_properties(
+            layer,
+            materials=materials,
+            temperature_K=hot_face_C + CELSIUS_TO_KELVIN_OFFSET,
+        )
+        for layer in wall["layers"]
+    ]
+
+
+def _size_one_endmember(
+    *,
+    endmember: Mapping[str, Any],
+    base_layers: Sequence[Mapping[str, Any]],
+    hot_face_C: float,
+    wall: Mapping[str, Any],
+    materials: Mapping[str, Any],
+    radius_m: float | None,
+    limit_C: float,
+    import_rate: float,
+    in_situ_rate: float | None,
+    area_m2: float | None,
+) -> dict[str, Any]:
+    template = _interlayer_resolved(endmember, materials, hot_face_C)
+    conductivity = template.get("conductivity_W_m_K")
+    if conductivity is None:
+        return {
+            "status": "unavailable",
+            "oxide": endmember["oxide"],
+            "reason": template.get("conductivity_reason") or "endmember_k_unset",
+            "citation": endmember["citation"],
+        }
+    solved = _minimum_interlayer_thickness(
+        base_layers,
+        template,
+        hot_face_C,
+        wall,
+        radius_m=radius_m,
+        limit_C=limit_C,
+    )
+    row: dict[str, Any] = {
+        "oxide": endmember["oxide"],
+        "citation": endmember["citation"],
+        "specimen_density_status": endmember["density_status"],
+        "k_W_m_K": float(conductivity),
+        "k_flag": template.get("conductivity_flag"),
+        "k_evaluated_at_C": hot_face_C,
+        "k_evaluation": "k_evaluated_at_hot_face",
+        "doloma_k_measured": False,
+        "mass_density_kg_m3": template.get("density_kg_m3"),
+        "mass_density_flag": template.get("density_flag"),
+        "mass_density_owner": "doloma_catalog",
+        "cao_bearing_behind_liner": _is_cao_bearing(template),
+        "status": solved["status"],
+        "reason": solved.get("reason"),
+    }
+    if solved["status"] != "ok":
+        return row
+    stack = solved.get("stack")
+    if not stack:
+        row["status"] = "unavailable"
+        row["reason"] = "insulation_layer_missing"
+        return row
+    sheet = _sheet_split(stack, 1.0, import_rate, in_situ_rate)
+    row.update(
+        thickness_m=solved["thickness_m"],
+        felt_inner_C=solved["felt_inner_C"],
+        interfaces=_walk_interfaces(solved["conduction"]),
+        resistance_share=_resistance_share(solved["conduction"]),
+        conductive_loss=_loss_value(solved["conduction"]),
+        conductive_loss_units=(
+            "W/m" if radius_m is not None else "W/m2"
+        ),
+        stack_usd_per_m2=sheet["cost_usd"],
+        imported_usd_per_m2=sheet["imported_usd"],
+        in_situ_usd_per_m2=sheet["in_situ_usd"],
+        in_situ_usd_includes="dense_interlayer_and_75_mm_structure",
+        stack_kg_per_m2=sheet["mass_kg"],
+        conduction=solved["conduction"],
+        stack_layers=stack,
+    )
+    if radius_m is not None:
+        cylinder = _cylinder_split(stack, radius_m, import_rate, in_situ_rate)
+        row["stack_usd_per_m"] = cylinder["cost_usd"]
+        row["stack_kg_per_m"] = cylinder["mass_kg"]
+        row["outer_radius_m"] = cylinder["outer_radius_m"]
+    if area_m2 is not None:
+        stage = _sheet_split(stack, area_m2, import_rate, in_situ_rate)
+        row["stage_cost_usd"] = stage["cost_usd"]
+        row["stage_imported_kg"] = stage["imported_kg"]
+        row["stage_in_situ_kg"] = stage["in_situ_kg"]
+        row["stage_imported_usd"] = stage["imported_usd"]
+        row["stage_in_situ_usd"] = stage["in_situ_usd"]
+        row["stage_mass_kg"] = stage["mass_kg"]
+    return row
+
+
+def _label_endmember_bounds(bounds: list[dict[str, Any]]) -> None:
+    ready = [
+        bound for bound in bounds
+        if isinstance(bound.get("k_W_m_K"), (int, float))
+    ]
+    if len(ready) < 2:
+        return
+    ordered = sorted(ready, key=lambda bound: float(bound["k_W_m_K"]))
+    low = ordered[0]
+    high = ordered[-1]
+    if float(low["k_W_m_K"]) == float(high["k_W_m_K"]):
+        for bound in ready:
+            bound["walk_label"] = "endmembers_equal_at_hot_face"
+        return
+    low["walk_label"] = "conservative_lower_k"
+    high["walk_label"] = "optimistic_higher_k"
+    low["build_quantity"] = "thinner"
+    high["build_quantity"] = "thicker"
+    low["brief_label"] = "conservative_per_brief"
+    high["brief_label"] = "optimistic_per_brief"
+
+
+def _collector_total_for_bound(
+    bound_name: str,
+    stage_bounds: Mapping[str, Mapping[str, Any]],
+    shipped_costs: Mapping[str, Mapping[str, Any]] | None,
+) -> dict[str, Any]:
+    if shipped_costs is None:
+        return {"status": "unavailable", "reason": "shipped_collector_costs_unset"}
+    rows: dict[str, Any] = {}
+    reasons: list[str] = []
+    for area_key, shipped in shipped_costs.items():
+        stage = stage_bounds.get(area_key)
+        bound = None if stage is None else stage.get(bound_name)
+        if isinstance(bound, Mapping) and "stage_cost_usd" in bound:
+            cost = bound["stage_cost_usd"]
+            row = {
+                "cost_usd": cost,
+                "imported_kg": bound.get("stage_imported_kg"),
+                "in_situ_kg": bound.get("stage_in_situ_kg"),
+                "imported_usd": bound.get("stage_imported_usd"),
+                "in_situ_usd": bound.get("stage_in_situ_usd"),
+                "pricing": "layered_stack_with_doloma_interlayer",
+            }
+        else:
+            row = {
+                "cost_usd": shipped.get("cost_usd"),
+                "imported_kg": shipped.get("imported_kg"),
+                "in_situ_kg": shipped.get("in_situ_kg"),
+                "imported_usd": shipped.get("imported_usd"),
+                "in_situ_usd": shipped.get("in_situ_usd"),
+                "pricing": shipped.get("pricing"),
+            }
+        if _is_unavailable(row["cost_usd"]):
+            reasons.append(_reason_of(row["cost_usd"]))
+        rows[area_key] = row
+    total = _sum_money(rows, reasons)
+    return {
+        "status": "ok" if not _is_unavailable(total) else "unavailable",
+        "collector_stage_cost_usd": total,
+        "reason": _join(reasons) if reasons else None,
+        "stages_repriced": [
+            key for key, row in rows.items()
+            if row.get("pricing") == "layered_stack_with_doloma_interlayer"
+        ],
+    }
+
+
+def _attach_doloma_interlayer(
+    rows: dict[str, Any],
+    wall: Mapping[str, Any],
+    bands_C: Mapping[str, tuple[float, float]],
+    *,
+    duct_radius_m: float | None,
+    import_rate: float,
+    in_situ_rate: float | None,
+    materials: Mapping[str, Any],
+    stage_areas_m2: Mapping[str, float] | None,
+    shipped_collector_costs: Mapping[str, Mapping[str, Any]] | None,
+    continuum_sweeps: Sequence[Mapping[str, Any]] | None,
+) -> None:
+    catalog = cited_oxide_endmember_conductivity()
+    endmembers = list(catalog["endmembers"].values())
+    shipped_thickness_m = {
+        str(layer.get("role")): layer.get("thickness_m")
+        for layer in wall["layers"]
+    }
+    stages: dict[str, Any] = {}
+    stage_jobs = [("hot_duct", float(bands_C[HOT_DUCT_TRAIN_KEY][1]), duct_radius_m, None)]
+    for area_key, _number, train_key in COLLECTOR_STAGE_JOIN:
+        stage_jobs.append((
+            area_key,
+            float(bands_C[train_key][1]),
+            None,
+            None if stage_areas_m2 is None else stage_areas_m2.get(area_key),
+        ))
+    duct_hold = float(bands_C[HOT_DUCT_TRAIN_KEY][1])
+    shipped_duct_layers = _resolved_shipped_layers(wall, duct_hold, materials)
+    shipped_duct_walk = _solve_wall_conduction(
+        shipped_duct_layers,
+        duct_hold,
+        wall,
+        radius_m=duct_radius_m,
+        emissivity=_YSZ_TBC_EMISSIVITY,
+    )
+    for name, hot_face, radius, area in stage_jobs:
+        existing = rows.get(name) or {}
+        if existing.get("status") == "not_applicable_no_insulation_layer":
+            stages[name] = {
+                "status": "not_applicable_no_insulation_layer",
+                "reason": "product_baffle_has_no_insulation_layer",
+            }
+            continue
+        if existing.get("felt_overheats_at_shipped_thickness") is not True:
+            stages[name] = {
+                "status": existing.get("status", "unavailable"),
+                "interlayer_required": False,
+                "reason": "felt_within_continuous_service_at_shipped_wall",
+            }
+            continue
+        limit = existing.get("felt_continuous_service_C")
+        if not isinstance(limit, (int, float)) or isinstance(limit, bool):
+            stages[name] = {
+                "status": "unavailable",
+                "reason": "felt_continuous_service_unset",
+            }
+            continue
+        base = _resolved_shipped_layers(wall, hot_face, materials)
+        bounds = [
+            _size_one_endmember(
+                endmember=endmember,
+                base_layers=base,
+                hot_face_C=hot_face,
+                wall=wall,
+                materials=materials,
+                radius_m=radius,
+                limit_C=float(limit),
+                import_rate=import_rate,
+                in_situ_rate=in_situ_rate,
+                area_m2=area,
+            )
+            for endmember in endmembers
+        ]
+        _label_endmember_bounds(bounds)
+        by_oxide = {str(bound["oxide"]): bound for bound in bounds}
+        stages[name] = {
+            "status": "ok" if all(bound.get("status") == "ok" for bound in bounds) else "unavailable",
+            "interlayer_required": True,
+            "order": "ysz_5_mm_then_dense_doloma_then_felt_then_75_mm_structure",
+            "replaces_75_mm_structure": False,
+            "shipped_liner_thickness_m": shipped_thickness_m.get("liner"),
+            "bounds": by_oxide,
+        }
+        ysz = existing.get("thicker_liner_usd_per_m2")
+        for bound in bounds:
+            stack_usd = bound.get("stack_usd_per_m2")
+            if (
+                isinstance(ysz, (int, float))
+                and not isinstance(ysz, bool)
+                and isinstance(stack_usd, (int, float))
+                and not isinstance(stack_usd, bool)
+            ):
+                bound["cheaper_than_thicker_ysz_liner"] = stack_usd < float(ysz)
+                bound["thicker_ysz_liner_usd_per_m2"] = float(ysz)
+    duct = stages.get("hot_duct") or {}
+    duct_bounds = duct.get("bounds") or {}
+    for bound in duct_bounds.values():
+        conduction = bound.pop("conduction", None)
+        stack_layers = bound.pop("stack_layers", None)
+        if not isinstance(conduction, Mapping):
+            continue
+        felt = next(
+            (
+                pair for pair in bound.get("interfaces") or []
+                if pair.get("role") == "insulation"
+            ),
+            None,
+        )
+        if felt is not None and duct_radius_m is not None:
+            felt_radius = _felt_inner_radius_m(stack_layers or [], duct_radius_m)
+            bound["insulation_dew_point"] = insulation_vapour_dew_point(
+                felt["inner_temperature_C"],
+                felt["outer_temperature_C"],
+                species_partials=_design_duct_partials(),
+                felt_thickness_m=_felt_thickness_m(stack_layers or []),
+                geometry="cylindrical",
+                inner_radius_m=felt_radius,
+            )
+        bound["trace_heating"] = _trace_for_stack(
+            conduction,
+            continuum_sweeps,
+            pipe_diameter_m=(
+                None if duct_radius_m is None else duct_radius_m * 2.0
+            ),
+            hold_temperature_C=duct_hold,
+        )
+        bound.pop("stack_layers", None)
+    shipped_loss = _loss_value(shipped_duct_walk)
+    for bound in duct_bounds.values():
+        loss = bound.get("conductive_loss")
+        if (
+            isinstance(loss, (int, float))
+            and not isinstance(loss, bool)
+            and isinstance(shipped_loss, (int, float))
+            and not isinstance(shipped_loss, bool)
+        ):
+            bound["duct_loss_minus_shipped_W_per_m"] = float(loss) - float(shipped_loss)
+            # A cylindrical felt's resistance is ln(r_out/r_in). Moving
+            # that felt outward shrinks the ratio by more than the dense
+            # layer adds, so the duct loss rises. A flat stage does not.
+            bound["duct_loss_versus_shipped"] = (
+                "higher_because_felt_moves_outward"
+                if float(loss) > float(shipped_loss)
+                else "not_higher"
+            )
+    shipped_trace = _trace_for_stack(
+        shipped_duct_walk,
+        continuum_sweeps,
+        pipe_diameter_m=None if duct_radius_m is None else duct_radius_m * 2.0,
+        hold_temperature_C=duct_hold,
+    )
+    for stage in stages.values():
+        for bound in (stage.get("bounds") or {}).values():
+            bound.pop("conduction", None)
+            bound.pop("stack_layers", None)
+    totals = _totals_by_walk_label(stages, shipped_collector_costs)
+    rows["intermediate_dense_layer"] = {
+        "status": "priced",
+        "reason": "doloma_endmember_bounds",
+        "mixture_k_status": "uncited_endmember_bound",
+        "doloma_k_stored": False,
+        "fourth_shipped_role": False,
+        "replaces_75_mm_structure": False,
+        "shipped_thicknesses_unchanged": True,
+        "shipped_layer_thickness_m": shipped_thickness_m,
+        "order": "ysz_5_mm_then_dense_doloma_then_felt_then_75_mm_structure",
+        "endmembers": catalog,
+        "stages": stages,
+        "shipped_duct_conductive_loss": shipped_loss,
+        "shipped_duct_loss_units": "W/m" if duct_radius_m is not None else "W/m2",
+        "shipped_duct_trace_heating": shipped_trace,
+        "shipped_duct_resistance_share": _resistance_share(shipped_duct_walk),
+        "collector_totals": totals,
+        "areas_basis": "setpoint_stage_areas_m2",
+    }
+    rows["comparison"] = {
+        "status": "in_situ_doloma_interlayer_priced",
+        "priced_alternative": "dense_doloma_interlayer",
+        "also_priced": "thicker_ysz_liner",
+        "shipped_liner_unchanged": True,
+        "shipped_thicknesses_unchanged": True,
+        "interlayer_replaces_75_mm_structure": False,
+        "detail": (
+            "The shipped 5/25/75 mm wall is unchanged. The dense doloma "
+            "interlayer is a priced alternative between the 5 mm YSZ and "
+            "the felt. It uses cited MgO and CaO conductivity bounds, not "
+            "a measured doloma k. The higher-k bound is the thicker build. "
+            "The brief calls the lower-k walk conservative. On the duct "
+            "the felt moves outward, so its cylindrical resistance falls "
+            "and the loss rises. On a flat stage the felt still holds "
+            "most of the series resistance."
+        ),
+    }
+
+
+def _totals_by_walk_label(
+    stages: Mapping[str, Any],
+    shipped_costs: Mapping[str, Mapping[str, Any]] | None,
+) -> dict[str, Any]:
+    labels = ("conservative_lower_k", "optimistic_higher_k")
+    totals = {}
+    for label in labels:
+        remapped: dict[str, Any] = {}
+        for key, stage in stages.items():
+            bounds = stage.get("bounds") or {}
+            chosen = None
+            for bound in bounds.values():
+                if bound.get("walk_label") == label:
+                    chosen = bound
+                    break
+            remapped[key] = {label: chosen} if chosen is not None else {}
+        totals[label] = _collector_total_for_bound(label, remapped, shipped_costs)
+    low = totals["conservative_lower_k"].get("collector_stage_cost_usd")
+    high = totals["optimistic_higher_k"].get("collector_stage_cost_usd")
+    cheaper = None
+    if (
+        isinstance(low, (int, float))
+        and not isinstance(low, bool)
+        and isinstance(high, (int, float))
+        and not isinstance(high, bool)
+    ):
+        cheaper = (
+            "conservative_lower_k" if float(low) <= float(high) else "optimistic_higher_k"
+        )
+    totals["cheaper_walk_label"] = cheaper
+    totals["thinner_lower_k_does_not_hold_felt_if_material_is_higher_k"] = (
+        cheaper == "conservative_lower_k"
+    )
+    return totals
+
+
 def felt_overheat_alternatives(
     layered_wall: Mapping[str, Any],
     bands_C: Mapping[str, tuple[float, float]],
@@ -2301,14 +3122,18 @@ def felt_overheat_alternatives(
     duct_radius_m: float | None,
     import_delivery_cost_per_kg: float,
     materials: Mapping[str, Any] | None = None,
+    in_situ_bootstrap_cost_per_kg: float | None = None,
+    stage_areas_m2: Mapping[str, float] | None = None,
+    shipped_collector_costs: Mapping[str, Mapping[str, Any]] | None = None,
+    continuum_sweeps: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """YSZ thickness that holds the felt at its continuous limit.
+    """YSZ thickness and a dense doloma interlayer that hold the felt.
 
-    The shipped 5 mm liner is not changed. An intermediate dense layer is
-    not priced: no crop-verified conductivity and density for a
-    high-alumina castable or fireclay is stored. The USD/m² quote is the
-    flat areal identity thickness × density × import price. The duct
-    temperature walk is cylindrical.
+    The shipped 5/25/75 mm wall is not changed. The interlayer is a
+    priced alternative between the liner and the felt. Its conductivity
+    is a cited MgO or CaO bound, not a measured doloma k. The USD/m²
+    quote for the thicker YSZ liner remains the flat areal identity.
+    The duct temperature walk is cylindrical.
     """
 
     wall = normalize_layered_wall(layered_wall)
@@ -2338,30 +3163,18 @@ def felt_overheat_alternatives(
             import_rate=rate,
             materials=catalog,
         )
-    rows["intermediate_dense_layer"] = {
-        "status": "unavailable",
-        "reason": "intermediate_layer_uncited",
-        "usd_per_m2": None,
-        "detail": (
-            "No crop-verified thermal conductivity and density for a "
-            "high-alumina castable or fireclay was stored. A rendered "
-            "crop of that table would clear the price. The layer is not "
-            "inserted into the shipped wall."
-        ),
-    }
-    rows["comparison"] = {
-        "status": "comparison_incomplete",
-        "reason": "intermediate_layer_uncited",
-        "priced_alternative": "thicker_ysz_liner",
-        "shipped_liner_unchanged": True,
-        "detail": (
-            "The shipped liner thickness is unchanged and is flagged "
-            "where the felt exceeds its continuous-service limit. The "
-            "thicker YSZ liner is the only priced alternative that "
-            "meets that limit. It costs more per square metre than the "
-            "shipped liner. The intermediate layer was not priced."
-        ),
-    }
+    _attach_doloma_interlayer(
+        rows,
+        wall,
+        bands_C,
+        duct_radius_m=duct_radius_m,
+        import_rate=rate,
+        in_situ_rate=in_situ_bootstrap_cost_per_kg,
+        materials=catalog,
+        stage_areas_m2=stage_areas_m2,
+        shipped_collector_costs=shipped_collector_costs,
+        continuum_sweeps=continuum_sweeps,
+    )
     return rows
 
 
@@ -2379,6 +3192,8 @@ def _design_duct_partials() -> dict[str, Any]:
             "printed": True,
             "partial_pressure_Pa": _DESIGN_DUCT_SIO_PARTIAL_PA,
             "pO2_mbar": _DESIGN_DUCT_PO2_MBAR,
+            "pO2_floor_bar": _C2A_PO2_BAR_UPPER_BOUND,
+            "pO2_floor_citation": _C2A_PO2_FLOOR_CITATION,
             "hour": _DESIGN_POINT_HOUR,
             "location": _DESIGN_POINT_LOCATION,
             "label": _DESIGN_POINT_LABEL,
@@ -2433,7 +3248,12 @@ def _invert_design_partial(
             "depth_m": None,
             "clearing_print": (
                 f"duct-inlet partial pressure of {species_id} at "
-                f"{_DESIGN_POINT_LABEL} hour {_DESIGN_POINT_HOUR}"
+                f"{_DESIGN_POINT_LABEL} hour {_DESIGN_POINT_HOUR}. "
+                "probe_d452_r4_sizing_v3.py DIAGNOSTIC_SPECIES is "
+                "Mn, SiO, and Si. D452_MN_CLEAN_WINDOW prints only "
+                "those. condensation._segment_species_partial_pressures_pa "
+                "is the map that would carry this partial if that print "
+                "included it."
             ),
         }
     partial = supplied.get("partial_pressure_Pa")
@@ -2448,24 +3268,35 @@ def _invert_design_partial(
     oxygen_dependent = abs(float(evaluator.pO2_exponent)) > 0.0 or (
         evaluator.o2_channel_term is not None
     )
-    if oxygen_dependent and float(pO2_mbar) <= 0.0:
-        return {
-            "status": "unavailable",
-            "reason": "equilibrium_singular_at_zero_pO2",
-            "partial_pressure_Pa": float(partial),
-            "pO2_mbar": float(pO2_mbar),
-            "pO2_exponent": float(evaluator.pO2_exponent),
-            "hour": supplied.get("hour"),
-            "location": supplied.get("location"),
-            "label": supplied.get("label"),
-            "flag": "design_point",
-            "dew_temperature_C": None,
-            "depth_m": None,
-            "clearing_print": (
-                "a non-zero pO2_mbar on the same duct-inlet row as the "
-                f"{species_id} partial"
-            ),
-        }
+    printed_pO2_mbar = float(pO2_mbar)
+    floor_bar = supplied.get("pO2_floor_bar")
+    floor_used = False
+    if oxygen_dependent and printed_pO2_mbar <= 0.0:
+        if (
+            isinstance(floor_bar, (int, float))
+            and not isinstance(floor_bar, bool)
+            and float(floor_bar) > 0.0
+        ):
+            pO2_mbar = float(floor_bar) * MBAR_PER_BAR
+            floor_used = True
+        else:
+            return {
+                "status": "unavailable",
+                "reason": "equilibrium_singular_at_zero_pO2",
+                "partial_pressure_Pa": float(partial),
+                "pO2_mbar": printed_pO2_mbar,
+                "pO2_exponent": float(evaluator.pO2_exponent),
+                "hour": supplied.get("hour"),
+                "location": supplied.get("location"),
+                "label": supplied.get("label"),
+                "flag": "design_point",
+                "dew_temperature_C": None,
+                "depth_m": None,
+                "clearing_print": (
+                    "a non-zero pO2_mbar on the same duct-inlet row as the "
+                    f"{species_id} partial"
+                ),
+            }
     activity = supplied.get("source_activity")
     activity_flag = None
     if activity is None:
@@ -2477,6 +3308,12 @@ def _invert_design_partial(
         pO2_bar=float(pO2_mbar) / MBAR_PER_BAR,
         source_activity=float(activity),
     )
+    if floor_used:
+        found["printed_pO2_mbar"] = printed_pO2_mbar
+        found["pO2_mbar_used"] = float(pO2_mbar)
+        found["pO2_floor_flag"] = "setpoint_upper_bound_used_as_floor"
+        found["pO2_floor_citation"] = supplied.get("pO2_floor_citation")
+        found["pO2_floor_is_not_the_printed_value"] = True
     if found["status"] != "ok":
         return found
     depth = _dew_depth_m(
@@ -2673,7 +3510,7 @@ def _felt_limit_row(
         "felt_continuous_service_C": continuous,
         "shipped_liner_usd_per_m2": shipped_price,
         "usd_per_m2_basis": "flat_areal_thickness_times_density_times_import_price",
-        "intermediate_layer_reason": "intermediate_layer_uncited",
+        "intermediate_layer_reason": "see_doloma_endmember_interlayer",
         "radiative_boundary": shipped.get("radiative_boundary"),
     }
     if continuous is None:
