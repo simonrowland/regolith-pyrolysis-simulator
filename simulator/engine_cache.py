@@ -1353,6 +1353,9 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
 def _initialize_cache(connection: sqlite3.Connection) -> None:
     if connection.in_transaction:
         raise sqlite3.ProgrammingError("cache initialization requires a connection with no active transaction")
+    # An interrupted publish leaves *.v3.bak or *.v4-new beside this path.
+    # Creating the schema would mark an empty file as the current cache.
+    _initialize_cache_refuses_leftovers(connection)
     isolation_level = connection.isolation_level
     connection.isolation_level = None
     try:
@@ -1403,6 +1406,9 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     key = (str(path), readonly)
     if key in _CONNECTIONS:
         return _CONNECTIONS[key]
+    # sqlite3.connect creates a missing path. That empty file must not become
+    # a schema-4 cache while a publish backup is sitting beside the name.
+    _refuse_interrupted_cache_open(path)
     if readonly:
         if not path.exists():
             return None
@@ -2496,23 +2502,310 @@ def _copy_database_file(source: Path, destination: Path) -> None:
             dst.execute("PRAGMA journal_mode=DELETE")
 
 
+# The open and recover paths both match this sentence. It names the only
+# repair: a later migrate of an empty schema-4 file would say already_current
+# and leave the accumulated rows unserved.
+_INTERRUPTED_MIGRATE = "interrupted migrate; run engine_cache_sync.py migrate --recover"
+
+
+def _raise_interrupted_migrate(found: str) -> None:
+    raise EngineCacheSchemaMismatch("migration", (_INTERRUPTED_MIGRATE,), (found,))
+
+
+def _migration_names(path: Path) -> dict[str, Path]:
+    """Live pair plus the side names publish and recover share.
+
+    One owner for the suffixes. A second spelling would let recover look
+    beside a different file than the one publish wrote.
+    """
+
+    cold = _cache_pair(path)[1]
+    return {
+        "hot_bak": path.with_name(path.name + ".v3.bak"),
+        "hot_new": path.with_name(path.name + ".v4-new"),
+        "cold": cold,
+        "cold_bak": cold.with_name(cold.name + ".v3.bak"),
+        "cold_new": cold.with_name(cold.name + ".v4-new"),
+    }
+
+
+def _migration_leftovers(path: Path) -> tuple[Path, ...]:
+    names = _migration_names(path)
+    return tuple(
+        candidate
+        for candidate in (
+            names["hot_bak"],
+            names["hot_new"],
+            names["cold_bak"],
+            names["cold_new"],
+        )
+        if candidate.exists() or candidate.is_symlink()
+    )
+
+
+def _read_user_version(path: Path) -> int | None:
+    """user_version through a read-only URI.
+
+    ``sqlite3.connect(path)`` would create a missing file. A read-only URI
+    does not, and it does not flip journal_mode to WAL.
+    """
+
+    if not path.is_file():
+        return None
+    try:
+        with closing(
+            sqlite3.connect(_cache_uri(path), uri=True, timeout=_TIMEOUT_MS / 1000)
+        ) as connection:
+            row = connection.execute("PRAGMA user_version").fetchone()
+    except sqlite3.Error:
+        return None
+    return None if row is None else int(row[0])
+
+
+def _pair_versions_disagree(path: Path) -> bool:
+    """True when one side is schema 4 and the other is not.
+
+    A schema-3 hot file beside a cold file that never set user_version is
+    the unmigrated pair, not a torn publish. Only a current side opposite
+    an older side is the crash between the two replaces.
+    """
+
+    names = _migration_names(path)
+    if not path.is_file() or not names["cold"].is_file():
+        return False
+    hot_version = _read_user_version(path)
+    cold_version = _read_user_version(names["cold"])
+    if hot_version == cold_version:
+        return False
+    return hot_version == _CACHE_SCHEMA_VERSION or cold_version == _CACHE_SCHEMA_VERSION
+
+
+def _refuse_interrupted_cache_open(path: Path) -> None:
+    """Fail closed before ``sqlite3.connect`` can create an empty cache.
+
+    Checked only when a side file is present, so a normal open does not
+    probe user_version twice. A missing live name is not created. An empty
+    live file is not initialized. A schema-4 cold beside a schema-3 hot is
+    not served.
+    """
+
+    if not _migration_leftovers(path):
+        return
+    if not path.is_file():
+        _raise_interrupted_migrate("no live cache file")
+    if _read_user_version(path) in (None, 0):
+        _raise_interrupted_migrate("empty live cache beside migration leftovers")
+    if _pair_versions_disagree(path):
+        _raise_interrupted_migrate("hot and cold schema versions differ")
+
+
+def _connection_main_path(connection: sqlite3.Connection) -> Path | None:
+    row = connection.execute("PRAGMA database_list").fetchone()
+    if row is None or not row[2]:
+        return None
+    return Path(str(row[2]))
+
+
+def _initialize_cache_refuses_leftovers(connection: sqlite3.Connection) -> None:
+    """Do not create a schema beside publish leftovers.
+
+    ``_connect`` refuses before it creates a file. Merge and any other
+    caller that already holds a connection hit this gate. A finished
+    schema-4 file may still be opened while ``*.v3.bak`` names remain:
+    those are the originals of a publish that has not unlinked them yet.
+    """
+
+    path = _connection_main_path(connection)
+    if path is None or not _migration_leftovers(path):
+        return
+    version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+    has_outputs = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+        (_TABLE,),
+    ).fetchone()
+    if version == _CACHE_SCHEMA_VERSION and has_outputs:
+        return
+    _raise_interrupted_migrate("migration leftovers beside an uninitialized cache")
+
+
+def _unlink_named(paths: Iterable[Path]) -> None:
+    for candidate in paths:
+        if candidate.exists() or candidate.is_symlink():
+            candidate.unlink()
+
+
+def _unlink_migration_copies(path: Path) -> None:
+    names = _migration_names(path)
+    _unlink_named((names["hot_new"], names["cold_new"]))
+
+
+def _unlink_migration_backups(path: Path) -> None:
+    names = _migration_names(path)
+    _unlink_named((names["hot_bak"], names["cold_bak"]))
+
+
+def _stored_hot_rows(path: Path) -> int:
+    if not path.is_file():
+        return 0
+    try:
+        with closing(
+            sqlite3.connect(_cache_uri(path), uri=True, timeout=_TIMEOUT_MS / 1000)
+        ) as connection:
+            found = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='engine_outputs'"
+            ).fetchone()
+            if not found:
+                return 0
+            return int(connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0])
+    except sqlite3.Error:
+        return 0
+
+
+def _v4_new_is_complete(path: Path) -> bool:
+    """True when the copies are a finished schema-4 pair.
+
+    user_version becomes 4 at the end of the transform. A crash during the
+    copy leaves 3, 0, or an unreadable file. Publishing that would replace
+    the live pair with a partial one. A cold side is any of the live cold
+    name, its backup, or its copy. Hot-only caches have none of those.
+    """
+
+    names = _migration_names(path)
+    if _read_user_version(names["hot_new"]) != _CACHE_SCHEMA_VERSION:
+        return False
+    cold_side = (
+        names["cold"].exists() or names["cold_bak"].exists() or names["cold_new"].exists()
+    )
+    if not cold_side:
+        return True
+    return _read_user_version(names["cold_new"]) == _CACHE_SCHEMA_VERSION
+
+
+def _should_finish_publish(path: Path) -> bool:
+    if not _v4_new_is_complete(path):
+        return False
+    if not path.is_file():
+        return True
+    # The live names already hold a consistent schema-4 pair. Replacing
+    # them with the copy would drop rows written after that copy was made.
+    if (
+        _read_user_version(path) == _CACHE_SCHEMA_VERSION
+        and not _pair_versions_disagree(path)
+        and _stored_hot_rows(path) > 0
+    ):
+        return False
+    return True
+
+
+def _should_restore_migration(path: Path) -> bool:
+    names = _migration_names(path)
+    if not (names["hot_bak"].exists() or names["cold_bak"].exists()):
+        return False
+    if not path.is_file():
+        return True
+    version = _read_user_version(path)
+    if version in (None, 0):
+        return True
+    if _pair_versions_disagree(path):
+        return True
+    # Both replaces finished: the live pair is schema 4 and still has its
+    # rows, and the backups are the pre-migrate inodes. Restoring would
+    # undo that publish. An empty schema-4 file beside a backup that has
+    # rows is the cache the rename gap used to create; the backup is the pair.
+    if _stored_hot_rows(path) == 0 and _stored_hot_rows(names["hot_bak"]) > 0:
+        return True
+    return False
+
+
+def _link_backup(live: Path, backup: Path) -> None:
+    """Add ``backup`` as a second name for ``live``. The live name stays.
+
+    ``os.replace`` of the new file onto ``live`` changes one directory
+    entry. The backup name keeps the original inode, so a crash never
+    leaves the live name absent. A backup that already names that inode is
+    recover calling publish again. A backup that names a different inode
+    is not overwritten: that would drop the original.
+    """
+
+    if backup.is_symlink() or live.is_symlink():
+        _raise_interrupted_migrate(f"{backup.name} is a symlink")
+    if backup.exists():
+        if live.exists() and os.path.samefile(live, backup):
+            return
+        if not live.exists():
+            return
+        _raise_interrupted_migrate(f"{backup.name} is not a hard link of the live file")
+    if live.exists():
+        os.link(live, backup)
+
+
+def _restore_backup_name(live: Path, backup: Path) -> None:
+    """Point the live name at the backup inode.
+
+    When the two names are already one inode, ``os.replace`` of a name onto
+    itself fails on macOS. The live name is already the original, so only
+    the extra backup name is removed.
+    """
+
+    if backup.is_symlink():
+        _raise_interrupted_migrate(f"{backup.name} is a symlink")
+    if not backup.exists():
+        return
+    if live.exists() and os.path.samefile(live, backup):
+        backup.unlink()
+        return
+    os.replace(backup, live)
+
+
+def _restore_migration_backups(path: Path) -> None:
+    """Put the original inodes back at the live names.
+
+    Cold is restored first. Restoring hot first while cold is already the
+    new file would leave a schema-4 hot beside a schema-3 cold, which is
+    the pair this publish order exists to avoid.
+    """
+
+    names = _migration_names(path)
+    if not names["hot_bak"].exists() and not names["cold_bak"].exists():
+        _raise_interrupted_migrate("no schema-3 backup to restore")
+    if names["cold_bak"].exists():
+        _restore_backup_name(names["cold"], names["cold_bak"])
+    if names["hot_bak"].exists():
+        _restore_backup_name(path, names["hot_bak"])
+    elif not path.is_file():
+        _raise_interrupted_migrate("no hot backup to restore")
+    _fsync_path(path.parent)
+
+
 def _discard_unpublished_migration(
     live: Path, hot_new: Path, cold_new: Path | None
 ) -> None:
-    """Remove ``.v4-new`` copies when the live pair is still in place.
+    """Delete ``.v4-new`` copies only when publish has not linked a backup.
 
-    If publish already moved the live hot name to ``*.v3.bak``, that path
-    is absent. Leave the bak files and any remaining ``.v4-new`` files:
-    those are a complete old pair and a complete new pair.
+    A ``*.v3.bak`` hard link means publish started. Those copies are what
+    ``migrate --recover`` finishes. Deleting them would leave no schema-4
+    pair. A failure before any link still has the untouched live pair, so
+    the copies are safe to delete. A missing live name is left alone:
+    nothing here invents a replacement file.
     """
 
     if not live.exists():
         return
-    cold = _cache_pair(live)[1]
+    names = _migration_names(live)
+    if names["hot_bak"].exists() or names["cold_bak"].exists():
+        return
+    cold = names["cold"]
     for side in (hot_new, cold_new):
         if side is None or not (side.exists() or side.is_symlink()):
             continue
-        resolved = side.resolve()
+        if side.is_symlink():
+            side.unlink()
+            continue
+        try:
+            resolved = side.resolve()
+        except OSError:
+            side.unlink()
+            continue
         if resolved == live.resolve():
             continue
         if cold.exists() and resolved == cold.resolve():
@@ -2520,35 +2813,50 @@ def _discard_unpublished_migration(
         side.unlink()
 
 
+def _publish_checkpoint(step: str) -> None:
+    """Crash seam after ``backups``, ``cold``, or ``hot``.
+
+    Production calls these three names and continues. A test replaces this
+    function and raises. That raise is a process death after the directory
+    update the name stands for, and before the next one.
+    """
+
+    if step not in {"backups", "cold", "hot"}:
+        _raise_interrupted_migrate(f"unknown publish step {step}")
+
+
 def _publish_migrated_pair(live: Path, hot_new: Path, cold_new: Path | None) -> None:
     """Fsync the schema-4 copies and put them at the live names.
 
-    Both originals move to ``*.v3.bak`` before either copy takes a live
-    name. Cold is renamed before hot. A crash leaves the complete old
-    pair (at the live names, or at the bak names) or the complete new
-    pair (at the ``.v4-new`` names, with cold already live and hot still
-    ``.v4-new``, or both live). It does not leave a schema-4 hot file
-    beside a schema-3 cold file: hot arrives last, and it is absent until
-    cold is already the new file. Bak files are removed only after both
-    renames have succeeded.
+    Backups are hard links, made before either live name changes, and the
+    directory is fsynced before a replace. ``os.replace`` then installs
+    cold, then hot, over the names that already exist. Both live names are
+    present at every instant. A crash after the links still has the original
+    pair at the live names. A crash after the cold replace has a new cold
+    and the original hot; opening that pair fails closed. A crash after the
+    hot replace has the new pair at the live names. Backup names are removed
+    only after both replaces have returned.
     """
 
+    if not hot_new.is_file():
+        _raise_interrupted_migrate("schema-4 hot copy is missing")
     _fsync_path(hot_new)
+    names = _migration_names(live)
     if cold_new is not None:
+        if not cold_new.is_file():
+            _raise_interrupted_migrate("schema-4 cold copy is missing")
         _fsync_path(cold_new)
-    hot_bak = live.with_name(live.name + ".v3.bak")
-    os.replace(live, hot_bak)
-    cold_bak: Path | None = None
-    if cold_new is not None:
-        cold_live = _cache_pair(live)[1]
-        cold_bak = cold_live.with_name(cold_live.name + ".v3.bak")
-        os.replace(cold_live, cold_bak)
-        os.replace(cold_new, cold_live)
-    os.replace(hot_new, live)
+        _link_backup(names["cold"], names["cold_bak"])
+    _link_backup(live, names["hot_bak"])
     _fsync_path(live.parent)
-    hot_bak.unlink()
-    if cold_bak is not None:
-        cold_bak.unlink()
+    _publish_checkpoint("backups")
+    if cold_new is not None:
+        os.replace(cold_new, names["cold"])
+        _publish_checkpoint("cold")
+    os.replace(hot_new, live)
+    _publish_checkpoint("hot")
+    _fsync_path(live.parent)
+    _unlink_migration_backups(live)
 
 
 def _transform_v3_copy(hot_path: Path, cold_path: Path | None) -> dict[str, Any]:
@@ -2663,11 +2971,13 @@ def _transform_v3_copy(hot_path: Path, cold_path: Path | None) -> dict[str, Any]
 def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, Any]:
     """Convert a schema-3 HOT/COLD pair by publishing a schema-4 copy.
 
-    The transform runs on ``*.v4-new`` files. On success both originals
-    move to ``*.v3.bak`` and the copies take their names, cold first.
-    A crash leaves the complete old pair or the complete new pair, not a
-    schema-4 hot file beside a schema-3 cold file. HOT key and value
-    bytes stay.
+    The transform runs on ``*.v4-new`` files. Publish hard-links the live
+    names to ``*.v3.bak`` and then ``os.replace``s the copies onto those
+    names, cold first, so the live names are never absent. A crash leaves
+    the original pair, a new cold beside the original hot, or the new pair.
+    It does not leave a schema-4 hot file beside a schema-3 cold file.
+    HOT key and value bytes stay. Leftovers refuse this call; ``recover``
+    finishes or restores them.
 
     Old fingerprints are dropped. engine_build_id is the explicit
     ``unknown-pre-migration`` row: a schema-3 file did not record the open
@@ -2681,6 +2991,8 @@ def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, An
     """
 
     path = Path(path).expanduser()
+    if _migration_leftovers(path):
+        _raise_interrupted_migrate("migration leftovers are beside this cache")
     if not path.is_file():
         raise FileNotFoundError(str(path))
     connection = sqlite3.connect(str(path), timeout=_TIMEOUT_MS / 1000)
@@ -2746,6 +3058,46 @@ def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, An
         "after": engine_cache_stats(path),
         "after_payload": _payload_bytes(path),
         "vacuumed": bool(vacuum),
+    }
+
+
+def recover_cache_file(path: str | Path) -> dict[str, Any]:
+    """Finish or undo an interrupted schema-4 publish. Idempotent.
+
+    A complete ``*.v4-new`` pair is published when the live names are
+    missing, empty, or still the old schema. A torn pair, a missing live
+    file, or an empty schema-4 file beside a backup that has rows is
+    restored from ``*.v3.bak``. When the live pair is already one schema
+    and still has its rows, backup names are leftovers of a finished
+    publish: removing them keeps those rows. Restoring in that case would
+    undo replaces that both completed. A second call finds nothing to do.
+    """
+
+    path = Path(path).expanduser()
+    if not path.is_file() and not _migration_leftovers(path):
+        raise FileNotFoundError(str(path))
+    if _should_finish_publish(path):
+        names = _migration_names(path)
+        cold_new = names["cold_new"] if names["cold_new"].is_file() else None
+        _publish_migrated_pair(path, names["hot_new"], cold_new)
+        action = "published"
+    elif _should_restore_migration(path):
+        _restore_migration_backups(path)
+        _unlink_migration_copies(path)
+        _fsync_path(path.parent)
+        action = "restored"
+    elif _migration_leftovers(path):
+        _unlink_migration_copies(path)
+        _unlink_migration_backups(path)
+        _fsync_path(path.parent)
+        action = "removed-leftovers"
+    else:
+        action = "nothing"
+    return {
+        "action": action,
+        "schema_version": _read_user_version(path),
+        "hot_rows": _stored_hot_rows(path),
+        "file": str(path),
     }
 
 

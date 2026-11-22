@@ -160,6 +160,14 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="keep the freed pages. The default reclaims them",
     )
+    migrate.add_argument(
+        "--recover",
+        action="store_true",
+        help=(
+            "finish a complete schema-4 copy, or restore the schema-3 pair "
+            "from hard-linked backups, then remove leftover migration files"
+        ),
+    )
     args = parser.parse_args(argv)
     try:
         if args.command in {"snapshot", "seed"}:
@@ -182,7 +190,10 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "prune":
             result = cache.prune_cache_file(args.file, apply=_apply(parser, args))
         elif args.command == "migrate":
-            result = cache.migrate_cache_file(args.file, vacuum=not args.no_vacuum)
+            if args.recover:
+                result = cache.recover_cache_file(args.file)
+            else:
+                result = cache.migrate_cache_file(args.file, vacuum=not args.no_vacuum)
         else:
             result = cache.engine_cache_stats(args.file.expanduser())
     except (OSError, sqlite3.Error, ValueError, cache.EngineCacheSchemaMismatch) as exc:
@@ -200,6 +211,13 @@ def main(argv: list[str] | None = None) -> int:
         unclassifiable = result.get("unclassifiable_rows")
         if unclassifiable is not None:
             print(f"unclassifiable rows: {unclassifiable}", file=sys.stderr)
+    if isinstance(result, dict) and args.command == "migrate" and args.recover:
+        print(
+            f"recover: {result.get('action')}; "
+            f"schema {result.get('schema_version')}; "
+            f"hot rows {result.get('hot_rows')}",
+            file=sys.stderr,
+        )
     if isinstance(result, dict) and args.command == "migrate" and result.get("migrated"):
         unknown_by_engine = result.get("species_unknown_by_engine") or {}
         listed = (

@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import json
 import math
+import os
 import sqlite3
 import zlib
 from contextlib import redirect_stderr, redirect_stdout
@@ -970,6 +971,281 @@ def test_migrate_publish_failure_leaves_the_schema_3_pair(tmp_path, monkeypatch)
         assert connection.execute("SELECT value FROM engine_outputs").fetchone()[0] == original
     with sqlite3.connect(cold) as connection:
         assert connection.execute("SELECT value FROM engine_values").fetchone()[0] == cold_value
+
+
+_RECOVER_MESSAGE = "interrupted migrate; run engine_cache_sync.py migrate --recover"
+
+
+def _hot_pairs(path: Path) -> list[tuple[bytes, bytes]]:
+    with sqlite3.connect(path) as connection:
+        return [
+            (bytes(key), bytes(value))
+            for key, value in connection.execute(
+                "SELECT key, value FROM engine_outputs ORDER BY row_seq"
+            )
+        ]
+
+
+def _schema3_pair(path: Path) -> list[tuple[bytes, bytes]]:
+    """Two HOT rows and one linked COLD row at schema 3, including its indexes."""
+
+    rows: list[tuple[bytes, bytes]] = []
+    first = engine_cache.ENGINE_CACHE_BOX_RANGES["laptop"][0]
+    with _schema_v3(path) as connection:
+        connection.commit()
+        connection.execute("PRAGMA journal_mode=DELETE")
+        for offset in (0, 1):
+            key = engine_cache.engine_cache_key(
+                "openimcc",
+                1,
+                {
+                    "temperature_K": 1700.0 + offset,
+                    "composition_wt_pct": {"SiO2": 60.0, "MgO": 40.0},
+                },
+            )
+            value = pack({"answer": offset + 1})
+            rows.append((key, value))
+            connection.execute(
+                "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+                (key, value, "openimcc", "1", "laptop", first + offset, 0),
+            )
+        connection.execute("INSERT INTO box_sequences VALUES (?,?)", ("laptop", first + 2))
+    cold = Path(str(path) + ".cold")
+    with sqlite3.connect(cold) as connection:
+        connection.execute("PRAGMA journal_mode=DELETE")
+        connection.execute(
+            "CREATE TABLE engine_values ("
+            "key BLOB PRIMARY KEY, value BLOB NOT NULL, input_fingerprint BLOB"
+            ") WITHOUT ROWID"
+        )
+        connection.execute("PRAGMA user_version=3")
+        connection.execute(
+            "INSERT INTO engine_values VALUES (?,?,?)",
+            (rows[0][0], b"cold-bytes", b"fingerprint"),
+        )
+    return rows
+
+
+def _user_version(path: Path) -> int | None:
+    if not path.is_file():
+        return None
+    with sqlite3.connect(path) as connection:
+        return int(connection.execute("PRAGMA user_version").fetchone()[0])
+
+
+def _open_outcome(path: Path, *, readonly: bool) -> tuple:
+    """What ``_connect`` does. A served pair must have rows; a refusal must not create a file."""
+
+    engine_cache._close_connections()
+    existed = path.is_file()
+    try:
+        connection = engine_cache._connect(path, readonly=readonly)
+        if connection is None:
+            return ("missing",)
+        version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+        count = int(connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0])
+        cold_version = _user_version(Path(str(path) + ".cold"))
+        return ("served", version, count, cold_version)
+    except engine_cache.EngineCacheSchemaMismatch as exc:
+        return ("refused", str(exc))
+    finally:
+        engine_cache._close_connections()
+        if not existed:
+            assert not path.exists()
+
+
+def _assert_open_keeps_rows(path: Path, rows: list[tuple[bytes, bytes]], *, step: str) -> None:
+    """No open yields an empty cache. It refuses, or it reads a complete pair."""
+
+    for readonly in (True, False):
+        outcome = _open_outcome(path, readonly=readonly)
+        if step == "hot":
+            assert outcome[0] == "served"
+            version, count, cold_version = outcome[1:]
+            assert count == len(rows)
+            assert version == engine_cache._CACHE_SCHEMA_VERSION
+            assert cold_version == version
+        else:
+            assert outcome[0] == "refused"
+            if step == "cold":
+                assert _RECOVER_MESSAGE in outcome[1]
+    assert path.is_file()
+    version = _user_version(path)
+    if version == engine_cache._CACHE_SCHEMA_VERSION:
+        assert _hot_pairs(path) == rows
+    else:
+        assert version == 3
+        assert _hot_pairs(path) == rows
+    if step != "hot":
+        with sqlite3.connect(path) as connection:
+            mode = str(connection.execute("PRAGMA journal_mode").fetchone()[0]).lower()
+        assert mode == "delete"
+        assert not path.with_name(path.name + "-wal").exists()
+    if step == "cold":
+        assert _user_version(Path(str(path) + ".cold")) == engine_cache._CACHE_SCHEMA_VERSION
+
+
+def _side_names(path: Path) -> list[Path]:
+    cold = Path(str(path) + ".cold")
+    return [
+        path.with_name(path.name + ".v3.bak"),
+        path.with_name(path.name + ".v4-new"),
+        cold.with_name(cold.name + ".v3.bak"),
+        cold.with_name(cold.name + ".v4-new"),
+    ]
+
+
+@pytest.mark.parametrize("step", ["backups", "cold", "hot"])
+def test_publish_crash_never_opens_an_empty_cache(tmp_path, monkeypatch, step: str) -> None:
+    """Cut inside publish. The whole-function failure test stays beside this one."""
+
+    path = tmp_path / "live.sqlite"
+    rows = _schema3_pair(path)
+
+    def crash(name: str) -> None:
+        if name == step:
+            raise sqlite3.OperationalError(f"injected after {step}")
+
+    monkeypatch.setattr(engine_cache, "_publish_checkpoint", crash)
+    with pytest.raises(sqlite3.OperationalError, match=f"injected after {step}"):
+        engine_cache.migrate_cache_file(path)
+    monkeypatch.setattr(engine_cache, "_publish_checkpoint", lambda _name: None)
+
+    if step == "backups":
+        assert os.path.samefile(path, path.with_name(path.name + ".v3.bak"))
+        assert path.with_name(path.name + ".v4-new").is_file()
+    elif step == "cold":
+        assert os.path.samefile(path, path.with_name(path.name + ".v3.bak"))
+        assert not os.path.samefile(
+            Path(str(path) + ".cold"),
+            Path(str(path) + ".cold.v3.bak"),
+        )
+    else:
+        assert not path.with_name(path.name + ".v4-new").exists()
+        assert _user_version(path) == engine_cache._CACHE_SCHEMA_VERSION
+
+    _assert_open_keeps_rows(path, rows, step=step)
+    report = engine_cache.recover_cache_file(path)
+    assert report["hot_rows"] == len(rows)
+    assert _hot_pairs(path) == rows
+    assert all(not side.exists() for side in _side_names(path))
+    if step == "cold":
+        assert report["action"] == "restored"
+        assert report["schema_version"] == 3
+        with sqlite3.connect(Path(str(path) + ".cold")) as connection:
+            assert connection.execute("SELECT value FROM engine_values").fetchone()[0] == b"cold-bytes"
+    else:
+        assert report["schema_version"] == engine_cache._CACHE_SCHEMA_VERSION
+        assert _user_version(Path(str(path) + ".cold")) == engine_cache._CACHE_SCHEMA_VERSION
+        assert report["action"] == ("published" if step == "backups" else "removed-leftovers")
+    again = engine_cache.recover_cache_file(path)
+    assert again["action"] == "nothing"
+    assert _hot_pairs(path) == rows
+
+
+def test_open_creates_a_cache_only_without_migration_leftovers(tmp_path) -> None:
+    fresh = tmp_path / "fresh.sqlite"
+    connection = engine_cache._connect(fresh, readonly=False)
+    try:
+        assert connection is not None
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
+    finally:
+        engine_cache._close_connections()
+
+    path = tmp_path / "backed.sqlite"
+    rows = _schema3_pair(path)
+    os.link(path, path.with_name(path.name + ".v3.bak"))
+    path.unlink()
+    assert not path.exists()
+    for readonly in (False, True):
+        with pytest.raises(engine_cache.EngineCacheSchemaMismatch, match=_RECOVER_MESSAGE):
+            engine_cache._connect(path, readonly=readonly)
+        engine_cache._close_connections()
+        assert not path.exists()
+    restored = engine_cache.recover_cache_file(path)
+    assert restored["action"] == "restored"
+    assert restored["hot_rows"] == len(rows)
+    assert _hot_pairs(path) == rows
+    assert _user_version(path) == 3
+
+
+def test_recover_replaces_an_empty_schema4_file_with_the_backup(tmp_path) -> None:
+    """The rename gap used to leave a user_version-4 file with no rows."""
+
+    path = tmp_path / "emptied.sqlite"
+    rows = _schema3_pair(path)
+    cold = Path(str(path) + ".cold")
+    hot_bak = path.with_name(path.name + ".v3.bak")
+    cold_bak = cold.with_name(cold.name + ".v3.bak")
+    hot_bak.write_bytes(path.read_bytes())
+    cold_bak.write_bytes(cold.read_bytes())
+    path.unlink()
+    with sqlite3.connect(path) as connection:
+        connection.execute("PRAGMA user_version=4")
+        connection.execute(
+            "CREATE TABLE engine_outputs (key BLOB PRIMARY KEY, value BLOB) WITHOUT ROWID"
+        )
+    with sqlite3.connect(cold) as connection:
+        connection.execute("PRAGMA user_version=4")
+    assert _user_version(path) == 4
+    assert _hot_pairs(path) == []
+    report = engine_cache.recover_cache_file(path)
+    assert report["action"] == "restored"
+    assert _hot_pairs(path) == rows
+    assert _user_version(path) == 3
+    assert all(not side.exists() for side in _side_names(path))
+    again = engine_cache.recover_cache_file(path)
+    assert again["action"] == "nothing"
+
+
+def test_migrate_recover_cli_prints_the_action(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "cli.sqlite"
+    rows = _schema3_pair(path)
+
+    def crash(name: str) -> None:
+        if name == "backups":
+            raise sqlite3.OperationalError("injected after backups")
+
+    monkeypatch.setattr(engine_cache, "_publish_checkpoint", crash)
+    with pytest.raises(sqlite3.OperationalError):
+        engine_cache.migrate_cache_file(path)
+    monkeypatch.setattr(engine_cache, "_publish_checkpoint", lambda _name: None)
+
+    from scripts.engine_cache_sync import main
+
+    def _run(argv: list[str]) -> tuple[int, dict, str]:
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            code = main(argv)
+        text = stdout.getvalue()
+        payload = json.loads(text) if text.strip() else {}
+        return code, payload, stderr.getvalue()
+
+    refused, _payload, refused_err = _run(["migrate", str(path)])
+    assert refused == 1
+    assert _RECOVER_MESSAGE in refused_err
+    assert _hot_pairs(path) == rows
+    code, payload, stderr = _run(["migrate", str(path), "--recover"])
+    assert code == 0
+    assert payload["action"] == "published"
+    assert stderr.splitlines()[0].startswith("recover: published;")
+    assert _hot_pairs(path) == rows
+    again_code, again, again_err = _run(["migrate", str(path), "--recover"])
+    assert again_code == 0
+    assert again["action"] == "nothing"
+    assert again_err.splitlines()[0].startswith("recover: nothing;")
+
+
+def test_recover_of_an_untouched_schema3_pair_does_nothing(tmp_path) -> None:
+    path = tmp_path / "untouched.sqlite"
+    rows = _schema3_pair(path)
+    report = engine_cache.recover_cache_file(path)
+    assert report["action"] == "nothing"
+    assert report["schema_version"] == 3
+    assert _hot_pairs(path) == rows
+    with pytest.raises(FileNotFoundError):
+        engine_cache.recover_cache_file(tmp_path / "absent.sqlite")
 
 
 def test_expire_species_feo_t_expires_the_feo_family(tmp_path, monkeypatch) -> None:
