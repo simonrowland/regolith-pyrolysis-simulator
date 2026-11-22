@@ -34,13 +34,20 @@ from simulator.battery.enums import (
     AdmissionStatus,
     Engine,
     EvidenceClass,
+    NoticeKind,
     Phase,
     Quantity,
     Rail,
     ResidualStatus,
 )
 from simulator.battery.identity import State
-from simulator.battery.records import CandidateRequest, Species, Value
+from simulator.battery.records import (
+    CandidateRequest,
+    Notice,
+    NoticePolicy,
+    Species,
+    Value,
+)
 import simulator.battery.score as score_mod
 from tests.battery import factories as F
 from tests.battery.test_score import _predict, _streaming_score_fixture
@@ -2420,3 +2427,61 @@ def test_changed_report_heading_misses_the_output_pins(
     assert _without_certified_counts(got["payload_report"]) != _without_certified_counts(
         PIN_PAYLOAD_REPORT
     )
+
+
+def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
+    residual = F.residual(
+        "unknown-quantity::none::nasa-cea-9",
+        "unknown-quantity",
+        quantity=Quantity.P_SAT,
+    )
+    residual = replace(
+        residual,
+        candidate_request=CandidateRequest(
+            "exp-1", None, Engine.NASA_CEA_9, "cea"
+        ),
+    )
+
+    payload = json.loads(score_mod.dumps_residual_line(residual))
+
+    assert payload["candidate_request"] == {
+        "channel": "cea",
+        "engine": Engine.NASA_CEA_9.value,
+        "experiment_id": "exp-1",
+        "quantity": None,
+    }
+
+
+def test_assumed_pressure_notice_token_is_pinned() -> None:
+    assert NoticeKind.ASSUMED_PRESSURE.value == "assumed_pressure"
+
+    notice = Notice(
+        kind=NoticeKind.ASSUMED_PRESSURE,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="observation does not carry total_pressure_Pa",
+        origin="score:predict_with_engine",
+        policy=NoticePolicy(
+            id="DP-101",
+            version="v1",
+            status="proposed",
+            value="1e-06",
+            units="bar",
+        ),
+    )
+    residual = replace(
+        F.residual(
+            "assumed-pressure::partial",
+            "assumed-pressure",
+            quantity=Quantity.P_PARTIAL,
+        ),
+        notices=(notice,),
+    )
+    payload = json.loads(score_mod.dumps_residual_line(residual))
+
+    assert payload["notices"][0]["policy"] == {
+        "id": "DP-101",
+        "version": "v1",
+        "status": "proposed",
+        "value": "1e-06",
+        "units": "bar",
+    }

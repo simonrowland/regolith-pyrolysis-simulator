@@ -203,7 +203,13 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
     }
 )
 
-_DEFAULT_PRESSURE_BAR = 1.0e-6
+# Proposed DP-101: preserve the scorer's existing finite high-vacuum engine
+# boundary when the source omits total pressure. Unit check: 1e-6 bar ×
+# 1e5 Pa/bar = 0.1 Pa. This is a model boundary, not inferred source pressure.
+# Limiting check: pressure-independent comparisons should be unchanged by this
+# input; lowering pressure moves a pressure-sensitive gas equilibrium toward
+# its vacuum limit. Actual higher pressure may therefore bias the prediction.
+DP_101_PRESSURE_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
@@ -5446,7 +5452,7 @@ def _equilibrate_cell_uncached(
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
     if physical_pressure_bar is None:
-        physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+        physical_pressure_bar = DP_101_PRESSURE_BAR
     else:
         physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
@@ -6195,7 +6201,7 @@ def build_report(
                 "engine_default": grid.engine_default_po2,
                 "commanded": list(grid.commanded_po2_bar),
             },
-            "pressure_bar": _DEFAULT_PRESSURE_BAR,
+            "pressure_bar": DP_101_PRESSURE_BAR,
         },
         "pots": [
             {
