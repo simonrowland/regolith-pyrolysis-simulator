@@ -112,15 +112,23 @@ lab_geometry:
     pressed_at_tons: 2.5
     pellet_source_class: literature_sidecar
     pellet_citation_id: robinot_2026
-    pellet_digest: "Section 3.2 prints a pellet 13 mm in diameter and 10 mm in height, pressed at 2.5 tons. Those dimensions are not an exposed-area measurement."
-    exposed_melt_area_m2: null
-    exposed_melt_area_reason: "not printed; the top face of the 13 mm pellet was not inferred"
+    pellet_digest: "Section 3.2 prints a pellet 13 mm in diameter and 10 mm in height, pressed at 2.5 tons. Those dimensions are not an exposed-area measurement; the top-face area is recorded separately as an assumption."
+    exposed_melt_area_m2: 0.00013273228961416876
+    exposed_melt_area_basis: assumed_pellet_top_face_from_reported_diameter
+    exposed_melt_area_source_class: assumption_with_sensitivity_marker
+    exposed_melt_area_source_ref: robinot_2026_methods
+    exposed_melt_area_citation_id: robinot_2026
+    exposed_melt_area_locator:
+      section: "3.2"
+      physical_pdf_page: 5
+      field: pellet_diameter_mm
+      printed_value_mm: 13
+    exposed_melt_area_digest: "Assumed top-face area pi*(6.5e-3 m)^2 from the printed 13 mm diameter; the paper does not report melt area."
     crucible_opening_area_m2: null
     crucible_opening_area_reason: not_printed
     named_missing_fields:
       - crucible_material
       - crucible_opening_area_m2
-      - exposed_melt_area_m2
   chamber:
     volume_m3: null
     volume_reason: not_printed

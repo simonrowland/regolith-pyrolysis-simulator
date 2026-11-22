@@ -308,7 +308,7 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
 
 
 def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
-    for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
+    for name in ("sesko_2024.yaml",):
         preset = _vacuum_preset(name)
         assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
             None,
@@ -326,6 +326,29 @@ def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
         assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
 
     robinot = _vacuum_preset("robinot_2026.yaml")
+    sample = robinot["lab_geometry"]["sample"]
+    assert sample["exposed_melt_area_source_class"] == (
+        "assumption_with_sensitivity_marker"
+    )
+    assert sample["exposed_melt_area_locator"] == {
+        "section": "3.2",
+        "physical_pdf_page": 5,
+        "field": "pellet_diameter_mm",
+        "printed_value_mm": 13,
+    }
+    preset_spec = runner_module._load_preset_run_spec(
+        REPO_ROOT / "data/presets/vacuum_pyrolysis/robinot_2026.yaml",
+        "faithful",
+    )
+    power_driver = preset_spec.lab_schedule[runner_module.FURNACE_POWER_DRIVER_KEY]
+    assert power_driver["exposed_area_m2"] is None
+    assert power_driver["radiating_face_set"] == "hot_upper"
+    robinot_session = SimSession()
+    robinot_session.start(_gram_lab_run(robinot, campaign="C0")._session_config())
+    assert robinot_session.simulator.melt.melt_surface_area_m2 == pytest.approx(
+        sample["exposed_melt_area_m2"]
+    )
+
     printed = copy.deepcopy(robinot)
     printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
     printed_run = _gram_lab_run(printed, campaign="C2A")

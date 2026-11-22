@@ -39,6 +39,10 @@ from simulator.diagnostic_helpers.vacuum_pyrolysis import (
 )
 from simulator.physical_constants import PA_PER_BAR, PA_PER_MBAR
 from simulator.process_timestep import PROCESS_HOUR_S
+from simulator.geometry import (
+    _cylinder_volume_m3,
+    _sphere_surface_area_m2_from_volume,
+)
 from simulator.runner import (
     FURNACE_POWER_DRIVER_KEY,
     PRESET_PROVENANCE_METADATA_KEY,
@@ -58,6 +62,7 @@ from simulator.thermal_budget import (
     FACE_FULL_SIDE,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
+    declared_benchtop_lengths_m,
     reported_temperature_observations,
 )
 
@@ -143,30 +148,10 @@ def _load_corpus(corpus_root: Path, spec: PresetRunSpec) -> dict[str, Any]:
         if pin.endswith("_csv"):
             series_by_pin[pin] = _read_source_series(path)
 
-    power_observable = trajectory["recorded_input_traces"][0]
-    power_pin = str(power_observable["source_pin"])
-    power_series_name = str(power_observable["source_series"])
-    power_rows = series_by_pin[power_pin].get(power_series_name)
-    if not power_rows:
-        raise RobinotReproductionError(
-            f"power series {power_series_name!r} is absent from corpus pin {power_pin}"
-        )
-    power_trace = {
-        "role": power_observable["role"],
-        "units": power_observable["units"],
-        "source_pin": power_pin,
-        "source_series": power_series_name,
-        "point_fields": ["time_min", "expected_value"],
-        "points": [
-            [row["time_min"], row["value"]]
-            for row in power_rows
-        ],
-    }
     return {
         "digests": digests,
         "file_paths": file_paths,
         "series_by_pin": series_by_pin,
-        "power_trace": power_trace,
     }
 
 
@@ -230,10 +215,10 @@ def _time_min(step_index: int, dt_s: float) -> float:
 def _run_case(
     *,
     spec: PresetRunSpec,
-    corpus: Mapping[str, Any],
     max_steps: int | None = None,
     face_set: str | None = None,
     solar_absorptance: float | None = None,
+    exposed_melt_area_m2: float | None = None,
     pressure_driver: str = DRIVER_IMPOSED,
     variant: str,
 ) -> dict[str, Any]:
@@ -241,13 +226,20 @@ def _run_case(
     schedule = deepcopy(dict(spec.lab_schedule))
     geometry = deepcopy(dict(spec.lab_geometry))
     driver = schedule[FURNACE_POWER_DRIVER_KEY]
-    driver["trace"] = deepcopy(corpus["power_trace"])
     if face_set is not None:
         driver["radiating_face_set"] = face_set
         geometry["sample"]["radiating_face_set"] = face_set
     if solar_absorptance is not None:
         driver["solar_absorptance"] = float(solar_absorptance)
     case_flags: list[str] = []
+    if exposed_melt_area_m2 is not None:
+        geometry["sample"]["exposed_melt_area_m2"] = float(
+            exposed_melt_area_m2
+        )
+        geometry["sample"]["exposed_melt_area_basis"] = (
+            "assumed_equal_volume_molten_bead_sphere"
+        )
+        case_flags.append("exposed_melt_area_equal_volume_sphere_sensitivity")
     if pressure_driver == DRIVER_APPARATUS:
         schedule["gas_boundary"]["pressure_control"]["pressure_driver"] = (
             DRIVER_APPARATUS
@@ -415,6 +407,14 @@ def _run_case(
         "cumulative_samples": cumulative_samples,
         "power_temperature_records": power_records,
         "teststand_pressure_records": teststand_pressure_records,
+        "geometry_assumptions": {
+            "exposed_melt_area_m2": float(
+                geometry["sample"]["exposed_melt_area_m2"]
+            ),
+            "exposed_melt_area_basis": str(
+                geometry["sample"].get("exposed_melt_area_basis") or ""
+            ),
+        },
         "flags": case_flags,
         "pressure_case": {
             "driver": pressure_driver,
@@ -440,7 +440,12 @@ def _run_case(
     }
 
 
-def _base_record(record: Any, *, mode: str) -> dict[str, Any]:
+def _base_record(
+    record: Any,
+    *,
+    mode: str,
+    additional_flags: Sequence[str] = (),
+) -> dict[str, Any]:
     comparison = record.as_dict()
     coordinate = record.coordinate
     t: Any = coordinate.get("time_min")
@@ -452,6 +457,7 @@ def _base_record(record: Any, *, mode: str) -> dict[str, Any]:
     flags = [] if record.status == "match" else [record.status]
     if record.status == "out-of-domain":
         flags.append("runtime_time_coverage_missing")
+    flags.extend(additional_flags)
     return {
         "t": t,
         "observable": record.observable_id,
@@ -596,8 +602,6 @@ def _compare_trajectory(
                     recipe=recipe,
                     observation={"points": supported},
                     runtime={"samples": runtime_samples, "run": runtime_summary},
-                    assumed_input=True,
-                    out_of_domain=runtime_summary["status"] != "ok",
                 )
             else:
                 comparison_records = compare_time_series(
@@ -617,7 +621,16 @@ def _compare_trajectory(
                     assumed_input=True,
                     out_of_domain=runtime_summary["status"] != "ok",
                 )
-            records.extend(_base_record(item, mode=mode) for item in comparison_records)
+            records.extend(
+                _base_record(
+                    item,
+                    mode=mode,
+                    additional_flags=("assumed_input",)
+                    if semantics == "rate"
+                    else (),
+                )
+                for item in comparison_records
+            )
         for point in unavailable_points:
             missing_record = compare_values(
                 case_id=_COMPARATOR_CASE_ID,
@@ -641,7 +654,13 @@ def _compare_trajectory(
                 assumed_input=True,
                 out_of_domain=True,
             )
-            record = _base_record(missing_record, mode=mode)
+            record = _base_record(
+                missing_record,
+                mode=mode,
+                additional_flags=("assumed_input",)
+                if semantics == "rate"
+                else (),
+            )
             record["chamber_pressure_mbar"] = _pressure_at(
                 float(point["time_min"]), pressure_samples
             )
@@ -964,6 +983,12 @@ def _sensitivity_metrics(run_data: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "status": run_data["runtime"]["status"],
         "steps_completed": run_data["runtime"]["steps_completed"],
+        "exposed_melt_area_m2": run_data["geometry_assumptions"][
+            "exposed_melt_area_m2"
+        ],
+        "exposed_melt_area_basis": run_data["geometry_assumptions"][
+            "exposed_melt_area_basis"
+        ],
         "peak_predicted_temperature_C": max(temperatures, default=None),
         "last_cumulative_o2_mg": final_mass,
     }
@@ -983,6 +1008,9 @@ def _spread(cases: Mapping[str, Mapping[str, Any]], key: str) -> dict[str, Any]:
 
 
 def _markdown_report(summary: Mapping[str, Any]) -> str:
+    def format_value(value: Any) -> str:
+        return "-" if value is None else f"{float(value):.6g}"
+
     lines = [
         "# Robinot 2026 benchtop reproduction",
         "",
@@ -1011,6 +1039,25 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
         [
             "",
             "## Sensitivity",
+            "",
+            "Equal-volume molten-bead area uses the printed cylinder volume: "
+            "`V = π(D/2)^2 H`; `A_bead = 4π(3V/(4π))^(2/3)`. This is an "
+            "assumption sensitivity; the deck keeps the top-face area for its "
+            "baseline melt-area input.",
+            "",
+            "| Variant | Melt area (m²) | Area basis | Peak T (°C) | Final O₂ (mg) |",
+            "|---|---:|---|---:|---:|",
+        ]
+    )
+    for name, case in summary["sensitivity"]["cases"].items():
+        lines.append(
+            f"| {name} | {format_value(case['exposed_melt_area_m2'])} | "
+            f"{case['exposed_melt_area_basis']} | "
+            f"{format_value(case['peak_predicted_temperature_C'])} | "
+            f"{format_value(case['last_cumulative_o2_mg'])} |"
+        )
+    lines.extend(
+        [
             "",
             "| Quantity | Minimum | Maximum | Spread |",
             "|---|---:|---:|---:|",
@@ -1063,9 +1110,6 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
         pair[f"{mode_key}_simulated"] = record.get("simulated")
         pair[f"{mode_key}_residual"] = record.get("residual")
         pair[f"{mode_key}_pressure_mbar"] = record.get("chamber_pressure_mbar")
-
-    def format_value(value: Any) -> str:
-        return "-" if value is None else f"{float(value):.6g}"
 
     for (observable, time_min), pair in sorted(paired_records.items()):
         lines.append(
@@ -1148,14 +1192,12 @@ def run_reproduction(
     )
     imposed_run = _run_case(
         spec=spec,
-        corpus=corpus,
         max_steps=max_steps,
         variant=DRIVER_IMPOSED,
     )
     limiting_mode = "limiting_case_unrestricted_conductance"
     limiting_run = _run_case(
         spec=spec,
-        corpus=corpus,
         max_steps=max_steps,
         pressure_driver=DRIVER_APPARATUS,
         variant=limiting_mode,
@@ -1210,27 +1252,39 @@ def run_reproduction(
     )
 
     sensitivity_runs: dict[str, dict[str, Any]] = {"imposed_hot_upper_default": imposed_run}
+    sample_geometry = spec.lab_geometry["sample"]
+    pellet_lengths = declared_benchtop_lengths_m(sample_geometry)
+    pellet_volume_m3 = _cylinder_volume_m3(
+        float(pellet_lengths["pellet_diameter_m"]),
+        float(pellet_lengths["pellet_height_m"]),
+    )
+    molten_bead_area_m2 = _sphere_surface_area_m2_from_volume(pellet_volume_m3)
     if include_sensitivity:
         sensitivity_runs["imposed_full_side_default"] = _run_case(
             spec=spec,
-            corpus=corpus,
             max_steps=max_steps,
             face_set=FACE_FULL_SIDE,
             variant="imposed_full_side_default",
         )
         sensitivity_runs["imposed_hot_upper_alpha_0.669"] = _run_case(
             spec=spec,
-            corpus=corpus,
             max_steps=max_steps,
             solar_absorptance=GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
             variant="imposed_hot_upper_alpha_0.669",
         )
         sensitivity_runs["imposed_hot_upper_alpha_0.906"] = _run_case(
             spec=spec,
-            corpus=corpus,
             max_steps=max_steps,
             solar_absorptance=GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
             variant="imposed_hot_upper_alpha_0.906",
+        )
+        sensitivity_runs[
+            "imposed_molten_bead_equal_volume_sphere"
+        ] = _run_case(
+            spec=spec,
+            max_steps=max_steps,
+            exposed_melt_area_m2=molten_bead_area_m2,
+            variant="imposed_molten_bead_equal_volume_sphere",
         )
     sensitivity_cases = {
         name: _sensitivity_metrics(run_data)
@@ -1244,6 +1298,37 @@ def run_reproduction(
         }.items()
         for notice in _run_notices_and_flags(name, run_data)
     ]
+    melt_area_assumption = {
+        "area_m2": float(sample_geometry["exposed_melt_area_m2"]),
+        "basis": str(sample_geometry["exposed_melt_area_basis"]),
+        "source_class": str(sample_geometry["exposed_melt_area_source_class"]),
+        "source_ref": str(sample_geometry["exposed_melt_area_source_ref"]),
+        "citation_id": str(sample_geometry["exposed_melt_area_citation_id"]),
+        "source_locator": dict(sample_geometry["exposed_melt_area_locator"]),
+        "derivation": "top face: pi*(D/2)^2, D=13 mm from section 3.2",
+    }
+    notices_and_flags.append(
+        {
+            "path": "deck.lab_geometry.sample.exposed_melt_area_m2",
+            "kind": "assumption/knob_defaulted",
+            "value": melt_area_assumption,
+        }
+    )
+    if include_sensitivity:
+        notices_and_flags.append(
+            {
+                "path": "sensitivity.imposed_molten_bead_equal_volume_sphere.exposed_melt_area_m2",
+                "kind": "sensitivity_assumption",
+                "value": {
+                    "area_m2": molten_bead_area_m2,
+                    "basis": "equal_volume_sphere_from_printed_pellet_cylinder",
+                    "formula": "V=pi*(D/2)^2*H; A=4*pi*(3*V/(4*pi))^(2/3)",
+                    "source_locator": dict(
+                        sample_geometry["exposed_melt_area_locator"]
+                    ),
+                },
+            }
+        )
     target_pressure_mbar = float(
         spec.lab_schedule["chamber_pressure_mbar"][0]["value"]
     )
@@ -1286,8 +1371,12 @@ def run_reproduction(
                 for point in spec.lab_schedule["chamber_pressure_mbar"]
             ],
             "radiating_face_set": spec.lab_geometry["sample"]["radiating_face_set"],
+            "exposed_melt_area": melt_area_assumption,
             "process_dt_s": float(spec.process_dt_s),
-            "unprinted_thermal_knobs": "left unset for owner defaults and notices",
+            "unprinted_thermal_knobs": (
+                "left unset for owner defaults and notices; exposed melt area "
+                "is separately declared as an assumption"
+            ),
         },
         "runs": {
             DRIVER_IMPOSED: imposed_run,
@@ -1321,6 +1410,9 @@ def run_reproduction(
         "sensitivity": {
             "cases": sensitivity_cases,
             "spread": {
+                "exposed_melt_area_m2": _spread(
+                    sensitivity_cases, "exposed_melt_area_m2"
+                ),
                 "peak_predicted_temperature_C": _spread(
                     sensitivity_cases, "peak_predicted_temperature_C"
                 ),
@@ -1328,6 +1420,9 @@ def run_reproduction(
                     sensitivity_cases, "last_cumulative_o2_mg"
                 ),
             },
+            "equal_volume_sphere_area_formula": (
+                "V = pi*(D/2)^2*H; A_bead = 4*pi*(3*V/(4*pi))^(2/3)"
+            ),
         },
         "notices_and_flags": notices_and_flags,
         "digests": {

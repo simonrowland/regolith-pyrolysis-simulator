@@ -669,6 +669,10 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
                 f"malformed_preset: {exc.reason}: {exc}",
                 provenance=provenance,
             ) from exc
+        if lengths.get("radiating_face_set") is not None:
+            # The sample's exposed melt area drives evaporation. A declared
+            # thermal face set independently owns the power balance area.
+            exposed_area_m2 = None
         schedule[FURNACE_POWER_DRIVER_KEY] = furnace_power_driver_payload(
             power_trace,
             mass_kg=mass_kg,

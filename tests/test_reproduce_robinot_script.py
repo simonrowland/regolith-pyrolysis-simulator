@@ -32,6 +32,7 @@ def test_robinot_pyrometer_observation_uses_selected_preset_point() -> None:
     assert observation["value"] == 1800
     assert observation["qualifier"] == "approximate_peak"
     assert observation["source_ref"] == "robinot_2026_methods"
+    assert observation["citation_id"] == "robinot_2026"
 
 
 def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
@@ -56,10 +57,12 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
     result = run_reproduction(
         corpus_root=corpus_root,
         max_steps=3,
-        include_sensitivity=False,
+        include_sensitivity=True,
     )
 
-    assert result["runs"]["imposed"]["runtime"]["steps_completed"] == 3
+    assert result["runs"]["imposed"]["runtime"]["steps_completed"] == 3, (
+        result["runs"]["imposed"]["runtime"]
+    )
     assert len(result["runs"]["imposed"]["teststand_pressure_records"]) == 3
     assert (
         result["runs"]["limiting_case_unrestricted_conductance"]["runtime"][
@@ -75,6 +78,37 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
     assert result["limiting_case"]["conductance_reconciliation_diagnostic"][
         "used_in_scored_run"
     ] is False
+    assert result["deck"]["exposed_melt_area"]["area_m2"] == pytest.approx(
+        reproduction._preset_spec().lab_geometry["sample"][
+            "exposed_melt_area_m2"
+        ]
+    )
+    assert result["deck"]["exposed_melt_area"]["source_locator"][
+        "physical_pdf_page"
+    ] == 5
+    sensitivity_cases = result["sensitivity"]["cases"]
+    assert {
+        "imposed_full_side_default",
+        "imposed_hot_upper_alpha_0.669",
+        "imposed_hot_upper_alpha_0.906",
+        "imposed_molten_bead_equal_volume_sphere",
+    } <= sensitivity_cases.keys()
+    bead_case = sensitivity_cases["imposed_molten_bead_equal_volume_sphere"]
+    assert bead_case["exposed_melt_area_m2"] != pytest.approx(
+        result["deck"]["exposed_melt_area"]["area_m2"]
+    )
+    assert bead_case["exposed_melt_area_basis"] == (
+        "assumed_equal_volume_molten_bead_sphere"
+    )
+    area_notices = [
+        notice
+        for notice in result["notices_and_flags"]
+        if notice["kind"] == "assumption/knob_defaulted"
+    ]
+    assert any(
+        notice["value"]["source_locator"]["physical_pdf_page"] == 5
+        for notice in area_notices
+    )
     records = result["records"]
     assert records
     assert all(RECORD_FIELDS <= record.keys() for record in records)
@@ -89,6 +123,11 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
         "robinot_pyrometer_peak_temperature_C",
     }
     assert all(isinstance(record["flags"], list) for record in records)
+    assert all(
+        "assumed_input" in record["flags"]
+        for record in records
+        if record["observable"] == "robinot_o2_ppm_time_series"
+    )
     pyrometer_records = [
         record
         for record in records
@@ -116,7 +155,14 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
             if record["mode"] == mode
             and record["observable"] == "predicted_melt_temperature_C"
         ]
-        assert len(temperature_times) == 3
+        run_data = result["runs"][mode]
+        expected_temperature_times = {
+            float(record["time_min"])
+            for record in run_data["power_temperature_records"]
+            if record.get("temperature_C") is not None
+        }
+        assert set(temperature_times) == expected_temperature_times
+        assert temperature_times
         assert len(temperature_times) == len(set(temperature_times))
 
     json_path, markdown_path = reproduction._write_outputs(result, tmp_path)
@@ -125,6 +171,7 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
     assert written["records"] == records
     assert "typed_unavailable" in report
     assert "missing_reported_pyrometer_observation" in report
+    assert "A_bead = 4π(3V/(4π))^(2/3)" in report
     progress_lines = [
         line for line in capsys.readouterr().out.splitlines()
         if line.startswith("Robinot reproduction: starting ")
@@ -132,4 +179,8 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
     assert progress_lines == [
         "Robinot reproduction: starting imposed",
         "Robinot reproduction: starting limiting_case_unrestricted_conductance",
+        "Robinot reproduction: starting imposed_full_side_default",
+        "Robinot reproduction: starting imposed_hot_upper_alpha_0.669",
+        "Robinot reproduction: starting imposed_hot_upper_alpha_0.906",
+        "Robinot reproduction: starting imposed_molten_bead_equal_volume_sphere",
     ]

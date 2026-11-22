@@ -401,8 +401,20 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert pO2_cover["effective_pO2_achieved_mbar"] == pO2_cover["setpoint_mbar"]
     assert pO2_cover["status"] == "achieved_as_setpoint"
 
-    assert preset["lab_geometry"]["sample"]["mass_g"] == ROBINOT_SAMPLE_MASS_G
-    assert "sample_mass_g" not in preset["lab_geometry"]["sample"]["named_missing_fields"]
+    sample = preset["lab_geometry"]["sample"]
+    assert sample["mass_g"] == ROBINOT_SAMPLE_MASS_G
+    assert "sample_mass_g" not in sample["named_missing_fields"]
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        0.00013273228961416876
+    )
+    assert sample["exposed_melt_area_basis"] == (
+        "assumed_pellet_top_face_from_reported_diameter"
+    )
+    assert sample["exposed_melt_area_source_class"] == (
+        "assumption_with_sensitivity_marker"
+    )
+    assert sample["exposed_melt_area_locator"]["physical_pdf_page"] == 5
+    assert "exposed_melt_area_m2" not in sample["named_missing_fields"]
     assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_DURATION_H
     assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_DURATION_H
     assert preset["pair"]["faithful"]["kinetics_caveat"] == "none"
