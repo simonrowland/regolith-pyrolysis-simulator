@@ -768,6 +768,167 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     )
 
 
+def _regime_factor_at(model, pressure_pa: float) -> float:
+    gas_temperature_K = (
+        float(model.gas_temperature_C) + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    )
+    knudsen_number = condensation_module._knudsen_number(
+        pressure_pa,
+        gas_temperature_K,
+        float(model.pipe_diameter_m),
+        carrier_gas=model.carrier_gas,
+    )
+    return condensation_module._knudsen_regime_factor(knudsen_number)
+
+
+def _series_resistance_terms(model, alpha_s: float, pressure_pa: float, temperature_K: float):
+    """Split the production series coefficient at one wall temperature.
+
+    ``1/k = 1/(alpha*k_HKL) + (1-f)/k_MT``. ``k_HKL`` is the Hertz-Knudsen
+    impingement resolver, ``k_MT`` is Sherwood times Chapman-Enskog ``D_AB``
+    over the hydraulic diameter, and ``f`` is the Knudsen regime factor.
+    The returned ``k`` is that split. Callers check it against
+    ``_series_resistance_deposition_flux_mol_m2_s`` / flowing pressure.
+    """
+
+    gas_temperature_K = (
+        float(model.gas_temperature_C) + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    )
+    hydraulic_diameter_m = float(model.pipe_diameter_m)
+    sherwood = condensation_module._stirring_enhanced_sherwood(
+        model.stir_factor,
+        radial_stir_factor=model.radial_stir_factor,
+    )
+    diffusivity_m2_s = condensation_module._chapman_enskog_d_ab_m2_s(
+        "SiO",
+        gas_temperature_K,
+        pressure_pa,
+        carrier=model.carrier_gas,
+    )
+    k_mt = sherwood * diffusivity_m2_s / (
+        hydraulic_diameter_m
+        * condensation_module.GAS_CONSTANT_J_MOL_K
+        * gas_temperature_K
+    )
+    k_hkl = alpha_s * condensation_module._hkl_impingement_flux_mol_m2_s(
+        "SiO",
+        1.0,
+        gas_temperature_K,
+    )
+    regime_factor = _regime_factor_at(model, pressure_pa)
+    mt_weight = 1.0 - regime_factor
+    hkl_resistance = 1.0 / k_hkl
+    mt_resistance = mt_weight / k_mt
+    total_resistance = hkl_resistance + mt_resistance
+    notices: dict = {}
+    flux = condensation_module._series_resistance_deposition_flux_mol_m2_s(
+        "SiO",
+        pressure_pa,
+        temperature_K,
+        alpha_s,
+        pipe_diameter_m=hydraulic_diameter_m,
+        stir_factor=model.stir_factor,
+        radial_stir_factor=model.radial_stir_factor,
+        regime_factor=regime_factor,
+        T_gas_K=gas_temperature_K,
+        overhead_pressure_pa=pressure_pa,
+        carrier_gas=model.carrier_gas,
+        vapor_pressure_data=model.vapor_pressure_data,
+        reactive_product_backstop=True,
+        antoine_extrapolations=notices,
+    )
+    return {
+        "k": 1.0 / total_resistance,
+        "k_flux": flux / pressure_pa,
+        "sherwood": sherwood,
+        "diffusivity_m2_s": diffusivity_m2_s,
+        "hkl_resistance": hkl_resistance,
+        "mt_resistance": mt_resistance,
+        "regime_factor": regime_factor,
+    }
+
+
+def _zero_psat_series_eta(model, stage, *, pressure_pa: float, available_kg: float) -> float:
+    """P_sat = 0 limit of the production band solution.
+
+    ``eta = 1 - exp(-q*C*t)`` with ``q = p_in/N_stage`` and
+    ``C = sum_i(k_i*A/n)``. ``k_i`` is the production flux divided by the
+    flowing pressure. Samples above the reactive condensation temperature
+    are the same pass-through the route skips. The route does not return
+    the per-strip coefficients, so this closure stays in the test.
+    """
+
+    species = "SiO"
+    condensation_temperature_C = condensation_module._species_condensation_temperature_C(
+        species,
+        temps=model.condensation_temperatures_C,
+    )
+    lo_C, hi_C = condensation_module._stage_temp_band_C(stage)
+    width_C = hi_C - lo_C
+    sample_count = 1 if width_C == 0.0 else condensation_module.HKL_BAND_SAMPLES
+    record = condensation_module._stage_alpha_record(stage, species, model.materials)
+    coefficient_spec = record.get("alpha_s_coefficient_spec")
+    area_m2 = model._stage_area_m2_for_stage(stage)
+    hydraulic_diameter_m = model._hydraulic_diameter_m_for_stage_number(
+        int(stage.stage_number)
+    )
+    residence_s = float(model.residence_time_s[int(stage.stage_number)])
+    gas_temperature_K = (
+        float(model.gas_temperature_C) + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    )
+    regime_factor = _regime_factor_at(model, pressure_pa)
+    conductance = 0.0
+    for sample in range(sample_count):
+        sample_C = (
+            lo_C if width_C == 0.0
+            else lo_C + width_C * (sample + 0.5) / sample_count
+        )
+        if (
+            condensation_module._reactive_product_backstop_authorized(species)
+            and sample_C > condensation_temperature_C
+        ):
+            continue
+        sample_K = sample_C + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+        if isinstance(coefficient_spec, dict):
+            alpha_s = condensation_module._condensation_alpha_s(
+                species,
+                sample_K,
+                {"coefficient_spec": coefficient_spec},
+            )
+        else:
+            alpha_s = float(record["alpha_s"])
+        notices: dict = {}
+        flux = condensation_module._series_resistance_deposition_flux_mol_m2_s(
+            species,
+            pressure_pa,
+            sample_K,
+            alpha_s,
+            pipe_diameter_m=hydraulic_diameter_m,
+            stir_factor=model.stir_factor,
+            radial_stir_factor=model.radial_stir_factor,
+            regime_factor=regime_factor,
+            T_gas_K=gas_temperature_K,
+            overhead_pressure_pa=pressure_pa,
+            carrier_gas=model.carrier_gas,
+            vapor_pressure_data=model.vapor_pressure_data,
+            reactive_product_backstop=condensation_module.reactive_product_backstop_enabled(
+                species, sample_C, condensation_temperature_C,
+            ),
+            antoine_extrapolations=notices,
+        )
+        conductance += (flux / pressure_pa) * area_m2 / sample_count
+    molar_mass = (
+        condensation_module._molecular_mass_kg_per_molecule(
+            species,
+            vapor_pressure_data=model.vapor_pressure_data,
+        )
+        * condensation_module.AVOGADRO_MOL
+    )
+    inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
+    ntu = (pressure_pa / inventory_mol) * conductance * residence_s
+    return 1.0 - math.exp(-ntu)
+
+
 def test_band_aware_hkl_route_captures_sio_in_stage_3(
     synthetic_sio_stage_authority,
 ):
@@ -784,23 +945,52 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     _assert_synthetic_sio_route_authority(route)
     # The 1 kg/hr parcel is sequential capture. Stage 3 takes eta3 of the
     # inlet. Stage 4, the alkali/Mg cyclone, takes eta4 of what Stage 3
-    # leaves. SiO was never refused by stage isolation: _stage_isolation_blocks
-    # only keeps non-designated species off the Cr cartridge, and SiO's
-    # designated stage is stage_3_sio_zone. At ae5998456 the old remainder
-    # 0.6848392024862018 kg already included some Stage-4 SiO. Commit
-    # 37f7351c87 lets K freeze on the Na tap and non-K vapor freeze on the
-    # K trap. It does not change SiO admission on this cyclone.
-    # Collector area in this fixture is the default ratio times the throat
-    # (sio 6x, alkali 5x). Residence stays the model constants, 4 s and 3 s,
-    # the same dict as at ae5998456. Those areas are not the design
-    # collectors in setpoints.yaml. The capture gas-side length is the
-    # condenser hydraulic diameter, not the throat: this fixture writes
-    # DEFAULT_PIPE_DIAMETER_M onto pipe_diameter_m. At ae5998456 the fixture
-    # wrote the throat diameter, and that throat was also 0.12 m, so the
-    # numeric length matches. Flowing pressure is the Poiseuille report on
-    # the throat and is a different input. probe_d452_r14.py prints both
-    # sides; these destination values stay the tip probe until that pair
-    # exists.
+    # leaves. Collector area is the default ratio times the throat
+    # (sio 6x, alkali 5x). Residence stays 4 s and 3 s. The capture
+    # gas-side length is DEFAULT_PIPE_DIAMETER_M, 0.12 m, on both the
+    # 12 cm throat and this 0.50 m throat. Those areas are the synthetic
+    # ratios, not the design collectors in setpoints.yaml.
+    #
+    # d-452 changed the throat from pi*0.06**2 to pi*0.25**2, a factor
+    # (0.25/0.06)**2 = 17.361111111111114. Vacuum-downstream compressible
+    # Poiseuille has P = sqrt(F/C) with C proportional to d**4, so flowing
+    # pressure scales as 1/d**2, the same factor. Residence, hydraulic
+    # diameter, and the stage temperatures do not move.
+    #
+    # SiO's wall fit is valid on [1400, 2273.15] K. Both stage midpoints
+    # sit below it, so sio_psat is refused. SiO is reactive, and the
+    # product backstop then sets P_sat = 0. The driving force is the full
+    # partial pressure on every active strip, including the fixture's
+    # 100 Pa window at 1323-1324 K, because that window is above the
+    # flowing pressure and the reactive branch still uses P_sat = 0.
+    # Therefore eta = 1 - exp(-NTU), NTU = q*C*t, q = p_in/N_stage,
+    # C = k*A. k is the series coefficient
+    # 1/k = 1/(alpha*k_HKL) + (1-f)/k_MT, with k_MT = Sh*D_AB/Dh.
+    # D_AB scales as 1/P. Sh is the laminar 3.66 at radial stir 1. It
+    # does not depend on Reynolds number, so the throat does not change it.
+    # k_HKL is alpha times the Hertz-Knudsen impingement and does not
+    # depend on pressure.
+    #
+    # Ideal transport-limited scaling is NTU ~ D*A/P-scaled-inventory.
+    # A grows by 17.36 and p_in shrinks by 17.36, so those cancel with
+    # D ~ 1/P and NTU would grow by 17.36 if k stayed equal to k_MT.
+    # It does not. At the 12 cm pressure the cold cyclone (250 C, cold-wall
+    # alpha = 1) is mass-transfer limited: about 91% of 1/k is (1-f)/k_MT.
+    # At this throat the same alpha is kinetic-limited: about 92% of 1/k
+    # is 1/(alpha*k_HKL). The Knudsen weight f = Kn/(Kn+0.01) rises and
+    # removes boundary-layer resistance, which would increase k further.
+    # The Hertz-Knudsen term is the ceiling that leaves the stage-4 k
+    # ratio at about 10.41. Stage 4's remaining mass only changes by the
+    # small stage-3 move, so its NTU ratio is about 10.55.
+    #
+    # Stage 3 (900-1200 C) uses the Wetzel & Gail proxy
+    # alpha = 0.52*exp(-3685/T), about 0.023 to 0.032 on the half of the
+    # band at or below T_cond = 1050 C. The hotter 16 of 33 samples are
+    # the reactive pass-through. That alpha is already the majority of
+    # 1/k at the 12 cm pressure (about 70% at the cold edge) and about
+    # 99.6% of 1/k at this throat. Stage-3 NTU therefore rises only by
+    # about 1.28. The limit is the sticking coefficient, not a small
+    # supersaturation.
     from simulator.overhead import (
         DEFAULT_CONDENSER_STAGE_AREA_RATIOS,
         DEFAULT_INITIAL_THROAT_AREA_M2,
@@ -839,6 +1029,14 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     trap_outcomes = [
         item for item in outcomes if item.get("stage_key") == K_TRAP_STAGE_KEY
     ]
+    # The trap's own row is the pass-through. The extrapolated stage-4 row
+    # has no stage_key: the efficiency writer stamps stage_key on
+    # _mint_zero and not on the extrapolated append. A join of unkeyed
+    # outcomes by stage number, which probe_d452_r14._stage_row does,
+    # attributes this cyclone eta to stage_4b_k_trap as well. That join
+    # already mirrored the cyclone at ae5998456. The trap area is unset
+    # on this map, so the numeric stage-4 key did not turn the trap into
+    # a second capture. Mass below counts the cyclone once.
     assert trap_outcomes
     assert all(
         item["status"] == "pass_through"
@@ -846,6 +1044,7 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
         and item["eta"] == 0.0
         for item in trap_outcomes
     )
+    assert "stage_key" not in stage4_outcome
     assert not any(
         item.get("status") == "refused" and item.get("parameter") == "stage_area_m2"
         for item in outcomes
@@ -860,8 +1059,87 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert remaining_kg == pytest.approx((1.0 - eta3) * (1.0 - eta4))
     assert route.retained_in_source_by_species.get("SiO", 0.0) == pytest.approx(0.0)
     assert route.wall_deposit_by_species.get("SiO", 0.0) == pytest.approx(0.0)
-    # Probe at 15696ca7b3 on this synthetic fixture. The algebra above is
-    # the expectation; these values identify the destinations.
+    from tests.studio_pin_support import TWELVE_CM_INITIAL_THROAT_AREA_M2
+
+    pressure_pa = float(stage3_outcome["flowing_pressure_pa"])
+    assert float(stage4_outcome["flowing_pressure_pa"]) == pytest.approx(pressure_pa)
+    assert pressure_pa == pytest.approx(float(model.overhead_pressure_mbar) * 100.0)
+    assert _regime_factor_at(model, pressure_pa) == pytest.approx(model.regime_factor)
+    throat_ratio = DEFAULT_INITIAL_THROAT_AREA_M2 / TWELVE_CM_INITIAL_THROAT_AREA_M2
+    assert throat_ratio == pytest.approx((0.25 / 0.06) ** 2)
+    # P scales as 1/area. The 12 cm flowing pressure is this route's
+    # pressure times the throat-area ratio.
+    pressure_12cm_pa = pressure_pa * throat_ratio
+    sio_stage = next(
+        stage for stage in model.train.stages if int(stage.stage_number) == 3
+    )
+    cyclone = next(
+        stage for stage in model.train.stages
+        if stage.stage_key == NA_COLLECTOR_STAGE_KEY
+    )
+    expected_eta3 = _zero_psat_series_eta(
+        model, sio_stage, pressure_pa=pressure_pa, available_kg=1.0,
+    )
+    expected_eta4 = _zero_psat_series_eta(
+        model,
+        cyclone,
+        pressure_pa=pressure_pa,
+        available_kg=1.0 - expected_eta3,
+    )
+    assert eta3 == pytest.approx(expected_eta3)
+    assert eta4 == pytest.approx(expected_eta4)
+    cold_wall_K = 250.0 + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    cold_record = condensation_module._stage_alpha_record(
+        cyclone, "SiO", model.materials, T_K=cold_wall_K,
+    )
+    assert cold_record["alpha_s"] == pytest.approx(1.0)
+    assert cold_record.get("alpha_s_cold_wall_condensation") is True
+    tip_cold = _series_resistance_terms(model, 1.0, pressure_pa, cold_wall_K)
+    old_cold = _series_resistance_terms(model, 1.0, pressure_12cm_pa, cold_wall_K)
+    assert tip_cold["k_flux"] == pytest.approx(tip_cold["k"])
+    assert old_cold["k_flux"] == pytest.approx(old_cold["k"])
+    assert tip_cold["sherwood"] == pytest.approx(old_cold["sherwood"])
+    assert tip_cold["sherwood"] == pytest.approx(
+        condensation_module.DEFAULT_SHERWOOD_LAMINAR
+    )
+    assert (
+        tip_cold["diffusivity_m2_s"] / old_cold["diffusivity_m2_s"]
+        == pytest.approx(throat_ratio)
+    )
+    assert tip_cold["hkl_resistance"] > tip_cold["mt_resistance"]
+    assert old_cold["mt_resistance"] > old_cold["hkl_resistance"]
+    assert (tip_cold["k"] / old_cold["k"]) < throat_ratio
+    band_edge_C = 900.0 + (1200.0 - 900.0) * 0.5 / condensation_module.HKL_BAND_SAMPLES
+    band_edge_K = band_edge_C + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    band_record = condensation_module._stage_alpha_record(
+        sio_stage, "SiO", model.materials, T_K=band_edge_K,
+    )
+    band_alpha = condensation_module._condensation_alpha_s(
+        "SiO",
+        band_edge_K,
+        {"coefficient_spec": band_record["alpha_s_coefficient_spec"]},
+    )
+    tip_hot = _series_resistance_terms(model, band_alpha, pressure_pa, band_edge_K)
+    old_hot = _series_resistance_terms(model, band_alpha, pressure_12cm_pa, band_edge_K)
+    assert tip_hot["k_flux"] == pytest.approx(tip_hot["k"])
+    assert old_hot["hkl_resistance"] > old_hot["mt_resistance"]
+    assert tip_hot["hkl_resistance"] > tip_hot["mt_resistance"]
+    assert (tip_hot["k"] / old_hot["k"]) < (tip_cold["k"] / old_cold["k"])
+    notices: dict = {}
+    midpoint_K = (900.0 + 1200.0) / 2.0 + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    for temperature_K in (cold_wall_K, band_edge_K, midpoint_K):
+        driving_pa = condensation_module._wall_deposition_driving_pressure_pa(
+            "SiO",
+            pressure_pa,
+            temperature_K,
+            vapor_pressure_data=model.vapor_pressure_data,
+            reactive_product_backstop=True,
+            antoine_extrapolations=notices,
+        )
+        assert driving_pa == pytest.approx(pressure_pa)
+    # Resolver closure at this throat. The same closure at pressure_12cm_pa
+    # is the ae5998456 probe column (stage 3 eta 0.04612806257579693,
+    # stage 4 eta 0.2820428239711992).
     assert eta3 == pytest.approx(0.058775901177849185)
     assert eta4 == pytest.approx(0.9697037276473276)
     assert stage3_kg == pytest.approx(0.058775901177849185)
