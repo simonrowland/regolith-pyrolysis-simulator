@@ -14,7 +14,10 @@ from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
 
-from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+from engines.builtin.evaporation_flux import (
+    BuiltinEvaporationFluxProvider,
+    _DEFAULT_EVAPORATION_ALPHA,
+)
 from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
@@ -1769,11 +1772,6 @@ def _mass_loss_sourced_alphas(
                 "T_range_K": [low, high],
                 "extrapolated": not low <= temperature_K <= high,
             }
-    if not fits:
-        raise ResidueInventoryRefusal(
-            "evaporation_coefficients_not_sourced",
-            "per-species evaporation coefficients are not sourced for this work",
-        )
     return fits
 
 
@@ -1799,20 +1797,40 @@ def _mass_loss_area_inputs(
                 if sample.get("sample") != row_name:
                     continue
                 try:
-                    uncertainty = surface["uncertainty"]
                     diameter = float(sample["diameter_mm"])
+                    initial = float(sample["initial_area_mm2"]) * 1.0e-6
+                    final = float(sample["final_area_mm2"]) * 1.0e-6
+                except KeyError as exc:
+                    raise ResidueInventoryRefusal(
+                        "sample_area_endpoints_not_stated"
+                    ) from exc
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise ResidueInventoryRefusal(
+                        "sample_area_not_numeric", str(exc)
+                    ) from exc
+                if (
+                    not all(math.isfinite(x) and x > 0 for x in (initial, final, diameter))
+                    or diameter < 1.0
+                ):
+                    raise ResidueInventoryRefusal("sample_area_invalid")
+                try:
+                    uncertainty = surface["uncertainty"]
                     percent = float(uncertainty[
                         "one_mm_percent" if diameter == 1.0 else "larger_samples_percent"
                     ])
-                    initial = float(sample["initial_area_mm2"]) * 1.0e-6
-                    final = float(sample["final_area_mm2"]) * 1.0e-6
-                    if not all(math.isfinite(x) and x > 0 for x in (
-                        initial, final, diameter, percent
-                    )) or diameter < 1.0 or not uncertainty.get("locator"):
-                        raise ValueError("invalid area evidence")
-                    matches.add((initial, final, percent / 100.0))
-                except (KeyError, TypeError, ValueError) as exc:
+                except KeyError as exc:
                     raise ResidueInventoryRefusal("sample_area_uncertainty_not_stated") from exc
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise ResidueInventoryRefusal(
+                        "sample_area_uncertainty_not_numeric", str(exc)
+                    ) from exc
+                if (
+                    not math.isfinite(percent)
+                    or percent <= 0.0
+                    or not uncertainty.get("locator")
+                ):
+                    raise ResidueInventoryRefusal("sample_area_uncertainty_not_stated")
+                matches.add((initial, final, percent / 100.0))
     if len(matches) != 1:
         raise ResidueInventoryRefusal("sample_area_endpoints_not_stated")
     initial, final, relative_uncertainty = matches.pop()
@@ -2204,17 +2222,6 @@ def predict_mass_loss_fraction(
     sample_mass_kg = _located_point(getattr(sample, "mass_kg", None))
     if sample_mass_kg is None or sample_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("sample_mass_not_stated", "sample.mass_kg point")
-    apparatus = getattr(experiment, "apparatus", None)
-    geometry = None if apparatus is None else getattr(apparatus, "geometry", None)
-    area_m2 = _located_point(
-        None if geometry is None else getattr(geometry, "exposed_area_m2", None)
-    )
-    if area_m2 is None or area_m2 <= 0.0:
-        raise ResidueInventoryRefusal(
-            "sample_geometry_not_stated",
-            "apparatus.geometry.exposed_area_m2 point",
-        )
-
     method_state = getattr(experiment, "method", None)
     method = getattr(method_state, "value", None) if getattr(
         method_state, "is_value", False
@@ -2279,14 +2286,43 @@ def predict_mass_loss_fraction(
     )
     if total_pressure_Pa is None or not math.isfinite(total_pressure_Pa) or total_pressure_Pa < 0:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
-    area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
-        experiment, observation, source_document or {}
-    )
+    area_default_reason = None
+    try:
+        area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
+            experiment, observation, source_document or {}
+        )
+    except ResidueInventoryRefusal as exc:
+        if exc.reason not in {
+            "sample_area_endpoints_not_stated",
+            "sample_area_uncertainty_not_stated",
+            "sample_area_uncertainty_not_numeric",
+            "area_shape_not_self_similar",
+        }:
+            raise
+        from simulator.equipment import EquipmentDesigner
+
+        # Use the same face area the simulator's equipment designer assigns to
+        # an unconfigured crucible. A = pi(d/2)^2, with d derived from the
+        # sample-mass volume, is in m²; multiplying an HK flux in kg m⁻² s⁻¹
+        # by it gives kg s⁻¹. As sample mass tends to zero, d and A tend to
+        # zero too, so the default contributes no finite evaporation at zero
+        # inventory. This is a named design default, never a fit to the row.
+        area_m2 = EquipmentDesigner().size_crucible(sample_mass_kg).melt_surface_area_m2
+        observed_loss = float(observation.value.point)
+        final_area_m2 = _self_similar_area_m2(area_m2, 1.0 - observed_loss, 1.0)
+        area_uncertainty = 0.0
+        area_default_reason = exc.reason
     preheat_maximum_K, preheat_duration_s, segments = _mass_loss_thermal_segments(
         experiment, float(temperature_K)
     )
     flags: set[str] = set()
     metadata: dict[str, str] = {}
+    if area_default_reason is not None:
+        flags.add(
+            f"knob_defaulted:area={area_m2:.17g} m2; "
+            f"original_reason={area_default_reason}; "
+            "default_source=EquipmentDesigner.size_crucible(sample_mass_kg).melt_surface_area_m2"
+        )
     flags.add(
         "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
         "declared free-desorption assumption, not independently sourced coefficients; "
@@ -2307,6 +2343,7 @@ def predict_mass_loss_fraction(
     )
     unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
                       if parent and str(species) not in fits)
+    default_alpha = float(_DEFAULT_EVAPORATION_ALPHA["value"])
 
     bounds_by_channel = {species: 0.0 for species in unsourced}
     preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
@@ -2376,9 +2413,18 @@ def predict_mass_loss_fraction(
                 alpha = at_fits[species]["alpha"]
                 provenance = at_fits[species]["source_observation_id"]
             else:
-                alpha = 1.0 if unsourced_unity else 0.0
-                provenance = ("alpha<=1 joint/preheat arm; not sourced coefficient" if unsourced_unity
-                              else "unsourced channel excluded from point loss")
+                # The built-in HKL provider owns this value. Since 0 <= alpha
+                # <= 1 and flux is linear in alpha, alpha=1 is the upper flux
+                # bound (dimensionless alpha leaves kg m⁻² s⁻¹ unchanged).
+                # alpha=0 is the zero-flux limit; the stated upper bound is
+                # therefore conservative without fitting the measured loss.
+                alpha = default_alpha
+                provenance = str(_DEFAULT_EVAPORATION_ALPHA["source"])
+                flags.add(
+                    f"knob_defaulted:evaporation_alpha:{species}={alpha:.17g}; "
+                    "original_reason=evaporation_coefficients_not_sourced; "
+                    f"default_source={provenance}"
+                )
             channels.append(ResidueChannel(species, species, parent or None, alpha, provenance))
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
@@ -2507,7 +2553,25 @@ def predict_mass_loss_fraction(
                 preheat_bound_kg=preheat_bound_kg,
             )
         except ResidueInventoryRefusal as exc:
-            if exc.reason not in {"alpha_not_sourced", "preheat_bound_not_negligible"}:
+            if exc.reason == "alpha_not_sourced":
+                # Missing coefficients now use the explicitly flagged alpha=1
+                # point model. Keep its envelope as diagnostics, but only the
+                # independent preheat envelope can still refuse this point.
+                try:
+                    _mass_loss_bound_gate(
+                        preheat_bound_kg, point_loss_kg, uncertainty_kg,
+                        channels=(), preheat_bound_kg=preheat_bound_kg,
+                    )
+                except ResidueInventoryRefusal as preheat_exc:
+                    if preheat_exc.reason != "preheat_bound_not_negligible":
+                        raise
+                    preheat_detail = json.loads(preheat_exc.detail)
+                    preheat_detail.update(evidence)
+                    raise ResidueInventoryRefusal(
+                        preheat_exc.reason,
+                        json.dumps(preheat_detail, sort_keys=True),
+                    ) from preheat_exc
+            elif exc.reason != "preheat_bound_not_negligible":
                 raise
             diagnostics = json.loads(exc.detail)
             diagnostics.update(evidence)

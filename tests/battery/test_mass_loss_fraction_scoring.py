@@ -12,6 +12,7 @@ from simulator.battery.enums import (
     Engine,
     MethodToken,
     MetricOperation,
+    NoticeKind,
     Quantity,
     RefusalReason,
     ResidualStatus,
@@ -136,20 +137,14 @@ def _richter_rep5_run(experiment):
     )
 
 
-_EVAPORATION_COEFFICIENTS_NOT_SOURCED = (
-    "per-species evaporation coefficients are not sourced for this work"
-)
-
-
-def _assert_evaporation_coefficients_not_sourced(prediction) -> None:
-    assert prediction.value is None, prediction.value
-    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS, (
-        prediction.refusal_reason
+def _assert_defaulted_evaporation_alpha(prediction) -> None:
+    assert prediction.value is not None, prediction.refusal_detail
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason.startswith("knob_defaulted:evaporation_alpha:")
+        and "original_reason=evaporation_coefficients_not_sourced" in notice.reason
+        for notice in prediction.notices
     )
-    detail = prediction.refusal_detail
-    assert detail["reason"] == "evaporation_coefficients_not_sourced"
-    assert detail["detail"] == _EVAPORATION_COEFFICIENTS_NOT_SOURCED
-    assert detail["missing_input"] is Quantity.EVAPORATION_COEFFICIENT_ALPHA
 
 
 def _extract_mass_loss_selection(source_id: str, observation_id: str):
@@ -329,7 +324,7 @@ def test_finalize_never_promotes_untyped_observation_map_to_initial(
 
 @pytest.mark.parametrize("sample_id", ("R-11", "R-14"))
 @pytest.mark.usefixtures("without_sourced_alpha_context")
-def test_richter_rows_refuse_unsourced_evaporation_coefficients(
+def test_richter_rows_use_defaulted_unsourced_evaporation_coefficients(
     fresh_mass_loss_extracts, sample_id
 ) -> None:
     richter_result, _markova_result = fresh_mass_loss_extracts
@@ -343,14 +338,14 @@ def test_richter_rows_refuse_unsourced_evaporation_coefficients(
 
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
 
-    _assert_evaporation_coefficients_not_sourced(prediction)
+    _assert_defaulted_evaporation_alpha(prediction)
 
 
 @pytest.mark.parametrize(
     "source_id",
     ("kems-015-hashimoto-1983", "kems-026-markova-1984"),
 )
-def test_any_source_refuses_unsourced_evaporation_coefficients(
+def test_any_source_uses_defaulted_unsourced_evaporation_coefficients(
     fresh_mass_loss_extracts, source_id
 ) -> None:
     """The predictor does not exempt a source, including Hashimoto 1983."""
@@ -369,7 +364,7 @@ def test_any_source_refuses_unsourced_evaporation_coefficients(
         experiment=experiment,
     )
 
-    _assert_evaporation_coefficients_not_sourced(prediction)
+    _assert_defaulted_evaporation_alpha(prediction)
 
 
 def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_residue(
@@ -464,7 +459,7 @@ def test_richter_catalogue_sibling_keeps_initial_through_finalization(
     )
 
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=migrated)
-    _assert_evaporation_coefficients_not_sourced(prediction)
+    _assert_defaulted_evaporation_alpha(prediction)
 
 
 def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
@@ -500,7 +495,7 @@ def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
 
 
 @pytest.mark.usefixtures("without_sourced_alpha_context")
-def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
+def test_richter_rep5_row_scores_with_defaulted_evaporation_coefficients(
     mass_loss_rows,
 ) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
@@ -513,8 +508,7 @@ def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
         experiment=_richter_rep5_run(experiment),
     )
 
-    _assert_evaporation_coefficients_not_sourced(prediction)
-    assert prediction.notices == ()
+    _assert_defaulted_evaporation_alpha(prediction)
     context = load_score_context(sources=("kems-010-richter-2007",))
     context = replace(
         context,
@@ -530,11 +524,14 @@ def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
         prediction=prediction,
         comparison_ids={richter.observation_id},
     )
-    assert scored.status is ResidualStatus.REFUSED
-    assert scored.numeric is None
-    assert scored.refusal is not None
-    assert scored.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert scored.refusal.detail["reason"] == "evaporation_coefficients_not_sourced"
+    assert scored.status is not ResidualStatus.REFUSED
+    assert scored.numeric is not None
+    assert scored.refusal is None
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason.startswith("knob_defaulted:evaporation_alpha:")
+        for notice in scored.notices
+    )
 
 
 def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
@@ -580,7 +577,7 @@ def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
     assert Decimal(exposed_area) == Decimal("0.0000913")
 
 
-def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
+def test_richter_row_without_exposed_area_uses_printed_sample_face(mass_loss_rows) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows
     )
@@ -597,9 +594,24 @@ def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
         experiment=missing_geometry,
     )
 
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail["reason"] == "sample_geometry_not_stated"
-    assert prediction.value is None
+    assert prediction.value is not None, prediction.refusal_detail
+    context = load_score_context(sources=("kems-010-richter-2007",))
+    context = replace(
+        context,
+        experiments={
+            **context.experiments,
+            missing_geometry.experiment_id: missing_geometry,
+        },
+    )
+    scored, _candidate = compile_residual(
+        richter,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+        comparison_ids={richter.observation_id},
+    )
+    assert scored.numeric is not None, scored.refusal
+    assert scored.refusal is None
 
 
 def test_engine_without_residue_capability_refuses_with_engine_name(mass_loss_rows) -> None:

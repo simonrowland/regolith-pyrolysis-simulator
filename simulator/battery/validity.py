@@ -18,17 +18,17 @@ Ambiguity resolutions:
 - Background ≥ 1e-2 Pa fails KEMS *equilibrium* pressure/activity only.
   Millibar bench kinetic experiments are out of this gate's scope.
 - Apparatus determinants are those the actual derivation needs: calibrated
-  KEMS p_partial/p_sat requires a grounded calibration but no orifice
-  geometry; absolute-flux effusion and Langmuir pressure/alpha require their
-  respective geometry. Determinants must be grounded VALUES (unknown
-  calibration fails), physically valid (area > 0, Clausing in (0, 1]), and
+  source-reduced KEMS pressures, activities, pressure ratios, and partial
+  molar enthalpies need no reconstructed sensitivity or orifice geometry;
+  absolute-flux effusion and Langmuir pressure/alpha use their respective
+  geometry. Determinants must be grounded VALUES, physically valid (area > 0,
+  Clausing in (0, 1]), and
   present for TGA/solar/vacuum kinetic area. A printed positive orifice
-  diameter interval (locator, no inference) is usable for calibrated KEMS
+  diameter interval (locator, no inference) is usable for source-reduced KEMS
   pressure (d-326 case 1: no value band; the coded p/d regime check runs
   at both ends) and for a raw-rate Knudsen reduction (case 2: geometric-mean
   diameter and a dex band). An inferred or unlocated interval is not.
-  Activity, activity coefficient, log10 Kf, and reference pressure still
-  require a point orifice. An area interval is not a point area.
+  An area interval is not a point area.
   Missing required geometry is ``underdetermined_apparatus``. Unknown
   method is ``method_unknown`` when the quantity class is one the schema
   scopes by method (effusion pressure, Langmuir pressure/alpha,
@@ -41,7 +41,7 @@ Ambiguity resolutions:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -101,6 +101,19 @@ _CALIBRATION_STANDARD_FIELDS = frozenset(
         "pressure_reference_substance",
         "pressure_standard_substance",
         "standard",
+    }
+)
+_KEMS_REDUCED_QUANTITIES = frozenset(
+    {
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+        Quantity.P_REFERENCE,
+        Quantity.LOG10_KF,
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.LOG10_K_REACTION,
+        Quantity.LOG10_K_STAR,
+        Quantity.PARTIAL_MOLAR_ENTHALPY,
     }
 )
 
@@ -382,6 +395,44 @@ def _calibration_not_grounded_detail(calibration: object) -> dict[str, str] | No
     return None
 
 
+def _kems_calibration_check(
+    experiment: Experiment, quantity: Quantity
+) -> tuple[GateCheck, bool, bool]:
+    """Source-reduced KEMS quantities need no reconstructed sensitivity."""
+
+    calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
+    calibrated = _calibration_grounded(calibration)
+    ungrounded_detail = (
+        None if calibrated else _calibration_not_grounded_detail(calibration)
+    )
+    calibration_flagged = not calibrated and quantity in _KEMS_REDUCED_QUANTITIES
+    check = GateCheck(
+        "kems_calibration",
+        calibrated or calibration_flagged,
+        {
+            "missing": [] if calibrated or calibration_flagged else ["calibration"],
+            "method": MethodToken.KNUDSEN_EFFUSION.value,
+            "quantity": quantity.value,
+            "reason": None
+            if calibrated
+            else "the source already reports a reduced numeric quantity",
+            **(
+                {
+                    "flag": "kems_calibration_by_source",
+                    "calibration_record_status": (
+                        None
+                        if ungrounded_detail is None
+                        else ungrounded_detail.get("calibration_record_status")
+                    ),
+                }
+                if calibration_flagged
+                else (ungrounded_detail or {})
+            ),
+        },
+    )
+    return check, calibrated, calibration_flagged
+
+
 def table_self_consistency(
     *,
     delta_fG_kJ_mol: object,
@@ -570,42 +621,23 @@ def underdetermined_apparatus(
     missing: list[str] = []
     invalid: tuple[str, ...] = ()
     if _is_kems_calibrated_pressure(method, quantity):
-        # Knudsen-effusion mass spectrometry uses the calibrated pressure
-        # relation P_i = k_i I_i^+ T.  k_i comes from a calibration (for
-        # example, a reference vaporization such as Ag, or a weight-loss
-        # calibration), so this route needs neither orifice area nor a
-        # Clausing factor. Those geometry terms enter only the absolute-flux
+        # Raw Knudsen-effusion ion intensities use P_i = k_i I_i^+ T, where
+        # k_i comes from a calibration. A printed reduced pressure already
+        # includes the author's reduction, so its unrecorded sensitivity is
+        # reported as provenance rather than reconstructed. Neither route
+        # needs orifice geometry; those terms enter only the absolute-flux
         # Hertz-Knudsen weight-loss route:
         # p = (dm/dt)/(A W) * sqrt(2 pi R T / M).
-        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
-        calibrated = _calibration_grounded(calibration)
-        ungrounded_detail = (
-            None if calibrated else _calibration_not_grounded_detail(calibration)
+        calibration_check, calibrated, calibration_flagged = (
+            _kems_calibration_check(experiment, quantity)
         )
-        calibration_flagged = (
-            quantity is Quantity.P_PARTIAL and ungrounded_detail is not None
-        )
-        checks.append(
-            GateCheck(
-                "kems_calibration",
-                calibrated or calibration_flagged,
-                {
-                    "missing": [] if calibrated else ["calibration"],
-                    "method": method.value,
-                    "quantity": quantity.value,
-                    "reason": None
-                    if calibrated
-                    else "KEMS pressure requires a recorded calibration",
-                    **(ungrounded_detail if calibration_flagged else {}),
-                },
-            )
-        )
+        checks.append(calibration_check)
         if not calibrated and not calibration_flagged:
             return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
-        # A calibrated KEMS pressure does not need geometry when it is absent.
-        # A supplied point must be positive. A supplied diameter interval is
-        # usable only when it is printed: area does not enter p = k I T, so
-        # that interval is not a value band (d-326 case 1). An inferred or
+        # A source-reduced KEMS pressure does not need geometry when it is
+        # absent. A supplied point must be positive. A supplied diameter
+        # interval is usable only when printed: area does not enter p = k I T,
+        # so that interval is not a value band (d-326 case 1). An inferred or
         # unlocated interval, a bound, and an area interval stay missing.
         invalid = _invalid_kems_geometry_fields(geometry)
         if geometry is not None:
@@ -692,6 +724,10 @@ def underdetermined_apparatus(
                     },
                 )
             )
+        elif quantity in _KEMS_REDUCED_QUANTITIES:
+            # Source-reduced pressures, activities and their thermodynamic
+            # ratios do not need geometry reconstructed from the apparatus.
+            pass
         elif geometry is None:
             missing.extend(KEMS_GEOMETRY_FACTS)
         else:
@@ -706,36 +742,18 @@ def underdetermined_apparatus(
                 and "clausing_factor" not in invalid
             ):
                 missing.append("clausing_factor")
-        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
-        calibrated = _calibration_grounded(calibration)
-        activity_quantity = quantity in {
-            Quantity.ACTIVITY,
-            Quantity.ACTIVITY_COEFFICIENT,
-        }
-        ungrounded_detail = (
-            None if calibrated else _calibration_not_grounded_detail(calibration)
+        calibration_check, calibrated, calibration_flagged = (
+            _kems_calibration_check(experiment, quantity)
         )
-        calibration_flagged = (
-            quantity is Quantity.ACTIVITY and ungrounded_detail is not None
-        )
-        if activity_quantity:
-            checks.append(
-                GateCheck(
-                    "kems_calibration",
-                    calibrated or calibration_flagged,
-                    {
-                        "missing": [] if calibrated else ["calibration"],
-                        "method": method.value,
-                        "quantity": quantity.value,
-                        "reason": None
-                        if calibrated
-                        else "KEMS activity requires a recorded calibration",
-                        **(ungrounded_detail if calibration_flagged else {}),
-                    },
-                )
-            )
+        if quantity in _KEMS_REDUCED_QUANTITIES:
+            checks.append(calibration_check)
         if not calibrated and not calibration_flagged:
             missing.append("calibration")
+    elif method is MethodToken.KNUDSEN_EFFUSION and quantity in _KEMS_REDUCED_QUANTITIES:
+        calibration_check, _calibrated, _calibration_flagged = (
+            _kems_calibration_check(experiment, quantity)
+        )
+        checks.append(calibration_check)
     if _is_langmuir_pressure_or_alpha(method, quantity):
         if geometry is None or _finite_positive(geometry.exposed_area_m2) is None:
             missing.append("exposed_area_m2")
@@ -768,6 +786,11 @@ def underdetermined_apparatus(
                 and "orifice_area_m2" not in missing
             ):
                 missing.append("orifice_area_m2")
+        elif quantity is Quantity.MASS_LOSS_FRACTION:
+            # The residue scorer resolves a printed sample face from the
+            # source row and otherwise uses EquipmentDesigner.size_crucible;
+            # apparatus.geometry.exposed_area_m2 is not its input contract.
+            pass
         elif geometry is None or (
             _finite_positive(geometry.exposed_area_m2) is None
             and _finite_positive(geometry.orifice_area_m2) is None
@@ -778,6 +801,14 @@ def underdetermined_apparatus(
             elif "exposed_area_m2" not in missing:
                 missing.append("exposed_area_m2")
     detail = {"missing": missing, "method": method.value, "quantity": quantity.value}
+    if (
+        method is MethodToken.KNUDSEN_EFFUSION
+        and quantity is Quantity.MASS_LOSS_RATE
+        and "orifice_area_m2" in missing
+    ):
+        detail["reason"] = (
+            "orifice_area_required_to_convert_mass_loss_rate_to_pressure"
+        )
     if invalid:
         detail["invalid"] = list(invalid)
     if _is_kems_calibrated_pressure(method, quantity):
@@ -973,6 +1004,19 @@ def effusion_regime_unverified(
             # A lower bound already above the limit proves the cell is outside
             # the regime, even though species coverage is incomplete.
             pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
+        elif not diameters:
+            checks.append(
+                GateCheck(
+                    "effusion_regime_assumed",
+                    True,
+                    {
+                        "flag": "effusion_regime_assumed",
+                        "reason": pressure_detail.get("reason")
+                        or "orifice and in-cell pressure sum are not printed",
+                    },
+                )
+            )
+            return _pass(checks)
         checks.append(
             GateCheck(
                 "in_cell_partial_pressure_sum",
@@ -999,6 +1043,17 @@ def effusion_regime_unverified(
             "(limit source: Drowart et al. 2005, p. 689; "
             f"{diameter_basis})"
         )
+        if not diameters:
+            checks.append(
+                GateCheck(
+                    "effusion_regime_assumed",
+                    True,
+                    {
+                        "flag": "effusion_regime_assumed",
+                        "reason": "no printed orifice diameter; used the Drowart 10 Pa cell limit",
+                    },
+                )
+            )
     if ungrounded_detail is not None:
         gate_detail = {
             **pressure_detail,
@@ -1586,16 +1641,17 @@ def _orifice_area_m2(diameter_m: Decimal) -> Decimal:
 
 def _constant_clausing(
     clausing_factor: Located[Value | Decimal] | Decimal | None,
-    orifice_channel_length_m: Located[Value | Decimal] | Decimal | None,
 ) -> Decimal:
-    """Point Clausing factor, or 1 when neither C nor a length was printed.
+    """Point Clausing factor, or the thin-orifice default when C is absent.
 
-    A printed length with no point C is refused. Short-orifice W(l/r) is
-    not owned; long-tube Clausing (L/D >= 10) is the wrong regime. The
-    ideal-orifice default C = 1 also lives in
+    C = 1 is the thin-orifice limit. Real C is below one, so this default
+    underestimates pressure reduced from a mass-loss rate. The same value
+    also lives in
     simulator/diagnostic_helpers/extract_reproduction.py as a float on the
     engine-reproduction path. That copy is not Located geometry and is not
-    this reduction.
+    this reduction. Channel length alone does not determine C without a
+    short-orifice correction, so the reported length does not change this
+    stated default.
     """
 
     if isinstance(clausing_factor, Decimal):
@@ -1612,15 +1668,6 @@ def _constant_clausing(
         if not _clausing_value_ok(clausing):
             raise ValueError("clausing_factor must be a point in (0, 1]")
         return clausing
-    length_printed = isinstance(orifice_channel_length_m, Decimal) or (
-        isinstance(orifice_channel_length_m, Located)
-        and orifice_channel_length_m.state.is_value
-    )
-    if length_printed:
-        raise ValueError(
-            "missing clausing_factor: printed orifice length makes the "
-            "Clausing factor depend on l/r, and no short-orifice W(l/r) is owned"
-        )
     return Decimal("1")
 
 
@@ -1684,10 +1731,27 @@ def knudsen_effusion_pressure_from_mass_rate(
         extent = _positive_extent(orifice_diameter_m)
         if extent is None:
             raise ValueError(
-                "orifice diameter must be a positive point or a positive closed interval"
+                "orifice_area_required_to_convert_mass_loss_rate_to_pressure"
             )
         low, high, kind = extent
-    clausing = _constant_clausing(clausing_factor, orifice_channel_length_m)
+    clausing_defaulted = clausing_factor is None or (
+        isinstance(clausing_factor, Located) and not clausing_factor.state.is_value
+    )
+    clausing = _constant_clausing(clausing_factor)
+    clausing_notice = (
+        Notice(
+            kind=NoticeKind.UNVERIFIED_APPARATUS,
+            affected_quantities=(quantity,),
+            reason=(
+                f"knob_defaulted:clausing_factor={clausing}; "
+                "original_reason=clausing_factor_not_stated; "
+                "thin-orifice limit; real C < 1, so C = 1 underestimates derived pressure"
+            ),
+            origin=origin,
+        )
+        if clausing_defaulted
+        else None
+    )
     from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 
     k_hk = Decimal(
@@ -1710,7 +1774,7 @@ def knudsen_effusion_pressure_from_mass_rate(
             pressure_Pa=pressure_at(low),
             evaluation_diameter_m=low,
             band_dex=None,
-            notice=None,
+            notice=clausing_notice,
         )
     d_gm = (low * high).sqrt()
     pressure_gm = pressure_at(d_gm)
@@ -1720,21 +1784,29 @@ def knudsen_effusion_pressure_from_mass_rate(
         abs((pressure_at(low) / pressure_gm).ln() / Decimal(10).ln()),
         abs((pressure_at(high) / pressure_gm).ln() / Decimal(10).ln()),
     )
+    interval_notice = Notice(
+        kind=NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED,
+        affected_quantities=(quantity,),
+        reason=(
+            "apparatus_geometry_interval_printed: printed orifice diameter "
+            f"interval {low}-{high} m evaluated at geometric mean {d_gm} m; "
+            f"effusion pressure band +/-{band} dex from A ~ d^2"
+        ),
+        origin=origin,
+        band=f"+/-{band} dex",
+    )
+    notice = interval_notice
+    if clausing_notice is not None:
+        notice = replace(
+            clausing_notice,
+            reason=f"{clausing_notice.reason}; {interval_notice.reason}",
+            band=interval_notice.band,
+        )
     return KnudsenEffusionPressure(
         pressure_Pa=pressure_gm,
         evaluation_diameter_m=d_gm,
         band_dex=band,
-        notice=Notice(
-            kind=NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED,
-            affected_quantities=(quantity,),
-            reason=(
-                "apparatus_geometry_interval_printed: printed orifice diameter "
-                f"interval {low}-{high} m evaluated at geometric mean {d_gm} m; "
-                f"effusion pressure band +/-{band} dex from A ~ d^2"
-            ),
-            origin=origin,
-            band=f"+/-{band} dex",
-        ),
+        notice=notice,
     )
 
 

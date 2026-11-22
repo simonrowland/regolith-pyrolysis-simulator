@@ -75,13 +75,13 @@ def test_fit_domain_includes_1500C_and_labels_extrapolation(
 
 
 @pytest.mark.parametrize("local_id,document_present", [("cai-r-7", True), ("cai-r-11", False)])
-def test_absent_or_inapplicable_fits_keep_d204(fig3_source, local_id, document_present):
+def test_absent_or_inapplicable_fits_are_reported_for_runtime_default(
+    fig3_source, local_id, document_present
+):
     experiment = SimpleNamespace(experiment_id=f"work::experiment::{local_id}")
-    with pytest.raises(ResidueInventoryRefusal) as failure:
-        _mass_loss_sourced_alphas(
-            experiment, fig3_source if document_present else {}, 2073.15
-        )
-    assert failure.value.reason == "evaporation_coefficients_not_sourced"
+    assert _mass_loss_sourced_alphas(
+        experiment, fig3_source if document_present else {}, 2073.15
+    ) == {}
 
 
 
@@ -495,24 +495,101 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
-def test_full_prediction_refuses_non_negligible_unsourced_channel(
+def test_unsourced_alpha_uses_the_builtin_runtime_default(
+    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
+):
+    import engines.builtin.evaporation_flux as evaporation_flux
+    import simulator.battery.residue as residue
+
+    row, experiment = r11_inputs
+    source = deepcopy(fig3_source)
+    for block in source["species"].values():
+        block["context"] = []
+    monkeypatch.setitem(evaporation_flux._DEFAULT_EVAPORATION_ALPHA, "value", 0.37)
+    monkeypatch.setitem(
+        evaporation_flux._DEFAULT_EVAPORATION_ALPHA,
+        "source",
+        "test mutation of the built-in HKL default",
+    )
+
+    result = residue.predict_mass_loss_fraction(
+        "openimcc", experiment, temperature_K=2073.15,
+        source_document=source, observation=row,
+    )
+
+    assert "knob_defaulted:evaporation_alpha:Mg=0.37" in result.engine_flags
+    assert any(
+        flag.startswith("knob_defaulted:evaporation_alpha:")
+        and "test mutation of the built-in HKL default" in flag
+        for flag in result.engine_flags
+    )
+
+
+@pytest.mark.parametrize(
+    "area_edit,reason",
+    [
+        ("remove", "sample_area_endpoints_not_stated"),
+        ("shape", "area_shape_not_self_similar"),
+        ("uncertainty", "sample_area_uncertainty_not_numeric"),
+    ],
+)
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
+def test_missing_or_non_self_similar_area_uses_equipment_default(
+    r11_inputs, prescribed_pressure_engine, fig3_source, area_edit, reason,
+):
+    import simulator.battery.residue as residue
+    from simulator.equipment import EquipmentDesigner
+
+    row, experiment = r11_inputs
+    source = deepcopy(fig3_source)
+    sample_area = source["species"]["Mg"]["observations"][0]["equipment"][
+        "sample_surface_area"
+    ]
+    if area_edit == "remove":
+        source["species"]["Mg"]["observations"] = []
+    elif area_edit == "shape":
+        sample_area["value"][0]["final_area_mm2"] = 50.0
+    else:
+        diameter = float(sample_area["value"][0]["diameter_mm"])
+        key = "one_mm_percent" if diameter == 1.0 else "larger_samples_percent"
+        sample_area["uncertainty"][key] = "not numeric"
+
+    result = residue.predict_mass_loss_fraction(
+        "openimcc", experiment, temperature_K=2073.15,
+        source_document=source, observation=row,
+    )
+
+    default_area = EquipmentDesigner().size_crucible(
+        float(experiment.sample.mass_kg.state.value.point)
+    ).melt_surface_area_m2
+    assert any(
+        flag.startswith(f"knob_defaulted:area={default_area:.17g} m2;")
+        and f"original_reason={reason}" in flag
+        for flag in result.engine_flags
+    )
+
+
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
+def test_full_prediction_uses_defaulted_unsourced_channel(
     r11_inputs, prescribed_pressure_engine,
 ):
     row, experiment = r11_inputs
     prescribed_pressure_engine["unsourced_ca"] = True
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert prediction.refusal_detail["reason"] == "alpha_not_sourced"
-    detail = json.loads(prediction.refusal_detail["detail"])
-    assert detail["bound_fraction"] > 0.01
-    assert detail["unsourced_channels"] == ["Ca"]
+    assert prediction.value is not None, prediction.refusal_detail
+    assert any(
+        notice.reason.startswith("knob_defaulted:evaporation_alpha:Ca=")
+        and notice.kind.value == "unverified_apparatus"
+        for notice in prediction.notices
+    )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("gases", [("Ca",), ("Ca", "Ca2")],
                          ids=["single-gas", "shared-parent-gases"])
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     gases, prescribed_pressure_engine, fig3_source, r11_inputs, monkeypatch,
 ):
@@ -562,7 +639,7 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
             "openimcc", experiment, temperature_K=2073.15,
             source_document=fig3_source, observation=row,
         )
-    assert failure.value.reason == "alpha_not_sourced"
+    assert failure.value.reason == "preheat_bound_not_negligible"
     bound = json.loads(failure.value.detail)
     assert integrations == [("sphere_constant", 2, 120.0),
                             ("sphere_shrinking", 2, 120.0), ("sphere_shrinking", 2, 120.0)]
@@ -578,7 +655,9 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     )
 
 
-def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch):
+def test_real_r11_preheat_bound_is_independent_of_defaulted_alpha(
+    fig3_source, r11_inputs, monkeypatch,
+):
     pytest.importorskip("openimcc")
     row, experiment = r11_inputs
     original = score_module.load_yaml
@@ -586,16 +665,8 @@ def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch)
         deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original(path)
     ))
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    assert prediction.refusal_detail["reason"] == "alpha_not_sourced", prediction.refusal_detail
-    bound = json.loads(prediction.refusal_detail["detail"])
-    assert bound["point_loss_kg"] > 0.0
-    assert bound["bound_fraction"] > 0.01
-    assert bound["corner_ordering_verified"]
-    assert bound["corner_steps"] > 0
-    assert bound["unsourced_bound_kg_by_channel"]["AlO2"] > 0.0
-    assert bound["inventory_bound_kg_by_parent"] == {}
-    assert bound["preheat_bound_kg"] > 0.0
-    assert bound["joint_arm_loss_kg_non_gating"] is not None
+    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert prediction.refusal_detail["reason"] == "preheat_bound_not_negligible"
 
 
 def test_pressure_ceiling_uses_net_flux_and_preserves_equilibrium_guard(fig3_source):
