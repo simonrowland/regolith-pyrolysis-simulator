@@ -254,7 +254,34 @@ def _assert_transitional_steps_are_flagged(diagnostics: list[dict]) -> None:
                 for notice in notices
             ), f"out-of-domain species {species} at step {step_number} lacked a notice"
 
-    assert out_of_domain_steps, "the run must reach out-of-domain transport"
+    # d-452 sizes the collection throat to the owner 0.5 m aperture
+    # (data/setpoints.yaml initial_throat_area_m2; green was 0.12 m).
+    # Kn = λ/D, so the same mean free path is 0.12/0.5 of the 12 cm value
+    # and this campaign stays below VISCOUS_KNUDSEN_MAX. The closure
+    # tolerances after this helper are unchanged. A transitional step, if
+    # one appears, is still required to carry the extrapolation notice.
+    weighted_knudsen_numbers = []
+    for diagnostic in diagnostics:
+        series = diagnostic.get("evaporation_series_resistance", {}) or {}
+        for species_diagnostic in series.values():
+            if not isinstance(species_diagnostic, dict):
+                continue
+            if species_diagnostic.get("gas_resistance_weight", 0.0) <= 0.0:
+                continue
+            knudsen_number = species_diagnostic.get("knudsen_number")
+            if isinstance(knudsen_number, (int, float)):
+                weighted_knudsen_numbers.append(float(knudsen_number))
+    assert weighted_knudsen_numbers, (
+        "the run must record in-domain gas-resistance Knudsen numbers"
+    )
+    assert all(
+        knudsen_number < VISCOUS_KNUDSEN_MAX
+        for knudsen_number in weighted_knudsen_numbers
+    ), (
+        "owner 0.5 m throat must keep this campaign below the viscous "
+        f"Knudsen ceiling {VISCOUS_KNUDSEN_MAX}; "
+        f"got {weighted_knudsen_numbers}"
+    )
 
 
 def _run_c2a_staged_to_completion(
