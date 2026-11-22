@@ -498,6 +498,12 @@ def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
 def test_richter_rep5_row_scores_with_defaulted_evaporation_coefficients(
     mass_loss_rows,
 ) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_ASSUMED,
+        flagged_strata,
+        headline_rows,
+    )
+
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows
     )
@@ -527,11 +533,41 @@ def test_richter_rep5_row_scores_with_defaulted_evaporation_coefficients(
     assert scored.status is not ResidualStatus.REFUSED
     assert scored.numeric is not None
     assert scored.refusal is None
-    assert any(
-        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and notice.reason.startswith("knob_defaulted:evaporation_alpha:")
+    alpha_default_notice = next(
+        notice
         for notice in scored.notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason.startswith("knob_defaulted:evaporation_alpha:")
     )
+    assert "original_reason=evaporation_coefficients_not_sourced" in (
+        alpha_default_notice.reason
+    )
+    assert scored.score_eligible is False
+    assert FLAGGED_STRATUM_ASSUMED in flagged_strata(scored.notices)
+
+    def measured_n(residual) -> int:
+        row = next(
+            item
+            for item in headline_rows(
+                (residual,),
+                context=context,
+                engines=(Engine.OPENIMCC,),
+                tier="measured",
+            )
+            if item["rail"] == residual.rail.value
+            and item["engine"] == Engine.OPENIMCC.value
+        )
+        return row["n"]
+
+    # The production residual is excluded from the clean measured headline.
+    assert measured_n(scored) == 0
+
+    # Mutation check: keeping only this real d-460 flag still excludes it;
+    # removing the flag makes the measured row enter the headline.
+    flagged_only = replace(scored, notices=(alpha_default_notice,))
+    assert measured_n(flagged_only) == 0
+    unflagged = replace(flagged_only, notices=())
+    assert measured_n(unflagged) == 1
 
 
 def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:

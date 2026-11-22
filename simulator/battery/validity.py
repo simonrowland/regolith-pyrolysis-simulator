@@ -874,6 +874,32 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
+    method_implies_effusion = (
+        method_state.is_value
+        and method_state.value is MethodToken.KNUDSEN_EFFUSION
+    )
+
+    def regime_gap_check(reason: object) -> GateCheck:
+        # A printed Knudsen-effusion method implies molecular effusion inside
+        # the cell and vacuum outside. In-cell total pressure remains the sum
+        # of partial pressures, never an assumed 1 atm; without the method the
+        # existing Drowart-limit fallback assumes free-molecular effusion.
+        flag = "method_implied" if method_implies_effusion else "assumed"
+        return GateCheck(
+            flag,
+            True,
+            {
+                "flag": flag,
+                "condition": (
+                    "molecular_effusion_inside_cell; vacuum_outside; "
+                    "total_pressure=sum_of_partial_pressures"
+                    if method_implies_effusion
+                    else "free_molecular_effusion_regime"
+                ),
+                "reason": reason or "orifice and in-cell pressure sum are not printed",
+            },
+        )
+
     regime = experiment.pressure_environment.regime
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)
@@ -1004,18 +1030,8 @@ def effusion_regime_unverified(
             # A lower bound already above the limit proves the cell is outside
             # the regime, even though species coverage is incomplete.
             pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
-        elif not diameters:
-            checks.append(
-                GateCheck(
-                    "effusion_regime_assumed",
-                    True,
-                    {
-                        "flag": "effusion_regime_assumed",
-                        "reason": pressure_detail.get("reason")
-                        or "orifice and in-cell pressure sum are not printed",
-                    },
-                )
-            )
+        elif method_implies_effusion or not diameters:
+            checks.append(regime_gap_check(pressure_detail.get("reason")))
             return _pass(checks)
         checks.append(
             GateCheck(
@@ -1045,13 +1061,8 @@ def effusion_regime_unverified(
         )
         if not diameters:
             checks.append(
-                GateCheck(
-                    "effusion_regime_assumed",
-                    True,
-                    {
-                        "flag": "effusion_regime_assumed",
-                        "reason": "no printed orifice diameter; used the Drowart 10 Pa cell limit",
-                    },
+                regime_gap_check(
+                    "no printed orifice diameter; used the Drowart 10 Pa cell limit"
                 )
             )
     if ungrounded_detail is not None:
