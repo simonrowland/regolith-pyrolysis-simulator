@@ -315,16 +315,10 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         engine="openimcc",
     )
     predictions = copy.deepcopy(cohort)
-    # The pin-port comparison covered 38,482 values and found zero numeric
-    # changes. This cohort digest moves because each record's
-    # provenance.openimcc_pin changes from 9c327c2 to 979adb2; OpenIMCC's
-    # bisect found zero numeric changes across four text/identity commits,
-    # including c75456f's v5-to-v6 default redox-pack reissue. The primary
-    # numeric outputs remain pinned below as float.hex (digest
-    # a4eec091ae9bbf962ba3667f8726eb5ca570d48250697614dc5b0898550cec0d
-    # -> ed1e1b31f5ec0d2420decb7f5283ffe176f4066b7207f07ccc926aa6c90bc787).
+    # 979adb2 -> bae51f7 moves this tuple digest via provenance.openimcc_pin.
+    # The float-hex primary pins below stay the numeric evidence.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
-        "ed1e1b31f5ec0d2420decb7f5283ffe176f4066b7207f07ccc926aa6c90bc787"
+        "29fbb2721e3dfe7837eb37d923ca8f6257e8eb6407755ae99cb1691b09f2a668"
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
