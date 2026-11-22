@@ -219,7 +219,7 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
 CACHE_SITES: dict[str, dict[str, Any]] = {
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 97,
+        "line": 102,
         "kind": 'lru',
         "name": '_string_bytes',
         "carries_disclosure": False,
@@ -227,23 +227,15 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:_key_float_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 107,
+        "line": 112,
         "kind": 'lru',
         "name": '_key_float_bytes',
         "carries_disclosure": False,
         "how": 'Memoized HOT key float encoding. It returns bytes, not an evaluated vapour-law result.',
     },
-    'lru:simulator/engine_cache.py:_engine_cache_input_identity_digest': {
-        "path": 'simulator/engine_cache.py',
-        "line": 523,
-        "kind": 'lru',
-        "name": '_engine_cache_input_identity_digest',
-        "carries_disclosure": False,
-        "how": 'Memoized digest of declared engine-cache inputs. It returns bytes for the cache key, not an evaluated vapour-law result.',
-    },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 1052,
+        "line": 1131,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -267,7 +259,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 627,
+        "line": 706,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -275,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 1239,
+        "line": 1328,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,

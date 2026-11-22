@@ -1,7 +1,8 @@
 """One process-local HOT SQLite cache for engine outputs.
 
-Chemistry changes expire cached outputs only when the engine's manually
-maintained chemistry version is bumped.
+The key is the engine number, the chemistry version, and the request.
+Read and write never delete a row. Species expiry and version prune are
+manual tools in scripts/engine_cache_sync.py.
 """
 
 from __future__ import annotations
@@ -12,13 +13,11 @@ import inspect
 import json
 import logging
 import math
-import re
 import struct
 import os
 import sqlite3
 import threading
 import time
-import tomllib
 import zlib
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
@@ -162,7 +161,7 @@ def pack(value, *, key: bool = False) -> bytes:
     raise TypeError(f"unsupported cache shape: {type(value).__name__}")
 
 
-def unpack(data: bytes):
+def unpack(data: bytes, *, key: bool = False):
     position = 0
 
     def take(size):
@@ -182,6 +181,22 @@ def unpack(data: bytes):
                 return result
             shift += 7
 
+    def read_key_float():
+        # Inverse of _key_float_bytes. Sign 0 is the negated, bit-inverted body.
+        sign = take(1)[0]
+        raw = take(10)
+        if sign == 0:
+            raw = bytes(byte ^ 255 for byte in raw)
+        elif sign != 1:
+            raise ValueError(f"invalid key float sign {sign}")
+        exponent, fixed = struct.unpack(">HQ", raw)
+        exponent -= 1074
+        if fixed == 0 and exponent == -1074:
+            value = 0.0
+        else:
+            value = math.ldexp(fixed / (1 << 53), exponent)
+        return -value if sign == 0 else value
+
     def read():
         tag = take(1)[0]
         if tag == 0:
@@ -200,6 +215,10 @@ def unpack(data: bytes):
             return tuple(items) if tag == 7 else items
         if tag == 8:
             return {read(): read() for _ in range(unsigned())}
+        if tag == 9:
+            if not key:
+                raise ValueError("invalid cache value tag 9")
+            return read_key_float()
         if tag == 10:
             return _Reference(unsigned())
         if tag == 11:
@@ -209,7 +228,9 @@ def unpack(data: bytes):
         if tag == 13:
             integer = unsigned()
             return float(-(integer // 2) - 1 if integer & 1 else integer // 2)
-        if 128 <= tag < 128 + len(_VALUE_TOKENS):
+        if key and 128 <= tag < 128 + len(_KEY_FIELDS):
+            return _KEY_FIELDS[tag - 128]
+        if not key and 128 <= tag < 128 + len(_VALUE_TOKENS):
             return _VALUE_TOKENS[tag - 128]
         raise ValueError(f"invalid cache value tag {tag}")
 
@@ -457,213 +478,125 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
 
 
-@dataclass(frozen=True)
-class EngineCacheInput:
-    path: str
-    kind: str
-    selector: str | None
-
-
 _ENGINE_CACHE_ROOT = Path(__file__).resolve().parents[1]
-
-# Only inputs read by a numeric engine path belong here. Package code/data
-# selected by each lock or OpenIMCC pin are covered by that immutable pin;
-# code-side tables stay under the versioned live-probe guard.
-# PySulfSat runs after cached equilibrium, and Thermobar has no cached-engine
-# caller, so neither lock entry can affect the value stored by this cache.
-ENGINE_CACHE_INPUTS = {
-    "openimcc": (
-        EngineCacheInput(
-            "pyproject.toml", "pyproject-dependency", "openimcc"
-        ),  # This pin selects OpenIMCC's solver and packaged datapacks.
-    ),
-    "internal-analytical": (
-        EngineCacheInput(
-            "pyproject.toml", "pyproject-dependency", "openimcc"
-        ),  # The oxygen-balance branch delegates to OpenIMCC.
-        EngineCacheInput(
-            "data/vapor_pressures.yaml", "data", None
-        ),  # The builtin vapor-pressure provider reads these coefficients.
-        EngineCacheInput(
-            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
-        ),  # The builtin catalog reads these executable NASA thermo rows.
-        EngineCacheInput(
-            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
-        ),  # The builtin catalog reads these executable IVTAN thermo rows.
-        EngineCacheInput(
-            "data/setpoints.yaml", "data", None
-        ),  # The core reads fallback and activity settings from this file.
-        EngineCacheInput(
-            "data/species_catalog.yaml", "data", None
-        ),  # The core's formula registry supplies formula masses for this path.
-    ),
-    "vaporock": (
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
-        ),  # VapoRock supplies the cached vapor result.
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
-        ),  # The VapoRock package loads ThermoEngine native libraries.
-    ),
-    "magemin": (
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.magemin"
-        ),  # This entry selects MAGEMin source, patches and built artifact.
-    ),
-    "alphamelts": (
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.alphamelts"
-        ),  # This entry selects the alphaMELTS runtime artifact.
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.petthermotools"
-        ),  # The alternate Python transport runs PetThermoTools.
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
-        ),  # The Python transport delegates vapor equilibrium to VapoRock.
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
-        ),  # VapoRock loads ThermoEngine native libraries.
-        EngineCacheInput(
-            "pyproject.toml", "pyproject-dependency", "openimcc"
-        ),  # Builtin subprocess projection may evaluate melt activity with OpenIMCC.
-        EngineCacheInput(
-            "data/vapor_pressures.yaml", "data", None
-        ),  # Shared MELTS support reads coefficients for oxide vapor projection.
-        EngineCacheInput(
-            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
-        ),  # Shared MELTS support reads CEA rows for O2 dissociation.
-        EngineCacheInput(
-            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
-        ),  # Catalog fallback reads this executable IVTAN extract.
-    ),
-    "thermoengine": (
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
-        ),  # This entry selects ThermoEngine source, patches and native libraries.
-        EngineCacheInput(
-            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
-        ),  # ThermoEngine delegates its vapor path to VapoRock.
-        EngineCacheInput(
-            "data/vapor_pressures.yaml", "data", None
-        ),  # Shared MELTS support reads coefficients for oxide vapor projection.
-        EngineCacheInput(
-            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
-        ),  # Shared MELTS support reads CEA rows for O2 dissociation.
-        EngineCacheInput(
-            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
-        ),  # Catalog-backed vapor fallback reads this executable IVTAN extract.
-    ),
-}
-_ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
 _ENGINE_CACHE_KEY_PREFIX_BYTES = 4
+_UNKNOWN_PRE_MIGRATION_BUILD = "unknown-pre-migration"
+
+# Species live in the request the key already packs. They are recorded beside
+# the row so a manual expire can find them. They are not added to the key:
+# a key change would miss every row the studios are warming.
+
+# Production request builders name species in these fields.
+# composition_*: openimcc evaluate, internal-analytical, and the isolated-cell
+# engines. parent_oxide_activities / parent_oxides: openimcc evaluate_gas.
+# inventory: openimcc evaluate_redox. native_activity_formula: the magemin
+# activity request. kwargs: the battery vapor path wraps those same fields.
+_SPECIES_MAP_FIELDS = (
+    "composition_wt_pct",
+    "composition_mol",
+    "composition_kg",
+    "composition",
+    "parent_oxide_activities",
+    "inventory",
+)
+_SPECIES_SEQUENCE_FIELDS = ("parent_oxides",)
+_SPECIES_NAME_FIELDS = ("native_activity_formula",)
+_SPECIES_NESTED_FIELDS = ("kwargs",)
 
 
-class EngineCacheInputIdentityError(ValueError):
-    """A declared engine pin or runtime data input cannot be identified."""
+class EngineCacheSpeciesError(ValueError):
+    """A cache request names species in a shape this record cannot store."""
 
-    def __init__(self, engine_id: str, path: str, reason: str) -> None:
-        self.engine_id = engine_id
-        self.path = path
+    def __init__(self, field: str, reason: str) -> None:
+        self.field = field
         self.reason = reason
-        super().__init__(
-            f"engine cache input identity unavailable for {engine_id!r} at "
-            f"{path!r}: {reason}"
-        )
+        super().__init__(f"engine cache species field {field!r}: {reason}")
 
 
-def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes:
-    path = _ENGINE_CACHE_ROOT / input_ref.path
-    try:
-        source = path.read_bytes()
-    except OSError as exc:
-        raise EngineCacheInputIdentityError(
-            engine_id, input_ref.path, f"cannot read declared input ({exc})"
-        ) from exc
+def _species_name(field: str, name: object) -> str:
+    if not isinstance(name, str) or not name:
+        raise EngineCacheSpeciesError(field, "names must be non-empty strings")
+    return name
 
-    if input_ref.kind == "data":
-        return source
 
-    try:
-        document = tomllib.loads(source.decode("utf-8"))
-    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
-        raise EngineCacheInputIdentityError(
-            engine_id, input_ref.path, f"invalid TOML input ({exc})"
-        ) from exc
-
-    if input_ref.kind == "engine-lock":
-        try:
-            selector_root, selector_name = (input_ref.selector or "").split(".", 1)
-            value = document[selector_root][selector_name]
-        except (KeyError, ValueError, TypeError) as exc:
-            raise EngineCacheInputIdentityError(
-                engine_id,
-                input_ref.path,
-                f"missing lock entry {input_ref.selector!r}",
-            ) from exc
-    elif input_ref.kind == "pyproject-dependency":
-        dependency_name = (input_ref.selector or "").replace("_", "-").lower()
-        project = document.get("project")
-        if not isinstance(project, Mapping):
-            raise EngineCacheInputIdentityError(
-                engine_id, input_ref.path, "project is not a TOML table"
+def _collect_species_fields(payload: Mapping[str, Any], found: set[str]) -> None:
+    for field in _SPECIES_MAP_FIELDS:
+        if field not in payload:
+            continue
+        value = payload[field]
+        if value is None:
+            continue
+        if not isinstance(value, Mapping):
+            raise EngineCacheSpeciesError(
+                field, f"must be a mapping or null, found {type(value).__name__}"
             )
-        dependencies = project.get("dependencies", ())
-        if not isinstance(dependencies, list):
-            raise EngineCacheInputIdentityError(
-                engine_id, input_ref.path, "project.dependencies is not a list"
+        for name in value:
+            found.add(_species_name(field, name))
+    for field in _SPECIES_SEQUENCE_FIELDS:
+        if field not in payload:
+            continue
+        value = payload[field]
+        if value is None:
+            continue
+        if isinstance(value, (str, bytes)) or not isinstance(value, (list, tuple)):
+            raise EngineCacheSpeciesError(
+                field, f"must be a sequence of names or null, found {type(value).__name__}"
             )
-        matches = []
-        for dependency in dependencies:
-            if not isinstance(dependency, str):
-                continue
-            match = re.match(r"\s*([A-Za-z0-9._-]+)", dependency)
-            if match and match.group(1).replace("_", "-").lower() == dependency_name:
-                matches.append(dependency)
-        if len(matches) != 1:
-            raise EngineCacheInputIdentityError(
-                engine_id,
-                input_ref.path,
-                f"expected one {dependency_name!r} dependency, found {len(matches)}",
+        for name in value:
+            found.add(_species_name(field, name))
+    for field in _SPECIES_NAME_FIELDS:
+        if field not in payload or payload[field] is None:
+            continue
+        found.add(_species_name(field, payload[field]))
+
+
+def cache_request_species(request: Any) -> frozenset[str]:
+    """Species the request names as inputs. Empty when it names none.
+
+    A field that is present but not a species map refuses. Storing that
+    request as "no species" would let expire --species keep a row that
+    depended on one.
+    """
+
+    if not isinstance(request, Mapping):
+        raise EngineCacheSpeciesError("request", "must be a mapping")
+    found: set[str] = set()
+    _collect_species_fields(request, found)
+    for field in _SPECIES_NESTED_FIELDS:
+        if field not in request or request[field] is None:
+            continue
+        nested = request[field]
+        if not isinstance(nested, Mapping):
+            raise EngineCacheSpeciesError(
+                field, f"must be a mapping or null, found {type(nested).__name__}"
             )
-        value = matches[0]
-    else:
-        raise EngineCacheInputIdentityError(
-            engine_id, input_ref.path, f"unknown input kind {input_ref.kind!r}"
-        )
+        _collect_species_fields(nested, found)
+    return frozenset(found)
 
+
+def species_from_natural_key(key: bytes) -> frozenset[str] | None:
+    """Species packed in a natural key.
+
+    None means the key is the blake2b fallback (flag 0xff). The payload is
+    not recoverable. Callers store no species rows, so expire --species does
+    not match them. --all and prune still do. An empty frozenset is a real
+    request that named no species; it is not this case.
+    """
+
+    if len(key) < _ENGINE_CACHE_KEY_PREFIX_BYTES:
+        raise EngineCacheSpeciesError("key", "shorter than the engine/version prefix")
+    flag = key[3]
+    if flag == 0xFF:
+        return None
+    if flag != 0:
+        raise EngineCacheSpeciesError("key", f"unknown key flag {flag}")
     try:
-        return json.dumps(
-            value, sort_keys=True, separators=(",", ":"), ensure_ascii=True
-        ).encode("ascii")
-    except (TypeError, ValueError) as exc:
-        raise EngineCacheInputIdentityError(
-            engine_id, input_ref.path, f"input is not canonicalizable ({exc})"
+        request = unpack(key[_ENGINE_CACHE_KEY_PREFIX_BYTES:], key=True)
+    except (TypeError, ValueError, UnicodeDecodeError) as exc:
+        raise EngineCacheSpeciesError(
+            "key", f"natural payload is not a request ({exc})"
         ) from exc
-
-
-@lru_cache(maxsize=None)
-def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
-    try:
-        inputs = ENGINE_CACHE_INPUTS[engine_id]
-    except KeyError as exc:
-        raise EngineCacheInputIdentityError(
-            engine_id, "ENGINE_CACHE_INPUTS", "engine has no declared inputs"
-        ) from exc
-
-    digest = hashlib.blake2b(digest_size=_ENGINE_CACHE_INPUT_IDENTITY_BYTES)
-    digest.update(b"engine-cache-input-identity-v1\0")
-    digest.update(engine_id.encode("utf-8"))
-    for input_ref in inputs:
-        label = json.dumps(
-            (input_ref.path, input_ref.kind, input_ref.selector),
-            separators=(",", ":"),
-        ).encode("utf-8")
-        component = _cache_input_component(engine_id, input_ref)
-        digest.update(len(label).to_bytes(4, "big"))
-        digest.update(label)
-        digest.update(len(component).to_bytes(8, "big"))
-        digest.update(component)
-    return digest.digest()
+    return cache_request_species(request)
 
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
@@ -696,7 +629,11 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
 OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
 
 _TABLE = "engine_outputs"
-_CACHE_SCHEMA_VERSION = 3
+_SPECIES_TABLE = "engine_output_species"
+_CACHE_SCHEMA_VERSION = 4
+_V3_OUTPUT_COLUMNS = (
+    "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id",
+)
 _CACHE_TABLE_DEFINITIONS = (
     (
         _TABLE,
@@ -713,10 +650,30 @@ _CACHE_TABLE_DEFINITIONS = (
     ),
     ("provenance", (("id", "INTEGER PRIMARY KEY"), ("value", "BLOB NOT NULL UNIQUE")), False),
     ("box_sequences", (("source_box", "TEXT PRIMARY KEY"), ("next_seq", "INTEGER NOT NULL")), True),
+    (
+        _SPECIES_TABLE,
+        (
+            ("source_box", "TEXT NOT NULL"),
+            ("row_seq", "INTEGER NOT NULL"),
+            ("species", "TEXT NOT NULL"),
+        ),
+        True,
+    ),
 )
+# Composite primary key is not a column clause. WITHOUT ROWID requires it.
+_CACHE_TABLE_CONSTRAINTS = {
+    _SPECIES_TABLE: "PRIMARY KEY(source_box, row_seq, species)",
+}
+_CACHE_TABLE_PRIMARY_KEYS = {
+    _SPECIES_TABLE: ("source_box", "row_seq", "species"),
+}
 _CACHE_INDEX_DEFINITIONS = (
     ("engine_outputs_box_seq", _TABLE, ("source_box", "row_seq"), True),
     ("engine_outputs_engine_version", _TABLE, ("engine", "chem_version"), False),
+    # expire --species looks up by species. The primary key leads with the row,
+    # so it does not serve that lookup. Without this index the manual tool
+    # would scan every warmed row.
+    ("engine_output_species_species", _SPECIES_TABLE, ("species",), False),
 )
 _SYNC_WATERMARKS_TABLE = "sync_watermarks"
 _ENGINE_NUMBERS = {
@@ -1287,9 +1244,17 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
             if table not in found_tables:
                 continue
             expected = expected_columns[table]
-            found = tuple(row[1] for row in connection.execute(f"PRAGMA table_info({table})"))
+            info = list(connection.execute(f"PRAGMA table_info({table})"))
+            found = tuple(row[1] for row in info)
             if found != expected:
                 raise EngineCacheSchemaMismatch(table, expected, found)
+            expected_pk = _CACHE_TABLE_PRIMARY_KEYS.get(table)
+            if expected_pk is not None:
+                found_pk = tuple(
+                    row[1] for row in sorted((item for item in info if item[5]), key=lambda item: item[5])
+                )
+                if found_pk != expected_pk:
+                    raise EngineCacheSchemaMismatch(table, expected_pk, found_pk)
 
         empty = not found_tables
         if empty:
@@ -1314,10 +1279,12 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
                 "SELECT name, tbl_name FROM sqlite_master WHERE type='index'"
             )
         }
-        table_indexes = {
-            row[1]: bool(row[2])
-            for row in connection.execute(f"PRAGMA index_list({_TABLE})")
-        } if _TABLE in found_tables else {}
+        table_indexes: dict[str, bool] = {}
+        for table_name in expected_tables:
+            if table_name not in found_tables:
+                continue
+            for row in connection.execute(f"PRAGMA index_list({table_name})"):
+                table_indexes[row[1]] = bool(row[2])
         missing_indexes = set()
         for name, table, columns, unique in _CACHE_INDEX_DEFINITIONS:
             if name not in found_indexes:
@@ -1368,6 +1335,9 @@ def _initialize_cache(connection: sqlite3.Connection) -> None:
         try:
             for table, columns, without_rowid in _CACHE_TABLE_DEFINITIONS:
                 definitions = ", ".join(f"{name} {sql}" for name, sql in columns)
+                constraint = _CACHE_TABLE_CONSTRAINTS.get(table)
+                if constraint:
+                    definitions = f"{definitions}, {constraint}"
                 suffix = " WITHOUT ROWID" if without_rowid else ""
                 connection.execute(
                     f"CREATE TABLE IF NOT EXISTS {table} ({definitions}){suffix}"
@@ -1523,14 +1493,20 @@ def _insert_cache_row_if_absent(
     row_seq: int | None = None,
     *,
     provenance: bytes = b"",
-) -> tuple[bool, bool]:
-    """Insert one output only when absent; report whether existing bytes conflict."""
+    species: frozenset[str] | None = None,
+) -> tuple[bool, bool, int | None]:
+    """Insert one output only when absent; report whether existing bytes conflict.
+
+    ``species`` is recorded only for a new row. None leaves the side table
+    alone so a merge can copy the source rows, including species a blake2b
+    key can no longer decode.
+    """
     row = connection.execute(
         f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (digest,)
     ).fetchone()
     if row is not None:
         existing_provenance = _read_provenance(connection, row[1])
-        return False, bytes(row[0]) != bytes(value) or existing_provenance != provenance
+        return False, bytes(row[0]) != bytes(value) or existing_provenance != provenance, None
     provenance_id = 0
     if provenance:
         connection.execute("INSERT OR IGNORE INTO provenance(value) VALUES (?)", (provenance,))
@@ -1553,7 +1529,21 @@ def _insert_cache_row_if_absent(
             provenance_id,
         ),
     )
-    return True, False
+    if species:
+        _write_output_species(connection, source_box, row_seq, species)
+    return True, False, row_seq
+
+
+def _write_output_species(
+    connection: sqlite3.Connection,
+    source_box: str,
+    row_seq: int,
+    species: frozenset[str],
+) -> None:
+    connection.executemany(
+        f"INSERT OR IGNORE INTO {_SPECIES_TABLE}(source_box, row_seq, species) VALUES (?,?,?)",
+        [(source_box, row_seq, name) for name in sorted(species)],
+    )
 
 
 def _advance_box_sequence(connection: sqlite3.Connection, source_box: str, row_seq: int) -> None:
@@ -1588,19 +1578,74 @@ def _read_provenance(connection: sqlite3.Connection, provenance_id: int) -> byte
     return bytes(row[0])
 
 
+def _forensic_build_identity(engine_id: str) -> str:
+    """Runtime identity for a new COLD row. Hits never call this.
+
+    A failure becomes an ``unknown:`` string. Trace metadata must not reject
+    a cache write, and it must not pretend the build was identified.
+    """
+
+    try:
+        identity = runtime_identity(engine_id)
+    except Exception as exc:
+        return f"unknown:{type(exc).__name__}:{exc}"
+    if isinstance(identity, RuntimeIdentityUnknown):
+        return f"unknown:{identity.reason}:{identity.detail}"
+    if isinstance(identity, str) and identity:
+        return identity
+    return f"unknown:untyped:{identity!r}"
+
+
+def _ensure_build_id(
+    connection: sqlite3.Connection, schema: str, engine: str, identity: str
+) -> int:
+    # UNIQUE(engine, identity), not identity alone: two engines that share a
+    # forensic string must not be collapsed into one row.
+    connection.execute(
+        f"INSERT OR IGNORE INTO {schema}.engine_builds(engine, identity) VALUES (?, ?)",
+        (engine, identity),
+    )
+    row = connection.execute(
+        f"SELECT id FROM {schema}.engine_builds WHERE engine=? AND identity=?",
+        (engine, identity),
+    ).fetchone()
+    if row is None:
+        raise EngineCacheSpeciesError("engine_build", "insert did not yield an id")
+    return int(row[0])
+
+
 def _initialize_cold(connection: sqlite3.Connection, schema: str = "main") -> None:
-    # Trace metadata only; cache lookup reads HOT and never consults this field.
-    connection.execute(f"CREATE TABLE IF NOT EXISTS {schema}.engine_values "
-                       "(key BLOB PRIMARY KEY, value BLOB NOT NULL, "
-                       "input_fingerprint BLOB) WITHOUT ROWID")
+    # An existing table is left for the schema check or for migrate. Creating
+    # over a schema-3 file would hide the key blob this migration has to move.
+    existing = connection.execute(
+        f"SELECT 1 FROM {schema}.sqlite_master WHERE type='table' AND name='engine_values'"
+    ).fetchone()
+    if existing:
+        return
+    connection.execute(
+        f"CREATE TABLE {schema}.engine_builds ("
+        "id INTEGER PRIMARY KEY, engine TEXT NOT NULL, identity TEXT NOT NULL, "
+        "UNIQUE(engine, identity))"
+    )
+    # row_seq alone, not (source_box, row_seq). ENGINE_CACHE_BOX_RANGES are
+    # disjoint 1e12-wide intervals, and the allocator refuses a sequence
+    # outside its box, so one integer names the HOT row without repeating
+    # the key blob. A colliding row_seq fails this primary key instead of
+    # attaching the value to the wrong row.
+    connection.execute(
+        f"CREATE TABLE {schema}.engine_values ("
+        "row_seq INTEGER PRIMARY KEY, value BLOB NOT NULL, "
+        "engine_build_id INTEGER NOT NULL) WITHOUT ROWID"
+    )
+    connection.execute(f"PRAGMA {schema}.user_version={_CACHE_SCHEMA_VERSION}")
 
 
 def _store_cold(
     connection: sqlite3.Connection,
     path: Path,
-    key: bytes,
+    row_seq: int,
     values: Mapping[str, Any],
-    input_fingerprint: bytes | None = None,
+    engine_id: str,
 ) -> None:
     if not any(row[1] == "cold" for row in connection.execute("PRAGMA database_list")):
         cold_path = _cache_pair(path)[1]
@@ -1615,14 +1660,17 @@ def _store_cold(
         connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
         _check_cold_schema(connection)
     if values:
+        build_id = _ensure_build_id(
+            connection, "cold", engine_id, _forensic_build_identity(engine_id)
+        )
         value = zlib.compress(pack(values), level=6)
         connection.execute(
             "INSERT OR REPLACE INTO cold.engine_values "
-            "(key, value, input_fingerprint) VALUES (?, ?, ?)",
-            (key, value, input_fingerprint),
+            "(row_seq, value, engine_build_id) VALUES (?, ?, ?)",
+            (row_seq, value, build_id),
         )
     else:
-        connection.execute("DELETE FROM cold.engine_values WHERE key=?", (key,))
+        connection.execute("DELETE FROM cold.engine_values WHERE row_seq=?", (row_seq,))
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
@@ -1746,9 +1794,19 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts[name] = counts.get(name, 0) + 1
         return hot
     try:
+        # Recorded beside the row, never inside engine_cache_key. A key change
+        # would miss every warmed entry. An unreadable species field is not
+        # stored as an empty set: expire --species would then keep it.
+        species = cache_request_species(request)
+    except EngineCacheSpeciesError:
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:species"] = counts.get("not_stored:species", 0) + 1
+        return hot
+    try:
         with _LOCK:
             connection.execute("BEGIN IMMEDIATE")
-            inserted, conflict = _insert_cache_row_if_absent(
+            inserted, conflict, row_seq = _insert_cache_row_if_absent(
                 connection,
                 cache_key,
                 hot_value,
@@ -1756,24 +1814,15 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 str(chem_version),
                 source_box,
                 provenance=provenance,
+                species=species,
             )
             if inserted:
                 cold_values = solved.cold if isinstance(solved, EngineCacheValue) else {}
-                input_fingerprint = None
-                # Fingerprint source inputs only for a newly created COLD output row.
-                if cold_values:
-                    try:
-                        input_fingerprint = _engine_cache_input_identity_digest(engine_id)
-                    except EngineCacheInputIdentityError:
-                        # Trace metadata must never prevent an otherwise valid cache write.
-                        pass
-                _store_cold(
-                    connection,
-                    path,
-                    cache_key,
-                    cold_values,
-                    input_fingerprint,
-                )
+                if row_seq is None:
+                    raise EngineCacheSpeciesError("row_seq", "a new row did not receive a sequence")
+                # Build id is forensic only and is written with the COLD value.
+                # The hit path above returns before this call.
+                _store_cold(connection, path, row_seq, cold_values, engine_id)
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
@@ -1851,7 +1900,8 @@ def load_cache_rows(
     connection.execute("BEGIN IMMEDIATE")
     try:
         for digest, value, engine, version, source_box, row_seq, provenance in values:
-            inserted, conflict = _insert_cache_row_if_absent(
+            decoded = species_from_natural_key(digest)
+            inserted, conflict, _stored_seq = _insert_cache_row_if_absent(
                 connection,
                 digest,
                 value,
@@ -1860,6 +1910,7 @@ def load_cache_rows(
                 source_box,
                 row_seq,
                 provenance=provenance,
+                species=frozenset() if decoded is None else decoded,
             )
             inserted_count += int(inserted)
             if inserted:
@@ -1896,14 +1947,19 @@ def _cache_uri(path: Path, mode: str = "ro") -> str:
 
 
 def _check_cold_schema(connection: sqlite3.Connection) -> None:
-    expected = ["key", "value", "input_fingerprint"]
+    expected_values = ["row_seq", "value", "engine_build_id"]
     found = [row[1] for row in connection.execute("PRAGMA cold.table_info(engine_values)")]
-    if found != expected:
-        raise EngineCacheSchemaMismatch("cold.engine_values", expected, found)
-    # The lean COLD format has always used SQLite's default namespace (0).
+    if found != expected_values:
+        raise EngineCacheSchemaMismatch("cold.engine_values", expected_values, found)
+    expected_builds = ["id", "engine", "identity"]
+    found_builds = [row[1] for row in connection.execute("PRAGMA cold.table_info(engine_builds)")]
+    if found_builds != expected_builds:
+        raise EngineCacheSchemaMismatch("cold.engine_builds", expected_builds, found_builds)
     namespace = connection.execute("PRAGMA cold.user_version").fetchone()[0]
-    if namespace != 0:
-        raise EngineCacheSchemaMismatch("cold.user_version", ("0",), (str(namespace),))
+    if namespace != _CACHE_SCHEMA_VERSION:
+        raise EngineCacheSchemaMismatch(
+            "cold.user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
+        )
 
 
 @contextmanager
@@ -1968,8 +2024,10 @@ def snapshot_cache(live: Path, out: Path) -> dict[str, Any]:
             with closing(sqlite3.connect(_cache_pair(out)[1])) as cold:
                 cold.execute("ATTACH DATABASE ? AS hot", (_cache_uri(out),))
                 # A failed live solve may have committed COLD before rolling back HOT.
+                # COLD is keyed by row_seq. A value with no HOT row is the orphan
+                # a failed solve left behind; snapshot still drops those.
                 cold.execute("DELETE FROM engine_values WHERE NOT EXISTS ("
-                             "SELECT 1 FROM hot.engine_outputs h WHERE h.key=engine_values.key)")
+                             "SELECT 1 FROM hot.engine_outputs h WHERE h.row_seq=engine_values.row_seq)")
                 cold.commit()
     return engine_cache_stats(out)
 
@@ -2019,14 +2077,25 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                     for key, value, engine, version, seq, provenance in cursor:
                         counts["read"] += 1
                         incoming_cold = source.execute(
-                            "SELECT value,input_fingerprint FROM cold.engine_values WHERE key=?", (key,),
+                            "SELECT v.value, b.engine, b.identity "
+                            "FROM cold.engine_values v "
+                            "LEFT JOIN cold.engine_builds b ON b.id=v.engine_build_id "
+                            "WHERE v.row_seq=?",
+                            (seq,),
                         ).fetchone() if has_cold else None
-                        kept_cold = destination.execute(
-                            "SELECT value,input_fingerprint FROM cold.engine_values WHERE key=?", (key,),
-                        ).fetchone()
-                        inserted, conflict = _insert_cache_row_if_absent(
+                        if incoming_cold and (incoming_cold[1] is None or incoming_cold[2] is None):
+                            raise EngineCacheSchemaMismatch(
+                                "cold.engine_builds", ("engine", "identity"), ()
+                            )
+                        inserted, conflict, _stored_seq = _insert_cache_row_if_absent(
                             destination, key, value, engine, version, box, seq, provenance=provenance,
                         )
+                        kept_box, kept_seq = destination.execute(
+                            "SELECT source_box,row_seq FROM engine_outputs WHERE key=?", (key,),
+                        ).fetchone()
+                        kept_cold = destination.execute(
+                            "SELECT value FROM cold.engine_values WHERE row_seq=?", (kept_seq,),
+                        ).fetchone()
                         conflict = conflict or bool(
                             incoming_cold and kept_cold and incoming_cold[0] != kept_cold[0]
                         )
@@ -2034,19 +2103,33 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                         counts["conflicts"] += int(conflict)
                         counts["already_present"] += int(not inserted and not conflict)
                         if conflict:
-                            kept_box, kept_seq = destination.execute(
-                                "SELECT source_box,row_seq FROM engine_outputs WHERE key=?", (key,),
-                            ).fetchone()
                             report.write(json.dumps({
                                 "key": key.hex(), "master": {"source_box": kept_box, "row_seq": kept_seq},
                                 "input": {"source_box": box, "row_seq": seq},
                             }, sort_keys=True) + "\n")
-                        elif incoming_cold:
-                            destination.execute(
-                                "INSERT OR IGNORE INTO cold.engine_values "
-                                "(key, value, input_fingerprint) VALUES (?, ?, ?)",
-                                (key, incoming_cold[0], incoming_cold[1]),
+                        else:
+                            # Same stored value. Fill species the master does not
+                            # yet name, including a digest key recorded at write.
+                            # A conflicting value does not contribute species:
+                            # that would let expire delete the kept row.
+                            names = source.execute(
+                                f"SELECT species FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
+                                (box, seq),
+                            ).fetchall()
+                            destination.executemany(
+                                f"INSERT OR IGNORE INTO {_SPECIES_TABLE}"
+                                "(source_box, row_seq, species) VALUES (?,?,?)",
+                                [(kept_box, kept_seq, name) for (name,) in names],
                             )
+                            if incoming_cold:
+                                build_id = _ensure_build_id(
+                                    destination, "cold", incoming_cold[1], incoming_cold[2]
+                                )
+                                destination.execute(
+                                    "INSERT OR IGNORE INTO cold.engine_values "
+                                    "(row_seq, value, engine_build_id) VALUES (?, ?, ?)",
+                                    (kept_seq, incoming_cold[0], build_id),
+                                )
                         last = seq
                     if last > (watermark[0] if watermark else 0):
                         destination.execute(
@@ -2067,6 +2150,419 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
     return {**counts, **engine_cache_stats(into), "conflict_report": str(report_path), "vacuumed": vacuum}
 
 
+def _create_species_table(connection: sqlite3.Connection) -> None:
+    columns = next(
+        spec for table, spec, _without in _CACHE_TABLE_DEFINITIONS if table == _SPECIES_TABLE
+    )
+    definitions = ", ".join(f"{name} {sql}" for name, sql in columns)
+    definitions = f"{definitions}, {_CACHE_TABLE_CONSTRAINTS[_SPECIES_TABLE]}"
+    connection.execute(
+        f"CREATE TABLE IF NOT EXISTS {_SPECIES_TABLE} ({definitions}) WITHOUT ROWID"
+    )
+    connection.execute(
+        "CREATE INDEX IF NOT EXISTS engine_output_species_species "
+        f"ON {_SPECIES_TABLE}(species)"
+    )
+
+
+def _forget_process_cache(path: Path) -> None:
+    expanded = path.expanduser().resolve()
+    with _LOCK:
+        for memory_key in tuple(_MEMORY_CACHE):
+            try:
+                same = Path(str(memory_key[0])).expanduser().resolve() == expanded
+            except OSError:
+                same = False
+            if same:
+                del _MEMORY_CACHE[memory_key]
+    if _CONNECTION_PATH is not None and _CONNECTION_PATH.expanduser().resolve() == expanded:
+        _close_connections()
+
+
+def _maintenance_connection(path: Path) -> tuple[sqlite3.Connection, bool]:
+    """Open a schema-4 file for a manual tool. Does not migrate and does not expire on its own."""
+    path = path.expanduser()
+    if not path.is_file():
+        raise FileNotFoundError(str(path))
+    connection = sqlite3.connect(str(path), timeout=_TIMEOUT_MS / 1000)
+    try:
+        _check_cache_schema(connection)
+        cold_path = _cache_pair(path)[1]
+        has_cold = cold_path.exists()
+        if has_cold:
+            if connection.in_transaction:
+                connection.commit()
+            connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
+            _check_cold_schema(connection)
+        return connection, has_cold
+    except BaseException:
+        connection.close()
+        raise
+
+
+def _rows_by_engine(connection: sqlite3.Connection) -> dict[str, int]:
+    return {
+        str(engine): int(count)
+        for engine, count in connection.execute(
+            f"SELECT engine, COUNT(*) FROM {_TABLE} GROUP BY engine ORDER BY engine"
+        )
+    }
+
+
+def _delete_cached_rows(
+    connection: sqlite3.Connection,
+    has_cold: bool,
+    pairs: list[tuple[str, int]],
+) -> None:
+    if not pairs:
+        return
+    connection.executemany(
+        f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
+        pairs,
+    )
+    connection.executemany(
+        f"DELETE FROM {_TABLE} WHERE source_box=? AND row_seq=?",
+        pairs,
+    )
+    if has_cold:
+        # row_seq is unique across boxes because the box ranges do not overlap.
+        connection.executemany(
+            "DELETE FROM cold.engine_values WHERE row_seq=?",
+            [(row_seq,) for _source_box, row_seq in pairs],
+        )
+
+
+def _migrate_cold_v3(connection: sqlite3.Connection) -> int:
+    """Re-link schema-3 COLD values by HOT row_seq. Values are copied unchanged."""
+    connection.execute(
+        "CREATE TABLE oldcold.engine_builds ("
+        "id INTEGER PRIMARY KEY, engine TEXT NOT NULL, identity TEXT NOT NULL, "
+        "UNIQUE(engine, identity))"
+    )
+    connection.execute(
+        "CREATE TABLE oldcold.engine_values_v4 ("
+        "row_seq INTEGER PRIMARY KEY, value BLOB NOT NULL, "
+        "engine_build_id INTEGER NOT NULL) WITHOUT ROWID"
+    )
+    linked = connection.execute(
+        "SELECT h.engine, h.row_seq, c.value FROM oldcold.engine_values c "
+        "JOIN engine_outputs h ON h.key = c.key"
+    ).fetchall()
+    build_ids: dict[str, int] = {}
+    for engine, row_seq, value in linked:
+        engine_name = str(engine)
+        if engine_name not in build_ids:
+            build_ids[engine_name] = _ensure_build_id(
+                connection, "oldcold", engine_name, _UNKNOWN_PRE_MIGRATION_BUILD
+            )
+        connection.execute(
+            "INSERT INTO oldcold.engine_values_v4(row_seq, value, engine_build_id) "
+            "VALUES (?,?,?)",
+            (int(row_seq), value, build_ids[engine_name]),
+        )
+    unlinked_rows = connection.execute(
+        "SELECT c.value FROM oldcold.engine_values c WHERE NOT EXISTS ("
+        "SELECT 1 FROM engine_outputs h WHERE h.key = c.key)"
+    ).fetchall()
+    if unlinked_rows:
+        # No HOT row has no row_seq. Negative sequences are outside every box
+        # range, so they cannot be served as hits. Migration does not delete
+        # the value. Snapshot still drops a COLD row with no HOT row.
+        build_id = _ensure_build_id(
+            connection, "oldcold", "unlinked", _UNKNOWN_PRE_MIGRATION_BUILD
+        )
+        for index, (value,) in enumerate(unlinked_rows, start=1):
+            connection.execute(
+                "INSERT INTO oldcold.engine_values_v4(row_seq, value, engine_build_id) "
+                "VALUES (?,?,?)",
+                (-index, value, build_id),
+            )
+    connection.execute("DROP TABLE oldcold.engine_values")
+    connection.execute("ALTER TABLE oldcold.engine_values_v4 RENAME TO engine_values")
+    connection.execute(f"PRAGMA oldcold.user_version={_CACHE_SCHEMA_VERSION}")
+    return len(unlinked_rows)
+
+
+def _payload_bytes(path: Path) -> dict[str, int]:
+    with closing(sqlite3.connect(_cache_uri(path), uri=True, timeout=_TIMEOUT_MS / 1000)) as connection:
+        hot_payload = connection.execute(
+            "SELECT COALESCE(SUM(length(key) + length(value)), 0) FROM engine_outputs"
+        ).fetchone()[0]
+        report = {"hot_payload_bytes": int(hot_payload), "cold_value_bytes": 0}
+        cold = _cache_pair(path)[1]
+        if cold.exists():
+            connection.execute("ATTACH DATABASE ? AS cold", (_cache_uri(cold),))
+            report["cold_value_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(length(value)), 0) FROM cold.engine_values"
+            ).fetchone()[0])
+        return report
+
+
+def migrate_cache_file(path: str | Path) -> dict[str, Any]:
+    """Convert a schema-3 HOT/COLD pair in place. HOT key and value bytes stay.
+
+    Old fingerprints are dropped. engine_build_id is the explicit
+    ``unknown-pre-migration`` row: a schema-3 file did not record the open
+    identity per row. Natural keys gain species rows; blake2b keys do not.
+    """
+
+    path = Path(path).expanduser()
+    if not path.is_file():
+        raise FileNotFoundError(str(path))
+    connection = sqlite3.connect(str(path), timeout=_TIMEOUT_MS / 1000)
+    try:
+        version = connection.execute("PRAGMA user_version").fetchone()[0]
+        if version == _CACHE_SCHEMA_VERSION:
+            _check_cache_schema(connection)
+            cold_path = _cache_pair(path)[1]
+            if cold_path.exists():
+                if connection.in_transaction:
+                    connection.commit()
+                connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
+                _check_cold_schema(connection)
+            connection.close()
+            connection = None
+            stats = engine_cache_stats(path)
+            return {
+                "migrated": False,
+                "already_current": True,
+                "schema_version": _CACHE_SCHEMA_VERSION,
+                "vacuumed": False,
+                **stats,
+            }
+        if version != 3:
+            raise EngineCacheSchemaMismatch(
+                "user_version",
+                ("3", str(_CACHE_SCHEMA_VERSION)),
+                (str(version),),
+            )
+        found = tuple(row[1] for row in connection.execute("PRAGMA table_info(engine_outputs)"))
+        if found != _V3_OUTPUT_COLUMNS:
+            raise EngineCacheSchemaMismatch("engine_outputs", _V3_OUTPUT_COLUMNS, found)
+        if connection.in_transaction:
+            connection.commit()
+        before: dict[str, Any] = {
+            "hot": _cache_space(connection, "main", _TABLE),
+            "hot_payload_bytes": int(connection.execute(
+                "SELECT COALESCE(SUM(length(key) + length(value)), 0) FROM engine_outputs"
+            ).fetchone()[0]),
+        }
+        cold_path = _cache_pair(path)[1]
+        has_cold = cold_path.exists()
+        if has_cold:
+            connection.execute("ATTACH DATABASE ? AS oldcold", (str(cold_path.resolve()),))
+            cold_columns = [
+                row[1] for row in connection.execute("PRAGMA oldcold.table_info(engine_values)")
+            ]
+            if cold_columns != ["key", "value", "input_fingerprint"]:
+                raise EngineCacheSchemaMismatch(
+                    "cold.engine_values",
+                    ("key", "value", "input_fingerprint"),
+                    tuple(cold_columns),
+                )
+            before["cold"] = _cache_space(connection, "oldcold", "engine_values")
+            before["cold_value_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(length(value)), 0) FROM oldcold.engine_values"
+            ).fetchone()[0])
+            before["cold_key_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(length(key)), 0) FROM oldcold.engine_values"
+            ).fetchone()[0])
+            before["cold_fingerprint_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(COALESCE(length(input_fingerprint), 0)), 0) "
+                "FROM oldcold.engine_values"
+            ).fetchone()[0])
+        else:
+            before["cold"] = {"rows": 0, "database_bytes": 0, "bytes_per_row": None}
+            before["cold_value_bytes"] = 0
+            before["cold_key_bytes"] = 0
+            before["cold_fingerprint_bytes"] = 0
+        before_hot_keys = [
+            (bytes(key), bytes(value))
+            for key, value in connection.execute("SELECT key, value FROM engine_outputs ORDER BY row_seq")
+        ]
+        connection.execute("BEGIN")
+        _create_species_table(connection)
+        natural_keys = 0
+        digest_keys = 0
+        for source_box, row_seq, key in connection.execute(
+            "SELECT source_box, row_seq, key FROM engine_outputs"
+        ):
+            species = species_from_natural_key(bytes(key))
+            if species is None:
+                digest_keys += 1
+                continue
+            natural_keys += 1
+            _write_output_species(connection, str(source_box), int(row_seq), species)
+        unlinked = _migrate_cold_v3(connection) if has_cold else 0
+        after_hot_keys = [
+            (bytes(key), bytes(value))
+            for key, value in connection.execute("SELECT key, value FROM engine_outputs ORDER BY row_seq")
+        ]
+        if after_hot_keys != before_hot_keys:
+            raise EngineCacheSchemaMismatch(
+                "engine_outputs", ("key", "value"), ("changed during migrate",)
+            )
+        connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
+        connection.commit()
+    except BaseException:
+        if connection is not None:
+            try:
+                connection.rollback()
+            except sqlite3.Error:
+                pass
+            connection.close()
+        raise
+    connection.close()
+    return {
+        "migrated": True,
+        "already_current": False,
+        "schema_version": _CACHE_SCHEMA_VERSION,
+        "natural_keys": natural_keys,
+        "digest_keys": digest_keys,
+        "unlinked_cold": unlinked,
+        "before": before,
+        "after": engine_cache_stats(path),
+        "after_payload": _payload_bytes(path),
+        "vacuumed": False,
+    }
+
+
+def expire_cache_file(
+    path: str | Path,
+    *,
+    engine: str,
+    species: tuple[str, ...] | None = None,
+    all_rows: bool = False,
+    apply: bool = False,
+) -> dict[str, Any]:
+    """Delete one engine's rows whose recorded inputs include a named species.
+
+    Dry-run unless ``apply``. ``all_rows`` deletes every row of that engine,
+    including rows with no recorded species. Nothing on the read or write
+    path calls this.
+    """
+
+    if engine not in ENGINE_CHEMISTRY_VERSION:
+        raise ValueError(f"unknown engine {engine!r}")
+    if all_rows == (species is not None):
+        raise ValueError("expire needs exactly one of species or all_rows")
+    names: tuple[str, ...] = ()
+    if species is not None:
+        if not species or any(not isinstance(name, str) or not name.strip() for name in species):
+            raise ValueError("expire species must be non-empty names")
+        names = tuple(dict.fromkeys(name.strip() for name in species))
+    path = Path(path).expanduser()
+    connection, has_cold = _maintenance_connection(path)
+    try:
+        totals = _rows_by_engine(connection)
+        totals.setdefault(engine, 0)
+        if all_rows:
+            matched = connection.execute(
+                f"SELECT source_box, row_seq FROM {_TABLE} WHERE engine=?",
+                (engine,),
+            ).fetchall()
+        else:
+            placeholders = ",".join("?" * len(names))
+            matched = connection.execute(
+                f"SELECT DISTINCT e.source_box, e.row_seq FROM {_TABLE} e "
+                f"JOIN {_SPECIES_TABLE} s "
+                "ON s.source_box=e.source_box AND s.row_seq=e.row_seq "
+                f"WHERE e.engine=? AND s.species IN ({placeholders})",
+                (engine, *names),
+            ).fetchall()
+        pairs = [(str(source_box), int(row_seq)) for source_box, row_seq in matched]
+        if apply and pairs:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                _delete_cached_rows(connection, has_cold, pairs)
+                connection.commit()
+            except BaseException:
+                connection.rollback()
+                raise
+            connection.execute("VACUUM main")
+            if has_cold:
+                connection.execute("VACUUM cold")
+            _forget_process_cache(path)
+        matched_by_engine = {name: 0 for name in totals}
+        matched_by_engine[engine] = len(pairs)
+        return {
+            "command": "expire",
+            "apply": bool(apply),
+            "dry_run": not apply,
+            "engine": engine,
+            "species": list(names) if species is not None else None,
+            "all_rows": bool(all_rows),
+            "rows_by_engine": totals,
+            "matched_by_engine": matched_by_engine,
+            "deleted_by_engine": {
+                name: (count if apply else 0) for name, count in matched_by_engine.items()
+            },
+            "vacuumed": bool(apply and pairs),
+        }
+    finally:
+        connection.close()
+
+
+def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]:
+    """Delete rows whose chemistry version is not the current one.
+
+    The build id is not a predicate. An engine name this code does not
+    version is left in place: it is not known to be disused. Dry-run unless
+    ``apply``. Nothing on the read or write path calls this.
+    """
+
+    path = Path(path).expanduser()
+    connection, has_cold = _maintenance_connection(path)
+    try:
+        totals = _rows_by_engine(connection)
+        known = tuple(ENGINE_CHEMISTRY_VERSION)
+        placeholders = ",".join("?" * len(known))
+        unknown = {
+            str(engine): int(count)
+            for engine, count in connection.execute(
+                f"SELECT engine, COUNT(*) FROM {_TABLE} "
+                f"WHERE engine NOT IN ({placeholders}) GROUP BY engine",
+                known,
+            )
+        }
+        matched_by_engine = {engine: 0 for engine in totals}
+        pairs: list[tuple[str, int]] = []
+        for engine, version in ENGINE_CHEMISTRY_VERSION.items():
+            found = connection.execute(
+                f"SELECT source_box, row_seq FROM {_TABLE} "
+                "WHERE engine=? AND chem_version!=?",
+                (engine, str(version)),
+            ).fetchall()
+            matched_by_engine[engine] = len(found)
+            pairs.extend((str(source_box), int(row_seq)) for source_box, row_seq in found)
+        if apply and pairs:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                _delete_cached_rows(connection, has_cold, pairs)
+                connection.commit()
+            except BaseException:
+                connection.rollback()
+                raise
+            connection.execute("VACUUM main")
+            if has_cold:
+                connection.execute("VACUUM cold")
+            _forget_process_cache(path)
+        return {
+            "command": "prune",
+            "apply": bool(apply),
+            "dry_run": not apply,
+            "rows_by_engine": totals,
+            "matched_by_engine": matched_by_engine,
+            "deleted_by_engine": {
+                engine: (count if apply else 0) for engine, count in matched_by_engine.items()
+            },
+            "skipped_unknown_engine": unknown,
+            "vacuumed": bool(apply and pairs),
+        }
+    finally:
+        connection.close()
+
+
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     path_value = _configured_engine_cache_path()
     if not path_value:
@@ -2074,13 +2570,31 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     path = Path(path_value).expanduser()
     connection = _connect(path, readonly=False)
     assert connection is not None
+    pairs = [
+        (str(source_box), int(row_seq))
+        for source_box, row_seq in connection.execute(
+            f"SELECT source_box, row_seq FROM {_TABLE} WHERE engine=? AND chem_version=?",
+            (engine_id, str(chem_version)),
+        )
+    ]
+    if not pairs:
+        return 0
+    connection.executemany(
+        f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
+        pairs,
+    )
     cursor = connection.execute(
         f"DELETE FROM {_TABLE} WHERE engine=? AND chem_version=?",
         (engine_id, str(chem_version)),
     )
     connection.commit()
-    with _LOCK:
-        for memory_key in tuple(_MEMORY_CACHE):
-            if memory_key[0] == path_value:
-                del _MEMORY_CACHE[memory_key]
+    cold_path = _cache_pair(path)[1]
+    if cold_path.exists():
+        with closing(sqlite3.connect(cold_path, timeout=_TIMEOUT_MS / 1000)) as cold:
+            cold.executemany(
+                "DELETE FROM engine_values WHERE row_seq=?",
+                [(row_seq,) for _source_box, row_seq in pairs],
+            )
+            cold.commit()
+    _forget_process_cache(path)
     return cursor.rowcount

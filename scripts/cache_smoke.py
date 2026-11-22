@@ -174,20 +174,23 @@ def _cache_storage_report(path: Path) -> list[str]:
         return []
     with sqlite3.connect(path) as connection:
         rows = connection.execute(
-            "SELECT engine, key, length(value) FROM engine_outputs"
+            "SELECT engine, row_seq, length(value) FROM engine_outputs"
         ).fetchall()
 
     cold_path = Path(str(path) + ".cold")
     cold_sizes = {}
     if cold_path.exists():
         with sqlite3.connect(cold_path) as connection:
-            cold_sizes = dict(connection.execute("SELECT key,length(value) FROM engine_values"))
+            # COLD is keyed by HOT row_seq. The key blob is not stored again.
+            cold_sizes = dict(
+                connection.execute("SELECT row_seq, length(value) FROM engine_values")
+            )
 
     sizes: dict[str, list[int]] = {}
     cold_by_engine: dict[str, list[int]] = {}
-    for engine, key, hot_bytes in rows:
+    for engine, row_seq, hot_bytes in rows:
         sizes.setdefault(str(engine), []).append(int(hot_bytes))
-        cold_by_engine.setdefault(str(engine), []).append(int(cold_sizes.get(key, 0)))
+        cold_by_engine.setdefault(str(engine), []).append(int(cold_sizes.get(row_seq, 0)))
     report = []
     for engine in ENGINE_ORDER:
         values = sizes.get(engine.value, [])
