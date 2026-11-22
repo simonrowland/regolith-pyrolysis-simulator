@@ -517,6 +517,123 @@ def test_c0_first_melt_stays_ahead_of_computed_exit_and_max_hold():
     )
 
 
+def _one_hour_lab_schedule() -> dict:
+    """Minimal schedule normalize_lab_schedule accepts. Duration is 1 h."""
+
+    return {
+        "id": "c0-schedule-owns-the-step",
+        "duration_h": 1.0,
+        "interpolation": "piecewise_linear",
+        "interpolation_source_class": "assumption_with_sensitivity_marker",
+        "interpolation_citation_id": "test",
+        "interpolation_extraction_note": "schedule owns the C0 step",
+        "furnace_ceiling_C": 1600.0,
+        "melt_temperature_C": [
+            {"t_h": 0.0, "value": 1200.0, "unit": "C"},
+            {"t_h": 1.0, "value": 1400.0, "unit": "C"},
+        ],
+        "chamber_pressure_mbar": [
+            {"t_h": 0.0, "value": 1.0, "unit": "mbar"},
+            {"t_h": 1.0, "value": 1.0, "unit": "mbar"},
+        ],
+        "gas_boundary": {
+            "background_gas": {
+                "species": "Ar",
+                "mole_fraction": 1.0,
+                "source_class": "assumption_with_sensitivity_marker",
+                "citation_id": "test",
+                "digest": "c0-schedule-argon",
+            },
+            "imposed_flow": {
+                "value": 0.3,
+                "unit": "NL_min",
+                "source_class": "assumption_with_sensitivity_marker",
+                "citation_id": "test",
+                "digest": "c0-schedule-flow",
+            },
+            "pressure_control": {
+                "mode": "flow_through_with_pump",
+                "source_class": "assumption_with_sensitivity_marker",
+                "citation_id": "test",
+                "digest": "c0-schedule-pressure",
+            },
+        },
+    }
+
+
+def _c0_with_lab_schedule() -> CampaignManager:
+    manager = CampaignManager(_setpoints())
+    manager.c0_first_melt_backstop = True
+    manager.overrides["C0"] = {"lab_schedule": _one_hour_lab_schedule()}
+    manager._process_dt_h = 1.0 / 60.0
+    return manager
+
+
+def test_lab_schedule_holds_c0_through_its_last_step_despite_first_melt():
+    manager = _c0_with_lab_schedule()
+    last_step = _melt(CampaignPhase.C0, 0, temperature_C=620.0)
+    last_step.campaign_hour = 59.0 / 60.0
+    completed = manager._completed_campaign_hour_for_endpoint(
+        last_step,
+        manager._process_dt_h,
+    )
+
+    assert completed == 1.0
+    assert manager.check_endpoint(
+        last_step,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    assert manager.last_c0_exit is None
+
+    manager = _c0_with_lab_schedule()
+    after_schedule = _melt(CampaignPhase.C0, 0, temperature_C=620.0)
+    after_schedule.campaign_hour = 1.0
+    completed_after = manager._completed_campaign_hour_for_endpoint(
+        after_schedule,
+        manager._process_dt_h,
+    )
+
+    assert completed_after > 1.0
+    assert manager.check_endpoint(
+        after_schedule,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+
+
+def test_lab_schedule_does_not_defer_c0_maximum_hold_or_computed_exit():
+    held = _c0_with_lab_schedule()
+    held.overrides["C0"]["max_hours"] = 0.5
+    at_hold = _melt(CampaignPhase.C0, 0, temperature_C=620.0)
+    at_hold.campaign_hour = 0.5
+    assert held.check_endpoint(
+        at_hold,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert held.last_c0_exit["backstop"] == "maximum_hold"
+
+    computed = _c0_with_lab_schedule()
+    computed.c0_exit_prediction = {
+        "T_exit_C": 900.0,
+        "runtime_exit_window_hr": 0.5,
+    }
+    at_exit = _melt(CampaignPhase.C0, 0, temperature_C=940.0)
+    at_exit.campaign_hour = 0.5
+    assert computed.check_endpoint(
+        at_exit,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert computed.last_c0_exit["backstop"] == "computed_exit"
+
+
 def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:
     return HourSnapshot(
         campaign=CampaignPhase.C4,

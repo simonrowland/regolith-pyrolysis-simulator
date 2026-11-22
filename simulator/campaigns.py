@@ -2973,7 +2973,8 @@ class CampaignManager:
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
         - C0: computed Na+K budget temperature and evacuation bound,
           incomplete and predict-and-flag (t-1417). Maximum hold and
-          first melt stay incomplete backstops.
+          first melt stay incomplete backstops. A lab schedule that still
+          covers the completed step defers only the first-melt backstop.
         - C0B: max_hold only
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
@@ -3043,21 +3044,31 @@ class CampaignManager:
                 raw_unreleased if isinstance(raw_unreleased, Mapping) else {}
             )
 
-            # First melt has priority over the computed exit and maximum hold.
+            # First melt ends C0 ahead of the computed exit and the maximum
+            # hold, unless this campaign's lab schedule still covers the
+            # completed step. Ending here would drop that schedule's
+            # temperature and chamber pressure. The melt flag is unchanged,
+            # and the schedule does not defer the later exits.
             if self.c0_first_melt_backstop:
-                _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
-                self.last_c0_exit = c0_exit_record(
-                    STAGE0_RELEASE_KINETICS,
-                    backstop="first_melt",
-                    ramp_C_per_hr=ramp_C_per_hr,
-                    prediction=prediction_payload,
-                    unreleased_inventory=unreleased_inventory,
-                    forecast_adjustment_notices=(
-                        self.c0_forecast_adjustment_notices
-                    ),
+                schedule = self._lab_schedule(campaign)
+                schedule_still_owns_step = (
+                    schedule is not None
+                    and completed_campaign_hour <= float(schedule["duration_h"])
                 )
-                return self._end_at("endpoint_met", detail="first_melt")
+                if not schedule_still_owns_step:
+                    _target_T, ramp_C_per_hr = self.get_temp_target(
+                        campaign, int(melt.campaign_hour), melt)
+                    self.last_c0_exit = c0_exit_record(
+                        STAGE0_RELEASE_KINETICS,
+                        backstop="first_melt",
+                        ramp_C_per_hr=ramp_C_per_hr,
+                        prediction=prediction_payload,
+                        unreleased_inventory=unreleased_inventory,
+                        forecast_adjustment_notices=(
+                            self.c0_forecast_adjustment_notices
+                        ),
+                    )
+                    return self._end_at("endpoint_met", detail="first_melt")
 
             if self.c0_remaining_budget_exit is not None:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
