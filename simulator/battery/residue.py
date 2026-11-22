@@ -31,6 +31,11 @@ from simulator.source_ids import (
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.geometry import (
+    _sphere_radius_m_from_volume,
+    _sphere_surface_area_m2_from_mass_density,
+    _sphere_surface_area_m2_from_radius,
+)
 
 
 _SECONDS_PER_HOUR = 3_600.0
@@ -2524,9 +2529,11 @@ def _hashimoto_geometry_areas(
     sample_mass_kg: float, preform_dimensions_mm: Mapping[str, float]
 ) -> dict[str, float]:
     density = _HASHIMOTO_DENSITY_KG_M3
-    radius_m = (3.0 * sample_mass_kg / (4.0 * math.pi * density)) ** (1.0 / 3.0)
     diameter_mm = float(preform_dimensions_mm["diameter"])
-    sphere_area_m2 = 4.0 * math.pi * radius_m**2
+    sphere_area_m2 = _sphere_surface_area_m2_from_mass_density(
+        sample_mass_kg,
+        density,
+    )
     disk_area_m2 = math.pi * (diameter_mm / 2_000.0) ** 2
     return {
         "sphere_constant": sphere_area_m2,
@@ -3466,8 +3473,8 @@ def _sossi_initial_inventory(
 def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
     density_kg_m3 = _HASHIMOTO_DENSITY_KG_M3
     volume_m3 = sample_mass_kg / density_kg_m3
-    radius_m = (3.0 * volume_m3 / (4.0 * math.pi)) ** (1.0 / 3.0)
-    sphere_area = 4.0 * math.pi * radius_m**2
+    radius_m = _sphere_radius_m_from_volume(volume_m3)
+    sphere_area = _sphere_surface_area_m2_from_radius(radius_m)
     # The comparison disk has the same bead volume and diameter as its height.
     disk_area = volume_m3 / (2.0 * radius_m)
     return {
