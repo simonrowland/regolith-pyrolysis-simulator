@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.accounting.formulas import parse_formula
+from simulator.battery.decimal_tokens import _decimal_rounding_half_width
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -372,7 +373,7 @@ def _published_cell_value(cell: object) -> tuple[Decimal, Decimal] | None:
     value = _published_decimal(_numeric_payload(published[0]))
     if value is None:
         return None
-    half_place = Decimal("0.5").scaleb(value.as_tuple().exponent)
+    half_place = _decimal_rounding_half_width(value)
     return value, half_place
 
 

@@ -84,7 +84,10 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     SOURCE_ID as _B1259_SOURCE_ID,
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery.decimal_tokens import (
+    _decimal_rounding_half_width,
+    decimal_token as _dec_str,
+)
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
@@ -1991,10 +1994,7 @@ def _percent_composition_closure_error(
         else sum(amounts, Decimal("0"))
     )
     rounding_bound = sum(
-        (
-            Decimal("0.5").scaleb(amount.as_tuple().exponent)
-            for amount in amounts
-        ),
+        (_decimal_rounding_half_width(amount) for amount in amounts),
         Decimal("0"),
     )
     if basis == "mass":

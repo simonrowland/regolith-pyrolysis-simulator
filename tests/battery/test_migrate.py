@@ -50,6 +50,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
+from simulator.battery.decimal_tokens import _decimal_rounding_half_width
 from simulator.battery.score import (
     ScoreContext,
     liquid_model_subsolidus_sample_notice,
@@ -10285,7 +10286,7 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
         printed = row["values"]["composition_mol"]
         amounts = [as_decimal(amount) for amount in printed.values()]
         rounding_bound = sum(
-            (Decimal("0.5").scaleb(amount.as_tuple().exponent) for amount in amounts),
+            (_decimal_rounding_half_width(amount) for amount in amounts),
             Decimal("0"),
         )
         assert abs(
