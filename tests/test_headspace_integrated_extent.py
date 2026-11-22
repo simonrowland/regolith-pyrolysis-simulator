@@ -1,6 +1,6 @@
 """The headspace ledger posts the solve's integrated additions.
 
-Four constructed hours, each driven through ``_step_one_hour``. The
+Five constructed hours, each driven through ``_step_one_hour``. The
 vapour reaction extent is the integrated gross. The vapour still in
 the headspace is the integral of q. The redox parcel is the integral
 of S. The endpoint is recorded and not posted. The pressure gate on
@@ -15,7 +15,10 @@ from dataclasses import dataclass, replace
 
 from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.capacity_coupling import headspace_integral_added_kg
+from simulator.capacity_coupling import (
+    DEFAULT_ABS_TOL_PA,
+    headspace_integral_added_kg,
+)
 from simulator.chemistry.kernel.dto import IntentResult
 from simulator.core import FO2_BUFFER_ACCOUNT, OXYGEN_SPECIES
 from simulator.evaporation import production_vapor_molar_mass_g_per_mol
@@ -507,6 +510,116 @@ def test_fast_root_books_the_end_rate_for_the_hour():
     assert abs(extent - _fast_law(hour.partials_Pa)) < 1.0e-15
     _assert_posted_extent(hour, "SiO")
     _assert_closed(hour)
+    return hour
+
+
+def _signed_account_o2_mol(sim, transition, account: str) -> float:
+    """Signed O2 moles one transition posted to one account."""
+
+    registry = sim.species_formula_registry
+    net = 0.0
+    for lot in transition.credits:
+        if str(lot.account) != account:
+            continue
+        net += float(
+            lot.species_moles_for(registry).get(OXYGEN_SPECIES, 0.0) or 0.0
+        )
+    for lot in transition.debits:
+        if str(lot.account) != account:
+            continue
+        net -= float(
+            lot.species_moles_for(registry).get(OXYGEN_SPECIES, 0.0) or 0.0
+        )
+    return net
+
+
+def test_open_hour_counts_vapour_coproduct_once():
+    """A vapour coproduct and a buffer excess share one open hour.
+
+    SiO's oxygen is overhead gas at once. Na2's oxygen is the buffer
+    excess the saturated settle exchanges. CrO2 consumes overhead
+    oxygen and returns it when captured, so the projector's net is
+    not the coproduct. The solve's O2 addition is the ledger's
+    addition. Counting the coproduct in the buffer credit as well as
+    in q leaves a gap equal to that coproduct.
+    """
+
+    sim = _sim(CampaignPhase.C4, 1160.0, 0.0)
+    sim.melt.oxygen_reservoir.melt_redox_capacity_mol_per_ln_fO2 = 0.0
+    assert sim._evaporative_redox_is_saturated(internal_o2_capacity_mol=1.0)
+    # CrO2 draws overhead oxygen. An empty holdup drops that vapour
+    # before the credit sees it, and the projector net stays the SiO
+    # coproduct. The seed keeps the draw. Downstream vacuum admits
+    # the fast root, and the end holdup still covers the coproduct,
+    # so a double-counted credit remains in the published moles.
+    _seed(sim, "process.overhead_gas", {OXYGEN_SPECIES: 1.0e-5}, "coproduct carrier")
+
+    def law(_partials):
+        return {"SiO": 1.0e-11, "Na2": 1.0e-6, "CrO2": 1.0e-7}
+
+    def fraction(species):
+        return 1.0 if species == "CrO2" else 0.0
+
+    hour = _step(sim, law, fraction)
+    assert hour.shut_path is None
+    assert sim._headspace_balance_terms["path"] == "fast_root"
+    _assert_closed(hour)
+
+    terms = sim._headspace_balance_terms
+    assert isinstance(terms, dict)
+    added = float(terms["A_mol"][OXYGEN_SPECIES])
+    opening = float(terms["n0_mol"][OXYGEN_SPECIES])
+    bled = float(terms["B_mol"][OXYGEN_SPECIES])
+    ledger = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    # The ledger's addition over the solved hour. n0 is the holdup
+    # the solve opened on, and B is the bleed it booked. What remains
+    # is what the hour added.
+    ledger_addition = ledger - opening + bled
+    scale = max(abs(added), abs(ledger_addition))
+    assert scale > 0.0
+    assert abs(added - ledger_addition) <= 1.0e-15 * scale, (
+        added,
+        ledger_addition,
+        added - ledger_addition,
+    )
+
+    coproduct = 0.0
+    consumer = 0.0
+    exchanged = 0.0
+    for transition in sim.atom_ledger.transitions:
+        name = str(transition.name)
+        signed = _signed_account_o2_mol(
+            sim, transition, "process.overhead_gas"
+        )
+        if name == "evaporate_SiO":
+            coproduct += signed
+        elif name in {"evaporate_CrO2", "condense_CrO2"}:
+            consumer += signed
+        elif name == "oxygen_reservoir_exchange":
+            exchanged += signed
+    per_mol = (
+        GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    # The coproduct on its own is wider than the inventory gate.
+    # A double count of it is the refusal. The end holdup is larger
+    # than this coproduct, so the bleed is not clipped down to it.
+    assert coproduct * per_mol > DEFAULT_ABS_TOL_PA, coproduct
+    assert abs(consumer) < 1.0e-12, consumer
+    buffer_mol = (
+        hour.posted_kg["Na2"][OXYGEN_SPECIES]
+        / _molar_mass_kg(sim, OXYGEN_SPECIES)
+    )
+    assert hour.credit_accounts["Na2"][OXYGEN_SPECIES] == FO2_BUFFER_ACCOUNT
+    assert hour.credit_accounts["SiO"][OXYGEN_SPECIES] == "process.overhead_gas"
+    assert buffer_mol > 1.0e-9, buffer_mol
+    assert exchanged > 1.0e-9, exchanged
     return hour
 
 

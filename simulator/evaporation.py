@@ -267,6 +267,71 @@ def _atom_moles_for_kg(species: str, kg: float, registry) -> dict:
     return formula.atom_moles(species_moles)
 
 
+def _stoich_o2_is_overhead(
+    o2_kg_hr: float,
+    oxygen_destination: str,
+    vapor_oxygen_atoms: float,
+) -> bool:
+    """Whether this stoichiometric O2 belongs to overhead gas.
+
+    The evaporation transition posts a positive coproduct to the fO2
+    buffer only for an explicit buffer destination, or for an elemental
+    vapour with no destination. Every other positive coproduct is
+    overhead gas at once. A negative stoich O2 is an overhead debit
+    on every destination. The buffer credit and the overhead projector
+    both use this split. Changing one without the other counts the
+    coproduct twice.
+    """
+
+    if o2_kg_hr < 0.0:
+        return True
+    if oxygen_destination == 'reservoir.fo2_buffer':
+        return False
+    return (
+        vapor_oxygen_atoms > 0.0
+        or oxygen_destination == 'process.overhead_gas'
+    )
+
+
+def _buffer_destined_stoich_o2_mol(
+    rates_kg_hr: Mapping[str, float],
+    stoich_by_species: Mapping[str, Mapping[str, Any]],
+    o2_molar_mass_kg_per_mol: float,
+    registry: Mapping[str, Any],
+) -> float:
+    """Positive stoichiometric O2 the ledger posts to the fO2 buffer.
+
+    Sorted names, then one fsum. A vapour coproduct is overhead gas
+    and is not this sum. The projector's net O2 is not the split: an
+    oxygen-consuming vapour drives that net through zero, and
+    subtracting max(0, net) leaves the coproduct in the buffer credit
+    while q still carries it.
+    Algebra: n = fsum(rate * O2_per / M_O2) over buffer-destined
+    species. Unit check: (kg/h) / (kg/mol) = mol/h.
+    Limit: a non-positive rate or a non-positive coproduct adds nothing.
+    """
+
+    terms: list[float] = []
+    for species in sorted(rates_kg_hr, key=str):
+        rate_kg_hr = max(0.0, float(rates_kg_hr[species]))
+        if rate_kg_hr <= 0.0:
+            continue
+        stoich = dict(stoich_by_species.get(species) or {})
+        o2_per = float(stoich.get('O2_per_product_kg') or 0.0)
+        if o2_per <= 0.0:
+            continue
+        o2_kg_hr = rate_kg_hr * o2_per
+        formula = resolve_species_formula(str(species), registry)
+        if _stoich_o2_is_overhead(
+            o2_kg_hr,
+            str(stoich.get('oxygen_destination') or ''),
+            float(formula.elements.get('O', 0.0) or 0.0),
+        ):
+            continue
+        terms.append(o2_kg_hr / o2_molar_mass_kg_per_mol)
+    return math.fsum(terms) if terms else 0.0
+
+
 def _project_evaporation_overhead_source_mol_hr(
     rates_kg_hr: Mapping[str, float],
     stoich_by_species: Mapping[str, Mapping[str, Any]],
@@ -298,17 +363,10 @@ def _project_evaporation_overhead_source_mol_hr(
         o2_kg_hr = rate_kg_hr * float(
             stoich.get('O2_per_product_kg') or 0.0
         )
-        oxygen_destination = str(
-            stoich.get('oxygen_destination') or ''
-        )
-        vapor_oxygen_atoms = float(
-            formula.elements.get('O', 0.0) or 0.0
-        )
-        if (
-            o2_kg_hr < 0.0
-            or (oxygen_destination != 'reservoir.fo2_buffer'
-                and (vapor_oxygen_atoms > 0.0
-                     or oxygen_destination == 'process.overhead_gas'))
+        if _stoich_o2_is_overhead(
+            o2_kg_hr,
+            str(stoich.get('oxygen_destination') or ''),
+            float(formula.elements.get('O', 0.0) or 0.0),
         ):
             o2_contributions.append(o2_kg_hr / o2_molar_mass)
     if o2_contributions:

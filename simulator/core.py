@@ -717,6 +717,7 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    _buffer_destined_stoich_o2_mol,
     attach_evaluated_transport_pO2,
     attach_pre_evaporation_melt_oxide_kg,
     attach_wall_supply_interval_physical_zero,
@@ -8364,23 +8365,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return carried
 
         def _buffer_credit_mol(gross):
-            # Positive stoichiometric O2 minus the overhead-destined O2
-            # the existing projector reports. The difference is the
-            # buffer credit. Overhead O2 is not multiplied by (1-f):
-            # the projector already left it out of the buffer.
+            # The buffer credit is the positive stoichiometric O2 the
+            # ledger posts to the fO2 buffer. A vapour coproduct is
+            # overhead gas at once and stays in q. Subtracting the
+            # projector's net O2 is not that split: an oxygen-consuming
+            # vapour drives the net through zero, and max(0, net) then
+            # leaves the coproduct in this credit as well as in q.
             # Unit check: (kg/h) / (kg/mol) = mol/h, and the hour is
             # 1 h so the figure is mol this hour.
-            positive_mol = _sorted_positive_stoich_o2_mol(
+            return _buffer_destined_stoich_o2_mol(
                 gross,
                 stoich,
                 OXYGEN_MOLAR_MASS_KG_PER_MOL,
+                self.species_formula_registry,
             )
-            overhead = self._project_evaporation_overhead_source_mol_hr(
-                gross,
-                stoich,
-            )
-            overhead_o2 = max(0.0, float(overhead.get(OXYGEN_SPECIES, 0.0) or 0.0))
-            return max(0.0, positive_mol - overhead_o2)
 
         def _capture_fractions(gross, partials_Pa):
             # One route on a copy. The copy's route does not commit and
