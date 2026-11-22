@@ -354,9 +354,9 @@ def test_c0_forecast_construction_does_not_resolve_live_gate_authority(
     callers = []
     original = PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour
 
-    def record_resolution(owner):
+    def record_resolution(owner, *args, **kwargs):
         callers.append(owner)
-        return original(owner)
+        return original(owner, *args, **kwargs)
 
     monkeypatch.setattr(
         PyrolysisSimulator,

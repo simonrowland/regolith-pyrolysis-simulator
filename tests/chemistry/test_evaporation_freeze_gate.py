@@ -2161,24 +2161,24 @@ def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
     sim._melt_redox_gate_authority_tick_verdict_identity = stale_identity
 
     load_bulk(80.001, 'hourly pin extrapolated silica verdict')
-    curve_resolutions = []
-    original_resolve_curve = sim._melt_redox_liquidus_gate_curve
+    record_resolutions = []
+    original_resolve_record = sim._melt_redox_liquidus_gate_record
 
-    def track_curve_resolution(**kwargs):
-        curve_resolutions.append(dict(kwargs))
-        return original_resolve_curve(**kwargs)
+    def track_record_resolution(**kwargs):
+        record_resolutions.append(dict(kwargs))
+        return original_resolve_record(**kwargs)
 
     monkeypatch.setattr(
         sim,
-        '_melt_redox_liquidus_gate_curve',
-        track_curve_resolution,
+        '_melt_redox_liquidus_gate_record',
+        track_record_resolution,
     )
     try:
         resolved = sim._resolved_melt_redox_gate_authority()
     except EvaporationFluxRefusal:
         resolved = None
 
-    assert curve_resolutions
+    assert record_resolutions
     assert resolved is not stale_pin
     assert not sim._melt_redox_gate_pin_verdicts_match(
         sim._freeze_gate_current_magemin_domain_identity,
@@ -2188,6 +2188,112 @@ def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
     assert sim._freeze_gate_current_magemin_domain_identity.silica_verdict == (
         'extrapolated'
     )
+    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
+    assert sim._melt_redox_gate_pin_verdicts_match(
+        sim._freeze_gate_current_magemin_domain_identity,
+        sim._melt_redox_gate_authority_tick_verdict_identity,
+        submitted_bulk_passes=True,
+    )
+
+
+def test_pin_verdict_matches_only_gate_domain_fields_and_skips_non_magemin(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    current = MAGEMinDomainIdentity(
+        'extrapolated', 'clear', (30.0, 80.0), 'first diagnostic detail',
+    )
+    same_gate_domain = MAGEMinDomainIdentity(
+        'extrapolated', 'clear', (30.0, 80.0), 'second diagnostic detail',
+    )
+    assert sim._melt_redox_gate_pin_verdicts_match(
+        current,
+        same_gate_domain,
+        submitted_bulk_passes=True,
+    )
+    assert not sim._melt_redox_gate_pin_verdicts_match(
+        current,
+        MAGEMinDomainIdentity(
+            'extrapolated', 'refused', (30.0, 80.0), 'first diagnostic detail',
+        ),
+        submitted_bulk_passes=True,
+    )
+    assert not sim._melt_redox_gate_pin_verdicts_match(
+        current,
+        MAGEMinDomainIdentity(
+            'extrapolated', 'clear', (31.0, 80.0), 'first diagnostic detail',
+        ),
+        submitted_bulk_passes=True,
+    )
+
+    sim._liquid_fraction_provider = 'alphamelts'
+    assert sim._melt_redox_gate_pin_verdicts_match(
+        None,
+        None,
+        submitted_bulk_passes=False,
+    )
+
+
+def test_same_hour_live_pin_survives_memo_admission_rejection(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=admission_module.BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_version': {
+                'tag': 'value',
+                'value': 'MAGEMin fixture runtime',
+                'reason': None,
+            },
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_gate_record_is_admitted',
+        lambda *_args, **_kwargs: False,
+    )
+
+    curve = sim._establish_melt_redox_gate_authority_for_current_hour()
+    authority = sim._melt_redox_gate_authority_this_tick
+    assert isinstance(authority, dict)
+    assert curve is authority['curve']
+    assert len(trace['provider_diagnostics']) == 1
+
+    assert sim._resolved_melt_redox_gate_authority() is curve
+    assert len(trace['provider_diagnostics']) == 1
 
 
 @pytest.mark.parametrize("failure_mode", ("success", "timeout", "failed"))

@@ -590,10 +590,10 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             provider_outcome="produced",
         )
 
-    def record_establish(self):
+    def record_establish(self, *args, **kwargs):
         nonlocal pin_window
         pin_window = True
-        authority = original_establish(self)
+        authority = original_establish(self, *args, **kwargs)
         established.append(authority)
         tick_authority = getattr(
             self,
@@ -652,12 +652,14 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         return authority
 
     def record_pin_matches(
+        self,
         current_verdict,
         pinned_verdict,
         *,
         submitted_bulk_passes,
     ):
         result = original_pin_matches(
+            self,
             current_verdict,
             pinned_verdict,
             submitted_bulk_passes=submitted_bulk_passes,
@@ -698,7 +700,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     monkeypatch.setattr(
         simulator_type,
         '_melt_redox_gate_pin_verdicts_match',
-        staticmethod(record_pin_matches),
+        record_pin_matches,
     )
     monkeypatch.setattr(
         simulator_type,
