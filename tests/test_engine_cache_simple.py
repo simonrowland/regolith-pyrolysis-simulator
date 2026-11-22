@@ -759,9 +759,7 @@ def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
     )
 
 
-def test_openimcc_chemistry_identity_matches_the_recorded_pin(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_openimcc_chemistry_identity_matches_the_recorded_pin() -> None:
     # The cache key already hashes the pyproject requirement string
     # (engine_cache.py:355-361), so this guards the identity record,
     # not stale serving. record_engine_open still only warns.
@@ -769,16 +767,10 @@ def test_openimcc_chemistry_identity_matches_the_recorded_pin(
 
     recorded_commit = OPENIMCC_RECORDED_PIN.rsplit("@", 1)[-1]
     expected = f"commit:{recorded_commit}"
-    identity_at = engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT
-    assert identity_at["openimcc"]["identity"] == expected
-    # 979adb2 is the identity 5129da3c1e left behind after the pin moved.
-    stale = "commit:979adb26079c8b94ab8dfc9586cef2e2120cf818"
-    monkeypatch.setitem(
-        identity_at,
-        "openimcc",
-        {**identity_at["openimcc"], "identity": stale},
+    assert (
+        engine_cache.ENGINE_CHEMISTRY_VERSION_IDENTITY_AT["openimcc"]["identity"]
+        == expected
     )
-    assert identity_at["openimcc"]["identity"] != expected
 
 
 def test_stale_runtime_warns_once_without_changing_hits_or_results(
