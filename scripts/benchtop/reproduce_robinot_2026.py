@@ -82,6 +82,14 @@ _ANALYZER_VISIBLE_SCOPE = "analyzer_visible_o2_in_argon_carrier"
 # This controller-steered speed belongs to the limiting-case comparison; the
 # printed NDX15 preset and imposed-pressure baseline remain unchanged.
 _ROBINOT_LIMITING_PUMP_SPEED_M3_H = 15.1
+# Species the alpha comparison has to read back. Order is the table order.
+_VAPOUR_SPECIES = ("SiO", "Na", "K", "Fe", "Mg")
+_MELT_OXIDES = ("SiO2", "FeO", "Na2O", "MgO")
+_ALPHA_COMPARISON = (
+    ("0.669", "imposed_hot_upper_alpha_0.669"),
+    ("0.906", "imposed_hot_upper_alpha_0.906"),
+)
+_ALPHA_COMPARISON_MINUTES = (10, 20, 30, 40, 59)
 
 
 class RobinotReproductionError(ValueError):
@@ -335,6 +343,7 @@ def _run_case(
 
     power_records: list[dict[str, Any]] = []
     teststand_pressure_records: list[dict[str, Any]] = []
+    step_pressure_by_snapshot: dict[int, dict[str, Any]] = {}
     executions = []
     original_get_temp_target = CampaignManager.get_temp_target
     original_execute_session = RunExecutor.execute_session
@@ -365,7 +374,27 @@ def _run_case(
         *args: Any,
         **kwargs: Any,
     ) -> Any:
+        diagnostic_before = getattr(
+            simulator, "_last_evaporation_flux_diagnostic", None
+        )
         snapshot = original_step_one_hour(simulator, *args, **kwargs)
+        diagnostic_after = getattr(
+            simulator, "_last_evaporation_flux_diagnostic", None
+        )
+        # A step that does not publish a new diagnostic must not keep the
+        # previous hour's P_eq. Early returns leave the same object in place.
+        fresh_diagnostic = (
+            diagnostic_after
+            if (
+                isinstance(diagnostic_after, Mapping)
+                and diagnostic_after is not diagnostic_before
+            )
+            else None
+        )
+        step_pressure_by_snapshot[id(snapshot)] = _equilibrium_pressure_record(
+            simulator,
+            fresh_diagnostic,
+        )
         pressure_record = simulator.__dict__.get("last_teststand_pressure")
         if isinstance(pressure_record, Mapping):
             item = deepcopy(dict(pressure_record))
@@ -414,6 +443,7 @@ def _run_case(
             if pressure_bar is None
             else float(pressure_bar) * PA_PER_BAR / PA_PER_MBAR
         )
+        previous_cumulative_mg = float(cumulative_samples[-1]["value"])
         cumulative_mg, release_mol_min = _booked_o2_step_observables(
             float(snapshot.oxygen_produced_kg),
             previous_kg=previous_oxygen_kg,
@@ -432,13 +462,19 @@ def _run_case(
                 "value": cumulative_mg,
             }
         )
+        recorded_pressure = step_pressure_by_snapshot.get(id(snapshot))
+        if recorded_pressure is None:
+            recorded_pressure = _empty_pressure_record()
         per_step.append(
             {
                 "t": time_min,
                 "chamber_pressure_mbar": pressure_mbar,
                 "melt_temperature_C": float(snapshot.temperature_C),
                 "o2_release_mol_min": rate_samples[-1]["o2_release_mol_min"],
+                "o2_step_mg": cumulative_mg - previous_cumulative_mg,
                 "cumulative_o2_mg": cumulative_samples[-1]["value"],
+                **_booked_melt_and_vapour(snapshot),
+                **recorded_pressure,
             }
         )
     for record in power_records:
@@ -1084,6 +1120,225 @@ def _booked_o2_step_observables(
     return stock_kg * 1_000_000.0, release_mol_min
 
 
+def _finite_float(value: Any) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _empty_pressure_record() -> dict[str, Any]:
+    return {
+        "p_eq_pa": {species: None for species in _VAPOUR_SPECIES},
+        "p_total_pa": None,
+        "p_eq_above_p_total": {species: False for species in _VAPOUR_SPECIES},
+    }
+
+
+def _equilibrium_pressure_record(
+    simulator: Any,
+    diagnostic: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """P_eq, imposed total, and the kernel's P_eq > P_total flag.
+
+    The flag is the evaporation notice, not a second comparison. Vacuum
+    (imposed total <= 0) stays unmarked because the kernel leaves it unmarked.
+    ``commanded_pressure_pa`` is ``melt.p_total_mbar * PA_PER_MBAR``; a fresh
+    notice's imposed total replaces that when the kernel recorded one.
+    """
+
+    record = _empty_pressure_record()
+    notices_by_species: dict[str, Mapping[str, Any]] = {}
+    series: Mapping[str, Any] = {}
+    if isinstance(diagnostic, Mapping):
+        raw_notices = diagnostic.get("equilibrium_pressure_exceeds_total_notices")
+        if isinstance(raw_notices, (list, tuple)):
+            for notice in raw_notices:
+                if isinstance(notice, Mapping) and notice.get("species"):
+                    notices_by_species[str(notice["species"])] = notice
+        raw_series = diagnostic.get("evaporation_series_resistance")
+        if isinstance(raw_series, Mapping):
+            series = raw_series
+    imposed_total_pa: float | None = None
+    for notice in notices_by_species.values():
+        imposed_total_pa = _finite_float(notice.get("imposed_total_Pa"))
+        if imposed_total_pa is not None:
+            break
+    if imposed_total_pa is None:
+        for row in series.values():
+            if not isinstance(row, Mapping):
+                continue
+            regime = row.get("total_pressure_regime_notice")
+            if not isinstance(regime, Mapping):
+                continue
+            imposed_total_pa = _finite_float(regime.get("imposed_total_Pa"))
+            if imposed_total_pa is not None:
+                break
+    if imposed_total_pa is None:
+        melt = getattr(simulator, "melt", None)
+        mbar = _finite_float(getattr(melt, "p_total_mbar", None))
+        if mbar is not None:
+            imposed_total_pa = mbar * PA_PER_MBAR
+    record["p_total_pa"] = imposed_total_pa
+    for species in _VAPOUR_SPECIES:
+        notice = notices_by_species.get(species)
+        row = series.get(species)
+        regime = (
+            row.get("total_pressure_regime_notice")
+            if isinstance(row, Mapping)
+            else None
+        )
+        flagged = isinstance(notice, Mapping) or isinstance(regime, Mapping)
+        p_eq = None
+        if isinstance(notice, Mapping):
+            p_eq = _finite_float(notice.get("P_eq_Pa"))
+        if p_eq is None and isinstance(regime, Mapping):
+            p_eq = _finite_float(regime.get("P_eq_Pa"))
+        if p_eq is None and isinstance(row, Mapping):
+            p_eq = _finite_float(row.get("P_eq_Pa"))
+        record["p_eq_pa"][species] = p_eq
+        record["p_eq_above_p_total"][species] = flagged
+    return record
+
+
+def _booked_melt_and_vapour(snapshot: Any) -> dict[str, Any]:
+    """Booked vapour mass this step, melt wt%, and remaining melt mass.
+
+    ``species_kg_hr`` is a rate. The ledger books that rate times the step,
+    and ``HourSnapshot.duration_h`` is that step in hours.
+    """
+
+    duration_h = _finite_float(getattr(snapshot, "duration_h", None))
+    if duration_h is None or duration_h < 0.0:
+        duration_h = 0.0
+    rates = getattr(getattr(snapshot, "evap_flux", None), "species_kg_hr", {}) or {}
+    vapor_kg: dict[str, float] = {}
+    for species in _VAPOUR_SPECIES:
+        rate = _finite_float(rates.get(species)) if isinstance(rates, Mapping) else None
+        if rate is None or rate < 0.0:
+            rate = 0.0
+        vapor_kg[species] = rate * duration_h
+    composition = getattr(snapshot, "composition_wt_pct", {}) or {}
+    melt_wt_pct: dict[str, float] = {}
+    for oxide in _MELT_OXIDES:
+        weight = (
+            _finite_float(composition.get(oxide))
+            if isinstance(composition, Mapping)
+            else None
+        )
+        melt_wt_pct[oxide] = 0.0 if weight is None else weight
+    return {
+        "vapor_kg": vapor_kg,
+        "melt_wt_pct": melt_wt_pct,
+        "melt_mass_kg": _finite_float(getattr(snapshot, "melt_mass_kg", None)),
+    }
+
+
+def _step_at_minute(
+    steps: Sequence[Mapping[str, Any]],
+    minute: int,
+) -> Mapping[str, Any] | None:
+    target = float(minute)
+    for step in steps:
+        if not isinstance(step, Mapping):
+            continue
+        time_min = _finite_float(step.get("t"))
+        if time_min is not None and abs(time_min - target) <= 1.0e-6:
+            return step
+    return None
+
+
+def _alpha_comparison_section(
+    summary: Mapping[str, Any],
+    format_value: Any,
+) -> list[str]:
+    cases = summary.get("sensitivity", {}).get("cases", {})
+    if not isinstance(cases, Mapping):
+        cases = {}
+    header = (
+        "| t (min) | alpha | T (C) | SiO kg | Na kg | K kg | Fe kg | Mg kg | "
+        "O2 step (mg) | O2 cum (mg) | P_eq SiO (Pa) | P_eq Na (Pa) | "
+        "P_eq K (Pa) | P_eq Fe (Pa) | P_eq Mg (Pa) | P_total (Pa) | "
+        "SiO>P | Na>P | K>P | Fe>P | Mg>P | SiO2 wt% | FeO wt% | "
+        "Na2O wt% | MgO wt% | melt kg |"
+    )
+    align = "|---:|---:|---:|" + "---:|" * 23
+    lines = [
+        "",
+        "## Alpha 0.669 vs 0.906",
+        "",
+        "Booked vapour is this step's mass. `P_eq > P_total` is the kernel "
+        "notice for a finite imposed total. A minute the variant did not "
+        "reach is `-`.",
+        "",
+        header,
+        align,
+    ]
+
+    def cell(value: Any, *, boolean: bool = False) -> str:
+        if boolean:
+            if value is None:
+                return "-"
+            return "yes" if bool(value) else "no"
+        return format_value(value)
+
+    def nested(step: Mapping[str, Any] | None, key: str, name: str) -> Any:
+        if step is None:
+            return None
+        block = step.get(key)
+        if not isinstance(block, Mapping) or name not in block:
+            return None
+        return block[name]
+
+    for minute in _ALPHA_COMPARISON_MINUTES:
+        for label, case_name in _ALPHA_COMPARISON:
+            case = cases.get(case_name)
+            steps = case.get("per_step") if isinstance(case, Mapping) else None
+            step = (
+                _step_at_minute(steps, minute)
+                if isinstance(steps, Sequence) and not isinstance(steps, (str, bytes))
+                else None
+            )
+            if step is None:
+                values = ["-"] * 24
+            else:
+                values = [
+                    cell(step.get("melt_temperature_C")),
+                    *(
+                        cell(nested(step, "vapor_kg", species))
+                        for species in _VAPOUR_SPECIES
+                    ),
+                    cell(step.get("o2_step_mg")),
+                    cell(step.get("cumulative_o2_mg")),
+                    *(
+                        cell(nested(step, "p_eq_pa", species))
+                        for species in _VAPOUR_SPECIES
+                    ),
+                    cell(step.get("p_total_pa")),
+                    *(
+                        cell(
+                            nested(step, "p_eq_above_p_total", species),
+                            boolean=True,
+                        )
+                        for species in _VAPOUR_SPECIES
+                    ),
+                    *(
+                        cell(nested(step, "melt_wt_pct", oxide))
+                        for oxide in _MELT_OXIDES
+                    ),
+                    cell(step.get("melt_mass_kg")),
+                ]
+            lines.append(
+                f"| {minute} | {label} | " + " | ".join(values) + " |"
+            )
+    return lines
+
+
 def _sensitivity_metrics(run_data: Mapping[str, Any]) -> dict[str, Any]:
     temperatures = [
         float(record["temperature_C"])
@@ -1110,6 +1365,7 @@ def _sensitivity_metrics(run_data: Mapping[str, Any]) -> dict[str, Any]:
         ],
         "peak_predicted_temperature_C": max(temperatures, default=None),
         "last_cumulative_o2_mg": final_mass,
+        "per_step": list(run_data["per_step"]),
     }
 
 
@@ -1182,6 +1438,7 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
             f"`{case['reason']}` | "
             f"{format_value(case['last_cumulative_o2_mg'])} |"
         )
+    lines.extend(_alpha_comparison_section(summary, format_value))
     lines.extend(
         [
             "",
