@@ -507,22 +507,13 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     resolved = []
     cleared_hours = []
     simulator_type = validation_map.PyrolysisSimulator
-    from simulator import engine_binding_admission
-
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
     )
     original_resolve = simulator_type._resolved_melt_redox_gate_authority
-    original_pin_verdict = simulator_type._melt_redox_gate_current_pin_verdict
-    original_memo_admission = (
-        engine_binding_admission.gate_curve_memo_reuse_eligible
-    )
     original_clear = (
         simulator_type._clear_melt_redox_gate_authority_for_completed_hour
     )
-    pin_verdicts = []
-    memo_admission_results = []
-    freeze_call_sites = []
 
     def fail_then_recover(self):
         from simulator.engine_binding_admission import (
@@ -568,37 +559,6 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 provider_outcome="produced",
             )
         curve_calls += 1
-        import traceback
-
-        freeze_call_sites.append(
-            {
-                'hour': getattr(getattr(self, 'melt', None), 'hour', None),
-                'campaign_hour': getattr(
-                    getattr(self, 'melt', None), 'campaign_hour', None
-                ),
-                'authority_hour': getattr(
-                    self, '_melt_redox_gate_authority_tick_hour', None
-                ),
-                'pinned_identity': repr(
-                    getattr(
-                        self,
-                        '_melt_redox_gate_authority_tick_verdict_identity',
-                        None,
-                    )
-                ),
-                'retained_identity': repr(
-                    getattr(
-                        self,
-                        '_liquid_feo_resolved_curve_domain_identity',
-                        None,
-                    )
-                ),
-                'stack': [
-                    (frame.name, frame.lineno)
-                    for frame in traceback.extract_stack(limit=9)[:-1]
-                ],
-            }
-        )
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
         curve = add_current_domain_diagnostic({
@@ -627,16 +587,6 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             resolved.append(authority)
         return authority
 
-    def record_pin_verdict(self):
-        verdict = original_pin_verdict(self)
-        pin_verdicts.append(verdict)
-        return verdict
-
-    def record_memo_admission(*args, **kwargs):
-        admitted = original_memo_admission(*args, **kwargs)
-        memo_admission_results.append(admitted)
-        return admitted
-
     def record_clear(self, completed_hour):
         nonlocal pin_window
         cleared_hours.append(int(completed_hour))
@@ -661,16 +611,6 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
     monkeypatch.setattr(
         simulator_type,
-        '_melt_redox_gate_current_pin_verdict',
-        record_pin_verdict,
-    )
-    monkeypatch.setattr(
-        engine_binding_admission,
-        'gate_curve_memo_reuse_eligible',
-        record_memo_admission,
-    )
-    monkeypatch.setattr(
-        simulator_type,
         '_clear_melt_redox_gate_authority_for_completed_hour',
         record_clear,
     )
@@ -687,11 +627,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
 
     assert row['row_passes_base_integrity'] is True
-    assert curve_calls == 1, (
-        f'curve_calls={curve_calls}; pin_verdicts={pin_verdicts!r}; '
-        f'memo_admission_results={memo_admission_results!r}; '
-        f'freeze_call_sites={freeze_call_sites!r}'
-    )
+    assert curve_calls == 1
     assert len(established) == 1
     assert resolved
     assert all(authority is established[0] for authority in resolved)

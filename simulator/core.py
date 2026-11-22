@@ -5448,14 +5448,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 verdict_identity
             )
             return authority['curve']
-        if (
-            not isinstance(authority, Mapping)
-            and authority is not None
-            and not isinstance(
-                getattr(self, '_last_reduced_real_replay_notices', None),
-                list,
-            )
-        ):
+        # A replay miss may leave notices beside the typed floor fallback;
+        # the fallback still resolves this hour and must be pinned.
+        if not isinstance(authority, Mapping) and authority is not None:
             self._melt_redox_gate_authority_this_tick = authority
             self._melt_redox_gate_authority_tick_hour = current_hour
             verdict_identity, _submitted_bulk_passes = (
