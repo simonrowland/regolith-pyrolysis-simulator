@@ -66,6 +66,9 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     assert areas["pt_loop_bead_sphere_constant"] == pytest.approx(
         4.0 * math.pi * radius_m**2
     )
+    assert areas["pt_loop_bead_sphere_constant"] == pytest.approx(
+        0.00002132398102968089, rel=1e-14
+    )
     assert areas["pt_loop_bead_disk_equivalent_volume"] != areas[
         "pt_loop_bead_sphere_constant"
     ]
