@@ -1885,6 +1885,20 @@ def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
         ) from exc
 
 
+def furnace_power_trace_time_bounds_s(
+    trace: Mapping[str, Any],
+) -> tuple[float, float]:
+    """Inclusive sample window of a measured power trace, in seconds.
+
+    The curve is the one ``sample_furnace_power_W`` interpolates. A time
+    outside it is ``power_trace_does_not_bracket``. This does not hold or
+    extend the last point.
+    """
+
+    curve = _power_trace_curve_s(trace)
+    return (curve[0][0], curve[-1][0])
+
+
 def solve_power_driven_melt_temperature_C(
     *,
     power_W: float,

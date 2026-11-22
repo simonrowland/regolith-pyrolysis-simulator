@@ -63,6 +63,8 @@ from simulator.thermal_budget import (
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
     declared_benchtop_lengths_m,
+    furnace_power_trace_time_bounds_s,
+    measured_furnace_power_trace,
     reported_temperature_observations,
 )
 
@@ -213,15 +215,48 @@ def _time_min(step_index: int, dt_s: float) -> float:
 
 
 def _reproduction_step_budget(spec: PresetRunSpec) -> int:
-    """Executor step count for one preset.
+    """Steps whose end times the measured power trace still brackets.
 
-    ``PresetRunSpec.hours`` is already that count: ``duration_step_count``
-    when the timestep is shorter than one hour, and ``int(duration_h)`` on
-    the one-hour path. Multiplying by ``PROCESS_HOUR_S / process_dt_s``
-    again asks for an hour of steps per process step.
+    ``spec.hours`` is the campaign step count. Each step samples its end,
+    and ``sample_furnace_power_W`` refuses a time past the last measured
+    point. The budget is the greatest ``n`` with ``n * process_dt_s``
+    inside that window, and never more than the campaign count. A deck
+    with no measured driver keeps the campaign count. The trace is not
+    extended, and the preset duration is not shortened.
     """
 
-    return int(spec.hours)
+    campaign_steps = int(spec.hours)
+    trace = measured_furnace_power_trace(spec.document)
+    if trace is None:
+        return campaign_steps
+    _start_s, end_s = furnace_power_trace_time_bounds_s(trace)
+    bracketed = math.floor((end_s / float(spec.process_dt_s)) + 1.0e-8)
+    return min(campaign_steps, max(0, int(bracketed)))
+
+
+def _reproduction_end_reason(
+    spec: PresetRunSpec,
+    *,
+    steps_requested: int,
+    steps_completed: int,
+    execution_status: str,
+    execution_reason: str,
+) -> str:
+    """Typed end when a completed run stops at the measured driver.
+
+    A shorter ``max_steps`` cut is not this reason. A failed or refused
+    execution, or an execution that already named its own end, keeps
+    that reason. Status stays the executor status: this is not a failure.
+    """
+
+    if execution_status != "ok" or execution_reason:
+        return execution_reason
+    if steps_completed != steps_requested:
+        return execution_reason
+    budget = _reproduction_step_budget(spec)
+    if steps_requested == budget and budget < int(spec.hours):
+        return "driver_trace_end"
+    return execution_reason
 
 
 def _run_case(
@@ -351,6 +386,15 @@ def _run_case(
         raise RobinotReproductionError("runner returned without a RunExecution")
     execution = executions[-1]
     runtime_result.get("run_metadata", {}).pop("started_at_utc", None)
+    steps_completed = len(execution.snapshots)
+    execution_status = str(execution.status)
+    end_reason = _reproduction_end_reason(
+        spec,
+        steps_requested=steps,
+        steps_completed=steps_completed,
+        execution_status=execution_status,
+        execution_reason=str(execution.reason or ""),
+    )
 
     per_step: list[dict[str, Any]] = []
     rate_samples = [{"time_min": 0.0, "o2_release_mol_min": 0.0}]
@@ -400,14 +444,14 @@ def _run_case(
         )
     return {
         "runtime": {
-            "status": str(execution.status),
-            "reason": str(execution.reason or ""),
+            "status": execution_status,
+            "reason": end_reason,
             "error_message": str(execution.error_message or ""),
-            "steps_completed": len(execution.snapshots),
+            "steps_completed": steps_completed,
             "steps_requested": steps,
             "process_dt_s": float(spec.process_dt_s),
             "duration_completed_min": _time_min(
-                len(execution.snapshots), spec.process_dt_s
+                steps_completed, spec.process_dt_s
             ),
             "backend_status": str(execution.backend_status),
         },
@@ -1025,6 +1069,7 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
         "# Robinot 2026 benchtop reproduction",
         "",
         f"- Runtime status: `{summary['runs'][DRIVER_IMPOSED]['runtime']['status']}`",
+        f"- End reason: `{summary['runs'][DRIVER_IMPOSED]['runtime']['reason']}`",
         f"- Corpus input: `{summary['corpus']['root']}`",
         f"- Face set: `{summary['deck']['radiating_face_set']}`",
         f"- Process timestep: `{summary['deck']['process_dt_s']} s`",

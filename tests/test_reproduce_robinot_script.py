@@ -10,6 +10,10 @@ from scripts.benchtop.reproduce_robinot_2026 import (
     run_reproduction,
 )
 from simulator.corpus_paths import regolith_corpus_root
+from simulator.thermal_budget import (
+    PowerTemperatureRefusal,
+    sample_furnace_power_W,
+)
 
 
 RECORD_FIELDS = {
@@ -29,7 +33,35 @@ def test_robinot_step_budget_is_one_hour_of_process_steps() -> None:
     assert spec.provenance["duration_h"] == 1.0
     assert spec.step_count == 60
     assert spec.hours == 60
-    assert reproduction._reproduction_step_budget(spec) == spec.hours
+    budget = reproduction._reproduction_step_budget(spec)
+    assert budget < spec.hours
+    trace = spec.lab_schedule[reproduction.FURNACE_POWER_DRIVER_KEY]["trace"]
+    dt_s = float(spec.process_dt_s)
+    sample_furnace_power_W(trace, budget * dt_s)
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        sample_furnace_power_W(trace, (budget + 1) * dt_s)
+    assert refused.value.reason == "power_trace_does_not_bracket"
+    assert reproduction._reproduction_end_reason(
+        spec,
+        steps_requested=budget,
+        steps_completed=budget,
+        execution_status="ok",
+        execution_reason="",
+    ) == "driver_trace_end"
+    assert reproduction._reproduction_end_reason(
+        spec,
+        steps_requested=3,
+        steps_completed=3,
+        execution_status="ok",
+        execution_reason="",
+    ) == ""
+    assert reproduction._reproduction_end_reason(
+        spec,
+        steps_requested=budget,
+        steps_completed=budget,
+        execution_status="failed",
+        execution_reason="power_trace_does_not_bracket",
+    ) == "power_trace_does_not_bracket"
 
 
 def test_robinot_pyrometer_observation_uses_selected_preset_point() -> None:
