@@ -143,6 +143,7 @@ from simulator.accounting.queries import (
 )
 from simulator.config import load_config_bundle
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.lots import mass_kg_underflows
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -8743,10 +8744,11 @@ def _assign_declared_wall_capture(
             if take <= 0.0:
                 continue
             debit = take * o2_per
-            oxygen_mol -= debit
             credit = 0.0
         else:
             take = remaining
+            if take <= 0.0:
+                continue
             debit = 0.0
             credit = take * (-o2_per) if o2_per < 0.0 else 0.0
             # This credit is part of a proposal, not committed inventory.
@@ -8756,6 +8758,19 @@ def _assign_declared_wall_capture(
             for product, ratio in reaction.products_mol_per_mol_vapour
             if take * float(ratio) > 0.0
         }
+        # A denormal product (mol * M == 0) is not a solid. Booking it
+        # beside a representable sibling makes MaterialLot refuse the lot
+        # and poisons the hour. Leave the vapour for a later leg.
+        if not products or any(
+            mass_kg_underflows(
+                mol,
+                resolve_species_formula(product).molar_mass_kg_per_mol(),
+            )
+            for product, mol in products.items()
+        ):
+            continue
+        if o2_per > 0.0:
+            oxygen_mol -= debit
         legs.append({
             "reaction_id": reaction.reaction_id,
             "notices": reaction.notices,

@@ -27,6 +27,7 @@ from simulator.accounting.lots import (
     MaterialLot,
     _species_moles_from_kg,
     allocate_pool_withdrawal,
+    mass_kg_underflows,
 )
 from simulator.account_ids import (
     ALKALI_CARTRIDGE_ACCOUNT,
@@ -2373,8 +2374,9 @@ def _species_mol_to_kg_value(
 ) -> float:
     formula = resolve_species_formula(str(species), registry)
     amount = float(species_mol)
-    kg = amount * formula.molar_mass_kg_per_mol()
-    if amount != 0.0 and kg == 0.0:
+    molar_mass = formula.molar_mass_kg_per_mol()
+    kg = amount * molar_mass
+    if mass_kg_underflows(amount, molar_mass):
         raise AccountingError(
             f"nonzero amount for species {species!r} underflows during mol-to-kg conversion"
         )

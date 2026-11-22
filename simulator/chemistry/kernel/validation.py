@@ -25,6 +25,7 @@ from typing import Any
 from simulator.accounting.exceptions import AccountingError, UnbalancedTransitionError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.ledger import LedgerTransition
+from simulator.accounting.lots import mass_kg_underflows
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import (
     ControlAudit,
@@ -253,7 +254,13 @@ def _build_lots(
             if value == 0.0:
                 continue
             formula = resolve_species_formula(str(species), registry)
-            species_kg[str(species)] = value * formula.molar_mass_kg_per_mol()
+            molar_mass = formula.molar_mass_kg_per_mol()
+            # A denormal mole has no representable mass. Dropping it here is
+            # the same empty-entry rule as value == 0. Raising would abort
+            # the hour after earlier transitions have already committed.
+            if mass_kg_underflows(value, molar_mass):
+                continue
+            species_kg[str(species)] = value * molar_mass
             retained_species_mol[str(species)] = value
         if species_kg:
             lot_meta = dict(meta or {})

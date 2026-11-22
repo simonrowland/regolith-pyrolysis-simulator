@@ -939,6 +939,44 @@ def test_zero_flow_closure_is_not_applicable() -> None:
         }
 
 
+def test_mg2_denormal_oxygen_leg_does_not_book_zero_mass_mgo() -> None:
+    """Mg2's oxidative leg must not book MgO when the oxygen slice has no mass.
+
+    The association leg still deposits representable Mg on the same account.
+    A zero-mass MgO mole beside that Mg is the lot MaterialLot refuses.
+    """
+
+    from simulator.accounting.lots import mass_kg_underflows
+
+    molar_mass = resolve_species_formula("MgO").molar_mass_kg_per_mol()
+    dust = 1.0
+    while not mass_kg_underflows(dust, molar_mass):
+        dust /= 2.0
+    captured = 1.0e-4
+    kwargs = {
+        "T_K": _TABLE_T_K,
+        "p_local_pa": 1.0e6,
+        "pO2_Pa": _PO2_PA,
+        "vapor_pressure_data": None,
+    }
+    legs_real, _, _ = _assign_declared_wall_capture(
+        "Mg2", captured, oxygen_mol=1.0e-8, **kwargs,
+    )
+    assert any("MgO" in leg["products_mol"] for leg in legs_real)
+
+    legs_dust, oxygen_left, unbooked = _assign_declared_wall_capture(
+        "Mg2", captured, oxygen_mol=dust / 4.0, **kwargs,
+    )
+    for leg in legs_dust:
+        for product, mol in leg["products_mol"].items():
+            product_mass = resolve_species_formula(product).molar_mass_kg_per_mol()
+            assert not mass_kg_underflows(mol, product_mass)
+    assert not any("MgO" in leg["products_mol"] for leg in legs_dust)
+    booked = sum(float(leg["vapour_mol"]) for leg in legs_dust)
+    assert booked + unbooked == pytest.approx(captured)
+    assert oxygen_left == dust / 4.0
+
+
 def test_uncommitted_reductive_credit_is_not_lent_to_next_capture() -> None:
     legs, oxygen_left, unbooked = _assign_declared_wall_capture(
         "CrO2", 1.0, T_K=_TABLE_T_K, p_local_pa=1.0e6,

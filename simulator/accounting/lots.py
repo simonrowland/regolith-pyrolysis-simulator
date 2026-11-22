@@ -15,6 +15,20 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.scalar_boundary import is_declared_real_scalar
 
 EMPTY_KG_TOLERANCE = 1e-12
+
+
+def mass_kg_underflows(mol: float, molar_mass_kg_per_mol: float) -> bool:
+    """True when a nonzero mole converts to exact-zero kilograms.
+
+    ``mol * M`` underflows for a denormal mole. That amount is not a
+    representable mass. A mol-basis lot that keeps the mole and a zero
+    mass aborts the hour (``poisoned_hour``) with no rollback.
+    """
+
+    amount = float(mol)
+    return amount != 0.0 and amount * float(molar_mass_kg_per_mol) == 0.0
+
+
 MATERIAL_ORIGINS = frozenset({"feedstock", "reagent"})
 ATTRIBUTION_METHODS = frozenset({"tracked", "pool_ratio"})
 POOL_WITHDRAWAL_ABSOLUTE_TOLERANCE = 1.0e-18

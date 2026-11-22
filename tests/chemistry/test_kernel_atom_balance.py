@@ -10,7 +10,9 @@ from __future__ import annotations
 import pytest
 
 from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.ledger import AtomLedger
+from simulator.accounting.lots import mass_kg_underflows
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     CapabilityProfile,
@@ -137,6 +139,42 @@ def test_mol_lot_materialization_keeps_nonzero_species_or_refuses_underflow():
             "process.metal_phase_bottom_pool",
             {"Si": -si_mol},
         )
+
+
+def test_kernel_drops_unrepresentable_mol_mass_and_keeps_the_sibling():
+    """A denormal mole beside a real sibling must not abort the proposal.
+
+    MaterialLot refuses a mol-basis lot whose mass is exact zero. That
+    refusal is what poisoned the Robinot hour after earlier commits. The
+    denormal has no representable mass, so the kernel omits it and the
+    balanced sibling still validates. Direct ``credit_mol`` still refuses.
+    """
+
+    dust = 1e-323
+    for species in ("MgO", "Fe", "Al", "SiO2"):
+        molar_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
+        assert mass_kg_underflows(dust, molar_mass)
+    proposal = LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"SiO2": 1.0, "MgO": dust}},
+        credits={"process.overhead_gas": {"SiO2": 1.0, "MgO": dust}},
+        reason="denormal_mgo_beside_sio2",
+    )
+    validate_atom_balance(proposal, species_formula_registry={})
+
+    from simulator.chemistry.kernel.validation import _proposal_to_ledger_transition
+
+    transition = _proposal_to_ledger_transition(proposal, {})
+    for lot in (*transition.debits, *transition.credits):
+        assert "MgO" not in lot.species_kg
+        assert lot.meta["species_mol"].get("MgO", 0.0) == 0.0
+        assert lot.species_kg["SiO2"] > 0.0
+
+    dust_only = LedgerTransitionProposal(
+        debits={"process.overhead_gas": {"Fe": dust, "Al": dust}},
+        credits={"process.wall_deposit": {"Fe": dust, "Al": dust}},
+        reason="denormal_only",
+    )
+    validate_atom_balance(dust_only, species_formula_registry={})
 
 
 # ---------------------------------------------------------------------------
