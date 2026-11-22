@@ -9227,28 +9227,51 @@ def _printed_fe_redox_fo2_log(
     return fo2_log
 
 
+def _score_pressure_state(
+    identity: Identity,
+    observation: Observation | None = None,
+) -> State[Any] | None:
+    """Use the identity pressure, falling back to a printed point condition."""
+
+    pressure = identity.total_pressure_Pa
+    if (
+        (pressure is None or not pressure.is_value or pressure.value is None)
+        and observation is not None
+    ):
+        point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
+        if point_pressure is not None:
+            return State.of(point_pressure)
+    return pressure
+
+
+def _score_pressure_bar(
+    pressure: State[Any] | None,
+) -> tuple[float | None, bool]:
+    """Convert one recorded pressure for scorer use; second value means invalid."""
+
+    if pressure is None or not pressure.is_value or pressure.value is None:
+        return None, False
+    pascals = nominal_pressure_pa(pressure)
+    if pascals is None or not pascals.is_finite() or pascals < 0:
+        return None, True
+    bar = float(pascals) / PA_PER_BAR
+    if not math.isfinite(bar) or bar < 0.0:
+        return None, True
+    return bar, False
+
+
 def _fe_redox_pressure(
     observation: Observation, identity: Identity
 ) -> tuple[float, State[Any]] | _FeRedoxRefusal:
-    pressure_pa = identity.total_pressure_Pa
-    point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
-    if (
-        (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
-        and point_pressure is not None
-    ):
-        pressure_pa = State.of(point_pressure)
-    if (
-        pressure_pa is not None
-        and pressure_pa.is_value
-        and pressure_pa.value is not None
-    ):
-        pressure_amount = nominal_pressure_pa(pressure_pa)
-        if pressure_amount is None:
-            return _FeRedoxRefusal(
-                RefusalReason.INVALID_IDENTITY,
-                {"reason": "invalid_input", "input": "total_pressure_Pa"},
-            )
-        pressure_bar = float(pressure_amount) / PA_PER_BAR
+    pressure_pa = _score_pressure_state(identity, observation)
+    pressure_bar, pressure_invalid = _score_pressure_bar(pressure_pa)
+    if pressure_invalid:
+        return _FeRedoxRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_input", "input": "total_pressure_Pa"},
+        )
+    if pressure_bar is not None:
+        assert pressure_pa is not None
     elif observation.source_id == "borisov-2018-compilation":
         # The cited compilation is explicitly a 1-atm dataset.
         pressure_bar = 1.01325
@@ -9258,12 +9281,7 @@ def _fe_redox_pressure(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "total_pressure_Pa"},
         )
-    if pressure_bar < 0.0 or not math.isfinite(pressure_bar):
-        return _FeRedoxRefusal(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": "invalid_input", "input": "total_pressure_Pa"},
-        )
-    assert pressure_pa is not None
+    assert pressure_bar is not None and pressure_pa is not None
     return pressure_bar, pressure_pa
 
 
@@ -10113,12 +10131,13 @@ def total_pressure_bar_for_score(
 
     from simulator.diagnostic_helpers.binary_pot_battery import _DEFAULT_PRESSURE_BAR
 
+    state = _score_pressure_state(identity)
+    pressure_bar, invalid = _score_pressure_bar(state)
+    if invalid:
+        return 0.0, None, "total_pressure_invalid"
+    if pressure_bar is not None:
+        return pressure_bar, None, None
     state = identity.total_pressure_Pa
-    if state is not None and state.is_value and state.value is not None:
-        pa = nominal_pressure_pa(state)
-        if pa is None or not pa.is_finite() or pa < 0:
-            return 0.0, None, "total_pressure_invalid"
-        return float(pa) / PA_PER_BAR, None, None
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
