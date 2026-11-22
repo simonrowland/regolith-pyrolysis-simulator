@@ -25,6 +25,7 @@ from simulator.cost_parameters import (
 from simulator.layered_wall import (
     COLLECTOR_STAGE_JOIN,
     HOT_DUCT_TRAIN_KEY,
+    cited_oxide_endmember_conductivity,
     cylindrical_wall_conduction,
     equilibrium_pressure_pa,
     flat_wall_conduction,
@@ -1026,8 +1027,9 @@ def test_felt_limit_thickness_meets_continuous_service_and_keeps_five_millimetre
         assert row["thicker_liner_usd_per_m2"] > row["shipped_liner_usd_per_m2"]
         assert row["cheaper_per_m2"] == "shipped_liner_is_cheaper_and_overheats"
     assert alternatives["intermediate_dense_layer"]["reason"] == (
-        "intermediate_layer_uncited"
+        "doloma_endmember_bounds"
     )
+    assert alternatives["intermediate_dense_layer"]["fourth_shipped_role"] is False
     assert alternatives["sio_stage3"]["status"] == "not_applicable_no_insulation_layer"
     assert alternatives["comparison"]["shipped_liner_unchanged"] is True
 
@@ -1098,9 +1100,12 @@ def test_design_vapour_stream_uses_printed_sio_neighbors_not_pipe_capacity() -> 
     assert colder["verdict"] == "hot_face_not_held_by_design_vapour_stream"
 
 
-def test_printed_duct_sio_dew_is_singular_and_alkali_partials_are_unprinted() -> None:
+def test_printed_duct_sio_dew_uses_c2a_floor_and_alkali_partials_stay_unprinted() -> None:
     report = shipped_design_report()
-    dew = report["interface_temperatures"]["hot_duct"]["insulation_dew_point"]
+    hot = report["interface_temperatures"]["hot_duct"]
+    dew = hot["insulation_dew_point"]
+    sio = dew["species"]["SiO"]
+    felt = next(layer for layer in hot["layers"] if layer["role"] == "insulation")
     flags = report["collector_stages"]["collector_stage_costs"]["fe_stage1"][
         "failure_flags"
     ]
@@ -1110,14 +1115,30 @@ def test_printed_duct_sio_dew_is_singular_and_alkali_partials_are_unprinted() ->
     cao = next(
         flag for flag in flags if flag["code"] == "cao_shell_not_behind_intact_liner"
     )
-
-    assert dew["species"]["SiO"]["reason"] == "equilibrium_singular_at_zero_pO2"
-    assert dew["species"]["SiO"]["partial_pressure_Pa"] == pytest.approx(
-        10.902171990335434
+    again = equilibrium_pressure_pa(
+        "SiO",
+        sio["dew_temperature_K"],
+        pO2_bar=sio["pO2_bar"],
+        source_activity=1.0,
     )
-    assert dew["species"]["SiO"]["pO2_mbar"] == pytest.approx(0.0)
+
+    assert sio["status"] == "ok"
+    assert sio["reason"] == "equilibrium_not_pure_saturation"
+    assert sio["partial_pressure_Pa"] == pytest.approx(10.902171990335434)
+    assert sio["printed_pO2_mbar"] == pytest.approx(0.0)
+    assert sio["pO2_bar"] == pytest.approx(1.0e-8)
+    assert sio["pO2_mbar_used"] == pytest.approx(1.0e-8 * MBAR_PER_BAR)
+    assert sio["pO2_floor_flag"] == "setpoint_upper_bound_used_as_floor"
+    assert "C2B" in sio["pO2_floor_citation"]
+    assert "1e-8" in sio["pO2_floor_citation"]
+    assert again == pytest.approx(sio["partial_pressure_Pa"], rel=1e-6)
+    assert sio["dew_temperature_C"] > felt["inner_temperature_C"]
+    assert sio["depth_reason"] == "dew_before_the_felt"
+    assert sio["depth_m"] is None
     assert dew["species"]["Na"]["reason"] == "duct_inlet_partial_not_in_design_print"
     assert dew["species"]["K"]["reason"] == "duct_inlet_partial_not_in_design_print"
+    assert "probe_d452_r4_sizing_v3.py" in dew["species"]["Na"]["clearing_print"]
+    assert "DIAGNOSTIC_SPECIES" in dew["species"]["K"]["clearing_print"]
     assert (
         report["interface_temperatures"]["sio_stage3"]["insulation_dew_point"]["status"]
         == "not_applicable_no_insulation_layer"
@@ -1167,3 +1188,151 @@ def test_dew_temperature_reevaluates_to_the_supplied_partial() -> None:
     assert sio["depth_m"] == pytest.approx(0.0125, rel=1e-3)
     assert sio["reason"] == "equilibrium_not_pure_saturation"
     assert found["species"]["Na"]["reason"] == "duct_inlet_partial_not_in_design_print"
+
+
+def test_zero_pO2_without_a_floor_stays_singular() -> None:
+    found = insulation_vapour_dew_point(
+        1600.0,
+        500.0,
+        species_partials={
+            "SiO": {
+                "printed": True,
+                "partial_pressure_Pa": 10.902171990335434,
+                "pO2_mbar": 0.0,
+            },
+            "Na": {"printed": False},
+            "K": {"printed": False},
+        },
+        felt_thickness_m=0.025,
+        geometry="flat",
+    )
+    sio = found["species"]["SiO"]
+
+    assert sio["reason"] == "equilibrium_singular_at_zero_pO2"
+    assert sio["pO2_mbar"] == pytest.approx(0.0)
+    assert "pO2_floor_flag" not in sio
+    assert sio["dew_temperature_C"] is None
+
+
+def test_endmember_conductivity_pins_the_cropped_hot_end() -> None:
+    catalog = cited_oxide_endmember_conductivity()
+    materials = load_wall_materials()["materials"]
+    magnesia = catalog["endmembers"]["MgO"]
+    calcia = catalog["endmembers"]["CaO"]
+    magnesia_hot = magnesia["thermal_conductivity"][-1]
+    calcia_hot = calcia["thermal_conductivity"][-1]
+
+    assert catalog["doloma_k_stored"] is False
+    assert catalog["thickness_relation"] == "higher_k_needs_more_thickness"
+    assert "thermal_conductivity" not in materials["doloma"]
+    assert magnesia_hot["temperature_K"] == pytest.approx(1300.0)
+    assert magnesia_hot["value_W_m_K"] == pytest.approx(6.8)
+    assert "Table 2" in magnesia["citation"]
+    assert magnesia["touloukian_volume_opened"] is False
+    assert "not opened" in magnesia["citation"]
+    assert calcia_hot["value_W_m_K"] == pytest.approx(7.74)
+    assert calcia_hot["temperature_K"] == pytest.approx(1000.0 + CELSIUS_TO_KELVIN_OFFSET)
+    assert "Table A.4" in calcia["citation"]
+    assert "Powel" in calcia["citation"]
+    assert calcia["not_touloukian"] is True
+    assert calcia["density_status"] == "unprinted"
+
+
+def test_doloma_interlayer_holds_the_felt_and_undercuts_thick_ysz() -> None:
+    materials = load_wall_materials()["materials"]
+    report = shipped_design_report()
+    limit = materials["kaowool_rcf_blanket"]["service_temp"]["continuous_C"]
+    layers = cost_parameters_from_mapping().layered_wall["layers"]
+    alternatives = report["felt_overheat_alternatives"]
+    priced = alternatives["intermediate_dense_layer"]
+    shipped_total = report["collector_stages"]["collector_stage_cost_usd"]
+    totals = priced["collector_totals"]
+    low_total = totals["conservative_lower_k"]["collector_stage_cost_usd"]
+    high_total = totals["optimistic_higher_k"]["collector_stage_cost_usd"]
+
+    assert priced["status"] == "priced"
+    assert priced["fourth_shipped_role"] is False
+    assert priced["replaces_75_mm_structure"] is False
+    assert priced["shipped_layer_thickness_m"]["liner"] == pytest.approx(
+        layers["liner"]["thickness_m"]
+    )
+    assert priced["shipped_layer_thickness_m"]["insulation"] == pytest.approx(
+        layers["felt"]["thickness_m"]
+    )
+    assert priced["shipped_layer_thickness_m"]["structure"] == pytest.approx(
+        layers["structure"]["thickness_m"]
+    )
+    assert layers["liner"]["thickness_m"] == pytest.approx(0.005)
+    assert layers["felt"]["thickness_m"] == pytest.approx(0.025)
+    assert layers["structure"]["thickness_m"] == pytest.approx(0.075)
+    assert totals["cheaper_walk_label"] == "conservative_lower_k"
+    assert totals["thinner_lower_k_does_not_hold_felt_if_material_is_higher_k"] is True
+    assert low_total > shipped_total
+    assert high_total > low_total
+    assert set(totals["conservative_lower_k"]["stages_repriced"]) == {
+        "fe_stage1",
+        "cr_stage2",
+    }
+    for name in ("hot_duct", "fe_stage1", "cr_stage2"):
+        stage = priced["stages"][name]
+        magnesia = stage["bounds"]["MgO"]
+        calcia = stage["bounds"]["CaO"]
+        assert stage["interlayer_required"] is True
+        assert stage["replaces_75_mm_structure"] is False
+        assert stage["shipped_liner_thickness_m"] == pytest.approx(0.005)
+        assert magnesia["k_W_m_K"] < calcia["k_W_m_K"]
+        assert magnesia["walk_label"] == "conservative_lower_k"
+        assert calcia["walk_label"] == "optimistic_higher_k"
+        assert magnesia["build_quantity"] == "thinner"
+        assert calcia["build_quantity"] == "thicker"
+        assert calcia["thickness_m"] > magnesia["thickness_m"]
+        assert magnesia["felt_inner_C"] == pytest.approx(limit, abs=0.05)
+        assert calcia["felt_inner_C"] == pytest.approx(limit, abs=0.05)
+        assert magnesia["k_flag"] == "k_extended_off_cited_temperature"
+        assert calcia["k_flag"] == "k_extended_off_cited_temperature"
+        assert magnesia["cao_bearing_behind_liner"] is True
+        assert magnesia["doloma_k_measured"] is False
+        assert magnesia["stack_usd_per_m2"] < magnesia["thicker_ysz_liner_usd_per_m2"]
+        assert calcia["stack_usd_per_m2"] < calcia["thicker_ysz_liner_usd_per_m2"]
+        assert magnesia["imported_usd_per_m2"] == pytest.approx(calcia["imported_usd_per_m2"])
+        assert magnesia["in_situ_usd_per_m2"] < magnesia["imported_usd_per_m2"]
+        share = magnesia["resistance_share"]
+        assert share["felt_share"] > share["dense_interlayer_share"]
+        assert share["felt_share"] > share["by_role"]["liner"]
+    assert priced["stages"]["sio_stage3"]["status"] == "not_applicable_no_insulation_layer"
+    assert priced["stages"]["alkali_stage4"]["interlayer_required"] is False
+    assert priced["stages"]["k_stage4b"]["interlayer_required"] is False
+
+    duct_low = priced["stages"]["hot_duct"]["bounds"]["MgO"]
+    duct_high = priced["stages"]["hot_duct"]["bounds"]["CaO"]
+    assert duct_low["duct_loss_versus_shipped"] == "higher_because_felt_moves_outward"
+    assert duct_high["conductive_loss"] > priced["shipped_duct_conductive_loss"]
+    assert duct_low["stack_usd_per_m"] < alternatives["hot_duct"]["thicker_liner_usd_per_m"]
+    for name in ("fe_stage1", "cr_stage2"):
+        shipped_flux = report["interface_temperatures"][name]["radiative_boundary"][
+            "outer_flux_W_m2"
+        ]
+        assert priced["stages"][name]["bounds"]["MgO"]["conductive_loss"] < shipped_flux
+    dew = duct_low["insulation_dew_point"]["species"]["SiO"]
+    again = equilibrium_pressure_pa(
+        "SiO",
+        dew["dew_temperature_K"],
+        pO2_bar=dew["pO2_bar"],
+        source_activity=1.0,
+    )
+    flue = next(
+        row for row in report["flue_gas_energy_balance"] if row["campaign"] == "C4"
+    )
+    trace = next(row for row in duct_low["trace_heating"] if row["campaign"] == "C4")
+
+    assert dew["dew_temperature_C"] > duct_low["felt_inner_C"]
+    assert dew["depth_reason"] == "dew_before_the_felt"
+    assert again == pytest.approx(dew["partial_pressure_Pa"], rel=1e-6)
+    assert trace["verdict"] == "hot_face_not_held_by_design_vapour_stream"
+    assert trace["trace_heating_power_W_per_m"] > 0.0
+    assert trace["stream_power_W"]["value"] == pytest.approx(
+        flue["design_vapour_stream"]["stream_power_W"]["value"]
+    )
+    assert priced["shipped_duct_conductive_loss"] == pytest.approx(
+        flue["design_vapour_stream"]["conductive_loss_W_per_m"]
+    )
