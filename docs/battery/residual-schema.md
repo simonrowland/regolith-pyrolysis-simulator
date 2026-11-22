@@ -42,8 +42,9 @@ visible in the `oxide-from-element-mass-percent-composition` flagged stratum.
 **Range-only NASA-9 fit points.** An accepted fit with no source-printed grid is
 evaluated at `Tmin`, `Tmax`, and every interior multiple of 100 K. If that gives
 more than 11 points, it is evaluated at 11 evenly spaced points including both
-endpoints. The evaluator refuses temperatures outside the fit's validity range.
-Each comparison carries the `evaluated_from_fit_on_declared_grid` notice; its
+endpoints. The evaluator predicts temperatures outside the fit's validity range
+and adds an `out_of_certified_band` notice naming that range. Each comparison
+carries the `evaluated_from_fit_on_declared_grid` notice; its
 reason names the fit record, validity range, and grid rule. Points from one
 fit quantity share a series id, so the grid is one flagged series rather than
 independent measurements. NASA-9 comparison JSONL rows serialize these notices
@@ -68,5 +69,6 @@ including any printed zero components, goes in `identity.composition`. The
 saturating solid is kept in the point conditions as a cross-check. When the
 source reports no starting charge, the experiment's initial composition stays
 unknown and never inherits a row's liquid composition. Liquidus-temperature
-prediction is an upcoming feature; until it ships, these rows are refused as
-`quantity_not_predicted` before any engine is opened.
+prediction is an upcoming feature; until a predictor exists, these rows are
+reported with observation counts in the engine × quantity capability matrix,
+not as refused observations.

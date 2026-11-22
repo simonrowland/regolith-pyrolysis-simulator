@@ -38,8 +38,13 @@ score report, headline summary, hero charts and the battery leaderboard
 | `data/battery/score-report.md`, `score-summary.json` | Scorer outputs |
 
 Each scoring run writes `data/battery/residuals.jsonl` afresh; it is generated, not committed.
-The migrator never invents a value: an unprinted pressure, phase or method stays unknown, and
-absence is never stored as a measured zero.
+The migrator never invents a value: an unprinted pressure, phase or method stays unknown in
+the store. Absence is never stored as a measured zero, and no scorer default is written back
+into the extract. When an observation is otherwise callable, the scorer uses a stated default
+with a typed flag naming the default and original reason. Unstated pressure uses 1 atm with an
+assumed-pressure flag (d-451); an unprinted apparatus knob uses the simulator default with
+`knob_defaulted` (d-456). An unsourced evaporation coefficient uses α = 1, the Hertz–Knudsen
+upper bound, with a typed flag.
 
 ## Quoted records and inherited values
 
@@ -153,9 +158,11 @@ OpenIMCC, alphaMELTS and ThermoEngine, and VapoRock and MAGEMin decline it with
 - **Same oxygen.** `simulator/battery/fo2_ladder.py` resolves one fO₂ per row and gives it to
   every engine. In general it takes the first of: the printed fO₂; the printed Fe³⁺/ΣFe through
   the Kress and Carmichael (1991) inverse; the experiment's controlled atmosphere or buffer; and
-  the melt's intrinsic fO₂, flagged as borrowed. A row that resolves none is refused for every
-  engine alike. Rows where an engine computes its own redox state are labelled `engine_intrinsic`
-  and kept apart from `shared_ladder` rows.
+  the melt's intrinsic fO₂, flagged as borrowed. When earlier inputs do not resolve a value,
+  the ladder uses its stated last rung, intrinsic melt fO₂, if composition and temperature are
+  available, with a flag naming the unavailable earlier rungs. Without composition or temperature
+  no engine can be called. Rows where an engine computes its own redox state are labelled
+  `engine_intrinsic` and kept apart from `shared_ladder` rows.
 - **Same population.** A pairwise comparison uses only the shared rows: observations on which
   both engines returned exactly one numeric residual. A refusal on either side drops the row
   from that pair, so no engine is credited or penalised for rows the other did not answer.
@@ -203,8 +210,11 @@ The status is then `match` (|residual| ≤ band), `mismatch`, or `no_band` when 
 A `no_band` row keeps its number and counts in n and RMS; the match rate uses banded rows only.
 
 **Refusal.** A `refused` residual carries a typed `RefusalReason` and a detail payload, never a
-number. Missing and invalid inputs refuse. A refusal is a diagnostic: the report's refusal census
-counts every reason, marking where data or certification is still needed.
+number. An observation is refused only when no engine can be called: it has no usable composition,
+no temperature, no identifiable quantity, or a non-numeric value. Other unknowns use a stated
+default with a typed flag naming the default and original reason, and the numeric prediction stays
+in the flagged tier. A refusal is a diagnostic: the report's refusal census counts every reason,
+marking where data or certification is still needed.
 
 **Notice flags.** Out-of-domain physics is predicted and flagged rather than refused. An engine
 answer outside its certified band, or outside its activity-coefficient domain, is priced with an

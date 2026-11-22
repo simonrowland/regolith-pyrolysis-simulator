@@ -34,8 +34,13 @@ Ambiguity resolutions:
   scopes by method (effusion pressure, Langmuir pressure/alpha,
   kinetic/yield); thermochemistry at a stated T/reference state is not
   that class and does not borrow the apparatus token. Archival
-  storage of incomplete apparatus is allowed; the gate fails the
-  comparison, not the record.
+  storage of incomplete apparatus is allowed. These tokens identify missing
+  inputs, not automatic refusals: when composition, temperature, quantity,
+  and numeric value make the row callable, the scorer uses its stated method
+  or apparatus default and attaches a typed flag naming the default and
+  original reason (``knob_defaulted`` for apparatus). The archive keeps the
+  absence; no default is written into the record. An ion-intensity row with
+  no calibration still has no numeric pressure for an engine call.
 """
 
 from __future__ import annotations

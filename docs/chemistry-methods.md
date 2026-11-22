@@ -426,13 +426,10 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
   conflicting-proxy envelope. These are labelled as proxies, not regolith-melt measurements.
 - **No grounded coefficient.** Chromium, manganese, and the chromium-oxide vapor have no grounded
-  coefficient. The provider default is to fail loud — it returns a missing-coefficient signal and
-  refuses to evaporate them rather than silently assuming α = 1. This default can be overridden by an
-  unmeasured-alpha fallback that substitutes α = 1 and records that it was used; that override is
-  **enabled in the checked-in setpoints**, so in the default configured run these species do evaporate
-  under a recorded α = 1 fallback. The distinction matters for auditing: the provider will not invent a
-  coefficient on its own, but the shipped recipe configuration opts into the fallback, and the output
-  records which species used it.
+  coefficient. For an unsourced coefficient, the scorer uses α = 1, the Hertz–Knudsen upper bound,
+  and flags the prediction with the default and the missing sourced coefficient. This is not a
+  measured coefficient or a silent default, and the prediction stays in the flagged tier. Species
+  with cited coefficients retain those coefficients.
 <!-- impl: §4.2 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:800 — alpha fallback policy -->
 
 SiO is treated specially because the hot-source and cold-wall interfaces are physically different.

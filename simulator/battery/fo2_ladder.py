@@ -21,8 +21,10 @@ Tiers 1 and the atmosphere part of tier 3 reuse ``oxygen_condition`` routes.
 The Kress inverse lives in ``simulator.fe_redox``. The effusion closure is
 the existing oxygen-balance solver; this module only names the route.
 Tier 4 is ``intrinsic_melt_fO2``, the ledger diagnostic in this tree (the
-d-160 feedstock seeder is not on this commit). A row that resolves nothing
-returns None; callers refuse every engine the same way.
+d-160 feedstock seeder is not on this commit). When earlier rungs are absent,
+use this stated last rung if composition and temperature permit, with a flag
+naming the unavailable earlier rungs. A row with no composition or temperature
+cannot be called.
 """
 
 from __future__ import annotations
