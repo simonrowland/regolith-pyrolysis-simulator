@@ -643,6 +643,12 @@ def _established_record_host(record):
     host._melt_redox_gate_pin_verdicts_match = (
         PyrolysisSimulator._melt_redox_gate_pin_verdicts_match.__get__(host)
     )
+    host._melt_redox_gate_verdict_matches_current = (
+        PyrolysisSimulator._melt_redox_gate_verdict_matches_current.__get__(host)
+    )
+    host._resolved_melt_redox_gate_authority = (
+        PyrolysisSimulator._resolved_melt_redox_gate_authority.__get__(host)
+    )
     establish_authority = (
         PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour
     )
@@ -653,11 +659,10 @@ def _established_record_host(record):
 
 
 def test_replay_and_originless_live_curves_feed_the_liquid_feo_domain():
-    """A resolved curve admission will not pin still has a liquidus.
+    """A refused replay or unpinned live record still has a liquidus.
 
-    The redox resolver collapses both records to None. That None is not the
-    FeO domain: 225 C is below the curve, and a temperature above the curve
-    is not.
+    The current-hour live pin remains usable, while an equivalent unpinned
+    record is refused. Neither refusal removes the curve from the FeO domain.
     """
 
     replay = {
@@ -738,7 +743,9 @@ def test_replay_and_originless_live_curves_feed_the_liquid_feo_domain():
     )
     assert live_resolved["source"] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     assert (
-        PyrolysisSimulator._resolved_melt_redox_gate_authority(live_host, live)
+        PyrolysisSimulator._resolved_melt_redox_gate_authority(
+            live_host, dict(live),
+        )
         is None
     )
     below_floor = PyrolysisSimulator.liquid_feo_domain_at(

@@ -3914,18 +3914,31 @@ def test_pt1_persistent_store_round_trips_exact_payload(
     assert row[0] == "freeze_gate_curve"
     assert row[1]
     assert row[2]
-    # PT-1 payload bytes captured from green
-    # 0a99e3afe9f059e5b80960c84561ca01beff479e.
-    assert len(row[3]) == 213
+    expected_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction:fallback:magemin-shadow",
+            "solidus_T_C": 1210.0,
+            "liquidus_T_C": 1320.0,
+            "is_liquidus_floor": False,
+            "path": [
+                {"temperature_C": 1210.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1320.0, "liquid_fraction": 1.0},
+            ],
+        },
+    }
+    expected_bytes = canonical_json_bytes(expected_payload)
+    assert row[3] == expected_bytes
+    assert len(row[3]) == 239
     assert hashlib.sha256(row[3]).hexdigest() == (
-        "dbc926be76bb3e3214d18f26a89dd20d5bea2974b9a084bcab918ee22bea53fa"
+        "0f8c8858ed0f6ccdd103f7c0141a9666f2adff2b47f69e7797d08e8dcf2fe538"
     )
     payload = json.loads(row[3])
-    assert set(payload) == {"curve"}
+    assert payload == expected_payload
     assert b"producer_pid" not in row[3]
     assert b"producer_configuration" not in row[3]
     assert b"producer_evidence" not in row[3]
     assert set(payload["curve"]) == {
+        "is_liquidus_floor",
         "liquidus_T_C",
         "path",
         "solidus_T_C",

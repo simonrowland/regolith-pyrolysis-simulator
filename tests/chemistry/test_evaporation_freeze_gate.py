@@ -1936,7 +1936,6 @@ def test_same_hour_magemin_pin_never_resurrects_a_refused_bulk(
     assert not sim._melt_redox_gate_pin_verdicts_match(
         unknown_identity,
         unknown_identity,
-        submitted_bulk_passes=True,
     )
     assert len(trace['provider_diagnostics']) == 1
 
@@ -2154,7 +2153,6 @@ def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
     assert sim._melt_redox_gate_pin_verdicts_match(
         stale_identity,
         stale_pin.verdict_identity if pin_kind == 'floor' else stale_identity,
-        submitted_bulk_passes=True,
     )
     sim._melt_redox_gate_authority_this_tick = stale_pin
     sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
@@ -2183,7 +2181,6 @@ def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
     assert not sim._melt_redox_gate_pin_verdicts_match(
         sim._freeze_gate_current_magemin_domain_identity,
         stale_identity,
-        submitted_bulk_passes=True,
     )
     assert sim._freeze_gate_current_magemin_domain_identity.silica_verdict == (
         'extrapolated'
@@ -2192,7 +2189,6 @@ def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
     assert sim._melt_redox_gate_pin_verdicts_match(
         sim._freeze_gate_current_magemin_domain_identity,
         sim._melt_redox_gate_authority_tick_verdict_identity,
-        submitted_bulk_passes=True,
     )
 
 
@@ -2222,28 +2218,35 @@ def test_pin_verdict_uses_domain_identity_and_skips_non_magemin(
     assert not sim._melt_redox_gate_pin_verdicts_match(
         current,
         different_reason,
-        submitted_bulk_passes=True,
+    )
+    refused = MAGEMinDomainIdentity(
+        'extrapolated', 'refused', (30.0, 80.0), 'same refusal reason',
+    )
+    assert refused.matches(refused)
+    assert sim._melt_redox_gate_pin_verdicts_match(refused, refused)
+    assert not sim._melt_redox_gate_pin_verdicts_match(
+        refused,
+        MAGEMinDomainIdentity(
+            'extrapolated', 'refused', (30.0, 80.0), 'different refusal reason',
+        ),
     )
     assert not sim._melt_redox_gate_pin_verdicts_match(
         current,
         MAGEMinDomainIdentity(
             'extrapolated', 'refused', (30.0, 80.0), 'first diagnostic detail',
         ),
-        submitted_bulk_passes=True,
     )
     assert not sim._melt_redox_gate_pin_verdicts_match(
         current,
         MAGEMinDomainIdentity(
             'extrapolated', 'clear', (31.0, 80.0), 'first diagnostic detail',
         ),
-        submitted_bulk_passes=True,
     )
 
     sim._liquid_fraction_provider = 'alphamelts'
     assert sim._melt_redox_gate_pin_verdicts_match(
         None,
         None,
-        submitted_bulk_passes=False,
     )
 
 

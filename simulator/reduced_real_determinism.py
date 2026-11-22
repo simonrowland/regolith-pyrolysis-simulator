@@ -754,35 +754,7 @@ class PT0DeterminismStore:
         sim: Any,
         payload: Mapping[str, Any],
     ) -> EquilibriumResult:
-        result = equilibrium_from_payload(payload)
-        result_diagnostics = dict(result.diagnostics or {})
-        feo_activity = result_diagnostics.get('a_FeO_calphad')
-        if isinstance(feo_activity, Mapping):
-            domain_at = getattr(sim, 'liquid_feo_domain_at', None)
-            if not callable(domain_at):
-                raise TypeError(
-                    'cached a_FeO_calphad requires the current '
-                    'liquid_feo_domain_at resolver'
-                )
-            from simulator.fe_redox import (
-                _with_liquid_model_below_liquidus_notice,
-            )
-
-            current_domain = domain_at(
-                float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-            )
-            current_qualification = _with_liquid_model_below_liquidus_notice(
-                {},
-                current_domain,
-            )
-            refreshed_feo_activity = dict(feo_activity)
-            current_notices = current_qualification.get('notices')
-            if current_notices:
-                refreshed_feo_activity['notices'] = current_notices
-            else:
-                refreshed_feo_activity.pop('notices', None)
-            result_diagnostics['a_FeO_calphad'] = refreshed_feo_activity
-            result.diagnostics = result_diagnostics
+        result = _refresh_feo_qualification(sim, equilibrium_from_payload(payload))
         sim._last_reduced_real_cache_state = self.last_cache_state
         sim._last_backend_status = getattr(result, "status", "ok")
         self._apply_equilibrium_cache_authority(sim, result)
@@ -1297,6 +1269,13 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 continue
+            if artifact == "freeze_gate_curve":
+                curve_payload = (entry.get("payload") or {}).get("curve")
+                # Markerless rows reach the decoder, which rejects them.
+                if not isinstance(curve_payload, Mapping) or not (
+                    _curve_floor_marker_is_valid(curve_payload, require_present=False)
+                ):
+                    continue
             if require_gate_curve_domain_diagnostic:
                 identity = _magemin_identity_from_replay_key(key)
                 curve_payload = (entry.get("payload") or {}).get("curve")
@@ -4003,11 +3982,14 @@ def canonical_replay_output_projection(
     result: Any,
 ) -> dict[str, Any]:
     if artifact == "freeze_gate_curve":
+        curve_payload = _curve_payload(
+            result,
+            include_liquidus_floor=False,
+        )
+        for domain_key in GATE_CURVE_DOMAIN_KEYS:
+            curve_payload.pop(domain_key, None)
         return {
-            "curve": _curve_payload(
-                result,
-                include_liquidus_floor=False,
-            ),
+            "curve": curve_payload,
         }
     if artifact != "equilibrium_post_record":
         raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
@@ -4411,7 +4393,7 @@ def _curve_payload(
 
 def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     is_liquidus_floor = payload.get("is_liquidus_floor")
-    if type(is_liquidus_floor) is not bool:
+    if not _curve_floor_marker_is_valid(payload, require_present=True):
         raise PT0CacheMiss(
             "PT-0 cached replay miss: gate-curve floor marker is missing or invalid"
         )
@@ -5542,3 +5524,43 @@ def _diff_top_fields(left: Mapping[str, Any], right: Mapping[str, Any]) -> list[
         if _json_ready(left.get(key)) != _json_ready(right.get(key)):
             fields.append(str(key))
     return fields
+
+
+def _curve_floor_marker_is_valid(
+    payload: Mapping[str, Any],
+    *,
+    require_present: bool,
+) -> bool:
+    marker = payload.get("is_liquidus_floor")
+    return type(marker) is bool or (marker is None and not require_present)
+
+
+def _refresh_feo_qualification(
+    sim: Any,
+    result: EquilibriumResult,
+) -> EquilibriumResult:
+    diagnostics = dict(result.diagnostics or {})
+    feo_activity = diagnostics.get("a_FeO_calphad")
+    if not isinstance(feo_activity, Mapping):
+        return result
+    domain_at = getattr(sim, "liquid_feo_domain_at", None)
+    if not callable(domain_at):
+        raise TypeError(
+            "cached a_FeO_calphad requires the current "
+            "liquid_feo_domain_at resolver"
+        )
+    from simulator.fe_redox import _with_liquid_model_below_liquidus_notice
+
+    current_domain = domain_at(
+        float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+    )
+    qualification = _with_liquid_model_below_liquidus_notice({}, current_domain)
+    refreshed_activity = dict(feo_activity)
+    notices = qualification.get("notices")
+    if notices:
+        refreshed_activity["notices"] = notices
+    else:
+        refreshed_activity.pop("notices", None)
+    diagnostics["a_FeO_calphad"] = refreshed_activity
+    result.diagnostics = diagnostics
+    return result

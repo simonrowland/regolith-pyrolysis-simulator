@@ -5222,7 +5222,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pinned_hour == int(self.melt.hour)
                 and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             ):
-                current_verdict, submitted_bulk_passes = (
+                current_verdict, _ = (
                     self._melt_redox_gate_current_pin_verdict()
                 )
                 pinned_verdict = getattr(
@@ -5233,7 +5233,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 verdict_matches = self._melt_redox_gate_pin_verdicts_match(
                     current_verdict,
                     pinned_verdict,
-                    submitted_bulk_passes=submitted_bulk_passes,
                 )
                 if isinstance(pinned_authority, Mapping):
                     if (
@@ -5257,13 +5256,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return gate_authority
         if isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback):
             if self._liquid_fraction_provider == 'magemin':
-                verdict, submitted_bulk_passes = (
+                verdict, _ = (
                     self._melt_redox_gate_current_pin_verdict()
                 )
                 if not self._melt_redox_gate_pin_verdicts_match(
                     verdict,
                     gate_authority.verdict_identity,
-                    submitted_bulk_passes=submitted_bulk_passes,
                 ):
                     return self._establish_melt_redox_gate_authority_for_current_hour(
                         redox_state=redox_state,
@@ -5358,7 +5356,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _melt_redox_gate_verdict_matches_current(self) -> bool:
-        current_verdict, submitted_bulk_passes = (
+        current_verdict, _ = (
             self._melt_redox_gate_current_pin_verdict()
         )
         pinned_verdict = getattr(
@@ -5369,21 +5367,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return self._melt_redox_gate_pin_verdicts_match(
             current_verdict,
             pinned_verdict,
-            submitted_bulk_passes=submitted_bulk_passes,
         )
-
-    def _melt_redox_gate_pin_verdicts_match(
-        self,
-        current_verdict: MAGEMinDomainIdentity | None,
-        pinned_verdict: MAGEMinDomainIdentity | None,
-        *,
-        submitted_bulk_passes: bool,
-    ) -> bool:
-        if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
-            return True
-        if not submitted_bulk_passes or current_verdict is None:
-            return False
-        return current_verdict.matches(pinned_verdict)
 
     def _establish_melt_redox_gate_authority_for_current_hour(
         self,
@@ -5406,7 +5390,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pinned_hour == current_hour
             and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ):
-            current_verdict, submitted_bulk_passes = (
+            current_verdict, _ = (
                 self._melt_redox_gate_current_pin_verdict()
             )
             pinned_verdict = getattr(
@@ -5417,7 +5401,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             verdict_matches = self._melt_redox_gate_pin_verdicts_match(
                 current_verdict,
                 pinned_verdict,
-                submitted_bulk_passes=submitted_bulk_passes,
             )
             if isinstance(pinned_authority, Mapping):
                 if (
@@ -5442,7 +5425,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and authority.get('disposition') in {'live', 'memo-hit'}
             and isinstance(authority.get('curve'), Mapping)
         ):
-            verdict_identity, _submitted_bulk_passes = (
+            verdict_identity, _ = (
                 self._melt_redox_gate_current_pin_verdict()
             )
             self._melt_redox_gate_authority_this_tick = authority
@@ -5461,7 +5444,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             self._melt_redox_gate_authority_this_tick = authority
             self._melt_redox_gate_authority_tick_hour = current_hour
-            verdict_identity, _submitted_bulk_passes = (
+            verdict_identity, _ = (
                 self._melt_redox_gate_current_pin_verdict()
             )
             self._melt_redox_gate_authority_tick_verdict_identity = (
@@ -5502,6 +5485,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._melt_redox_gate_authority_tick_hour = None
         self._melt_redox_gate_authority_tick_verdict_identity = None
+
+    def _melt_redox_gate_pin_verdicts_match(
+        self,
+        current_verdict: MAGEMinDomainIdentity | None,
+        pinned_verdict: MAGEMinDomainIdentity | None,
+    ) -> bool:
+        """Use the owner identity's match rule for every hourly MAGEMin pin.
+
+        Other providers do not use MAGEMin domain identities.
+
+        For MAGEMin, this is the cache key's exact comparison rule.
+        MAGEMinDomainIdentity.matches owns reusability and compares the
+        evaluated silica verdict, projection-threshold verdict, certified
+        band, and typed refusal reason.
+
+        A projection refusal can still be reusable when its identity is
+        reusable. The submitted-bulk pass flag is not a second pin key.
+        Matching refusals reuse the hourly authority; a changed reason
+        forces a fresh resolution.
+
+        Missing or unknown identities still fail through matches and cannot
+        reuse an authority. This keeps cache and pin decisions aligned and
+        avoids repeated dispatches for an unchanged refused domain.
+        """
+        if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
+            return True
+        return (
+            current_verdict is not None
+            and current_verdict.matches(pinned_verdict)
+        )
 
     def _melt_redox_liquidus_gate_curve(
         self,
