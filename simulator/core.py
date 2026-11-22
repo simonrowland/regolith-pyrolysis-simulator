@@ -5241,18 +5241,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ) and verdict_matches:
                     return pinned_authority['curve']
                 if not isinstance(pinned_authority, Mapping):
-                    fallback_identity_matches = (
-                        not isinstance(
-                            pinned_authority,
-                            _MeltRedoxLiquidusFloorFallback,
-                        )
-                        or self._melt_redox_gate_pin_verdicts_match(
-                            current_verdict,
-                            pinned_authority.verdict_identity,
-                            submitted_bulk_passes=submitted_bulk_passes,
-                        )
-                    )
-                    if verdict_matches and fallback_identity_matches:
+                    if verdict_matches:
                         return pinned_authority
                 self._melt_redox_gate_authority_this_tick = (
                     _RESOLVE_MELT_REDOX_GATE_AUTHORITY
@@ -5448,9 +5437,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 verdict_identity
             )
             return authority['curve']
-        # A replay miss may leave notices beside the typed floor fallback;
-        # the fallback still resolves this hour and must be pinned.
-        if not isinstance(authority, Mapping) and authority is not None:
+        if (
+            not isinstance(authority, Mapping)
+            and authority is not None
+            and not isinstance(
+                getattr(self, '_last_reduced_real_replay_notices', None),
+                list,
+            )
+        ):
             self._melt_redox_gate_authority_this_tick = authority
             self._melt_redox_gate_authority_tick_hour = current_hour
             verdict_identity, _submitted_bulk_passes = (
