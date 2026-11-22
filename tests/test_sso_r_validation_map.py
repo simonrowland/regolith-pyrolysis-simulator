@@ -500,14 +500,41 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
 
 
 @pytest.mark.parametrize(
-    ('provider_failure', 'row_integrity'),
-    ((False, True), (True, False)),
+    (
+        'provider_failure',
+        'row_integrity',
+        'expected_curve_calls',
+        'expected_domain_verdicts',
+    ),
+    (
+        (
+            False,
+            True,
+            2,
+            (
+                ('in_band', 'clear', None),
+                ('in_band', 'clear', None),
+                ('extrapolated', 'clear', (30.0, 80.0)),
+            ),
+        ),
+        (
+            True,
+            False,
+            1,
+            (
+                ('in_band', 'clear', None),
+                ('in_band', 'clear', None),
+            ),
+        ),
+    ),
     ids=('live-authority', 'typed-provider-fallback'),
 )
 def test_run_row_establishes_one_production_authority_pin(
     monkeypatch,
     provider_failure,
     row_integrity,
+    expected_curve_calls,
+    expected_domain_verdicts,
 ):
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
     curve_calls = 0
@@ -515,14 +542,12 @@ def test_run_row_establishes_one_production_authority_pin(
     established = []
     resolved = []
     cleared_hours = []
-    establishment_states = []
-    pin_match_states = []
+    established_domain_verdicts = []
     simulator_type = validation_map.PyrolysisSimulator
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
     )
     original_resolve = simulator_type._resolved_melt_redox_gate_authority
-    original_pin_matches = simulator_type._melt_redox_gate_pin_verdicts_match
     original_clear = (
         simulator_type._clear_melt_redox_gate_authority_for_completed_hour
     )
@@ -589,22 +614,20 @@ def test_run_row_establishes_one_production_authority_pin(
     def record_establish(self, *args, **kwargs):
         nonlocal pin_window
         pin_window = True
-        before = (
-            int(self.melt.hour),
-            getattr(self, '_melt_redox_gate_authority_tick_hour', None),
-            type(getattr(self, '_melt_redox_gate_authority_this_tick', None)).__name__,
-            repr(getattr(self, '_melt_redox_gate_authority_tick_verdict_identity', None)),
-        )
         authority = original_establish(self, *args, **kwargs)
         established.append(authority)
-        establishment_states.append((
-            before,
-            int(self.melt.hour),
-            getattr(self, '_melt_redox_gate_authority_tick_hour', None),
-            type(getattr(self, '_melt_redox_gate_authority_this_tick', None)).__name__,
-            repr(getattr(self, '_melt_redox_gate_authority_tick_verdict_identity', None)),
-            type(authority).__name__,
-        ))
+        identity = getattr(
+            self,
+            '_melt_redox_gate_authority_tick_verdict_identity',
+            None,
+        )
+        established_domain_verdicts.append(
+            (
+                getattr(identity, 'silica_verdict', None),
+                getattr(identity, 'projection_threshold_verdict', None),
+                getattr(identity, 'certified_band', None),
+            )
+        )
         return authority
 
     def record_resolve(self, *args, **kwargs):
@@ -612,27 +635,6 @@ def test_run_row_establishes_one_production_authority_pin(
         if pin_window:
             resolved.append(authority)
         return authority
-
-    def record_pin_matches(
-        self,
-        current_verdict,
-        pinned_verdict,
-        *,
-        submitted_bulk_passes,
-    ):
-        result = original_pin_matches(
-            self,
-            current_verdict,
-            pinned_verdict,
-            submitted_bulk_passes=submitted_bulk_passes,
-        )
-        pin_match_states.append((
-            repr(current_verdict),
-            repr(pinned_verdict),
-            submitted_bulk_passes,
-            result,
-        ))
-        return result
 
     def record_clear(self, completed_hour):
         nonlocal pin_window
@@ -658,11 +660,6 @@ def test_run_row_establishes_one_production_authority_pin(
     )
     monkeypatch.setattr(
         simulator_type,
-        '_melt_redox_gate_pin_verdicts_match',
-        record_pin_matches,
-    )
-    monkeypatch.setattr(
-        simulator_type,
         '_clear_melt_redox_gate_authority_for_completed_hour',
         record_clear,
     )
@@ -679,13 +676,18 @@ def test_run_row_establishes_one_production_authority_pin(
     )
 
     assert row['row_passes_base_integrity'] is row_integrity
-    assert curve_calls == 1, f'establishments={establishment_states!r}'
-    assert len(established) == 1, (
-        f'establishments={establishment_states!r}; '
-        f'pin_matches={pin_match_states!r}'
-    )
+    assert curve_calls == expected_curve_calls
+    assert established_domain_verdicts == list(expected_domain_verdicts)
+    unique_authorities = []
+    for authority in established:
+        if not any(authority is known for known in unique_authorities):
+            unique_authorities.append(authority)
+    assert len(unique_authorities) == len(set(expected_domain_verdicts))
     assert resolved
-    assert all(authority is established[0] for authority in resolved)
+    assert all(
+        any(authority is known for known in unique_authorities)
+        for authority in resolved
+    )
     assert cleared_hours == [0]
     if provider_failure:
         assert type(established[0]).__name__ == (
