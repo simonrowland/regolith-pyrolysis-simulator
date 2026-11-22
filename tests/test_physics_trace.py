@@ -286,8 +286,8 @@ def test_wall_deposit_delta_matches_route_projection_before_commit():
     routes = []
     original_route = model.route
 
-    def capture_route(evap_flux, melt):
-        route = original_route(evap_flux, melt)
+    def capture_route(evap_flux, melt, **kwargs):
+        route = original_route(evap_flux, melt, **kwargs)
         routes.append(route)
         return route
 
