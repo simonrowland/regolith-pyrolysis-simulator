@@ -560,6 +560,10 @@ from simulator.account_ids import (
     SOLID_CHAR_CARBON_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+from simulator.melt_resident import (
+    MELT_RESIDENT_OXIDE_ACCOUNTS,
+    melt_resident_species_kg,
+)
 from simulator.accounting import (
     AccountPolicy,
     AccountingQueries,
@@ -9818,15 +9822,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return aggregate_high_t_melt_activity_table_fallback_run_notice(self)
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
-        ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
-        spent_reductant_residue = self.atom_ledger.project_account_kg(
-            SPENT_REDUCTANT_RESIDUE_ACCOUNT)
-        projected_melt = {
-            species: float(kg)
-            for species, kg in ledger_melt.items()
-        }
-        for species, kg in spent_reductant_residue.items():
-            projected_melt[species] = projected_melt.get(species, 0.0) + float(kg)
+        # project_account_kg clamps negative dust. Evaporation stock uses
+        # kg_by_account through the same sum, so the two callers do not share
+        # one source map.
+        projected_melt = melt_resident_species_kg({
+            account: self.atom_ledger.project_account_kg(account)
+            for account in MELT_RESIDENT_OXIDE_ACCOUNTS
+        })
         # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
         # FactSAGE LIQUID/SOLID phase can legitimately carry non-oxide species
         # (dissolved metallic Fe/Si, a solid mineral). Truncating to oxides

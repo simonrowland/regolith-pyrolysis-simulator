@@ -11,7 +11,11 @@ from typing import Any, NamedTuple
 
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.melt_resident import (
+    MELT_RESIDENT_OXIDE_ACCOUNTS,
+    melt_resident_parent_kg,
+    melt_resident_species_kg,
+)
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -3411,6 +3415,27 @@ class EvaporationMixin:
             return None
         return parsed
 
+    def _melt_resident_kg_by_account(self) -> dict[str, dict[str, float]]:
+        """Exact kilograms in each melt-resident oxide account."""
+
+        return {
+            account: self.atom_ledger.kg_by_account(account)
+            for account in MELT_RESIDENT_OXIDE_ACCOUNTS
+        }
+
+    def _melt_resident_evaporable_kg(self) -> dict[str, float]:
+        """Species kilograms evaporation may draw. No residue copies cleaned melt."""
+
+        return melt_resident_species_kg(self._melt_resident_kg_by_account())
+
+    def _melt_resident_parent_kg(self, species: str) -> float:
+        """One species' melt-resident kilograms. No residue returns the cleaned float."""
+
+        return melt_resident_parent_kg(
+            self._melt_resident_kg_by_account(),
+            species,
+        )
+
     def _build_evaporation_aux_maps(
         self, vapor_pressures: dict,
     ) -> tuple[dict, dict, dict]:
@@ -3438,10 +3463,7 @@ class EvaporationMixin:
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
 
-        cleaned_melt_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt')
-        spent_reductant_residue_kg = self.atom_ledger.kg_by_account(
-            SPENT_REDUCTANT_RESIDUE_ACCOUNT)
+        resident_kg = self._melt_resident_kg_by_account()
         projection_parity_tolerance_pct = 5.0e-12
 
         for species in vapor_pressures:
@@ -3468,11 +3490,10 @@ class EvaporationMixin:
             )
             stoich = self._evaporation_stoich(species, sp_data)
             stoich_by_species[species] = dict(stoich)
-            # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
-            # cleaned_melt + spent_reductant_residue define the projection.
-            ledger_oxide_kg = (
-                float(cleaned_melt_kg.get(parent_oxide, 0.0))
-                + float(spent_reductant_residue_kg.get(parent_oxide, 0.0))
+            # Same two accounts as the melt projection. A missing or zero
+            # residue leaves the cleaned-melt float unchanged.
+            ledger_oxide_kg = melt_resident_parent_kg(
+                resident_kg, parent_oxide,
             )
             projection_oxide_kg = float(self.melt.composition_kg.get(
                 parent_oxide, 0.0))
