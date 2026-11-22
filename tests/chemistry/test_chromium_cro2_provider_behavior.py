@@ -95,6 +95,84 @@ def test_evaporation_transition_debits_o2_reactant_for_cro2():
     assert transition.credits["process.overhead_gas"]["CrO2"] == pytest.approx(1.0)
 
 
+def _o2_accounts(proposal, side: str) -> list[str]:
+    book = proposal.debits if side == "debits" else proposal.credits
+    return sorted(
+        account
+        for account, species_mol in dict(book).items()
+        if "O2" in dict(species_mol)
+    )
+
+
+def test_transition_o2_account_is_the_stoich_owner():
+    """Stoichiometric O2 is posted on the account the owner names.
+
+    The expected account is ``_stoich_o2_is_overhead``. A negative leg
+    is a debit and a positive leg is a credit. The transition's own
+    branches are not the expected value.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.evaporation import _stoich_o2_is_overhead
+
+    registry = _registry()
+    provider = BuiltinEvaporationTransitionProvider()
+    cases = (
+        ("CrO2", "Cr2O3", -0.0952388322513129, ""),
+        ("SiO", "SiO2", 0.36363636363636365, ""),
+        ("Na", "Na2O", 0.347959124886007, ""),
+        ("Na", "Na2O", 0.347959124886007, "reservoir.fo2_buffer"),
+        ("SiO", "SiO2", 0.36363636363636365, "process.overhead_gas"),
+    )
+    for species, parent, o2_per, destination in cases:
+        formula = resolve_species_formula(species, registry)
+        atoms = float(formula.elements.get("O", 0.0) or 0.0)
+        o2_kg = 1.0 * o2_per
+        overhead = _stoich_o2_is_overhead(o2_kg, destination, atoms)
+        expected_account = (
+            "process.overhead_gas" if overhead else "reservoir.fo2_buffer"
+        )
+        expected_side = "debits" if o2_kg < 0.0 else "credits"
+        sp_data = {"oxygen_destination": destination} if destination else {}
+        request = IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_TRANSITION,
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            fO2_log=-8.0,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {parent: 10.0}},
+                species_formula_registry=registry,
+            ),
+            control_inputs={
+                "species": species,
+                "stoich": {
+                    "parent_oxide": parent,
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": o2_per,
+                },
+                "sp_data": sp_data,
+                "rate_kg_hr": 1.0,
+                "remaining_kg_hr": 1.0,
+                "dt_hr": 1.0,
+                "available_kg": 10.0,
+            },
+        )
+        result = provider.dispatch(request)
+        assert result.status == "ok", (species, result.diagnostic)
+        proposal = result.transition
+        assert proposal is not None, species
+        assert _o2_accounts(proposal, expected_side) == [expected_account], (
+            species,
+            destination,
+            expected_side,
+            expected_account,
+            proposal.debits,
+            proposal.credits,
+        )
+        other = "credits" if expected_side == "debits" else "debits"
+        assert _o2_accounts(proposal, other) == [], species
+
+
 def test_condensation_route_sends_cro2_chromia_to_terminal_and_o2_to_overhead():
     registry = _registry()
     provider = BuiltinCondensationRouteProvider()
