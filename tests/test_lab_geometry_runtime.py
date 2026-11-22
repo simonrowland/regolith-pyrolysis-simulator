@@ -22,9 +22,12 @@ from simulator.core import PyrolysisSimulator
 from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import (
+    LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER,
+    gram_lab_exposed_melt_area_bridge,
     LabGeometryError,
     _lab_surface_temperature_default_notices,
     parse_lab_geometry,
+    resolve_gram_lab_exposed_melt_area,
     require_lab_pipe_length,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -272,6 +275,107 @@ def _surface_sio_delta(row: dict, surface_id: str) -> float:
     return sum(
         float(species_kg.get(species, 0.0))
         for species in ("SiO", "Si", "SiO2", "FeSi")
+    )
+
+
+def test_assumed_pellet_diameter_area_reports_basis_and_domain_flag() -> None:
+    area_m2 = 1.327e-4
+    locator = "robinot_2026_experimental_procedure"
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {
+            "pellet_diameter_mm": 13,
+            "exposed_melt_area_m2": area_m2,
+            "exposed_melt_area_basis": (
+                LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER
+            ),
+            "exposed_melt_area_source_ref": locator,
+            "exposed_melt_area_source_class": (
+                "assumption_with_sensitivity_marker"
+            ),
+            "exposed_melt_area_sensitivity_marker": (
+                "robinot_pellet_top_face_area"
+            ),
+        },
+    }
+
+    resolution = resolve_gram_lab_exposed_melt_area(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    bridge = gram_lab_exposed_melt_area_bridge(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+
+    assert resolution.area_m2 == pytest.approx(area_m2)
+    assert resolution.defaulted is False
+    assert resolution.out_of_domain is True
+    assert bridge["effective_exposed_area_m2"] == pytest.approx(area_m2)
+    assert bridge["notices"] == [
+        {
+            "code": "knob_assumed",
+            "path": "lab_geometry.sample.exposed_melt_area_m2",
+            "knob": "exposed_melt_area_m2",
+            "value": area_m2,
+            "unit": "m2",
+            "basis": "assumed_from_printed_pellet_diameter",
+            "derivation": "pi*(D/2)^2",
+            "locator": locator,
+            "source_class": "assumption_with_sensitivity_marker",
+            "sensitivity_marker": "robinot_pellet_top_face_area",
+            "out_of_domain": True,
+            "out_of_domain_reason": "molten_bead_is_not_a_flat_face",
+        }
+    ]
+
+
+def test_declared_area_without_basis_is_printed_but_requires_locator() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {
+            "exposed_melt_area_m2": 0.000123,
+            "exposed_melt_area_source_ref": "printed_area_locator",
+        },
+    }
+
+    resolution = resolve_gram_lab_exposed_melt_area(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    bridge = gram_lab_exposed_melt_area_bridge(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    assert resolution.area_m2 == pytest.approx(0.000123)
+    assert resolution.basis == "printed"
+    assert resolution.defaulted is False
+    assert resolution.out_of_domain is False
+    assert bridge["effective_exposed_area_m2"] == pytest.approx(0.000123)
+    assert "notices" not in bridge
+
+    geometry["sample"].pop("exposed_melt_area_source_ref")
+    with pytest.raises(LabGeometryError) as excinfo:
+        resolve_gram_lab_exposed_melt_area(geometry)
+    assert excinfo.value.code == (
+        "missing_lab_geometry_exposed_melt_area_locator"
+    )
+
+
+def test_unknown_exposed_area_basis_is_typed_refusal() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {
+            "exposed_melt_area_m2": 0.000123,
+            "exposed_melt_area_basis": "assumed_from_vibes",
+            "exposed_melt_area_source_ref": "area_locator",
+        },
+    }
+
+    with pytest.raises(LabGeometryError) as excinfo:
+        resolve_gram_lab_exposed_melt_area(geometry)
+    assert excinfo.value.code == (
+        "invalid_lab_geometry_exposed_melt_area_basis"
     )
 
 

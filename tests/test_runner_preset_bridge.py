@@ -97,7 +97,10 @@ def _write_bridge_preset(
     exposed_area_line = (
         ""
         if exposed_melt_area_m2 is None
-        else f"\n                exposed_melt_area_m2: {exposed_melt_area_m2}"
+        else (
+            f"\n                exposed_melt_area_m2: {exposed_melt_area_m2}"
+            "\n                exposed_melt_area_source_ref: bridge_test_locator"
+        )
     )
     comparison_block = ""
     if comparison_sidecar_path is not None:
@@ -226,6 +229,7 @@ def _runtime_geometry(*, scale: str, exposed_melt_area_m2: float) -> dict:
         "sample": {
             "mass_g": 2.0,
             "exposed_melt_area_m2": exposed_melt_area_m2,
+            "exposed_melt_area_source_ref": "runtime_area_test_locator",
         },
         "surfaces": [
             {
@@ -344,6 +348,7 @@ def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
     printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
+    printed["lab_geometry"]["sample"].pop("exposed_melt_area_basis", None)
     printed_run = _gram_lab_run(printed, campaign="C2A")
     printed_session = printed_run._start_session()
     printed_run._apply_lab_area_bridge(
@@ -493,9 +498,35 @@ def test_c0_start_installs_printed_area_before_the_bridge(
     assert declared_bridge["effective_exposed_area_m2"] == pytest.approx(
         declared_area_m2
     )
-    assert "notices" not in declared_bridge
+    assert declared_bridge["notices"] == [
+        {
+            "code": "knob_assumed",
+            "path": "lab_geometry.sample.exposed_melt_area_m2",
+            "knob": "exposed_melt_area_m2",
+            "value": declared_area_m2,
+            "unit": "m2",
+            "basis": "assumed_from_printed_pellet_diameter",
+            "derivation": "pi*(D/2)^2",
+            "locator": "robinot_2026_methods:Section 3.2",
+            "source_class": "assumption_with_sensitivity_marker",
+            "sensitivity_marker": "robinot_pellet_top_face_area",
+            "out_of_domain": True,
+            "out_of_domain_reason": "molten_bead_is_not_a_flat_face",
+        }
+    ]
+    printed_without_basis = copy.deepcopy(robinot["lab_geometry"])
+    printed_without_basis["sample"].pop("exposed_melt_area_basis", None)
+    printed_bridge = lab_geometry_module.gram_lab_exposed_melt_area_bridge(
+        printed_without_basis,
+        crucible_face_area_m2=sized_m2,
+    )
+    assert printed_bridge["effective_exposed_area_m2"] == pytest.approx(
+        declared_area_m2
+    )
+    assert "notices" not in printed_bridge
     omitted = copy.deepcopy(robinot)
     omitted["lab_geometry"]["sample"]["exposed_melt_area_m2"] = None
+    omitted["lab_geometry"]["sample"].pop("exposed_melt_area_basis", None)
     omitted_session = SimSession()
     omitted_session.start(
         _gram_lab_run(omitted, campaign="C0")._session_config()

@@ -13,6 +13,9 @@ from simulator.scalar_boundary import is_declared_real_scalar
 LAB_GEOMETRY_SCALE = "gram_lab"
 LAB_FIXED_EQUIPMENT_SIZING = "lab_fixed_geometry"
 LAB_EXPOSED_MELT_AREA_BASIS = "gram_lab_exposed_melt"
+LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER = (
+    "assumed_from_printed_pellet_diameter"
+)
 _LAB_SURFACE_TEMPERATURE_DEFAULT_C = 0.0
 LAB_SURFACE_ROLES = frozenset({
     "holder",
@@ -51,6 +54,8 @@ class GramLabMeltAreaResolution:
     area_m2: float | None
     defaulted: bool = False
     out_of_domain: bool = False
+    basis: str | None = None
+    locator: str | None = None
 
 
 @dataclass(frozen=True)
@@ -218,11 +223,43 @@ def resolve_gram_lab_exposed_melt_area(
         return GramLabMeltAreaResolution(None)
 
     raw_area = sample.get("exposed_melt_area_m2")
+    raw_basis = sample.get("exposed_melt_area_basis")
+    basis = str(raw_basis).strip() if raw_basis not in (None, "") else None
+    raw_locator = sample.get("exposed_melt_area_source_ref")
+    locator = (
+        raw_locator.strip()
+        if isinstance(raw_locator, str) and raw_locator.strip()
+        else None
+    )
     defaulted = raw_area in (None, "")
     if defaulted:
+        if basis is not None:
+            raise LabGeometryError(
+                "lab_geometry_exposed_melt_area_basis_without_value",
+                "lab_geometry.sample.exposed_melt_area_basis requires "
+                "exposed_melt_area_m2",
+            )
         if crucible_face_area_m2 is None:
             return GramLabMeltAreaResolution(None)
         raw_area = crucible_face_area_m2
+    else:
+        basis = basis or "printed"
+        if basis not in {
+            "printed",
+            LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER,
+        }:
+            raise LabGeometryError(
+                "invalid_lab_geometry_exposed_melt_area_basis",
+                "lab_geometry.sample.exposed_melt_area_basis must be "
+                "'printed' or "
+                f"'{LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER}'",
+            )
+        if locator is None:
+            raise LabGeometryError(
+                "missing_lab_geometry_exposed_melt_area_locator",
+                "declared lab_geometry.sample.exposed_melt_area_m2 requires "
+                "exposed_melt_area_source_ref",
+            )
 
     try:
         area = (
@@ -243,7 +280,12 @@ def resolve_gram_lab_exposed_melt_area(
     return GramLabMeltAreaResolution(
         area_m2=area,
         defaulted=defaulted,
-        out_of_domain=defaulted,
+        out_of_domain=(
+            defaulted
+            or basis == LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER
+        ),
+        basis=basis,
+        locator=locator,
     )
 
 
@@ -274,6 +316,38 @@ def gram_lab_exposed_melt_area_bridge(
         }
         if resolution.out_of_domain:
             notice["out_of_domain"] = True
+        bridge["notices"] = [notice]
+    elif (
+        resolution.basis
+        == LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER
+    ):
+        sample = (
+            lab_geometry.get("sample")
+            if isinstance(lab_geometry, Mapping)
+            else None
+        )
+        notice = {
+            "code": "knob_assumed",
+            "path": "lab_geometry.sample.exposed_melt_area_m2",
+            "knob": "exposed_melt_area_m2",
+            "value": resolution.area_m2,
+            "unit": "m2",
+            "basis": resolution.basis,
+            "derivation": "pi*(D/2)^2",
+            "locator": resolution.locator,
+            "source_class": (
+                sample.get("exposed_melt_area_source_class")
+                if isinstance(sample, Mapping)
+                else None
+            ),
+            "sensitivity_marker": (
+                sample.get("exposed_melt_area_sensitivity_marker")
+                if isinstance(sample, Mapping)
+                else None
+            ),
+            "out_of_domain": True,
+            "out_of_domain_reason": "molten_bead_is_not_a_flat_face",
+        }
         bridge["notices"] = [notice]
     return bridge
 

@@ -403,6 +403,7 @@ def require_value_citation(value: dict, measurement_id: str) -> None:
 
 def test_robinot_preset_carries_required_external_anchors() -> None:
     preset = load_yaml(PRESET_PATH)
+    sample = preset["lab_geometry"]["sample"]
 
     schedule = preset["lab_schedule"]
     assert schedule["interpolation"] == ROBINOT_INTERPOLATION
@@ -437,8 +438,15 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert pO2_cover["effective_pO2_achieved_mbar"] == pO2_cover["setpoint_mbar"]
     assert pO2_cover["status"] == "achieved_as_setpoint"
 
-    assert preset["lab_geometry"]["sample"]["mass_g"] == ROBINOT_SAMPLE_MASS_G
-    assert "sample_mass_g" not in preset["lab_geometry"]["sample"]["named_missing_fields"]
+    assert sample["mass_g"] == ROBINOT_SAMPLE_MASS_G
+    assert "sample_mass_g" not in sample["named_missing_fields"]
+    assert sample["exposed_melt_area_m2"] == pytest.approx(1.327e-4)
+    assert sample["exposed_melt_area_basis"] == (
+        "assumed_from_printed_pellet_diameter"
+    )
+    assert sample["exposed_melt_area_source_ref"] == (
+        "robinot_2026_methods:Section 3.2"
+    )
     assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_DURATION_H
     assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_DURATION_H
     assert preset["pair"]["faithful"]["kinetics_caveat"] == "none"
@@ -446,6 +454,54 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert preset["comparison_contract"]["model_evidence_class"] == "builtin_process_model"
     assert "cached-real" in preset["comparison_contract"]["fidelity_tier_allowed"]
     assert preset["comparison_contract"]["internal_analytical_used"] is False
+
+
+def test_robinot_assumed_area_is_reported_by_preset_resolver(
+    tmp_path: Path,
+) -> None:
+    preset = runner_module._load_vacuum_preset_run_spec(
+        PRESET_PATH,
+        "faithful",
+    )
+    area_notices = [
+        notice
+        for notice in preset.provenance.get("notices", [])
+        if notice.get("path") == "lab_geometry.sample.exposed_melt_area_m2"
+    ]
+
+    assert len(area_notices) == 1
+    notice = area_notices[0]
+    assert notice["code"] == "knob_assumed"
+    assert notice["knob"] == "exposed_melt_area_m2"
+    assert notice["value"] == pytest.approx(1.327e-4)
+    assert notice["basis"] == "assumed_from_printed_pellet_diameter"
+    assert notice["derivation"] == "pi*(D/2)^2"
+    assert notice["locator"] == "robinot_2026_methods:Section 3.2"
+    assert notice["out_of_domain"] is True
+    assert notice["out_of_domain_reason"] == (
+        "molten_bead_is_not_a_flat_face"
+    )
+
+    document = load_yaml(PRESET_PATH)
+    document["lab_geometry"]["surfaces"][0].pop("temperature_profile")
+    mutated_path = tmp_path / "robinot_area_and_surface_default.yaml"
+    mutated_path.write_text(
+        yaml.safe_dump(document, sort_keys=False),
+        encoding="utf-8",
+    )
+    mutated = runner_module._load_vacuum_preset_run_spec(
+        mutated_path,
+        "faithful",
+    )
+    mutated_notices = mutated.provenance["notices"]
+    assert any(
+        row["path"] == "lab_geometry.sample.exposed_melt_area_m2"
+        for row in mutated_notices
+    )
+    assert any(
+        row["path"] == "lab_geometry.surfaces.holder.temperature_C"
+        for row in mutated_notices
+    )
 
 
 def test_pomeroy_preset_captures_recipe_and_leaves_pressure_unset() -> None:

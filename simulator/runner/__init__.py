@@ -629,7 +629,14 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
     )
     if notices:
         provenance["notices"] = notices
-    provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
+    area_bridge = gram_lab_exposed_melt_area_bridge(geometry)
+    area_notices = area_bridge.pop("notices", [])
+    provenance.update(area_bridge)
+    if area_notices:
+        provenance["notices"] = [
+            *provenance.get("notices", []),
+            *area_notices,
+        ]
     return PresetRunSpec(
         feedstock_id=feedstock_id,
         hours=hours,
