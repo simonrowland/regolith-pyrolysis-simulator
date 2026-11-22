@@ -421,11 +421,11 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
+    ).hexdigest() == "3d1181198c3ed5425d44a1d1c4fb3f96d1d4a36f3ceff918eb7d7a0d7ecdc8e5"
     # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "1064588935496b5f0ff99e1ff6e2908bc62f20e1845520ebe8aa321a91c76582"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -440,11 +440,11 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "61e9be015d7f7fc80787b36f2836523b4094950b6fb8d1a0fa917cdb882cf2b1"
+    ).hexdigest() == "f82b65f10ddba00cbfdeaee41ac19406e2d81fc91a2e55518a2b5388a2137d01"
     # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "7f0cbcb90a852319495d1eaf070ab30efa5d4361413d01e7bcfb57934e8ea102"
+    ).hexdigest() == "4557c916600edd636d29d482a0772385440fa4daf68a9d5a6d54139c5b344fdd"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])

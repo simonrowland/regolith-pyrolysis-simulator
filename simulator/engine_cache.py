@@ -30,11 +30,17 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import quote
 
+
 @dataclass(frozen=True)
 class EngineCacheValue:
     hot: object
     cold: Mapping = field(default_factory=dict)
     cacheable: bool = True
+    # Ephemeral refusal metadata: the stored HOT value keeps its existing
+    # projection and wire shape. These fields only let the cache apply its
+    # refusal allowlist before encoding that projection.
+    refusal_reason: str | None = None
+    refusal_status: str | None = None
 
 
 @dataclass(frozen=True)
@@ -288,19 +294,58 @@ REFUSAL_ENGINE_CRASH = "engine_crash"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
+# engine_cache is a standard-library leaf (tests/test_import_boundary.py::
+# test_engine_cache_is_a_standard_library_leaf), so it cannot import
+# engines.domain_reason. These literals mirror the enum's values;
+# tests/test_engine_cache_refusal_codes.py pins each one to it.
+REFUSAL_FORBIDDEN_SPECIES = "forbidden_species"
+REFUSAL_LIQUID_STATE = "liquid_state"
+REFUSAL_INVALID_PRESSURE_BAR = "invalid_pressure_bar"
+REFUSAL_INVALID_FO2_LOG = "invalid_fo2_log"
+REFUSAL_SUM_PRESSURE_SANITY = "sum_pressure_sanity"
+REFUSAL_SPECIATION_NO_FINITE_VALUES = "speciation_no_finite_values"
 
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID,
+    REFUSAL_FORBIDDEN_SPECIES,
+    REFUSAL_LIQUID_STATE,
+    REFUSAL_INVALID_PRESSURE_BAR,
+    REFUSAL_INVALID_FO2_LOG,
+    REFUSAL_SUM_PRESSURE_SANITY,
+    REFUSAL_SPECIATION_NO_FINITE_VALUES,
 })
 
 
+def _cacheable_refusal_status(
+    refusal_reason: str | None, status: str | None,
+) -> bool:
+    if status in {
+        None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+    }:
+        return True
+    return (
+        refusal_reason == REFUSAL_SPECIATION_NO_FINITE_VALUES
+        and status == "not_converged"
+    )
+
+
 def cacheable_refusal(result) -> bool:
+    if isinstance(result, EngineCacheValue):
+        return (
+            result.cacheable
+            and result.refusal_reason in CACHEABLE_REFUSAL_CODES
+            and _cacheable_refusal_status(
+                result.refusal_reason, result.refusal_status,
+            )
+        )
     return (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
         and result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES
-        and result.get("engine_status") in {None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok"}
+        and _cacheable_refusal_status(
+            result.get("refusal_reason"), result.get("engine_status"),
+        )
         and not result.get("exit_signal")
         and not result.get("exit_code")
     )
@@ -1508,8 +1553,10 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         connection = _connect(path, readonly=readonly)
     except (sqlite3.Error, OSError):
         with _LOCK:
+            counts = _counter_bucket(engine_id)
             counts["read_error"] += 1
             counts["misses"] += 1
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
         return live_hot(solve())
     with _LOCK:
         try:
@@ -1533,9 +1580,41 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
 
     solved = solve()
     hot = live_hot(solved)
-    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+    if readonly or connection is None:
+        # Readonly state takes precedence: a refusal or uncacheable value
+        # cannot be stored either way, so count this miss in one bucket.
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
         return hot
-    if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
+    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:cacheable_false"] = counts.get(
+                "not_stored:cacheable_false", 0
+            ) + 1
+        return hot
+    wrapped_refusal = (
+        isinstance(solved, EngineCacheValue)
+        and solved.refusal_reason is not None
+    )
+    refusal_not_cacheable = (
+        wrapped_refusal and not cacheable_refusal(solved)
+    ) or (
+        _is_refusal(hot) and not cacheable_refusal(hot)
+    )
+    if refusal_not_cacheable:
+        refusal_reason = (
+            solved.refusal_reason if wrapped_refusal
+            else hot.get("refusal_reason") if isinstance(hot, Mapping)
+            else getattr(hot, "refusal_reason", None)
+        )
+        reason_label = str(refusal_reason) if refusal_reason is not None else "untyped"
+        with _LOCK:
+            counter = f"not_stored:refusal:{reason_label}"
+            counts = _counter_bucket(engine_id)
+            counts[counter] = counts.get(counter, 0) + 1
+    if refusal_not_cacheable:
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (
@@ -1621,6 +1700,12 @@ def load_cache_rows(
     for digest, hot, engine, version, source_box, row_seq in rows:
         if isinstance(hot, EngineCacheValue) and not hot.cacheable:
             raise ValueError("transient engine results are not cacheable")
+        if (
+            isinstance(hot, EngineCacheValue)
+            and hot.refusal_reason is not None
+            and not cacheable_refusal(hot)
+        ):
+            raise ValueError("refusal code is not cacheable")
         if not isinstance(digest, bytes) or not 4 <= len(digest) <= _NATURAL_KEY_LIMIT:
             raise ValueError("cache keys must be natural packed keys or 16-byte request digests")
         if engine not in ENGINE_CHEMISTRY_VERSION:
