@@ -8151,6 +8151,10 @@ def stage_purity_report(
             # Stage 3's projection includes both cartridges. The dedicated
             # ledger account holds the Mn-window cartridge; subtract its live
             # species balances to report the silica-window cartridge alone.
+            # Rebuild the local projection. Assigning collected_kg[species]
+            # is the stage-inventory mutation the artifact guard forbids,
+            # even on this report-only copy.
+            cartridge_overrides: dict[str, float] = {}
             for species, raw_kg in mn_cartridge_kg.items():
                 cartridge_kg = _finite_nonnegative_value(
                     raw_kg,
@@ -8164,7 +8168,9 @@ def stage_purity_report(
                         f"({cartridge_kg:g} kg) exceeds Stage-3 projection "
                         f"({stage_projection_kg:g} kg)"
                     )
-                collected_kg[species] = max(0.0, remaining_kg)
+                cartridge_overrides[species] = max(0.0, remaining_kg)
+            if cartridge_overrides:
+                collected_kg = {**collected_kg, **cartridge_overrides}
         if explicit_key:
             accepted_species = accepted_species_for_stage_key(explicit_key)
             coproduct_species = frozenset(
