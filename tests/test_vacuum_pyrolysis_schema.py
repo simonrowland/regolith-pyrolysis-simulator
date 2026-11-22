@@ -604,6 +604,14 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert feedstock_ids == {"lunar_eac_1a"}
     assert measurement["material_context"]["feedstock_id"] == "lunar_eac_1a"
     assert measurement["conditions_reported"]["feedstock"]["species"] == "EAC-1A"
+    pressure_digest = next(
+        row["digest"]
+        for row in preset["source_notes"]
+        if row["digest"].startswith("Reported exposure pressure spans")
+    )
+    assert "assumed initial schedule point" in pressure_digest
+    assert "not a time-resolved trace" in pressure_digest
+    assert "runtime floor" not in pressure_digest
 
     schedule = preset["lab_schedule"]
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C

@@ -1369,6 +1369,9 @@ class ExtractionMixin:
         self._configure_condensation_operating_conditions(evap_flux)
         if sample_time_h is not None:
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
+        # gas_products_kg is this step's mass, stored in the kg/h field.
+        # condensed_kg is not multiplied by dt. Leave the oxygen clip at
+        # one hour so it compares those step moles with the inventory.
         route_result = self.condensation_model.route(evap_flux, self.melt)
         route_diagnostic: dict[str, Any] = {}
         species_order = tuple(
