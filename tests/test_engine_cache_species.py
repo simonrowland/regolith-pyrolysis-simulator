@@ -587,6 +587,82 @@ def test_expire_matches_iron_total_and_case(tmp_path, monkeypatch) -> None:
     assert left == {"sio2", "fe2o3"}
 
 
+def test_expire_species_includes_feedstock_total_iron_spellings(
+    tmp_path, monkeypatch
+) -> None:
+    path = tmp_path / "feedstock-iron.sqlite"
+    for marker, name in enumerate(
+        ("FeO_T", "FeO*", "FeOT", "FeOt", "FeO_total", "feo"), start=1
+    ):
+        _store(
+            monkeypatch,
+            path,
+            "openimcc",
+            {"composition_wt_pct": {name: 1.0}, "marker": marker},
+        )
+    _store(
+        monkeypatch,
+        path,
+        "openimcc",
+        {"composition_wt_pct": {"Fe2O3": 1.0}, "marker": 7},
+    )
+    # The leaf matches the stored casefold only. "feo" is that spelling.
+    leaf = engine_cache.expire_cache_file(path, engine="openimcc", species=("FeO",))
+    assert leaf["matched_by_engine"]["openimcc"] == 1
+
+    from scripts.engine_cache_sync import main
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stderr):
+        assert main(
+            ["expire", str(path), "--engine", "openimcc", "--species", "FeO", "--apply"]
+        ) == 0
+    assert stderr.getvalue().splitlines()[0] == "species-unknown rows: 0"
+    report = json.loads(stdout.getvalue())
+    assert report["deleted_by_engine"]["openimcc"] == 6
+    for spelling in ("feo_t", "feo*", "feot", "feo_total", "feo"):
+        assert spelling in report["species"]
+    assert "fe2o3" not in report["species"]
+    assert set().union(*_species_by_row(path).values()) == {"fe2o3"}
+
+
+def test_expire_counts_an_unclassifiable_key_and_continues(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "bad-flag.sqlite"
+    _store(monkeypatch, path, "openimcc", {"composition_wt_pct": {"SiO2": 1.0}})
+    bad = bytearray(
+        engine_cache.engine_cache_key("openimcc", 1, {"temperature_K": 1800.0})
+    )
+    bad[3] = 0x01
+    with sqlite3.connect(path) as connection:
+        seq = connection.execute("SELECT MAX(row_seq) FROM engine_outputs").fetchone()[0]
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+            (bytes(bad), pack({"answer": 9}), "openimcc", "1", "laptop", seq + 1, 0),
+        )
+    dry = engine_cache.expire_cache_file(path, engine="openimcc", species=("SiO2",))
+    assert dry["unclassifiable_rows"] == 1
+    assert dry["species_unknown_rows"] == 0
+    assert dry["matched_by_engine"]["openimcc"] == 1
+    assert len(_output_rows(path)) == 2
+
+    from scripts.engine_cache_sync import main
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stderr):
+        assert main(
+            ["expire", str(path), "--engine", "openimcc", "--species", "SiO2", "--apply"]
+        ) == 0
+    lines = stderr.getvalue().splitlines()
+    assert lines[0] == "species-unknown rows: 0"
+    assert "unclassifiable rows: 1" in lines
+    report = json.loads(stdout.getvalue())
+    assert report["deleted_by_engine"]["openimcc"] == 1
+    assert report["unclassifiable_rows"] == 1
+    left = _output_rows(path)
+    assert len(left) == 1
+    assert bytes(left[0][2])[3] == 0x01
+
+
 def test_migrate_skips_an_unreadable_key_and_warns(tmp_path) -> None:
     path = tmp_path / "flag.sqlite"
     natural = engine_cache.engine_cache_key(
@@ -671,22 +747,41 @@ def test_refused_open_keeps_the_journal_mode(tmp_path) -> None:
     assert not path.with_name(path.name + "-wal").exists()
 
 
-def test_drop_chemistry_version_rolls_back_hot_and_cold_together(
+def test_drop_chemistry_version_commits_hot_before_cold(
     tmp_path, monkeypatch
 ) -> None:
     path = tmp_path / "drop.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
-    engine_cache.cached_engine_call(
-        "openimcc",
-        {"composition_wt_pct": {"MgO": 1.0}},
-        lambda: engine_cache.EngineCacheValue(hot={"answer": 1}, cold={"enthalpy": 2.0}),
-    )
-    cold_path = path.with_name(path.name + ".cold")
-    assert cold_path.is_file()
 
-    def boom(_connection, _pairs) -> None:
+    def store() -> None:
+        engine_cache.cached_engine_call(
+            "openimcc",
+            {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
+            lambda: engine_cache.EngineCacheValue(
+                hot={"answer": 1}, cold={"enthalpy": 2.0}
+            ),
+        )
+
+    cold_path = path.with_name(path.name + ".cold")
+    store()
+    assert cold_path.is_file()
+    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
+        assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
+    with sqlite3.connect(cold_path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 0
+
+    store()
+    seen: dict[str, list] = {}
+
+    def boom(connection, pairs) -> None:
+        seen["pairs"] = list(pairs)
+        hot_left = connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0]
+        if hot_left != 0:
+            raise AssertionError("cold delete ran while hot rows remained")
         raise sqlite3.OperationalError("injected between hot and cold")
 
     original = engine_cache._drop_attached_cold
@@ -694,16 +789,22 @@ def test_drop_chemistry_version_rolls_back_hot_and_cold_together(
     with pytest.raises(sqlite3.OperationalError, match="injected between hot and cold"):
         engine_cache.drop_chemistry_version("openimcc", 1)
     with sqlite3.connect(path) as connection:
-        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 1
-        assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
+        assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
     with sqlite3.connect(cold_path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 1
 
+    # The hot rows are gone, so a second drop cannot see the orphan.
     monkeypatch.setattr(engine_cache, "_drop_attached_cold", original)
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
-    with sqlite3.connect(path) as connection:
-        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
-        assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
+    assert engine_cache.drop_chemistry_version("openimcc", 1) == 0
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
+        connection.execute("BEGIN IMMEDIATE")
+        original(connection, seen["pairs"])
+        connection.commit()
+    finally:
+        connection.close()
     with sqlite3.connect(cold_path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 0
 

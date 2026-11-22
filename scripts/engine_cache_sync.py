@@ -48,15 +48,21 @@ def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
     ``FeO_total`` and ``FeOT`` are ``FeO``, and ``sio2`` is ``SiO2``. Walking
     the helper's existing ``_OXIDE_ALIASES`` collects every spelling that
     folds to the same oxide. That dict is the provider copy of the adapter
-    map, not a third table. A name the helper does not know stays its own
-    casefold, so an unknown species is still expired. The cache casefolds
-    again, which does not change these strings.
+    map, not a third table. Feedstock total-iron keys that the oxide map
+    does not contain (``FeO_T``, ``FeO*``) come from
+    ``_TOTAL_IRON_AS_FEO_KEYS``. Those keys are already FeO-equivalent, so
+    a query the helper calls ``FeO`` includes them. Copying either list
+    would let the two drift, and ``expire --species FeO`` would keep
+    serving the missed spelling. A name neither source knows stays its
+    own casefold. The cache casefolds again, which does not change these
+    strings.
     """
 
     from engines.alphamelts.domain import (
         _OXIDE_ALIASES,
         canonical_melt_oxide_activity_name,
     )
+    from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
 
     spellings: list[str] = []
     for name in names:
@@ -79,6 +85,14 @@ def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
                     spelling_folded = str(spelling).strip().casefold()
                     if spelling_folded:
                         found.add(spelling_folded)
+            # The helper returns "FeO" for FeO and for FeO_total. The
+            # feedstock tuple is the other existing spelling list for that
+            # same iron, including FeO_T and FeO*.
+            if canonical == "FeO":
+                for key in _TOTAL_IRON_AS_FEO_KEYS:
+                    key_folded = str(key).strip().casefold()
+                    if key_folded:
+                        found.add(key_folded)
         spellings.extend(sorted(found))
     return tuple(dict.fromkeys(spellings))
 
@@ -174,6 +188,9 @@ def main(argv: list[str] | None = None) -> int:
                 "any expire --species on this engine will delete these rows",
                 file=sys.stderr,
             )
+        unclassifiable = result.get("unclassifiable_rows")
+        if unclassifiable is not None:
+            print(f"unclassifiable rows: {unclassifiable}", file=sys.stderr)
     if isinstance(result, dict) and args.command == "migrate" and result.get("migrated"):
         unknown_by_engine = result.get("species_unknown_by_engine") or {}
         listed = (

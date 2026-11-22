@@ -20,7 +20,7 @@ import threading
 import time
 import zlib
 from collections import OrderedDict
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from contextlib import ExitStack, closing, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -601,7 +601,8 @@ def species_from_natural_key(key: bytes) -> frozenset[str] | None:
     treats that row as species-unknown and deletes it: the species it served
     cannot be shown to be unaffected. --all and prune still delete it too.
     An empty frozenset is a real request that named no species; it is not
-    this case, and expire --species leaves it in place.
+    this case, and expire --species leaves it in place. A flag other than
+    0x00 or 0xff raises. expire counts that row and leaves it.
     """
 
     if len(key) < _ENGINE_CACHE_KEY_PREFIX_BYTES:
@@ -2241,27 +2242,62 @@ def _rows_by_engine(connection: sqlite3.Connection) -> dict[str, int]:
     }
 
 
+def _delete_cold_values(
+    connection: sqlite3.Connection, pairs: list[tuple[str, int]]
+) -> None:
+    # row_seq is unique across boxes because the box ranges do not overlap.
+    connection.executemany(
+        "DELETE FROM cold.engine_values WHERE row_seq=?",
+        [(row_seq,) for _source_box, row_seq in pairs],
+    )
+
+
 def _delete_cached_rows(
     connection: sqlite3.Connection,
     has_cold: bool,
     pairs: list[tuple[str, int]],
+    cold_delete: Callable[[sqlite3.Connection, list[tuple[str, int]]], None] | None = None,
 ) -> None:
+    """Delete the HOT row and its species, then the COLD value.
+
+    Two commits. SQLite does not guarantee that one COMMIT updates both
+    a WAL database and an attached database: a crash can change one file
+    and leave the other. The HOT row is what a hit serves, so it commits
+    first. The residue is a COLD value with no HOT row. That value is not
+    served, and snapshot drops it. Deleting COLD first would leave a HOT
+    row whose COLD value is already gone, and that row would still be a
+    hit. ``cold_delete`` is only the drop_chemistry_version seam. expire
+    and prune use the default delete.
+    """
+
     if not pairs:
         return
-    connection.executemany(
-        f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
-        pairs,
-    )
-    connection.executemany(
-        f"DELETE FROM {_TABLE} WHERE source_box=? AND row_seq=?",
-        pairs,
-    )
-    if has_cold:
-        # row_seq is unique across boxes because the box ranges do not overlap.
+    connection.execute("BEGIN IMMEDIATE")
+    try:
         connection.executemany(
-            "DELETE FROM cold.engine_values WHERE row_seq=?",
-            [(row_seq,) for _source_box, row_seq in pairs],
+            f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
+            pairs,
         )
+        connection.executemany(
+            f"DELETE FROM {_TABLE} WHERE source_box=? AND row_seq=?",
+            pairs,
+        )
+        connection.commit()
+    except BaseException:
+        connection.rollback()
+        raise
+    if not has_cold:
+        return
+    connection.execute("BEGIN IMMEDIATE")
+    try:
+        if cold_delete is None:
+            _delete_cold_values(connection, pairs)
+        else:
+            cold_delete(connection, pairs)
+        connection.commit()
+    except BaseException:
+        connection.rollback()
+        raise
 
 
 def _migrate_cold_v3(connection: sqlite3.Connection) -> int:
@@ -2555,17 +2591,16 @@ def expire_cache_file(
         # A pre-migration digest key has no species rows. Any --species on
         # its engine expires it. A natural key with no names is not unknown.
         unknown_pairs: list[tuple[str, int]] = []
+        unclassifiable_rows = 0
         if not all_rows:
-            unknown_pairs = _species_unknown_pairs(connection, engine)
+            unknown_pairs, unclassifiable_rows = _species_unknown_pairs(connection, engine)
             already = set(pairs)
             pairs.extend(pair for pair in unknown_pairs if pair not in already)
         if apply and pairs:
-            connection.execute("BEGIN IMMEDIATE")
             try:
                 _delete_cached_rows(connection, has_cold, pairs)
-                connection.commit()
             except BaseException:
-                connection.rollback()
+                _forget_process_cache(path)
                 raise
             connection.execute("VACUUM main")
             if has_cold:
@@ -2587,6 +2622,7 @@ def expire_cache_file(
             },
             "vacuumed": bool(apply and pairs),
             "species_unknown_rows": None if all_rows else len(unknown_pairs),
+            "unclassifiable_rows": None if all_rows else unclassifiable_rows,
         }
     finally:
         connection.close()
@@ -2594,13 +2630,15 @@ def expire_cache_file(
 
 def _species_unknown_pairs(
     connection: sqlite3.Connection, engine: str
-) -> list[tuple[str, int]]:
-    """Digest keys of one engine that recorded no species.
+) -> tuple[list[tuple[str, int]], int]:
+    """Digest keys of one engine that recorded no species, and the rest.
 
     ``species_from_natural_key`` returns None only for the blake2b fallback.
     Migrate uses that same result to count digest keys and to skip species
     rows. A natural key that named no species returns an empty set and stays.
-    A key this code cannot classify raises, so expire does not leave it.
+    A flag other than 0x00 or 0xff is counted and left. Deleting it would
+    drop a row this code cannot show is the named species, and raising
+    would abort the expire before any other row was removed.
     """
 
     rows = connection.execute(
@@ -2611,10 +2649,16 @@ def _species_unknown_pairs(
         (engine,),
     ).fetchall()
     found: list[tuple[str, int]] = []
+    unclassifiable = 0
     for source_box, row_seq, key in rows:
-        if species_from_natural_key(bytes(key)) is None:
+        try:
+            species = species_from_natural_key(bytes(key))
+        except EngineCacheSpeciesError:
+            unclassifiable += 1
+            continue
+        if species is None:
             found.append((str(source_box), int(row_seq)))
-    return found
+    return found, unclassifiable
 
 
 def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]:
@@ -2650,12 +2694,10 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
             matched_by_engine[engine] = len(found)
             pairs.extend((str(source_box), int(row_seq)) for source_box, row_seq in found)
         if apply and pairs:
-            connection.execute("BEGIN IMMEDIATE")
             try:
                 _delete_cached_rows(connection, has_cold, pairs)
-                connection.commit()
             except BaseException:
-                connection.rollback()
+                _forget_process_cache(path)
                 raise
             connection.execute("VACUUM main")
             if has_cold:
@@ -2680,17 +2722,16 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
 def _drop_attached_cold(
     connection: sqlite3.Connection, pairs: list[tuple[str, int]]
 ) -> None:
-    """Delete COLD values inside the caller's open transaction.
+    """Delete COLD values inside the caller's open COLD transaction.
 
-    ``drop_chemistry_version`` stages the HOT and species deletes first.
-    A failure here rolls all three back. A second connection used to
-    commit the COLD delete later, so a crash between them left orphans.
+    The HOT and species deletes are already committed. A failure here
+    rolls back only this COLD delete, so the file keeps COLD values
+    with no HOT row. Those values are not hits. Snapshot drops them.
+    One COMMIT is not atomic across a WAL database and an attached
+    database, so the two deletes are not one transaction.
     """
 
-    connection.executemany(
-        "DELETE FROM cold.engine_values WHERE row_seq=?",
-        [(row_seq,) for _source_box, row_seq in pairs],
-    )
+    _delete_cold_values(connection, pairs)
 
 
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
@@ -2718,21 +2759,18 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     ):
         connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
         _check_cold_schema(connection)
-    connection.execute("BEGIN IMMEDIATE")
     try:
-        connection.executemany(
-            f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
+        _delete_cached_rows(
+            connection,
+            has_cold,
             pairs,
+            cold_delete=_drop_attached_cold,
         )
-        cursor = connection.execute(
-            f"DELETE FROM {_TABLE} WHERE engine=? AND chem_version=?",
-            (engine_id, str(chem_version)),
-        )
-        if has_cold:
-            _drop_attached_cold(connection, pairs)
-        connection.commit()
     except BaseException:
-        connection.rollback()
+        # The HOT delete may already be committed. Drop the process copy
+        # either way: a rolled-back delete reloads from the file, and a
+        # committed one must not keep serving.
+        _forget_process_cache(path)
         raise
     _forget_process_cache(path)
-    return cursor.rowcount
+    return len(pairs)
