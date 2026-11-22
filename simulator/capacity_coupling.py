@@ -110,12 +110,18 @@ class CapacityShadowRefusal:
     # explicit_ladder, midpoint, radau_fallback, or backward_euler.
     # None when the refusal is raised before a path is chosen.
     # The inventory refusal, headspace_negative_bleed, and
-    # headspace_balance_nonconvergence carry the per-species balance
-    # and the O2 writes. Other refusals leave those unset.
+    # headspace_balance_nonconvergence carry the per-species ledger
+    # balance and the O2 writes. A work-cap refusal carries the last
+    # accepted integrator state in species_balance (mol, partial_Pa),
+    # S(P) in redox_mol_s, and the hour-open buffer stock. The release
+    # refusal carries that post-vapour stock and leaves S unset.
     # Plain dicts and lists, so vars() serialises.
     path: str | None = None
     species_balance: dict[str, dict[str, Any]] | None = None
     overhead_o2_writes: list[dict[str, Any]] | None = None
+    redox_mol_s: dict[str, float] | None = None
+    buffer_o2_mol: float | None = None
+    buffer_o2_mol_signed: float | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -911,12 +917,17 @@ def _shadow_from_balance(
     iterations: int = 0,
     *,
     path: str | None = None,
+    species_balance: dict[str, dict[str, Any]] | None = None,
+    redox_mol_s: dict[str, float] | None = None,
+    buffer_o2_mol: float | None = None,
+    buffer_o2_mol_signed: float | None = None,
 ) -> CapacityShadowRefusal:
     """Copy a balance refusal onto the shadow payload.
 
     The work cap names which counter fired and both counts. The path
     is the branch the law had entered. Other reasons leave the cap
-    unset. The reason string is unchanged.
+    unset. The reason string is unchanged. A work-cap caller passes
+    the last accepted state; other callers leave it unset.
     """
 
     return CapacityShadowRefusal(
@@ -926,7 +937,66 @@ def _shadow_from_balance(
         flux_evaluations=refused.flux_evaluations,
         integrator_evaluations=refused.integrator_evaluations,
         path=path,
+        species_balance=species_balance,
+        redox_mol_s=redox_mol_s,
+        buffer_o2_mol=buffer_o2_mol,
+        buffer_o2_mol_signed=buffer_o2_mol_signed,
     )
+
+
+def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
+    """Last accepted state, S(P), and the hour-open buffer stock.
+
+    The cap check runs at the start of the next evaluation, so the
+    stash is the previous completed step. A Jacobian probe does not
+    replace that step. A flux cap that fires before any completed
+    step uses the last completed flux partials and leaves S unset
+    when that partial was not the one S was evaluated at.
+    """
+
+    balance: dict[str, dict[str, Any]] | None = None
+    redox: dict[str, float] | None = None
+    if law.accepted_moles is not None:
+        partials = law.accepted_partials or {}
+        balance = {
+            name: {
+                "mol": float(law.accepted_moles.get(name, 0.0)),
+                "partial_Pa": float(partials.get(name, 0.0)),
+            }
+            for name in law.species
+        }
+        redox = {
+            name: float(rate)
+            for name, rate in dict(law.accepted_step_redox or {}).items()
+        }
+    elif law.accepted_flux_partials is not None:
+        factor = GAS_CONSTANT * law.temperature_K / law.volume_m3
+        partials = law.accepted_flux_partials
+        balance = {
+            name: {
+                "mol": (
+                    float(partials.get(name, 0.0)) / factor
+                    if factor > 0.0
+                    else 0.0
+                ),
+                "partial_Pa": float(partials.get(name, 0.0)),
+            }
+            for name in law.species
+        }
+        if (
+            law.accepted_redox_key is not None
+            and law.accepted_redox_key == law.accepted_flux_key
+        ):
+            redox = {
+                name: float(rate)
+                for name, rate in dict(law.paired_redox_mol_s or {}).items()
+            }
+    return {
+        "species_balance": balance,
+        "redox_mol_s": redox,
+        "buffer_o2_mol": law.buffer_o2_mol,
+        "buffer_o2_mol_signed": law.buffer_o2_mol_signed,
+    }
 
 
 def _refused_shadow(
@@ -944,7 +1014,17 @@ def _refused_shadow(
     count = law.balance_iterations
     if not isinstance(count, int) or isinstance(count, bool) or count < 0:
         count = 0
-    return _shadow_from_balance(refused, count, path=law.balance_path)
+    payload: dict[str, Any] = {}
+    if refused.reason == "headspace_balance_work_cap":
+        # The hour wrapper returns a work-cap refusal unchanged.
+        # Filling the last accepted state here is what the walk shows.
+        payload = _work_cap_payload(law)
+    return _shadow_from_balance(
+        refused,
+        count,
+        path=law.balance_path,
+        **payload,
+    )
 
 
 @dataclass
@@ -1039,6 +1119,32 @@ class _HeadspaceLaw:
         self.extent_holder = extent_holder
         self._last_gross_kg_s: dict[str, float] = {}
         self._last_redox_mol_s: dict[str, float] = {}
+        # Hour-open stock S drains. signed_mol is the ledger figure
+        # and may be negative. mol is max(0, signed). Set by the hour
+        # on the extent holder before the solve. Absent on a caller
+        # that does not pass one.
+        self.buffer_o2_mol: float | None = None
+        self.buffer_o2_mol_signed: float | None = None
+        raw_stock = None
+        if isinstance(extent_holder, dict):
+            raw_stock = extent_holder.get("_opening_buffer_o2")
+        if isinstance(raw_stock, dict):
+            mol = raw_stock.get("mol")
+            signed = raw_stock.get("signed_mol")
+            if isinstance(mol, (int, float)) and not isinstance(mol, bool):
+                self.buffer_o2_mol = float(mol)
+            if isinstance(signed, (int, float)) and not isinstance(signed, bool):
+                self.buffer_o2_mol_signed = float(signed)
+        # Last completed integrator step. A later Jacobian probe must
+        # not replace it: the cap fires on the next evaluation, and
+        # the walk wants the step that was accepted.
+        self.accepted_moles: dict[str, float] | None = None
+        self.accepted_partials: dict[str, float] | None = None
+        self.accepted_step_redox: dict[str, float] | None = None
+        self.paired_redox_mol_s: dict[str, float] | None = None
+        self.accepted_flux_partials: dict[str, float] | None = None
+        self.accepted_flux_key: tuple | None = None
+        self.accepted_redox_key: tuple | None = None
         # First notice per (species, reason). The sweep calls the pipe
         # on every trial; the hour keeps one flag, not one per sample.
         self.species_notices: dict[tuple[str, str], Mapping[str, Any]] = {}
@@ -1067,6 +1173,7 @@ class _HeadspaceLaw:
         # so a chunk-2 zero is unchanged.
         if self.redox_mol_s_at_partials is None:
             self._last_redox_mol_s = self.redox_mol_s
+            self._remember_redox_partials(partials, self.redox_mol_s)
             return self.redox_mol_s
         try:
             raw = self.redox_mol_s_at_partials(partials)
@@ -1085,7 +1192,27 @@ class _HeadspaceLaw:
                 raise _BalanceRefused(f"missing_molar_mass:{label}")
             out[label] = _as_finite(rate, f"redox_source_not_finite:{label}")
         self._last_redox_mol_s = out
+        self._remember_redox_partials(partials, out)
         return out
+
+    def _remember_redox_partials(
+        self,
+        partials: Mapping[str, float],
+        redox: Mapping[str, float],
+    ) -> None:
+        # S at this partial. The integrator step copies the same pair
+        # after it accepts the step. A flux cap before any step uses
+        # this only when the partial matches the last completed flux.
+        self.paired_redox_mol_s = {
+            str(name): float(rate) for name, rate in redox.items()
+        }
+        self.accepted_redox_key = headspace_partial_key(partials)
+
+    def _remember_flux_partials(self, partials: Mapping[str, float]) -> None:
+        self.accepted_flux_partials = {
+            str(name): float(pressure) for name, pressure in partials.items()
+        }
+        self.accepted_flux_key = headspace_partial_key(partials)
 
     def partials_of(self, moles: Mapping[str, float]) -> dict[str, float]:
         return _ideal_gas_partials_Pa(
@@ -1161,6 +1288,7 @@ class _HeadspaceLaw:
                     )
                     gross_kg_s[label] = max(0.0, number) / 3600.0
         self._last_gross_kg_s = gross_kg_s
+        self._remember_flux_partials(partials)
         return out
 
     def _source_mol_s(self, partials: Mapping[str, float]) -> dict[str, float]:
@@ -2174,7 +2302,14 @@ def _slow_converge(
                 flux_evaluations=law.flux_evaluations,
                 integrator_evaluations=law.integrator_evaluations,
             )
-        packed = rates_of(moles_of(state))
+        moles = moles_of(state)
+        packed = rates_of(moles)
+        # The cap check is at the top of the next call. This is the
+        # step that call had already accepted. A Jacobian probe updates
+        # the paired redox below and does not replace these three.
+        law.accepted_moles = dict(moles)
+        law.accepted_partials = law.partials_of(moles)
+        law.accepted_step_redox = dict(law.paired_redox_mol_s or {})
         # n, A, B. G and R only when the hour asked to track them.
         # Leaving them out keeps the untracked rhs the three lists
         # it integrated before.

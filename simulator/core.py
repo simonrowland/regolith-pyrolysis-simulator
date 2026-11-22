@@ -8416,11 +8416,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or float(reservoir.melt_redox_capacity_mol_per_ln_fO2)
             <= OXYGEN_RESERVOIR_NOOP_MOL
         )
-        pre_buffer_mol = max(0.0, float(
+        signed_buffer_mol = float(
             self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
                 OXYGEN_SPECIES, 0.0
             )
-        ))
+            or 0.0
+        )
+        # S drains a nonnegative stock. A negative ledger figure is
+        # not a sink. The solve reads this frozen opening, not a
+        # stock it is drawing down. The work-cap refusal copies both
+        # numbers so the next walk can see an empty or negative open.
+        pre_buffer_mol = max(0.0, signed_buffer_mol)
+        state['extent_holder']['_opening_buffer_o2'] = {
+            'mol': pre_buffer_mol,
+            'signed_mol': signed_buffer_mol,
+        }
 
         def _dispatch_gross(partials_Pa):
             iteration_controls = dict(controls)
@@ -8851,11 +8861,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             excess_mol = (
                 pre_buffer_mol + credit_mol - debit_mol - uptake_mol
             )
-            if excess_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+            # The excess is a stock. A negative figure is an empty
+            # stock, not a source that changes sign with P. Dust at
+            # or below the noop is not a drain: posting it would be
+            # the same zero the exchange already skips, and the step
+            # at that dust is under the solver's monotone floor.
+            stock_mol = max(0.0, excess_mol)
+            if stock_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
                 state['excess_mol'][key] = 0.0
                 return {OXYGEN_SPECIES: reducing_rate}
-            state['excess_mol'][key] = excess_mol
-            return {OXYGEN_SPECIES: excess_mol / 3600.0 + reducing_rate}
+            state['excess_mol'][key] = stock_mol
+            return {OXYGEN_SPECIES: stock_mol / 3600.0 + reducing_rate}
 
         def _solve():
             # Keep fractions_frozen. Clearing it here routed the
@@ -9529,12 +9545,46 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if excess_integrated > OXYGEN_RESERVOIR_NOOP_MOL:
             # Algebra: n = ∫S dt − n_reducing. Unit: mol.
-            # Limit: at or below the noop posts nothing. A negative
-            # figure was clamped above and is not a buffer debit.
-            self._dispatch_and_commit(
-                ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
-                control_inputs={'dn_to_headspace_mol': excess_integrated},
+            # The post debits the stock still in the buffer after the
+            # vapour and the settle. Dust at or below the noop is the
+            # same no-move the exchange already uses, so an overdraw
+            # inside that dust posts the stock and the buffer ends at
+            # zero. A larger overdraw is refused. It is not clipped
+            # to zero and it is not posted through a negative balance.
+            signed_after_mol = float(
+                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                    OXYGEN_SPECIES, 0.0,
+                )
+                or 0.0
             )
+            available_mol = max(0.0, signed_after_mol)
+            if (
+                excess_integrated
+                > available_mol + OXYGEN_RESERVOIR_NOOP_MOL
+            ):
+                holder = state.get('extent_holder')
+                path = None
+                if isinstance(holder, dict):
+                    terms = holder.get('_balance_terms')
+                    if isinstance(terms, dict) and isinstance(
+                        terms.get('path'), str
+                    ):
+                        path = terms['path']
+                raise CapacityCouplingRefusalError(
+                    CapacityShadowRefusal(
+                        'headspace_buffer_release_exceeds_inventory',
+                        int(solved.iterations),
+                        path=path,
+                        buffer_o2_mol=available_mol,
+                        buffer_o2_mol_signed=signed_after_mol,
+                    )
+                )
+            posted_mol = min(excess_integrated, available_mol)
+            if posted_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+                self._dispatch_and_commit(
+                    ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                    control_inputs={'dn_to_headspace_mol': posted_mol},
+                )
         self._headspace_hour_settled = True
         self._remember_headspace_balance_terms(
             state.get("extent_holder") if solved is not None else None

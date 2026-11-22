@@ -18,6 +18,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import MaterialLot
 from simulator.capacity_coupling import (
     DEFAULT_ABS_TOL_PA,
+    CapacityCouplingRefusalError,
     CapacityShadowRefusal,
     headspace_integral_added_kg,
 )
@@ -1469,6 +1470,19 @@ def test_balance_refusals_carry_the_buffer_write_log():
     bare = CapacityShadowRefusal("headspace_trial_committed", 0)
     assert sim._headspace_diagnostic_refusal(bare) is bare
 
+    # A work-cap refusal already carries the last accepted step.
+    # Rebuilding it from the ledger would drop S and the buffer stock.
+    carried = CapacityShadowRefusal(
+        "headspace_balance_work_cap",
+        4,
+        cap="integrator",
+        species_balance={"O2": {"mol": 1.0, "partial_Pa": 2.0}},
+        redox_mol_s={"O2": 3.0},
+        buffer_o2_mol=0.0,
+        buffer_o2_mol_signed=-1.0e-13,
+    )
+    assert sim._headspace_diagnostic_refusal(carried) is carried
+
     inventory = sim._headspace_inventory_mismatch_refusal()
     assert inventory.reason == "headspace_published_pressure_not_inventory"
     assert inventory.species_balance[OXYGEN_SPECIES]["bleed_posted_mol"] == -1.0
@@ -1477,3 +1491,74 @@ def test_balance_refusals_carry_the_buffer_write_log():
         row["account"] == FO2_BUFFER_ACCOUNT
         for row in inventory.overhead_o2_writes
     )
+
+
+def _buffer_mol(sim) -> float:
+    return float(
+        sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+
+
+def _set_buffer_kg(sim, kg: float) -> None:
+    molar = MOLAR_MASS["O2"] / 1000.0
+    mol = kg / molar
+    current = _buffer_mol(sim)
+    if mol > current:
+        _seed(
+            sim,
+            FO2_BUFFER_ACCOUNT,
+            {OXYGEN_SPECIES: mol - current},
+            "hour-22 buffer",
+        )
+        return
+    sim.atom_ledger._balances.setdefault(FO2_BUFFER_ACCOUNT, {})[
+        OXYGEN_SPECIES
+    ] = mol
+
+
+def test_hour22_buffer_stays_nonnegative_and_overdraw_refuses():
+    """The C4 hour after a 27.174 Pa close, on the real vapour law.
+
+    Overhead O2 is the published hour-21 inventory, downstream is
+    20 Pa, and the melt is 1170 C. A fresh lunar melt publishes this
+    opening at a zero buffer, at one ulp, and at 1e-12 kg. None of
+    those hit the integrator cap. The release is bounded by the stock,
+    so the buffer ends at or above zero. An opening of -1e-13 kg makes
+    the integrated release exceed that stock by more than the noop.
+    The hour refuses ``headspace_buffer_release_exceeds_inventory``
+    and does not debit the buffer through zero.
+    """
+
+    opening_pa = 27.174056558659704
+    molar = MOLAR_MASS["O2"] / 1000.0
+
+    def _open(kg: float):
+        sim = _sim(CampaignPhase.C4, 1170.0, 20.0)
+        _seed_pa(sim, OXYGEN_SPECIES, opening_pa, "hour-21 close")
+        _set_buffer_kg(sim, kg)
+        return sim
+
+    for kg in (0.0, molar * math.ulp(1.0), 1.0e-12):
+        sim = _open(kg)
+        sim._step_one_hour()
+        assert _buffer_mol(sim) >= 0.0, (kg, _buffer_mol(sim))
+        assert sim._headspace_capacity_result.authoritative
+
+    sim = _open(-1.0e-13)
+    try:
+        sim._step_one_hour()
+    except CapacityCouplingRefusalError as exc:
+        refusal = exc.refusal
+    else:
+        raise AssertionError(
+            f"negative opening published, buffer {_buffer_mol(sim)}"
+        )
+    assert refusal.reason == "headspace_buffer_release_exceeds_inventory"
+    assert refusal.buffer_o2_mol is not None
+    assert refusal.buffer_o2_mol >= 0.0
+    assert refusal.buffer_o2_mol_signed is not None
+    assert _buffer_mol(sim) > 0.0
+    assert _buffer_mol(sim) + 1.0e-15 >= refusal.buffer_o2_mol_signed

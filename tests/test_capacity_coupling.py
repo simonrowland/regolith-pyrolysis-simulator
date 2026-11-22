@@ -3456,6 +3456,10 @@ def test_flux_cap_refuses_instead_of_running_on():
         refused = _commit_o2(_FLOOR_O2_KG, _SOURCE_02_KG_H, 1.0)
     assert isinstance(refused, CapacityShadowRefusal)
     assert refused.reason == "headspace_balance_work_cap"
+    assert refused.cap == "flux"
+    assert refused.species_balance is not None
+    assert math.isfinite(refused.species_balance["O2"]["partial_Pa"])
+    assert refused.species_balance["O2"]["mol"] >= 0.0
 
 
 def test_integrator_cap_refuses_instead_of_running_on():
@@ -3480,6 +3484,64 @@ def test_integrator_cap_refuses_instead_of_running_on():
         )
     assert isinstance(refused, CapacityShadowRefusal)
     assert refused.reason == "headspace_balance_work_cap"
+    assert refused.cap == "integrator"
+    assert refused.species_balance is not None
+    assert refused.species_balance["O2"]["mol"] > 0.0
+    assert math.isfinite(refused.species_balance["O2"]["partial_Pa"])
+    assert refused.redox_mol_s is not None
+    assert math.isfinite(refused.redox_mol_s["O2"])
+
+
+def test_work_cap_carries_the_buffer_stock_and_s():
+    # The stranded holdup enters Radau. The cap stops it on the
+    # third integrator evaluation. The refusal keeps the previous
+    # accepted step, the S that step evaluated, and the hour-open
+    # buffer the hour put on the extent holder.
+    dt_s = 0.25
+    threshold_pa = 100.0
+    holder = {
+        "_opening_buffer_o2": {"mol": 0.0, "signed_mol": -1.0e-13},
+    }
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        if partials["O2"] >= threshold_pa:
+            return {"O2": 0.0}
+        return {"O2": _SOURCE_02_KG_H}
+
+    def redox(_partials: dict[str, float]) -> dict[str, float]:
+        return {"O2": 1.0e-6}
+
+    with patch.object(capacity_coupling, "_MAX_INTEGRATOR_EVALUATIONS", 2):
+        refused = solve_capacity_shadow(
+            pre_holdup_mol={"O2": _moles_of_kg(_STRANDED_O2_KG)},
+            molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+            flux_kg_hr_at_partials=flux,
+            capacity=NoColdTrain("runtime_enforcement_disabled"),
+            head_bled_species_mol={},
+            external_o2_holdup_mol=0.0,
+            temperature_K=_HS_T_K,
+            volume_m3=_HS_V_M3,
+            dt_hr=dt_s / 3600.0,
+            bleed_conductance_kg_s=0.0,
+            downstream_pressure_Pa=0.0,
+            k_relief_kg_hr_Pa=0.0,
+            p_open_Pa=1.0,
+            pipe_diameter_m=_HS_D_M,
+            pipe_length_m=_HS_L_M,
+            redox_mol_s_at_partials=redox,
+            extent_holder=holder,
+        )
+    assert isinstance(refused, CapacityShadowRefusal)
+    assert refused.reason == "headspace_balance_work_cap"
+    assert refused.cap == "integrator"
+    assert refused.path == "radau_fallback"
+    row = refused.species_balance["O2"]
+    assert row["mol"] > 0.0
+    assert math.isfinite(row["partial_Pa"])
+    assert row["partial_Pa"] > 0.0
+    assert refused.redox_mol_s["O2"] == 1.0e-6
+    assert refused.buffer_o2_mol == 0.0
+    assert refused.buffer_o2_mol_signed == -1.0e-13
 
 
 def test_closed_pipe_varying_source_matches_an_independent_integral():
