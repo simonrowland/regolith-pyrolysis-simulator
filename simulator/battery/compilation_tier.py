@@ -4638,19 +4638,6 @@ def _write_compilation_comparisons_body(
     return written
 
 
-# Modules whose source the comparison rows execute. The token also hashes
-# everything those modules import, so a helper change misses the cache.
-_COMPILATION_REUSE_ENTRY_FILES = (
-    "simulator/battery/compilation_tier.py",
-    "simulator/chemistry/ellingham_thermo.py",
-    "simulator/battery/generators/compilation_thermo_fits.py",
-    "simulator/battery/generators/janaf.py",
-    "simulator/diagnostic_helpers/species_rail_differential.py",
-    "simulator/diagnostic_helpers/gibbs_battery.py",
-    "simulator/battery/score.py",
-)
-
-
 def _write_compilation_comparisons_jsonl(
     context,
     path: Path,
@@ -4661,33 +4648,26 @@ def _write_compilation_comparisons_jsonl(
     rail: Rail | None = None,
     observation_filter: Callable[[Observation], bool] | None = None,
 ) -> int:
-    """Write comparison rows, reusing bytes for one unchanged snapshot.
+    """Write comparison rows, or restore the open prologue's JSONL.
 
-    The rows are a pure function of the parsed store, the run filters, the
-    engine set, ``invoke_pure_phase``, the thermo sidecar, the CEA extract,
-    the MAGEMin binary when a live pure-phase call is allowed, and the
-    modules that score them. A context that is not the unfiltered snapshot
-    is computed every time and not stored: a synthetic context shares no
-    objects with that snapshot, so its rows cannot be served for the
-    on-disk store.
+    The rows are a pure function of the prologue key: the parsed store,
+    these engines and filters, and the data files that key hashes. A
+    context that is not the prologue is computed and not stored.
     """
 
-    key = _compilation_reuse_key(
+    from simulator.battery.parsed_store_cache import store_compilation, take_compilation
+
+    cached = take_compilation(
         context,
+        path,
         engines=engines,
         invoke_pure_phase=invoke_pure_phase,
         work_id=work_id,
         rail=rail,
         observation_filter=observation_filter,
     )
-    if key is not None:
-        from simulator.battery.parsed_store_cache import read_reuse_blob, restore_bytes
-
-        cached = read_reuse_blob("compilation_comparisons", key)
-        if cached is not None:
-            body, count = cached
-            restore_bytes(path, body)
-            return count
+    if cached is not None:
+        return cached
     written = _write_compilation_comparisons_body(
         context,
         path,
@@ -4697,140 +4677,18 @@ def _write_compilation_comparisons_jsonl(
         rail=rail,
         observation_filter=observation_filter,
     )
-    if key is not None and path.is_file():
-        from simulator.battery.parsed_store_cache import write_reuse_blob
-
-        write_reuse_blob("compilation_comparisons", key, path.read_bytes(), written)
+    if path.is_file():
+        store_compilation(
+            context,
+            path,
+            written,
+            engines=engines,
+            invoke_pure_phase=invoke_pure_phase,
+            work_id=work_id,
+            rail=rail,
+            observation_filter=observation_filter,
+        )
     return written
-
-
-def _compilation_reuse_key(
-    context,
-    *,
-    engines: Sequence[Engine],
-    invoke_pure_phase: bool,
-    work_id: str | None,
-    rail: Rail | None,
-    observation_filter: Callable[[Observation], bool] | None,
-) -> str | None:
-    from simulator.battery.parsed_store_cache import (
-        REUSE_SCHEMA,
-        active_parsed_store,
-        canonical_material,
-        code_token,
-    )
-
-    parsed = active_parsed_store(context)
-    if parsed is None:
-        return None
-    try:
-        payload = {
-            "store": parsed.store_content_sha256,
-            "builder": parsed.builder_token,
-            "engines": [engine.value for engine in engines],
-            "invoke_pure_phase": bool(invoke_pure_phase),
-            "work_id": work_id,
-            "rail": None if rail is None else rail.value,
-            "observations": _selected_observation_token(context, observation_filter),
-            "sidecar": _optional_file_token(_compilation_sidecar_path()),
-            "cea": _optional_file_token(_cea_extract_path()),
-            "pure_phase": _pure_phase_token(invoke_pure_phase),
-            "code": code_token(_COMPILATION_REUSE_ENTRY_FILES, schema=REUSE_SCHEMA),
-        }
-    except (OSError, ValueError):
-        return None
-    material = canonical_material(payload)
-    if material is None:
-        return None
-    return hashlib.sha256(material.encode("utf-8")).hexdigest()
-
-
-def _selected_observation_token(
-    context,
-    observation_filter: Callable[[Observation], bool] | None,
-) -> str:
-    """Identity of the filter is the set of observation ids it accepts.
-
-    ``id(filter)`` would miss whenever the scorer builds a new lambda for
-    the same species set, and would hit across different species sets that
-    happened to reuse one function object.
-    """
-
-    if observation_filter is None:
-        return "none"
-    selected = sorted(
-        observation.observation_id
-        for observation in context.observations.values()
-        if observation_filter(observation)
-    )
-    return hashlib.sha256("\n".join(selected).encode("utf-8")).hexdigest()
-
-
-def _compilation_sidecar_path() -> Path:
-    from simulator.battery.generators.compilation_thermo_fits import DEFAULT_SIDECAR_PATH
-
-    return DEFAULT_SIDECAR_PATH
-
-
-def _cea_extract_path() -> Path:
-    from simulator.diagnostic_helpers.gibbs_battery import CEA_EXTRACT_PATH
-
-    return CEA_EXTRACT_PATH
-
-
-def _optional_file_token(path: Path | None) -> str:
-    if path is None or not path.is_file():
-        return "absent"
-    from simulator.battery.store_validation import hash_relative_files
-
-    return hash_relative_files(path.parent, [path])
-
-
-def _pure_phase_token(invoke_pure_phase: bool) -> str:
-    """Inputs of a live MAGEMin or ThermoEngine call that are not repo source.
-
-    ``invoke_pure_phase`` false never calls those backends. When it is true,
-    ``default_pure_phase`` reads ``REGOLITH_MAGEMIN_BINARY`` and
-    ``MAGEMinBackend`` resolves the binary; those bytes are part of the key.
-    ThermoEngine is imported by name. The key records that module's origin
-    file. A data file beside that origin is not hashed, so a data-only
-    ThermoEngine edit can reuse a stale NASA-9 row.
-    """
-
-    if not invoke_pure_phase:
-        return "off"
-    env_value = os.environ.get("REGOLITH_MAGEMIN_BINARY")
-    return "env={};file={};thermoengine={}".format(
-        "unset" if not env_value else env_value,
-        _optional_file_token(_resolved_magemin_binary()),
-        _thermoengine_origin_token(),
-    )
-
-
-def _resolved_magemin_binary() -> Path | None:
-    try:
-        from simulator.melt_backend.magemin import MAGEMinBackend
-    except ImportError:
-        return None
-
-    backend = MAGEMinBackend()
-    explicit = os.environ.get("REGOLITH_MAGEMIN_BINARY")
-    if explicit:
-        backend._config = {"binary_path": explicit}
-    resolved = backend._resolve_binary_path()
-    return resolved if isinstance(resolved, Path) else None
-
-
-def _thermoengine_origin_token() -> str:
-    import importlib.util
-
-    spec = importlib.util.find_spec("thermoengine")
-    if spec is None or not spec.origin:
-        return "absent"
-    origin = Path(spec.origin)
-    if not origin.is_file():
-        return "absent"
-    return _optional_file_token(origin)
 
 
 def iter_compilation_comparisons_jsonl(path: Path) -> Iterable[dict[str, object]]:

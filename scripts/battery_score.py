@@ -44,8 +44,13 @@ from simulator.battery.pins import (  # noqa: E402
     _pin_failures_from_payloads,
     write_pins,
 )
+from simulator.battery.parsed_store_cache import (  # noqa: E402
+    close_prologue,
+    open_prologue,
+)
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    _read_decision_band_ratchet,
     _render_score_report_from_payloads_legacy,
     _ResidualJsonlRows,
     _count_residuals_jsonl,
@@ -785,6 +790,62 @@ def main(argv: list[str] | None = None) -> int:
 
     run_started_wall = time.perf_counter()
     run_started_cpu = time.process_time()
+    melts = [e.value for e in engines if e.value in {"alphamelts", "thermoengine", "magemin"}]
+    laptop = [e for e in engines if e.value not in {"alphamelts", "thermoengine", "magemin"}]
+    host = socket.gethostname()
+    # Known before the load. The compilation rows use the laptop engines
+    # when melt engines are sent to a Studio, and they do not call pure phase.
+    studio_routed = bool(
+        args.studio
+        and melts
+        and studio_host not in host
+        and "studio" not in host.lower()
+    )
+    prologue_engines = tuple(laptop) if studio_routed else tuple(engines)
+    ratchet_entries, _ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
+        args.root
+    )
+    open_prologue(
+        args.root,
+        engines=tuple(engine.value for engine in prologue_engines),
+        invoke_pure_phase=not studio_routed,
+        work_id=args.work,
+        rail=None if rail is None else rail.value,
+        species_arg=args.species or None,
+        entries=ratchet_entries,
+    )
+    try:
+        return _score_with_open_prologue(
+            args,
+            parser,
+            engines=engines,
+            rail=rail,
+            engine_cache_path=engine_cache_path,
+            studio_host=studio_host,
+            melts=melts,
+            laptop=laptop,
+            studio_routed=studio_routed,
+            run_started_wall=run_started_wall,
+            run_started_cpu=run_started_cpu,
+        )
+    finally:
+        close_prologue()
+
+
+def _score_with_open_prologue(
+    args,
+    parser,
+    *,
+    engines,
+    rail,
+    engine_cache_path,
+    studio_host,
+    melts,
+    laptop,
+    studio_routed,
+    run_started_wall,
+    run_started_cpu,
+) -> int:
     context = load_score_context(args.root)
     try:
         species_formulas = normalize_species_filters(
@@ -808,20 +869,10 @@ def main(argv: list[str] | None = None) -> int:
     report_path = output_directory / "score-report.md"
     compilation_comparisons_path = output_directory / "compilation-comparisons.jsonl"
 
-    melts = [e.value for e in engines if e.value in {"alphamelts", "thermoengine", "magemin"}]
-    laptop = [e for e in engines if e.value not in {"alphamelts", "thermoengine", "magemin"}]
     studio_hostname = None
     studio_comparisons_path = None
     studio_cache_summary = None
-    studio_routed = False
-    host = socket.gethostname()
-    if (
-        args.studio
-        and melts
-        and studio_host not in host
-        and "studio" not in host.lower()
-    ):
-        studio_routed = True
+    if studio_routed:
         extra = []
         if rail is not None:
             extra.extend(["--rail", rail.value])

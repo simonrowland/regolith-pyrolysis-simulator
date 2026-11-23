@@ -326,14 +326,6 @@ from simulator.battery.validate import (
     _build_validation_indexes,
     validate_corpus,
 )
-from simulator.battery.parsed_store_cache import (
-    active_parsed_store,
-    canonical_material,
-    code_token,
-    load_unfiltered_score_inputs,
-    read_reuse_pickle,
-    write_reuse_pickle,
-)
 from simulator.battery.validity import (
     GateCheck,
     GateOutcome,
@@ -7633,87 +7625,27 @@ def _source_band_catalog_compute(
     return bands, records, no_band_reasons
 
 
-# The catalog walks score, the compilation series reader, and identity.
-# code_token also hashes the modules those files import.
-_SOURCE_BAND_CODE_FILES = (
-    "simulator/battery/score.py",
-    "simulator/battery/compilation_tier.py",
-    "simulator/battery/identity.py",
-)
-
-
 def _source_band_catalog(
     context: ScoreContext,
     ratchet_entries: Mapping[str, Mapping[str, object]],
 ) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
-    """Return source bands, reusing them for one unchanged snapshot.
+    """Return source bands for the open prologue, or compute them.
 
     The catalog is a pure function of the parsed store and the ratchet
-    entries. Callers do not mutate the returned mappings; a cache hit
-    unpickles a fresh object. A context that is not the unfiltered
-    snapshot is computed and not stored.
+    entries. The prologue key hashes the ratchet file and these entries.
+    A context that is not that prologue is computed and not stored.
+    Callers do not mutate the returned mappings.
     """
 
-    from simulator.battery.parsed_store_cache import REUSE_SCHEMA
+    from simulator.battery.parsed_store_cache import store_source_band, take_source_band
 
-    key = _source_band_reuse_key(context, ratchet_entries, schema=REUSE_SCHEMA)
-    if key is not None:
-        cached = _cached_source_band(read_reuse_pickle("source_band_catalog", key))
-        if cached is not None:
-            return cached
+    cached = take_source_band(context, ratchet_entries)
+    if cached is not None:
+        bands, records, reasons = cached
+        return bands, records, reasons
     computed = _source_band_catalog_compute(context, ratchet_entries)
-    if key is not None:
-        write_reuse_pickle("source_band_catalog", key, computed)
+    store_source_band(context, ratchet_entries, computed)
     return computed
-
-
-def _source_band_reuse_key(
-    context: ScoreContext,
-    ratchet_entries: Mapping[str, Mapping[str, object]],
-    *,
-    schema: int,
-) -> str | None:
-    parsed = active_parsed_store(context)
-    if parsed is None:
-        return None
-    try:
-        payload = {
-            "store": parsed.store_content_sha256,
-            "builder": parsed.builder_token,
-            "ratchet_file": _ratchet_file_token(context.root),
-            "entries": canonical_material(ratchet_entries),
-            "code": code_token(_SOURCE_BAND_CODE_FILES, schema=schema),
-        }
-    except (OSError, ValueError):
-        return None
-    if payload["entries"] is None:
-        return None
-    material = canonical_material(payload)
-    if material is None:
-        return None
-    return hashlib.sha256(material.encode("utf-8")).hexdigest()
-
-
-def _ratchet_file_token(root: Path) -> str:
-    """The ratchet file is not part of the migrated-store content digest."""
-
-    path = root / DECISION_BAND_RATCHET_RELATIVE_PATH
-    if not path.is_file():
-        return "absent"
-    from simulator.battery.store_validation import hash_relative_files
-
-    return hash_relative_files(path.parent, [path])
-
-
-def _cached_source_band(
-    value: object,
-) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]] | None:
-    if not isinstance(value, tuple) or len(value) != 3:
-        return None
-    bands, records, reasons = value
-    if not isinstance(bands, dict) or not isinstance(records, list) or not isinstance(reasons, dict):
-        return None
-    return bands, records, reasons
 
 
 def update_decision_band_ratchet(context: ScoreContext) -> int:
@@ -19400,7 +19332,7 @@ def _load_extract_review(
     """Review status from ``extracts/*.yaml``.
 
     Those files are not inputs of the migrated-store content digest, so this
-    map is never taken from the parsed-store snapshot.
+    map is never taken from the prologue pickle.
     """
 
     extract_review: dict[str, str | None] = {}
@@ -19442,9 +19374,18 @@ def load_score_context(
     tokens = source_filter_tokens(sources)
     # The unfiltered path keeps the historical call exactly, so callers and test
     # doubles that replace load_migrated_store(root) see no signature change.
-    # An unchanged store reuses one parsed snapshot; the patched name does not.
+    # An open prologue reuses one pickle of this build; the patched name does not.
     if sources is None and load_migrated_store is _REAL_LOAD_MIGRATED_STORE:
-        parsed = load_unfiltered_score_inputs(root)
+        from simulator.battery.parsed_store_cache import (
+            build_unfiltered,
+            store_parsed,
+            take_parsed_store,
+        )
+
+        parsed = take_parsed_store()
+        if parsed is None:
+            parsed = build_unfiltered(root)
+            store_parsed(parsed)
         return ScoreContext(
             works=parsed.works,
             experiments=parsed.experiments,

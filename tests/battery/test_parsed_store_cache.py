@@ -1,13 +1,15 @@
-"""Contract tests for the parsed-store snapshot and the pure-function reuse.
+"""Contract tests for the one prologue pickle.
 
-The snapshot key is the migrated-store content digest plus the builder
-token. A warm load must not call validate_corpus again. Compilation rows
-and the source-band catalog are reused only for that same snapshot.
+The key is the migrated-store content digest, every declared data input,
+the simulator and engines Python trees, the VapoRock package, and, when
+pure phase is on, the ThermoEngine tree and the MAGEMin binary. A warm
+prologue must not call validate_corpus again. A torn pickle rebuilds.
 """
 
 from __future__ import annotations
 
-import ast
+import os
+import pickle
 import socket
 from dataclasses import replace
 from decimal import Decimal
@@ -16,35 +18,18 @@ from pathlib import Path
 import pytest
 
 from simulator.battery.enums import Engine, EvidenceClass
-from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.parsed_store_cache import (
-    HARMLESS_LOADER_SETTINGS,
-    PARSED_STORE_ENTRY_FILES,
-    ParsedScoreInputs,
-    _remember,
-    load_unfiltered_score_inputs,
-    reachable_source_files,
+    PROLOGUE_DATA_INPUTS,
+    _directory_token,
+    canonical_material,
+    close_prologue,
+    open_prologue,
+    prologue_key,
+    runtime_token,
 )
 from simulator.battery.records import DecisionBand
 from simulator.battery.score import ScoreContext
-from simulator.battery.store_validation import (
-    _migrated_store_content_sha256,
-    hash_relative_files,
-)
 from tests.battery import factories as F
-
-_LOADER_MODULES = (
-    "simulator/battery/migrate.py",
-    "simulator/battery/records.py",
-    "simulator/battery/identity.py",
-    "simulator/battery/validate.py",
-    "simulator/battery/validity.py",
-    "simulator/battery/polymorph_dictionary.py",
-    "simulator/accounting/formulas.py",
-    "simulator/accounting/oxide_mass.py",
-    "simulator/yaml_cache.py",
-    "simulator/state.py",
-)
 
 
 def _tiny_store(root: Path) -> Path:
@@ -75,47 +60,24 @@ def _tiny_store(root: Path) -> Path:
     return root
 
 
-def _store_paths(root: Path) -> list[Path]:
-    from simulator.battery.migrate import (
-        iter_observation_store_paths,
-        iter_work_store_paths,
-    )
-
-    literature = root / "data" / "literature"
-    paths = iter_work_store_paths(literature / "works")
-    for directory_name in ("extracts-v2", "observations-v2"):
-        paths.extend(iter_observation_store_paths(literature / directory_name))
-    return paths
-
-
-def _issue_rows(context: ScoreContext) -> tuple[tuple[str, tuple[tuple[str, str, str], ...]], ...]:
-    return _issue_rows_from_map(context.hard_issues_by_observation)
-
-
-def _issue_rows_from_map(issues_by_observation):
-    return tuple(
-        (
-            observation_id,
-            tuple((issue.path, issue.reason.value, issue.detail) for issue in issues),
-        )
-        for observation_id, issues in sorted(issues_by_observation.items())
-    )
-
-
-def _plain_records(context: ScoreContext) -> tuple[object, object, object, dict[str, str]]:
-    from simulator.battery.migrate import to_plain
-
-    return (
-        to_plain(context.works),
-        to_plain(context.experiments),
-        to_plain(context.observations),
-        dict(context.origins),
-    )
-
-
 def _use_cache(monkeypatch: pytest.MonkeyPatch, directory: Path) -> None:
     monkeypatch.setenv("REGOLITH_PARSED_STORE_CACHE", "on")
     monkeypatch.setenv("REGOLITH_PARSED_STORE_CACHE_DIR", str(directory))
+
+
+def _stub_installed_trees(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep session tests off the installed VapoRock and checkout trees.
+
+    The generative test hashes a tmp tree for real. These stubs only stop
+    the session tests from rehashing that installed tree on every load.
+    """
+
+    import simulator.battery.parsed_store_cache as cache_mod
+
+    monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
+    monkeypatch.setattr(cache_mod, "_python_tree_token", lambda _root: "code-stub")
+    monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-stub")
+    monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "magemin-stub")
 
 
 def _counting_validate(monkeypatch: pytest.MonkeyPatch) -> dict[str, int]:
@@ -132,73 +94,259 @@ def _counting_validate(monkeypatch: pytest.MonkeyPatch) -> dict[str, int]:
     return calls
 
 
-class _Row:
-    def __init__(self, observation_id: str) -> None:
-        self.observation_id = observation_id
-        self.experiment_id = "experiment-1"
+def _plain_records(context: ScoreContext):
+    from simulator.battery.migrate import to_plain
 
-
-def _registered_context(
-    root: Path,
-    *,
-    observations: dict | None = None,
-) -> ScoreContext:
-    works: dict = {}
-    experiments: dict = {}
-    rows = {} if observations is None else observations
-    benches: dict = {}
-    origins: dict = {}
-    parsed = ParsedScoreInputs(
-        store_content_sha256="ab" * 32,
-        builder_token="cd" * 32,
-        works=works,
-        experiments=experiments,
-        observations=rows,
-        benches=benches,
-        origins=origins,
-        hard_issues_by_observation={},
-    )
-    _remember(parsed)
-    return ScoreContext(
-        works=works,
-        experiments=experiments,
-        observations=rows,
-        origins=origins,
-        benches=benches,
-        root=root,
+    return (
+        to_plain(context.works),
+        to_plain(context.experiments),
+        to_plain(context.observations),
+        dict(context.origins),
     )
 
 
-def test_snapshot_digest_is_the_store_content_hash(tmp_path: Path) -> None:
-    root = _tiny_store(tmp_path / "store")
-    digest = _migrated_store_content_sha256(root)
-    assert hash_relative_files(root, _store_paths(root)) == digest
+def _issue_rows(context: ScoreContext):
+    return tuple(
+        (
+            observation_id,
+            tuple((issue.path, issue.reason.value, issue.detail) for issue in issues),
+        )
+        for observation_id, issues in sorted(context.hard_issues_by_observation.items())
+    )
 
 
-def test_loader_closure_includes_modules_that_build_records() -> None:
-    files = set(reachable_source_files(REPO_ROOT, PARSED_STORE_ENTRY_FILES))
-    missing = [relative for relative in _LOADER_MODULES if relative not in files]
-    assert missing == []
+def _layout(root: Path) -> Path:
+    """One file for every declared input, plus one simulator and engines module."""
+
+    for relative in PROLOGUE_DATA_INPUTS:
+        path = root / relative
+        if Path(relative).suffix:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("a\n", encoding="utf-8")
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+            (path / "marker.txt").write_text("a\n", encoding="utf-8")
+    (root / "simulator").mkdir()
+    (root / "simulator" / "marker.py").write_text("a = 1\n", encoding="utf-8")
+    (root / "engines").mkdir()
+    (root / "engines" / "marker.py").write_text("a = 1\n", encoding="utf-8")
+    return root
 
 
-def test_warm_snapshot_skips_validation_and_matches_a_fresh_load(
+def _key(root: Path, **overrides) -> str:
+    args = {
+        "engines": ("vaporock",),
+        "invoke_pure_phase": False,
+        "work_id": None,
+        "rail": None,
+        "species_arg": None,
+        "entries_material": "{}",
+        "code_root": root,
+    }
+    args.update(overrides)
+    return prologue_key(root, **args)
+
+
+def _mutate(path: Path) -> None:
+    path.write_text(path.read_text(encoding="utf-8") + "b\n", encoding="utf-8")
+
+
+def test_prologue_key_changes_for_every_declared_input_and_a_python_file(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    import simulator.battery.parsed_store_cache as cache_mod
+
+    # The installed package is not the tmp copy. Pin it so this test's
+    # mutations are the declared inputs and the Python files.
+    monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
+    root = _layout(tmp_path / "copy")
+    base = _key(root)
+    targets = []
+    for relative in PROLOGUE_DATA_INPUTS:
+        path = root / relative
+        targets.append(path if path.is_file() else path / "marker.txt")
+    targets.append(root / "simulator" / "marker.py")
+    targets.append(root / "engines" / "marker.py")
+    assert len(targets) == len(PROLOGUE_DATA_INPUTS) + 2
+    for path in targets:
+        original = path.read_text(encoding="utf-8")
+        _mutate(path)
+        assert _key(root) != base
+        path.write_text(original, encoding="utf-8")
+        assert _key(root) == base
+
+
+def test_directory_token_and_installed_packages_change_the_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.parsed_store_cache as cache_mod
+
+    package = tmp_path / "package"
+    package.mkdir()
+    (package / "JANAF-vapor-data-full.csv").write_text("a\n", encoding="utf-8")
+    before = _directory_token(package)
+    (package / "JANAF-vapor-data-full.csv").write_text("b\n", encoding="utf-8")
+    assert _directory_token(package) != before
+
+    monkeypatch.setattr(cache_mod, "_python_tree_token", lambda _root: "code-stub")
+    monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-stub")
+    monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "magemin-stub")
+    root = _layout(tmp_path / "copy")
+    monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "one")
+    first = _key(root)
+    monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "two")
+    assert _key(root) != first
+    calls = {"n": 0}
+
+    def counted() -> str:
+        calls["n"] += 1
+        return "backend"
+
+    monkeypatch.setattr(cache_mod, "_thermoengine_token", counted)
+    monkeypatch.setattr(cache_mod, "_magemin_binary_token", counted)
+    assert _key(root, invoke_pure_phase=False) == _key(root, invoke_pure_phase=False)
+    assert calls["n"] == 0
+    pure = _key(root, invoke_pure_phase=True)
+    assert calls["n"] == 2
+    monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "other-binary")
+    assert _key(root, invoke_pure_phase=True) != pure
+
+
+def test_runtime_token_names_the_interpreter_and_pyyaml() -> None:
+    import yaml
+
+    token = runtime_token()
+    assert sys_version_in(token)
+    assert yaml.__version__ in token
+
+
+def sys_version_in(token: str) -> bool:
+    import sys
+
+    return sys.version in token
+
+
+def test_species_arg_and_engines_change_the_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _stub_installed_trees(monkeypatch)
+    root = _layout(tmp_path / "copy")
+    base = _key(root)
+    assert _key(root, species_arg="SiO2") != base
+    assert _key(root, engines=("openimcc",)) != base
+    assert canonical_material({"values": {1}}) is None
+
+
+def _run_prologue(root: Path, *, entries: object, species_arg: str | None = None) -> ScoreContext:
+    from simulator.battery.compilation_tier import _write_compilation_comparisons_jsonl
+    from simulator.battery.score import _source_band_catalog, load_score_context
+
+    open_prologue(
+        root,
+        engines=("vaporock",),
+        invoke_pure_phase=False,
+        work_id=None,
+        rail=None,
+        species_arg=species_arg,
+        entries=entries,
+    )
+    try:
+        context = load_score_context(root)
+        _source_band_catalog(context, entries if isinstance(entries, dict) else {})
+        _write_compilation_comparisons_jsonl(
+            context,
+            root / "comparisons.jsonl",
+            engines=(Engine.VAPOROCK,),
+            invoke_pure_phase=False,
+            observation_filter=None if species_arg is None else (lambda _observation: True),
+        )
+        return context
+    finally:
+        close_prologue()
+
+
+def test_warm_prologue_skips_validation_and_restores_both_products(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.score as score_mod
     from simulator.battery.score import load_score_context
 
-    root = _tiny_store(tmp_path / "store")
+    _stub_installed_trees(monkeypatch)
     _use_cache(monkeypatch, tmp_path / "cache")
+    root = _tiny_store(tmp_path / "store")
     calls = _counting_validate(monkeypatch)
+    entries: dict = {}
+    band_calls = {"n": 0}
+    body_calls = {"n": 0}
+    band = DecisionBand(Decimal("1.5"), "K", "derived_scatter")
 
-    cold = load_score_context(root)
+    def compute(_context, _entries):
+        band_calls["n"] += 1
+        return ({"group": band}, [{"group_key": {"formula": "MgO"}}], {"other": "held"})
+
+    def body(_context, path: Path, **_kwargs) -> int:
+        body_calls["n"] += 1
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text('{"row":1}\n', encoding="utf-8")
+        return 1
+
+    monkeypatch.setattr(score_mod, "_source_band_catalog_compute", compute)
+    monkeypatch.setattr(compilation_tier, "_write_compilation_comparisons_body", body)
+
+    cold = _run_prologue(root, entries=entries)
     assert calls["n"] == 1
+    assert band_calls["n"] == 1
+    assert body_calls["n"] == 1
     assert cold.hostname == socket.gethostname()
-    warm = load_score_context(root)
+    (root / "comparisons.jsonl").unlink()
+
+    warm = _run_prologue(root, entries=entries)
     assert calls["n"] == 1
+    assert band_calls["n"] == 1
+    assert body_calls["n"] == 1
     assert warm.observations is not cold.observations
     assert _plain_records(warm) == _plain_records(cold)
     assert _issue_rows(warm) == _issue_rows(cold)
-    assert any((tmp_path / "cache").rglob("*.pickle"))
+    assert (root / "comparisons.jsonl").read_text(encoding="utf-8") == '{"row":1}\n'
+    bands, _records, _reasons = score_mod._source_band_catalog(warm, entries)
+    # The catalog above ran outside a session, so it computed. Re-open for a hit copy.
+    assert band_calls["n"] == 2
+    open_prologue(
+        root,
+        engines=("vaporock",),
+        invoke_pure_phase=False,
+        work_id=None,
+        rail=None,
+        species_arg=None,
+        entries=entries,
+    )
+    try:
+        held = load_score_context(root)
+        first = score_mod._source_band_catalog(held, entries)
+        second = score_mod._source_band_catalog(held, entries)
+        assert band_calls["n"] == 2
+        assert first[0]["group"] is not second[0]["group"]
+        assert second[0]["group"].value == Decimal("1.5")
+        compilation_tier._write_compilation_comparisons_jsonl(
+            held,
+            root / "comparisons.jsonl",
+            engines=(Engine.OPENIMCC,),
+            invoke_pure_phase=False,
+        )
+        assert body_calls["n"] == 2
+        plain = ScoreContext(works={}, experiments={}, observations={}, root=root)
+        compilation_tier._write_compilation_comparisons_jsonl(
+            plain,
+            root / "comparisons.jsonl",
+            engines=(Engine.VAPOROCK,),
+            invoke_pure_phase=False,
+        )
+        assert body_calls["n"] == 3
+    finally:
+        close_prologue()
+    assert calls["n"] == 1
+    assert bands["group"].value == Decimal("1.5")
 
     extracts = root / "data" / "literature" / "extracts"
     extracts.mkdir()
@@ -206,7 +354,7 @@ def test_warm_snapshot_skips_validation_and_matches_a_fresh_load(
         "source_id: child-source\nreview_status: reviewed\n",
         encoding="utf-8",
     )
-    reviewed = load_score_context(root)
+    reviewed = _run_prologue(root, entries=entries)
     assert calls["n"] == 1
     assert reviewed.extract_review["child-source"] == "reviewed"
 
@@ -215,271 +363,148 @@ def test_warm_snapshot_skips_validation_and_matches_a_fresh_load(
     if not text.endswith("\n"):
         text += "\n"
     work_path.write_text(text + "# cache-bust\n", encoding="utf-8")
-    rebuilt = load_score_context(root)
+    rebuilt = _run_prologue(root, entries=entries)
     assert calls["n"] == 2
     assert _plain_records(rebuilt) == _plain_records(cold)
-    assert _issue_rows(rebuilt) == _issue_rows(cold)
-
-    monkeypatch.setenv("REGOLITH_PARSED_STORE_CACHE", "off")
-    fresh = load_score_context(root)
-    assert calls["n"] == 3
-    assert _plain_records(fresh) == _plain_records(cold)
-    assert _issue_rows(fresh) == _issue_rows(cold)
 
 
-def test_comment_changes_the_digest_without_changing_parsed_records(
+def test_torn_and_random_pickles_rebuild(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from simulator.battery.migrate import to_plain
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.score as score_mod
 
+    _stub_installed_trees(monkeypatch)
+    cache = tmp_path / "cache"
+    _use_cache(monkeypatch, cache)
     root = _tiny_store(tmp_path / "store")
-    _use_cache(monkeypatch, tmp_path / "cache")
-    before_digest = _migrated_store_content_sha256(root)
-    before = load_unfiltered_score_inputs(root)
-    assert before.store_content_sha256 == before_digest
-    work_path = root / "data" / "literature" / "works" / "work.yaml"
-    text = work_path.read_text(encoding="utf-8")
-    if not text.endswith("\n"):
-        text += "\n"
-    work_path.write_text(text + "# cache-bust\n", encoding="utf-8")
-    after_digest = _migrated_store_content_sha256(root)
-    assert before_digest != after_digest
-    after = load_unfiltered_score_inputs(root)
-    assert after.store_content_sha256 == after_digest
-    assert to_plain(before.works) == to_plain(after.works)
-    assert to_plain(before.experiments) == to_plain(after.experiments)
-    assert to_plain(before.observations) == to_plain(after.observations)
-    assert before.origins == after.origins
-    assert _issue_rows_from_map(before.hard_issues_by_observation) == _issue_rows_from_map(
-        after.hard_issues_by_observation
-    )
+    calls = _counting_validate(monkeypatch)
+
+    def compute(_context, _entries):
+        return ({}, [], {})
+
+    def body(_context, path: Path, **_kwargs) -> int:
+        path.write_text("{}\n", encoding="utf-8")
+        return 0
+
+    monkeypatch.setattr(score_mod, "_source_band_catalog_compute", compute)
+    monkeypatch.setattr(compilation_tier, "_write_compilation_comparisons_body", body)
+    _run_prologue(root, entries={})
+    assert calls["n"] == 1
+    pickles = list(cache.rglob("*.pickle"))
+    assert len(pickles) == 1
+    original = pickles[0].read_bytes()
+
+    pickles[0].write_bytes(original[:10])
+    _run_prologue(root, entries={})
+    assert calls["n"] == 2
+
+    pickles = list(cache.rglob("*.pickle"))
+    assert len(pickles) == 1
+    pickles[0].write_bytes(os.urandom(64))
+    _run_prologue(root, entries={})
+    assert calls["n"] == 3
+
+    pickles = list(cache.rglob("*.pickle"))
+    assert len(pickles) == 1
+    with pickles[0].open("wb") as handle:
+        pickle.dump({"schema": 1, "key": pickles[0].stem}, handle)
+    _run_prologue(root, entries={})
+    assert calls["n"] == 4
 
 
 def test_fixture_root_does_not_write_the_user_cache(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from simulator.battery.score import load_score_context
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.score as score_mod
 
     xdg = tmp_path / "xdg"
     monkeypatch.setenv("XDG_CACHE_HOME", str(xdg))
     monkeypatch.delenv("REGOLITH_PARSED_STORE_CACHE_DIR", raising=False)
     monkeypatch.setenv("REGOLITH_PARSED_STORE_CACHE", "on")
+    _stub_installed_trees(monkeypatch)
+    monkeypatch.setattr(
+        score_mod, "_source_band_catalog_compute", lambda _context, _entries: ({}, [], {})
+    )
+    monkeypatch.setattr(
+        compilation_tier,
+        "_write_compilation_comparisons_body",
+        lambda _context, path, **_kwargs: path.write_text("{}\n", encoding="utf-8") or 0,
+    )
     calls = _counting_validate(monkeypatch)
     root = _tiny_store(tmp_path / "store")
-    load_score_context(root)
-    load_score_context(root)
+    _run_prologue(root, entries={})
+    _run_prologue(root, entries={})
     assert calls["n"] == 2
     assert not (xdg / "regolith-pyrolysis-simulator" / "parsed-store").exists()
 
 
-def test_patched_loader_is_not_served_the_snapshot(
+def test_patched_loader_is_not_served_the_prologue(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
     import simulator.battery.score as score_mod
     from simulator.battery.score import load_score_context
 
-    root = _tiny_store(tmp_path / "store")
+    _stub_installed_trees(monkeypatch)
     _use_cache(monkeypatch, tmp_path / "cache")
-    load_score_context(root)
+    root = _tiny_store(tmp_path / "store")
+
+    def compute(_context, _entries):
+        return ({}, [], {})
+
+    def body(_context, path: Path, **_kwargs) -> int:
+        path.write_text("{}\n", encoding="utf-8")
+        return 0
+
+    monkeypatch.setattr(score_mod, "_source_band_catalog_compute", compute)
+    monkeypatch.setattr(compilation_tier, "_write_compilation_comparisons_body", body)
+    _run_prologue(root, entries={})
 
     def boom(*_args, **_kwargs):
         raise RuntimeError("patched loader")
 
     monkeypatch.setattr(score_mod, "load_migrated_store", boom)
-    with pytest.raises(RuntimeError, match="patched loader"):
-        load_score_context(root)
+    open_prologue(
+        root,
+        engines=("vaporock",),
+        invoke_pure_phase=False,
+        work_id=None,
+        rail=None,
+        species_arg=None,
+        entries={},
+    )
+    try:
+        with pytest.raises(RuntimeError, match="patched loader"):
+            load_score_context(root)
+    finally:
+        close_prologue()
 
 
-def test_compilation_reuse_follows_the_snapshot_and_its_inputs(
+def test_noncanonical_entries_are_not_cached(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     import simulator.battery.compilation_tier as compilation_tier
-
-    _use_cache(monkeypatch, tmp_path / "cache")
-    rows = {"a": _Row("a"), "b": _Row("b")}
-    context = _registered_context(tmp_path, observations=rows)
-    calls = {"n": 0}
-
-    def body(_context, path: Path, **_kwargs) -> int:
-        calls["n"] += 1
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text('{"row":1}\n', encoding="utf-8")
-        return 1
-
-    monkeypatch.setattr(compilation_tier, "_write_compilation_comparisons_body", body)
-    path = tmp_path / "comparisons.jsonl"
-    engines = (Engine.VAPOROCK,)
-    assert (
-        compilation_tier._write_compilation_comparisons_jsonl(
-            context, path, engines=engines, invoke_pure_phase=False
-        )
-        == 1
-    )
-    assert calls["n"] == 1
-    path.unlink()
-    assert (
-        compilation_tier._write_compilation_comparisons_jsonl(
-            context, path, engines=engines, invoke_pure_phase=False
-        )
-        == 1
-    )
-    assert calls["n"] == 1
-    assert path.read_text(encoding="utf-8") == '{"row":1}\n'
-
-    other = ScoreContext(works={}, experiments={}, observations={}, root=tmp_path)
-    compilation_tier._write_compilation_comparisons_jsonl(
-        other, path, engines=engines, invoke_pure_phase=False
-    )
-    assert calls["n"] == 2
-
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context,
-        path,
-        engines=(Engine.OPENIMCC,),
-        invoke_pure_phase=False,
-    )
-    assert calls["n"] == 3
-
-    def keep_a(observation: _Row) -> bool:
-        return observation.observation_id == "a"
-
-    def keep_a_again(observation: _Row) -> bool:
-        return observation.observation_id == "a"
-
-    def keep_b(observation: _Row) -> bool:
-        return observation.observation_id == "b"
-
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context,
-        path,
-        engines=engines,
-        invoke_pure_phase=False,
-        observation_filter=keep_a,
-    )
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context,
-        path,
-        engines=engines,
-        invoke_pure_phase=False,
-        observation_filter=keep_a_again,
-    )
-    assert calls["n"] == 4
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context,
-        path,
-        engines=engines,
-        invoke_pure_phase=False,
-        observation_filter=keep_b,
-    )
-    assert calls["n"] == 5
-
-    monkeypatch.setenv("REGOLITH_MAGEMIN_BINARY", str(tmp_path / "missing-a"))
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context, path, engines=engines, invoke_pure_phase=True
-    )
-    monkeypatch.setenv("REGOLITH_MAGEMIN_BINARY", str(tmp_path / "missing-b"))
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context, path, engines=engines, invoke_pure_phase=True
-    )
-    assert calls["n"] == 7
-    compilation_tier._write_compilation_comparisons_jsonl(
-        context, path, engines=engines, invoke_pure_phase=False
-    )
-    assert calls["n"] == 7
-
-
-def test_source_band_reuse_follows_the_snapshot_and_the_ratchet(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
     import simulator.battery.score as score_mod
 
-    _use_cache(monkeypatch, tmp_path / "cache")
-    context = _registered_context(tmp_path)
-    calls = {"n": 0}
-    band = DecisionBand(Decimal("1.5"), "K", "derived_scatter")
+    _stub_installed_trees(monkeypatch)
+    cache = tmp_path / "cache"
+    _use_cache(monkeypatch, cache)
+    root = _tiny_store(tmp_path / "store")
+    calls = _counting_validate(monkeypatch)
 
     def compute(_context, _entries):
-        calls["n"] += 1
-        return ({"group": band}, [{"group_key": {"formula": "MgO"}}], {"other": "zero_scatter_aligned_group"})
+        return ({}, [], {})
+
+    def body(_context, path: Path, **_kwargs) -> int:
+        path.write_text("{}\n", encoding="utf-8")
+        return 0
 
     monkeypatch.setattr(score_mod, "_source_band_catalog_compute", compute)
-    first_bands, first_records, first_reasons = score_mod._source_band_catalog(context, {})
-    second_bands, second_records, second_reasons = score_mod._source_band_catalog(context, {})
-    assert calls["n"] == 1
-    assert second_bands["group"].value == first_bands["group"].value
-    assert second_bands["group"] is not first_bands["group"]
-    assert second_records == first_records
-    assert second_reasons == first_reasons
-
-    score_mod._source_band_catalog(context, {"group": {"ticket_line": "1"}})
+    monkeypatch.setattr(compilation_tier, "_write_compilation_comparisons_body", body)
+    entries = {"bad": {"values": {1}}}
+    _run_prologue(root, entries=entries)
+    _run_prologue(root, entries=entries)
     assert calls["n"] == 2
-    plain = ScoreContext(works={}, experiments={}, observations={}, root=tmp_path)
-    score_mod._source_band_catalog(plain, {})
-    assert calls["n"] == 3
-    score_mod._source_band_catalog(context, {"bad": {"values": {1}}})
-    score_mod._source_band_catalog(context, {"bad": {"values": {1}}})
-    assert calls["n"] == 5
-
-
-def _environ_string_names(path: Path) -> set[str]:
-    tree = ast.parse(path.read_text(encoding="utf-8"))
-    found: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-            if node.func.attr == "get" and _is_os_environ(node.func.value):
-                if node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
-                    found.add(node.args[0].value)
-        if isinstance(node, ast.Subscript) and _is_os_environ(node.value):
-            slice_node = node.slice
-            if isinstance(slice_node, ast.Constant) and isinstance(slice_node.value, str):
-                found.add(slice_node.value)
-    return found
-
-
-def _is_os_environ(node: ast.AST) -> bool:
-    return (
-        isinstance(node, ast.Attribute)
-        and node.attr == "environ"
-        and isinstance(node.value, ast.Name)
-        and node.value.id == "os"
-    )
-
-
-def test_loader_settings_are_harmless_or_absent_from_the_records() -> None:
-    import simulator.yaml_cache as yaml_cache
-    from simulator.battery import parsed_store_cache as cache_mod
-
-    names = {
-        yaml_cache._CACHE_ENV,
-        yaml_cache._CACHE_ENABLED_ENV,
-        yaml_cache._CACHE_MAX_BYTES_ENV,
-        cache_mod._CACHE_SWITCH,
-        cache_mod._CACHE_DIR_ENV,
-    }
-    for relative in (
-        "simulator/yaml_cache.py",
-        "simulator/battery/migrate.py",
-        "simulator/battery/validate.py",
-        "simulator/battery/parsed_store_cache.py",
-    ):
-        names.update(_environ_string_names(REPO_ROOT / relative))
-    missing = sorted(names.difference(HARMLESS_LOADER_SETTINGS))
-    assert missing == []
-    assert "REGOLITH_PARSED_STORE_CACHE" in HARMLESS_LOADER_SETTINGS
-
-
-def test_compilation_entry_files_are_in_the_reuse_closure() -> None:
-    from simulator.battery.compilation_tier import _COMPILATION_REUSE_ENTRY_FILES
-
-    files = set(reachable_source_files(REPO_ROOT, _COMPILATION_REUSE_ENTRY_FILES))
-    missing = [relative for relative in _COMPILATION_REUSE_ENTRY_FILES if relative not in files]
-    assert missing == []
-    assert "simulator/chemistry/ellingham_thermo.py" in files
-
-
-def test_source_band_entry_files_are_in_the_reuse_closure() -> None:
-    from simulator.battery.score import _SOURCE_BAND_CODE_FILES
-
-    files = set(reachable_source_files(REPO_ROOT, _SOURCE_BAND_CODE_FILES))
-    missing = [relative for relative in _SOURCE_BAND_CODE_FILES if relative not in files]
-    assert missing == []
+    assert list(cache.rglob("*.pickle")) == []
