@@ -2078,14 +2078,27 @@ def _score_outputs(
     )
     engines = (engine,)
     root = score_mod.REPO_ROOT
-    residuals, candidates = score_mod.score_store(context, engines=engines)
+    # Element retention is outside every declared set, so the production
+    # gate does not emit it. This pin formats a residual the caller asked
+    # to score. An injected predictor is that gate's exception.
+    injected_predict = None
+    if include_retention:
+        def injected_predict(*_args, **_kwargs):
+            raise AssertionError("compile stub owns this score")
+    residuals, candidates = score_mod.score_store(
+        context, engines=engines, predict=injected_predict
+    )
     direct_jsonl_path = tmp_path / "direct-residuals.jsonl"
     score_mod.write_residuals_jsonl(
         residuals, candidates, direct_jsonl_path, root=root
     )
     streamed_path = tmp_path / "residuals.jsonl"
     _written, metadata = score_mod._score_store_to_jsonl(
-        context, streamed_path, root=root, engines=engines
+        context,
+        streamed_path,
+        root=root,
+        engines=engines,
+        predict=injected_predict,
     )
     partial = streamed_path.with_name(streamed_path.name + ".partial")
     direct_summary = tmp_path / "direct-summary.json"
