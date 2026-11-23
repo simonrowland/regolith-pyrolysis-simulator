@@ -373,23 +373,29 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
 
 
 def test_notice_policy_field_round_trips_as_structured_metadata() -> None:
-    from simulator.battery.records import Notice
+    from simulator.battery.records import Notice, NoticePolicy
 
     notice = Notice(
         kind=NoticeKind.METHOD_ASSUMED,
         affected_quantities=(Quantity.P_PARTIAL,),
         reason="method_assumed; quantity and source text identify equilibrium pressure",
         origin="policy-round-trip",
-        policy={
-            "id": "DP-011",
-            "version": "v1",
-            "status": "canonical",
-            "value": "equilibrium_partial_pressure",
-            "units": "method",
-        },
+        policy=NoticePolicy(
+            id="DP-011",
+            version=1,
+            status="canonical",
+            value="equilibrium_partial_pressure",
+            units="method token",
+        ),
     )
     payload = to_plain(notice)
-    assert payload["policy"] == dict(notice.policy)
+    assert payload["policy"] == {
+        "id": "DP-011",
+        "version": 1,
+        "status": "canonical",
+        "value": "equilibrium_partial_pressure",
+        "units": "method token",
+    }
     assert _notice_from_plain(payload) == notice
     assert notice in {notice}
     other_policy_notice = Notice(
@@ -397,7 +403,7 @@ def test_notice_policy_field_round_trips_as_structured_metadata() -> None:
         affected_quantities=notice.affected_quantities,
         reason=notice.reason,
         origin=notice.origin,
-        policy={**notice.policy, "id": "DP-012"},
+        policy=replace(notice.policy, id="DP-012"),
     )
     assert other_policy_notice != notice
 from simulator.battery.records import (

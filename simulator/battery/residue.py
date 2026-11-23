@@ -8,7 +8,7 @@ import math
 import multiprocessing
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from decimal import Decimal
 from multiprocessing.util import Finalize
 from pathlib import Path
@@ -2310,7 +2310,7 @@ def predict_mass_loss_fraction(
                         "kind": notice.kind.value,
                         "reason": notice.reason,
                         "origin": notice.origin,
-                        **({"policy": dict(notice.policy)} if notice.policy else {}),
+                        **({"policy": asdict(notice.policy)} if notice.policy else {}),
                     }
                     for notice in omission_notices
                 ],
@@ -3260,7 +3260,7 @@ def _predict_hashimoto_residue_cohort(
             for notice in getattr(pressure_model, "below_threshold_omission_notices", ()):
                 row = {"reason": notice.reason, "kind": str(notice.kind.value)}
                 if notice.policy:
-                    row["policy"] = dict(notice.policy)
+                    row["policy"] = asdict(notice.policy)
                 if row not in refinement_notices:
                     refinement_notices.append(row)
             band = {

@@ -592,16 +592,17 @@ def render_legacy_score_report_markdown(
             "flag kinds retain their existing scoring rules. A row carrying both flags "
             "appears in both strata.",
             "",
-            "| stratum | rail | engine | n | median dex | RMS dex |",
-            "|---|---|---|---:|---:|---:|",
+            "| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |",
+            "|---|---|---|---|---|---:|---:|---:|",
         ]
     )
     if not flagged_rows:
-        lines.append("| (none) | — | — | 0 | — | — |")
+        lines.append("| (none) | — | — | — | — | 0 | — | — |")
     else:
         for row in flagged_rows:
             lines.append(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
+                f"{row.get('policy_id', '—')} | {row.get('policy_status', '—')} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
     lines.extend(["", *condition_lines])
@@ -830,16 +831,17 @@ def render_payload_score_report_markdown(
             "Flagged numeric diagnostics are excluded from the measured headline, "
             "bands, and band statistics.",
             "",
-            "| stratum | rail | engine | n | median dex | RMS dex |",
-            "|---|---|---|---:|---:|---:|",
+            "| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |",
+            "|---|---|---|---|---|---:|---:|---:|",
         ]
     )
     if not flagged_rows:
-        lines.append("| (none) | — | — | 0 | — | — |")
+        lines.append("| (none) | — | — | — | — | 0 | — | — |")
     else:
         for row in flagged_rows:
             lines.append(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
+                f"{row.get('policy_id', '—')} | {row.get('policy_status', '—')} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
     if condition_lines is not None:

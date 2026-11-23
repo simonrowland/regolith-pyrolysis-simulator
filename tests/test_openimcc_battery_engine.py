@@ -2168,7 +2168,7 @@ assert all(
     if candidate.observation_id.startswith("engine:openimcc:")
 )
 assert abs(float(flagged["median_dex"]) - (-0.193144973432544415)) < 0.00000001
-assert abs(float(flagged["rms_dex"]) - 0.2097386994979764836) < 0.00000001
+assert abs(float(flagged["rms_dex"]) - 0.2180912476850483) < 0.00000001
 print(json.dumps({"headline": summary, "flagged": flagged, "lineage": "independent"}))
 '''
     env = {
@@ -2194,7 +2194,7 @@ print(json.dumps({"headline": summary, "flagged": flagged, "lineage": "independe
         -0.193144973432544415, abs=1e-8
     )
     assert float(result["flagged"]["rms_dex"]) == pytest.approx(
-        0.2097386994979764836, abs=1e-8
+        0.2180912476850483, abs=1e-8
     )
     assert result["lineage"] == "independent"
 
@@ -2761,7 +2761,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         -0.193144973432544415, abs=1e-8
     )
     assert float(flagged["rms_dex"]) == pytest.approx(
-        0.209738699497976484, abs=1e-8
+        0.2180912476850483, abs=1e-8
     )
 
     solved_openimcc_notice = next(

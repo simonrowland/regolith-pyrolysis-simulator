@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
+    DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -1013,6 +1014,31 @@ class Derivation:
 
 
 @dataclass(frozen=True)
+class NoticePolicy:
+    id: str
+    version: str | int
+    status: str
+    value: str
+    units: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.id, str) or not self.id.startswith("DP-"):
+            raise ValueError("notice policy id must be a DP id")
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not all(
+                isinstance(value, str) and value
+                for value in (self.value, self.units)
+            )
+        ):
+            raise ValueError("notice policy requires id, version, value, and units")
+        if self.status not in {"canonical", "proposed", "rejected"}:
+            raise ValueError("notice policy status is not recognized")
+
+
+@dataclass(frozen=True)
 class Notice:
     kind: NoticeKind
     affected_quantities: tuple[Quantity, ...]
@@ -1027,10 +1053,7 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
-    # Policy metadata is compared as part of notice identity, but mappings are
-    # unhashable. Excluding only this field from the generated hash preserves
-    # equality semantics while allowing notices in residual validation sets.
-    policy: Mapping[str, str] | None = field(default=None, hash=False)
+    policy: NoticePolicy | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1045,13 +1068,6 @@ class Notice:
             raise ValueError("Notice.reason is required")
         if not self.origin:
             raise ValueError("Notice.origin is required")
-        if self.policy is not None:
-            required_policy_fields = {"id", "version", "status", "value", "units"}
-            if not isinstance(self.policy, Mapping) or set(self.policy) != required_policy_fields:
-                raise TypeError("Notice.policy must contain id, version, status, value, and units")
-            if any(not isinstance(value, str) or not value for value in self.policy.values()):
-                raise TypeError("Notice.policy values must be nonempty strings")
-            object.__setattr__(self, "policy", dict(self.policy))
         if self.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION:
             if self.authority is not Authority.CONVENTION:
                 raise ValueError(
@@ -1061,6 +1077,13 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        if self.policy is not None:
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
+        if self.kind is NoticeKind.ASSUMED_PRESSURE and self.policy is None:
+            raise ValueError("assumed_pressure requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
@@ -1894,8 +1917,10 @@ class Observation:
 
 @dataclass(frozen=True)
 class CandidateRequest:
+    """Requested engine comparison; quantity is None when identity is unknown."""
+
     experiment_id: str
-    quantity: Quantity
+    quantity: Quantity | None
     engine: Engine
     channel: str
 
@@ -2000,7 +2025,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
-                None if notice.policy is None else tuple(sorted(notice.policy.items())),
+                notice.policy,
             )
             if fingerprint in seen:
                 continue
