@@ -7178,15 +7178,19 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
-    if converted is not None and convention is not None:
-        confidence_token, coverage_factor = convention
-        if (
-            isinstance(raw_declaration, Mapping)
-            and "k" in raw_declaration
-            and confidence_token == "one_sigma"
-            and coverage_factor not in {Decimal(1), Decimal(2)}
-        ):
-            converted /= coverage_factor
+    confidence_token, coverage_factor = convention or (confidence_level, Decimal(1))
+    numeric_k_has_scaled_width = (
+        convention is not None
+        and isinstance(raw_declaration, Mapping)
+        and "k" in raw_declaration
+        and confidence_token == "one_sigma"
+        and coverage_factor not in {Decimal(1), Decimal(2)}
+    )
+    width_coverage_factor = (
+        Decimal(1) if numeric_k_has_scaled_width else coverage_factor
+    )
+    if converted is not None and convention is not None and numeric_k_has_scaled_width:
+        converted /= coverage_factor
     if converted is None:
         return _PrintedBandResolution(
             refusal={
@@ -7256,13 +7260,7 @@ def _printed_uncertainty_band(
                         "operation": operation.value,
                     }
                 )
-            confidence_width_scale = (
-                Decimal(2)
-                if confidence_level == "two_sigma"
-                else NORMAL_95_TICKET_MULTIPLIER
-                if confidence_level == "ci95"
-                else Decimal(1)
-            )
+            confidence_width_scale = width_coverage_factor
             sigma_r = converted / confidence_width_scale
             # FE3/Fe2 residuals use log10 distance, so propagate directly to
             # dex at the reduction owner before the scorer applies its band policy.
@@ -7328,24 +7326,12 @@ def _printed_uncertainty_band(
     standard_uncertainty_dex = None
     standard_uncertainty = None
     standard_uncertainty_unit = None
-    if convention is not None and confidence_level != "range_half_width":
-        confidence_token, coverage_factor = convention
-        standard_uncertainty = (
-            converted
-            if (
-                isinstance(raw_declaration, Mapping)
-                and "k" in raw_declaration
-                and confidence_token == "one_sigma"
-                and coverage_factor not in {Decimal(1), Decimal(2)}
-            )
-            else converted / coverage_factor
-        )
+    if convention is not None and confidence_token != "range_half_width":
+        standard_uncertainty = converted / width_coverage_factor
         standard_uncertainty_unit = converted_unit
     if operation is MetricOperation.DEX:
-        if confidence_level in {"one_sigma", "ci95"}:
-            standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
-        elif confidence_level == "two_sigma":
-            standard_uncertainty_dex = ticket / Decimal(2)
+        if confidence_token in {"one_sigma", "two_sigma", "ci95"}:
+            standard_uncertainty_dex = ticket / width_coverage_factor
     two_sigma_band = None
     if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
         two_sigma_band = DecisionBand(

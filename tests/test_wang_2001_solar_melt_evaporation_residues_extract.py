@@ -588,11 +588,12 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
         ),
         ({"confidence_level": "not_stated"}, None, None, None),
         ({"kind": "printed"}, None, None, None),
-        ({"k": "Infinity"}, None, None, None),
-        ({"k": "NaN"}, None, None, None),
-        ({"k": 0}, None, None, None),
-        ({"confidence_level": "unknown convention"}, None, None, None),
+        ({"k": "Infinity"}, "conflict", None, None),
+        ({"k": "NaN"}, "conflict", None, None),
+        ({"k": 0}, "conflict", None, None),
+        ({"confidence_level": "unknown convention"}, "conflict", None, None),
         ({"confidence_level": "ci95", "k": 3}, "conflict", None, None),
+        ({"kind": "ci95", "k": 3}, "conflict", None, None),
         ({"confidence_level": "range_half_width", "kind": "two_sigma"}, "conflict", None, None),
     ],
 )
@@ -674,6 +675,57 @@ def test_residue_component_parent_convention_controls_width_lookup(
         assert resolution.standard_uncertainty_unit == "mass_percent"
         assert resolution.band.value == expected_band
         assert resolution.band.unit == "mass_percent"
-        assert resolution.band.rule.startswith("printed_")
+        expected_rule = {
+            "one_sigma": "printed_1sigma:",
+            "two_sigma": "printed_2sigma:",
+            "ci95": "printed_2sigma:",
+        }[expected_token]
+        assert resolution.band.rule.startswith(expected_rule)
     else:
         assert row.uncertainty.verbatim is None or "sigma" not in row.uncertainty.verbatim
+
+
+def test_convention_resolver_checks_every_field_pair_and_token() -> None:
+    from simulator.battery.uncertainty_conventions import (
+        UncertaintyConventionConflict,
+        printed_uncertainty_convention,
+    )
+
+    factors = {
+        "one_sigma": Decimal(1),
+        "two_sigma": Decimal(2),
+        "ci95": Decimal("1.959963984540054"),
+        "range_half_width": None,
+    }
+    fields = ("confidence_level", "kind")
+    for first_field in fields:
+        for second_field in fields:
+            if first_field == second_field:
+                continue
+            for first_token, first_factor in factors.items():
+                for second_token, second_factor in factors.items():
+                    declaration = {
+                        first_field: first_token,
+                        second_field: second_token,
+                    }
+                    conflict = (
+                        first_factor is None
+                        and second_factor is not None
+                    ) or (
+                        second_factor is None
+                        and first_factor is not None
+                    ) or (
+                        first_factor is not None
+                        and second_factor is not None
+                        and abs(first_factor - second_factor) > Decimal("0.001")
+                    )
+                    if conflict:
+                        with pytest.raises(UncertaintyConventionConflict):
+                            printed_uncertainty_convention(declaration)
+                    else:
+                        resolved = printed_uncertainty_convention(declaration)
+                        assert resolved is not None
+                        if first_factor is not None:
+                            assert abs(resolved[1] - first_factor) <= Decimal("0.001")
+    with pytest.raises(UncertaintyConventionConflict):
+        printed_uncertainty_convention({"kind": "ci95", "k": 3})
