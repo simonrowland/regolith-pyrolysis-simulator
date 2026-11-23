@@ -1122,6 +1122,7 @@ def test_imported_openimcc_is_the_pyproject_pin() -> None:
     _project, dependency = _pyproject_openimcc_dependency()
     pinned_commit = dependency.rsplit("@", 1)[-1]
     assert len(pinned_commit) == 40
+    assert pinned_commit == "7cf98e62812b6a338158f6c7568e6f373c473056"
 
     distribution = metadata.distribution("openimcc")
     direct_url = distribution.read_text("direct_url.json")
