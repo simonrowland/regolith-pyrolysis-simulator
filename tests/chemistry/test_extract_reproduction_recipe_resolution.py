@@ -103,7 +103,10 @@ def test_located_mole_fraction_composition_overrides_parent_recipe() -> None:
     assert recipe == pytest.approx(
         {name: float(amount) for name, amount in expected.components}
     )
-    assert recipe == pytest.approx({"SiO2": 0.6, "MgO": 0.4})
+    assert {oxide: amount.hex() for oxide, amount in recipe.items()} == {
+        "SiO2": "0x1.3333333333333p-1",
+        "MgO": "0x1.999999999999ap-2",
+    }
 
 
 def test_effective_point_role_defaults_only_unknown_usable_composition() -> None:
