@@ -1771,18 +1771,15 @@ def _evaluated_magemin_oxide_bulk(
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
-    _fold_ferric_split: bool = True,
 ) -> Dict[str, float] | None:
     """Return the exact oxide bulk evaluated by MAGEMin without the engine."""
 
     if composition_mol_by_account:
-        accounts = bulk
-        if _fold_ferric_split:
-            _kg, _mol, accounts = _liquidus_inputs_on_feo_total_iron_basis(
-                composition_kg=None,
-                composition_mol=None,
-                composition_mol_by_account=bulk,
-            )
+        _kg, _mol, accounts = _liquidus_inputs_on_feo_total_iron_basis(
+            composition_kg=None,
+            composition_mol=None,
+            composition_mol_by_account=bulk,
+        )
         if accounts is None:
             return None
         melt_moles = accounts.get(CLEANED_MELT_ACCOUNT)
@@ -1821,15 +1818,10 @@ def evaluated_silica_verdict(
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
-    _fold_ferric_split: bool = True,
 ) -> Dict[str, object] | None:
-    """Classify SiO2 on the exact projected bulk MAGEMin evaluates.
+    """Classify the liquidus-finder bulk after its ferric iron fold.
 
-    ``bulk`` is either the submitted oxide wt% mapping or an account mapping.
-    Account mappings use the liquidus iron fold by default; equilibrium
-    callers pass ``_fold_ferric_split=False`` to preserve the closed oxygen
-    budget used by direct ``equilibrate``. This is a pure projection: it does
-    not initialize or call the engine.
+    This pure projection does not initialize or call the engine.
     """
     from engines.magemin.domain import MAGEMinDomainGate
 
@@ -1838,7 +1830,6 @@ def evaluated_silica_verdict(
         database,
         species_formula_registry=species_formula_registry,
         composition_mol_by_account=composition_mol_by_account,
-        _fold_ferric_split=_fold_ferric_split,
     )
     if evaluated_bulk is None:
         return None

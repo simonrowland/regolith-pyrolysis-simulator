@@ -2795,9 +2795,12 @@ def _backend_boundary_composition(
     species_registry = getattr(sim, "species_formula_registry", None)
     family = namespace_id.partition(":")[0]
     if family == "magemin":
-        if backend is None or not hasattr(backend, "_build_db_bulk_projection"):
-            from simulator.melt_backend.magemin import MAGEMinBackend
+        from simulator.melt_backend.magemin import (
+            MAGEMinBackend,
+            _MAGEMIN_ENGINE_INPUT_BASIS,
+        )
 
+        if backend is None or not hasattr(backend, "_build_db_bulk_projection"):
             backend = MAGEMinBackend()
             database = _effective_magemin_database(sim, intent, provider_role)
             if database:
@@ -2805,7 +2808,11 @@ def _backend_boundary_composition(
         projection = project_melt_to_oxide_projection(
             composition_kg=None,
             composition_mol=cleaned,
-            oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+            oxide_basis=getattr(
+                backend,
+                "_MAGEMIN_INPUT_BASIS",
+                _MAGEMIN_ENGINE_INPUT_BASIS,
+            ),
             species_formula_registry=species_registry,
         )
         bulk = backend._build_db_bulk_projection(projection.oxide_wt_pct)

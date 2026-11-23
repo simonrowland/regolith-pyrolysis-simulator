@@ -740,13 +740,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             1,
             (
                 ('in_band', 'clear', None),
-                ('in_band', 'clear', None),
-                ('extrapolated', 'clear', (30.0, 80.0)),
             ),
         ),
         (
             True,
-            False,
+            True,
             1,
             (
                 ('in_band', 'clear', None),
@@ -894,7 +892,7 @@ def test_run_row_domain_identity_cases_establish_provider_pin(
     row = validation_map.run_row(
         1650.0,
         validation_map.GasPoint(1.0e-6, 10.0, 'n2_carrier'),
-        1.0,
+        1.0 if provider_failure else 0.0,
         calibration,
         setpoints,
         feedstocks,
@@ -903,7 +901,7 @@ def test_run_row_domain_identity_cases_establish_provider_pin(
     )
 
     assert row['row_passes_base_integrity'] is row_integrity
-    assert curve_calls == expected_curve_calls
+    assert curve_calls == expected_curve_calls, established_domain_verdicts
     assert established_domain_verdicts == list(expected_domain_verdicts)
     unique_authorities = []
     for authority in established:

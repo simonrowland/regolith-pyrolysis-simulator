@@ -345,7 +345,13 @@ def _cache_key() -> tuple[dict, dict]:
             "sulfur_side": {},
             "model": {},
         },
-        {"curve": {"status": "in_range", "tag": "law-disclosure"}},
+        {
+            "curve": {
+                "status": "in_range",
+                "tag": "law-disclosure",
+                "is_liquidus_floor": False,
+            },
+        },
     )
 
 
@@ -711,7 +717,13 @@ def _tagged_curve(tag: str) -> tuple[dict, dict]:
     key, _payload = _cache_key()
     return (
         {**key, "tag": tag},
-        {"curve": {"status": "in_range", "tag": tag}},
+        {
+            "curve": {
+                "status": "in_range",
+                "tag": tag,
+                "is_liquidus_floor": False,
+            },
+        },
     )
 
 

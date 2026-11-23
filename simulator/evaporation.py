@@ -3565,7 +3565,10 @@ class EvaporationMixin:
         step_down = curve.get('gate_provider_step_down')
         if not isinstance(step_down, Mapping):
             return True
-        return step_down.get('magemin_sourced') is True
+        return (
+            step_down.get('magemin_sourced') is True
+            or curve.get('is_liquidus_floor') is True
+        )
 
     def _hold_freeze_gate_provider_curve(
         self,
@@ -4654,8 +4657,7 @@ class EvaporationMixin:
                 'failed_providers': failed_providers,
                 'realized_provider': fallback_provider if status == 'ok' else None,
                 'magemin_sourced': (
-                    status == 'ok'
-                    and diagnostic.get('magemin_sourced') is True
+                    diagnostic.get('magemin_sourced') is True
                 ),
             }
         if fallback_provider:

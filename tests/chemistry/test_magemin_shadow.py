@@ -499,10 +499,24 @@ def test_provider_closes_warm_pool_when_provider_lifetime_ends(monkeypatch):
     from simulator.melt_backend import magemin as magemin_module
 
     backends = []
+    projection_backend = magemin_module.MAGEMinBackend()
 
     def make_backend():
         backend = _PooledFakeMAGEMinBackend()
-        backends.append(backend)
+        backend._build_db_bulk_projection = (
+            projection_backend._build_db_bulk_projection
+        )
+        backend._domain_gate_oxide_composition = (
+            projection_backend._domain_gate_oxide_composition
+        )
+        initialize = backend.initialize
+
+        def initialize_and_record(config):
+            available = initialize(config)
+            backends.append(backend)
+            return available
+
+        backend.initialize = initialize_and_record
         return backend
 
     monkeypatch.setattr(magemin_module, 'MAGEMinBackend', make_backend)
@@ -906,6 +920,64 @@ def test_shadow_backend_typed_engine_failure_surfaces_diagnostics():
     assert result.warnings == (
         f'MAGEMin equilibrate failed: RuntimeError: {message}',
     )
+
+
+@pytest.mark.parametrize(
+    ('composition_wt_pct', 'expected_authority'),
+    (
+        ({'SiO2': 29.999, 'MgO': 60.001, 'Fe2O3': 10.0}, 'extrapolated'),
+        ({'SiO2': 50.0, 'MgO': 40.0, 'Fe2O3': 10.0}, None),
+    ),
+    ids=('closed-oxygen-extrapolated', 'closed-oxygen-in-band'),
+)
+def test_equilibrium_domain_verdict_uses_backend_evaluated_bulk(
+    monkeypatch,
+    composition_wt_pct,
+    expected_authority,
+):
+    from pathlib import Path
+
+    from simulator.accounting import resolve_species_formula
+    import simulator.melt_backend.magemin as magemin_module
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {}
+    backend._call_magemin = lambda **kwargs: {
+        'phases': {'liq': 1.0},
+        'fO2': kwargs['fO2_log'],
+        'ph': ['qfm'],
+    }
+    provider = MAGEMinShadowProvider(backend=backend)
+    provider._backend_initialised = True
+
+    def unexpected_preflight(*_args, **_kwargs):
+        pytest.fail('equilibrium domain verdict must use the backend projection')
+
+    monkeypatch.setattr(
+        magemin_module,
+        'evaluated_silica_verdict',
+        unexpected_preflight,
+    )
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(species, {}).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    result = provider.dispatch(_make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=composition_mol,
+    ))
+
+    assert result.status == 'ok'
+    assert result.diagnostic.get('authority') == expected_authority
+    if expected_authority == 'extrapolated':
+        assert result.diagnostic['certified_band']['sio2_wt_pct'] == [
+            30.0, 80.0,
+        ]
 
 
 def test_shadow_backend_keyerror_propagates():

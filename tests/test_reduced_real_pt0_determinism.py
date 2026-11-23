@@ -200,7 +200,13 @@ def _repair_notice_test_record() -> tuple[dict[str, str], dict[str, object]]:
             "sulfur_side": {},
             "model": {},
         },
-        {"curve": {"status": "in_range", "tag": "notice-recapture"}},
+        {
+            "curve": {
+                "status": "in_range",
+                "tag": "notice-recapture",
+                "is_liquidus_floor": False,
+            },
+        },
     )
 
 
@@ -1467,6 +1473,7 @@ def test_gate_replay_rejects_malformed_required_silica_diagnostic(
         "curve": {
             "authority": "extrapolated",
             "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
+            "is_liquidus_floor": False,
         },
     }
     store._store(
@@ -1492,6 +1499,7 @@ def test_gate_replay_rejects_malformed_required_silica_diagnostic(
             "curve": {
                 "authority": "extrapolated",
                 "certified_band": {"sio2_wt_pct": sio2_wt_pct},
+                "is_liquidus_floor": False,
             },
         },
         law_disclosures=[],
@@ -1690,6 +1698,7 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
                 "status": "in_range",
                 "solidus_T_C": 1000.0,
                 "liquidus_T_C": 1200.0,
+                "is_liquidus_floor": False,
             }
         },
         repair_notices=(),
@@ -1711,6 +1720,7 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
         "source": "gate_liquid_fraction:test-sodium-inert",
         "solidus_T_C": 1000.0,
         "liquidus_T_C": 1200.0,
+        "is_liquidus_floor": False,
     }
     current_store._store(
         "freeze_gate_curve",
@@ -4511,7 +4521,14 @@ def test_pt0_gate_curve_decoder_refuses_markerless_rows(
         law_disclosures=[markerless_disclosure],
     )
     alternate_key = dict(key)
-    alternate_key['pressure_bar'] = float(key['pressure_bar']) + 0.01
+    alternate_pressure = float(key['controls']['pressure_bar']) + 0.01
+    alternate_controls = dict(key['controls'])
+    alternate_controls['pressure_bar'] = alternate_pressure
+    alternate_key['controls'] = alternate_controls
+    cache_key = key['freeze_gate_cache_key']._replace(
+        pressure_bar=alternate_pressure,
+    )
+    alternate_key['freeze_gate_cache_key'] = cache_key
     valid_payload = {
         'curve': {
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',

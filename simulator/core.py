@@ -5249,8 +5249,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 self._melt_redox_gate_authority_tick_hour = None
                 self._melt_redox_gate_authority_tick_verdict_identity = None
-            return self._establish_melt_redox_gate_authority_for_current_hour(
-                redox_state=redox_state,
+            return self._melt_redox_liquidus_gate_curve(
+                **redox_state_kwargs,
             )
         if gate_authority is None:
             return gate_authority
@@ -5264,7 +5264,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     gate_authority.verdict_identity,
                 ):
                     return self._establish_melt_redox_gate_authority_for_current_hour(
-                        redox_state=redox_state,
+                        **redox_state_kwargs,
                     )
             return gate_authority
         if isinstance(gate_authority, Mapping):
@@ -5290,7 +5290,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._melt_redox_gate_authority_tick_hour = None
                 self._melt_redox_gate_authority_tick_verdict_identity = None
                 return self._establish_melt_redox_gate_authority_for_current_hour(
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 )
             if gate_authority.get('disposition') in {'live', 'memo-hit', 'replay'}:
                 if self._melt_redox_gate_record_is_admitted(
@@ -5437,9 +5437,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if (
             not isinstance(authority, Mapping)
             and authority is not None
-            and not isinstance(
-                getattr(self, '_last_reduced_real_replay_notices', None),
-                list,
+            and (
+                isinstance(authority, _MeltRedoxLiquidusFloorFallback)
+                or not isinstance(
+                    getattr(self, '_last_reduced_real_replay_notices', None),
+                    list,
+                )
             )
         ):
             self._melt_redox_gate_authority_this_tick = authority
@@ -6130,9 +6133,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # redox read so an extrapolated request gets its own flagged
                 # curve or typed floor fallback.
                 try:
-                    curve = (
-                        self._establish_melt_redox_gate_authority_for_current_hour()
-                    )
+                    curve = self._resolved_melt_redox_gate_authority()
                 except Exception:
                     curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
             else:
@@ -6201,17 +6202,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 liquidus_unknown=True,
             )
-        step_down = (
-            curve.get('gate_provider_step_down')
-            if isinstance(curve, Mapping)
-            else None
-        )
         if isinstance(curve, Mapping) and "liquidus_T_C" not in curve:
             nested = curve.get("curve")
             if isinstance(nested, Mapping):
                 curve = nested
-                if step_down is None:
-                    step_down = curve.get('gate_provider_step_down')
         if not isinstance(curve, Mapping) or curve.get("liquidus_T_C") is None:
             return domain(
                 below_liquidus=None,
@@ -6238,14 +6232,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquidus_unknown=True,
             )
         source = str(curve.get("source") or "liquidus_solidus")
-        magemin_sourced = (
-            getattr(self, '_liquid_fraction_provider', None) == 'magemin'
-        )
-        if isinstance(step_down, Mapping):
-            magemin_sourced = step_down.get('magemin_sourced') is True
-        if not magemin_sourced:
-            domain_identity = not_applicable_identity
         liquidus_unknown = curve.get('is_liquidus_floor') is True
+        if not self._freeze_gate_curve_uses_magemin_domain_identity(curve):
+            domain_identity = not_applicable_identity
         # Valid at and above the silicate liquidus. The Kress91 floor
         # (max(liquidus, 1200 C)) is a redox-capacity gate, not this bound.
         return domain(

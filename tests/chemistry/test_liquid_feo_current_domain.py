@@ -293,6 +293,7 @@ def test_timeout_then_magemin_retry_keeps_extrapolated_feo_qualification(
     setpoints_data,
 ):
     from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.chemistry.kernel.dto import IntentResult
     from simulator.engine_pool import EngineWorkerTimeout
     from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
@@ -323,6 +324,15 @@ def test_timeout_then_magemin_retry_keeps_extrapolated_feo_qualification(
         },
     )
     _install_magemin_subprocess_gate(sim, monkeypatch)
+    alphamelts_provider = sim._chem_registry.gate_provider_order[1]
+    monkeypatch.setattr(
+        alphamelts_provider,
+        'dispatch',
+        lambda request: IntentResult(
+            intent=request.intent,
+            status='unavailable',
+        ),
+    )
     monkeypatch.setattr(sim, '_pt0_store', lambda: None, raising=False)
     provider = sim._chem_registry.fallback_for(
         ChemistryIntent.GATE_LIQUID_FRACTION
@@ -343,7 +353,7 @@ def test_timeout_then_magemin_retry_keeps_extrapolated_feo_qualification(
     monkeypatch.setattr(backend, '_call_magemin', timeout_then_magemin)
     composition = _liquid_feo_bulk(sim, 80.001)
     authority = sim._establish_melt_redox_gate_authority_for_current_hour()
-    curve = authority['curve']
+    curve = authority
 
     assert engine_calls >= 2
     assert curve['gate_provider_step_down']['realized_provider'] == (

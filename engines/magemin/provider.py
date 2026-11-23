@@ -281,6 +281,9 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     backend_status='out_of_domain',
                     backend_status_reason=gate_reason,
                     backend_warnings=tuple(gate_warnings),
+                    magemin_sourced=(
+                        request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
+                    ),
                     **domain_diagnostic,
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),
@@ -291,17 +294,18 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             evaluated_silica_verdict,
         )
 
-        domain_diagnostic = evaluated_silica_verdict(
-            composition_mol_by_account,
-            str(_SHADOW_BACKEND_CONFIG.get(
-                'database', DEFAULT_MAGEMIN_DATABASE,
-            )),
-            species_formula_registry=(
-                request.account_view.species_formula_registry
-            ),
-            composition_mol_by_account=True,
-            _fold_ferric_split=False,
-        ) or {}
+        domain_diagnostic = {}
+        if request.intent is not ChemistryIntent.SILICATE_EQUILIBRIUM:
+            domain_diagnostic = evaluated_silica_verdict(
+                composition_mol_by_account,
+                str(_SHADOW_BACKEND_CONFIG.get(
+                    'database', DEFAULT_MAGEMIN_DATABASE,
+                )),
+                species_formula_registry=(
+                    request.account_view.species_formula_registry
+                ),
+                composition_mol_by_account=True,
+            ) or {}
         if not domain_diagnostic:
             gate_warnings = [
                 warning
@@ -323,6 +327,9 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     mode='unavailable',
                     engine_version=self._engine_version(),
                     backend_status='unavailable',
+                    magemin_sourced=(
+                        request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
+                    ),
                     **domain_diagnostic,
                 ).as_diagnostic(),
                 warnings=(
@@ -399,7 +406,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         )
         if (
             request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
-            and diagnostics.backend_status == 'ok'
         ):
             diagnostics = replace(diagnostics, magemin_sourced=True)
 
@@ -605,13 +611,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         _ensure_close_reaper()
         if self._backend is not None:
             if not self._backend_initialised:
-                self._backend_initialization_error = None
-                try:
-                    self._backend.initialize(
-                        dict(_SHADOW_BACKEND_CONFIG)
-                    )
-                except Exception as exc:
-                    self._backend_initialization_error = exc
+                self._initialize_backend(self._backend)
                 self._backend_initialised = True
             if self._backend_initialization_error is not None:
                 return None
@@ -627,7 +627,12 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 backend_finalizer = weakref.finalize(
                     self, _enqueue_backend_close, close, os.getpid()
                 )
-            backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+            if not self._initialize_backend(backend):
+                if backend_finalizer is not None:
+                    backend_finalizer()
+                self._backend = None
+                self._backend_finalizer = None
+                return None
         except Exception as exc:
             self._backend_initialization_error = exc
             if backend_finalizer is not None:
@@ -642,6 +647,23 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         self._backend_finalizer = backend_finalizer
         self._backend_initialised = True
         return backend
+
+    def _initialize_backend(self, backend: Any) -> bool:
+        """Treat the backend's explicit unavailable result as a failed init."""
+        self._backend_initialization_error = None
+        try:
+            initialized = backend.initialize(
+                dict(_SHADOW_BACKEND_CONFIG)
+            )
+        except Exception as exc:
+            self._backend_initialization_error = exc
+            return False
+        if initialized is False:
+            self._backend_initialization_error = RuntimeError(
+                'MAGEMin backend initialization returned unavailable'
+            )
+            return False
+        return True
 
     def _run_backend(
         self,

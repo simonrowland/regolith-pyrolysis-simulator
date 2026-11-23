@@ -2017,6 +2017,10 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     last_good_identity = sim._freeze_gate_last_good_curve[
         'magemin_domain_identity'
     ]
+    assert last_good_identity is not None, (
+        sim._freeze_gate_last_good_curve['curve'],
+        sim._freeze_gate_current_magemin_domain_identity,
+    )
     assert last_good_identity.projection_threshold_verdict == 'clear'
 
     provider = sim._chem_registry.fallback_for(
