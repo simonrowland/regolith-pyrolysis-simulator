@@ -27,6 +27,103 @@ DEFAULT_REL_TOL = 1.0e-9
 DEFAULT_ABS_TOL_PA = 1.0e-6
 DEFAULT_MAX_ITERATIONS = 50
 
+# A diagnostic flux sample. The opening-scale probe and the frozen
+# species probe both evaluate q, and neither is a solver step. The
+# callback arms an undo on this sample; the sample runs it on exit.
+# Default None means a real evaluation, which may latch.
+_DIAGNOSTIC_FLUX: contextvars.ContextVar = contextvars.ContextVar(
+    "headspace_diagnostic_flux",
+    default=None,
+)
+
+
+class _DiagnosticFluxSample:
+    """One non-solver flux sample. The callback arms its own undo."""
+
+    def __init__(self) -> None:
+        self._token = None
+        self._undo: list = []
+        self.armed = False
+
+    def arm(self, undo) -> None:
+        # The first evaluation snapshots. A later redox read in the
+        # same sample must not replace that snapshot with the mutated
+        # state, or the undo would keep the sample's writes.
+        if self.armed:
+            return
+        self.armed = True
+        self._undo.append(undo)
+
+    def __enter__(self) -> "_DiagnosticFluxSample":
+        self._token = _DIAGNOSTIC_FLUX.set(self)
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        try:
+            for undo in reversed(self._undo):
+                undo()
+        finally:
+            if self._token is not None:
+                _DIAGNOSTIC_FLUX.reset(self._token)
+        return False
+
+
+def diagnostic_flux_sample_active() -> _DiagnosticFluxSample | None:
+    sample = _DIAGNOSTIC_FLUX.get()
+    if isinstance(sample, _DiagnosticFluxSample):
+        return sample
+    return None
+
+
+class _DiagnosticLawSample:
+    """Restore the law's solver marks around one diagnostic sample.
+
+    The callback's undo is the flux sample's. This one owns the law
+    fields the sample writes: the flux counter, the gross snapshot,
+    the accepted partials, the pipe piece, the notices, and the redox
+    stash. A refusal leaves those fields as they were.
+    """
+
+    def __init__(self, law) -> None:
+        self._law = law
+        self._sample = _DiagnosticFluxSample()
+        self._saved = None
+
+    def __enter__(self) -> _DiagnosticFluxSample:
+        law = self._law
+        self._saved = (
+            law.flux_evaluations,
+            dict(law._last_gross_kg_s),
+            law.accepted_flux_partials,
+            law.accepted_flux_key,
+            law._last_pipe_piece,
+            dict(law.species_notices),
+            dict(law._last_redox_mol_s),
+            law.paired_redox_mol_s,
+            law.accepted_redox_key,
+        )
+        return self._sample.__enter__()
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        law = self._law
+        saved = self._saved
+        try:
+            if saved is not None:
+                (
+                    law.flux_evaluations,
+                    law._last_gross_kg_s,
+                    law.accepted_flux_partials,
+                    law.accepted_flux_key,
+                    law._last_pipe_piece,
+                    law.species_notices,
+                    law._last_redox_mol_s,
+                    law.paired_redox_mol_s,
+                    law.accepted_redox_key,
+                ) = saved
+        finally:
+            self._sample.__exit__(exc_type, exc, tb)
+        return False
+
 
 @dataclass(frozen=True)
 class OxygenShadowPartition:
@@ -1533,10 +1630,11 @@ class _HeadspaceLaw:
         """Stash n/Q and n/Σ(q+S) at the opening holdup.
 
         The sample is not a solver evaluation. The flux counter, the
-        accepted-step stash, and the species notices are restored, so
-        the root still sees the hour it would have seen without the
-        sample. A refusal from the sample leaves the scales unset and
-        does not become the hour's refusal: the solve still runs.
+        accepted-step stash, and the species notices are restored, and
+        the callback undoes its own latch, so the root still sees the
+        hour it would have seen without the sample. A refusal from the
+        sample leaves the scales unset and does not become the hour's
+        refusal: the solve still runs.
 
         Premise: dn_i/dt = s_i − y_i Q, with one composition time
         shared by every species. The flush time is tau = n/Q. The
@@ -1550,37 +1648,21 @@ class _HeadspaceLaw:
         leaves both unset.
         """
 
-        saved_flux = self.flux_evaluations
-        saved_gross = dict(self._last_gross_kg_s)
-        saved_flux_partials = self.accepted_flux_partials
-        saved_flux_key = self.accepted_flux_key
-        saved_piece = self._last_pipe_piece
-        saved_notices = dict(self.species_notices)
-        saved_redox = dict(self._last_redox_mol_s)
-        saved_paired = self.paired_redox_mol_s
-        saved_redox_key = self.accepted_redox_key
         source: dict[str, float] | None = None
         outflow: dict[str, float] | None = None
         redox: dict[str, float] | None = None
         try:
-            partials = self.partials_of(n0)
-            source, outflow, _binding, _piece = self._flows(
-                partials,
-                counted=False,
-            )
-            redox = self._redox_rates(partials)
+            # Diagnostic: the callback must not latch capture, recorded,
+            # or the holder. The law marks are restored with them.
+            with _DiagnosticLawSample(self):
+                partials = self.partials_of(n0)
+                source, outflow, _binding, _piece = self._flows(
+                    partials,
+                    counted=False,
+                )
+                redox = self._redox_rates(partials)
         except _BalanceRefused:
             source = None
-        finally:
-            self.flux_evaluations = saved_flux
-            self._last_gross_kg_s = saved_gross
-            self.accepted_flux_partials = saved_flux_partials
-            self.accepted_flux_key = saved_flux_key
-            self._last_pipe_piece = saved_piece
-            self.species_notices = saved_notices
-            self._last_redox_mol_s = saved_redox
-            self.paired_redox_mol_s = saved_paired
-            self.accepted_redox_key = saved_redox_key
         if source is None or outflow is None or redox is None:
             return
         total = math.fsum(
@@ -3509,11 +3591,16 @@ def _manifold_rates(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
     pressure: float,
+    *,
+    counted: bool = True,
 ) -> tuple[dict[str, float], dict[str, float], dict[str, float]]:
     """s_i = q_i + S_i, the redox part, and the gross, at one total pressure."""
 
     partials = law.partials_of(_moles_along(law, fractions, pressure))
-    source, _outflow, _binding, _piece = law._flows(partials)
+    source, _outflow, _binding, _piece = law._flows(
+        partials,
+        counted=counted,
+    )
     redox = law._redox_rates(partials)
     inflow = {
         name: source[name] + redox[name] for name in law.species

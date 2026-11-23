@@ -9,6 +9,7 @@ published versus ledger is 1e-9 Pa. These hours are not the canon walk.
 
 from __future__ import annotations
 
+import copy
 import math
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
@@ -23,8 +24,15 @@ from simulator.capacity_coupling import (
     headspace_integral_added_kg,
 )
 from simulator.chemistry.kernel.dto import IntentResult
-from simulator.core import FO2_BUFFER_ACCOUNT, OXYGEN_SPECIES
-from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+from simulator.core import (
+    FO2_BUFFER_ACCOUNT,
+    OXYGEN_RESERVOIR_NOOP_MOL,
+    OXYGEN_SPECIES,
+)
+from simulator.evaporation import (
+    headspace_buffer_release_stock_mol,
+    production_vapor_molar_mass_g_per_mol,
+)
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.state import MOLAR_MASS, CampaignPhase
 from tests.chemistry.conftest import _build_sim, _load_yaml
@@ -507,6 +515,13 @@ def test_c4_open_hour_posts_the_integrated_buffer_release():
     )
     assert hour.credit_accounts["Na2"][OXYGEN_SPECIES] == FO2_BUFFER_ACCOUNT
     assert hour.credit_accounts["SiO"][OXYGEN_SPECIES] == "process.overhead_gas"
+    # The gross is flat, so the stock S was defined against is the
+    # integral. The release does not exceed it. A second formula that
+    # only checks the ledger end would stay green if S and the post
+    # drifted apart by the same amount.
+    stock = float(sim._headspace_buffer_release_stock_mol)
+    assert exchanged <= stock + OXYGEN_RESERVOIR_NOOP_MOL
+    assert abs(exchanged - stock) <= 1.0e-12 * max(stock, 1.0)
     return hour
 
 
@@ -555,6 +570,118 @@ def test_open_buffer_hour_posts_the_integral_of_s():
     _assert_closed(hour)
     assert hour.partials_Pa["Na2"] > 1.0
     assert hour.partials_Pa[OXYGEN_SPECIES] > 1.0
+    return hour
+
+
+def test_buffer_release_stock_is_the_excess_above_the_noop():
+    """The release stock is the opening plus credits, minus debits and uptake.
+
+    Independent arithmetic: 5 + 0.2 − 0.05 − 0.1 = 5.05 mol. A
+    non-positive excess is an empty stock. A figure at or below the
+    noop is the same zero the exchange skips. Mutation: dropping the
+    noop test posts dust, and clipping only the negative leaves that
+    dust as a source.
+    """
+
+    noop = OXYGEN_RESERVOIR_NOOP_MOL
+    opening = 5.0
+    credit = 0.2
+    debit = 0.05
+    uptake = 0.1
+    stock = headspace_buffer_release_stock_mol(
+        opening, credit, debit, uptake, noop_mol=noop,
+    )
+    # 5 + 0.2 - 0.05 - 0.1. Left to right, the same binary64 sum the
+    # figures have. 5.05 is not that sum (it lands one ulp high).
+    assert stock == 5.0 + 0.2 - 0.05 - 0.1
+    assert stock > opening
+    assert headspace_buffer_release_stock_mol(
+        1.0, 0.0, 2.0, 0.0, noop_mol=noop,
+    ) == 0.0
+    assert headspace_buffer_release_stock_mol(
+        noop, 0.0, 0.0, 0.0, noop_mol=noop,
+    ) == 0.0
+    assert headspace_buffer_release_stock_mol(
+        noop * 0.1, 0.0, 0.0, 0.0, noop_mol=noop,
+    ) == 0.0
+
+
+def test_diagnostic_opening_sample_leaves_the_callback_unchanged():
+    """The opening-scale probe does not latch the callback.
+
+    Discovery has already recorded. The probe evaluates partials that
+    include the zero-holdup species discovery omitted, so its gross is
+    not the discovery gross. Mutation: deleting the arm leaves that
+    gross in the holder, and deleting the undo leaves the arm count
+    ahead of the undo count.
+    """
+
+    import simulator.capacity_coupling as coupling
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 20.0)
+    counts = {"arm": 0, "undo": 0}
+    original_record = coupling._HeadspaceLaw._record_opening_scales
+    original_arm = coupling._DiagnosticFluxSample.arm
+
+    def counting_arm(self, undo):
+        if self.armed:
+            return original_arm(self, undo)
+        counts["arm"] += 1
+
+        def wrapped():
+            counts["undo"] += 1
+            undo()
+
+        return original_arm(self, wrapped)
+
+    def watching_record(self, n0, dt_s):
+        holder = self.extent_holder
+        before_holder = (
+            copy.deepcopy(holder) if isinstance(holder, dict) else None
+        )
+        before_partials = copy.deepcopy(
+            getattr(sim, "_headspace_publisher_partials_Pa", None)
+        )
+        before_rates = copy.deepcopy(
+            getattr(sim, "_headspace_publisher_rates_at_open_kg_hr", None)
+        )
+        had_stock = hasattr(sim, "_headspace_buffer_release_stock_mol")
+        before_stock = (
+            copy.deepcopy(sim._headspace_buffer_release_stock_mol)
+            if had_stock
+            else None
+        )
+        original_record(self, n0, dt_s)
+        if isinstance(holder, dict):
+            assert holder == before_holder
+        assert (
+            getattr(sim, "_headspace_publisher_partials_Pa", None)
+            == before_partials
+        )
+        assert (
+            getattr(sim, "_headspace_publisher_rates_at_open_kg_hr", None)
+            == before_rates
+        )
+        assert hasattr(sim, "_headspace_buffer_release_stock_mol") == had_stock
+        if had_stock:
+            assert sim._headspace_buffer_release_stock_mol == before_stock
+
+    def law(partials):
+        # Discovery's opening partials omit a zero holdup. The probe's
+        # partials include every carried species, so this rate moves.
+        extra = 1.0e-8 if "Na2" in partials else 0.0
+        return {"SiO": 1.0e-6 + extra, "Na2": 1.0e-9}
+
+    coupling._HeadspaceLaw._record_opening_scales = watching_record
+    coupling._DiagnosticFluxSample.arm = counting_arm
+    try:
+        hour = _step(sim, law, lambda _species: 0.0)
+    finally:
+        coupling._HeadspaceLaw._record_opening_scales = original_record
+        coupling._DiagnosticFluxSample.arm = original_arm
+    assert counts["arm"] >= 1
+    assert counts["undo"] == counts["arm"]
+    _assert_closed(hour)
     return hour
 
 

@@ -724,6 +724,7 @@ from simulator.evaporation import (
     attach_pre_evaporation_melt_oxide_kg,
     attach_wall_supply_interval_physical_zero,
     evaporation_flux_for_campaign_hour,
+    headspace_buffer_release_stock_mol,
     note_pre_evaporation_melt_oxide_kg,
     pressure_vapour_evaluation_consumed,
     publish_wall_supply_on_flux,
@@ -8278,6 +8279,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             CapacityCouplingRefusalError,
             CapacityShadowRefusal,
             DEFAULT_ABS_TOL_PA,
+            diagnostic_flux_sample_active,
             headspace_capture_fractions,
             headspace_capture_move_Pa,
             headspace_capture_scale,
@@ -8796,7 +8798,80 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             state['fractions_frozen'] = frozen
             state['capture_C'] = scale
 
+        def _arm_diagnostic_restore():
+            # One snapshot, taken before this sample writes. The
+            # opening-scale probe and the frozen species probe both
+            # call this flux, and neither is a solver step. A later
+            # redox read in the same sample must not replace the
+            # snapshot. The undo runs when the sample exits, including
+            # on a refusal.
+            sample = diagnostic_flux_sample_active()
+            if sample is None or sample.armed:
+                return
+            absent = object()
+            keys = (
+                'recorded',
+                'capture_C',
+                'fractions_frozen',
+                'fractions',
+                'owned',
+                'gross',
+                'credit_mol',
+                'debit_mol',
+                'excess_mol',
+                'wall_fraction',
+                'wall_booking',
+                'wall_accounts',
+                'capture_at_trial',
+            )
+            saved_state = {
+                key: _copy.deepcopy(state[key])
+                for key in keys
+                if key in state
+            }
+            missing_state = [key for key in keys if key not in state]
+            holder = state.get('extent_holder')
+            holder_is_dict = isinstance(holder, dict)
+            saved_holder = {}
+            if holder_is_dict:
+                for key in ('gross_kg_hr', '_capture_fractions'):
+                    saved_holder[key] = (
+                        _copy.deepcopy(holder[key]) if key in holder else absent
+                    )
+            saved_attrs = {}
+            for name in (
+                '_headspace_publisher_partials_Pa',
+                '_headspace_publisher_rates_at_open_kg_hr',
+                '_headspace_buffer_release_stock_mol',
+            ):
+                saved_attrs[name] = (
+                    _copy.deepcopy(getattr(self, name))
+                    if hasattr(self, name)
+                    else absent
+                )
+
+            def undo():
+                for key, value in saved_state.items():
+                    state[key] = value
+                for key in missing_state:
+                    state.pop(key, None)
+                if holder_is_dict:
+                    for key, value in saved_holder.items():
+                        if value is absent:
+                            holder.pop(key, None)
+                        else:
+                            holder[key] = value
+                for name, value in saved_attrs.items():
+                    if value is absent:
+                        if hasattr(self, name):
+                            delattr(self, name)
+                    else:
+                        setattr(self, name, value)
+
+            sample.arm(undo)
+
         def flux_at_partials(partials_Pa):
+            _arm_diagnostic_restore()
             key = _partial_key(partials_Pa)
             # A second solve after evaporation keeps the committed
             # gross. Re-dispatching would book a different vapor than
@@ -8875,15 +8950,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         reducing_rate = reducing_overhead_mol / 3600.0
 
+        def _remember_stock(stock_mol: float) -> None:
+            # The post debits this stock. A diagnostic sample reads S
+            # and must not replace it. The real evaluation overwrites
+            # it, including the zero of an unsaturated or empty hour,
+            # so a previous hour cannot leave its stock behind.
+            if diagnostic_flux_sample_active() is None:
+                self._headspace_buffer_release_stock_mol = stock_mol
+
         def redox_at_partials(partials_Pa):
-            # S is the hour's excess mol / 3600 s, plus the reducing
-            # overhead credit. The excess is the hour-open buffer,
-            # plus the buffer credit, minus the oxidative debit and
-            # the Fe uptake. The debit stays on the buffer. It is not
-            # a headspace source. The commit posts the integral of
-            # this rate. The substep length is not in this rate.
-            # Credit at or below the noop does not saturate, and the
-            # buffer is not read into S then.
+            # S is the stock over the solver hour, plus the reducing
+            # overhead credit. The stock is the hour-open buffer, plus
+            # the buffer credit, minus the oxidative debit and the Fe
+            # uptake. One function owns that figure. The debit stays
+            # on the buffer. It is not a headspace source. The commit
+            # posts the integral of this rate. The substep length is
+            # not in this rate. Credit at or below the noop does not
+            # saturate, and the buffer is not read into S then.
+            _arm_diagnostic_restore()
             key = _partial_key(partials_Pa)
             credit_mol = float(state['credit_mol'].get(key, 0.0) or 0.0)
             debit_mol = float(state['debit_mol'].get(key, 0.0) or 0.0)
@@ -8891,6 +8975,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 internal_o2_capacity_mol=credit_mol,
             ):
                 state['excess_mol'][key] = 0.0
+                _remember_stock(0.0)
                 return {OXYGEN_SPECIES: reducing_rate}
             diagnostic = self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
@@ -8902,19 +8987,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 0.0,
                 float((diagnostic or {}).get('o2_debit_mol', 0.0) or 0.0),
             )
-            excess_mol = (
-                pre_buffer_mol + credit_mol - debit_mol - uptake_mol
+            # The stock is a release, not a sink. The function returns
+            # 0 for a non-positive excess and for dust at or below the
+            # noop. Posting that dust would be the same zero the
+            # exchange already skips.
+            stock_mol = headspace_buffer_release_stock_mol(
+                pre_buffer_mol,
+                credit_mol,
+                debit_mol,
+                uptake_mol,
+                noop_mol=OXYGEN_RESERVOIR_NOOP_MOL,
             )
-            # The excess is a stock. A negative figure is an empty
-            # stock, not a source that changes sign with P. Dust at
-            # or below the noop is not a drain: posting it would be
-            # the same zero the exchange already skips, and the step
-            # at that dust is under the solver's monotone floor.
-            stock_mol = max(0.0, excess_mol)
-            if stock_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
-                state['excess_mol'][key] = 0.0
-                return {OXYGEN_SPECIES: reducing_rate}
             state['excess_mol'][key] = stock_mol
+            _remember_stock(stock_mol)
+            if stock_mol <= 0.0:
+                return {OXYGEN_SPECIES: reducing_rate}
             return {OXYGEN_SPECIES: stock_mol / 3600.0 + reducing_rate}
 
         def _solve():
@@ -9555,8 +9642,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # credit is zero, so the release is R. The commit posts
             # it through the same dispatch as the vapour. The settle
             # does not choose another exchange. On a fast root S is
-            # the end rate, so this is the endpoint excess. A
-            # shortfall inside the pressure gate is the tolerance.
+            # the end rate, so this is the endpoint stock the source
+            # was defined against. A slow hour's integral is not that
+            # endpoint. A shortfall inside the pressure gate is the
+            # tolerance.
             integrated = float(
                 dict(getattr(solved, "redox_added_mol", {}) or {}).get(
                     OXYGEN_SPECIES, 0.0,
@@ -9589,12 +9678,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if excess_integrated > OXYGEN_RESERVOIR_NOOP_MOL:
             # Algebra: n = ∫S dt − n_reducing. Unit: mol.
-            # The post debits the stock still in the buffer after the
-            # vapour and the settle. Dust at or below the noop is the
-            # same no-move the exchange already uses, so an overdraw
-            # inside that dust posts the stock and the buffer ends at
-            # zero. A larger overdraw is refused. It is not clipped
-            # to zero and it is not posted through a negative balance.
+            # S was the stock over the solver hour. On a fast root
+            # the integral is that endpoint stock. This read is the
+            # buffer still there after the vapour and the settle. The
+            # two agree when every oxygen move S subtracted was
+            # booked by that same post. Dust at or below the noop is
+            # the same no-move the exchange already uses, so an
+            # overdraw inside that dust posts the stock and the
+            # buffer ends at zero. A larger overdraw is an
+            # inconsistency. It is refused. It is not clipped to zero
+            # and it is not posted through a negative balance.
             signed_after_mol = float(
                 self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
                     OXYGEN_SPECIES, 0.0,

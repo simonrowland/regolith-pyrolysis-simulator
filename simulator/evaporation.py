@@ -413,6 +413,41 @@ def _buffer_oxidative_stoich_o2_mol(
     return math.fsum(terms) if terms else 0.0
 
 
+def headspace_buffer_release_stock_mol(
+    opening_mol: float,
+    credit_mol: float,
+    debit_mol: float,
+    uptake_mol: float,
+    *,
+    noop_mol: float,
+) -> float:
+    """Buffer moles the headspace release is defined against.
+
+    One formula. The source S is this stock over the solver hour,
+    and the post debits the integral of that S. The integral cannot
+    exceed the stock it is defined against. The ledger check still
+    refuses when the buffer that remains is a different number: that
+    difference is an inconsistency, and it is not clipped away.
+
+    Algebra: n = max(0, n_open + n_credit − n_debit − n_uptake)
+    when that excess is above the noop, else 0.
+    Unit: mol.
+    Limit: a non-positive excess is an empty stock, not a sink.
+    A figure at or below the noop is the same zero the exchange skips.
+    """
+
+    excess = (
+        float(opening_mol)
+        + float(credit_mol)
+        - float(debit_mol)
+        - float(uptake_mol)
+    )
+    stock = max(0.0, excess)
+    if stock <= float(noop_mol):
+        return 0.0
+    return stock
+
+
 def _project_evaporation_overhead_source_mol_hr(
     rates_kg_hr: Mapping[str, float],
     stoich_by_species: Mapping[str, Mapping[str, Any]],
