@@ -875,6 +875,276 @@ def _pressureless_tabulation_experiment(temperature_K: Decimal):
     return replace(experiment, pressure_environment=environment)
 
 
+def _pressureless_knudsen_experiment(temperature_K: Decimal):
+    from simulator.battery.enums import MethodToken
+
+    return replace(
+        _pressureless_tabulation_experiment(temperature_K),
+        method=State.of(MethodToken.KNUDSEN_EFFUSION),
+    )
+
+
+def test_knudsen_phase_rows_keep_dp004_and_do_not_attempt_without_pressure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict[str, object]] = []
+
+    def hook(engine, **kwargs):
+        calls.append({"engine": engine, **kwargs})
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 100.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    identity = replace(
+        _phase_identity(
+            "SiO2",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.MELT,
+            fO2_Pa=None,
+            total_pressure_Pa=None,
+        ),
+        composition=State.of(
+            Composition(
+                basis="ordered_complete_mole_inventory",
+                components=(("SiO2", Decimal("1")),),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            )
+        ),
+    )
+    observation = F.observation(
+        "knudsen-phase-no-total",
+        "knudsen-phase-no-total-experiment",
+        identity,
+        Decimal("100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    experiment = _pressureless_knudsen_experiment(identity.temperature_K.value)
+
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment
+    )
+
+    assert calls == []
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == (
+        "knudsen_total_pressure_unavailable_for_phase_assembly"
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-004"
+        for notice in prediction.notices
+    )
+    assert prediction.refusal_reason is not RefusalReason.ATTEMPTED_UNAVAILABLE
+
+
+def test_knudsen_element_phase_rows_keep_dp004_and_do_not_attempt_without_pressure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict[str, object]] = []
+
+    def hook(engine, **kwargs):
+        calls.append({"engine": engine, **kwargs})
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 100.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    identity = replace(
+        _phase_identity(
+            "O",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.MELT,
+            subtype="element_wt_percent",
+            fO2_Pa=None,
+            total_pressure_Pa=None,
+        ),
+        composition=State.of(
+            Composition(
+                basis="ordered_complete_mole_inventory",
+                components=(("SiO2", Decimal("1")),),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            )
+        ),
+    )
+    observation = F.observation(
+        "knudsen-element-phase-no-total",
+        "knudsen-element-phase-no-total-experiment",
+        identity,
+        Decimal("53.256"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+        derivation=Derivation(
+            relation="oxygen_excess",
+            inputs=("printed_elemental_analysis",),
+            parameters=(),
+            output_unit="wt%",
+        ),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            "element_wt_percent": F.located(
+                Composition(
+                    basis="element_wt_percent",
+                    components=(
+                        ("Si", Decimal("28.085")),
+                        ("O", Decimal("31.998")),
+                    ),
+                    amount_basis=AmountBasis.MASS_PERCENT,
+                )
+            )
+        },
+    )
+    experiment = _pressureless_knudsen_experiment(identity.temperature_K.value)
+
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment
+    )
+
+    assert calls == []
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == (
+        "knudsen_total_pressure_unavailable_for_phase_assembly"
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-004"
+        for notice in prediction.notices
+    )
+    assert prediction.refusal_reason is not RefusalReason.ATTEMPTED_UNAVAILABLE
+
+
+def test_fe_free_phase_and_element_condition_rows_omit_dp010(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict[str, object]] = []
+
+    def hook(engine, **kwargs):
+        calls.append({"engine": engine, **kwargs})
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 60.0, "MgO": 40.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.7")), ("MgO", Decimal("0.3"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _phase_identity(
+            "SiO2",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.MELT,
+            fO2_Pa=None,
+            total_pressure_Pa=Decimal("100000"),
+        ),
+        composition=State.of(composition),
+    )
+    observation = F.observation(
+        "fe-free-phase-no-fo2",
+        "fe-free-phase-experiment",
+        identity,
+        Decimal("60"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    experiment = F.tabulation_experiment(
+        T_K=identity.temperature_K.value,
+        total_P=Decimal("100000"),
+    )
+    phase_prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment
+    )
+    assert phase_prediction.value is not None
+    assert calls[-1]["fO2_log"] is None
+    assert calls[-1]["redox_mode"] == "not_an_input"
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "no multivalent element" in notice.reason
+        for notice in phase_prediction.notices
+    )
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in phase_prediction.notices
+    )
+
+    element_identity = replace(
+        _phase_identity(
+            "O",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.MELT,
+            subtype="element_wt_percent",
+            fO2_Pa=None,
+            total_pressure_Pa=Decimal("100000"),
+        ),
+        composition=State.of(
+            Composition(
+                basis="ordered_complete_mole_inventory",
+                components=(("SiO2", Decimal("1")),),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            )
+        ),
+    )
+    element_observation = F.observation(
+        "fe-free-element-conditions-no-fo2",
+        "fe-free-element-experiment",
+        element_identity,
+        Decimal("53.256"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+        derivation=Derivation(
+            relation="oxygen_excess",
+            inputs=("printed_elemental_analysis",),
+            parameters=(),
+            output_unit="wt%",
+        ),
+    )
+    element_observation = replace(
+        element_observation,
+        point_conditions={
+            "element_wt_percent": F.located(
+                Composition(
+                    basis="element_wt_percent",
+                    components=(
+                        ("Si", Decimal("28.085")),
+                        ("O", Decimal("31.998")),
+                    ),
+                    amount_basis=AmountBasis.MASS_PERCENT,
+                )
+            )
+        },
+    )
+    element_prediction = predict_with_engine(
+        Engine.ALPHAMELTS, element_observation, experiment=experiment
+    )
+    assert element_prediction.value is not None
+    assert calls[-1]["fO2_log"] is None
+    assert calls[-1]["redox_mode"] == "not_an_input"
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "no multivalent element" in notice.reason
+        for notice in element_prediction.notices
+    )
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in element_prediction.notices
+    )
+
+
 def test_missing_pressure_and_fo2_phase_rows_reach_each_melts_adapter(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

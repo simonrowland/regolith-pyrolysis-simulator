@@ -67,6 +67,8 @@ from simulator.battery.waypoints import (
     oxygen_condition,
 )
 from simulator.fe_redox import (
+    _kress91_log10_fO2_from_fe3_over_sigma_fe,
+    intrinsic_melt_fO2,
     kress91_log10_fO2_from_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
@@ -313,6 +315,59 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
         replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
     )
     assert _fo2_input(changed) == _fo2_input(resolved)
+
+
+def test_tier2_knudsen_ferric_inverse_deliberately_omits_pressure_term() -> None:
+    experiment, bench, observation = _feo_case()
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    assert resolved.route.startswith("kress_inverse:Fe3_over_sum_Fe;")
+    assert "pressure_term_omitted" in resolved.route
+    assert "pressure_bar=None" in resolved.route
+    weights = composition_wt_pct(observation.identity.composition.value)
+    expected = _kress91_log10_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=0.2,
+        mol_fractions=melt_mol_fractions_for_kress91(weights),
+        T_K=float(observation.identity.temperature_K.value),
+        pressure_bar=None,
+    )
+    assert resolved.log10_fO2_bar == expected
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
+    assert "pressure_term_omitted" in notice.reason
+    assert "pressure_bar=None" in notice.reason
+
+
+def test_tier2_out_of_band_kress_inverse_is_predicted_and_flagged() -> None:
+    experiment, bench, observation = _feo_case(
+        temperature=Value.point_of(Decimal("1973.15")),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    assert resolved.temperature_band_status == "extrapolation_experimentally_confirmed"
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert "fo2_from_printed_ferric_ratio" in notice.reason
+    assert "Kress91 temperature band" in (notice.band or "")
 
 
 def test_tier2_kress_inverse_uses_banded_identity_nominal_pressure() -> None:
@@ -640,6 +695,8 @@ def test_printed_gas_mix_uses_dp002_when_total_pressure_is_unprinted() -> None:
 
 
 def test_vacuum_fo2_proxy_is_explicitly_flagged() -> None:
+    from simulator.battery.score import composition_wt_pct
+
     experiment, bench, observation = _feo_case()
     experiment = replace(experiment, method=State.of(MethodToken.VACUUM_CHAMBER_PYROLYSIS))
     resolved = resolve_row_fo2(experiment, bench, observation, quantity=Quantity.ACTIVITY)
@@ -649,6 +706,10 @@ def test_vacuum_fo2_proxy_is_explicitly_flagged() -> None:
     notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
     assert notice.kind is NoticeKind.FO2_VACUUM_CELL_PROXY
     assert "legacy intrinsic-melt clamp" in notice.reason
+    weights = composition_wt_pct(observation.identity.composition.value)
+    assert resolved.log10_fO2_bar == float(
+        intrinsic_melt_fO2(weights, float(observation.identity.temperature_K.value))
+    )
 
 
 def test_container_buffers_use_the_existing_frost_owner() -> None:
@@ -702,6 +763,80 @@ def test_container_buffers_use_the_existing_frost_owner() -> None:
         assert fo2_tier_notice(Quantity.ACTIVITY, resolved).kind is (
             NoticeKind.FO2_BUFFER_FROM_CONTAINER
         )
+
+
+def test_molybdenum_capsule_is_a_typed_gap_even_for_knudsen() -> None:
+    _base_experiment, bench, observation = _feo_case()
+    for container in (
+        "rhenium boat",
+        "ruthenium capsule",
+        "molybdenum capsule",
+        "tungsten cell",
+        "Re wire loop",
+        "Re/Ru capsule",
+        "Mo/W cell",
+        "MoO2 capsule",
+    ):
+        for method in (
+            MethodToken.QUENCH_EQUILIBRATION,
+            MethodToken.KNUDSEN_EFFUSION,
+        ):
+            experiment = F.tabulation_experiment(
+                method=method, T_K=Decimal("1473.15")
+            )
+            experiment = replace(
+                experiment,
+                sample=replace(
+                    experiment.sample,
+                    container=F.located(container),
+                ),
+            )
+            oxygen = oxygen_condition(experiment, bench, observation)
+            assert oxygen.selected is None, container
+            assert oxygen.absence is not None, container
+            assert oxygen.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            resolved = resolve_row_fo2(
+                experiment,
+                bench,
+                observation,
+                composition=observation.identity.composition.value,
+                temperature_K=float(observation.identity.temperature_K.value),
+                oxygen=oxygen,
+                quantity=Quantity.ACTIVITY,
+            )
+            assert resolved is None, (container, method, resolved)
+
+
+def test_unknown_explicit_buffer_does_not_resolve_dp010_or_vacuum_proxy() -> None:
+    _base_experiment, bench, observation = _feo_case()
+    for method in (
+        MethodToken.QUENCH_EQUILIBRATION,
+        MethodToken.KNUDSEN_EFFUSION,
+        MethodToken.VACUUM_CHAMBER_PYROLYSIS,
+    ):
+        experiment = F.tabulation_experiment(
+            method=method, T_K=Decimal("1473.15")
+        )
+        experiment = replace(
+            experiment,
+            fO2_control=FO2Control(
+                channel=F.State.of(FO2Channel.BUFFER),
+                buffer=F.located("NOT_A_REAL_BUFFER"),
+            ),
+        )
+        oxygen = oxygen_condition(experiment, bench, observation)
+        assert oxygen.absence is not None
+        assert oxygen.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            observation,
+            composition=observation.identity.composition.value,
+            temperature_K=float(observation.identity.temperature_K.value),
+            oxygen=oxygen,
+            quantity=Quantity.ACTIVITY,
+        )
+        assert resolved is None, (method, resolved)
 
 
 def test_graphite_container_uses_closed_cco_at_printed_or_resolved_pressure() -> None:

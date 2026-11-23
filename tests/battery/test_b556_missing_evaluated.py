@@ -320,6 +320,8 @@ def test_unusable_fo2_control_stays_in_the_gap() -> None:
         assert result.absence is not None
         assert "experiment.fO2_control" in result.absence.missing
         assert "fO2_log" in result.absence.missing
+    assert unknown_buffer.absence is not None
+    assert unknown_buffer.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
 def test_published_buffer_stays_present_when_temperature_is_absent() -> None:

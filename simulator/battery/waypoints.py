@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from enum import StrEnum
@@ -1905,6 +1906,7 @@ def oxygen_condition(
                 WaypointAuthority.DERIVED, point_pressure.inputs))
     control = experiment.fO2_control
     container_buffer_token: str | None = None
+    unsupported_container: str | None = None
     container = experiment.sample.container
     if container is not None and container.state.is_value:
         container_text = (
@@ -1914,6 +1916,7 @@ def oxygen_condition(
             .replace("–", "-")
             .replace("—", "-")
         )
+        container_tokens = set(re.findall(r"[a-z0-9]+", container_text))
         if "graphite" in container_text:
             container_buffer_token = "CCO"
         elif any(
@@ -1953,6 +1956,19 @@ def oxygen_condition(
             )
         ):
             container_buffer_token = "WM"
+        elif any(
+            token in container_text
+            for token in (
+                "rhenium",
+                "ruthenium",
+                "molybdenum",
+                "tungsten",
+                "re/ru",
+                "mo/w",
+                "moo2",
+            )
+        ) or container_tokens.intersection({"re", "ru", "mo", "w"}):
+            unsupported_container = str(container.state.value)
     if control is not None:
         pressure = _value(control.oxygen_partial_pressure_Pa)
         if pressure is not None:
@@ -2227,6 +2243,41 @@ def oxygen_condition(
         buffer_known = (
             is_c_co_buffer_token(buffer_token)
             or buffer_token.upper() in PUBLISHED_BUFFERS
+        )
+    unsupported_buffer = (
+        explicit_buffer_token
+        if explicit_buffer_token is not None and not buffer_known
+        else None
+    )
+    if unsupported_buffer is not None:
+        return WaypointResult(
+            "oxygen_condition",
+            None,
+            tuple(routes),
+            WaypointAbsence(
+                "oxygen_condition",
+                GapReason.UNSUPPORTED_PRINT_FORM,
+                (
+                    "experiment.fO2_control.buffer "
+                    f"(unsupported token: {unsupported_buffer!r})",
+                    "fO2_log",
+                ),
+            ),
+        )
+    if unsupported_container is not None and explicit_buffer_token is None:
+        return WaypointResult(
+            "oxygen_condition",
+            None,
+            tuple(routes),
+            WaypointAbsence(
+                "oxygen_condition",
+                GapReason.UNSUPPORTED_PRINT_FORM,
+                (
+                    "experiment.sample.container "
+                    f"(unsupported buffer material: {unsupported_container!r})",
+                    "fO2_log",
+                ),
+            ),
         )
     control_present = buffer_known
     oxygen_inputs = {

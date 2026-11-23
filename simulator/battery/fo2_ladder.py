@@ -64,6 +64,7 @@ from simulator.battery.records import (
 )
 from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
+    GapReason,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
@@ -112,6 +113,8 @@ class ResolvedFo2:
     # The air route resolves DP-003 alongside its pressure input so notice
     # construction reuses the same audited formula result.
     policy: NoticePolicy | None = None
+    temperature_band_status: str | None = None
+    temperature_band_source: str | None = None
 
 
 _PHYSICS_RUNG_LABELS = {
@@ -144,6 +147,12 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             "fo2_from_printed_ferric_ratio; Kress-Carmichael inverse at row T and P; "
             f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; {reason}"
         )
+        if resolved.temperature_band_status is not None:
+            reason += (
+                "; kress91_temperature_band_status="
+                f"{resolved.temperature_band_status}; "
+                f"kress91_authority={resolved.temperature_band_source}"
+            )
         kind = NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
     elif container_buffer:
         reason = (
@@ -206,13 +215,32 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             kind = NoticeKind.OUT_OF_CERTIFIED_BAND
         else:
             kind = NoticeKind.SOURCE_DISAGREEMENT
+    out_of_band_kress = (
+        ferric_ratio
+        and resolved.temperature_band_status is not None
+        and resolved.temperature_band_status != "authoritative"
+    )
+    if out_of_band_kress:
+        kind = NoticeKind.OUT_OF_CERTIFIED_BAND
     return Notice(
         kind=kind,
         affected_quantities=(quantity,),
         reason=reason,
         origin="fo2_ladder",
-        band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
-        authority=Authority.BRIDGE if resolved.borrowed else None,
+        band=(
+            f"Kress91 temperature band: {resolved.temperature_band_status}"
+            if out_of_band_kress
+            else f"borrowed fO2: {resolved.route}"
+            if resolved.borrowed
+            else None
+        ),
+        authority=(
+            Authority.EXTRAPOLATED
+            if out_of_band_kress
+            else Authority.BRIDGE
+            if resolved.borrowed
+            else None
+        ),
         fo2_mode=Fo2Mode.SHARED_LADDER,
         policy=policy,
     )
@@ -311,7 +339,8 @@ def resolve_row_fo2(
         temperature = _temperature_K(None, float(temperature_K))
     else:
         temperature = None
-    routes = _oxygen_routes(experiment, bench, observation, oxygen)
+    oxygen_result = _oxygen_result(experiment, bench, observation, oxygen)
+    routes = () if oxygen_result is None else oxygen_result.routes
     knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
     rys_row_oxygen_unverified = (
         _rys_oxygen_measurement_status(observation, quantity)
@@ -350,6 +379,12 @@ def resolve_row_fo2(
     tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
     if tier2 is not None:
         return tier2
+    if (
+        oxygen_result is not None
+        and oxygen_result.absence is not None
+        and oxygen_result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    ):
+        return None
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
             log = _log_point(route.value)
@@ -627,17 +662,15 @@ def _temperature_K(identity: Identity | None, explicit: float | None) -> float |
     return None
 
 
-def _oxygen_routes(
+def _oxygen_result(
     experiment: Experiment | None,
     bench: object | None,
     observation: Observation | None,
     oxygen: WaypointResult | None,
-) -> tuple[Waypoint, ...]:
+) -> WaypointResult | None:
     if oxygen is None and experiment is not None and bench is not None:
         oxygen = oxygen_condition(experiment, bench, observation)
-    if oxygen is None:
-        return ()
-    return oxygen.routes
+    return oxygen
 
 
 def _is_tier1(route: Waypoint, observation: Observation | None) -> bool:
@@ -813,19 +846,19 @@ def _tier2(
         except Kress91InvalidControls:
             mol_fractions = {}
     from simulator.fe_redox import (
-        Kress91InvalidControls,
-        kress91_log10_fO2_from_fe3_over_sigma_fe,
+        _kress91_log10_fO2_from_fe3_over_sigma_fe,
+        kress91_temperature_band_case,
     )
 
-    try:
-        log = kress91_log10_fO2_from_fe3_over_sigma_fe(
-            fe3_over_sigma_fe=fraction,
-            mol_fractions=mol_fractions,
-            T_K=temperature_K,
-            pressure_bar=pressure_bar,
-        )
-    except Kress91InvalidControls:
-        return None
+    temperature_band = kress91_temperature_band_case(
+        temperature_K - 273.15
+    )
+    log = _kress91_log10_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=fraction,
+        mol_fractions=mol_fractions,
+        T_K=temperature_K,
+        pressure_bar=pressure_bar,
+    )
     if not math.isfinite(log):
         return None
     return ResolvedFo2(
@@ -833,6 +866,8 @@ def _tier2(
         2,
         f"kress_inverse:{source};pressure={pressure_route}",
         False,
+        temperature_band_status=str(temperature_band["status"]),
+        temperature_band_source=str(temperature_band["source"]),
     )
 
 
@@ -898,7 +933,7 @@ def _kress_pressure_bar(
             if log_bar is not None:
                 return log_bar, boundary.route
     if _is_knudsen(experiment) or _is_vacuum_fO2_method(experiment):
-        return None, "pressure_term_deliberately_dropped_no_cell_total_available"
+        return None, "pressure_term_omitted; pressure_bar=None"
     policy_pressure = Decimal(str(resolve("DP-001").value))
     return float(policy_pressure) / PA_PER_BAR, "DP-001_assumed_pressure"
 

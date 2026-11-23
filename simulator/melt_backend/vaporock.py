@@ -399,14 +399,15 @@ def vaporock_liquid_fraction_admitted(
 
 
 def vaporock_pressure_bar_admitted(pressure_bar: Any) -> bool:
-    """True when *pressure_bar* is a finite positive total pressure.
+    """True when *pressure_bar* is absent or is a finite positive pressure.
 
-    Total pressure is in bar. P > 0 because a thermodynamic cell
-    coordinate cannot be zero or negative: vacuum is approached by a
-    small positive P (this adapter's default is 1e-6 bar). Non-finite
-    values are not a pressure. Applied on the ``equilibrate`` entry
-    path; this helper does not wrap other callers.
+    Total pressure is diagnostic-only on the VapoRock System path, which
+    omits its optional P argument. When a pressure is supplied, it is in
+    bar and must be positive and finite. Applied on the ``equilibrate``
+    entry path; this helper does not wrap other callers.
     """
+    if pressure_bar is None:
+        return True
     try:
         value = float(pressure_bar)
     except (TypeError, ValueError):
@@ -1745,7 +1746,7 @@ class VapoRockBackend(MeltBackend):
         temperature_C: float,
         composition_kg: Optional[Dict[str, float]] = None,
         fO2_log: float = -9.0,
-        pressure_bar: float = 1e-6,
+        pressure_bar: float | None = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
         composition_mol_by_account: Optional[
@@ -1777,9 +1778,9 @@ class VapoRockBackend(MeltBackend):
         ``pressure_bar`` remains diagnostic-only: the System path in this
         adapter does not pass total pressure through to the engine
         (upstream accepts optional ``P``; this adapter omits it).
-        Non-finite, zero, or negative ``pressure_bar``, and non-finite
-        ``fO2_log``, are refused on this entry path before any engine
-        call.
+        ``None`` therefore carries no pressure input. Non-finite, zero, or
+        negative supplied ``pressure_bar``, and non-finite ``fO2_log``, are
+        refused on this entry path before any engine call.
 
         ``EquilibriumResult.ledger_transition`` is left ``None`` and no
         phase assemblage is reported: VapoRock holds no ``AtomLedger``
@@ -1836,7 +1837,9 @@ class VapoRockBackend(MeltBackend):
                 'temperature_input_category': 'non_finite',
                 'vaporock_t_min_K': VAPOROCK_T_MIN_K,
                 'vaporock_t_max_K': VAPOROCK_T_MAX_K,
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'pressure_control_authoritative': False,
             }
             return EquilibriumResult(
@@ -1878,7 +1881,9 @@ class VapoRockBackend(MeltBackend):
                 'liquid_fraction': liquid_diag,
                 'vaporock_min_liquid_fraction': VAPOROCK_MIN_LIQUID_FRACTION,
                 'temperature_K': float(temperature_K),
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'pressure_control_authoritative': False,
             }
             return EquilibriumResult(
@@ -1941,7 +1946,9 @@ class VapoRockBackend(MeltBackend):
                 **melt_envelope_diagnostics,
                 'backend_status_reason': OutOfDomainReason.INVALID_FO2_LOG.value,
                 'temperature_K': float(temperature_K),
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'fO2_log': fo2_diag,
                 'pressure_control_authoritative': False,
             }
@@ -2108,11 +2115,12 @@ class VapoRockBackend(MeltBackend):
             if self._temperature_units == 'K'
             else temperature_C
         )
-        pressure_value = (
-            pressure_bar * PA_PER_BAR
-            if self._pressure_units == 'Pa'
-            else pressure_bar
-        )
+        if pressure_bar is None:
+            pressure_value = None
+        elif self._pressure_units == 'Pa':
+            pressure_value = pressure_bar * PA_PER_BAR
+        else:
+            pressure_value = pressure_bar
 
         try:
             vaporock_output = self._call_vaporock(
@@ -2179,7 +2187,9 @@ class VapoRockBackend(MeltBackend):
                 'sum_pressure_bar': float(sum_bar),
                 'vaporock_max_sum_pressure_bar': VAPOROCK_MAX_SUM_PRESSURE_BAR,
                 'temperature_K': float(temperature_K),
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'pressure_control_authoritative': False,
             })
             return EquilibriumResult(
@@ -2219,7 +2229,9 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics.update({
                 'pressure_control_authoritative': False,
                 'pressure_control_reason': pressure_authority_warning,
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'temperature_K': float(temperature_K),
                 'sum_pressure_bar': float(sum_bar),
             })
@@ -2376,7 +2388,7 @@ class VapoRockBackend(MeltBackend):
         self,
         composition_wt_pct: Dict[str, float],
         temperature: float,
-        pressure: float,
+        pressure: float | None,
         fO2_log: float,
         include_oxide_activities: bool = False,
     ) -> Any:

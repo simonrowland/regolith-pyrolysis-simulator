@@ -7999,32 +7999,36 @@ def oxygen_is_scorer_input(
 ) -> tuple[bool, str, tuple[str, ...]]:
     """Whether a missing fO2 must be refused, and the record of why.
 
-    Melt activity takes oxygen only when a multivalent element is present.
-    Every other quantity follows its identity profile: a required fO2 is an
-    input, and a not-applicable fO2 is omitted rather than filled.
+    Melt activity and phase-composition outputs take oxygen only when a
+    multivalent element is present. Other quantities follow their identity
+    profile: a required fO2 is an input, and a not-applicable fO2 is omitted.
     """
 
     quantity = quantity_token(identity)
     from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
 
+    phase_composition = quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    redox_sensitive = quantity in MELT_ACTIVITY_QUANTITIES or phase_composition
     redox = (
         multivalent_components(
             composition,
-            identity.species.formula,
+            None if phase_composition else identity.species.formula,
             oxide_aliases=MELTS_OXIDE_ALIASES,
         )
-        if quantity in MELT_ACTIVITY_QUANTITIES
+        if redox_sensitive
         else ()
     )
-    if quantity in MELT_ACTIVITY_QUANTITIES:
+    if redox_sensitive:
         if redox:
-            return True, "melt contains multivalent " + ", ".join(redox), redox
-        # fO2 changes melt activity through redox speciation. With no
-        # multivalent element in this fixed oxide composition, there is no
-        # redox pair for oxygen potential to shift, so fO2 is not an input.
+            subject = "phase charge" if phase_composition else "melt"
+            return True, subject + " contains multivalent " + ", ".join(redox), redox
+        # With no multivalent element in this fixed oxide composition, there
+        # is no redox pair for oxygen potential to shift, so fO2 is not an
+        # input to this activity or phase-composition prediction.
+        subject = "phase charge" if phase_composition else "melt"
         return (
             False,
-            "melt has no multivalent element "
+            f"{subject} has no multivalent element "
             f"({', '.join(MULTIVALENT_MELT_ELEMENTS)}) in the composition or measured species; "
             "oxygen is not an input and was omitted",
             (),
@@ -9525,6 +9529,25 @@ def _resolve_score_total_pressure(
     if invalid or pressure_bar is None:
         return 0.0, pressure_state, None, "total_pressure_invalid"
     return pressure_bar, pressure_state, notice, None
+
+
+def _knudsen_phase_pressure_gap(
+    pressure_bar: float | None,
+    notice: Notice | None,
+) -> dict[str, object] | None:
+    """Keep the DP-004 phase-assembly gap typed before a backend call."""
+
+    if (
+        pressure_bar is not None
+        or notice is None
+        or notice.policy is None
+        or notice.policy.id != "DP-004"
+    ):
+        return None
+    return {
+        "reason": "knudsen_total_pressure_unavailable_for_phase_assembly",
+        "policy": "DP-004",
+    }
 
 
 def _pressure_refusal(
@@ -12166,6 +12189,14 @@ def _predict_element_mass_fraction_phase(
         )
     if pressure_notice is not None:
         notices = notices + (pressure_notice,)
+    pressure_gap = _knudsen_phase_pressure_gap(pressure_bar, pressure_notice)
+    if pressure_gap is not None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            pressure_gap,
+            execution=ExecutionState.NOT_PROBED,
+            notices=notices,
+        )
 
     redox_mode: str | None = None
     fo2_log: float | None = None
@@ -12176,8 +12207,26 @@ def _predict_element_mass_fraction_phase(
         redox_mode = REDOX_MODE_NOT_AN_INPUT
     elif decision.redox_kind == "conditions":
         weights = _feo_t_wt_percent(decision)
-        fo2_log = _printed_fo2_log10_bar(identity)
-        if fo2_log is None:
+        composition_state = identity.composition
+        phase_composition = (
+            composition_state.value
+            if composition_state is not None
+            and composition_state.is_value
+            and isinstance(composition_state.value, Composition)
+            else None
+        )
+        oxygen_required, oxygen_reason, _redox_components = (
+            oxygen_is_scorer_input(identity, phase_composition)
+        )
+        if not oxygen_required:
+            from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+            redox_mode = REDOX_MODE_NOT_AN_INPUT
+            if quantity is not None:
+                notices = notices + (_omission_notice(quantity, oxygen_reason),)
+        else:
+            fo2_log = _printed_fo2_log10_bar(identity)
+        if oxygen_required and fo2_log is None:
             from simulator.battery.fo2_ladder import (
                 fo2_tier_notice,
                 resolve_row_fo2,
@@ -12626,10 +12675,32 @@ def _predict_phase_row(
         )
     if pressure_notice is not None:
         exclusion_notices = exclusion_notices + (pressure_notice,)
+    pressure_gap = _knudsen_phase_pressure_gap(pressure_bar, pressure_notice)
+    if pressure_gap is not None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            pressure_gap,
+            execution=ExecutionState.NOT_PROBED,
+            notices=exclusion_notices,
+        )
     if pressure_state is not None:
         identity = replace(identity, total_pressure_Pa=pressure_state)
-    fo2_log = _printed_fo2_log10_bar(identity)
-    if fo2_log is None:
+    oxygen_required, oxygen_reason, _redox_components = oxygen_is_scorer_input(
+        identity, composition_state.value
+    )
+    redox_mode: str | None = None
+    if oxygen_required:
+        fo2_log = _printed_fo2_log10_bar(identity)
+    else:
+        from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+        fo2_log = None
+        redox_mode = REDOX_MODE_NOT_AN_INPUT
+        if quantity is not None:
+            exclusion_notices = exclusion_notices + (
+                _omission_notice(quantity, oxygen_reason),
+            )
+    if oxygen_required and fo2_log is None:
         from simulator.battery.fo2_ladder import (
             fo2_tier_notice,
             resolve_row_fo2,
@@ -12703,6 +12774,7 @@ def _predict_phase_row(
             fO2_log=fo2_log,
             pressure_bar=float(pressure_bar),
             **call_kwargs,
+            redox_mode=redox_mode,
         )
     except Exception as exc:  # a backend failure is a counted refusal
         return refused(

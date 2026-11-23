@@ -401,13 +401,14 @@ def _validate_kress91_controls(
     *,
     fO2_log: float,
     T_K: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
 ) -> None:
     controls = {
         'fO2_log': (fO2_log, False),
         'T_K': (T_K, True),
-        'pressure_bar': (pressure_bar, True),
     }
+    if pressure_bar is not None:
+        controls['pressure_bar'] = (pressure_bar, True)
     for name, (value, positive) in controls.items():
         try:
             number = float(value)
@@ -877,7 +878,7 @@ def _kress91_ln_ratio(
     fO2_log: float,
     mol_fractions: Mapping[str, float],
     T_K: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
     fo2_term: float | None = None,
 ) -> float:
     """Left fold of Kress91 ln(Fe2O3/FeO).
@@ -895,7 +896,16 @@ def _kress91_ln_ratio(
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
+    pressure_term = 0.0
+    if pressure_bar is not None:
+        p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
+        pressure_term = (
+            KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
+            + KRESS91_PRESSURE_D_T_COEFFICIENT * (
+                ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
+            )
+            + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
+        )
     return (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
@@ -910,11 +920,7 @@ def _kress91_ln_ratio(
             - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
             - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
         )
-        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
-        + KRESS91_PRESSURE_D_T_COEFFICIENT * (
-            ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
-        )
-        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
+        + pressure_term
     )
 
 
@@ -947,6 +953,23 @@ def kress91_log10_fO2_from_fe3_over_sigma_fe(
     finite oxygen fugacity. This inverts the unclamped ln(ratio) equation;
     the forward exp() clamp is a numerical guard, not part of the relation.
     """
+
+    return _kress91_log10_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=fe3_over_sigma_fe,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+
+
+def _kress91_log10_fO2_from_fe3_over_sigma_fe(
+    *,
+    fe3_over_sigma_fe: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float | None,
+) -> float:
+    """Invert Kress91, optionally omitting the pressure term by ruling."""
 
     try:
         fraction = float(fe3_over_sigma_fe)

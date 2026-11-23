@@ -3545,7 +3545,7 @@ def _internal_analytical_vapor_pressure_adapter(
     *,
     core: Any,
     temperature_C: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
     composition_kg: Mapping[str, float] | None,
     composition_mol: Mapping[str, float] | None,
     fO2_log: float | None,
@@ -3556,7 +3556,8 @@ def _internal_analytical_vapor_pressure_adapter(
     """Evaluate a battery observation through the simulator VAPOR_PRESSURE intent.
 
     The producer supplies only its observation-derived oxide inventory,
-    temperature, pressure and existing battery oxygen-condition request.
+    temperature, any consumed total pressure and the existing battery
+    oxygen-condition request.
     """
 
     from types import SimpleNamespace
@@ -3580,8 +3581,10 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_temperature",
             f"temperature_C must be finite and above absolute zero; got {temperature_C!r}",
         )
-    pressure = finite_float(pressure_bar)
-    if isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0:
+    pressure = None if pressure_bar is None else finite_float(pressure_bar)
+    if pressure_bar is not None and (
+        isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0
+    ):
         raise _InternalAnalyticalInputRefusal(
             2,
             "internal_analytical_invalid_total_pressure",
@@ -3704,6 +3707,9 @@ def _internal_analytical_vapor_pressure_adapter(
                 "pressure_prediction_source": "internal-analytical core",
             }
         )
+    elif po2_request.mode == PO2_NOT_AN_INPUT:
+        po2_bar = None
+        oxygen_source = "not_an_input"
     else:
         raise _InternalAnalyticalInputRefusal(
             1,
@@ -3713,7 +3719,7 @@ def _internal_analytical_vapor_pressure_adapter(
 
     # Score maps the battery's fugacity in Pa to pO2 in bar using the stated
     # ideal-gas assumption. The effusion branch uses the already-derived pO2.
-    fO2_log_used = math.log10(po2_bar)
+    fO2_log_used = None if po2_bar is None else math.log10(po2_bar)
 
     core.atom_ledger = core._new_atom_ledger()
     try:
@@ -3731,14 +3737,16 @@ def _internal_analytical_vapor_pressure_adapter(
     core.melt.composition_kg = dict(validated_melt_mass_kg_by_species)
     core.melt.update_total_mass()
     core.melt.temperature_C = temperature
-    core.melt.p_total_mbar = pressure * 1000.0
-    core.melt.atmosphere = Atmosphere.CONTROLLED_O2
-    core.melt.pO2_mbar = po2_bar * 1000.0
-    core.melt.fO2_log = fO2_log_used
-    core.melt.melt_fO2_log = fO2_log_used
-    core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_used
-    core.melt.oxygen_reservoir.headspace_transport_pO2_bar = po2_bar
-    core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2_bar
+    if pressure is not None:
+        core.melt.p_total_mbar = pressure * 1000.0
+    if po2_bar is not None:
+        core.melt.atmosphere = Atmosphere.CONTROLLED_O2
+        core.melt.pO2_mbar = po2_bar * 1000.0
+        core.melt.fO2_log = fO2_log_used
+        core.melt.melt_fO2_log = fO2_log_used
+        core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_used
+        core.melt.oxygen_reservoir.headspace_transport_pO2_bar = po2_bar
+        core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2_bar
     core._chem_kernel = core._build_chemistry_kernel()
 
     equilibrium = SimpleNamespace(
@@ -3748,16 +3756,18 @@ def _internal_analytical_vapor_pressure_adapter(
         warnings=[],
     )
     if include_diagnostic_shadows:
-        core._refresh_vapor_pressures_from_kernel(
-            equilibrium,
-            observation_pO2_bar=po2_bar,
-        )
+        if po2_bar is None:
+            core._refresh_vapor_pressures_from_kernel(equilibrium)
+        else:
+            core._refresh_vapor_pressures_from_kernel(
+                equilibrium,
+                observation_pO2_bar=po2_bar,
+            )
     else:
-        core._refresh_vapor_pressures_from_kernel(
-            equilibrium,
-            include_diagnostic_shadows=False,
-            observation_pO2_bar=po2_bar,
-        )
+        refresh_kwargs = {"include_diagnostic_shadows": False}
+        if po2_bar is not None:
+            refresh_kwargs["observation_pO2_bar"] = po2_bar
+        core._refresh_vapor_pressures_from_kernel(equilibrium, **refresh_kwargs)
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []
     for field_name in (
@@ -3907,7 +3917,7 @@ def internal_analytical_residue_vapor_pressure(
     *,
     core: Any,
     temperature_C: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
     composition_kg: Mapping[str, float] | None,
     composition_mol: Mapping[str, float] | None,
     fO2_log: float | None,
@@ -3998,7 +4008,7 @@ class _InternalAnalyticalBatteryBackend:
         temperature_C: float,
         composition_kg: Mapping[str, float] | None = None,
         fO2_log: float | None = None,
-        pressure_bar: float = 1.0e-6,
+        pressure_bar: float | None = 1.0e-6,
         *,
         composition_mol: Mapping[str, float] | None = None,
         po2_request: Po2Request | None = None,

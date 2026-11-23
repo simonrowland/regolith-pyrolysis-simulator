@@ -818,17 +818,30 @@ def test_unallowlisted_formation_quantity_refuses_before_engine(monkeypatch) -> 
 
 
 def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> None:
-    seen = _capture_cell(monkeypatch)
     ident = F.psat_identity("Na")
     obs = F.observation("na-psat", "exp", ident, Decimal("1"))
-    prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
+    with monkeypatch.context() as capture:
+        seen = _capture_cell(capture)
+        request_prediction = predict_with_engine(
+            Engine.VAPOROCK, obs, isolated=False
+        )
     assert seen["wt"] == {"Na": 100.0}
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
     assert seen["pressure_bar"] is None
-    reasons = [notice.reason for notice in prediction.notices]
+    reasons = [notice.reason for notice in request_prediction.notices]
     assert any("pure condensed substance Na (l)" in reason for reason in reasons)
     assert any("p_sat does not take oxygen" in reason and "omitted" in reason for reason in reasons)
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in request_prediction.notices
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, obs, isolated=False
+    )
+    assert prediction.value is not None and prediction.value.is_finite()
+    assert prediction.refusal_reason is None, prediction.refusal_detail
     assert not any(
         notice.policy is not None and notice.policy.id == "DP-001"
         for notice in prediction.notices

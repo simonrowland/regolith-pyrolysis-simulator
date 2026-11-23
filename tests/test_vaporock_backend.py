@@ -3405,6 +3405,33 @@ def test_degenerate_pressure_bar_is_refused_before_engine(monkeypatch):
     assert calls["n"] == 1
 
 
+def test_vaporock_pressureless_diagnostic_input_is_admitted(monkeypatch):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"SiO(g)": 1.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize(
+        {"warm_worker": False, "vapor_pressure_units": "Pa"}
+    )
+    assert vaporock_module.vaporock_pressure_bar_admitted(None)
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=None,
+    )
+    assert result.status == "non_authoritative"
+    assert result.pressure_bar is None
+    assert calls["n"] == 1
+
+
 def test_degenerate_fo2_log_is_refused_before_engine(monkeypatch):
     calls = {"n": 0}
 
