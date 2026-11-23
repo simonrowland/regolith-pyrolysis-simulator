@@ -118,7 +118,13 @@ def main(argv: list[str] | None = None) -> int:
     merge.add_argument("inputs", type=Path, nargs="+")
     merge.add_argument("--strict", action="store_true", help="exit 2 after merging if values conflicted")
     merge.add_argument("--vacuum", action="store_true", help="reclaim unused HOT/COLD pages after merge")
-    stats = commands.add_parser("stats", help="report allocated HOT/COLD bytes per row")
+    stats = commands.add_parser(
+        "stats",
+        help=(
+            "report allocated HOT/COLD bytes per row and species-unknown "
+            "rows per engine. Read-only"
+        ),
+    )
     stats.add_argument("file", type=Path)
     expire = commands.add_parser(
         "expire",
@@ -234,6 +240,16 @@ def main(argv: list[str] | None = None) -> int:
             f"hot rows {result.get('hot_rows')}",
             file=sys.stderr,
         )
+    if isinstance(result, dict) and args.command == "stats":
+        unknown_by_engine = result.get("species_unknown_by_engine") or {}
+        listed = (
+            ", ".join(
+                f"{engine} {count}"
+                for engine, count in sorted(unknown_by_engine.items())
+            )
+            or "0"
+        )
+        print(f"species-unknown rows: {listed} per engine", file=sys.stderr)
     if isinstance(result, dict) and args.command == "migrate" and result.get("migrated"):
         unknown_by_engine = result.get("species_unknown_by_engine") or {}
         listed = (

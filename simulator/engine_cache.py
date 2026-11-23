@@ -1890,6 +1890,9 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
         raise
     _CONNECTIONS[key] = connection
     _BLOOMS[connection] = _build_bloom(connection)
+    # A new connection is a new view of the file. The presence memo is
+    # per connection generation so a reopened file is checked again.
+    _note_new_species_presence_connection()
     return connection
 
 
@@ -1958,6 +1961,156 @@ def _is_refusal(result: Any) -> bool:
     )
 
 
+# Process memo of HOT keys whose species side row is known to exist.
+# A warm score hits each key once on disk and then again after the
+# 65536-entry result cache evicts it. The memo is what makes the
+# existence check once per key per connection, not once per hit.
+_SPECIES_PRESENT: set[bytes] = set()
+_SPECIES_PRESENT_GENERATION = 0
+_SPECIES_PRESENT_SEEN_PID = 0
+_SPECIES_PRESENT_SEEN_GENERATION = 0
+# Indexed existence checks actually run. A memo hit does not increment.
+_SPECIES_PRESENCE_CHECKS = 0
+
+
+def _note_new_species_presence_connection() -> None:
+    global _SPECIES_PRESENT_GENERATION
+    _SPECIES_PRESENT_GENERATION += 1
+
+
+def _species_present_keys() -> set[bytes]:
+    """Keys known to have a species side row for the open connection."""
+
+    global _SPECIES_PRESENT_SEEN_PID, _SPECIES_PRESENT_SEEN_GENERATION
+    pid = os.getpid()
+    generation = _SPECIES_PRESENT_GENERATION
+    if (
+        pid != _SPECIES_PRESENT_SEEN_PID
+        or generation != _SPECIES_PRESENT_SEEN_GENERATION
+    ):
+        _SPECIES_PRESENT.clear()
+        _SPECIES_PRESENT_SEEN_PID = pid
+        _SPECIES_PRESENT_SEEN_GENERATION = generation
+    return _SPECIES_PRESENT
+
+
+def _is_blake2b_cache_key(key: bytes) -> bool:
+    """True for the flag ``species_from_natural_key`` treats as unreadable.
+
+    That function owns the flag's meaning (None, not an empty set). The
+    byte test stays here as well so a store of a natural key that named
+    nothing does not unpack the key to decide it needs no marker. The
+    two agree: flag 0xff at byte 3, and only there.
+    """
+
+    return len(key) >= _ENGINE_CACHE_KEY_PREFIX_BYTES and key[3] == 0xFF
+
+
+def _record_output_species(
+    connection: sqlite3.Connection,
+    source_box: str,
+    row_seq: int,
+    digest: bytes,
+    species: frozenset[str],
+) -> None:
+    """Write the side rows a store writes for one request.
+
+    ``species`` is the set ``cache_request_species`` returned. An empty
+    set on a blake2b key is a request that named nothing: one side row
+    whose species text is empty marks it known-empty. expire --species
+    matches stored names, and ``_casefolded_species_name`` rejects the
+    empty string, so that marker is not a species and the row survives.
+    A natural key that named nothing stays with no side row, because
+    ``species_from_natural_key`` can still read it. Callers pass None
+    by not calling this, which leaves a loaded blake2b key unknown.
+    """
+
+    if species:
+        _write_output_species(connection, source_box, row_seq, species)
+        return
+    if _is_blake2b_cache_key(digest):
+        # Same flag ``species_from_natural_key`` treats as unreadable.
+        # Without this row the key is indistinguishable from a migrated
+        # digest, and the next expire --species would delete a request
+        # that named nothing.
+        connection.execute(
+            f"INSERT INTO {_SPECIES_TABLE}(source_box, row_seq, species) VALUES (?,?,?)",
+            (source_box, row_seq, ""),
+        )
+
+
+def _species_side_row_present(
+    connection: sqlite3.Connection, source_box: str, row_seq: int
+) -> bool:
+    """One indexed probe. The primary key leads with (source_box, row_seq)."""
+
+    global _SPECIES_PRESENCE_CHECKS
+    _SPECIES_PRESENCE_CHECKS += 1
+    found = connection.execute(
+        f"SELECT 1 FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=? LIMIT 1",
+        (source_box, row_seq),
+    ).fetchone()
+    return found is not None
+
+
+def _backfill_input_species_on_hit(
+    connection: sqlite3.Connection,
+    cache_key: bytes,
+    source_box: str,
+    row_seq: int,
+    request: Any,
+    *,
+    readonly: bool,
+) -> bool:
+    """Record the request's species when this HOT row has no side row.
+
+    Returns False only when a writable hit failed to write, so the caller
+    does not keep the result in the process cache and the next hit retries.
+    A read-only cache never writes. The cached value is not consulted:
+    a refusal hit carries no input composition, and species come from
+    ``request``, which is the value that formed the key. A request that
+    is not a mapping, or whose species fields cannot be read, is left
+    unknown rather than marked known-empty.
+    """
+
+    present = _species_present_keys()
+    if cache_key in present:
+        return True
+    if _species_side_row_present(connection, source_box, row_seq):
+        present.add(cache_key)
+        return True
+    if readonly or not isinstance(request, Mapping):
+        return True
+    try:
+        species = cache_request_species(request)
+    except EngineCacheSpeciesError:
+        return True
+    if not species and not _is_blake2b_cache_key(cache_key):
+        return True
+    try:
+        if connection.in_transaction:
+            connection.commit()
+        connection.execute("BEGIN IMMEDIATE")
+        _record_output_species(connection, source_box, row_seq, cache_key, species)
+        connection.commit()
+    except sqlite3.IntegrityError:
+        # The empty marker's primary key lost a race. The row is known.
+        try:
+            connection.rollback()
+        except sqlite3.Error:
+            pass
+        present.add(cache_key)
+        return True
+    except sqlite3.Error:
+        try:
+            connection.rollback()
+        except sqlite3.Error:
+            pass
+        return False
+    present.add(cache_key)
+    return True
+
+
 def _insert_cache_row_if_absent(
     connection: sqlite3.Connection,
     digest: bytes,
@@ -1972,15 +2125,11 @@ def _insert_cache_row_if_absent(
 ) -> tuple[bool, bool]:
     """Insert one output only when absent; report whether existing bytes conflict.
 
-    ``species`` is recorded only for a new row. None leaves the side table
-    alone so a merge can copy the source rows, and so a loaded blake2b key
-    stays species-unknown: this loader did not see the request. An empty
-    set on a blake2b key is a request that named nothing. One side row with
-    an empty species text marks it known-empty. expire --species matches
-    stored names, and ``_casefolded_species_name`` rejects the empty string,
-    so that marker is not a species and the row survives. A natural key
-    that named nothing has flag 0x00 and stays with no side row, because
-    ``species_from_natural_key`` can still read it.
+    ``species`` is recorded only for a new row, by ``_record_output_species``.
+    None leaves the side table alone so a merge can copy the source rows,
+    and so a loaded blake2b key stays species-unknown: this loader did not
+    see the request. A hit of that row records the species once the
+    request is in hand.
     """
     row = connection.execute(
         f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (digest,)
@@ -2010,21 +2159,8 @@ def _insert_cache_row_if_absent(
             provenance_id,
         ),
     )
-    if species:
-        _write_output_species(connection, source_box, row_seq, species)
-    elif (
-        species is not None
-        and len(digest) >= _ENGINE_CACHE_KEY_PREFIX_BYTES
-        and digest[3] == 0xFF
-    ):
-        # Same flag ``species_from_natural_key`` treats as unreadable.
-        # Without this row the key is indistinguishable from a migrated
-        # digest, and the next expire --species would delete a request
-        # that named nothing.
-        connection.execute(
-            f"INSERT INTO {_SPECIES_TABLE}(source_box, row_seq, species) VALUES (?,?,?)",
-            (source_box, row_seq, ""),
-        )
+    if species is not None:
+        _record_output_species(connection, source_box, row_seq, digest, species)
     return True, False
 
 
@@ -3039,7 +3175,9 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     answer. Serving it in tests is valid. CI uses the runner file read-only
     by default. Only ``engine_cache_off`` tests opt out. A stored exact
     output or cacheable-refusal row wins over a mask cell. The mask applies
-    only to a key that has no exact row.
+    only to a key that has no exact row. A HOT hit with no species side row
+    backfills the request species through the store's writer. A read-only
+    cache does not write, and a refusal-mask hit has no output species row.
     """
 
     if _CACHE_BYPASSED.get():
@@ -3125,7 +3263,8 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     with _LOCK:
         try:
             row = None if connection is None or _definitely_absent(connection, cache_key) else connection.execute(
-                f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (cache_key,)
+                f"SELECT value, provenance_id, source_box, row_seq FROM {_TABLE} WHERE key=?",
+                (cache_key,),
             ).fetchone()
         except sqlite3.Error:
             counts["read_error"] += 1
@@ -3138,9 +3277,18 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 row = None
             else:
                 # Exact row, including a stored cacheable refusal. It wins
-                # over any mask cell that covers this request.
+                # over any mask cell that covers this request. Species are
+                # recovered from the request that formed this exact key.
                 counts["hits"] += 1
-                _remember_memory_value(memory_key, result)
+                if _backfill_input_species_on_hit(
+                    connection,
+                    cache_key,
+                    str(row[2]),
+                    int(row[3]),
+                    request,
+                    readonly=readonly,
+                ):
+                    _remember_memory_value(memory_key, result)
                 return result
 
     version = str(chem_version)
@@ -3318,7 +3466,13 @@ def _cache_space(connection: sqlite3.Connection, schema: str, table: str) -> dic
 
 
 def engine_cache_stats(path: Path) -> dict[str, Any]:
-    """Allocated SQLite bytes, including pages currently in WAL, per stored row."""
+    """Allocated SQLite bytes, including pages currently in WAL, per stored row.
+
+    ``species_unknown_by_engine`` counts blake2b rows that still have no
+    species side row. A natural key is not unknown: its request can be
+    read. The open is read-only. Engines with rows and no such digest
+    are present with 0.
+    """
     with _read_cache(path) as (connection, has_cold):
         return {
             "file": str(path),
@@ -3326,6 +3480,7 @@ def engine_cache_stats(path: Path) -> dict[str, Any]:
             "cold": _cache_space(connection, "cold", "engine_values") if has_cold else {
                 "rows": 0, "database_bytes": 0, "bytes_per_row": None,
             },
+            "species_unknown_by_engine": _species_unknown_by_engine(connection),
         }
 
 
@@ -4493,14 +4648,60 @@ def expire_cache_file(
         connection.close()
 
 
+def _rows_missing_species_side(
+    connection: sqlite3.Connection, engine: str | None = None
+):
+    """HOT rows with no species side row. The side-table primary key serves this."""
+
+    sql = (
+        f"SELECT e.engine, e.source_box, e.row_seq, e.key FROM {_TABLE} e "
+        f"WHERE NOT EXISTS ("
+        f"SELECT 1 FROM {_SPECIES_TABLE} s "
+        "WHERE s.source_box=e.source_box AND s.row_seq=e.row_seq)"
+    )
+    params: tuple[str, ...] = ()
+    if engine is not None:
+        sql += " AND e.engine=?"
+        params = (engine,)
+    return connection.execute(sql, params)
+
+
+def _missing_side_row_is_species_unknown(key: bytes) -> bool | None:
+    """Classify a row that has no species side row.
+
+    True is the blake2b fallback: ``species_from_natural_key`` returns
+    None, and expire deletes the row because its inputs cannot be shown.
+    False is a natural key, including one that named nothing. None is a
+    flag expire counts and leaves. Migrate's transform calls
+    ``species_from_natural_key`` itself because it also writes the
+    natural-key side rows; it is not a second classifier.
+    """
+
+    try:
+        species = species_from_natural_key(key)
+    except EngineCacheSpeciesError:
+        return None
+    return species is None
+
+
+def _species_unknown_by_engine(connection: sqlite3.Connection) -> dict[str, int]:
+    """Blake2b rows with no side row, per engine that has any HOT row."""
+
+    counts = {engine: 0 for engine in _rows_by_engine(connection)}
+    for engine, _source_box, _row_seq, key in _rows_missing_species_side(connection):
+        if _missing_side_row_is_species_unknown(bytes(key)) is True:
+            name = str(engine)
+            counts[name] = counts.get(name, 0) + 1
+    return counts
+
+
 def _species_unknown_pairs(
     connection: sqlite3.Connection, engine: str
 ) -> tuple[list[tuple[str, int]], int]:
     """Digest keys of one engine that recorded no species, and the rest.
 
-    ``species_from_natural_key`` returns None only for the blake2b fallback.
-    Migrate uses that same result to count digest keys and to skip species
-    rows. A store of a blake2b request that named nothing writes an empty
+    ``_missing_side_row_is_species_unknown`` is the classifier stats uses.
+    A store of a blake2b request that named nothing writes an empty
     species marker, so that row has a side row and is not selected here.
     A natural key that named no species returns an empty set and stays.
     A flag other than 0x00 or 0xff is counted and left. Deleting it would
@@ -4508,22 +4709,15 @@ def _species_unknown_pairs(
     would abort the expire before any other row was removed.
     """
 
-    rows = connection.execute(
-        f"SELECT e.source_box, e.row_seq, e.key FROM {_TABLE} e "
-        f"WHERE e.engine=? AND NOT EXISTS ("
-        f"SELECT 1 FROM {_SPECIES_TABLE} s "
-        "WHERE s.source_box=e.source_box AND s.row_seq=e.row_seq)",
-        (engine,),
-    ).fetchall()
     found: list[tuple[str, int]] = []
     unclassifiable = 0
-    for source_box, row_seq, key in rows:
-        try:
-            species = species_from_natural_key(bytes(key))
-        except EngineCacheSpeciesError:
+    for _engine, source_box, row_seq, key in _rows_missing_species_side(
+        connection, engine
+    ):
+        kind = _missing_side_row_is_species_unknown(bytes(key))
+        if kind is None:
             unclassifiable += 1
-            continue
-        if species is None:
+        elif kind:
             found.append((str(source_box), int(row_seq)))
     return found, unclassifiable
 
