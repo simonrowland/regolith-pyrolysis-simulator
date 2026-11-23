@@ -322,6 +322,28 @@ def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: P
         ({"published_page": 532}, False, False),
         ({"pdf_page_index": 3}, False, False),
         ({"published_page": 532, "pdf_page_index": True}, False, False),
+        (
+            {"published_page": 532, "pdf_page_index": 3},
+            False,
+            False,
+        ),
+        (
+            {
+                "published_page": "oxygen statement",
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            False,
+        ),
+        (
+            {
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            False,
+        ),
     ):
         control.clear()
         control.update(original)
