@@ -53,6 +53,7 @@ from collections import deque
 from dataclasses import dataclass
 import logging
 import math
+import sys
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Sequence, Tuple
@@ -9884,9 +9885,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # and it is not posted through a negative balance.
             signed_after_mol = signed_after_settle_mol
             available_mol = max(0.0, signed_after_mol)
+            roundoff_terms = (
+                buffer_release.get("n_open"),
+                buffer_release.get("n_credit"),
+                buffer_release.get("n_debit"),
+                buffer_release.get("n_uptake"),
+                signed_after_mol,
+            )
+            roundoff_magnitude_mol = math.fsum(
+                abs(float(term))
+                for term in roundoff_terms
+                if term is not None
+            )
+            # Premise: the residual compares a signed sum of these five
+            # mol terms. Four additions, each at most 0.5 ulp of a running
+            # magnitude no larger than M, bound roundoff by 2 eps M. Thus
+            # k = 2. M is mol and eps is dimensionless, so the slack is mol.
+            # At M ≈ 10 mol, the bound is 4.44e-15 mol, above the walk's
+            # 1.78e-15 mol (two ulp at 5.09 mol).
+            roundoff_slack_mol = max(
+                OXYGEN_RESERVOIR_NOOP_MOL,
+                2 * sys.float_info.epsilon * roundoff_magnitude_mol,
+            )
             if (
                 excess_integrated
-                > available_mol + OXYGEN_RESERVOIR_NOOP_MOL
+                > available_mol + roundoff_slack_mol
             ):
                 holder = state.get('extent_holder')
                 path = None

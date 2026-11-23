@@ -1689,3 +1689,61 @@ def test_hour22_buffer_stays_nonnegative_and_overdraw_refuses():
     assert refusal.buffer_o2_mol_signed is not None
     assert _buffer_mol(sim) > 0.0
     assert _buffer_mol(sim) + 1.0e-15 >= refusal.buffer_o2_mol_signed
+
+
+def test_buffer_release_roundoff_scales_with_stock_but_material_overdraw_refuses():
+    """A two-ulp stock mismatch at five mol is roundoff, not a leak.
+
+    Mutation: restoring the absolute 1e-15 mol slack refuses the first
+    hour because its two-ulp mismatch is 1.78e-15 mol. A 1e-9 mol
+    shortfall remains a real overdraw and must still refuse.
+    """
+
+    opening_pa = 27.174056558659704
+    molar = MOLAR_MASS["O2"] / 1000.0
+
+    def _run_with_shortfall(shortfall_mol: float):
+        sim = _sim(CampaignPhase.C4, 1170.0, 20.0)
+        _seed_pa(sim, OXYGEN_SPECIES, opening_pa, "hour-21 close")
+        _set_buffer_kg(sim, 5.04514324972239 * molar)
+        settle = sim._settle_evaporative_redox_after_batch
+
+        def settle_with_shortfall(*args, **kwargs):
+            result = settle(*args, **kwargs)
+            balances = sim.atom_ledger._balances.setdefault(
+                FO2_BUFFER_ACCOUNT, {}
+            )
+            balances[OXYGEN_SPECIES] = (
+                float(balances.get(OXYGEN_SPECIES, 0.0) or 0.0)
+                - shortfall_mol
+            )
+            return result
+
+        sim._settle_evaporative_redox_after_batch = settle_with_shortfall
+        try:
+            sim._step_one_hour()
+        except CapacityCouplingRefusalError as exc:
+            return sim, exc.refusal
+        return sim, None
+
+    sim, refusal = _run_with_shortfall(2.0 * math.ulp(5.0))
+    assert refusal is None
+    release = next(
+        row
+        for row in sim._headspace_species_notices
+        if row.get("reason") == "headspace_buffer_release"
+    )
+    mismatch = (
+        release["excess_integrated"]
+        - release["fo2_buffer_after_settle_mol"]
+    )
+    assert mismatch == 2.0 * math.ulp(5.0)
+    assert math.ulp(release["excess_integrated"]) == math.ulp(5.0)
+
+    _sim_overdraw, refusal = _run_with_shortfall(1.0e-9)
+    assert refusal is not None
+    assert refusal.reason == "headspace_buffer_release_exceeds_inventory"
+    assert (
+        refusal.buffer_release["excess_integrated"]
+        - refusal.buffer_release["fo2_buffer_after_settle_mol"]
+    ) > 0.99e-9
