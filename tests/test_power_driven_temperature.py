@@ -23,6 +23,7 @@ from simulator.thermal_budget import (
     SOLAR_ABSORPTANCE_DEFAULT,
     WINDOW_TRANSMITTANCE_UPPER_BOUND,
     PowerTemperatureRefusal,
+    absorbed_focal_power_W,
     furnace_power_driver_payload,
     measured_furnace_power_trace,
     melt_temperature_from_furnace_power,
@@ -134,6 +135,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert record["focal_power_W"] == pytest.approx(watts[1.0])
     assert record["intercept"] == pytest.approx(0.4225)
     assert record["solar_absorptance"] == pytest.approx(SOLAR_ABSORPTANCE_DEFAULT)
+    assert record["solar_absorptance"] == pytest.approx(0.7875)
     assert record["window_transmittance"] == pytest.approx(
         WINDOW_TRANSMITTANCE_UPPER_BOUND
     )
@@ -385,6 +387,19 @@ def test_uniform_disk_intercept_books_the_printed_13_mm_pellet():
     assert record["surroundings_K"] == pytest.approx(0.0)
 
 
+def test_pellet_larger_than_focal_spot_intercepts_the_focal_power_once():
+    absorbed, intercept = absorbed_focal_power_W(
+        1000.0,
+        pellet_diameter_m=0.030,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=1.0,
+        window_transmittance=1.0,
+    )
+
+    assert intercept == pytest.approx(1.0)
+    assert absorbed == pytest.approx(1000.0)
+
+
 def test_one_focal_diameter_without_the_other_refuses():
     with pytest.raises(PowerTemperatureRefusal) as missing_spot:
         solve_power_driven_melt_temperature_C(
@@ -566,13 +581,11 @@ def test_printed_face_areas_match_the_investigation_with_holder_and_argon():
     assert default_k["sensitivity"]["temperature_C"] == pytest.approx(
         solved[0.85]["sensitivity"]["temperature_C"]
     )
-    # Gaier midpoint sits between the published band endpoints.
+    # The Gaier midpoint is 0.7875; its independently recomputed hot-upper
+    # root is 2025.77 °C, rounded to the 2026 °C default.
     midpoint = _peak_pellet(solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT)
-    assert (
-        solved[0.669]["temperature_C"]
-        < midpoint["temperature_C"]
-        < solved[0.906]["temperature_C"]
-    )
+    assert SOLAR_ABSORPTANCE_DEFAULT == pytest.approx(0.7875)
+    assert midpoint["temperature_C"] == pytest.approx(2026.0, abs=0.5)
 
 
 def test_holder_series_is_not_the_cold_boundary():
