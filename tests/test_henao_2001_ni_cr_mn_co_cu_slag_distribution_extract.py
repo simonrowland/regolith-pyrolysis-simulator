@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.migrate import Migrator
+from simulator.state_types import State
 from simulator.battery.score import _predict_with_engine
 
 
@@ -252,6 +253,38 @@ def _assert_slag_compositions_remain_unknown(document: dict) -> None:
             assert locator["row"] == row["locator"]["row"]
 
 
+def _assert_henao_pressure_pins(experiments: dict, observations: list) -> None:
+    henao_experiments = [
+        row
+        for row in experiments.values()
+        if row.experiment_id.startswith(
+            "10.2320/matertrans.42.1959::experiment::henao:"
+        )
+    ]
+    assert len(henao_experiments) == 55
+    assert all(
+        row.pressure_environment.total_pressure_Pa.state.is_value
+        and row.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101300")
+        and row.pressure_environment.total_pressure_Pa.locator is not None
+        and row.pressure_environment.total_pressure_Pa.locator.pdf_page_index == 0
+        and row.pressure_environment.total_pressure_Pa.locator.published_page == "1959"
+        for row in henao_experiments
+    )
+    assert all(
+        row.pressure_environment.sweep_gas.state.is_value
+        and row.pressure_environment.sweep_gas.state.value.species == "CO-CO2"
+        and row.pressure_environment.sweep_gas.state.value.flow_sccm.is_unknown
+        and row.pressure_environment.sweep_gas.state.value.partial_pressure_Pa.is_unknown
+        for row in henao_experiments
+    )
+    assert all(
+        row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("101300")
+        for row in observations
+    )
+
+
 def test_printed_phase_assays_are_bound_and_iron_valence_stays_unknown() -> None:
     document = _document()
     _assert_composition_bindings(document)
@@ -296,12 +329,40 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     assert all(row.admission.status.value == "admitted" for row in observations)
     assert not [entry for entry in result.queue if entry.source.endswith(EXTRACT.name)]
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
-    assert all(
-        row.identity.total_pressure_Pa is not None
-        and row.identity.total_pressure_Pa.is_value
-        and row.identity.total_pressure_Pa.value == Decimal("101300")
-        for row in observations
+    _assert_henao_pressure_pins(result.experiments, observations)
+    mutated_experiments = dict(result.experiments)
+    pressure_experiment = next(
+        row
+        for row in result.experiments.values()
+        if row.experiment_id.startswith(
+            "10.2320/matertrans.42.1959::experiment::henao:"
+        )
     )
+    pressure_record = pressure_experiment.pressure_environment.total_pressure_Pa
+    mutated_experiments[pressure_experiment.experiment_id] = replace(
+        pressure_experiment,
+        pressure_environment=replace(
+            pressure_experiment.pressure_environment,
+            total_pressure_Pa=replace(
+                pressure_record,
+                state=State.unknown("pressure mutation"),
+            ),
+        ),
+    )
+    mutated_observations = [
+        replace(
+            row,
+            identity=replace(
+                row.identity,
+                total_pressure_Pa=State.unknown("pressure mutation"),
+            ),
+        )
+        if row.experiment_id == pressure_experiment.experiment_id
+        else row
+        for row in observations
+    ]
+    with pytest.raises(AssertionError):
+        _assert_henao_pressure_pins(mutated_experiments, mutated_observations)
     henao_experiments = [
         row
         for row in result.experiments.values()
@@ -309,22 +370,6 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
             "10.2320/matertrans.42.1959::experiment::henao:"
         )
     ]
-    assert len(henao_experiments) == 55
-    assert all(
-        row.pressure_environment.total_pressure_Pa.state.is_value
-        and row.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101300")
-        and row.pressure_environment.total_pressure_Pa.locator is not None
-        and row.pressure_environment.total_pressure_Pa.locator.pdf_page_index == 0
-        and row.pressure_environment.total_pressure_Pa.locator.published_page == "1959"
-        for row in henao_experiments
-    )
-    assert all(
-        row.pressure_environment.sweep_gas.state.is_value
-        and row.pressure_environment.sweep_gas.state.value.species == "CO-CO2"
-        and row.pressure_environment.sweep_gas.state.value.flow_sccm.is_unknown
-        and row.pressure_environment.sweep_gas.state.value.partial_pressure_Pa.is_unknown
-        for row in henao_experiments
-    )
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
     # The unprinted slag iron valence leaves slag compositions unknown; alloy
@@ -450,6 +495,28 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
         prediction.execution.state.value == "unsupported"
         for prediction in metal_engine_outcomes
     )
+    engine_ready_metal = replace(
+        a1_metal,
+        identity=replace(
+            a1_metal.identity,
+            composition=State.of(
+                replace(
+                    a1_metal.identity.composition.value,
+                    basis="oxide_mole_fraction",
+                    components=(
+                        ("FeO", Decimal("0.5")),
+                        ("SiO2", Decimal("0.5")),
+                    ),
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                )
+            ),
+        ),
+    )
+    assert _predict_with_engine(
+        Engine.THERMOENGINE,
+        engine_ready_metal,
+        experiment=result.experiments[engine_ready_metal.experiment_id],
+    ).refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
     assert all(row.locator and row.locator.page and row.locator.published_page for row in observations)
     migrated_contexts = [
         context
