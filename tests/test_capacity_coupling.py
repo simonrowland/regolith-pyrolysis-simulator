@@ -5538,3 +5538,79 @@ def test_y_dependent_source_inside_the_gate_follows_the_ode():
     assert _frozen_notices(result) == []
     assert result.partial_pressures_Pa["A"] == pytest.approx(ode_pa, abs=1.0e-6)
     assert abs(result.partial_pressures_Pa["A"] - frozen_pa) > 1.0e-6
+
+
+def test_frozen_composition_falls_back_for_growing_sources_only():
+    """The end-sample slope gates unstable sources without rejecting restoring ones.
+
+    Mutation: deleting the lambda > 1 guard leaves the review's 8000-slope
+    false pass on frozen_composition; rejecting lambda <= 1 also rejects
+    the restoring source, whose bound is below tolerance.
+    """
+
+    temperature_K = _FROZEN_T_K
+    downstream_pa = _FROZEN_DOWNSTREAM_PA
+    mass = 0.032
+    masses = {"A": mass, "B": mass}
+    root_pa = downstream_pa + _FROZEN_OFFSET_PA
+    y0 = 0.5
+    fractions = {"A": y0, "B": 1.0 - y0}
+    n_star = _moles_at_pressure(root_pa, fractions, temperature_K)
+    s_total = _pipe_mol_s_at(
+        root_pa, n_star, temperature_K, masses, downstream_pa,
+    )
+    tau = math.fsum(n_star.values()) / s_total
+    ratio = 9.9e-4
+    dt_s = tau * ratio
+    s0 = 0.5000006376868968
+    assert ratio < capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+
+    for source_slope, expected_path in (
+        (8000.0, "radau_fallback"),
+        (-1.0, "frozen_composition"),
+    ):
+        holder: dict = {}
+
+        def flux(partials, *, slope=source_slope):
+            total = math.fsum(
+                float(partials.get(name, 0.0)) for name in masses
+            )
+            y_a = (
+                0.0
+                if total <= 0.0
+                else float(partials.get("A", 0.0)) / total
+            )
+            source_a = s0 + slope * (y_a - y0)
+            return {
+                "A": source_a * s_total * mass * 3600.0,
+                "B": (1.0 - source_a) * s_total * mass * 3600.0,
+            }
+
+        def storing(partials, *, rates=flux, store=holder):
+            gross = rates(partials)
+            store["gross_kg_hr"] = dict(gross)
+            return gross
+
+        result = _as_result(solve_capacity_shadow(
+            pre_holdup_mol=n_star,
+            molar_mass_kg_mol=masses,
+            flux_kg_hr_at_partials=storing,
+            capacity=NoColdTrain("runtime_enforcement_disabled"),
+            head_bled_species_mol={},
+            external_o2_holdup_mol=0.0,
+            temperature_K=temperature_K,
+            volume_m3=_HS_V_M3,
+            dt_hr=dt_s / 3600.0,
+            bleed_conductance_kg_s=0.0,
+            downstream_pressure_Pa=downstream_pa,
+            k_relief_kg_hr_Pa=0.0,
+            p_open_Pa=1.0,
+            pipe_diameter_m=_HS_D_M,
+            pipe_length_m=_HS_L_M,
+            extent_holder=holder,
+        ))
+        assert holder["_balance_terms"]["path"] == expected_path
+        if source_slope < 0.0:
+            assert len(_frozen_notices(result)) == 1
+        else:
+            assert _frozen_notices(result) == []

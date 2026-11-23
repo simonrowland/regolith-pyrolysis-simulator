@@ -5519,7 +5519,29 @@ def _frozen_composition_hour(
         _refuse_unless_work_or_roots(refused)
         return None
     for name in law.species:
-        delta_s = abs(float(end_inflow[name]) - float(inflow[name]))
+        start_y = float(fractions[name])
+        end_y = float(end_fractions[name])
+        delta_y = end_y - start_y
+        delta_s_signed = float(end_inflow[name]) - float(inflow[name])
+        y_resolution = sys.float_info.epsilon * max(
+            1.0, abs(start_y), abs(end_y),
+        )
+        if abs(delta_y) <= y_resolution:
+            # Fractions are dimensionless in [0, 1], so this change is
+            # below one ulp at their scale. Treat its unresolved slope as
+            # zero; the bound below still uses the measured |Δs|.
+            lambda_i = 0.0
+        else:
+            lambda_i = delta_s_signed / (s_sum * delta_y)
+        # Premise: the composition perturbation evolves at rate (lambda − 1)/tau.
+        # Algebra: over r = dt/tau its factor is exp((lambda − 1) r), so
+        # it grows only for lambda > 1; there the endpoint triangle can
+        # underbound integrated error and this hour must use Radau.
+        # Unit check: lambda and r are dimensionless. Limit: lambda = 1
+        # is neutral, while a restoring lambda = −1 decays as exp(−2 r).
+        if not math.isfinite(lambda_i) or lambda_i > 1.0:
+            return _slow_converge(law, n0, dt_s)
+        delta_s = abs(delta_s_signed)
         mole_err = delta_s * t_rem / 2.0
         bound_pa = mole_err * pa_per_mol
         partial_pa = abs(float(end_fractions[name]) * float(root))
