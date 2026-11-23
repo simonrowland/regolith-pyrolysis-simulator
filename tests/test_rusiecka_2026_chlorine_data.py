@@ -122,10 +122,22 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             for name, _value in point_composition.inference.parameters
         )
         assert row.identity.temperature_K.is_value
-        for condition_name in ("total_pressure_Pa", "fO2_bar", "fCl2_bar"):
+        fO2_condition_name = (
+            "fO2_Pa" if 81 <= row_number <= 96 else "fO2_bar"
+        )
+        for condition_name in (
+            "total_pressure_Pa",
+            fO2_condition_name,
+            "fCl2_bar",
+        ):
             condition = row.point_conditions[condition_name]
             assert condition.state.is_value
             assert condition.locator is not None
+        if 81 <= row_number <= 96:
+            assert row.identity.fO2_Pa.is_value
+            assert row.identity.fO2_Pa.value == Decimal(
+                source["point_conditions"]["fO2_Pa"]["state"]["value"]
+            )
     mutated_doc = deepcopy(doc)
     mutated_si = next(
         observation
@@ -220,7 +232,17 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == Decimal(str(ws.cell(row_number, 20).value)) + Decimal("273.15")
         assert row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.fO2_Pa.is_unknown
+        if 81 <= row_number <= 96:
+            expected_fO2_pa = _displayed_decimal(ws.cell(row_number, 25)) * Decimal(
+                "100000"
+            )
+            assert row.identity.fO2_Pa.is_value
+            assert row.identity.fO2_Pa.value == expected_fO2_pa
+            assert row.point_conditions["fO2_Pa"].state.value == expected_fO2_pa
+            assert row.point_conditions["fO2_Pa"].locator is not None
+            assert "fO2_bar" not in row.point_conditions
+        else:
+            assert row.identity.fO2_Pa.is_unknown
         assert row.experiment_id.endswith(f"::experiment::worksheet-row-{row_number}")
         assert row.point_conditions["total_pressure_Pa"].state.value == (
             _displayed_decimal(ws.cell(row_number, 21)) * Decimal("1000000000")
@@ -266,10 +288,16 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
             _displayed_decimal(ws.cell(row_number, 21)) * Decimal("1000000000")
         )
         assert row.point_conditions["total_pressure_Pa"].locator is not None
-        assert row.point_conditions["fO2_bar"].state.value == _displayed_decimal(
-            ws.cell(row_number, 25)
-        )
-        assert row.point_conditions["fO2_bar"].locator is not None
+        if 81 <= row_number <= 96:
+            assert row.point_conditions["fO2_Pa"].state.value == (
+                _displayed_decimal(ws.cell(row_number, 25)) * Decimal("100000")
+            )
+            assert row.point_conditions["fO2_Pa"].locator is not None
+        else:
+            assert row.point_conditions["fO2_bar"].state.value == _displayed_decimal(
+                ws.cell(row_number, 25)
+            )
+            assert row.point_conditions["fO2_bar"].locator is not None
         assert row.point_conditions["fCl2_bar"].state.value == _displayed_decimal(
             ws.cell(row_number, 24)
         )
@@ -502,3 +530,170 @@ def test_companion_table2_locator_and_sample_list_disagreement() -> None:
     assert "DCB-6" not in page
     assert "6.08E-06" in page
     assert "4.44E-11" in page
+
+
+def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None:
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+
+    doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    article_pdf = (
+        regolith_corpus_root()
+        / "raw"
+        / "rusiecka-wood-2026-chlorine-hcl"
+        / "rusiecka-wood-2026-chlorine-hcl.pdf"
+    )
+    if not article_pdf.is_file():
+        pytest.skip(f"companion paper PDF is absent: {article_pdf}")
+    table_page = subprocess.run(
+        ["pdftotext", "-f", "2", "-l", "2", "-layout", str(article_pdf), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    quench_page = subprocess.run(
+        ["pdftotext", "-f", "3", "-l", "3", "-layout", str(article_pdf), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    assert "Table 1 Anhydrous compositions of the starting materials" in table_page
+    assert "Page 2 of 15" in table_page
+    for render_pin in ("62.49", "77.30", "5.36", "22.65"):
+        assert render_pin in table_page
+    assert "The charges contained glass" in quench_page
+    assert "Page 3 of 15" in quench_page
+    expected_rows = {
+        81: "AND",
+        82: "HSR",
+        83: "AND",
+        84: "AND",
+        85: "AND",
+        86: "AND",
+        87: "AND",
+        88: "DCB",
+        89: "DCB",
+        90: "DCB-Al",
+        91: "DCB",
+        92: "DCB",
+        93: "HSR",
+        94: "HSR",
+        95: "DCB",
+        96: "DCB",
+    }
+    printed = {
+        "AND": {
+            "SiO2": "62.49", "TiO2": "0.62", "Al2O3": "18.20", "FeOT": "3.99",
+            "MgO": "3.47", "CaO": "6.85", "Na2O": "3.35", "K2O": "1.03",
+        },
+        "HSR": {
+            "SiO2": "77.30", "TiO2": "0.13", "Al2O3": "12.77", "FeOT": "1.62",
+            "MgO": "0.12", "CaO": "1.02", "Na2O": "3.52", "K2O": "3.46",
+        },
+        "DCB": {
+            "SiO2": "66.76", "TiO2": "1.02", "Al2O3": "14.62", "FeOT": "5.36",
+            "MgO": "1.42", "CaO": "4.02", "Na2O": "4.64", "K2O": "2.16",
+        },
+        "DCB-Al": {
+            "SiO2": "64.49", "TiO2": "1.01", "Al2O3": "22.65", "FeOT": "1.24",
+            "MgO": "1.67", "CaO": "4.14", "Na2O": "3.33", "K2O": "1.47",
+        },
+    }
+    source_experiments = {
+        int(run["experiment_id"].removeprefix("worksheet-row-")): run
+        for run in doc["experiments"]
+        if run["experiment_id"].startswith("worksheet-row-")
+        and int(run["experiment_id"].removeprefix("worksheet-row-")) in expected_rows
+    }
+    assert set(source_experiments) == set(expected_rows)
+
+    for row_number, sample_code in expected_rows.items():
+        initial = source_experiments[row_number]["sample"]["initial_composition"]
+        assert initial["state"]["value"]["components"] == printed[sample_code]
+        assert initial["locator"]["page"] == 2
+        assert initial["locator"]["pdf_page_index"] == 1
+        assert initial["locator"]["published_page"] == 2
+        assert initial["locator"]["table"] == "1"
+        assert initial["locator"]["row"] == sample_code
+
+    result = _migrate_real_extract(tmp_path / "starting-composition", EXTRACT_NAME)
+    assert result.validation is not None
+    assert not result.validation.hard_issues, result.validation.hard_issues
+    assert len(result.observations) == 1911
+    target_runs = []
+    for row_number, sample_code in expected_rows.items():
+        experiment = next(
+            migrated
+            for migrated in result.experiments.values()
+            if migrated.experiment_id.endswith(
+                f"::experiment::worksheet-row-{row_number}"
+            )
+        )
+        initial = experiment.sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.locator is not None
+        assert initial.locator.page == 2 and initial.locator.table == "1"
+        assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        expected = wt_pct_to_mole_fraction(
+            {name: Decimal(value) for name, value in printed[sample_code].items()}
+        )
+        assert initial.state.value.components == expected.components
+        target_runs.append(experiment.experiment_id)
+
+    phase_rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and row.experiment_id in target_runs
+    ]
+    assert len(phase_rows) == 272
+    target_source_rows = {
+        f"worksheet-row-{row_number}" for row_number in expected_rows
+    }
+    source_glass_rows = [
+        raw
+        for container in doc["species"].values()
+        for raw in container.get("observations", [])
+        if raw.get("experiment") in target_source_rows
+        and raw.get("type") == "composition_series"
+        and raw.get("values", {}).get("phase") == "glass"
+    ]
+    assert len(source_glass_rows) == 272
+    for raw in source_glass_rows:
+        quench = raw["values"]["quench_statement"]
+        assert quench["preservation"] == "not_stated"
+        assert quench["quench_direction"] == "not_stated"
+        assert quench["locator"]["page"] == 3
+        assert quench["locator"]["pdf_page_index"] == 2
+        assert quench["locator"]["published_page"] == 3
+        assert "no quench or glass-preservation statement located" in (
+            quench["locator"]["note"]
+        )
+
+    mutated_doc = deepcopy(doc)
+    mutated_and = next(
+        run
+        for run in mutated_doc["experiments"]
+        if run["experiment_id"] == "worksheet-row-81"
+    )
+    mutated_and["sample"]["initial_composition"]["state"]["value"]["components"][
+        "SiO2"
+    ] = "62.48"
+    changed_result = _migrate_real_extract(
+        tmp_path / "starting-composition-mutated",
+        EXTRACT_NAME,
+        extract_doc=mutated_doc,
+    )
+    changed_experiment = next(
+        migrated
+        for migrated in changed_result.experiments.values()
+        if migrated.experiment_id.endswith("::experiment::worksheet-row-81")
+    )
+    original_experiment = next(
+        migrated
+        for migrated in result.experiments.values()
+        if migrated.experiment_id.endswith("::experiment::worksheet-row-81")
+    )
+    assert changed_experiment.sample.initial_composition.state.value.components != (
+        original_experiment.sample.initial_composition.state.value.components
+    )

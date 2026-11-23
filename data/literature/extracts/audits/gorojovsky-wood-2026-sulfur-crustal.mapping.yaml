@@ -1,0 +1,104 @@
+source_id: gorojovsky-wood-2026-sulfur-crustal
+source_path: corpus/raw/gorojovsky-wood-2026-sulfur-crustal/gorojovsky-wood-2026-sulfur-crustal.pdf
+observable: equilibrium_phase_composition
+starting_materials:
+  locator:
+    page: 39
+    pdf_page_index: 38
+    table: '1'
+    printed_page: '845'
+  printed_caption: >-
+    Table 1. Major element compositions of starting materials used to test sulfide and sulfate solubilities
+  printed_row_count: 14
+  columns:
+    - SiO2
+    - TiO2
+    - Al2O3
+    - FeOtot
+    - MnO
+    - MgO
+    - CaO
+    - Na2O
+    - K2O
+    - Total
+  numeric_cell_count: 136
+  cell_confirmation: >-
+    Born-digital pdftotext characters are exact. Row and column assignments for the whole printed table were checked
+    against the 600 dpi page render. MinerU table conversion and QA found zero tables for this SID; therefore there is no
+    MinerU draft table to compare.
+  row_values:
+    - row: Icelandic Basalt
+      values: ['49.6', '0.92', '14.6', '9.0', '0.17', '8.7', '12.4', '2.3', '0.21', '98.2']
+    - row: Nepheline Basanite
+      values: ['43.8', '2.3', '10.9', '11.52', '0.18', '13.1', '9.4', '3.9', '1.9', '98.4']
+    - row: AJ99 Basanite
+      values: ['44.4', '3.1', '14.8', '6.3', '-', '6.6', '10.2', '4.0', '1.6', '98.6']
+    - row: High-Mg Basalt
+      values: ['45.4', '4.4', '10.4', '7.2', '0.17', '14.1', '11.4', '1.1', '0.20', '98.6']
+    - row: T-Basalt
+      values: ['47.0', '3.3', '16.4', '10.3', '0.21', '4.3', '9.4', '4.7', '1.9', '98.7']
+    - row: Phonolite
+      values: ['55.2', '0.34', '21.9', '2.8', '0.26', '0.1', '1.8', '8.2', '8.6', '99.5']
+    - row: T-Basaltic Andesite
+      values: ['56.3', '2.2', '23.3', '3.2', '1.1', '2.2', '4.7', '2.7', '3.7', '99.4']
+    - row: T-Andesite
+      values: ['57.9', '3.7', '25.2', '1.6', '0.20', '0.2', '1.9', '3.6', '5.4', '99.8']
+    - row: Foidite
+      values: ['38.2', '2.7', '18.1', '2.8', '0.25', '0.2', '1.5', '17.9', '15.9', '97.6']
+    - row: Nephelenite
+      values: ['41.7', '2.7', '14.2', '9.9', '2.5', '8.0', '13.9', '4.0', '3.2', '99.9']
+    - row: T-Phonolite
+      values: ['53.3', '1.5', '22.9', '4.4', '-', '1.9', '4.8', '7.8', '3.6', '100.4']
+    - row: Fe-Free T-Phonolite
+      values: ['58.2', '1.9', '21.6', '-', '0.11', '2.0', '5.0', '7.3', '3.0', '99.0']
+    - row: Basaltic Andesite
+      values: ['53.9', '0.61', '14.6', '6.4', '-', '9.4', '9.9', '2.8', '1.3', '99.0']
+    - row: DAC
+      values: ['64.2', '0.70', '16.8', '5.1', '0.10', '2.1', '5.6', '4.0', '1.4', '100.0']
+  experiment_linkage:
+    maps_re-stamped: 74
+    usable_initial_composition_maps: 68
+    typed_refused_high_mg_maps: 6
+    note: >-
+      Experiment sample labels match the Table 1 row labels. Four rows with printed dashes do not become complete
+      starting compositions. High-Mg Basalt has printed components summing to 94.37 wt.% versus the printed total 98.6;
+      its six experiment links remain typed-refused without normalization or filling.
+  render_fidelity_samples:
+    - row: DAC
+      column: SiO2
+      value: '64.2'
+    - row: Foidite
+      column: K2O
+      value: '15.9'
+    - row: T-Andesite
+      column: TiO2
+      value: '3.7'
+  uncertainty: No uncertainty is printed for Table 1 starting-material cells.
+observation_uncertainty:
+  zero_width_cells_restored: 35
+  value_as_published: 'measured value (0.0)'
+  confidence_level: two_sigma
+  caption_proofs:
+    - table: '2'
+      page: 40
+      pdf_page_index: 39
+      proof: 'Uncertainties (2 s.d.) are given in parentheses.'
+    - table: '3'
+      page: 41
+      pdf_page_index: 40
+      proof: 'Uncertainties (2 s.d.) are given in parentheses.'
+  remaining_no_numeric_width:
+    count: 7
+    note: >-
+      These cells lack the parentheses required by the table captions, so their adjacent numbers were not treated as
+      uncertainty widths. Ten further observations are unavailable dash rows with no numeric value or uncertainty.
+quench_statement:
+  observation_count: 936
+  source_statement: >-
+    After equilibration, charges were quenched by rapidly raising the chandelier to the cool region of the furnace.
+  preservation: not_stated
+  quench_direction: not_stated
+  locator:
+    page: 8
+    pdf_page_index: 7
+    section: Experimental procedure
