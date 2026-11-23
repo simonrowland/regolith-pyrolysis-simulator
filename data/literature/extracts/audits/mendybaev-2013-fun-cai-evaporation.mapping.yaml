@@ -216,6 +216,11 @@ migration:
     - simulator/battery/score.py::_extent_residue_prediction
   finding: The generic extract migrator derives mass_loss_fraction from the two located gram operands and drops a stale scalar when either operand is absent. Table 1's starting assays now migrate through sample.initial_composition; residue point_conditions retain the per-row assay. Both FUN experiments resolve to langmuir_free_evaporation with method_locator.
   scope_rule: One generic mass-loss operand rule lives in simulator/battery/migrate.py. The residue caller reuses integrate_knudsen_residue_inventory and the existing pressure closure; no second integrator or DP id was added.
+  source_restrictions: >-
+    The weight-derived mass_loss_fraction reducer in simulator/battery/migrate.py
+    is explicitly restricted to source_id mendybaev-2013-fun-cai-evaporation.
+    The scorer's Langmuir residue route in simulator/battery/score.py is also
+    explicitly restricted to that Mendybaev source_id.
   isolated_migration: Direct in-memory Migrator._migrate_extract plus finalize; 120 observations, 24 mass_loss_fraction and 96 residue_component_composition, 0 hard issues, 0 registry issues, 52 queued locator/source issues. Every row has the correct FUN start composition and 2173.15 K temperature, with its printed row time in point_conditions. This was not a store regeneration.
   fidelity_counts:
     pre_car1_green: {uncovered_observation: 2, unattested_sample: 1}
@@ -244,9 +249,9 @@ migration:
     predictor can run. The caller scores a one-point isothermal 2173.15 K extent, including positive xi on zero-time
     diagnostic rows.
   identity_pressure: >-
-    Keep identity.total_pressure_Pa unknown. The source ceiling remains located in experiment conditions and the
-    row point conditions where printed; the scorer reads the evidence and evaluates p_bulk = 0 Pa inside the
-    <0.0001 Pa bound. A printed point mutation to 101325 or 0.1 Pa is carried into pressure-model provenance.
+    Keep identity.total_pressure_Pa unknown. The source ceiling remains located in experiment conditions and row
+    point conditions where printed. The paper prints the <0.0001 Pa threshold before the temperature ramp to
+    1900 °C; 0 Pa is the modelled extent assumption within that pre-ramp threshold, not a printed pressure value.
 engine_readiness:
   observable: mass_loss_fraction, used as the per-bead gravimetric extent anchor by the later residue comparison.
   rows: 24
@@ -266,13 +271,14 @@ engine_readiness:
     Car 3 scores all 96 existing residue rows in the flagged absolute tier; it adds DP-005 relative-alpha sensitivity and melt_well_mixed_assumed notices, the 1900 C isothermal extent-band notice, the congruent-vapour closure notice, and pressure provenance. No new cohort or DP id is added.
 expected_store_delta: >-
   No store regen was committed. Score-time car 3 changes no stored observations.
-  Migration retains all 120 Mendy observation ids and all 24 xi point values;
-  the 24 xi identities bind to their FUN starting charge, and the 24 rows no
-  longer repeat the charge composition or pressure as point conditions. All 96
-  residue identities already matched their FUN starts. Wang retains 538 rows,
-  while its 16 mass-loss point values are recomputed from located weights and
-  receive replacement ids. No row count changes. The relation census found no
-  other source using either supported weight derivation.
+  Relative to the pre-Mendybaev car-1 baseline cbdb6448e, migration retains all
+  120 Mendybaev observation ids and all 24 xi point values; the 24 xi identities
+  bind to their FUN starting charge, and those rows no longer repeat the charge
+  composition or pressure as point conditions. The 96 residue observations
+  retain their FUN-start identities. Relative to green 4a566e411, the corpus
+  gains 24 Mendybaev mass_loss_fraction observations; the audit's in-car
+  observation delta is zero against the already-folded car-1 migration. No
+  Wang extract or store rows change.
 queued_tests:
   - tests/test_mendybaev_2013_fun_cai_extract.py
   - tests/test_yaml_flow_scalar_commas.py
