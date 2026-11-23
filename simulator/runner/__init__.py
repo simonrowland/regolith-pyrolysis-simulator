@@ -107,7 +107,6 @@ from simulator.process_timestep import (
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
     gram_lab_exposed_melt_area_bridge,
-    read_gram_lab_exposed_melt_area,
     stage_purity_report,
 )
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -142,7 +141,11 @@ from simulator.run_executor import (
     _json_safe,
     _safe_exception_text,
 )
-from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_geometry import (
+    LabGeometryError,
+    parse_lab_geometry,
+    resolve_lab_gas_film_geometry,
+)
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LabScheduleValidationError,
@@ -655,12 +658,8 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             provenance=provenance,
         ) from exc
     if power_trace is not None:
-        try:
-            exposed_area_m2 = read_gram_lab_exposed_melt_area(geometry)
-        except LabGeometryError as exc:
-            if exc.code != "exposed_melt_area_not_printed":
-                raise
-            exposed_area_m2 = None
+        lab_film = resolve_lab_gas_film_geometry(geometry)
+        exposed_area_m2 = lab_film.area_m2 if lab_film is not None else None
         sample = geometry.get("sample") if isinstance(geometry, Mapping) else None
         try:
             lengths = declared_benchtop_lengths_m(sample)
@@ -680,6 +679,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             power_trace,
             mass_kg=mass_kg,
             exposed_area_m2=power_area_m2,
+            evaporating_area_m2=exposed_area_m2,
             pellet_diameter_m=lengths.get("pellet_diameter_m"),
             pellet_height_m=lengths.get("pellet_height_m"),
             focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),

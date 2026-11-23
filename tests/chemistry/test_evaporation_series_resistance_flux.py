@@ -9,6 +9,7 @@ import pytest
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
     EvaporationFluxConfigurationError,
+    _stefan_film_enhancement,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
@@ -73,6 +74,114 @@ def test_unshaped_furnace_transport_keeps_its_pipe_length():
     furnace = _evap(knudsen_number=0.0, pipe_diameter_m=0.12)
 
     assert furnace.transport_length_m == pytest.approx(0.12)
+
+
+def test_dilute_furnace_hour_recovers_the_round_one_linear_flux():
+    linear = _evap(
+        P_eq_pa=1.0e-9,
+        P_bulk_pa=0.0,
+        overhead_pressure_pa=1000.0,
+        stefan_total_pressure_pa=1000.0,
+        _stefan_phi_override=1.0,
+    )
+    stefan = _evap(
+        P_eq_pa=1.0e-9,
+        P_bulk_pa=0.0,
+        overhead_pressure_pa=1000.0,
+        stefan_total_pressure_pa=1000.0,
+    )
+
+    assert stefan.transport_length_m == pytest.approx(0.12)
+    assert stefan.stefan_phi == pytest.approx(1.0, abs=1.0e-12)
+    assert stefan.flux_kg_s_m2 == pytest.approx(linear.flux_kg_s_m2, rel=1.0e-11)
+
+
+def test_surface_pressure_limit_recovers_interface_plus_melt_series_flux():
+    total_pressure = 1300.0
+    p_eq = 1350.0
+    result = _evap(
+        species="SiO",
+        P_eq_pa=p_eq,
+        P_bulk_pa=0.0,
+        T_surface_K=2200.0,
+        T_gas_K=2200.0,
+        molar_mass_kg_mol=0.044084,
+        alpha_i=0.1,
+        knudsen_number=4.0e-4,
+        pipe_diameter_m=1.0,
+        overhead_pressure_pa=total_pressure,
+        stefan_total_pressure_pa=total_pressure,
+        carrier_gas="Ar",
+        gas_film_shape=GAS_FILM_SPHERE,
+    )
+    interface_plus_melt = (p_eq - total_pressure) / (
+        result.r_interface + result.r_melt
+    )
+
+    assert result.surface_partial_pressure_Pa < total_pressure
+    assert result.surface_partial_pressure_Pa > total_pressure - 0.02
+    assert result.flux_kg_s_m2 == pytest.approx(interface_plus_melt, rel=5.0e-4)
+
+
+def test_robinot_outflow_pressure_is_finite_flagged_and_below_hk_bound():
+    total_pressure = 1300.0
+    p_eq = 1560.0
+    inputs = dict(
+        species="SiO",
+        P_eq_pa=p_eq,
+        P_bulk_pa=0.0,
+        T_surface_K=2236.0,
+        T_gas_K=2236.0,
+        molar_mass_kg_mol=0.044084,
+        alpha_i=0.1,
+        knudsen_number=4.0e-4,
+        pipe_diameter_m=0.013,
+        overhead_pressure_pa=total_pressure,
+        stefan_total_pressure_pa=total_pressure,
+        carrier_gas="Ar",
+        gas_film_shape=GAS_FILM_SPHERE,
+    )
+    result = _evap(**inputs)
+    linear_film = _evap(**inputs, _stefan_phi_override=1.0)
+    diagnostic = result.as_diagnostic()
+    hertz_knudsen_bound = (
+        result.alpha_intrinsic
+        * result.k_hk_kg_s_m2_pa
+        * (p_eq - result.P_bulk_Pa)
+    )
+
+    assert math.isfinite(result.flux_kg_s_m2)
+    assert result.surface_partial_pressure_Pa < total_pressure
+    assert 0.0 < result.flux_kg_s_m2 < hertz_knudsen_bound
+    assert result.flux_kg_s_m2 > 1.5 * linear_film.flux_kg_s_m2
+    assert diagnostic["P_eq_over_P_total"] == pytest.approx(1.2)
+    assert "bulk_outflow_regime" in diagnostic["typed_flags"]
+    assert "gas_film_stefan_effective_binary" in diagnostic["typed_flags"]
+    assert "internal bubble boiling" in diagnostic["typed_flag_details"][
+        "bulk_outflow_regime"
+    ]
+
+
+def test_stefan_film_and_interface_bracket_are_monotone():
+    total_pressure = 1300.0
+    p_bulk = 0.0
+    p_eq = 1560.0
+    interface_resistance = 20000.0
+    gas_conductance = 1.0e-5
+    surface_pressures = (0.0, 100.0, 500.0, 1000.0, 1290.0)
+    film_fluxes = []
+    interface_fluxes = []
+    for p_surface in surface_pressures:
+        phi = _stefan_film_enhancement(total_pressure, p_bulk, p_surface)
+        film_fluxes.append(
+            gas_conductance * phi * (p_surface - p_bulk)
+        )
+        interface_fluxes.append(
+            max(0.0, p_eq - p_surface) / interface_resistance
+        )
+
+    assert film_fluxes == sorted(film_fluxes)
+    assert interface_fluxes == sorted(interface_fluxes, reverse=True)
 
 
 def test_free_molecular_limit_recovers_intrinsic_alpha_hk():

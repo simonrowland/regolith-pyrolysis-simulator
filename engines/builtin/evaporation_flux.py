@@ -52,8 +52,8 @@ the VAPOR_PRESSURE provider declares, and the same one the legacy
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, replace
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from engines.builtin._common import (
@@ -156,9 +156,25 @@ class SeriesEvaporationFlux:
     k_mt_kg_s_m2_pa: float
     d_ab_m2_s: float
     transport_length_m: float
+    P_eq_Pa: float
+    P_bulk_Pa: float
+    surface_partial_pressure_Pa: float | None
+    total_pressure_Pa: float
+    stefan_phi: float
 
-    def as_diagnostic(self) -> dict[str, float | str | bool]:
+    def as_diagnostic(self) -> dict[str, Any]:
         denominator = self.r_interface + self.r_gas + self.r_melt
+        typed_flags = (
+            ["gas_film_stefan_effective_binary"]
+            if _stefan_phi_is_nontrivial(self.stefan_phi)
+            else []
+        )
+        bulk_outflow = (
+            self.total_pressure_Pa > 0.0
+            and self.P_eq_Pa / self.total_pressure_Pa >= 1.0
+        )
+        if bulk_outflow:
+            typed_flags.append("bulk_outflow_regime")
         if math.isfinite(denominator) and denominator > 0.0:
             r_interface_fraction = self.r_interface / denominator
             r_gas_fraction = self.r_gas / denominator
@@ -211,6 +227,26 @@ class SeriesEvaporationFlux:
             "k_mt_kg_s_m2_pa": self.k_mt_kg_s_m2_pa,
             "d_ab_m2_s": self.d_ab_m2_s,
             "transport_length_m": self.transport_length_m,
+            "P_eq_Pa": self.P_eq_Pa,
+            "P_bulk_Pa": self.P_bulk_Pa,
+            "surface_partial_pressure_Pa": self.surface_partial_pressure_Pa,
+            "P_total_Pa": self.total_pressure_Pa,
+            "P_eq_over_P_total": (
+                self.P_eq_Pa / self.total_pressure_Pa
+                if self.total_pressure_Pa > 0.0
+                else None
+            ),
+            "stefan_phi": self.stefan_phi,
+            "typed_flags": typed_flags,
+            "typed_flag_details": (
+                {
+                    "bulk_outflow_regime": (
+                        "interface-limited; internal bubble boiling is outside "
+                        "this stagnant-inert gas-film model"
+                    )
+                }
+                if bulk_outflow else {}
+            ),
             # HKL upper-bound authority (matrix policy i): R_m=0 until
             # species/state melt-transfer inputs exist. Not certified flux.
             "authority_class": "upper-bound",
@@ -620,6 +656,9 @@ def _coerce_frozen_skull_stir_ceiling(
 def _zero_series_evaporation_flux(
     *,
     alpha_intrinsic: float,
+    P_eq_Pa: float = 0.0,
+    P_bulk_Pa: float = 0.0,
+    total_pressure_Pa: float = 0.0,
     k_hk_kg_s_m2_pa: float = 0.0,
     r_interface: float = math.inf,
     r_gas: float = 0.0,
@@ -665,7 +704,266 @@ def _zero_series_evaporation_flux(
         k_mt_kg_s_m2_pa=max(0.0, k_mt_kg_s_m2_pa),
         d_ab_m2_s=max(0.0, d_ab_m2_s),
         transport_length_m=max(0.0, transport_length_m),
+        P_eq_Pa=max(0.0, P_eq_Pa),
+        P_bulk_Pa=max(0.0, P_bulk_Pa),
+        surface_partial_pressure_Pa=None,
+        total_pressure_Pa=max(0.0, total_pressure_Pa),
+        stefan_phi=1.0,
     )
+
+
+_STEFAN_ROOT_RELATIVE_TOLERANCE = 1.0e-12
+_STEFAN_ROOT_MAX_ITERATIONS = 160
+
+
+def _stefan_phi_is_nontrivial(phi: float) -> bool:
+    return abs(phi - 1.0) > 32.0 * math.ulp(1.0)
+
+
+def _stefan_pressure_rise_and_phi(
+    total_pressure_Pa: float,
+    bulk_pressure_Pa: float,
+    log_pressure_ratio: float,
+) -> tuple[float, float]:
+    pressure_rise = (total_pressure_Pa - bulk_pressure_Pa) * -math.expm1(
+        -log_pressure_ratio
+    )
+    phi = (
+        1.0
+        if log_pressure_ratio == 0.0
+        else log_pressure_ratio * total_pressure_Pa / pressure_rise
+    )
+    return pressure_rise, phi
+
+
+def _bisect_stefan_log_pressure_root(
+    residual_pressure_pa: Callable[[float], float],
+    *,
+    pressure_drive_pa: float,
+    upper_log_pressure_ratio: float | None,
+) -> float:
+    """Solve either Stefan root with the same bracket and pressure tolerance."""
+    lower = 0.0
+    upper = upper_log_pressure_ratio
+    if upper is None:
+        upper = 1.0
+        while residual_pressure_pa(upper) > 0.0:
+            upper *= 2.0
+            if not math.isfinite(upper):
+                raise EvaporationFluxConfigurationError(
+                    "Stefan surface-pressure root could not be bracketed"
+                )
+    if residual_pressure_pa(lower) <= 0.0 or residual_pressure_pa(upper) >= 0.0:
+        raise EvaporationFluxConfigurationError(
+            "Stefan surface-pressure root was not bracketed"
+        )
+    tolerance = _STEFAN_ROOT_RELATIVE_TOLERANCE * pressure_drive_pa
+    for _ in range(_STEFAN_ROOT_MAX_ITERATIONS):
+        midpoint = (lower + upper) / 2.0
+        residual = residual_pressure_pa(midpoint)
+        if abs(residual) <= tolerance:
+            return midpoint
+        if residual > 0.0:
+            lower = midpoint
+        else:
+            upper = midpoint
+    return (lower + upper) / 2.0
+
+
+def _stefan_film_enhancement(
+    total_pressure_Pa: float,
+    bulk_partial_pressure_Pa: float,
+    surface_partial_pressure_Pa: float,
+) -> float:
+    """Shared stagnant-inert film enhancement at the gas-side surface."""
+    delta_p = surface_partial_pressure_Pa - bulk_partial_pressure_Pa
+    if delta_p <= 0.0:
+        return 1.0
+    if total_pressure_Pa <= surface_partial_pressure_Pa:
+        return math.inf
+    if total_pressure_Pa <= bulk_partial_pressure_Pa:
+        raise EvaporationFluxConfigurationError(
+            "Stefan gas film requires bulk evolved pressure below total pressure"
+        )
+    # log1p retains precision as the evolved pressure becomes dilute.
+    log_ratio = math.log1p(delta_p / (total_pressure_Pa - surface_partial_pressure_Pa))
+    _pressure_rise, phi = _stefan_pressure_rise_and_phi(
+        total_pressure_Pa,
+        bulk_partial_pressure_Pa,
+        log_ratio,
+    )
+    return phi
+
+
+def _solve_single_species_stefan_film(
+    *,
+    P_eq_Pa: float,
+    P_bulk_Pa: float,
+    total_pressure_Pa: float,
+    r_interface_m_s_kg: float,
+    r_melt_m_s_kg: float,
+    k_gas_kg_s_m2_pa: float,
+) -> tuple[float, float, float]:
+    """Bracket the interface/film equality in a log-pressure coordinate.
+
+    ``y=ln((P-p_b)/(P-p_s))`` maps ``p_b <= p_s < P`` to ``y >= 0``
+    without losing a finite root when p_s is closer to P than floating-point
+    spacing.
+    """
+    pressure_gap = total_pressure_Pa - P_bulk_Pa
+    if pressure_gap <= 0.0:
+        raise EvaporationFluxConfigurationError(
+            "Stefan gas film requires bulk evolved pressure below total pressure"
+        )
+    if min(total_pressure_Pa, P_eq_Pa) <= P_bulk_Pa:
+        return P_bulk_Pa, 0.0, 1.0
+    r_interface_melt = r_interface_m_s_kg + r_melt_m_s_kg
+
+    def state_at(log_pressure_ratio: float) -> tuple[float, float, float, float]:
+        pressure_rise, phi = _stefan_pressure_rise_and_phi(
+            total_pressure_Pa,
+            P_bulk_Pa,
+            log_pressure_ratio,
+        )
+        surface_pressure = P_bulk_Pa + pressure_rise
+        if surface_pressure >= total_pressure_Pa:
+            surface_pressure = math.nextafter(total_pressure_Pa, P_bulk_Pa)
+        j_interface = max(0.0, P_eq_Pa - surface_pressure) / r_interface_melt
+        # By definition, phi*(p_s-p_b) = P*y.
+        j_film = k_gas_kg_s_m2_pa * total_pressure_Pa * log_pressure_ratio
+        residual_pressure = (
+            max(0.0, P_eq_Pa - surface_pressure)
+            - r_interface_melt * j_film
+        )
+        return surface_pressure, phi, (j_interface + j_film) / 2.0, residual_pressure
+
+    if P_eq_Pa < total_pressure_Pa:
+        upper = -math.log((total_pressure_Pa - P_eq_Pa) / pressure_gap)
+    else:
+        upper = None
+    root_log_pressure_ratio = _bisect_stefan_log_pressure_root(
+        lambda log_ratio: state_at(log_ratio)[3],
+        pressure_drive_pa=P_eq_Pa - P_bulk_Pa,
+        upper_log_pressure_ratio=upper,
+    )
+    surface_pressure, phi, flux, _residual_pressure = state_at(
+        root_log_pressure_ratio
+    )
+    return surface_pressure, flux, phi
+
+
+def _apply_shared_stefan_film(
+    series_by_species: Mapping[str, SeriesEvaporationFlux],
+    *,
+    total_pressure_Pa: float,
+    total_bulk_partial_pressure_Pa: float,
+) -> tuple[dict[str, SeriesEvaporationFlux], float, float]:
+    """Apply one pressure-ratio factor to the concurrently evolved carriers."""
+    candidates = {
+        species: series
+        for species, series in series_by_species.items()
+        if series.gas_resistance_weight > 0.0
+        and series.r_gas > 0.0
+        and series.k_mt_kg_s_m2_pa > 0.0
+        and series.P_eq_Pa > series.P_bulk_Pa
+    }
+    if not candidates:
+        return dict(series_by_species), total_bulk_partial_pressure_Pa, 1.0
+    if total_pressure_Pa <= total_bulk_partial_pressure_Pa:
+        raise EvaporationFluxConfigurationError(
+            "Stefan gas film requires total evolved bulk pressure below total pressure"
+        )
+    candidate_bulk = sum(series.P_bulk_Pa for series in candidates.values())
+    fixed_bulk = max(0.0, total_bulk_partial_pressure_Pa - candidate_bulk)
+    pressure_gap = total_pressure_Pa - total_bulk_partial_pressure_Pa
+    upper_limit = min(
+        total_pressure_Pa,
+        fixed_bulk + sum(series.P_eq_Pa for series in candidates.values()),
+    )
+    if upper_limit <= total_bulk_partial_pressure_Pa:
+        return dict(series_by_species), total_bulk_partial_pressure_Pa, 1.0
+
+    def state_at(log_pressure_ratio: float):
+        pressure_rise, phi = _stefan_pressure_rise_and_phi(
+            total_pressure_Pa,
+            total_bulk_partial_pressure_Pa,
+            log_pressure_ratio,
+        )
+        surface_total_pressure = total_bulk_partial_pressure_Pa + pressure_rise
+        if surface_total_pressure >= total_pressure_Pa:
+            surface_total_pressure = math.nextafter(
+                total_pressure_Pa,
+                total_bulk_partial_pressure_Pa,
+            )
+        pressure_by_species: dict[str, float] = {}
+        flux_by_species: dict[str, float] = {}
+        for species, series in candidates.items():
+            gas_resistance = series.r_gas / phi
+            denominator = series.r_interface + gas_resistance + series.r_melt
+            flux = max(0.0, series.P_eq_Pa - series.P_bulk_Pa) / denominator
+            surface_partial = (
+                series.P_bulk_Pa
+                + flux / (series.k_mt_kg_s_m2_pa * phi)
+            )
+            pressure_by_species[species] = surface_partial
+            flux_by_species[species] = flux
+        predicted_total = fixed_bulk + sum(pressure_by_species.values())
+        return (
+            predicted_total,
+            surface_total_pressure,
+            phi,
+            flux_by_species,
+            pressure_by_species,
+        )
+
+    def residual(log_pressure_ratio: float) -> float:
+        predicted, surface_total, _phi, _fluxes, _partials = state_at(
+            log_pressure_ratio
+        )
+        return predicted - surface_total
+
+    if upper_limit < total_pressure_Pa:
+        upper = -math.log(
+            (total_pressure_Pa - upper_limit) / pressure_gap
+        )
+    else:
+        upper = None
+    root_log_pressure_ratio = _bisect_stefan_log_pressure_root(
+        residual,
+        pressure_drive_pa=sum(
+            series.P_eq_Pa - series.P_bulk_Pa
+            for series in candidates.values()
+        ),
+        upper_log_pressure_ratio=upper,
+    )
+    (
+        _predicted,
+        surface_total_pressure,
+        phi,
+        fluxes,
+        partials,
+    ) = state_at(root_log_pressure_ratio)
+    if surface_total_pressure >= total_pressure_Pa:
+        surface_total_pressure = math.nextafter(
+            total_pressure_Pa,
+            total_bulk_partial_pressure_Pa,
+        )
+    updated = dict(series_by_species)
+    for species, base in candidates.items():
+        flux = fluxes[species]
+        alpha_effective = (
+            flux / (base.P_eq_Pa - base.P_bulk_Pa) / base.k_hk_kg_s_m2_pa
+        )
+        updated[species] = replace(
+            base,
+            flux_kg_s_m2=max(0.0, flux),
+            alpha_effective=max(0.0, min(base.alpha_intrinsic, alpha_effective)),
+            r_gas=base.r_gas / phi,
+            surface_partial_pressure_Pa=partials[species],
+            total_pressure_Pa=total_pressure_Pa,
+            stefan_phi=phi,
+        )
+    return updated, surface_total_pressure, phi
 
 
 def _series_resistance_evaporation_flux_kg_m2_s(
@@ -692,6 +990,8 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
     gas_film_shape: str | None = None,
+    stefan_total_pressure_pa: float | None = None,
+    _stefan_phi_override: float | None = None,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -718,6 +1018,11 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     M_kg_mol = _finite_float(molar_mass_kg_mol, 0.0)
     transport_length_m = _finite_float(pipe_diameter_m, 0.12)
     overhead_pa = _finite_float(overhead_pressure_pa, 0.0)
+    total_pressure_pa = (
+        overhead_pa
+        if stefan_total_pressure_pa is None
+        else _finite_float(stefan_total_pressure_pa, overhead_pa)
+    )
     effective_T_gas_K = _finite_float(T_gas_K, T_surface)
 
     axial_stir_validated = _validated_stir_factor(
@@ -748,6 +1053,9 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     ):
         return _zero_series_evaporation_flux(
             alpha_intrinsic=alpha_intrinsic,
+            P_eq_Pa=P_eq,
+            P_bulk_Pa=P_bulk,
+            total_pressure_Pa=total_pressure_pa,
             axial_stir_applied=axial_stir_applied,
             radial_stir_applied=radial_stir_applied,
             axial_stir_clamped=axial_was_clamped,
@@ -772,6 +1080,9 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     if delta_p_pa <= 0.0:
         return _zero_series_evaporation_flux(
             alpha_intrinsic=alpha_intrinsic,
+            P_eq_Pa=P_eq,
+            P_bulk_Pa=P_bulk,
+            total_pressure_Pa=total_pressure_pa,
             k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
             r_interface=r_interface,
             axial_stir_applied=axial_stir_applied,
@@ -884,17 +1195,28 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         # 4*a*D*DeltaC divided by pi*a^2 gives k=4D/(pi*a)=8D/(pi*d),
         # hence Sh_d=8/pi. Both use k=Sh*D/d; D/d has units m/s, and
         # multiplying by DeltaC gives mol/(m^2*s); using C=p/(R*T) gives
-        # the pressure-basis conductance used below. The natural-convection
-        # Grashof number is Gr=g*beta*DeltaT*d^3/nu^2; ideal-gas density
-        # gives nu proportional to 1/P, so Gr is proportional to P^2. For
-        # Robinot at 10 mbar Ar and about
-        # 2300 K, scaling Cai's 1-atm Ar nu=8e-5 m^2/s at 1600 C by 1/P
-        # and T^0.7 gives nu about 9e-3 m^2/s; with d=13 mm, DeltaT=2000 K,
-        # beta=1/2300 K and Earth g, Gr is about 0.23, so buoyant flow is
-        # negligible. The stated lambda about 5e-5 m gives Kn about 4e-3.
-        # Sanity at Robinot's 1300 Pa Ar condition and 2236 K: d=13 mm,
-        # Sh=2 retains 0.208 of the interface rate; the unchanged 0.12 m
-        # furnace pipe with its stirred Sh retains 0.0495.
+        # the pressure-basis conductance used below. For a stagnant inert,
+        # zero inert flux in Fick's law gives N_evolved proportional to
+        # dp/(P-p); integrating across delta yields
+        # N=D*P/(R*T*delta)*ln((P-p_b)/(P-p_s)). Its pressure-basis flux
+        # multiplier is phi=ln((P-p_b)/(P-p_s))/((p_s-p_b)/P). Units are
+        # D[m^2/s]*P[Pa]/(R[J/mol/K]*T[K]*delta[m])=mol/(m^2*s). For
+        # p << P, phi -> 1 and the current linear film is recovered; as
+        # p_s -> P, film resistance tends to zero and the interface-plus-
+        # melt series limit remains. The natural-convection Grashof number
+        # is Gr=g*beta*DeltaT*d^3/nu^2; ideal-gas density gives nu
+        # proportional to 1/P, so Gr is proportional to P^2. At 10 mbar Ar
+        # and about 2300 K, scaling Cai's 1-atm Ar nu=8e-5 m^2/s at 1600 C
+        # by 1/P and T^0.7 gives nu about 9e-3 m^2/s; with d=13 mm,
+        # DeltaT=2000 K, beta=1/2300 K and Earth g, Gr is about 0.23.
+        # Robinot's 13 mbar preset gives Gr about 0.39. Both are much less
+        # than one, so buoyant flow is negligible. At 10 mbar, the stated
+        # lambda about 5e-5 m gives sample-scale Kn about 4e-3.
+        # Sanity at Robinot's 1300 Pa Ar condition and 2236 K: the preset
+        # gives p_eq(SiO)=1602 Pa and runtime p_bulk(SiO) about zero;
+        # d=13 mm, Sh=2 retains 0.347 of the interface-only rate. In the
+        # dilute pipe limit, the unchanged 0.12 m length retains 0.0495
+        # unstirred (0.1131 at stir 6).
         k_mt_mol_s_m2_pa = (
             sherwood_eff
             * d_ab_m2_s
@@ -904,6 +1226,9 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         if not math.isfinite(k_mt_kg_s_m2_pa) or k_mt_kg_s_m2_pa <= 0.0:
             return _zero_series_evaporation_flux(
                 alpha_intrinsic=alpha_intrinsic,
+                P_eq_Pa=P_eq,
+                P_bulk_Pa=P_bulk,
+                total_pressure_Pa=total_pressure_pa,
                 k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
                 r_interface=r_interface,
                 knudsen_number=knudsen,
@@ -930,6 +1255,9 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     if not math.isfinite(denominator) or denominator <= 0.0:
         return _zero_series_evaporation_flux(
             alpha_intrinsic=alpha_intrinsic,
+            P_eq_Pa=P_eq,
+            P_bulk_Pa=P_bulk,
+            total_pressure_Pa=total_pressure_pa,
             k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
             r_interface=r_interface,
             r_gas=r_gas,
@@ -950,8 +1278,40 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             transport_length_m=transport_length_m,
         )
 
-    k_total_kg_s_m2_pa = 1.0 / denominator
-    flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
+    stefan_phi = 1.0
+    surface_partial_pressure = None
+    effective_r_gas = r_gas
+    if gas_weight > 0.0 and r_gas > 0.0:
+        if _stefan_phi_override is None:
+            surface_partial_pressure, flux_kg_s_m2, stefan_phi = (
+                _solve_single_species_stefan_film(
+                    P_eq_Pa=P_eq,
+                    P_bulk_Pa=P_bulk,
+                    total_pressure_Pa=total_pressure_pa,
+                    r_interface_m_s_kg=r_interface,
+                    r_melt_m_s_kg=r_melt,
+                    k_gas_kg_s_m2_pa=k_mt_kg_s_m2_pa,
+                )
+            )
+            effective_r_gas = r_gas / stefan_phi
+            k_total_kg_s_m2_pa = flux_kg_s_m2 / delta_p_pa
+        else:
+            stefan_phi = _finite_float(_stefan_phi_override, math.nan)
+            if not math.isfinite(stefan_phi) or stefan_phi <= 0.0:
+                raise EvaporationFluxConfigurationError(
+                    "shared Stefan enhancement must be finite and positive"
+                )
+            effective_r_gas = r_gas / stefan_phi
+            k_total_kg_s_m2_pa = 1.0 / (
+                r_interface + effective_r_gas + r_melt
+            )
+            flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
+            surface_partial_pressure = (
+                P_bulk + flux_kg_s_m2 / (k_mt_kg_s_m2_pa * stefan_phi)
+            )
+    else:
+        k_total_kg_s_m2_pa = 1.0 / denominator
+        flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
     alpha_effective = k_total_kg_s_m2_pa / k_hk_kg_s_m2_pa
     if not math.isfinite(flux_kg_s_m2) or not math.isfinite(alpha_effective):
         flux_kg_s_m2 = 0.0
@@ -963,7 +1323,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         alpha_effective=max(0.0, min(alpha_intrinsic, alpha_effective)),
         k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
         r_interface=r_interface,
-        r_gas=r_gas,
+        r_gas=effective_r_gas,
         r_melt=r_melt,
         knudsen_number=knudsen,
         gas_resistance_weight=gas_weight,
@@ -979,6 +1339,11 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
         d_ab_m2_s=d_ab_m2_s,
         transport_length_m=transport_length_m,
+        P_eq_Pa=P_eq,
+        P_bulk_Pa=P_bulk,
+        surface_partial_pressure_Pa=surface_partial_pressure,
+        total_pressure_Pa=total_pressure_pa,
+        stefan_phi=stefan_phi,
     )
 
 
@@ -1844,9 +2209,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         alpha_authority_status_by_species: dict[str, str] = {}
         flux_uncertainty_pct: dict[str, float] = {}
-        series_flux_diagnostics: dict[
-            str, dict[str, float | str | bool | None]
-        ] = {}
+        series_flux_diagnostics: dict[str, dict[str, Any]] = {}
+        series_by_species: dict[str, SeriesEvaporationFlux] = {}
         unmeasured_alpha_fallback_species: list[str] = []
         missing_molar_mass: dict[str, dict[str, float | str]] = {}
         missing_transport_parameters: dict[str, dict[str, float | str]] = {}
@@ -1985,6 +2349,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                     gas_film_shape=gas_film_shape,
+                    stefan_total_pressure_pa=overhead_pressure_pa,
+                    _stefan_phi_override=(1.0 if uses_gas_resistance else None),
                 )
             except EvaporationFluxConfigurationError as exc:
                 missing_transport_parameters[species] = {
@@ -1998,6 +2364,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 }
                 continue
             computable_transport_species.add(species)
+            series_by_species[species] = series_flux
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
@@ -2050,6 +2417,89 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             else:
                 below_threshold_flux_kg_hr[species] = rate_kg_hr
 
+        total_bulk_evolved_pressure = sum(
+            max(0.0, _finite_float(value, 0.0))
+            for value in overhead_partials.values()
+        )
+        total_evolved_P_eq_Pa = sum(
+            max(0.0, _finite_float(value, 0.0))
+            for value in vapor_pressures.values()
+        )
+        total_evolved_P_eq_over_P_total = (
+            total_evolved_P_eq_Pa / overhead_pressure_pa
+            if overhead_pressure_pa > 0.0
+            else None
+        )
+        try:
+            stefan_series_by_species, surface_evolved_pressure, shared_phi = (
+                _apply_shared_stefan_film(
+                    series_by_species,
+                    total_pressure_Pa=overhead_pressure_pa,
+                    total_bulk_partial_pressure_Pa=total_bulk_evolved_pressure,
+                )
+            )
+        except EvaporationFluxConfigurationError as exc:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "invalid_stefan_film_pressure_state",
+                    "detail": str(exc),
+                    "P_total_Pa": overhead_pressure_pa,
+                    "P_bulk_evolved_Pa": total_bulk_evolved_pressure,
+                },
+            )
+        for species, series_flux in stefan_series_by_species.items():
+            rate_kg_hr = (
+                series_flux.flux_kg_s_m2 * melt_surface_area_m2 * 3600.0
+            )
+            flux_kg_hr.pop(species, None)
+            below_threshold_flux_kg_hr.pop(species, None)
+            zero_net_flux_kg_hr.pop(str(species), None)
+            alpha_authority_status_by_species.pop(species, None)
+            if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
+                flux_kg_hr[species] = rate_kg_hr
+                alpha_status = series_flux_diagnostics[species].get(
+                    ALPHA_AUTHORITY_STATUS_FIELD
+                )
+                if alpha_status is not None:
+                    alpha_authority_status_by_species[species] = str(alpha_status)
+            elif rate_kg_hr > 0.0:
+                below_threshold_flux_kg_hr[species] = rate_kg_hr
+            else:
+                zero_net_flux_kg_hr[str(species)] = 0.0
+            series_diagnostic = series_flux_diagnostics[species]
+            series_diagnostic.update(series_flux.as_diagnostic())
+            series_diagnostic["total_evolved_P_eq_Pa"] = total_evolved_P_eq_Pa
+            series_diagnostic["total_evolved_P_eq_over_P_total"] = (
+                total_evolved_P_eq_over_P_total
+            )
+            series_diagnostic["shared_surface_evolved_P_Pa"] = (
+                surface_evolved_pressure
+            )
+            series_diagnostic["shared_stefan_phi"] = shared_phi
+
+        typed_flux_flags = []
+        if (
+            total_evolved_P_eq_over_P_total is not None
+            and total_evolved_P_eq_over_P_total >= 1.0
+        ):
+            typed_flux_flags.append("bulk_outflow_regime")
+            for series_diagnostic in series_flux_diagnostics.values():
+                typed = list(series_diagnostic.get("typed_flags") or ())
+                if "bulk_outflow_regime" not in typed:
+                    typed.append("bulk_outflow_regime")
+                series_diagnostic["typed_flags"] = typed
+                details = dict(series_diagnostic.get("typed_flag_details") or {})
+                details["bulk_outflow_regime"] = (
+                    "interface-limited; internal bubble boiling is outside "
+                    "this stagnant-inert gas-film model"
+                )
+                series_diagnostic["typed_flag_details"] = details
+
         if missing_transport_parameters and not computable_transport_species:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -2075,6 +2525,24 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             "flux_uncertainty_pct": flux_uncertainty_pct,
             "evaporation_series_resistance": series_flux_diagnostics,
             "temperature_C": T_C,
+            "total_evolved_P_eq_Pa": total_evolved_P_eq_Pa,
+            "P_total_Pa": overhead_pressure_pa,
+            "total_evolved_P_eq_over_P_total": (
+                total_evolved_P_eq_over_P_total
+            ),
+            "typed_flags": typed_flux_flags,
+            "typed_flag_details": (
+                {
+                    "bulk_outflow_regime": (
+                        "interface-limited; internal bubble boiling is outside "
+                        "this stagnant-inert gas-film model"
+                    )
+                }
+                if "bulk_outflow_regime" in typed_flux_flags
+                else {}
+            ),
+            "shared_surface_evolved_P_Pa": surface_evolved_pressure,
+            "shared_stefan_phi": shared_phi,
             # Matrix policy (i): source flux is HKL upper bound while R_m=0.
             "authority_class": "upper-bound",
             "authority_reason": (

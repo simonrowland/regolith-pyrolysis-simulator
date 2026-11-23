@@ -1364,6 +1364,55 @@ def _w3_dispatch_with_stir(stir_control) -> dict:
     return result.diagnostic['evaporation_series_resistance']['Na']
 
 
+@pytest.mark.xdist_group("serial")
+def test_provider_uses_one_shared_stefan_factor_and_flags_bulk_outflow():
+    result = _w3_result_with_controls(
+        0.0,
+        vapour_batch_flux_pressures_Pa={"Na": 900.0, "K": 700.0},
+        overhead_partials_Pa={"Na": 10.0, "K": 5.0},
+        overhead_pressure_pa=1300.0,
+        pipe_diameter_m=0.013,
+        gas_film_length_m=0.013,
+        gas_film_shape="sphere_equivalent",
+        gas_film_length_method="declared:pellet_diameter_mm",
+        carrier_gas="Ar",
+        gas_temperature_K=2200.0,
+        molar_mass_kg_mol={"Na": 0.023, "K": 0.0390983},
+        stoich_by_species={
+            "Na": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": 1.347,
+                "O2_per_product_kg": 0.347,
+            },
+            "K": {
+                "parent_oxide": "K2O",
+                "oxide_per_product_kg": 1.205,
+                "O2_per_product_kg": 0.205,
+            },
+        },
+        available_oxide_kg={"Na": 10.0, "K": 10.0},
+        alpha={"Na": 0.5, "K": 0.4},
+    )
+
+    assert result.status == "ok"
+    diagnostics = result.diagnostic["evaporation_series_resistance"]
+    sodium = diagnostics["Na"]
+    potassium = diagnostics["K"]
+    assert sodium["stefan_phi"] > 1.0
+    assert sodium["stefan_phi"] == pytest.approx(potassium["stefan_phi"])
+    assert sodium["surface_partial_pressure_Pa"] + potassium[
+        "surface_partial_pressure_Pa"
+    ] == pytest.approx(result.diagnostic["shared_surface_evolved_P_Pa"])
+    assert result.diagnostic["total_evolved_P_eq_over_P_total"] == pytest.approx(
+        1600.0 / 1300.0
+    )
+    assert "bulk_outflow_regime" in result.diagnostic["typed_flags"]
+    assert "internal bubble boiling" in result.diagnostic[
+        "typed_flag_details"
+    ]["bulk_outflow_regime"]
+    assert "gas_film_stefan_effective_binary" in sodium["typed_flags"]
+
+
 @pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf")])
 @pytest.mark.xdist_group("serial")
 def test_provider_refuses_invalid_melt_surface_area(area):

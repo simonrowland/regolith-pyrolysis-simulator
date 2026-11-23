@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import math
+from pathlib import Path
 from typing import Any, Mapping
 
 from simulator.state import PipeSegment
@@ -34,7 +35,6 @@ LAB_GEOMETRY_SOURCE_CLASSES = frozenset({
 LAB_MIN_PIPE_DIAMETER_M = 1.0e-9
 GAS_FILM_SPHERE = "sphere_equivalent"
 GAS_FILM_DISK = "disk_on_plane"
-DP_113_GAS_FILM_LENGTH_M = 0.01
 
 
 class LabGeometryError(ValueError):
@@ -226,6 +226,12 @@ def resolve_lab_gas_film_geometry(
 
     sample_raw = lab_geometry.get("sample")
     sample = sample_raw if isinstance(sample_raw, Mapping) else {}
+    surface_rows = lab_geometry.get("surfaces")
+    surfaces = (
+        tuple(row for row in surface_rows if isinstance(row, Mapping))
+        if isinstance(surface_rows, (list, tuple))
+        else ()
+    )
     apparatus_fields = (
         "crucible_material",
         "support_material",
@@ -237,11 +243,32 @@ def resolve_lab_gas_film_geometry(
         str(sample.get(field) or "").casefold()
         for field in apparatus_fields[:3]
     )
+    holder_surfaces = tuple(
+        row for row in surfaces
+        if str(row.get("role") or "").casefold() == "sample_holder"
+    )
+    holder_text = " ".join(
+        str(value or "").casefold()
+        for row in holder_surfaces
+        for value in (
+            row.get("id"),
+            row.get("liner_material"),
+            row.get("extraction_note"),
+        )
+    )
+    holder_declares_support = any(
+        marker in holder_text
+        for marker in ("crucible", "support")
+    )
+    apparatus_text = " ".join((apparatus_text, holder_text))
     wire_loop_sample = any(
         marker in apparatus_text
         for marker in ("wire", "loop", "bead", "free pellet", "free body")
     )
-    container_declared = any(bool(sample.get(field)) for field in apparatus_fields[:3])
+    container_declared = (
+        any(bool(sample.get(field)) for field in apparatus_fields[:3])
+        or holder_declares_support
+    )
     disk_diameter_declared = any(
         sample.get(field) not in (None, "") for field in apparatus_fields[3:]
     )
@@ -254,16 +281,20 @@ def resolve_lab_gas_film_geometry(
     shape_is_stated = (
         supported
         or wire_loop_sample
-        or bool(sample.get("pellet_diameter_mm"))
+        or declared_pellet_diameter_m(sample) is not None
     )
 
     declared_diameter_keys = (
         ("crucible_inner_diameter_mm", "exposed_melt_diameter_mm")
         if supported
-        else ("pellet_diameter_mm",)
+        else ()
     )
     length_m: float | None = None
     length_method = ""
+    pellet_diameter_m = declared_pellet_diameter_m(sample)
+    if pellet_diameter_m is not None and not supported:
+        length_m = pellet_diameter_m
+        length_method = "declared:pellet_diameter_mm"
     for key in declared_diameter_keys:
         raw = sample.get(key)
         if raw in (None, ""):
@@ -312,7 +343,7 @@ def resolve_lab_gas_film_geometry(
                 length_method = "derived:sphere_from_mass"
             flags.append("gas_film_length_derived")
         else:
-            length_m = DP_113_GAS_FILM_LENGTH_M
+            length_m = _dp_113_gas_film_length_m()
             length_method = "assumed:DP-113"
             flags.append("gas_film_length_assumed")
 
@@ -329,6 +360,45 @@ def resolve_lab_gas_film_geometry(
         length_method=length_method,
         flags=tuple(flags),
     )
+
+
+def declared_pellet_diameter_m(
+    sample: Mapping[str, Any] | None,
+) -> float | None:
+    """Return the deck's positive pellet diameter in metres, if declared."""
+    if not isinstance(sample, Mapping):
+        return None
+    raw = sample.get("pellet_diameter_mm")
+    if raw in (None, ""):
+        return None
+    return _lab_positive_scalar(raw, field="sample.pellet_diameter_mm") / 1000.0
+
+
+def _dp_113_gas_film_length_m() -> float:
+    """Read the flagged gram-lab length from its policy owner."""
+    import yaml
+
+    policy_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "battery"
+        / "default_policy.yaml"
+    )
+    document = yaml.safe_load(policy_path.read_text())
+    policies = document.get("policies") if isinstance(document, Mapping) else None
+    row = next(
+        (
+            item for item in policies or ()
+            if isinstance(item, Mapping) and item.get("id") == "DP-113"
+        ),
+        None,
+    )
+    if not isinstance(row, Mapping) or row.get("units") != "m":
+        raise LabGeometryError(
+            "dp113_policy_invalid",
+            "data/battery/default_policy.yaml must declare DP-113 in metres",
+        )
+    return _lab_positive_scalar(row.get("value"), field="DP-113.value")
 
 
 def _lab_positive_scalar(value: Any, *, field: str) -> float:

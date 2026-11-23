@@ -75,6 +75,9 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     )
     driver = preset.lab_schedule[runner_module.FURNACE_POWER_DRIVER_KEY]
     assert driver["exposed_area_m2"] is None
+    resolved_film = resolve_lab_gas_film_geometry(preset.lab_geometry)
+    assert resolved_film is not None
+    assert driver["evaporating_area_m2"] == pytest.approx(resolved_film.area_m2)
     assert driver["radiating_face_set"] == "hot_upper"
     trace = driver["trace"]
     fields = trace["point_fields"]
@@ -581,6 +584,23 @@ def test_crucible_mass_uses_hemisphere_length_and_coherent_disk_area() -> None:
     assert bridge["effective_exposed_area_m2"] == pytest.approx(
         math.pi * film.length_m**2 / 4.0
     )
+
+
+def test_sesko_deck_holder_resolves_hemispherical_melt_pool():
+    sesko = _vacuum_preset("sesko_2024.yaml")
+    from simulator.condensation import _stirring_enhanced_sherwood
+
+    film = resolve_lab_gas_film_geometry(sesko["lab_geometry"])
+
+    assert film is not None
+    assert film.shape == GAS_FILM_DISK
+    assert film.length_m == pytest.approx(0.02419, rel=5e-4)
+    assert film.area_m2 == pytest.approx(4.594e-4, rel=5e-4)
+    assert film.length_method == "derived:hemispherical_pool_from_mass"
+    assert _stirring_enhanced_sherwood(
+        radial_stir_factor=0.0,
+        gas_film_shape=film.shape,
+    ) == pytest.approx(8.0 / math.pi)
 
 
 def test_free_body_mass_uses_sphere_length_and_coherent_sphere_area() -> None:

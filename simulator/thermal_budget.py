@@ -1394,7 +1394,6 @@ ARGON_CONDUCTIVITY_1000K_W_M_K = 0.0438
 ARGON_CONDUCTIVITY_EXPONENT = 0.75
 _MM_TO_M = 1.0e-3
 _DECLARED_FOCAL_LENGTH_MM = (
-    ("pellet_diameter_mm", "pellet_diameter_m"),
     ("pellet_height_mm", "pellet_height_m"),
     ("focal_spot_diameter_mm", "focal_spot_diameter_m"),
 )
@@ -1470,6 +1469,7 @@ def furnace_power_driver_payload(
     *,
     mass_kg: float,
     exposed_area_m2: float | None,
+    evaporating_area_m2: float | None = None,
     pellet_diameter_m: float | None = None,
     pellet_height_m: float | None = None,
     focal_spot_diameter_m: float | None = None,
@@ -1497,6 +1497,7 @@ def furnace_power_driver_payload(
         "trace": copy.deepcopy(trace),
         "mass_kg": mass_kg,
         "exposed_area_m2": exposed_area_m2,
+        "evaporating_area_m2": evaporating_area_m2,
         "emissivity": None,
         "pellet_diameter_m": pellet_diameter_m,
         "pellet_height_m": pellet_height_m,
@@ -1527,6 +1528,17 @@ def declared_benchtop_lengths_m(
             "lab geometry sample must be a mapping",
         )
     lengths: dict[str, Any] = {}
+    from simulator.lab_geometry import LabGeometryError, declared_pellet_diameter_m
+
+    try:
+        pellet_diameter_m = declared_pellet_diameter_m(sample)
+    except LabGeometryError as exc:
+        raise PowerTemperatureRefusal(
+            "benchtop_length_not_positive",
+            str(exc),
+        ) from exc
+    if pellet_diameter_m is not None:
+        lengths["pellet_diameter_m"] = pellet_diameter_m
     for source_key, dest_key in _DECLARED_FOCAL_LENGTH_MM:
         if source_key not in sample or sample.get(source_key) in (None, ""):
             continue
@@ -2181,9 +2193,10 @@ def two_node_pellet_loss_W(
     That is a stated geometry, not a moving melt front. Node 1 is the
     top face plus the upper half-wall. It absorbs the beam, radiates
     that area at T_top, loses continuum argon, carries the evaporative
-    sink, and conducts into node 2. Radiation and evaporation share
-    ``A_node_1``: the rate callback receives that area, and its surface
-    flux is multiplied by it before the enthalpy sink is charged. Node
+    sink, and conducts into node 2. For ``hot_upper``, radiation and
+    evaporation share ``A_node_1``. The rate callback receives that area,
+    and its surface flux is multiplied by it before the enthalpy sink is
+    charged. Node
     2 is the lower half-wall plus the holder. It radiates
     ``pi * d * H / 2`` at T_side and conducts
     with the same half-slab conductance.
@@ -2398,6 +2411,7 @@ def solve_power_driven_melt_temperature_C(
     dt_s: float,
     mass_kg: float,
     area_m2: float | None,
+    evaporating_area_m2: float | None = None,
     emissivity: float | None,
     pellet_diameter_m: float | None = None,
     pellet_height_m: float | None = None,
@@ -2449,8 +2463,9 @@ def solve_power_driven_melt_temperature_C(
     ``species_rate_kg_hr_at_K`` is the evaporation step's booked kg/h
     at the trial kelvin, closed over the step-start composition. For
     ``hot_upper``, the two-node geometry supplies ``A_node_1`` to the
-    flux owner, so the same area radiates and evaporates. The root
-    evaluates that sink at the same temperature as the other losses.
+    flux owner, so the same area radiates and evaporates. Other face sets
+    use the area resolved from the sample geometry. The root evaluates
+    that sink at the same temperature as the other losses.
     None is a zero sink. The tonne sky has no pellet surface; a callback
     there is noticed and not applied.
 
@@ -2636,7 +2651,7 @@ def solve_power_driven_melt_temperature_C(
         evaporating_area_m2 = (
             faces[FACE_HOT_UPPER]
             if face_set == FACE_HOT_UPPER
-            else None
+            else evaporating_area_m2
         )
 
         def loss_for(radiating_area_m2: float) -> Callable[[float], float]:
@@ -2764,7 +2779,9 @@ def solve_power_driven_melt_temperature_C(
                 root_K,
                 species_rate_kg_hr_at_K,
                 melt_surface_area_m2=(
-                    node_1_area_m2 if nodes == "two_node" else None
+                    node_1_area_m2
+                    if nodes == "two_node"
+                    else evaporating_area_m2
                 ),
             ),
             notices=notices,
@@ -2814,6 +2831,7 @@ def solve_power_driven_melt_temperature_C(
         "side_area_m2": side_area_m2,
         "node_1_area_m2": node_1_area_m2,
         "node_2_area_m2": node_2_area_m2,
+        "evaporating_area_m2": evaporating_area_m2,
         "evaporative_sink_W": evaporative_sink_W,
         "emissivity": eps,
         "role": "prediction",
@@ -2869,6 +2887,7 @@ def melt_temperature_from_furnace_power(
         emissivity=driver.get("emissivity"),
         pellet_diameter_m=driver.get("pellet_diameter_m"),
         pellet_height_m=driver.get("pellet_height_m"),
+        evaporating_area_m2=driver.get("evaporating_area_m2"),
         focal_spot_diameter_m=driver.get("focal_spot_diameter_m"),
         radiating_face_set=driver.get("radiating_face_set"),
         solar_absorptance=driver.get("solar_absorptance"),

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -19,9 +20,14 @@ import yaml
 from engines.builtin.evaporation_flux import (
     _evaluate_alpha_control,
     _series_resistance_evaporation_flux_kg_m2_s,
+    species_drive_bulk_Pa,
 )
 from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
-from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.core import PyrolysisSimulator
+from simulator.evaporation import (
+    EvaporationMixin,
+    _load_evaporation_alpha_by_species,
+)
 from simulator.physical_constants import GAS_CONSTANT_6SIG
 from simulator.reference_data.janaf import (
     TABLES_DIR,
@@ -41,6 +47,7 @@ from simulator.thermal_budget import (
     pellet_face_areas_m2,
     solve_power_driven_melt_temperature_C,
 )
+from simulator.lab_geometry import resolve_lab_gas_film_geometry
 
 
 _REPO = Path(__file__).resolve().parents[1]
@@ -59,7 +66,6 @@ _JANAF_SIO_KJ_PER_MOL = -100.42 - (-910.94)
 # anchor plus the budget's dH. It is not a production pressure law.
 _ANCHOR_K = 2019.0 + 273.15
 _ANCHOR_P_PA = 4382.0
-_CHAMBER_PA = 1300.0
 _RELATIVE_CLOSURE = 1.0e-6
 
 
@@ -165,6 +171,24 @@ def _alpha_spec():
     return _load_evaporation_alpha_by_species(document)["SiO"]
 
 
+def _runtime_robinot_pressure_pair(*, gas_resistance_enabled: bool):
+    """Use the runtime chamber floor and SiO partial-pressure policy."""
+    runtime = object.__new__(PyrolysisSimulator)
+    runtime.melt = SimpleNamespace(p_total_mbar=13.0)
+    partials, total_pressure_pa = EvaporationMixin._langmuir_film(
+        runtime,
+        {"SiO": 0.0},
+    )
+    bulk_pressure_pa = species_drive_bulk_Pa(
+        "SiO",
+        partials.get("SiO", 0.0),
+        gas_resistance_enabled=gas_resistance_enabled,
+        hkl_upper_bound=False,
+        surface_oxygen_bound=False,
+    )
+    return partials, bulk_pressure_pa, total_pressure_pa
+
+
 def _kinetic_sio_kg_hr(
     temperature_K: float,
     alpha_spec,
@@ -203,16 +227,22 @@ def _kinetic_sio_kg_hr(
         temperature_K,
         alpha_spec,
     )
+    _partials, bulk_pressure_pa, total_pressure_pa = (
+        _runtime_robinot_pressure_pair(
+            gas_resistance_enabled=gas_resistance_enabled
+        )
+    )
     flux = _series_resistance_evaporation_flux_kg_m2_s(
         "SiO",
         p_eq,
-        _CHAMBER_PA,
+        bulk_pressure_pa,
         temperature_K,
         _sio_molar_mass_kg(),
         alpha,
         knudsen_number=None if gas_resistance_enabled else math.inf,
         pipe_diameter_m=transport_length_m,
-        overhead_pressure_pa=_CHAMBER_PA,
+        overhead_pressure_pa=total_pressure_pa,
+        stefan_total_pressure_pa=total_pressure_pa,
         carrier_gas=carrier_gas,
         T_gas_K=temperature_K,
         gas_resistance_enabled=gas_resistance_enabled,
@@ -427,21 +457,28 @@ def test_coupled_root_closes_and_a_dropped_sink_does_not():
     assert _relative_gap(dropped["power_W"], opened) > _RELATIVE_CLOSURE
     assert 0.0 < dropped["temperature_C"] - coupled["temperature_C"] < 2000.0
     assert coupled["evaporative_sink_W"] > 0.0
-    assert coupled["temperature_C"] == pytest.approx(
-        1956.81553705,
-        abs=0.1,
-    )
-    assert coupled["evaporative_sink_W"] == pytest.approx(47.5704215, abs=0.1)
+    assert coupled["temperature_C"] == pytest.approx(1876.38549444, abs=0.1)
+    assert coupled["evaporative_sink_W"] == pytest.approx(104.52774172, abs=0.1)
     assert rates(
         coupled["temperature_K"],
         coupled["node_1_area_m2"],
-    )["SiO"] == pytest.approx(9.88271449225e-3, rel=0.01)
+    )["SiO"] == pytest.approx(0.02164878087, rel=0.01)
     assert dropped["evaporative_sink_W"] == pytest.approx(0.0)
 
 
 def test_robinot_hot_upper_root_uses_sample_scale_argon_film():
-    from simulator.lab_geometry import GAS_FILM_SPHERE
-
+    preset = yaml.safe_load(
+        (_REPO / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml")
+        .read_text()
+    )
+    film = resolve_lab_gas_film_geometry(preset["lab_geometry"])
+    assert film is not None
+    runtime_partials, runtime_bulk_pa, runtime_total_pa = (
+        _runtime_robinot_pressure_pair(gas_resistance_enabled=True)
+    )
+    assert runtime_partials == {}
+    assert runtime_bulk_pa == pytest.approx(0.0)
+    assert runtime_total_pa == pytest.approx(1300.0)
     alpha_spec = _alpha_spec()
 
     def rates(temperature_K: float, area_m2: float | None) -> dict[str, float]:
@@ -450,8 +487,8 @@ def test_robinot_hot_upper_root_uses_sample_scale_argon_film():
             alpha_spec,
             area_m2,
             gas_resistance_enabled=True,
-            gas_film_shape=GAS_FILM_SPHERE,
-            transport_length_m=_DIAMETER_M,
+            gas_film_shape=film.shape,
+            transport_length_m=film.length_m,
             carrier_gas="Ar",
         )
 
@@ -462,19 +499,52 @@ def test_robinot_hot_upper_root_uses_sample_scale_argon_film():
         alpha_spec,
         coupled["node_1_area_m2"],
         gas_resistance_enabled=True,
-        gas_film_shape=GAS_FILM_SPHERE,
+        gas_film_shape=film.shape,
         transport_length_m=0.12,
         carrier_gas="Ar",
     )["SiO"]
 
     assert coupled["nodes"] == "two_node"
-    assert coupled["temperature_C"] == pytest.approx(1969.4736828, abs=0.1)
-    assert coupled["evaporative_sink_W"] == pytest.approx(38.0440733, abs=0.1)
-    assert rate == pytest.approx(7.90744716e-3, rel=0.01)
+    assert film.length_m == pytest.approx(0.013)
+    assert film.length_m != pytest.approx(0.12)
+    assert coupled["temperature_C"] == pytest.approx(1924.46504692, abs=0.1)
+    assert coupled["evaporative_sink_W"] == pytest.approx(71.21204765, abs=0.1)
+    assert rate == pytest.approx(0.01477597481, rel=0.01)
     assert rate > pipe_rate * 5.0
     assert _relative_gap(
         coupled["power_W"], _two_node_sinks_W(coupled, rates)
     ) < _RELATIVE_CLOSURE
+
+
+def test_other_face_set_uses_resolved_area_in_the_coupled_sink():
+    sesko = yaml.safe_load(
+        (_REPO / "data" / "presets" / "vacuum_pyrolysis" / "sesko_2024.yaml")
+        .read_text()
+    )
+    film = resolve_lab_gas_film_geometry(sesko["lab_geometry"])
+    assert film is not None
+    resolved_area_m2 = film.area_m2
+    alpha_spec = _alpha_spec()
+    seen_areas: list[float | None] = []
+
+    def rates(temperature_K: float, area_m2: float | None) -> dict[str, float]:
+        seen_areas.append(area_m2)
+        return _kinetic_sio_kg_hr(
+            temperature_K,
+            alpha_spec,
+            area_m2,
+        )
+
+    record = _solve(
+        radiating_face_set="full_side",
+        evaporating_area_m2=resolved_area_m2,
+        species_rate_kg_hr_at_K=rates,
+    )
+
+    assert record["nodes"] == "one_node"
+    assert record["evaporating_area_m2"] == pytest.approx(resolved_area_m2)
+    assert seen_areas
+    assert all(area == pytest.approx(resolved_area_m2) for area in seen_areas)
 
 
 def test_lumped_sio_dump_is_not_a_closed_state():
