@@ -2872,12 +2872,21 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     c6_cfg["hold_temp_C"] = 1400.0
     c6_cfg["kinetic_driven_above_crossover"] = False
 
+    # b-1281: 25 kg Na is reduced to melt-resident Na2O in the C3 residue.
+    # Evaporation now debits that residue, and the Na vapor holds the C4
+    # controlled-O2 pipe saturated. Held hours then exhaust
+    # max_target_acquisition_hr + max_process_wall_clock_hr (60 h + 40 h),
+    # C4 refuses, and C6_PROCEED is never offered (studio gate at
+    # 2fe7131465: total_hours=143, decisions PATH_AB and BRANCH_ONE_TWO
+    # only). Zero Na leaves native-scale alkali, so the pipe drain stays
+    # inside that wall, the 1580-1670 C Mg window is acquired, and this
+    # test still exercises C6. Mg=60 kg remains the thermite inventory.
     sim = _build_sim(
         "lunar_mare_low_ti",
         vapor_pressure_data,
         feedstocks_data,
         patched_setpoints,
-        additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
+        additives_kg={"K": 30.0, "Na": 0.0, "Mg": 60.0},
     )
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {

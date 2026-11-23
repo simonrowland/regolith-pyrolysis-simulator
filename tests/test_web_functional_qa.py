@@ -593,8 +593,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
     # 2.459768802 kg Cr against the 2.46 kg feed. CrO offgas remains 0.
     # 85fedcb8e's per-strip solver moves a further 1.4458e-7 kg from offgas
     # into Stage 2 capture; the later segment-update refactor leaves the pin
-    # unchanged.
-    _PINNED_CR_OFFGAS_EQ_KG = 0.18005189890349527
+    # at 0.18005189890349527 until the b-1281 r3 re-pin below.
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -624,6 +623,16 @@ def test_headless_full_run_ledgers_and_product_story_web(
     # 3.328320724389875 kg (studio gate at faa88e9ec6, headless full
     # run). The Cr feed still closes. Amalgamation attributes origins
     # and does not change this mol; re-measure if a later gate moves it.
+    # b-1281 r3 (studio gate at 2fe7131465, same headless full run):
+    # Cr-equivalent terminal offgas moves from 0.18005189890349527 to
+    # 0.18005392737207107 kg. The difference is 2.0284685758e-6 kg,
+    # relative 1.1266e-5, which exceeds the 1e-6 pin. CrO offgas stays
+    # 0 and rump Cr2O3 stays inside rel 1e-9, and the mass-balance
+    # assertion above this pin already passed. The extra Na vapor shifts
+    # the Stage 2 capture versus terminal-offgas trade; the Cr does not
+    # leave the ledger. Closure below remains the 2.46 kg feed within
+    # 0.02 kg.
+    _PINNED_CR_OFFGAS_EQ_KG = 0.18005392737207107
     assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328320724389875, rel=1e-9)
     assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
