@@ -56,6 +56,7 @@ def printed_uncertainty_convention(
         declaration = {}
 
     factors: list[Decimal] = []
+    numeric_factor: Decimal | None = None
     confidence_token: str | None = None
     declared_range = False
     for key in ("confidence_level", "kind"):
@@ -101,6 +102,7 @@ def printed_uncertainty_convention(
             raise UncertaintyConventionConflict("k must be a positive numeric factor")
         if not coverage_factor.is_finite() or coverage_factor <= 0:
             raise UncertaintyConventionConflict("k must be a positive finite factor")
+        numeric_factor = coverage_factor
         factors.append(coverage_factor)
 
     if declared_range and factors:
@@ -121,7 +123,7 @@ def printed_uncertainty_convention(
             "uncertainty_convention_conflict: declarations imply different coverage factors"
         )
 
-    factor = factors[0]
+    factor = numeric_factor if numeric_factor is not None else factors[0]
     if (
         confidence_token is None
         or _CONVENTION_FACTORS[confidence_token][1] is None

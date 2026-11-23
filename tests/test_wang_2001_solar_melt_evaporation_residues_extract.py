@@ -593,8 +593,9 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
         (
             {"confidence_level": "ci95", "k": "1.96"},
             "ci95",
-            Decimal("0.2040853827698615877696685115"),
-            Decimal("0.4"),
+            # Agreement keeps CI95 as the label but uses the printed 1.96 divisor.
+            Decimal("0.4") / Decimal("1.96"),
+            Decimal("0.4") / Decimal("1.96") * Decimal("1.959963984540054"),
         ),
         ({"confidence_level": "not_stated"}, None, None, None),
         ({"kind": "printed"}, None, None, None),

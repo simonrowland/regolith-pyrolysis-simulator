@@ -7088,10 +7088,16 @@ def _printed_uncertainty_band(
     confidence_level = stated_confidence_level or "not_stated"
     if confidence_level == "not_stated" and confidence_level_override is not None:
         confidence_level = confidence_level_override
-    log10_activity_sigma = (
+    log10_activity_width = (
         band_basis == "row_printed"
         and quantity is Quantity.ACTIVITY
         and _is_log10_activity_standard_deviation(raw_text)
+    )
+    log10_activity_sigma = (
+        log10_activity_width
+        and convention is None
+        and stated_confidence_level is None
+        and confidence_level_override is None
     )
     if log10_activity_sigma:
         confidence_level = "one_sigma"
@@ -7140,7 +7146,7 @@ def _printed_uncertainty_band(
         )
     source_unit = (
         "dex"
-        if log10_activity_sigma
+        if log10_activity_width
         else _uncertainty_unit(
             quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
         )
@@ -7178,6 +7184,22 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
+    if converted is not None:
+        printed_interval_metric_width = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            converted,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if printed_interval_metric_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_outside_metric_domain",
+                    "quantity": quantity.value,
+                    "original": raw_text,
+                }
+            )
     effective_convention = convention or printed_uncertainty_convention(
         raw_declaration, fallback_token=confidence_level
     )

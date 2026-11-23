@@ -70,9 +70,16 @@ def test_confidence_metadata_preserves_units_printed_in_scalar_value() -> None:
     )
 
     assert resolved.band is not None
-    assert resolved.band.value.quantize(Decimal("1e-24")) == Decimal(
-        "0.004364805402450084659744"
+    # A two-sigma 1 kPa width is divided to 0.5 kPa before the log interval:
+    # max(|log10(1.005)|, |log10(0.995)|) is the standard dex width, then Z95.
+    expected_standard_dex = max(
+        abs(Decimal("100500").ln() - Decimal("100000").ln())
+        / Decimal(10).ln(),
+        abs(Decimal("99500").ln() - Decimal("100000").ln())
+        / Decimal(10).ln(),
     )
+    expected_ticket = expected_standard_dex * Decimal("1.959963984540054")
+    assert abs(resolved.band.value - expected_ticket) < Decimal("1e-27")
     assert resolved.band.unit == "dimensionless"
 
 

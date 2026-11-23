@@ -47,26 +47,38 @@ def paper_point(store):
     )
 
 
-@pytest.mark.parametrize("confidence, factor", [
-    ("one_sigma", NORMAL_95_TICKET_MULTIPLIER),
-    ("two_sigma", Decimal(1)),
-    ("ci95", Decimal(1)),
-    ("not_stated", Decimal(1)),
+@pytest.mark.parametrize("declaration, factor, status", [
+    ({"confidence_level": "one_sigma"}, NORMAL_95_TICKET_MULTIPLIER, "MATCH"),
+    # A 1 wt% two-sigma width normalizes to 0.5 wt%, then gets Z95.
+    (
+        {"confidence_level": "two_sigma"},
+        Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
+        "MISMATCH",
+    ),
+    ({"confidence_level": "ci95"}, Decimal(1), "MATCH"),
+    ({"confidence_level": "not_stated"}, Decimal(1), "MATCH"),
+    (
+        {"kind": "two_sigma"},
+        Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
+        "MISMATCH",
+    ),
+    ({"k": 2}, Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER, "MISMATCH"),
 ])
-def test_shared_scalar_policy(paper_point, confidence, factor):
+def test_shared_scalar_policy(paper_point, declaration, factor, status):
     # Widths are comparator fixtures, never assertions about Hashimoto's errors.
     obs = replace(paper_point, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"value": "1", "unit": "wt%", "confidence_level": confidence},
+        verbatim={"value": "1", "unit": "wt%", **declaration},
     ))
     row = compare_point(obs, Decimal("23.74"))
     assert row["band_refusal"] is None
-    assert row["status"] == "MATCH"
+    assert row["status"] == status
     assert Decimal(row["band"]["value"]) == factor
     assert row["native_inside"] is True
-    if confidence == "not_stated":
+    assert Decimal(row["native_band"]["value"]) == Decimal(1)
+    if declaration.get("confidence_level") == "not_stated":
         assert row["band"]["rule"].startswith("printed_unstated:")
-    if confidence == "one_sigma":
+    if declaration.get("confidence_level") == "one_sigma":
         wider = compare_point(obs, Decimal("24.24"))
         assert wider["status"] == "MATCH"
         assert wider["native_inside"] is False

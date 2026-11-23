@@ -89,7 +89,13 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
     result["band_notice"] = to_plain(resolution.notice)
     native = observation.uncertainty
     if isinstance(native.verbatim, Mapping):
-        native = replace(native, verbatim={**native.verbatim, "confidence_level": "not_stated"})
+        native_declaration = {
+            key: value
+            for key, value in native.verbatim.items()
+            if key not in {"kind", "k"}
+        }
+        native_declaration["confidence_level"] = "not_stated"
+        native = replace(native, verbatim=native_declaration)
     native_resolution = _printed_uncertainty_band(
         quantity, native, reference, source_observation=observation,
     )

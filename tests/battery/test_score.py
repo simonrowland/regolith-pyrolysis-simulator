@@ -1816,6 +1816,49 @@ def test_dex_printed_width_keeps_print_and_ticket_factors_separate(
     assert printed.band.value == expected_ticket
 
 
+def test_structured_confidence_controls_rule_when_activity_note_names_sd() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species("FeO", Phase.L),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.1",
+            "units": "dex",
+            "confidence_level": "two_sigma",
+            "note": "standard deviation of log10(a)",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "structured-confidence-prose-precedence",
+            "structured-confidence-prose-precedence-experiment",
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="structured-confidence-prose-precedence-source",
+        ),
+        uncertainty=uncertainty,
+    )
+    printed = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty,
+        Decimal("0.5"),
+        source_observation=observation,
+    )
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.standard_uncertainty_dex == Decimal("0.05")
+    assert printed.band.value == (
+        Decimal("0.05") * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    )
+    assert printed.band.rule.startswith("printed_2sigma:")
+    assert printed.notice is None
+
+
 def test_dex_print_ticket_factor_swap_mutation_changes_the_pins(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1906,6 +1949,7 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
     width_count = 0
     band_count = 0
     conflict_ids: list[str] = []
+    outside_domain_ids: list[str] = []
     for observation in observations.values():
         quantity = quantity_token(observation.identity)
         reference = point_magnitude(observation.value)
@@ -1931,7 +1975,26 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
             and resolution.refusal.get("reason") == "uncertainty_convention_conflict"
         ):
             conflict_ids.append(observation.observation_id)
-    assert (width_count, band_count, tuple(sorted(conflict_ids))) == (21202, 13533, ())
+        if (
+            resolution.refusal is not None
+            and resolution.refusal.get("reason")
+            == "printed_uncertainty_outside_metric_domain"
+        ):
+            outside_domain_ids.append(observation.observation_id)
+    expected_outside_domain_ids = (
+        "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::bonnand_2020_A3a_cr2o3",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r011-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r020-cao",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r022-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r032-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r036-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t3-r003-cao",
+        "gorojovsky-wood-2026-sulfur-crustal::t3-r037-k2o",
+    )
+    # Captured from the green scorer on this same migrated store; explicit IDs
+    # catch the eight row-level additions seen in round 7.
+    assert (width_count, band_count, tuple(sorted(conflict_ids))) == (21202, 13525, ())
+    assert tuple(sorted(outside_domain_ids)) == expected_outside_domain_ids
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:

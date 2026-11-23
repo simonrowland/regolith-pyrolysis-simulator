@@ -337,15 +337,21 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
         Decimal("100000"),
         source_observation=source("Pa", Quantity.P_PARTIAL),
     )
+    # A printed 1 kPa two-sigma width means endpoints at 100,500 and 99,500 Pa.
     expected_standard_dex = max(
         abs(Decimal("100500").ln() - Decimal("100000").ln()) / Decimal(10).ln(),
         abs(Decimal("99500").ln() - Decimal("100000").ln()) / Decimal(10).ln(),
     )
+    # The standard dex width gets the normal-95 ticket multiplier once.
     expected_dex = expected_standard_dex * NORMAL_95_TICKET_MULTIPLIER
     assert pressure.band is not None
     assert pressure.band.unit == "dimensionless"
-    assert pressure.band.value == expected_dex
-    assert pressure.standard_uncertainty_dex == expected_standard_dex
+    assert pressure.standard_uncertainty_dex is not None
+    assert abs(pressure.band.value - expected_dex) < Decimal("1e-27")
+    assert (
+        abs(pressure.standard_uncertainty_dex - expected_standard_dex)
+        < Decimal("1e-27")
+    )
     assert _decision_band_kind(pressure.band) == "printed_2sigma"
 
 

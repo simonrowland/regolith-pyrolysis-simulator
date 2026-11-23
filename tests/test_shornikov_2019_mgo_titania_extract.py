@@ -393,7 +393,10 @@ def test_unprinted_standard_pressure_widens_printed_gas_band_at_row_temperature(
     )
     assert overridden.refusal is None
     assert overridden.band is not None
-    assert overridden.band.value == Decimal("0.2") + expected
+    # The two-sigma printed half-width is 0.1 kJ/mol; ticket it at normal 95%.
+    assert overridden.band.value == (
+        Decimal("0.1") * NORMAL_95_TICKET_MULTIPLIER + expected
+    )
     assert overridden.notice is None
     assert overridden.two_sigma_band is None
     if temperature_K == "2973":
