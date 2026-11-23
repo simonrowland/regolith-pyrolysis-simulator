@@ -42,6 +42,7 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
+_CHROMIUM_OXYGEN_PER_CR_CANDIDATES = (1.0, 1.5, 3.0)
 
 
 def _cell_material_class(
@@ -127,6 +128,21 @@ def _channel_parent_oxygen_demand(
     ):
         return channel.parent_oxygen_demand
     return float(channel.oxygen_per_metal_atom(float(q))) * channel.redox_metal_atoms
+
+
+def _chromium_oxygen_per_cr_from_valence(
+    reported_cr_valence: object | None,
+) -> float | None:
+    """Convert reported mean Cr valence to O atoms/Cr; None stays unknown."""
+    if isinstance(reported_cr_valence, bool) or reported_cr_valence is None:
+        return None
+    try:
+        valence = float(reported_cr_valence)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(valence) or valence <= 0.0:
+        return None
+    return valence / 2.0
 
 
 def _solve_vacuum_oxygen_balance(
