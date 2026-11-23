@@ -18,9 +18,11 @@ from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
+    _CHROMIUM_OXYGEN_PER_CR_CANDIDATES,
     OxygenBalanceBracketBoundary,
     _VacuumOxygenChannel,
     _channel_parent_oxygen_demand,
+    _chromium_oxygen_per_cr_from_valence,
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
@@ -705,13 +707,17 @@ def _pressure_with_fe_speciation(
             total_pressure_Pa=total_pressure_Pa,
         )
     _record_fe_speciation_source(model, source, engine_flags)
-    return PressureEvaluation(
+    evaluation = PressureEvaluation(
         pressures,
         fe3_over_sum_fe=q,
         fe_activity=activity,
         speciation_source=source,
         below_threshold_omissions=below_threshold_omissions,
     )
+    reported_cr_valence = getattr(engine_response, "cr_valence", None)
+    if reported_cr_valence is not None:
+        evaluation.cr_valence = reported_cr_valence
+    return evaluation
 
 
 def _formula_terms(formula_text: str) -> tuple[dict[str, float], float]:
@@ -855,9 +861,10 @@ def _residue_oxygen_channels(
         }
         redox_atoms = 0.0
         oxygen_per_metal = None
-        # Iron is the redox-variable metal this balance owns. o_bar_Fe replaces
-        # the FeO formula demand inside the residual; the stored demand stays
-        # the q = 0 stoichiometry that sets the declared exponent.
+        # Fe carries dynamic q today. CrO2's corner sign uses the optional
+        # reported valence through the named oxygen-per-Cr seam; absent producer
+        # speciation leaves the residual stoichiometric and the corner sign
+        # guard treats it as ambiguous.
         if set(metals) == {"Fe"}:
             redox_atoms = float(metals["Fe"])
             oxygen_per_metal = iron_mean_oxygen_per_atom
@@ -2304,22 +2311,75 @@ def _mass_loss_corner_bounds(
 
     low_pressures = pressure_at(-30.0)
     high_pressures = pressure_at(0.0)
+    chromium_in_inventory = any(
+        float(amount) > 0.0 and "Cr" in _formula_terms(oxide)[0]
+        for oxide, amount in inventory.items()
+    )
+    root_pressures = (
+        pressure_at(math.log10(sign_probe.pO2_bar) if sign_probe.pO2_bar > 0.0 else -30.0)
+        if chromium_in_inventory
+        and any(channel.species == "CrO2" for channel in variable_alpha_channels)
+        else {}
+    )
+    term_by_species = {term.source.species: term for term in terms}
     transfer_sign: dict[str, int] = {}
     ambiguous_channels: set[str] = set()
+    ambiguity_details: dict[str, dict[str, Any]] = {}
     for channel in variable_alpha_channels:
-        c_low = channel.oxygen_atoms - _channel_parent_oxygen_demand(
-            channel, low_pressures,
-        )
-        c_high = channel.oxygen_atoms - _channel_parent_oxygen_demand(
-            channel, high_pressures,
-        )
-        root_demand = sign_probe.parent_oxygen_demand_at_root.get(
-            channel.species, channel.parent_oxygen_demand,
-        )
-        c_root = channel.oxygen_atoms - root_demand
+        if channel.species == "CrO2" and chromium_in_inventory:
+            low_cr_oxygen = _chromium_oxygen_per_cr_from_valence(
+                getattr(low_pressures, "cr_valence", None)
+            )
+            high_cr_oxygen = _chromium_oxygen_per_cr_from_valence(
+                getattr(high_pressures, "cr_valence", None)
+            )
+            root_cr_oxygen = _chromium_oxygen_per_cr_from_valence(
+                getattr(root_pressures, "cr_valence", None)
+            )
+            if (
+                low_cr_oxygen is None
+                or high_cr_oxygen is None
+                or root_cr_oxygen is None
+            ):
+                ambiguous_channels.add(channel.species)
+                transfer_sign[channel.species] = 0
+                ambiguity_details[channel.species] = {
+                    "species": channel.species,
+                    "reason": "Cr valence not reported by the producer",
+                    "candidate_o_bar_per_Cr": list(
+                        _CHROMIUM_OXYGEN_PER_CR_CANDIDATES
+                    ),
+                    "context": (
+                        "Cr6+ is material in oxidising, alkali-rich melts near air; "
+                        "at Knudsen/vacuum pO2 Cr2+/Cr3+ dominate "
+                        "(o_bar_Cr in [1.0, 1.5], so c_CrO2 > 0). No sourced "
+                        "Cr6+ stability bound narrows this union; certification "
+                        "item t-1962."
+                    ),
+                }
+                continue
+            cr_atoms = term_by_species[channel.species].atom_counts.get("Cr", 0.0)
+            c_low = channel.oxygen_atoms - low_cr_oxygen * cr_atoms
+            c_high = channel.oxygen_atoms - high_cr_oxygen * cr_atoms
+            c_root = channel.oxygen_atoms - root_cr_oxygen * cr_atoms
+        else:
+            c_low = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+                channel, low_pressures,
+            )
+            c_high = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+                channel, high_pressures,
+            )
+            root_demand = sign_probe.parent_oxygen_demand_at_root.get(
+                channel.species, channel.parent_oxygen_demand,
+            )
+            c_root = channel.oxygen_atoms - root_demand
         if c_low * c_high < 0.0:
             ambiguous_channels.add(channel.species)
             transfer_sign[channel.species] = 0
+            ambiguity_details[channel.species] = {
+                "species": channel.species,
+                "reason": "net oxygen transfer changes sign across the pO2 bracket",
+            }
         elif c_root != 0.0:
             transfer_sign[channel.species] = 1 if c_root > 0.0 else -1
         elif c_low != 0.0:
@@ -2329,7 +2389,6 @@ def _mass_loss_corner_bounds(
         else:
             transfer_sign[channel.species] = 0
 
-    term_by_species = {term.source.species: term for term in terms}
     target_channels = list(variable_alpha_channels)
     if include_sourced:
         target_channels.extend(
@@ -2498,6 +2557,10 @@ def _mass_loss_corner_bounds(
                     "corner_sign_ambiguous": sorted(
                         ambiguous_channels
                     ),
+                    "corner_sign_ambiguity_details": [
+                        ambiguity_details[name]
+                        for name in sorted(ambiguity_details)
+                    ],
                     "corner_not_extremal_on_path": sorted(
                         path_non_extremal_species
                     )}
@@ -2849,8 +2912,21 @@ def predict_mass_loss_fraction(
     corner_neighbour_evaluations = 0
     corner_evaluations_by_arm: defaultdict[str, int] = defaultdict(int)
     corner_sign_ambiguities: set[str] = set()
+    corner_sign_ambiguity_details: dict[str, dict[str, Any]] = {}
     corner_path_non_extremal: set[str] = set()
     inventory_capped_channels = set()
+
+    def record_corner_sign_ambiguities(corners: Mapping[str, Any]) -> None:
+        for detail in corners["corner_sign_ambiguity_details"]:
+            species = str(detail["species"])
+            corner_sign_ambiguities.add(species)
+            corner_sign_ambiguity_details[species] = dict(detail)
+            flags.add("corner_sign_ambiguous")
+            flags.add(
+                "corner_sign_ambiguous:" + json.dumps(
+                    detail, sort_keys=True, separators=(",", ":"),
+                )
+            )
     # The shared callback names residue composition for Knudsen and Hashimoto.
     # This path keeps those notices and retargets only the mass-loss quantity.
     omission_notices: list[Any] = []
@@ -2937,9 +3013,7 @@ def predict_mass_loss_fraction(
                 temperature_K=at_K, area_m2=area, duration_s=duration,
                 include_sourced=rectangle,
             )
-            if corners["corner_sign_ambiguous"]:
-                flags.add("corner_sign_ambiguous")
-                corner_sign_ambiguities.update(corners["corner_sign_ambiguous"])
+            record_corner_sign_ambiguities(corners)
             corner_evaluations += corners["corner_count"]
             corner_root_solves += corners["corner_root_solves"]
             corner_evaluations_by_arm[arm] += corners["corner_count"]
@@ -2997,11 +3071,7 @@ def predict_mass_loss_fraction(
                 inventory_capped_channels.update(
                     endpoint_corners["inventory_capped_channels"]
                 )
-                if endpoint_corners["corner_sign_ambiguous"]:
-                    flags.add("corner_sign_ambiguous")
-                    corner_sign_ambiguities.update(
-                        endpoint_corners["corner_sign_ambiguous"]
-                    )
+                record_corner_sign_ambiguities(endpoint_corners)
                 if endpoint_corners["corner_not_extremal_on_path"]:
                     flags.add("corner_not_extremal_on_path")
                     corner_path_non_extremal.update(
@@ -3106,6 +3176,10 @@ def predict_mass_loss_fraction(
             "corner_neighbour_evaluations": corner_neighbour_evaluations,
             "corner_evaluations_by_arm": dict(corner_evaluations_by_arm),
             "corner_sign_ambiguous": sorted(corner_sign_ambiguities),
+            "corner_sign_ambiguity_details": [
+                corner_sign_ambiguity_details[species]
+                for species in sorted(corner_sign_ambiguity_details)
+            ],
             "corner_not_extremal_on_path": sorted(corner_path_non_extremal),
             "corner_ordering_verified": all(c["pO2_low_bar"] <= c["pO2_high_bar"] for c in corner_records),
             "pO2_corner_ranges_bar": {
