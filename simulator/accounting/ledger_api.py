@@ -222,8 +222,16 @@ class LedgerAPI:
                 "that the run selected an early tap"
             )
         elif view_name == "stage_purity":
-            from simulator.condensation import stage_purity_report
-            payload = stage_purity_report(self.sim.train)
+            from simulator.condensation import (
+                headspace_commit_posted_subfloor_share,
+                stage_purity_report,
+            )
+            payload = stage_purity_report(
+                self.sim.train,
+                post_subfloor_captured_share=(
+                    headspace_commit_posted_subfloor_share(self.sim)
+                ),
+            )
         elif view_name == "thermal_train":
             # Diagnostic view over run history, not atom inventory.
             payload = self.queries.thermal_train_report()

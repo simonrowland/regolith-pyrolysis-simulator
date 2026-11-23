@@ -11237,8 +11237,41 @@ STAGE_PURITY_VERDICTS = frozenset((
 STAGE_PURITY_NO_CAPTURED_MASS = 'no_captured_mass'
 
 
-def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
-    """Classify each stage's accumulated product as designated or impurity."""
+def headspace_commit_posted_subfloor_share(owner: object) -> bool:
+    """True after a headspace commit kept subfloor solids on the stage book.
+
+    The purity report is called later, from the run artifact and the
+    ledger view. Those callers pass this bool. They do not recompute
+    the floor.
+    """
+
+    return bool(
+        getattr(owner, "_headspace_posts_subfloor_captured_share", False)
+    )
+
+
+def stage_purity_report(
+    train: CondensationTrain,
+    *,
+    post_subfloor_captured_share: bool = False,
+) -> dict[str, dict[str, Any]]:
+    """Classify each stage's accumulated product as designated or impurity.
+
+    Off a headspace commit, a mass in (0, the kilogram floor] is not
+    captured. The flag is that commit: the solid the stage book kept
+    is in this report.
+    """
+
+    from engines.builtin.condensation_route import (
+        headspace_commit_drops_positive_mass,
+    )
+
+    def _kept(mass_kg: float) -> bool:
+        mass = float(mass_kg)
+        return mass > 0.0 and not headspace_commit_drops_positive_mass(
+            mass,
+            post_subfloor_captured_share=post_subfloor_captured_share,
+        )
 
     report: dict[str, dict[str, Any]] = {}
     for stage in train.stages:
@@ -11269,12 +11302,12 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         coproduct_species_kg: dict[str, float] = {}
         impurity_species_kg: dict[str, float] = {}
         activity = {
-            species: collected_kg[species] > 1e-12
+            species: _kept(collected_kg[species])
             for species in sorted(accepted_species)
             if species in collected_kg
         }
         for species, kg in sorted(collected_kg.items()):
-            if abs(kg) <= 1e-12:
+            if not _kept(kg):
                 continue
             if species in coproduct_species:
                 coproduct_species_kg[species] = kg
@@ -11289,7 +11322,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         )
         impurity_kg = sum(impurity_species_kg.values())
         total_kg = designated_kg + impurity_kg
-        if total_kg <= 1e-12:
+        if not _kept(total_kg):
             purity_fraction = None
             verdict = STAGE_PURITY_VERDICT_INDETERMINATE
         else:
@@ -11315,7 +11348,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             'verdict': verdict,
             'warning': (
                 'non-designated condensate present'
-                if impurity_kg > 1e-12 else ''
+                if _kept(impurity_kg) else ''
             ),
         }
         if verdict == STAGE_PURITY_VERDICT_INDETERMINATE:

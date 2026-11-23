@@ -8621,13 +8621,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # parent stoich, or a parent debit the melt does not cover.
             # The kilogram floor is not that test. A covered debit
             # below the floor is still the gas, and q is the gross.
-            # Above the floor, q = gross * (1 - f). A captured rate
-            # at or below the floor does not leave the overhead: the
-            # condensation debit would not fire, and q stays the gross.
-            # The floor is this instantaneous kg/h. The commit posts
-            # the integrated captured share even when that integral is
-            # at or under the same number, because this q already
-            # removed it.
+            # q = gross * (1 - f) for every positive captured share.
+            # This function is the headspace commit. The predicate
+            # keeps a captured rate the kilogram floor would zero, so
+            # a steady share under that floor leaves the overhead and
+            # the reductive credit integrates. Zero is not a share.
+            # The commit posts the integrated captured share. This q
+            # already removed it.
             # Overhead O2 is the projector on the parcels that post, plus
             # the O2 the condensation route will credit. A booking
             # replaces the static product map: CrO3's oxygen is that
@@ -8639,17 +8639,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # the oxygen integrated over the hour is the booking of
             # the integrated captured mass. Off that commit the floor
             # still retains the parcel and credits no O2.
-            # Algebra: q = gross - captured, captured = 0 when
-            # gross * f <= floor, else gross * f.
+            # Algebra: q = gross - captured. captured is 0 when
+            # gross * f is not positive, or when the predicate drops
+            # that positive mass. The headspace flag drops none of it.
             # Hold: available_kg >= rate * oxide_per > 0.
             # n_O2 = n_projector(posted) + Σ n_product(credited share).
             # Unit check: kg/h, and mol/h * kg/mol = kg/h.
             # Limit: f = 0 leaves the gross and returns no condensation
-            # oxygen. f = 1 with products above the floor leaves no
-            # vapor and still returns the product-map oxygen.
+            # oxygen. f = 1 leaves no vapor, including when the
+            # captured share is under the kilogram floor, and still
+            # returns the product-map oxygen.
             # A rate the melt cannot cover is 0 and is not in the
             # projector. The name set is frozen on the opening call.
             # A name outside that set is not returned.
+            from engines.builtin.condensation_route import (
+                headspace_commit_drops_positive_mass,
+            )
+
             fractions = state['fractions']
             walls = state.get('wall_fraction') or {}
             bookings = state.get('wall_booking') or {}
@@ -8704,7 +8710,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else:
                     captured_f = 0.0
                 captured_kg = rate * captured_f
-                if captured_kg <= rate_floor_kg_hr:
+                # Same predicate as the oxygen credit below. A positive
+                # share under the kilogram floor stays in q and in the
+                # credit. Zero is not a share.
+                if captured_kg <= 0.0 or headspace_commit_drops_positive_mass(
+                    captured_kg,
+                    post_subfloor_captured_share=True,
+                ):
                     captured_kg = 0.0
                 source[label] = rate - captured_kg
                 # The commit posts the integral of this captured mass.

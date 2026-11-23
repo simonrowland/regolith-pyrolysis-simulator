@@ -6221,6 +6221,10 @@ class EvaporationMixin:
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
         if headspace_remaining_kg_hr is not None:
+            # The stage book and the purity report read this. A later
+            # ordinary hour does not clear it: the solids already
+            # posted stay on the cartridge.
+            self._headspace_posts_subfloor_captured_share = True
             # Premise: the residual's vapor source is the mass that
             # stays in the headspace. The route's own remaining is a
             # second capture. The committed hour posts the residual.
@@ -6557,6 +6561,7 @@ class EvaporationMixin:
         )
         self._project_routed_condensate(
             route_result, species, credited_condensed_kg, sp_data,
+            post_subfloor_captured_share=post_subfloor_captured_share,
         )
 
         return {
@@ -6795,7 +6800,10 @@ class EvaporationMixin:
         self._record_wall_deposit_delta(species, diagnostic)
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         self._last_condensation_baffle_product_kg_by_account = (
-            self._stage_baffle_product_kg_from_credits(kernel_result.transition)
+            self._stage_baffle_product_kg_from_credits(
+                kernel_result.transition,
+                post_subfloor_captured_share=post_subfloor_captured_share,
+            )
         )
         return float(diagnostic.get('credited_condensed_kg', 0.0))
 
@@ -7160,11 +7168,41 @@ class EvaporationMixin:
     def _atom_moles_for_kg(self, species: str, kg: float) -> dict:
         return _atom_moles_for_kg(species, kg, self.species_formula_registry)
 
-    def _stage_baffle_product_kg_from_credits(self, proposal) -> dict:
+    def _stage_mass_is_omitted(
+        self,
+        mass_kg: float,
+        *,
+        post_subfloor_captured_share: bool,
+    ) -> bool:
+        """True when the stage book does not record this kilogram.
+
+        Zero is not a parcel. A positive mass under the kilogram floor
+        is recorded only on a headspace commit. The predicate is that
+        commit; this method adds the zero check the predicate excludes.
+        """
+
+        from engines.builtin.condensation_route import (
+            headspace_commit_drops_positive_mass,
+        )
+
+        mass = float(mass_kg)
+        return mass <= 0.0 or headspace_commit_drops_positive_mass(
+            mass,
+            post_subfloor_captured_share=post_subfloor_captured_share,
+        )
+
+    def _stage_baffle_product_kg_from_credits(
+        self,
+        proposal,
+        *,
+        post_subfloor_captured_share: bool = False,
+    ) -> dict:
         """Kg of baffle solids on the train and the chromia terminal.
 
         The proposal stores mol. Wall accounts, overhead O2 and retained
-        holdup are not stage condensate, so they are omitted.
+        holdup are not stage condensate, so they are omitted. A positive
+        solid under the kilogram floor is kept when the headspace commit
+        posted it.
         """
         credits = getattr(proposal, "credits", {}) or {}
         out: dict[str, dict[str, float]] = {}
@@ -7182,7 +7220,12 @@ class EvaporationMixin:
                     product, self.species_formula_registry,
                 )
                 kg = mol_f * formula.molar_mass_kg_per_mol()
-                if kg <= 1e-12:
+                if self._stage_mass_is_omitted(
+                    kg,
+                    post_subfloor_captured_share=(
+                        post_subfloor_captured_share
+                    ),
+                ):
                     continue
                 product_kg[str(product)] = kg
             if product_kg:
@@ -7195,6 +7238,8 @@ class EvaporationMixin:
         species: str,
         credited_condensed_kg: float,
         sp_data: dict,
+        *,
+        post_subfloor_captured_share: bool = False,
     ) -> dict:
         """Project this parcel onto the stage UI from the committed solids.
 
@@ -7235,6 +7280,9 @@ class EvaporationMixin:
                     product_kg,
                     source_account=account,
                     swing_alkali_cartridge=swing,
+                    post_subfloor_captured_share=(
+                        post_subfloor_captured_share
+                    ),
                 )
             return merged
         product_projection = self._condensed_products_kg(
@@ -7242,6 +7290,7 @@ class EvaporationMixin:
         )
         self._project_condensed_stage_collection(
             route_result, species, credited_condensed_kg, product_projection,
+            post_subfloor_captured_share=post_subfloor_captured_share,
         )
         return product_projection
 
@@ -7251,13 +7300,20 @@ class EvaporationMixin:
         *,
         source_account: str = "process.condensation_train",
         swing_alkali_cartridge: bool = True,
+        post_subfloor_captured_share: bool = False,
     ) -> None:
-        if credited_condensed_kg <= 1e-12:
+        def _omitted(mass_kg: float) -> bool:
+            return self._stage_mass_is_omitted(
+                mass_kg,
+                post_subfloor_captured_share=post_subfloor_captured_share,
+            )
+
+        if _omitted(credited_condensed_kg):
             return
         product_kg_by_species = product_kg_by_species or {
             species: credited_condensed_kg}
         intended_condensed_kg = route_result.condensed_for_species(species)
-        if intended_condensed_kg <= 1e-12:
+        if _omitted(intended_condensed_kg):
             return
         scale = credited_condensed_kg / intended_condensed_kg
         reaction = route_result.stage3_reactive_alkali_by_species.get(species, {})
@@ -7278,19 +7334,23 @@ class EvaporationMixin:
                     stage3_key, {},
                 ).get(species, 0.0)
             )
-            scale = ((credited_condensed_kg - reactive_vapor_kg) / ordinary_intended_kg
-                     if ordinary_intended_kg > 1e-12 else 0.0)
+            scale = (
+                (credited_condensed_kg - reactive_vapor_kg)
+                / ordinary_intended_kg
+                if not _omitted(ordinary_intended_kg)
+                else 0.0
+            )
         product_scale = {
             product: kg / credited_condensed_kg
             for product, kg in product_kg_by_species.items()
-            if kg > 1e-12
+            if not _omitted(kg)
         }
         def book(stage_idx, stage_products, is_impurity):
             if stage_idx is None:
                 return
             stage = self.train.stages[stage_idx]
             for product, stage_product_kg in stage_products.items():
-                if stage_product_kg <= 1e-12:
+                if _omitted(stage_product_kg):
                     continue
                 delta_key = (int(stage.stage_number), product)
                 deltas = self._last_condensed_by_stage_species_delta
@@ -7346,7 +7406,7 @@ class EvaporationMixin:
                     )
                 else:
                     stage_products = scaled_products(vapor_kg * scale)
-                if not any(kg > 1e-12 for kg in stage_products.values()):
+                if not any(not _omitted(kg) for kg in stage_products.values()):
                     continue
                 stage_idx = stage_index_for_visit_identity(
                     self.train, stage_number, sub_order,
@@ -7365,7 +7425,7 @@ class EvaporationMixin:
                 ):
                     cartridge_stage_idx = stage_idx
                     for product, product_kg in stage_products.items():
-                        if product_kg > 1e-12:
+                        if not _omitted(product_kg):
                             cartridge_booked[product] = (
                                 cartridge_booked.get(product, 0.0)
                                 + product_kg
@@ -7415,7 +7475,7 @@ class EvaporationMixin:
                 )
                 else scaled_products(projected_kg)
             )
-            if not any(kg > 1e-12 for kg in stage_products.values()):
+            if not any(not _omitted(kg) for kg in stage_products.values()):
                 continue
             stage_idx = stage_list_index_for_destination(
                 self.train, str(stage_key),

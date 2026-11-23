@@ -42,6 +42,7 @@ from simulator.backend_names import (
 from simulator.campaigns import CampaignManager, parse_campaign_override_value
 from simulator.condensation import (
     KnudsenRegimeRefusal,
+    headspace_commit_posted_subfloor_share,
     minimum_pressure_mbar_for_knudsen,
     stage_purity_report,
 )
@@ -2413,7 +2414,12 @@ def _tick_payload(
             k: round(v, 3) for k, v in snapshot.condensation_totals.items()
         },
         **_oxygen_reservoir_exchange_observables(snapshot),
-        'stage_purity_report': stage_purity_report(sim.train),
+        'stage_purity_report': stage_purity_report(
+            sim.train,
+            post_subfloor_captured_share=(
+                headspace_commit_posted_subfloor_share(sim)
+            ),
+        ),
         'energy_electrical_plus_evaporation_kWh': round(
             snapshot.energy.electrical_plus_evaporation_kWh, 4),
         'energy_electrical_kWh': round(snapshot.energy.electrical_total_kWh, 4),
@@ -2696,7 +2702,12 @@ def _completion_payload(sim):
         ),
         # VR-11 SC-50 surface: owned producer set via sc50_vr_socket_panels.
         **sc50_vr_socket_panels(sim),
-        'stage_purity_report': stage_purity_report(sim.train),
+        'stage_purity_report': stage_purity_report(
+            sim.train,
+            post_subfloor_captured_share=(
+                headspace_commit_posted_subfloor_share(sim)
+            ),
+        ),
         'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),
     }
     composition_projected_notice = _composition_projected_liquidus_notice(sim)

@@ -101,6 +101,7 @@ from simulator.core import (
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
     gram_lab_exposed_melt_area_bridge,
+    headspace_commit_posted_subfloor_share,
     stage_purity_report,
 )
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -1848,7 +1849,12 @@ class PyrolysisRun:
                 section="thermal_train_report",
             ),
             "stage_purity_report": _safe_failure_value(
-                lambda: _json_safe(stage_purity_report(sim.train)),
+                lambda: _json_safe(stage_purity_report(
+                    sim.train,
+                    post_subfloor_captured_share=(
+                        headspace_commit_posted_subfloor_share(sim)
+                    ),
+                )),
                 section="stage_purity_report",
             ),
             "vapor_pressure_source_report": _safe_failure_value(
@@ -6029,7 +6035,12 @@ def _runner_failure_result(
         )
     stage_report = (
         _safe_failure_value(
-            lambda: _json_safe(stage_purity_report(sim.train)),
+            lambda: _json_safe(stage_purity_report(
+                sim.train,
+                post_subfloor_captured_share=(
+                    headspace_commit_posted_subfloor_share(sim)
+                ),
+            )),
             section="stage_purity_report",
         )
         if sim is not None

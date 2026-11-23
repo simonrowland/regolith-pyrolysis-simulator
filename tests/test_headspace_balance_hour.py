@@ -1895,3 +1895,145 @@ def test_cro3_band_hour_oxygen_matches_the_integrated_captured_mass():
     withheld_delta, _withheld_oxide = _routed(clearing, headspace=False)
     assert delta == clearing_on
     assert withheld_delta == clearing_off
+
+
+def _stage_species_kg(sim, species: str) -> float:
+    return math.fsum(
+        float(stage.collected_kg.get(species, 0.0) or 0.0)
+        for stage in sim.train.stages
+    )
+
+
+def test_headspace_source_keeps_a_subfloor_captured_rate():
+    """The headspace source does not zero a captured rate under 1e-12 kg/h.
+
+    Mutation: restoring ``captured_kg <= rate_floor_kg_hr`` zeros a
+    5e-13 kg/h share before the oxygen credit. The hour then
+    integrates no reductive oxygen, and the predicate call is gone
+    from that clip.
+    """
+
+    hour = inspect.getsource(
+        PyrolysisSimulator._solve_and_commit_headspace_hour
+    )
+    start = hour.index("captured_kg = rate * captured_f")
+    window = hour[start:start + 700]
+    assert "headspace_commit_drops_positive_mass" in window
+    assert "post_subfloor_captured_share=True" in window
+    assert "rate_floor_kg_hr" not in window
+
+
+def test_headspace_subfloor_solid_is_the_stage_inventory():
+    """A subfloor solid on the ledger is the cartridge inventory.
+
+    The CrO3 booking posts Cr2O3 under 1e-12 kg. The stage book and
+    the purity report used to drop that kilogram with no flag.
+
+    Mutation: comparing the solid, the captured vapour, or the purity
+    total with 1e-12 leaves collected_kg empty and the report
+    indeterminate. Projecting the same solid with the flag off, or
+    reporting the flagged train without the flag, puts the solid
+    where the ordinary floor still hides it. This test fails that.
+    """
+
+    from types import SimpleNamespace
+
+    from engines.builtin.condensation_route import (
+        BuiltinCondensationRouteProvider,
+    )
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+    from simulator.condensation import (
+        STAGE_PURITY_VERDICT_INDETERMINATE,
+        STAGE_PURITY_VERDICT_PURE,
+        headspace_commit_posted_subfloor_share,
+        stage_purity_report,
+    )
+    from simulator.condensation import CondensationRouteResult
+    from simulator.condensation_routing import STAGE_KEY_BY_NUMBER
+
+    vapor_kg = 1.2e-12
+    assert vapor_kg > EMPTY_KG_TOLERANCE
+    sim = _lunar()
+    registry = sim.species_formula_registry
+    row = dict(
+        (sim.vapor_pressures.get("oxide_vapors", {}) or {}).get("CrO3") or {}
+    )
+    booking = _oxygen_crediting_booking(sim, "CrO3")
+    parent = sim._evaporation_stoich("CrO3", row)["parent_oxide"]
+    parent_molar = resolve_species_formula(
+        parent, registry,
+    ).molar_mass_kg_per_mol()
+    _seed(
+        sim, "process.cleaned_melt",
+        {parent: 1.0 / parent_molar}, "stage-book parent",
+    )
+    _seed(sim, "reservoir.fo2_buffer", {"O2": 1.0}, "stage-book oxidant")
+    _route_one_parcel(
+        sim, "CrO3", vapor_kg, 0.0,
+        headspace=True, post_subfloor=True, booking=booking,
+    )
+    chromium = BuiltinCondensationRouteProvider.CHROMIUM_CONDENSED_ACCOUNT
+    ledger_kg = float(
+        sim.atom_ledger.kg_by_account(chromium).get("Cr2O3", 0.0) or 0.0
+    )
+    assert 0.0 < ledger_kg <= EMPTY_KG_TOLERANCE
+    oxide_mol = _ledger_mol(sim, chromium, "Cr2O3")
+    proposal = SimpleNamespace(credits={chromium: {"Cr2O3": oxide_mol}})
+    kept = sim._stage_baffle_product_kg_from_credits(
+        proposal, post_subfloor_captured_share=True,
+    )
+    assert kept[chromium]["Cr2O3"] == ledger_kg
+    withheld = sim._stage_baffle_product_kg_from_credits(
+        proposal, post_subfloor_captured_share=False,
+    )
+    assert "Cr2O3" not in withheld.get(chromium, {})
+    snap = sim._last_condensation_baffle_product_kg_by_account
+    assert snap[chromium]["Cr2O3"] == ledger_kg
+
+    stage_key = STAGE_KEY_BY_NUMBER[2]
+
+    def _project(host, mass_kg: float, *, headspace: bool) -> None:
+        route = CondensationRouteResult(
+            condensed_by_stage_species={stage_key: {"CrO3": mass_kg}},
+            capture_kg_by_stage_identity={(2, 0): {"CrO3": mass_kg}},
+            wall_reaction_booking_by_species={"CrO3": booking},
+        )
+        host._last_condensation_baffle_product_kg_by_account = {
+            chromium: {"Cr2O3": ledger_kg},
+        }
+        host._project_routed_condensate(
+            route, "CrO3", mass_kg, row,
+            post_subfloor_captured_share=headspace,
+        )
+
+    assert _stage_species_kg(sim, "Cr2O3") == 0.0
+    _project(sim, vapor_kg, headspace=True)
+    assert _stage_species_kg(sim, "Cr2O3") == ledger_kg
+    flagged = stage_purity_report(
+        sim.train,
+        post_subfloor_captured_share=(
+            headspace_commit_posted_subfloor_share(sim)
+        ),
+    )
+    assert headspace_commit_posted_subfloor_share(sim) is True
+    assert flagged[stage_key]["designated_species_kg"]["Cr2O3"] == ledger_kg
+    assert flagged[stage_key]["activity"]["Cr2O3"] is True
+    assert flagged[stage_key]["verdict"] == STAGE_PURITY_VERDICT_PURE
+    plain = stage_purity_report(sim.train)
+    assert "Cr2O3" not in plain[stage_key]["designated_species_kg"]
+    assert plain[stage_key]["verdict"] == STAGE_PURITY_VERDICT_INDETERMINATE
+
+    # The captured vapour itself under the floor. The early return
+    # used to drop it before the solid was scaled.
+    subfloor_vapor = ledger_kg
+    assert subfloor_vapor <= EMPTY_KG_TOLERANCE
+    held = _lunar()
+    _project(held, subfloor_vapor, headspace=True)
+    assert _stage_species_kg(held, "Cr2O3") == ledger_kg
+    missed = _lunar()
+    _project(missed, vapor_kg, headspace=False)
+    assert _stage_species_kg(missed, "Cr2O3") == 0.0
+    missed_vapor = _lunar()
+    _project(missed_vapor, subfloor_vapor, headspace=False)
+    assert _stage_species_kg(missed_vapor, "Cr2O3") == 0.0
