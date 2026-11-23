@@ -12,10 +12,12 @@ from simulator.battery import migrate as battery_migrate
 from simulator.diagnostic_helpers.extract_reproduction import (
     _literature_pressure_points,
     _melt_recipe_mol,
+    evaluate_observation,
     load_adopted_observations,
     observation_admission_reason,
     _pressure_standard_state_kind,
 )
+import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 
 
 def _adopted_observation(source_id: str, species: str, observation_id: str):
@@ -191,3 +193,48 @@ def test_demaria_k_reservoir_reason_selects_melt_standard_state() -> None:
         "reason": "p_partial over multicomponent melt; no single pure-substance reservoir",
     }
     assert _pressure_standard_state_kind(obs) == "melt"
+
+
+def test_demaria_k_composition_points_report_scorer_only_closure_gap(
+    monkeypatch,
+) -> None:
+    obs = _adopted_observation(
+        "kems-022-demaria-1971",
+        "K",
+        "demaria_1971_k_psat_figure2_digitized",
+    )
+    points, skip, drops = _literature_pressure_points(obs)
+    assert skip is None
+    assert not drops
+    assert points is not None
+    composition_points = [
+        point for point in points if _melt_recipe_mol(obs, point=point)[0] is not None
+    ]
+    assert len(composition_points) == 2
+
+    melt_calls: list[tuple[object, ...]] = []
+
+    def refuse_numeric_po2(*args, **kwargs):
+        melt_calls.append(args)
+        raise AssertionError("Knudsen closure must not be replaced by numeric pO2")
+
+    runtimes: list[dict[str, object]] = []
+    compare_point = extract_reproduction._compare_point
+
+    def capture_runtime(**kwargs):
+        runtimes.append(dict(kwargs["runtime"]))
+        return compare_point(**kwargs)
+
+    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", refuse_numeric_po2)
+    monkeypatch.setattr(extract_reproduction, "_compare_point", capture_runtime)
+
+    evaluation = evaluate_observation(obs, vapor_pressure_data={})
+
+    scorer_gap = (
+        "typed-refusal:diagnostic_effusion_closure_via_scorer_only; "
+        "owner=simulator/battery/score.py::_borrow_internal_analytical_effusion"
+    )
+    assert len(evaluation.records) == 10
+    assert sum(runtime.get("skip_reason") == scorer_gap for runtime in runtimes) == 2
+    assert scorer_gap in evaluation.skip_reasons
+    assert not melt_calls
