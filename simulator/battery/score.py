@@ -11338,12 +11338,9 @@ def _select_phase_composition(
     result: EquilibriumResult, role: PhaseRole
 ) -> tuple[Mapping[str, float] | None, str | None]:
     comps = dict(result.phase_compositions or {})
-    exact = [name for name in comps if name.casefold() == role.value]
-    if len(exact) > 1:
-        return None, "ambiguous_phase"
-    if len(exact) == 1:
-        return comps[exact[0]], None
     if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
+        # An exact role name is one liquid match, not a shortcut past the
+        # others. {melt, liq} must not score the exact row.
         liquids = [name for name in comps if name.casefold() in LIQUID_ROLE_LABELS]
         if len(liquids) > 1:
             return None, "ambiguous_phase"
@@ -11358,6 +11355,11 @@ def _select_phase_composition(
         if ambiguous is not None:
             return None, ambiguous
         return None, "phase_not_in_assemblage"
+    exact = [name for name in comps if name.casefold() == role.value]
+    if len(exact) > 1:
+        return None, "ambiguous_phase"
+    if len(exact) == 1:
+        return comps[exact[0]], None
     needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
     hits = [name for name in comps if any(needle in name.casefold() for needle in needles)]
     if len(hits) > 1:

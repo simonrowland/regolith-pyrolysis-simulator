@@ -73,6 +73,19 @@ def test_non_exact_liquid_name_is_the_shared_role_set(monkeypatch):
     assert issue == "phase_not_in_assemblage"
 
 
+def test_exact_role_name_plus_another_liquid_is_ambiguous():
+    result = EquilibriumResult(
+        liquid_fraction=1.0,
+        phase_compositions={
+            "melt": {"SiO2": 10.0},
+            "liq": {"SiO2": 80.0},
+        },
+    )
+    selected, issue = _select_phase_composition(result, PhaseRole.MELT)
+    assert selected is None
+    assert issue == "ambiguous_phase"
+
+
 def test_two_liquid_names_stay_ambiguous():
     result = EquilibriumResult(
         liquid_fraction=1.0,
