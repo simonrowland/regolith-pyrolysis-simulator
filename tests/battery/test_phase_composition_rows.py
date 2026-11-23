@@ -2098,6 +2098,31 @@ def test_equal_mole_silica_lime_wt_percent_is_the_hand_value() -> None:
     _assert_near(wt + cao, Decimal(100))
 
 
+def test_printed_melt_mole_compositions_convert_to_engine_wt() -> None:
+    """Five printed melt compositions convert to the engine's wt% basis."""
+
+    rows = (
+        ("B/Na2O", "Na2O", {"Na2O": "0.635", "SiO2": "0.365"}, "64.217"),
+        ("B/SiO2", "SiO2", {"Na2O": "0.635", "SiO2": "0.365"}, "35.783"),
+        ("D/Na2O", "Na2O", {"Na2O": "0.545", "SiO2": "0.455"}, "55.269"),
+        ("D/SiO2", "SiO2", {"Na2O": "0.545", "SiO2": "0.455"}, "44.731"),
+        (
+            "Zaitsev 2006 Table 2, x(SiO2)=0.528",
+            "SiO2",
+            {"MgO": "0.472", "SiO2": "0.528"},
+            "62.513",
+        ),
+    )
+    for _row, component, printed, expected in rows:
+        fractions = {key: Decimal(value) for key, value in printed.items()}
+        wt, reason = phase_mole_fractions_to_component_wt_percent(
+            component, fractions
+        )
+        assert reason is None, _row
+        assert wt is not None, _row
+        assert wt.quantize(Decimal("0.001")) == Decimal(expected), _row
+
+
 def test_prose_mole_percent_divides_by_100_then_uses_the_same_wt_rule() -> None:
     """50 mol% is x = 0.50. t-1600's bulk map converter is not this path."""
 
@@ -2180,6 +2205,11 @@ def _assemblage_hook(store: list[dict]):
 def test_closed_mole_fraction_reaches_the_assemblage_and_the_hand_reference(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_BASIS_CONVERTED,
+        flagged_strata,
+    )
+
     calls: list[dict] = []
     monkeypatch.setattr(
         "simulator.battery.score._equilibrate_phase_assemblage",
@@ -2264,6 +2294,18 @@ def test_closed_mole_fraction_reaches_the_assemblage_and_the_hand_reference(
     assert expected is not None
     assert residual.numeric.value is not None
     _assert_near(residual.numeric.value, expected)
+    converted = tuple(
+        notice
+        for notice in residual.notices
+        if notice.kind.value == "basis_converted"
+    )
+    assert len(converted) == 1
+    assert converted[0].from_basis == "mole_fraction"
+    assert converted[0].to_basis == "wt_percent"
+    assert converted[0].source_conversion_cited is False
+    assert (
+        FLAGGED_STRATUM_BASIS_CONVERTED in flagged_strata(residual.notices)
+    )
 
 
 def test_unclosed_mole_fraction_siblings_do_not_call_the_assemblage(

@@ -602,6 +602,21 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_BASIS_ASSUMED = "basis_assumed"
+FLAGGED_STRATUM_BASIS_CONVERTED = "basis_converted"
+FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
+DP_013_POLICY_ID = "DP-013"
+DP_013_POLICY_VERSION = "v1"
+
+
+def _dp_013_policy(transform_id: str, units: str) -> Mapping[str, object]:
+    return {
+        "id": DP_013_POLICY_ID,
+        "version": DP_013_POLICY_VERSION,
+        "status": "canonical",
+        "value": transform_id,
+        "units": units,
+    }
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
@@ -2472,9 +2487,29 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
-    return _classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason) for notice in notices)
+    return _flagged_notice_strata(
+        tuple(
+            (
+                notice.kind.value,
+                notice.reason,
+                None if notice.policy is None else notice.policy.get("status"),
+            )
+            for notice in notices
+        )
     )
+
+
+def _flagged_notice_strata(
+    notices: Sequence[tuple[str, object, object]],
+) -> tuple[str, ...]:
+    strata = list(
+        _classify_flagged_notice_facts(
+            tuple((kind, reason) for kind, reason, _status in notices)
+        )
+    )
+    if any(status == "proposed" for _kind, _reason, status in notices):
+        strata.append(FLAGGED_STRATUM_PROPOSED_POLICY)
+    return tuple(strata)
 
 
 def _classify_flagged_notice_facts(
@@ -2482,6 +2517,10 @@ def _classify_flagged_notice_facts(
 ) -> tuple[str, ...]:
     strata: list[str] = []
     kinds = {kind for kind, _reason in notices}
+    if NoticeKind.BASIS_ASSUMED.value in kinds:
+        strata.append(FLAGGED_STRATUM_BASIS_ASSUMED)
+    if NoticeKind.BASIS_CONVERTED.value in kinds:
+        strata.append(FLAGGED_STRATUM_BASIS_CONVERTED)
     unverified_apparatus = tuple(
         reason
         for kind, reason in notices
@@ -18745,6 +18784,31 @@ def _compile_residual_with_lineage(
             )
         assert scaled is not None
         ref_point = scaled
+        if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            basis = effective_phase_basis(_subtype_text(identity))
+            if basis in {"mole_fraction", "mole_percent"}:
+                # The owner converter did the DP-013 transformation.
+                transform = (
+                    "phase_mole_fraction_to_wt_percent_via_oxide_molar_masses"
+                    if basis == "mole_fraction"
+                    else "phase_mole_percent_to_wt_percent_via_oxide_molar_masses"
+                )
+                notices = union_notices(
+                    notices,
+                    (
+                        Notice(
+                            kind=NoticeKind.BASIS_CONVERTED,
+                            affected_quantities=(quantity,),
+                            reason="coefficient_basis_mismatch",
+                            origin=reference.observation_id,
+                            from_basis=basis,
+                            to_basis="wt_percent",
+                            transform=transform,
+                            source_conversion_cited=False,
+                            policy=_dp_013_policy(transform, "wt_percent"),
+                        ),
+                    ),
+                )
     else:
         ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
@@ -24250,11 +24314,19 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
-        (str(notice.get("kind") or ""), notice.get("reason"))
+        (
+            str(notice.get("kind") or ""),
+            notice.get("reason"),
+            (
+                notice["policy"].get("status")
+                if isinstance(notice.get("policy"), Mapping)
+                else None
+            ),
+        )
         for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )
-    return _classify_flagged_notice_facts(notices)
+    return _flagged_notice_strata(notices)
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:

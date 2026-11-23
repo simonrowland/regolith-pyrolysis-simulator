@@ -83,6 +83,7 @@ from simulator.battery.records import (
     as_decimal,
     phase_token,
     polymorph_token,
+    union_notices,
 )
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_SEGMENTS,
@@ -1163,6 +1164,53 @@ def _refuse(
         refusal_detail=payload,
         call_evidence=call_evidence,
         coefficient_sources=() if quantity in FUSION_QUANTITIES else None,
+    )
+
+
+# DP-102 is a proposal for a missing printed per-basis. Thermochemistry
+# engines return these quantities per mole of species; the default therefore
+# applies an identity factor of 1. Unit check: the assumed mol-species unit is
+# unchanged. The limiting case is exactly the printed numeric value. If the
+# source used another denominator, the bias is unquantified, so this stays in
+# the proposed-policy tier.
+DP_102_DEFAULT_PER = PerBasis.MOL_SPECIES
+DP_102_POLICY: Mapping[str, object] = {
+    "id": "DP-102",
+    "version": "v1",
+    "status": "proposed",
+    "value": DP_102_DEFAULT_PER.value,
+    "units": "per-mol-species",
+}
+
+
+def _missing_per_reason(engine: Engine, quantity: Quantity) -> str:
+    if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
+        reason = "pure-phase-per-basis-mismatch"
+    elif engine is Engine.NASA_CEA_9:
+        reason = (
+            "nasa-cea-pure-thermo-requires-mol-species"
+            if quantity in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+            else "nasa-cea-formation-per-basis-unsupported"
+        )
+    elif engine is Engine.VAPOROCK:
+        return (
+            f"{RefusalReason.IDENTITY_UNKNOWN.value}:"
+            "vaporock-gas-thermo-requires-mol-species-basis"
+        )
+    else:
+        reason = "per-basis-unsupported"
+    return f"{RefusalReason.UNSUPPORTED.value}:{reason}"
+
+
+def _attach_basis_default(
+    attempt: ThermoAttempt,
+    notice: Notice | None,
+) -> ThermoAttempt:
+    if notice is None or attempt.value is None:
+        return attempt
+    return replace(
+        attempt,
+        notices=union_notices(attempt.notices, (notice,)),
     )
 
 
@@ -3591,6 +3639,19 @@ def predict_thermo_attempt(
             quantity=quantity,
             origin=origin,
         )
+    basis_notice = None
+    if quantity in _THERMO_QUANTITIES and (
+        identity.per is None or identity.per.is_unknown
+    ):
+        basis_notice = Notice(
+            kind=NoticeKind.BASIS_ASSUMED,
+            affected_quantities=(quantity,),
+            reason=_missing_per_reason(engine, quantity),
+            origin=origin,
+            policy=DP_102_POLICY,
+        )
+        identity = replace(identity, per=State.of(DP_102_DEFAULT_PER))
+        observation = replace(observation, identity=identity)
     if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
         if engine is not Engine.INTERNAL_ANALYTICAL:
             return _refuse(
@@ -3812,7 +3873,7 @@ def predict_thermo_attempt(
                     )
                 )
         notices = tuple(notice_list)
-        return ThermoAttempt(
+        attempt = ThermoAttempt(
             value=predicted,
             unit=QUANTITY_UNITS[quantity],
             authority=authority,
@@ -3825,25 +3886,38 @@ def predict_thermo_attempt(
             ),
             coefficient_sources=(solid, liquid),
         )
+        return _attach_basis_default(attempt, basis_notice)
     if engine is Engine.INTERNAL_ANALYTICAL:
-        return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
+        return _attach_basis_default(
+            _ellingham_attempt(identity, quantity, temperature_K, origin=origin),
+            basis_notice,
+        )
     if engine is Engine.NASA_CEA_9:
-        return _nasa_cea_9_attempt(
-            identity, quantity, temperature_K, origin=origin
+        return _attach_basis_default(
+            _nasa_cea_9_attempt(
+                identity, quantity, temperature_K, origin=origin
+            ),
+            basis_notice,
         )
     if engine is Engine.VAPOROCK:
-        return _vaporock_gas_attempt(
-            observation, identity, quantity, temperature_K, origin=origin
+        return _attach_basis_default(
+            _vaporock_gas_attempt(
+                observation, identity, quantity, temperature_K, origin=origin
+            ),
+            basis_notice,
         )
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
-        return _pure_phase_attempt(
-            engine,
-            identity,
-            quantity,
-            temperature_K,
-            origin=origin,
-            invoke_pure_phase=invoke_pure_phase,
-            pure_phase=pure_phase,
+        return _attach_basis_default(
+            _pure_phase_attempt(
+                engine,
+                identity,
+                quantity,
+                temperature_K,
+                origin=origin,
+                invoke_pure_phase=invoke_pure_phase,
+                pure_phase=pure_phase,
+            ),
+            basis_notice,
         )
     return _refuse(
         RefusalReason.UNSUPPORTED,

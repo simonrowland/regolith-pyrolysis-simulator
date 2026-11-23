@@ -3567,6 +3567,13 @@ def _notice_from_plain(payload: object) -> Notice:
         if payload.get("authority") is None
         else Authority(str(payload["authority"])),
         certification=payload.get("certification"),
+        from_basis=payload.get("from_basis"),
+        to_basis=payload.get("to_basis"),
+        transform=payload.get("transform"),
+        source_conversion_cited=payload.get("source_conversion_cited"),
+        policy=(
+            None if payload.get("policy") is None else dict(payload["policy"])
+        ),
     )
 
 

@@ -302,6 +302,8 @@ class BenchIdentityBasis(StrEnum):
 
 
 class NoticeKind(StrEnum):
+    BASIS_ASSUMED = "basis_assumed"
+    BASIS_CONVERTED = "basis_converted"
     FLOOR_INVERSION = "floor_inversion"
     FALLBACK = "fallback"
     OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"

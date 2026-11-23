@@ -331,11 +331,16 @@ def phase_mole_fractions_to_component_wt_percent(
     ``oxide_molar_mass`` (the project CIAAW table), not a rounded mass.
 
     Unit check: (mol/mol) * (g/mol) = g per mole of phase; g/g * 100 = wt%.
+    Limiting case: a pure component (x_i=1) returns 100 wt%.
 
     Worked example with the ruling's rounded masses SiO2 = 60.08 and
     CaO = 56.08: w(SiO2) = 100 * 0.5 * 60.08 / (0.5 * 60.08 + 0.5 * 56.08)
     = 51.72 wt%. The CIAAW masses this function uses are SiO2 = 60.083 and
     CaO = 56.077, so the same equal-mole point is 51.724346 wt%.
+
+    Worked source row: D'Ans & Löffler (1930), p. 34, Table 13, binary
+    eutectic B prints x(Na2O)=0.635 and x(SiO2)=0.365. With the owning
+    oxide masses 61.97853856 and 60.083 g/mol, Na2O is 64.216858 wt%.
     """
 
     from simulator.battery.migrate import is_engine_map_oxide_key, oxide_molar_mass

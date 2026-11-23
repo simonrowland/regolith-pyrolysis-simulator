@@ -9314,6 +9314,76 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     assert "| 10 | 10 | unsupported=1 |" in report
 
 
+def test_proposed_default_basis_flag_is_separate_and_excluded_from_headline() -> None:
+    from simulator.battery.score import dumps_residual_line
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    identity = replace(F.psat_identity("Na"), quantity=Quantity.DELTA_FG)
+    observation = F.observation(
+        "basis-policy-default",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, observation)
+    notice = Notice(
+        kind=NoticeKind.BASIS_ASSUMED,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason="unsupported:per-basis-unsupported",
+        origin="engine:fixture",
+        policy={
+            "id": "DP-102",
+            "version": "v1",
+            "status": "proposed",
+            "value": "mol_species",
+            "units": "per-mol-species",
+        },
+    )
+    residual = replace(
+        F.residual(
+            f"headline::{observation.observation_id}::{Engine.INTERNAL_ANALYTICAL.value}",
+            observation.observation_id,
+            candidate="produced",
+            status=ResidualStatus.MATCH,
+            rail=Rail.VAPOUR,
+            numeric=ResidualNumeric(
+                MetricOperation.DEX,
+                "dimensionless",
+                Decimal("2"),
+                DecisionBand(Decimal("20"), "dimensionless", "fixture band"),
+            ),
+        ),
+        notices=(notice,),
+    )
+    assert score_mod.flagged_strata((notice,)) == (
+        score_mod.FLAGGED_STRATUM_BASIS_ASSUMED,
+        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
+    )
+    assert residual not in score_mod._measured_residuals((residual,), context)
+    payload = json.loads(dumps_residual_line(residual))
+    assert payload["notices"][0]["kind"] == NoticeKind.BASIS_ASSUMED.value
+    assert payload["notices"][0]["policy"] == {
+        "id": "DP-102",
+        "version": "v1",
+        "status": "proposed",
+        "value": "mol_species",
+        "units": "per-mol-species",
+    }
+    assert score_mod._flagged_payload_strata(payload) == (
+        score_mod.FLAGGED_STRATUM_BASIS_ASSUMED,
+        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
+    )
+    assert not score_mod._headline_payload_admits(payload, tier="measured")
+
+    unflagged = replace(residual, notices=())
+    clean_payload = json.loads(dumps_residual_line(unflagged))
+    assert unflagged in score_mod._measured_residuals((unflagged,), context)
+    assert score_mod._headline_payload_admits(clean_payload, tier="measured")
+
+
 def test_measured_engine_rail_records_group_source_relation() -> None:
     from simulator.battery.score import dumps_residual_line
     engine = Engine.INTERNAL_ANALYTICAL

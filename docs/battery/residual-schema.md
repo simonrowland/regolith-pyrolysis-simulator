@@ -4,6 +4,13 @@ Battery residuals are serialized from the typed records in
 `simulator/battery/records.py` by `residual_to_plain()` and `to_plain()`.
 Enum values are written as their tokens, and optional `None` fields are omitted.
 
+The `basis_converted` notice carries `from_basis`, `to_basis`, `transform`, and
+`source_conversion_cited`, plus a structured `policy` object with `id`,
+`version`, `status`, `value`, and `units`. The `basis_assumed` notice carries
+the same policy object for a proposed native-basis default. Both retain the
+original refusal reason. Basis flags key their strata; proposed policies also
+enter the separate `proposed-policy` stratum.
+
 `Residual.fo2_mode` and `Notice.fo2_mode` are optional typed fields:
 
 | Token | Meaning |

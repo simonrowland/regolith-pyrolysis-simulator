@@ -429,7 +429,7 @@ def test_b592_aluminum_gas_outside_interval_uses_converter_basis(tmp_path: Path)
     assert attempt.refusal_detail["reason"] == "standard-pressure-unknown"
 
 
-def test_b2131_silver_stays_unmapped(tmp_path: Path) -> None:
+def test_b2131_silver_keeps_internal_capability_refusal(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B2131, "high-temperature-p067.json")
     liquid = _observation(
         result,
@@ -451,7 +451,11 @@ def test_b2131_silver_stays_unmapped(tmp_path: Path) -> None:
     assert Decimal("1600") in {point[0] for point in liquid.value.series}
     assert Decimal("1600") not in {point[0] for point in crystal.value.series}
     attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(liquid, "1600"))
-    assert attempt.refusal_detail["reason"] == _MISSING_PER
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+    assert not any(
+        notice.kind is NoticeKind.BASIS_ASSUMED for notice in attempt.notices
+    )
 
 
 def test_cited_value_reason_survives_plain_reload() -> None:
@@ -466,7 +470,7 @@ def test_cited_value_reason_survives_plain_reload() -> None:
     assert bare.reason is None
 
 
-def test_shornikov_solid_k2o_stays_missing_per_basis(tmp_path: Path) -> None:
+def test_shornikov_solid_k2o_uses_proposed_native_per_basis(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path,
         "shornikov-2013-potassium-silicate-thermodynamics.yaml",
@@ -482,7 +486,15 @@ def test_shornikov_solid_k2o_stays_missing_per_basis(tmp_path: Path) -> None:
     assert _per_is_unknown(oxide)
     assert oxide.value.point == Decimal("-161.387")
     attempt = _attempt(Engine.INTERNAL_ANALYTICAL, oxide)
-    assert attempt.refusal_detail["reason"] == _MISSING_PER
+    assert attempt.value is not None
+    assert any(
+        notice.kind is NoticeKind.BASIS_ASSUMED
+        and notice.reason == f"{RefusalReason.UNSUPPORTED.value}:{_MISSING_PER}"
+        and notice.policy is not None
+        and notice.policy["id"] == "DP-102"
+        and notice.policy["status"] == "proposed"
+        for notice in attempt.notices
+    )
 
 
 def _at_pressure(cell, pressure_Pa: Decimal):

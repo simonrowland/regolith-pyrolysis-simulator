@@ -1027,6 +1027,11 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
+    from_basis: str | None = None
+    to_basis: str | None = None
+    transform: str | None = None
+    source_conversion_cited: bool | None = None
+    policy: Mapping[str, object] | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1050,6 +1055,53 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        basis_payload = (
+            self.from_basis,
+            self.to_basis,
+            self.transform,
+            self.source_conversion_cited,
+        )
+        if self.kind is NoticeKind.BASIS_CONVERTED:
+            if not all(
+                isinstance(value, str) and value
+                for value in basis_payload[:3]
+            ) or not isinstance(self.source_conversion_cited, bool):
+                raise ValueError(
+                    "basis_converted requires source, target, transform, and citation status"
+                )
+            if self.policy is None:
+                raise ValueError("basis_converted requires policy metadata")
+        elif self.kind is NoticeKind.BASIS_ASSUMED:
+            if any(value is not None for value in basis_payload):
+                raise ValueError("basis_assumed cannot carry conversion details")
+            if self.policy is None:
+                raise ValueError("basis_assumed requires policy metadata")
+        elif any(value is not None for value in basis_payload):
+            raise ValueError("basis-conversion payload requires basis_converted")
+        if self.policy is not None:
+            if not isinstance(self.policy, Mapping) or set(self.policy) != {
+                "id",
+                "version",
+                "status",
+                "value",
+                "units",
+            }:
+                raise ValueError(
+                    "policy requires id, version, status, value, and units"
+                )
+            if any(
+                not isinstance(self.policy[field], str) or not self.policy[field]
+                for field in ("id", "version", "status", "units")
+            ):
+                raise ValueError("policy id, version, status, and units must be nonempty")
+            if self.policy["status"] not in {"canonical", "proposed"}:
+                raise ValueError("policy status must be canonical or proposed")
+            value = self.policy["value"]
+            if isinstance(value, bool) or not isinstance(
+                value, (str, int, float, Decimal)
+            ):
+                raise ValueError("policy value must be a scalar")
+            object.__setattr__(self, "policy", dict(self.policy))
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
@@ -1989,6 +2041,13 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
+                notice.from_basis,
+                notice.to_basis,
+                notice.transform,
+                notice.source_conversion_cited,
+                None
+                if notice.policy is None
+                else tuple(sorted(notice.policy.items())),
             )
             if fingerprint in seen:
                 continue
