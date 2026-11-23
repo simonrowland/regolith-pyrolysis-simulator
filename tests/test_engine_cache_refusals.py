@@ -229,6 +229,19 @@ def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
     assert counts["hits"] == counts["misses"] == counts["stores"] == 1
 
 
+def test_vaporock_hot_value_without_status_keeps_a_named_refusal():
+    from simulator.engine_cache import cacheable_refusal
+    from simulator.melt_backend.base import equilibrium_to_hot
+
+    value = equilibrium_to_hot(
+        {"diagnostics": {"backend_status_reason": "forbidden_species"}},
+        engine_id="vaporock",
+    )
+
+    assert value.refusal_reason == "forbidden_species"
+    assert not cacheable_refusal(value)
+
+
 def test_vaporock_no_finite_speciation_refusal_hits_after_disk_round_trip(
     tmp_path, monkeypatch,
 ):

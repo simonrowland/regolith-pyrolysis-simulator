@@ -614,16 +614,19 @@ def equilibrium_to_hot(
         if (numeric := _cold_numbers(values.get(name))) is not None
     }
     status = values.get('status')
-    # Omitted status is not a refusal: successes that leave it unset must store.
-    # ``refused`` is not mapped to invalid_input; a subprocess message with
-    # that status is not an input predicate.
-    if status not in {None, 'ok', 'non_authoritative'}:
-        refusal_reason = None
-        if isinstance(diagnostics, Mapping):
-            refusal_reason = (
-                diagnostics.get('backend_status_reason')
-                or diagnostics.get('backend_failure_reason_code')
-            )
+    named_refusal = None
+    if isinstance(diagnostics, Mapping):
+        named_refusal = (
+            diagnostics.get('backend_status_reason')
+            or diagnostics.get('backend_failure_reason_code')
+        )
+    # Missing status is a hot success unless VapoRock has already named a
+    # refusal. ``refused`` is not mapped to invalid_input: a subprocess
+    # message with that status is not an input predicate.
+    if status not in {None, 'ok', 'non_authoritative'} or (
+        engine_id == 'vaporock' and status is None and named_refusal is not None
+    ):
+        refusal_reason = named_refusal
         if refusal_reason is None:
             refusal_reason = {
                 'out_of_domain': OutOfDomainReason.OUT_OF_DOMAIN.value,
