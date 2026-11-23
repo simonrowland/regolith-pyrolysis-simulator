@@ -22,7 +22,14 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
     migrator.finalize()
     observations = migrator.result.observations
     assert len(observations) == 290
-    assert len(migrator.result.queue) == 643
+    assert len(migrator.result.queue) == 621
+    assert not any(
+        "phase" in (item.axes or ()) for item in migrator.result.queue
+    )
+    assert not any(
+        "method" in (item.axes or ()) and item.why == "source does not state method"
+        for item in migrator.result.queue
+    )
     assert not [
         issue
         for issue in migrator.result.validation.issues
@@ -71,13 +78,13 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
         f"{EXTRACT.stem}::powell_1971_eyber_na2so4_r0{row}_log_kp"
         for row in range(1, 7)
     }
-    phase_unknown = {
+    phase_inferred = {
         observation_id
         for observation_id, observation in observations.items()
         if observation.identity.species is not None
-        and observation.identity.species.phase.is_unknown
+        and any(notice.kind.value == "phase_inferred" for notice in observation.notices)
     }
-    assert phase_unknown == {
+    assert phase_inferred == {
         f"{EXTRACT.stem}::{observation_id}"
         for observation_id in (
             "powell_1971_t01_r05_mass_loss_rate",
@@ -89,9 +96,10 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
         )
     }
     assert all(
-        not observation.identity.species.phase.is_unknown
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value.value == "unspecified"
         for observation_id, observation in observations.items()
-        if observation.identity.species is not None and observation_id not in phase_unknown
+        if observation.identity.species is not None and observation_id in phase_inferred
     )
 
     # Render pins: PDF pages 79, 81, and 45. Values remain in their printed units/forms.

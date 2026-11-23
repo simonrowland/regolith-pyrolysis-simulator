@@ -615,6 +615,11 @@ FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION = (
 )
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
+FLAGGED_STRATUM_D460_MIGRATION = (
+    NoticeKind.METHOD_UNSTATED.value,
+    NoticeKind.METHOD_INFERRED.value,
+    NoticeKind.PHASE_INFERRED.value,
+)
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
@@ -2595,9 +2600,10 @@ def _classify_flagged_notice_facts(
         or NoticeKind.WUSTITE_REFERENCE_CONVERSION.value in kinds
     ):
         strata.append(FLAGGED_STRATUM_IRON_OXIDE_CONVENTION)
-    policy_flags = kinds & _DEFAULT_POLICY_FLAG_VALUES
-    if policy_flags:
-        strata.extend(sorted(policy_flags))
+    d460_flags = kinds & (
+        _DEFAULT_POLICY_FLAG_VALUES | set(FLAGGED_STRATUM_D460_MIGRATION)
+    )
+    strata.extend(sorted(d460_flags))
     unverified_apparatus = tuple(
         reason
         for kind, reason in notices
@@ -2625,7 +2631,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
+    if any(
+        _is_fusion_conversion_reason(reason)
+        for _kind, reason in notices
+    ):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
@@ -23220,6 +23229,10 @@ def _policies_for_stratum(
         if isinstance(notice, Notice):
             policy = notice.policy
             if policy is None:
+                if notice.kind is NoticeKind.METHOD_INFERRED:
+                    raise ValueError(
+                        "method_inferred notice requires policy metadata"
+                    )
                 continue
             if (
                 notice.kind.value == stratum
@@ -24588,6 +24601,11 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         if isinstance(notice, Mapping)
     )
     for notice in raw_notices:
+        if (
+            notice.get("kind") == NoticeKind.METHOD_INFERRED.value
+            and notice.get("policy") is None
+        ):
+            raise ValueError("method_inferred notice requires policy metadata")
         if (
             notice.get("policy") is not None
             and notice.get("kind") not in _DEFAULT_POLICY_FLAG_VALUES

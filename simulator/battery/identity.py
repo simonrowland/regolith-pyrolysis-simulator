@@ -1578,7 +1578,13 @@ def _axis_state(identity: Identity, name: str) -> State[Any] | None:
 def _phase_state(species: Species) -> State[Phase]:
     phase = species.phase
     if isinstance(phase, State):
-        return phase
+        return (
+            State.unknown("phase unspecified")
+            if phase.is_value and phase_token(species) is None
+            else phase
+        )
+    if phase_token(species) is None:
+        return State.unknown("phase unspecified")
     return State.of(phase)
 
 
