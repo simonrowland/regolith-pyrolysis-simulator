@@ -1804,3 +1804,67 @@ def test_buffer_release_roundoff_counts_the_reviewed_ten_postings():
     slack_mol = _headspace_buffer_release_roundoff_slack_mol(record)
     assert stock_mol > ledger_mol + OXYGEN_RESERVOIR_NOOP_MOL
     assert stock_mol <= ledger_mol + slack_mol
+
+
+def test_buffer_release_record_counts_live_lots_through_fe_settle():
+    """The production count includes each buffer lot through the Fe settle.
+
+    Mutation: deleting the record counter fails the production-field
+    assertion; omitting the settle debit makes the count differ from the
+    transition slice and the pinned three-posting value.
+    """
+
+    sim = _sim(CampaignPhase.C4, 1500.0, 20.0)
+    reservoir = sim.melt.oxygen_reservoir
+    upper = sim._melt_redox_fO2_upper_bound_log()
+    reservoir.melt_intrinsic_fO2_log = upper
+    reservoir.melt_redox_capacity_mol_per_ln_fO2 = 0.0
+    sim._melt_redox_source_capacity_mol_per_ln_fO2 = lambda **_kwargs: 1.0
+    _seed(sim, FO2_BUFFER_ACCOUNT, {OXYGEN_SPECIES: 5.0}, "live counter")
+    transition_at = len(sim.atom_ledger.transitions)
+
+    published = {}
+    publish = sim._publish_headspace_buffer_release
+
+    def capture_release(record):
+        publish(record)
+        published["record"] = dict(record)
+        published["transitions"] = tuple(
+            sim.atom_ledger.transitions[transition_at:]
+        )
+
+    sim._publish_headspace_buffer_release = capture_release
+    _step(
+        sim,
+        lambda _partials: {"Na2": 1.0e-8, "CrO3": 1.0e-2, "SiO": 1.0e-6},
+        lambda species: 0.5 if species == "CrO3" else 0.0,
+    )
+
+    record = published["record"]
+    transitions = published["transitions"]
+    registry = sim.species_formula_registry
+    actual_buffer_lots = [
+        lot
+        for transition in transitions
+        for lot in (*transition.debits, *transition.credits)
+        if str(lot.account) == FO2_BUFFER_ACCOUNT
+        and float(
+            lot.species_moles_for(registry).get(OXYGEN_SPECIES, 0.0) or 0.0
+        ) != 0.0
+    ]
+    settle_debits = [
+        lot
+        for transition in transitions
+        if str(transition.name) == "fe_redox_respeciation"
+        for lot in transition.debits
+        if str(lot.account) == FO2_BUFFER_ACCOUNT
+        and float(
+            lot.species_moles_for(registry).get(OXYGEN_SPECIES, 0.0) or 0.0
+        ) > 0.0
+    ]
+
+    assert record["fe_uptake_committed_mol"] > 0.0
+    assert len(settle_debits) == 1
+    assert len(actual_buffer_lots) == 3
+    assert record["buffer_postings"] == len(actual_buffer_lots)
+    assert record["buffer_postings"] == 3
