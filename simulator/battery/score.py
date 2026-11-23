@@ -326,11 +326,15 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.battery.validity import (
+    APPARATUS_PREDICTION_FLAGS,
+    APPARATUS_PREDICTION_NOTICE_KINDS,
+    APPARATUS_REGIME_NOTICE_KINDS,
     GateCheck,
     GateOutcome,
     KEMS_GEOMETRY_FACTS,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
+    apparatus_prediction_notices,
     apparatus_geometry_interval_notice,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
@@ -602,6 +606,8 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_METHOD_IMPLIED = NoticeKind.METHOD_IMPLIED.value
+FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
@@ -2189,11 +2195,43 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
+    evidence_class = reference.evidence.class_
+    is_source_observation = not (
+        evidence_class.is_value
+        and evidence_class.value
+        in {EvidenceClass.MODEL_DERIVED, EvidenceClass.ENGINE_PREDICTION}
+    )
+    notices: list[Notice] = []
+    if is_source_observation:
+        for check in gates.checks:
+            detail = check.detail if isinstance(check.detail, Mapping) else {}
+            prediction_notices = apparatus_prediction_notices(
+                detail.get("flag"),
+                detail,
+                check_name=check.name,
+                quantity=quantity,
+                origin=reference.observation_id,
+            )
+            notices.extend(prediction_notices)
+    has_unflagged_gate_failure = any(
+        not check.passed
+        and not (
+            isinstance(check.detail, Mapping)
+            and check.detail.get("flag") in APPARATUS_PREDICTION_FLAGS
+        )
+        for check in gates.checks
+    )
     author_reported_pressure = (
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        and reference.evidence.original_method_class
-        in {"measured", "measured_direct", "measured_tabulated"}
+        and (
+            (
+                evidence_class.is_value
+                and evidence_class.value in MEASURED_EVIDENCE
+            )
+            or reference.evidence.original_method_class
+            in {"measured", "measured_direct", "measured_tabulated"}
+        )
     )
     author_reported_activity = (
         (
@@ -2232,7 +2270,7 @@ def _unverified_apparatus_notices(
         not experiment.method.is_value
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
-        return ()
+        return () if has_unflagged_gate_failure else tuple(notices)
     kems_activity = (
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
@@ -2274,7 +2312,7 @@ def _unverified_apparatus_notices(
         or calibration_flagged_partial_pressure
         or calibration_flagged_activity
     ):
-        return ()
+        return () if has_unflagged_gate_failure else tuple(notices)
     allow_calibration = (
         author_reported_pressure
         or kems_activity
@@ -2289,6 +2327,8 @@ def _unverified_apparatus_notices(
         detail = check.detail
         if not isinstance(detail, Mapping):
             detail = {}
+        if detail.get("flag") in APPARATUS_PREDICTION_FLAGS:
+            continue
         if check.passed:
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
@@ -2313,8 +2353,7 @@ def _unverified_apparatus_notices(
             return ()
         missing[fact] = detail
     if not missing:
-        return ()
-    notices: list[Notice] = []
+        return tuple(notices)
     for fact in sorted(missing):
         detail = missing[fact]
         if fact == "in_cell_partial_pressure_sum":
@@ -2473,18 +2512,21 @@ def _cell_apparatus_inference_notices(
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     return _classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason) for notice in notices)
+        tuple(
+            (notice.kind.value, notice.reason, notice.policy)
+            for notice in notices
+        )
     )
 
 
 def _classify_flagged_notice_facts(
-    notices: Sequence[tuple[str, object]],
+    notices: Sequence[tuple[str, object, Mapping[str, str] | None]],
 ) -> tuple[str, ...]:
     strata: list[str] = []
-    kinds = {kind for kind, _reason in notices}
+    kinds = {kind for kind, _reason, _policy in notices}
     unverified_apparatus = tuple(
         reason
-        for kind, reason in notices
+        for kind, reason, _policy in notices
         if kind == NoticeKind.UNVERIFIED_APPARATUS.value
     )
     if any(_is_calibration_not_grounded_reason(reason) for reason in unverified_apparatus):
@@ -2494,6 +2536,31 @@ def _classify_flagged_notice_facts(
         for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    prediction_kinds = kinds & {
+        kind.value for kind in APPARATUS_PREDICTION_NOTICE_KINDS
+    }
+    if (
+        prediction_kinds
+        and FLAGGED_STRATUM_UNVERIFIED_APPARATUS not in strata
+    ):
+        strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.METHOD_ASSUMED.value in prediction_kinds:
+        strata.append(NoticeKind.METHOD_ASSUMED.value)
+    if NoticeKind.ALPHA_ASSUMED.value in prediction_kinds:
+        strata.append(NoticeKind.ALPHA_ASSUMED.value)
+    if NoticeKind.EFFUSION_REGIME_ASSUMED.value in prediction_kinds:
+        strata.append(NoticeKind.EFFUSION_REGIME_ASSUMED.value)
+    if NoticeKind.EFFUSION_REGIME_VIOLATED.value in prediction_kinds:
+        strata.append(NoticeKind.EFFUSION_REGIME_VIOLATED.value)
+        if any(
+            kind == NoticeKind.EFFUSION_REGIME_VIOLATED.value
+            and policy is not None
+            and policy.get("status") == "proposed"
+            for kind, _reason, policy in notices
+        ):
+            strata.append(FLAGGED_STRATUM_PROPOSED_POLICY)
+    if NoticeKind.METHOD_IMPLIED.value in prediction_kinds:
+        strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
@@ -2504,17 +2571,17 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
-        for kind, reason in notices
+        for kind, reason, _policy in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
+    if any(_is_fusion_conversion_reason(reason) for _kind, reason, _policy in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
         and reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED}:")
-        for _kind, reason in notices
+        for _kind, reason, _policy in notices
     ):
         strata.append(FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED)
     if any(
@@ -2522,13 +2589,13 @@ def _classify_flagged_notice_facts(
         and reason.startswith(
             f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
         )
-        for _kind, reason in notices
+        for _kind, reason, _policy in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
     if any(
         kind == NoticeKind.FIGURE_ONLY.value
         and (reason == "figure_only" or reason.startswith("figure_only:"))
-        for kind, reason in notices
+        for kind, reason, _policy in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.APPROXIMATE_VALUE.value in kinds:
@@ -6055,10 +6122,29 @@ def _derive_kems_partial_pressure_band(
             observation, experiment
         ):
             continue
-        strata = _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment, benches
+        gates = run_validity_gates(
+            experiment,
+            observation,
+            point_observations=point_observations_by_experiment.get(
+                observation.experiment_id, ()
+            ),
         )
-        if strata:
+        bench = (
+            None
+            if experiment is None or experiment.bench_id is None
+            else benches.get(experiment.bench_id)
+        )
+        notices = _flagged_stratum_notices(observation, experiment, gates, bench)
+        # This band describes the source's pressure-reading precision. A
+        # separate regime flag qualifies the equilibrium-pressure assumption;
+        # it does not erase a printed instrument-precision envelope. Other
+        # flagged strata still keep a row out of the band population.
+        band_blocking_notices = tuple(
+            notice
+            for notice in notices
+            if notice.kind not in APPARATUS_PREDICTION_NOTICE_KINDS
+        )
+        if any(flagged_strata((notice,)) for notice in band_blocking_notices):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -18022,9 +18108,57 @@ def _compile_residual_with_lineage(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("identity_equal",),
         )
-    apparatus_flagged = any(
+    has_legacy_apparatus_flag = any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in flagged_notices
     )
+    has_apparatus_prediction_flag = any(
+        notice.kind in APPARATUS_PREDICTION_NOTICE_KINDS for notice in flagged_notices
+    )
+    # New prediction flags waive only their own gate failures, so an unusable
+    # composition still blocks the engine call. Legacy apparatus notices keep
+    # their existing scoring behavior for the separately owned apparatus gate.
+    apparatus_flagged = has_legacy_apparatus_flag or (
+        has_apparatus_prediction_flag
+        and all(
+            check.passed
+            or (
+                isinstance(check.detail, Mapping)
+                and check.detail.get("flag") in APPARATUS_PREDICTION_FLAGS
+            )
+            for check in gates.checks
+        )
+    )
+    unusable_composition = next(
+        (
+            check.detail
+            for check in gates.checks
+            if isinstance(check.detail, Mapping)
+            and check.detail.get("composition_scope_details")
+        ),
+        None,
+    )
+    if (
+        apparatus_flagged
+        and isinstance(identity, Identity)
+        and identity.composition is not None
+        and identity.composition.is_value
+        and unusable_composition is not None
+    ):
+        # An apparatus default cannot make a malformed composition usable.
+        # The gate already owns the typed component diagnostics; preserve them
+        # as the refusal reason instead of letting source-oxygen resolution
+        # consume a raw, nonnumeric component amount.
+        return _refused(
+            RefusalReason.INVALID_SOURCE,
+            {
+                "reason": "composition_not_usable_for_engine_prediction",
+                "composition_scope_details": list(
+                    unusable_composition["composition_scope_details"]
+                ),
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("usable_composition",),
+        )
     scoring_gates = (
         replace(gates, passed=True, reason=None, primary_check=None)
         if apparatus_flagged
@@ -18367,6 +18501,7 @@ def _compile_residual_with_lineage(
         point_composition_notice is not None
         and _point_composition is not None
         and prediction.requested_composition == _point_composition
+        and prediction.value is not None
         and not oxide_identity_echo
     ):
         notices = union_notices(notices, (point_composition_notice,))
@@ -19121,6 +19256,7 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
+    band_preserving_kinds.update(APPARATUS_REGIME_NOTICE_KINDS)
     initial_charge_figure_band = (
         numeric.decision_band is not None
         and numeric.decision_band.band_basis == "row_printed"
@@ -24250,7 +24386,11 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
-        (str(notice.get("kind") or ""), notice.get("reason"))
+        (
+            str(notice.get("kind") or ""),
+            notice.get("reason"),
+            notice.get("policy") if isinstance(notice.get("policy"), Mapping) else None,
+        )
         for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )

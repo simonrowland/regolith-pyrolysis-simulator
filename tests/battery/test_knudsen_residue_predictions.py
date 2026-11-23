@@ -216,6 +216,7 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     reasons = [n.reason for n in result["notices"]]
     assert any("SC-360" in r and "3 dex (W) / 2.5 dex (Mo)" in r and "pO2^-nu" in r for r in reasons)
     assert any("printed step temperatures held" in r for r in reasons)
+    assert any("effusion_regime_assumed" in r for r in reasons)
     assert {r["source"] for r in result["oxygen_sources"]} == {"d142_closure"}
 
 
@@ -293,15 +294,17 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
-@pytest.mark.parametrize("change,reason", (
+@pytest.mark.parametrize("change,expected", (
     ("no_path", "printed_temperature_path_missing_or_invalid"),
     ("no_extent", "measured_mass_loss_fraction_missing_or_invalid"),
     ("no_initial", "initial_composition_not_stated"),
-    ("nonmolecular", "knudsen_near_saturation_invalid"),
-    ("bad_orifice_kn", "knudsen_near_saturation_invalid"),
-    ("bad_printed_pressure", "knudsen_near_saturation_invalid"),
+    ("nonmolecular", "effusion_regime_violated"),
+    ("bad_orifice_kn", "effusion_regime_violated"),
+    ("bad_printed_pressure", "effusion_regime_violated"),
 ))
-def test_prediction_boundary_refuses_missing_inputs(extent_point, change, reason):
+def test_prediction_boundary_refuses_missing_inputs_and_flags_regime(
+    extent_point, change, expected
+):
     reference, experiment, rows = extent_point
     if change == "no_path":
         experiment = replace(experiment, thermal_schedule=None)
@@ -321,9 +324,17 @@ def test_prediction_boundary_refuses_missing_inputs(extent_point, change, reason
             orifice_diameter_m=Located(State.of(Value.point_of("0.001")), reference.locator))))
         reference = replace(reference, point_conditions={
             "total_pressure_Pa": Located(State.of(Value.point_of(10)), reference.locator)})
-    with pytest.raises(ResidueInventoryRefusal) as exc:
-        predict_knudsen_residue_composition("internal-analytical", reference, experiment, rows)
-    assert exc.value.reason == reason
+    if expected == "effusion_regime_violated":
+        result = predict_knudsen_residue_composition(
+            "internal-analytical", reference, experiment, rows
+        )
+        assert any(expected in notice.reason for notice in result["notices"])
+    else:
+        with pytest.raises(ResidueInventoryRefusal) as exc:
+            predict_knudsen_residue_composition(
+                "internal-analytical", reference, experiment, rows
+            )
+        assert exc.value.reason == expected
 
 
 def test_printed_oxygen_is_identical_on_shared_trajectory_prefix(extent_point):

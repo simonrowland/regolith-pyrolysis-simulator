@@ -474,6 +474,52 @@ def test_m02_floor_notice_keeps_numeric_but_not_score_eligible() -> None:
     assert validate_corpus([w], [exp], [ref, clean_cand], [clean]).ok
 
 
+def test_d460_typed_method_flag_is_valid_only_as_a_flagged_residual() -> None:
+    from dataclasses import replace
+
+    identity = F.psat_identity("Na")
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "d460-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    candidate = F.engine_obs(
+        "d460-candidate", experiment.experiment_id, identity, Decimal("0.2")
+    )
+    notice = Notice(
+        kind=NoticeKind.METHOD_ASSUMED,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="method_assumed; assumed_method=equilibrium_partial_pressure; original_reason=method not stated",
+        origin=reference.observation_id,
+    )
+    flagged = F.residual(
+        "d460-flagged",
+        reference.observation_id,
+        candidate=candidate.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=False,
+        notices=(notice,),
+    )
+
+    assert validate_corpus(
+        [work], [experiment], [reference, candidate], [flagged]
+    ).ok
+    unflagged_claim = replace(flagged, score_eligible=True)
+    report = validate_corpus(
+        [work], [experiment], [reference, candidate], [unflagged_claim]
+    )
+    assert any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        and "flagged stratum" in issue.detail
+        for issue in report.issues
+    )
+
+
 def test_m03_cao_liquid_vs_crystal_is_identity_mismatch() -> None:
     liquid = F.cao_identity(Phase.L, T_K=Decimal("1200"))
     crystal = F.cao_identity(Phase.CR, T_K=Decimal("1200"))
@@ -3775,9 +3821,23 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     # millibar kinetic / yield is outside this gate
     assert background_pressure_high(kinetic, Quantity.MASS_LOSS_FRACTION).passed
     unknown_kn = F.kems_experiment(kn=None)
-    assert effusion_regime_unverified(unknown_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    unknown_kn_gate = effusion_regime_unverified(unknown_kn, Quantity.P_SAT)
+    assert unknown_kn_gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert next(
+        check for check in unknown_kn_gate.checks
+        if check.name == "in_cell_partial_pressure_sum"
+    ).detail["flag"] == "effusion_regime_assumed"
     low_kn = F.kems_experiment(kn=Decimal("0.5"))
-    assert effusion_regime_unverified(low_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    low_kn_gate = effusion_regime_unverified(low_kn, Quantity.P_SAT)
+    assert low_kn_gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    low_kn_check = next(
+        check for check in low_kn_gate.checks
+        if check.name == "orifice_knudsen"
+    )
+    assert low_kn_check.detail["flag"] == "effusion_regime_violated"
+    assert low_kn_check.detail["original_reason"] == (
+        "orifice_knudsen_below_free_molecular_threshold"
+    )
     stated = F.kems_experiment(total_P=Decimal("1e-6"))
     assert effusion_regime_unverified(stated, Quantity.P_SAT).passed
     assert background_pressure_high(stated, Quantity.P_SAT).passed
@@ -3827,7 +3887,10 @@ def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> Non
     calibrated_without_kn = with_interval("1e-6", "1e-3", kn=None)
     regime = effusion_regime_unverified(calibrated_without_kn, Quantity.P_PARTIAL)
     assert regime.passed
-    assert regime.checks[0].detail["flag"] == "orifice_knudsen_not_published"
+    assert regime.checks[0].detail["flag"] == "effusion_regime_assumed"
+    assert regime.checks[0].detail["original_reason"] == (
+        "orifice_knudsen_not_published"
+    )
     assert not any(check.name == "in_cell_partial_pressure_sum" for check in regime.checks)
     partial = _replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL)
     combined = run_validity_gates(
@@ -4279,7 +4342,8 @@ def test_mf_f04_calibrated_background_route_skips_in_cell_fallback(monkeypatch) 
     result = run_validity_gates(experiment, observation, point_observations=())
     assert result.passed
     assert any(
-        check.detail.get("flag") == "orifice_knudsen_not_published"
+        check.detail.get("flag") == "effusion_regime_assumed"
+        and check.detail.get("original_reason") == "orifice_knudsen_not_published"
         for check in result.checks
     )
     assert not any(check.name == "in_cell_partial_pressure_sum" for check in result.checks)

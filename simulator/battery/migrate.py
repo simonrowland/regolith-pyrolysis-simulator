@@ -3567,6 +3567,7 @@ def _notice_from_plain(payload: object) -> Notice:
         if payload.get("authority") is None
         else Authority(str(payload["authority"])),
         certification=payload.get("certification"),
+        policy=payload.get("policy"),
     )
 
 

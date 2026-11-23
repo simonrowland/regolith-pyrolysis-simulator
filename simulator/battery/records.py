@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, field, fields, is_dataclass
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
@@ -1027,6 +1027,10 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
+    # Policy metadata is compared as part of notice identity, but mappings are
+    # unhashable. Excluding only this field from the generated hash preserves
+    # equality semantics while allowing notices in residual validation sets.
+    policy: Mapping[str, str] | None = field(default=None, hash=False)
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1041,6 +1045,13 @@ class Notice:
             raise ValueError("Notice.reason is required")
         if not self.origin:
             raise ValueError("Notice.origin is required")
+        if self.policy is not None:
+            required_policy_fields = {"id", "version", "status", "value", "units"}
+            if not isinstance(self.policy, Mapping) or set(self.policy) != required_policy_fields:
+                raise TypeError("Notice.policy must contain id, version, status, value, and units")
+            if any(not isinstance(value, str) or not value for value in self.policy.values()):
+                raise TypeError("Notice.policy values must be nonempty strings")
+            object.__setattr__(self, "policy", dict(self.policy))
         if self.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION:
             if self.authority is not Authority.CONVENTION:
                 raise ValueError(
@@ -1989,6 +2000,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
+                None if notice.policy is None else tuple(sorted(notice.policy.items())),
             )
             if fingerprint in seen:
                 continue
