@@ -17,6 +17,9 @@ from simulator.battery.enums import (
     Quantity,
 )
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench, BenchIdentity, Derivation, FO2Control, Located, Notice, Reaction,
     ReactionTerm, Species, State, Value,
 )
@@ -620,6 +623,33 @@ def test_typed_source_inconsistency_prevents_conditioning(source_context, monkey
     assert _resolve(source_context, row, rows).reason is FallbackReason.SOURCE_INCONSISTENT
     notice = _fallback_notice(source_context, monkeypatch, row, rows)
     assert "source_oxygen_fallback=source_inconsistent" in notice.reason
+
+
+def test_initial_charge_proxy_notice_does_not_veto_same_cell_oxygen(source_context):
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    condition = _resolve(source_context, row)
+    original_oxygen = source_context.observations[
+        next(iter(condition.used_observations))
+    ]
+    proxy_notice = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+            f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+        ),
+        origin=row.observation_id,
+    )
+    flagged_row = replace(row, notices=(*row.notices, proxy_notice))
+    flagged_oxygen = replace(
+        original_oxygen,
+        notices=(*original_oxygen.notices, proxy_notice),
+    )
+
+    selected = _resolve(source_context, flagged_row, (flagged_row, flagged_oxygen))
+
+    assert isinstance(selected, SourceOxygenCondition)
 
 
 def test_printed_command_is_preserved(source_context, monkeypatch):

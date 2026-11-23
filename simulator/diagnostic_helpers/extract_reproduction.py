@@ -64,6 +64,7 @@ from simulator.physical_constants import (
     STANDARD_ATMOSPHERE_PA,
 )
 from simulator.battery import migrate as battery_migrate
+from simulator.battery.enums import Quantity
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_STATUSES,
@@ -257,6 +258,7 @@ class AdoptedObservation:
     # Preserve source spellings until the extract schema canonicalizes them.
     admission_metadata: Mapping[str, Any] = field(default_factory=dict)
     reservoir: Mapping[str, Any] | None = None
+    extract_path: Path | None = None
 
     @property
     def case_id(self) -> str:
@@ -740,6 +742,11 @@ def load_adopted_observations(
                     condensed_form=condensed_form,
                     source_doi=doi_by_source.get(source_id),
                     reservoir=reservoir,
+                    extract_path=(
+                        candidate_path
+                        if (candidate_path := directory / f"{source_id}.yaml").is_file()
+                        else None
+                    ),
                 )
             )
     adopted.sort(key=lambda row: (row.species_id, row.source_id, row.observation_id))
@@ -3097,7 +3104,7 @@ def _evaluate_psat(
     assert points is not None
     candidates = _engine_species_candidates(obs)
     standard_state_kind = _pressure_standard_state_kind(obs)
-    demaria_k_migrated_by_temperature: dict[float, tuple[Any, Any, Any]] = {}
+    demaria_k_migrated_observations: list[tuple[Any, Any, Any]] = []
     if (
         pO2 is None
         and standard_state_kind == "melt"
@@ -3105,15 +3112,17 @@ def _evaluate_psat(
         and obs.species_id == "K"
         and obs.observation_id == "demaria_1971_k_psat_figure2_digitized"
     ):
-        migrator = battery_migrate.Migrator(root=REPO_ROOT)
-        migrator._migrate_extract(EXTRACTS_DIR / f"{obs.source_id}.yaml")
-        migrator.finalize()
+        if obs.extract_path is not None:
+            migrator = battery_migrate.Migrator(root=REPO_ROOT)
+            migrator._migrate_extract(obs.extract_path)
+            migrator.finalize()
+        else:
+            migrator = None
         child_prefix = f"{obs.source_id}::{obs.observation_id}::T="
-        for migrated in migrator.result.observations.values():
+        for migrated in (
+            migrator.result.observations.values() if migrator is not None else ()
+        ):
             if not migrated.observation_id.startswith(child_prefix):
-                continue
-            temperature = migrated.identity.temperature_K
-            if not temperature.is_value:
                 continue
             experiment = migrator.result.experiments.get(migrated.experiment_id)
             if experiment is None:
@@ -3123,11 +3132,8 @@ def _evaluate_psat(
                 if experiment.bench_id is not None
                 else None
             )
-            demaria_k_migrated_by_temperature[float(temperature.value)] = (
-                migrated,
-                experiment,
-                bench,
-            )
+            demaria_k_migrated_observations.append((migrated, experiment, bench))
+    melt_only_assumption: str | None = None
     any_numeric = False
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
@@ -3221,9 +3227,49 @@ def _evaluate_psat(
                     and obs.observation_id
                     == "demaria_1971_k_psat_figure2_digitized"
                 ):
-                    migrated_context = demaria_k_migrated_by_temperature.get(T_K)
+                    migrated_context = None
+                    for candidate, candidate_experiment, candidate_bench in (
+                        demaria_k_migrated_observations
+                    ):
+                        candidate_identity = candidate.identity
+                        candidate_temperature = candidate_identity.temperature_K
+                        candidate_composition = candidate_identity.composition
+                        if (
+                            candidate_identity.quantity.is_value
+                            and candidate_identity.quantity.value is Quantity.P_PARTIAL
+                            and candidate_identity.species is not None
+                            and candidate_identity.species.formula == obs.species_id
+                            and candidate_temperature is not None
+                            and candidate_temperature.is_value
+                            and float(candidate_temperature.value) == T_K
+                            and candidate_composition is not None
+                            and candidate_composition.is_value
+                            and {
+                                str(oxide): float(amount)
+                                for oxide, amount in candidate_composition.value.components
+                                if amount > 0
+                            }
+                            == melt_recipe
+                            and candidate.value.point is not None
+                            and math.isclose(
+                                float(candidate.value.point),
+                                expected,
+                                rel_tol=1e-12,
+                                abs_tol=1e-15,
+                            )
+                        ):
+                            migrated_context = (
+                                candidate,
+                                candidate_experiment,
+                                candidate_bench,
+                            )
+                            break
                     if migrated_context is None:
-                        last_refusal = "missing_condition:migrated_scorer_observation"
+                        last_refusal = (
+                            "missing_condition:migrated_scorer_observation_for_identity"
+                            if obs.extract_path is not None
+                            else "missing_condition:source_extract_unavailable"
+                        )
                         runtime["refusal"] = last_refusal
                         continue
                     migrated_observation, experiment, bench = migrated_context
@@ -3290,6 +3336,23 @@ def _evaluate_psat(
                             notice.reason for notice in closure_notices
                         ],
                     }
+                    reactive_notice = next(
+                        (
+                            notice
+                            for notice in closure_notices
+                            if notice.kind
+                            is battery_score.NoticeKind.REACTIVE_CELL_NOT_MODELLED
+                        ),
+                        None,
+                    )
+                    if reactive_notice is not None:
+                        melt_only_assumption = (
+                            "reactive_cell_not_modelled: melt-only oxygen balance; "
+                            + reactive_notice.reason
+                        )
+                        runtime["oxygen_closure"]["melt_only_assumption"] = (
+                            melt_only_assumption
+                        )
                 else:
                     last_refusal = "missing_condition:pO2_boundary"
                     runtime["refusal"] = last_refusal
@@ -3411,6 +3474,20 @@ def _evaluate_psat(
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'engine_refusal_all_points'}"
         )
         evaluation.skip_reasons.append(evaluation.skip_reason)
+    if melt_only_assumption is not None:
+        melt_only_typed_reason = f"{_TYPED_SKIP_PREFIX}{melt_only_assumption}"
+        if melt_only_typed_reason not in evaluation.skip_reasons:
+            evaluation.skip_reasons.append(melt_only_typed_reason)
+        if evaluation.skip_reason is None:
+            evaluation.skip_reason = melt_only_typed_reason
+        elif "melt-only oxygen balance" not in evaluation.skip_reason:
+            evaluation.skip_reason = (
+                f"{evaluation.skip_reason}; {melt_only_typed_reason}"
+            )
+        evaluation.runtime_notes.append(
+            "flagged K diagnostic uses a melt-only oxygen balance; "
+            + melt_only_assumption
+        )
     return evaluation
 
 

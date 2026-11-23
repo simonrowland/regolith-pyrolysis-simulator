@@ -1274,6 +1274,31 @@ def test_adopted_observation_reproduction(
     for record in evaluation.records:
         assert record.status in COMPARISON_STATUSES
 
+    if (
+        obs.source_id == "kems-022-demaria-1971"
+        and obs.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    ):
+        initial_charge = [
+            record for record in evaluation.records
+            if record.status == "assumed-input"
+        ]
+        missing_composition = [
+            record for record in evaluation.records
+            if record.status == "unsupported-speciation"
+        ]
+        assert len(initial_charge) == 2
+        assert {
+            float(record.coordinate["temperature_K"])
+            for record in initial_charge
+        } == {1366.12, 1314.06}
+        assert all(
+            record.actual_value is not None and record.actual_value > 0
+            for record in initial_charge
+        )
+        assert len(missing_composition) == 8
+        assert all(record.actual_value is None for record in missing_composition)
+        assert "melt-only oxygen balance" in evaluation.skip_reason
+
     mismatches = [r for r in evaluation.records if r.status == "mismatch"]
     matches = [r for r in evaluation.records if r.status == "match"]
     ordering_scored = [

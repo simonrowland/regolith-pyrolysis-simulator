@@ -10533,6 +10533,7 @@ def _borrow_internal_analytical_effusion(
         experiment=experiment,
         bench=bench,
     )
+    notices[:] = union_notices(tuple(notices), prediction.notices)
     bar = _solved_effusion_po2_bar(prediction)
     if bar is None or not math.isfinite(bar) or bar <= 0.0:
         return _input_refusal(

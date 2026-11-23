@@ -203,7 +203,10 @@ def test_demaria_k_reservoir_reason_selects_melt_standard_state() -> None:
 
 def test_demaria_k_composition_points_use_scorer_effusion_closure(
     monkeypatch,
+    tmp_path,
 ) -> None:
+    import yaml
+
     from simulator.battery.enums import Engine, ExecutionState, NoticeKind, Quantity
     from simulator.battery.records import Execution, Notice
     from simulator.battery.score import (
@@ -214,10 +217,38 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
 
     import simulator.battery.score as score
 
-    obs = _adopted_observation(
-        "kems-022-demaria-1971",
-        "K",
-        "demaria_1971_k_psat_figure2_digitized",
+    source_path = (
+        extract_reproduction.EXTRACTS_DIR / "kems-022-demaria-1971.yaml"
+    )
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    raw_observation = next(
+        row
+        for row in document["species"]["K"]["observations"]
+        if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
+    )
+    raw_point = next(
+        point for point in raw_observation["values"]["points"]
+        if point["T_K"] == 1366.12
+    )
+    raw_components = (
+        raw_point["point_conditions"]["composition"]["state"]["value"][
+            "components"
+        ]
+    )
+    next(
+        component for component in raw_components if component[0] == "K2O"
+    )[1] = "0.61"
+    alternate_dir = tmp_path / "alternate-extracts"
+    alternate_dir.mkdir()
+    (alternate_dir / source_path.name).write_text(
+        yaml.safe_dump(document, sort_keys=False), encoding="utf-8"
+    )
+    obs = next(
+        row
+        for row in load_adopted_observations(extracts_dir=alternate_dir)
+        if row.source_id == "kems-022-demaria-1971"
+        and row.species_id == "K"
+        and row.observation_id == "demaria_1971_k_psat_figure2_digitized"
     )
     points, skip, drops = _literature_pressure_points(obs)
     assert skip is None
@@ -234,11 +265,15 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         assert engine is Engine.INTERNAL_ANALYTICAL
         experiment = kwargs["experiment"]
         closure_calls.append((observation, experiment))
+        reactive_notice = score._cell_oxygen_not_modelled_notice(
+            Quantity.P_PARTIAL, kwargs["bench"].cell_materials
+        )
         return EnginePrediction(
             engine=engine,
             channel=ENGINE_CHANNELS[engine],
             execution=Execution(state=ExecutionState.PRODUCED),
             notices=(
+                reactive_notice,
                 Notice(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
                     affected_quantities=(Quantity.P_PARTIAL,),
@@ -288,10 +323,24 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
     } == pytest.approx(
         {1366.12: 0.004526021577, 1314.06: 0.0025451684895}
     )
+    changed_composition = next(
+        observation.identity.composition.value
+        for observation, _experiment in closure_calls
+        if float(observation.identity.temperature_K.value) == 1366.12
+    )
+    assert dict(changed_composition.components)["K2O"] == pytest.approx(
+        0.00400546853226304
+    )
     assert len(melt_calls) == 2
     assert {call[1] for call in melt_calls} == {1366.12, 1314.06}
     assert {call[2] for call in melt_calls} == {5e-9}
     assert all(len(call[3]) == 9 for call in melt_calls)
+    changed_provider_recipe = next(
+        call[3] for call in melt_calls if call[1] == 1366.12
+    )
+    assert changed_provider_recipe["K2O"] == pytest.approx(
+        0.00400546853226304
+    )
     assert sum(record.status == "assumed-input" for record in evaluation.records) == 2
     assert sum(record.actual_value is None for record in evaluation.records) == 8
     assert all(
@@ -305,3 +354,14 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         for runtime in runtimes
         if runtime.get("temperature_K") in {1366.12, 1314.06}
     )
+    assert all(
+        "melt-only oxygen balance"
+        in runtime["oxygen_closure"]["melt_only_assumption"]
+        and any(
+            "reactive cell: oxygen balance of the cell not modelled" in reason
+            for reason in runtime["oxygen_closure"]["notice_reasons"]
+        )
+        for runtime in runtimes
+        if runtime.get("temperature_K") in {1366.12, 1314.06}
+    )
+    assert "melt-only oxygen balance" in evaluation.skip_reason
