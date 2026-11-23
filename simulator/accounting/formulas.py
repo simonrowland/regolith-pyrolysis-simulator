@@ -656,6 +656,14 @@ def _is_integer_compound_adduct(
             and part != "H2O"
         ):
             return False
+        if index > 0:
+            multiplier_match = _NUMBER_RE.match(part)
+            if multiplier_match is not None:
+                if multiplier_match.end() == len(part):
+                    return False
+                multiplier = float(multiplier_match.group())
+                if multiplier <= 0.0 or not multiplier.is_integer():
+                    return False
         body = part if index == 0 else _strip_one_leading_integer(part)
         count = _distinct_integer_elements(body)
         if count is None or count < 2:

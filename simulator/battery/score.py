@@ -1262,7 +1262,10 @@ def parse_species_formula(
         if _is_integer_compound_adduct(
             text, require_explicit_multipliers=True
         ):
-            elements = parse_formula(text, species=text).elements
+            try:
+                elements = parse_formula(text, species=text).elements
+            except ValueError:
+                return None
             return tuple(
                 sorted((str(symbol), float(count)) for symbol, count in elements.items())
             )

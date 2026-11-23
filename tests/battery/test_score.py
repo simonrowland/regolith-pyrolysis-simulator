@@ -4075,9 +4075,9 @@ def test_species_formula_parser_accepts_formula_owner_ascii_dot_adducts() -> Non
         ("CaAl2Si2O7(OH)2.H2O", "CaAl2Si2O7(OH)2.H2O"),
         ("CaCO3.H2O", "CaCO3.H2O"),
         ("FeSO4.H2O", "FeSO4.H2O"),
-        ("Hg2(OH)2CO3.3H2O", "Hg2(OH)2CO3.3H2O"),
+        ("Mg2(OH)2CO3.3H2O", "Mg2(OH)2CO3.3H2O"),
         ("NaAlSi2O6.H2O", "NaAlSi2O6.H2O"),
-        ("SrHgO.4CO2.5H2O", "SrHgO.4CO2.5H2O"),
+        ("5MgO.4CO2.5H2O", "5MgO.4CO2.5H2O"),
         ("Al₂O₃.3H₂O", "Al2O3.3H2O"),
         ("$Al_2O_3.3H_2O$", "Al2O3.3H2O"),
         ("CoSO₄.7H₂O", "CoSO4.7H2O"),
@@ -4089,6 +4089,17 @@ def test_species_formula_parser_accepts_formula_owner_ascii_dot_adducts() -> Non
             )
         )
         assert parse_species_formula(formula) == expected
+
+
+def test_species_formula_parser_refuses_malformed_ascii_adducts() -> None:
+    for formula in (
+        "3Al2O3.0SiO2",
+        "3Al2O3.0",
+        "XxO.2SiO2",
+        "3Al2O3..2SiO2",
+        "3Al2O3.2SiO2.",
+    ):
+        assert parse_species_formula(formula) is None
 
     for formula in ("Fe0.947O", "Al2O3.3H2O"):
         assert parse_species_formula(formula) == score_mod.formula_composition(formula)
