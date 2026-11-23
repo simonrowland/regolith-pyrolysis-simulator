@@ -26873,7 +26873,11 @@ class Migrator:
         observation_provenance = _provenance_from_extract(
             obs, values, provenance, quantity=q_token
         )
-        phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
+        phase_raw = (
+            compilation_phase_text(values)
+            or compilation_phase_text(obs)
+            or values.get("phase_label")
+        )
         observation_provenance = _provenance_with_printed_phase(
             observation_provenance, phase_raw
         )

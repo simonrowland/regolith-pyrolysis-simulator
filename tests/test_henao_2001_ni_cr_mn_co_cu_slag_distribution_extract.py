@@ -266,15 +266,25 @@ def _assert_henao_pressure_pins(experiments: dict, observations: list) -> None:
         row.pressure_environment.total_pressure_Pa.state.is_value
         and row.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101300")
         and row.pressure_environment.total_pressure_Pa.locator is not None
+        and row.pressure_environment.total_pressure_Pa.locator.page == 1
         and row.pressure_environment.total_pressure_Pa.locator.pdf_page_index == 0
         and row.pressure_environment.total_pressure_Pa.locator.published_page == "1959"
+        and row.pressure_environment.total_pressure_Pa.locator.section == "2. Experimental"
         for row in henao_experiments
     )
     assert all(
         row.pressure_environment.sweep_gas.state.is_value
         and row.pressure_environment.sweep_gas.state.value.species == "CO-CO2"
         and row.pressure_environment.sweep_gas.state.value.flow_sccm.is_unknown
+        and row.pressure_environment.sweep_gas.state.value.flow_sccm.reason
+        == "printed flow is 1.7e-6 m³/s; standard conditions for sccm conversion are not reported"
         and row.pressure_environment.sweep_gas.state.value.partial_pressure_Pa.is_unknown
+        and row.pressure_environment.sweep_gas.locator is not None
+        and row.pressure_environment.sweep_gas.locator.page == 2
+        and row.pressure_environment.sweep_gas.locator.pdf_page_index == 1
+        and row.pressure_environment.sweep_gas.locator.published_page == "1960"
+        and row.pressure_environment.sweep_gas.locator.section == "2. Experimental"
+        and "1.7e-6 m³/s" in row.pressure_environment.sweep_gas.locator.note
         for row in henao_experiments
     )
     assert all(
@@ -363,6 +373,37 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     ]
     with pytest.raises(AssertionError):
         _assert_henao_pressure_pins(mutated_experiments, mutated_observations)
+    observation_only_mutation = [
+        replace(
+            row,
+            identity=replace(
+                row.identity,
+                total_pressure_Pa=State.unknown("observation-only pressure mutation"),
+            ),
+        )
+        if row is observations[0]
+        else row
+        for row in observations
+    ]
+    with pytest.raises(AssertionError):
+        _assert_henao_pressure_pins(result.experiments, observation_only_mutation)
+    first_sweep = henao_experiments[0].pressure_environment.sweep_gas
+    mutated_sweep_experiment = replace(
+        henao_experiments[0],
+        pressure_environment=replace(
+            henao_experiments[0].pressure_environment,
+            sweep_gas=replace(
+                first_sweep,
+                state=State.unknown("sweep-flow mutation"),
+            ),
+        ),
+    )
+    mutated_sweep_experiments = dict(result.experiments)
+    mutated_sweep_experiments[mutated_sweep_experiment.experiment_id] = (
+        mutated_sweep_experiment
+    )
+    with pytest.raises(AssertionError):
+        _assert_henao_pressure_pins(mutated_sweep_experiments, observations)
     henao_experiments = [
         row
         for row in result.experiments.values()
@@ -392,6 +433,12 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
         "default_policy_id": "DP-017",
         "rule": "analysed phase rows cannot use their own analysis as input",
     }
+    without_printed_phase = replace(a1_slag, provenance={})
+    assert _predict_with_engine(
+        Engine.THERMOENGINE,
+        without_printed_phase,
+        experiment=result.experiments[without_printed_phase.experiment_id],
+    ).refusal_detail == {"reason": "missing_input", "input": "composition"}
     unrelated_map_conditions = dict(a1_slag.point_conditions)
     printed_map = unrelated_map_conditions["printed_composition"]
     unrelated_map_conditions["printed_composition"] = replace(

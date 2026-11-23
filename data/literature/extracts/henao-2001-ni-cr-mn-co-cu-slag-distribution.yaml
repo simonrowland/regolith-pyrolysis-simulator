@@ -21,8 +21,8 @@ fidelity_samples:
     locator: {page: 2, pdf_page_index: 1, published_page: '1960', table: '1', row: '4'}
 experiments:
   - experiment_id: henao:A-1
-    pressure_environment:
-      total_pressure_Pa: &henao_total_pressure
+    pressure_environment: &henao_pressure_environment
+      total_pressure_Pa:
         state:
           tag: value
           value: '101300'
@@ -36,14 +36,14 @@ experiments:
           tag: value
           value:
             species: CO-CO2
-            flow_sccm: {tag: unknown, reason: flow rate not reported}
+            flow_sccm: {tag: unknown, reason: 'printed flow is 1.7e-6 m³/s; standard conditions for sccm conversion are not reported'}
             partial_pressure_Pa: {tag: unknown, reason: gas partial pressures not reported}
         locator:
-          page: 1
-          pdf_page_index: 0
-          published_page: '1959'
+          page: 2
+          pdf_page_index: 1
+          published_page: '1960'
           section: '2. Experimental'
-          note: CO-CO2 mixture is stated; its flow and component pressures are not.
+          note: CO-CO2 flow is 1.7e-6 m³/s as printed; standard conditions for an sccm conversion are not stated.
     locator:
       page: 2
       pdf_page_index: 1
@@ -51,8 +51,7 @@ experiments:
       table: '1'
       row: '4'
   - experiment_id: henao:A-2
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -60,8 +59,7 @@ experiments:
       table: '1'
       row: '5'
   - experiment_id: henao:A-3
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -69,8 +67,7 @@ experiments:
       table: '1'
       row: '6'
   - experiment_id: henao:A-4
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -78,8 +75,7 @@ experiments:
       table: '1'
       row: '7'
   - experiment_id: henao:A-5
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -87,8 +83,7 @@ experiments:
       table: '1'
       row: '8'
   - experiment_id: henao:A-6
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -96,8 +91,7 @@ experiments:
       table: '1'
       row: '9'
   - experiment_id: henao:A-7
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -105,8 +99,7 @@ experiments:
       table: '1'
       row: '10'
   - experiment_id: henao:A-8
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -114,8 +107,7 @@ experiments:
       table: '1'
       row: '11'
   - experiment_id: henao:A-9
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -123,8 +115,7 @@ experiments:
       table: '1'
       row: '12'
   - experiment_id: henao:A-10
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -132,8 +123,7 @@ experiments:
       table: '1'
       row: '13'
   - experiment_id: henao:A-11
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -141,8 +131,7 @@ experiments:
       table: '1'
       row: '14'
   - experiment_id: henao:A-12
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -150,8 +139,7 @@ experiments:
       table: '1'
       row: '15'
   - experiment_id: henao:A-13
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -159,8 +147,7 @@ experiments:
       table: '1'
       row: '16'
   - experiment_id: henao:A-14
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -168,8 +155,7 @@ experiments:
       table: '1'
       row: '17'
   - experiment_id: henao:A-15
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -177,8 +163,7 @@ experiments:
       table: '1'
       row: '18'
   - experiment_id: henao:A-16
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -186,8 +171,7 @@ experiments:
       table: '1'
       row: '19'
   - experiment_id: henao:A-17
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 2
       pdf_page_index: 1
@@ -195,8 +179,7 @@ experiments:
       table: '1'
       row: '20'
   - experiment_id: henao:B-1
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -204,8 +187,7 @@ experiments:
       table: '2'
       row: '4'
   - experiment_id: henao:B-2
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -213,8 +195,7 @@ experiments:
       table: '2'
       row: '5'
   - experiment_id: henao:B-3
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -222,8 +203,7 @@ experiments:
       table: '2'
       row: '6'
   - experiment_id: henao:B-4
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -231,8 +211,7 @@ experiments:
       table: '2'
       row: '7'
   - experiment_id: henao:B-5
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -240,8 +219,7 @@ experiments:
       table: '2'
       row: '8'
   - experiment_id: henao:B-6
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -249,8 +227,7 @@ experiments:
       table: '2'
       row: '9'
   - experiment_id: henao:B-7
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -258,8 +235,7 @@ experiments:
       table: '2'
       row: '10'
   - experiment_id: henao:B-8
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -267,8 +243,7 @@ experiments:
       table: '2'
       row: '11'
   - experiment_id: henao:B-9
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -276,8 +251,7 @@ experiments:
       table: '2'
       row: '12'
   - experiment_id: henao:B-10
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -285,8 +259,7 @@ experiments:
       table: '2'
       row: '13'
   - experiment_id: henao:C-1
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -294,8 +267,7 @@ experiments:
       table: '3'
       row: '4'
   - experiment_id: henao:C-2
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -303,8 +275,7 @@ experiments:
       table: '3'
       row: '5'
   - experiment_id: henao:C-3
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -312,8 +283,7 @@ experiments:
       table: '3'
       row: '6'
   - experiment_id: henao:C-4
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -321,8 +291,7 @@ experiments:
       table: '3'
       row: '7'
   - experiment_id: henao:C-5
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -330,8 +299,7 @@ experiments:
       table: '3'
       row: '8'
   - experiment_id: henao:C-8
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -339,8 +307,7 @@ experiments:
       table: '3'
       row: '11'
   - experiment_id: henao:C-9
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -348,8 +315,7 @@ experiments:
       table: '3'
       row: '12'
   - experiment_id: henao:C-10
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -357,8 +323,7 @@ experiments:
       table: '3'
       row: '13'
   - experiment_id: henao:C-11
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -366,8 +331,7 @@ experiments:
       table: '3'
       row: '14'
   - experiment_id: henao:C-12
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -375,8 +339,7 @@ experiments:
       table: '3'
       row: '15'
   - experiment_id: henao:C-13
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -384,8 +347,7 @@ experiments:
       table: '3'
       row: '16'
   - experiment_id: henao:C-14
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -393,8 +355,7 @@ experiments:
       table: '3'
       row: '17'
   - experiment_id: henao:C-15
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -402,8 +363,7 @@ experiments:
       table: '3'
       row: '18'
   - experiment_id: henao:C-16
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -411,8 +371,7 @@ experiments:
       table: '3'
       row: '19'
   - experiment_id: henao:C-18
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -420,8 +379,7 @@ experiments:
       table: '3'
       row: '21'
   - experiment_id: henao:C-19
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -429,8 +387,7 @@ experiments:
       table: '3'
       row: '22'
   - experiment_id: henao:C-20
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -438,8 +395,7 @@ experiments:
       table: '3'
       row: '23'
   - experiment_id: henao:C-21
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -447,8 +403,7 @@ experiments:
       table: '3'
       row: '24'
   - experiment_id: henao:C-22
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -456,8 +411,7 @@ experiments:
       table: '3'
       row: '25'
   - experiment_id: henao:C-23
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -465,8 +419,7 @@ experiments:
       table: '3'
       row: '26'
   - experiment_id: henao:C-24
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -474,8 +427,7 @@ experiments:
       table: '3'
       row: '27'
   - experiment_id: henao:C-25
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -483,8 +435,7 @@ experiments:
       table: '3'
       row: '28'
   - experiment_id: henao:C-26
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -492,8 +443,7 @@ experiments:
       table: '3'
       row: '29'
   - experiment_id: henao:C-27
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -501,8 +451,7 @@ experiments:
       table: '3'
       row: '30'
   - experiment_id: henao:C-28
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -510,8 +459,7 @@ experiments:
       table: '3'
       row: '31'
   - experiment_id: henao:C-17
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -519,8 +467,7 @@ experiments:
       table: '3'
       row: '20'
   - experiment_id: henao:C-6
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
@@ -528,8 +475,7 @@ experiments:
       table: '3'
       row: '9'
   - experiment_id: henao:C-7
-    pressure_environment:
-      total_pressure_Pa: *henao_total_pressure
+    pressure_environment: *henao_pressure_environment
     locator:
       page: 3
       pdf_page_index: 2
