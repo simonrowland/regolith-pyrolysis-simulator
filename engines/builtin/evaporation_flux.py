@@ -1866,9 +1866,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 hkl_upper_bound=species in hkl_upper_bound_transport_species,
                 surface_oxygen_bound=surface_oxygen_bound,
             )
-            evaporation_driving_delta_Pa[str(species)] = (
-                P_eq_Pa - P_bulk_Pa
-            )
+            # Two sub-picopascal pressures are a trivial zero, not a
+            # meaningful saturation crossing for the reduced-path tape.
+            if not (P_eq_Pa < 1.0e-12 and P_bulk_Pa < 1.0e-12):
+                evaporation_driving_delta_Pa[str(species)] = (
+                    P_eq_Pa - P_bulk_Pa
+                )
 
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:

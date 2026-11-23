@@ -290,6 +290,10 @@ class CapacityShadowRefusal:
         dict[str, int] | None
     ) = None
     reduced_evaporation_drive_band_Pa: float | None = None
+    reduced_error_test_rejections: int | None = None
+    reduced_newton_nonconvergence_failures: int | None = None
+    reduced_error_test_top3_component_counts: dict[str, int] | None = None
+    reduced_newton_failure_diagnostics: list[dict[str, Any]] | None = None
     reduced_accepted_steps: int | None = None
     # Error-test rejections plus failed Newton collocation attempts.
     reduced_rejected_steps: int | None = None
@@ -1385,6 +1389,20 @@ def _hour_cost_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
             )
         ),
         "reduced_evaporation_drive_band_Pa": _SLOW_ATOL_PA,
+        "reduced_error_test_rejections": law.reduced_error_test_rejections,
+        "reduced_newton_nonconvergence_failures": (
+            law.reduced_newton_nonconvergence_failures
+        ),
+        "reduced_error_test_top3_component_counts": (
+            None
+            if law.reduced_error_test_top3_component_counts is None
+            else dict(sorted(law.reduced_error_test_top3_component_counts.items()))
+        ),
+        "reduced_newton_failure_diagnostics": (
+            None
+            if law.reduced_newton_failure_diagnostics is None
+            else [dict(row) for row in law.reduced_newton_failure_diagnostics]
+        ),
         "reduced_accepted_steps": int(law.reduced_accepted_steps),
         "reduced_rejected_steps": int(law.reduced_rejected_steps),
         "reduced_step_size_min_s": reduced_step_min,
@@ -1622,6 +1640,10 @@ class _HeadspaceLaw:
         self.reduced_rejection_evaporation_drive_crossing_fraction: float | None = None
         self.reduced_rejection_evaporation_drive_crossing_species_counts: dict[str, int] = {}
         self._last_evaporation_drive_delta_Pa: dict[str, float] | None = None
+        self.reduced_error_test_rejections: int | None = None
+        self.reduced_newton_nonconvergence_failures: int | None = None
+        self.reduced_error_test_top3_component_counts: dict[str, int] | None = None
+        self.reduced_newton_failure_diagnostics: list[dict[str, Any]] | None = None
         self.reduced_accepted_steps = 0
         self.reduced_rejected_steps = 0
         self.reduced_step_sizes_s: list[float] = []
@@ -2895,15 +2917,50 @@ def _stiffness_collocation(*args, **kwargs):
     miss is counted once.
     """
 
-    result = _RADAU_COLLOCATION(*args, **kwargs)
     recorder = _ACTIVE_STIFFNESS.get()
-    if (
-        recorder is not None
-        and isinstance(result, tuple)
-        and result
-        and result[0] is False
-    ):
-        recorder.note_newton_failure()
+    if recorder is None or not recorder.capture_reduced_diagnostics:
+        result = _RADAU_COLLOCATION(*args, **kwargs)
+        if isinstance(result, tuple) and result and result[0] is False:
+            if recorder is not None:
+                recorder.note_newton_failure()
+        return result
+
+    positional = list(args)
+    keyword = dict(kwargs)
+    if len(positional) >= 10:
+        scale = positional[5]
+        solve_lu = positional[9]
+        use_positional_solver = True
+    elif "scale" in keyword and "solve_lu" in keyword:
+        scale = keyword["scale"]
+        solve_lu = keyword["solve_lu"]
+        use_positional_solver = False
+    else:
+        result = _RADAU_COLLOCATION(*args, **kwargs)
+        recorder.mark_failed()
+        if isinstance(result, tuple) and result and result[0] is False:
+            recorder.note_newton_failure()
+        return result
+
+    solved_increments = []
+
+    def capture_solve(lu, rhs):
+        increment = solve_lu(lu, rhs)
+        solved_increments.append(increment)
+        return increment
+
+    if use_positional_solver:
+        positional[9] = capture_solve
+        result = _RADAU_COLLOCATION(*positional, **keyword)
+    else:
+        keyword["solve_lu"] = capture_solve
+        result = _RADAU_COLLOCATION(*positional, **keyword)
+    if isinstance(result, tuple) and result and result[0] is False:
+        recorder.note_newton_failure(
+            result=result,
+            scale=scale,
+            increments=solved_increments[-2:],
+        )
     return result
 
 
@@ -2961,15 +3018,26 @@ class _RadauNormTape:
 class _StiffnessRecord:
     """Accepted steps and error-test rejections for one Radau call."""
 
-    def __init__(self, species, block_names) -> None:
+    def __init__(
+        self,
+        species,
+        block_names,
+        *,
+        capture_reduced_diagnostics: bool = False,
+    ) -> None:
         self.species = tuple(species)
         self.block_names = tuple(block_names)
         self.count = len(self.species)
+        self.capture_reduced_diagnostics = bool(
+            capture_reduced_diagnostics
+        )
         self.steps: deque = deque(maxlen=_STIFFNESS_STEPS)
         self.dominators: deque = deque(maxlen=_STIFFNESS_REJECTIONS)
         self.rejected = 0
         self.last_y = None
         self.newton_failures = 0
+        self.error_test_top3_component_counts: dict[str, int] = {}
+        self.newton_failure_diagnostics: list[dict[str, Any]] = []
         self._pending = False
         self._drive_crossings_since_error_test: set[str] = set()
         self._pending_drive_crossing_species: set[str] = set()
@@ -3003,11 +3071,69 @@ class _StiffnessRecord:
                 self.rejected_drive_crossing_species_counts.get(name, 0) + 1
             )
 
-    def note_newton_failure(self) -> None:
+    def note_newton_failure(
+        self,
+        *,
+        result=None,
+        scale=None,
+        increments=(),
+    ) -> None:
         self.newton_failures += 1
         crossings = set(self._drive_crossings_since_error_test)
         self._drive_crossings_since_error_test.clear()
         self._record_rejected_drive_crossings(crossings)
+        if not self.capture_reduced_diagnostics:
+            return
+        try:
+            self.newton_failure_diagnostics.append(
+                self._newton_failure_diagnostic(result, scale, increments)
+            )
+        except Exception:
+            self.mark_failed()
+
+    def _newton_failure_diagnostic(self, result, scale, increments):
+        import numpy as np
+
+        rate = result[3] if isinstance(result, tuple) and len(result) > 3 else None
+        if rate is not None:
+            rate = float(rate)
+            if not math.isfinite(rate):
+                rate = None
+        iterations = (
+            int(result[1])
+            if isinstance(result, tuple) and len(result) > 1
+            else None
+        )
+        components = []
+        if len(increments) == 2 and scale is not None:
+            real = np.asarray(increments[0], dtype=float).reshape(-1)
+            complex_part = np.asarray(increments[1], dtype=complex).reshape(-1)
+            widths = np.asarray(scale, dtype=float).reshape(-1)
+            if (
+                real.size == complex_part.size == widths.size
+                and real.size > 0
+                and np.isfinite(widths).all()
+                and np.all(widths > 0.0)
+            ):
+                rows = np.vstack((real, complex_part.real, complex_part.imag))
+                scores = np.max(np.abs(rows) / widths[None, :], axis=0)
+                indices = np.argsort(scores)[::-1][:3]
+                for index in indices:
+                    named = self._name(int(index))
+                    score = float(scores[index])
+                    if named is None or not math.isfinite(score) or score <= 0.0:
+                        continue
+                    species_name, state_name = named
+                    components.append({
+                        "species": species_name,
+                        "state": state_name,
+                        "scaled_increment": score,
+                    })
+        return {
+            "convergence_rate": rate,
+            "iterations": iterations,
+            "dominant_components": components,
+        }
 
     def accept(self, step_s: float, y) -> None:
         import numpy as np
@@ -3102,6 +3228,22 @@ class _StiffnessRecord:
         ):
             self.mark_failed()
             return
+        if self.capture_reduced_diagnostics:
+            order = np.argsort(np.abs(weighted))[::-1][:3]
+            for rank, component_index in enumerate(order, start=1):
+                if not math.isfinite(float(weighted[component_index])):
+                    continue
+                if float(weighted[component_index]) == 0.0:
+                    continue
+                component_name = self._name(int(component_index))
+                if component_name is None:
+                    self.mark_failed()
+                    return
+                component_species, component_state = component_name
+                label = f"{rank}:{component_state}:{component_species}"
+                self.error_test_top3_component_counts[label] = (
+                    self.error_test_top3_component_counts.get(label, 0) + 1
+                )
         species_name, block = named
         self.rejected += 1
         self.dominators.append({
@@ -4088,6 +4230,7 @@ def _reduced_manifold(
     recorder = _StiffnessRecord(
         species,
         ("n", "A", "B", "G", "R") if track_extent else ("n", "A", "B"),
+        capture_reduced_diagnostics=True,
     )
     last_stage_drive_delta_Pa: list[dict[str, float] | None] = [None]
 
@@ -4285,6 +4428,10 @@ def _reduced_manifold(
             law.reduced_rejections_with_evaporation_drive_crossing = None
             law.reduced_rejection_evaporation_drive_crossing_species_counts = {}
             law.reduced_rejection_evaporation_drive_crossing_fraction = None
+            law.reduced_error_test_rejections = None
+            law.reduced_newton_nonconvergence_failures = None
+            law.reduced_error_test_top3_component_counts = None
+            law.reduced_newton_failure_diagnostics = None
         else:
             law.reduced_rejections_with_evaporation_drive_crossing = (
                 recorder.rejected_with_drive_crossing
@@ -4298,6 +4445,16 @@ def _reduced_manifold(
                 if law.reduced_rejected_steps > 0
                 else None
             )
+            law.reduced_error_test_rejections = recorder.rejected
+            law.reduced_newton_nonconvergence_failures = (
+                recorder.newton_failures
+            )
+            law.reduced_error_test_top3_component_counts = dict(
+                sorted(recorder.error_test_top3_component_counts.items())
+            )
+            law.reduced_newton_failure_diagnostics = [
+                dict(row) for row in recorder.newton_failure_diagnostics
+            ]
     if not solution.success:
         return None
     end = solution.y[:, -1]
