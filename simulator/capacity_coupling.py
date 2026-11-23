@@ -2745,6 +2745,96 @@ def _continuous_open_root(
     return min(ahead, key=lambda root: abs(root - pressure))
 
 
+def _warm_started_open_root(
+    value_at: Callable[[float], float],
+    piece_at: Callable[[float], tuple],
+    guess: float,
+    downstream: float,
+) -> float | None:
+    """The open root Newton reaches from the previous one.
+
+    The caller has already found G(P_down) > 0. The reduced step and
+    the stall check hold a pressure next to P*. A damped Newton step
+    that stays inside the kink band, then Brent on the sign change it
+    finds, is that same root. Brent publishes, as it does on the scan.
+
+    The band is the continuity cut a second root must lie inside to
+    be the one the pressure has reached. A root outside it, a step
+    that leaves the piece, a window with no sign change, or a root
+    the pressure mode does not fall through is not this commit: the
+    bracket still publishes. A guess at or below P_down is the scan.
+    """
+
+    if not (math.isfinite(guess) and guess > downstream):
+        return None
+    half = _KINK_BAND_PA
+    lo = max(guess - half, downstream)
+    hi = guess + half
+    if not hi > lo:
+        return None
+    proposed = _newton_propose(value_at, piece_at, guess, lo, hi)
+    center = float(guess if proposed is None else proposed)
+    if not (lo <= center <= hi):
+        return None
+    try:
+        g_center = value_at(center)
+    except _BalanceRefused:
+        raise
+    if not math.isfinite(g_center):
+        return None
+    if g_center == 0.0:
+        root = center
+    else:
+        span = max(abs(center) * 1.0e-8, 1.0e-12)
+        left_g = g_center
+        right_g = g_center
+        bracket: tuple[float, float] | None = None
+        root = center
+        for _expand in range(16):
+            left = max(lo, center - span)
+            right = min(hi, center + span)
+            try:
+                if left < center:
+                    left_g = value_at(left)
+                if right > center:
+                    right_g = value_at(right)
+            except _BalanceRefused:
+                raise
+            if not math.isfinite(left_g) or not math.isfinite(right_g):
+                return None
+            if left_g == 0.0:
+                root = left
+                bracket = None
+                break
+            if right_g == 0.0:
+                root = right
+                bracket = None
+                break
+            if left_g * g_center < 0.0:
+                bracket = (left, center)
+                break
+            if g_center * right_g < 0.0:
+                bracket = (center, right)
+                break
+            if left <= lo and right >= hi:
+                return None
+            span *= 4.0
+        else:
+            return None
+        if bracket is not None:
+            try:
+                root, _iterations = _brent(value_at, bracket[0], bracket[1])
+            except _BalanceRefused as refused:
+                if refused.reason == "headspace_balance_work_cap":
+                    raise
+                return None
+    if not (math.isfinite(root) and root > downstream):
+        return None
+    if not _pressure_root_attracts(value_at, root, downstream):
+        return None
+    return float(root)
+
+
 def _open_or_shut_fixed_point(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
@@ -2771,8 +2861,6 @@ def _open_or_shut_fixed_point(
 
         def piece_at(pressure: float) -> tuple:
             return law.piece_at(pressure)
-
-        samples = law.g_samples(refuse_multiple=False)
     else:
         def value_at(pressure: float) -> float:
             return _mixture_g(law, fractions, pressure)
@@ -2780,9 +2868,24 @@ def _open_or_shut_fixed_point(
         def piece_at(pressure: float) -> tuple:
             return _mixture_piece(law, fractions, pressure)
 
-        samples = _ray_samples(law, fractions, refuse_multiple=False)
     if value_at(downstream) <= 0.0:
         return "shut", None
+    # The scan is the publisher when this neighborhood has no root.
+    # A hit is the same Brent root the scan would keep, and it does
+    # not walk the pressure grid.
+    if near_Pa is not None:
+        warmed = _warm_started_open_root(
+            value_at,
+            piece_at,
+            float(near_Pa),
+            downstream,
+        )
+        if warmed is not None:
+            return "open", warmed
+    if len(law.species) == 1:
+        samples = law.g_samples(refuse_multiple=False)
+    else:
+        samples = _ray_samples(law, fractions, refuse_multiple=False)
     open_crossings = [
         crossing
         for crossing in _crossings(samples)
@@ -3239,9 +3342,10 @@ def _slow_manifold(
     n_end = n0 + A − B by that algebra.
 
     Where s_i depends on the partials, the same reduced ODE is
-    integrated with one solve_ivp. Each evaluation re-solves P* on
-    the open side, so the state never sits on the pipe kink. There
-    is not a second solver beside that reduction.
+    integrated with one solve_ivp. Each evaluation re-solves P*
+    from the previous root: Newton, then Brent, on that neighborhood.
+    The bracket runs only when that step fails. The state never sits
+    on the pipe kink. There is not a second solver beside that reduction.
 
     Unit check: (mol/s)·s = mol, and n_tot / (mol/s) = s.
     Limit: s_i / Σ s = y_i0 leaves the composition fixed, so

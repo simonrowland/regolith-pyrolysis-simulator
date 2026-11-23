@@ -4546,3 +4546,164 @@ def test_shut_fill_steeper_than_inverse_pressure_falls_through():
     net_pa_h = rate_mol_s * pa_per_mol * 3600.0
     fill_pa_h = k_pa3_s / (oracle_pa ** 2) * 3600.0
     assert net_pa_h == pytest.approx(fill_pa_h, rel=1.0e-8)
+
+
+def test_warm_started_open_root_is_the_bracket_root():
+    """Newton from the last P* publishes the Brent root of that neighborhood.
+
+    A guess inside the kink band is Brent's root. A guess a pascal
+    away is not a commit: the bracket still owns that root. The local
+    step does not walk the factor-of-two grid.
+    """
+
+    downstream = 20.0
+    root_pa = downstream + 4.5e-4
+
+    def value_at(pressure: float) -> float:
+        return root_pa - pressure
+
+    def piece_at(_pressure: float) -> tuple:
+        return ("open",)
+
+    warm = capacity_coupling._warm_started_open_root(
+        value_at, piece_at, root_pa - 2.0e-5, downstream,
+    )
+    bracket, _iterations = capacity_coupling._brent(
+        value_at, downstream, downstream + 1.0,
+    )
+    assert warm == pytest.approx(bracket, abs=1.0e-12)
+    assert capacity_coupling._warm_started_open_root(
+        value_at, piece_at, downstream + 1.0, downstream,
+    ) is None
+    counted = {"n": 0}
+
+    def counting(pressure: float) -> float:
+        counted["n"] += 1
+        # A rise past the first root is the reversal that sends the
+        # bracket onto the sign scan. The local step never evaluates it.
+        rise = 50.0 if 70.0 < pressure < 90.0 else 0.0
+        return root_pa - pressure + rise
+
+    capacity_coupling._warm_started_open_root(
+        counting, piece_at, root_pa, downstream,
+    )
+    local = counted["n"]
+    counted["n"] = 0
+    points = capacity_coupling._geometric_pressures(downstream)
+    _samples, fallback = capacity_coupling._geometric_sign_samples(
+        points,
+        counting,
+        direction="down",
+        refuse_multiple=False,
+    )
+    assert fallback is True
+    if fallback:
+        capacity_coupling._pressure_sign_scan(downstream, counting)
+    assert local < counted["n"]
+
+
+def test_continuation_hour_with_nonzero_buffer_stays_under_the_flux_cap():
+    """A reduced-manifold hour with buffer S does not re-bracket P*.
+
+    S is the walked 0.105 mol of buffer oxygen. The potassium rate
+    depends on the potassium fraction, so the closed form does not
+    apply. The opening is the root. Newton from that root publishes
+    it; the bracket on the same hour costs about twice the flux.
+    The budget sits between those two counts.
+    """
+
+    temperature_K = 1170.0 + 273.15
+    downstream_pa = 20.0
+    target_pa = downstream_pa + 4.5e-4
+    factor = GAS_CONSTANT * temperature_K / _HS_V_M3
+    oxygen = _o2_molar_mass_kg()
+    potassium = MOLAR_MASS["K"] / 1000.0
+    masses = {"O2": oxygen, "K": potassium}
+    k_share = 0.0004756403194864617 / target_pa
+    opening = {
+        "O2": target_pa * (1.0 - k_share),
+        "K": target_pa * k_share,
+    }
+    outflow = pipe_species_outflow_mol_s(
+        target_pa,
+        downstream_pa,
+        temperature_K,
+        {name: opening[name] / factor for name in masses},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol=masses,
+    )
+    pipe_mol_s = math.fsum(
+        float(outflow.species_mol_s[name]) for name in masses
+    )
+    s_o2 = 0.5 * pipe_mol_s
+    potassium_mol_s = pipe_mol_s - s_o2
+    potassium_kg_h = potassium_mol_s * potassium * 3600.0
+    stock_mol = 0.10518011013741849
+    holder: dict = {
+        "_opening_buffer_o2": {"mol": stock_mol, "signed_mol": stock_mol},
+    }
+    calls = {"n": 0}
+
+    def cliff(partials: dict[str, float]) -> dict[str, float]:
+        calls["n"] += 1
+        total = math.fsum(partials.values())
+        if total <= 0.0:
+            return {"O2": 0.0, "K": 0.0}
+        frac = float(partials.get("K", 0.0)) / total
+        shape = math.exp(-max(total - target_pa, 0.0) / 1.0e-4)
+        rate = potassium_kg_h * shape * (
+            1.0 + 0.01 * (frac / k_share - 1.0)
+        )
+        return {"O2": 0.0, "K": rate}
+
+    def redox(_partials: dict[str, float]) -> dict[str, float]:
+        if holder["_opening_buffer_o2"]["mol"] <= 0.0:
+            return {"O2": 0.0, "K": 0.0}
+        return {"O2": s_o2, "K": 0.0}
+
+    result = solve_capacity_shadow(
+        pre_holdup_mol={name: opening[name] / factor for name in masses},
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=cliff,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        redox_mol_s_at_partials=redox,
+        extent_holder=holder,
+        authoritative=True,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.authoritative
+    terms = holder["_balance_terms"]
+    assert terms["path"] != "headspace_balance_work_cap"
+    assert calls["n"] < capacity_coupling._MAX_FLUX_EVALUATIONS
+    # The warm hour measures 21579 flux evaluations. The same hour
+    # with the warm start removed measures 42517. A count at or
+    # above 30000 is the bracket, not this root.
+    assert calls["n"] < 30_000
+    notices = [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "quasi_steady_fixed_point"
+    ]
+    assert len(notices) == 1
+    assert terms["R_mol"]["O2"] > 0.0
+    total = math.fsum(result.partial_pressures_Pa.values())
+    assert total == pytest.approx(target_pa, abs=1.0e-3)
+    factor_end = GAS_CONSTANT * temperature_K / _HS_V_M3
+    for name, n0 in terms["n0_mol"].items():
+        identity = n0 + terms["A_mol"][name] - terms["B_mol"][name]
+        assert result.partial_pressures_Pa[name] == pytest.approx(
+            identity * factor_end,
+            abs=1.0e-6,
+        )
