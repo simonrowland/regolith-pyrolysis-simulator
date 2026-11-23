@@ -1016,6 +1016,10 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
     assert sim._freeze_gate_liquid_fraction_curve_memo[startup_key]["curve"] == (
         startup_record["curve"]
     )
+    sim._freeze_gate_liquid_fraction_cache = None
+    live_curve_record = sim._melt_redox_liquidus_gate_record()
+    assert live_curve_record["curve"] == startup_record["curve"]
+    assert len(liquidus_searches) == 1
 
     feed_alkali_kg = startup_prediction["Na_plus_K_feed_mass_kg"]
     budget_fraction = startup_prediction["alkali_retention_budget_fraction"]
