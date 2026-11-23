@@ -8876,13 +8876,13 @@ def _selected_shared_ladder_oxygen(
             or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
         ):
             continue
-        match = re.fullmatch(
-            r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)",
+        match = re.search(
+            r"(?:^|; )fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)",
             notice.reason,
         )
         if match is None:
             continue
-        route = match.group(3)
+        route = match.group(3).partition("; kress91_temperature_band_status=")[0]
         borrowed_suffix = "; borrowed"
         if route.endswith(borrowed_suffix):
             route = route[:-len(borrowed_suffix)]

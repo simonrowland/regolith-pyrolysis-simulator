@@ -350,12 +350,14 @@ def test_tier2_knudsen_ferric_inverse_deliberately_omits_pressure_term() -> None
 def test_tier2_out_of_band_kress_inverse_is_predicted_and_flagged() -> None:
     experiment, bench, observation = _feo_case(
         temperature=Value.point_of(Decimal("1973.15")),
+        pressure=Value.point_of(Decimal("1e-6")),
     )
     observation = replace(
         observation,
         identity=replace(
             observation.identity,
             temperature_K=State.of(Decimal("1973.15")),
+            per=State.of(PerBasis.DIMENSIONLESS),
         ),
         point_conditions={
             **observation.point_conditions,
@@ -784,11 +786,11 @@ def test_container_buffers_use_the_existing_frost_owner() -> None:
         assert "experiment.sample.container" in oxygen.selected.inputs
         buffer = PUBLISHED_BUFFERS[token]
         expected = frost_condensed_buffer_log10_fO2_bar(
-            buffer.A_K,
-            buffer.B,
-            buffer.pressure_coefficient_K_per_bar,
-            float(temperature_K),
-            float(pressure_Pa / Decimal("100000")),
+            Decimal(str(buffer.A_K)),
+            Decimal(str(buffer.B)),
+            Decimal(str(buffer.pressure_coefficient_K_per_bar)),
+            temperature_K,
+            pressure_Pa / Decimal("100000"),
         )
         resolved = resolve_row_fo2(
             experiment,
@@ -1017,7 +1019,7 @@ def test_graphite_container_uses_closed_cco_at_printed_or_resolved_pressure() ->
     unresolved = oxygen_condition(unknown_pressure, bench, None)
     assert unresolved.selected is None
 
-    identity = F.pref_identity()
+    identity = replace(F.pref_identity(T_K=temperature_K), fO2_Pa=None)
     pressure = _resolve_score_total_pressure(
         identity,
         Quantity.ACTIVITY,
@@ -1113,7 +1115,16 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
         _cell,
     )
     experiment, bench, observation = _feo_case()
-    experiment = replace(experiment, method=State.of(MethodToken.TABULATION))
+    experiment = replace(
+        experiment, method=State.of(MethodToken.TABULATION),
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=replace(
+                experiment.pressure_environment.total_pressure_Pa,
+                state=State.unknown("total pressure not printed"),
+            ),
+        ),
+    )
     predictions = []
     for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
         predictions.append(predict_with_engine(
@@ -1160,6 +1171,9 @@ def test_tier_notice_reaches_the_residual() -> None:
         experiment,
         method=F.State.of(MethodToken.TABULATION),
         bench_id=bench.id,
+    )
+    observation = replace(
+        observation, identity=replace(observation.identity, per=State.of(PerBasis.DIMENSIONLESS)),
     )
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,

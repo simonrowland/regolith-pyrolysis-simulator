@@ -2,9 +2,10 @@
 
 from collections.abc import Callable, Mapping
 from dataclasses import replace
+from decimal import Decimal, InvalidOperation
 
 from simulator.battery.enums import FO2Channel, NoticeKind, Quantity
-from simulator.battery.records import Experiment, Located, Locator, Notice, Observation, State
+from simulator.battery.records import Experiment, Located, Locator, Notice, Observation, State, Value
 
 FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
 FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
@@ -41,8 +42,12 @@ def _cell_coordinates(locator: Locator) -> tuple[str | None, ...]:
     )
 
 
-def _cell_relation(target: Locator | None, condition: Locator | None) -> str | None:
-    """Match an addressed row unless the supplied physical coordinates disagree."""
+def _cell_relation(
+    target: Locator | None, condition: Locator | None, *,
+    printed_values: tuple[object, object] | None = None,
+    derived_from_target: bool = False,
+) -> str | None:
+    """Match an addressed cell, using printed values when a column is missing."""
     if target is None or condition is None:
         return None
     left, right = _cell_coordinates(target), _cell_coordinates(condition)
@@ -52,7 +57,24 @@ def _cell_relation(target: Locator | None, condition: Locator | None) -> str | N
         return None
     if any(a is not None and b is not None and a != b for a, b in zip(left, right)):
         return None
-    return "ambiguous" if left[5] is None or right[5] is None else "same"
+    if left[5] is not None and right[5] is not None:
+        return "same"
+    if derived_from_target:
+        return "ambiguous"
+    if printed_values is None:
+        return None
+    a, b = (value.point if isinstance(value, Value) else value for value in printed_values)
+    if not isinstance(a, (str, Decimal, int)) or not isinstance(b, (str, Decimal, int)):
+        return None
+    if isinstance(a, bool) or isinstance(b, bool):
+        return None
+    if isinstance(a, str) and isinstance(b, str) and a == b:
+        return "ambiguous"
+    try:
+        a, b = Decimal(a), Decimal(b)
+    except InvalidOperation:
+        return None
+    return "ambiguous" if a.is_finite() and b.is_finite() and a == b else None
 
 
 def _condition_references(observation: Observation, field: str) -> set[str]:
@@ -161,12 +183,14 @@ def independent_redox_conditions(
             or (axis == "temperature_K" and condition.inference is not None)
         ):
             continue
-        relation = _cell_relation(observation.locator, condition.locator)
+        relation = _cell_relation(
+            observation.locator, condition.locator,
+            printed_values=(observation.value, condition.state.value),
+        )
         if relation is not None:
             excluded[field] = relation
         elif ferric_target and field in _FERRIC_CONDITION_FIELDS and (
             condition.locator is None or observation.locator is None
-            or condition.locator == observation.locator
         ):
             excluded[field] = "unlocated_ferric_assay"
 
@@ -191,7 +215,11 @@ def independent_redox_conditions(
         }
         if not dependent:
             break
-        excluded.update(dict.fromkeys(dependent, "derived_from_target"))
+        for field in dependent:
+            relation = _cell_relation(
+                observation.locator, conditions[field].locator, derived_from_target=True,
+            )
+            excluded[field] = "ambiguous" if relation == "ambiguous" else "derived_from_target"
 
     independent = {field: condition for field, condition in conditions.items() if field not in excluded}
     invalid_axes = correction_axes | {
