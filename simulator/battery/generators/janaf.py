@@ -38,6 +38,7 @@ from simulator.battery.polymorph_dictionary import (
     JANAF_CRYSTAL_TABLE_IDS,
     JANAF_LABEL_POLYMORPHS,
     JANAF_TRANSITION_POLYMORPHS,
+    JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS,
     canonicalize_janaf_transition,
     resolve_janaf_polymorph,
 )
@@ -2607,6 +2608,7 @@ _JANAF_POLYMORPH_BY_TABLE = {
         # row that names hematite for Fe-030 does not exist for eskolaite.
         "Cr-014": Polymorph.ESKOLAITE,
     },
+    **JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS,
     **{
         table_id: JANAF_CRYSTAL_DICTIONARY[key]
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()

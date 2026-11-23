@@ -1701,6 +1701,7 @@ _FUSION_TABLES = {
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
+    "SrO": ("O-013", "O-014"),
 }
 
 # The source hashes identify the JANAF text; pin the extracted temperature-node
@@ -1710,6 +1711,8 @@ _FUSION_NODE_SET_SHA256 = {
     "Cr-015": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
     "Fe-018": "26bd2778c67db2938646629673d132f619c12e1ee9e9f32a1e90923e1bf80522",
     "Fe-019": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
+    "O-013": "d53e5993158eb4f22e3289299e21729953646127f0dd67579b9f758fb01064dc",
+    "O-014": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-043": "d231eea23e8ba366462064cece26816dd7bbf837eddc77d98a1af859f811bbf1",
     "O-044": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
     "O-037": "26bd2778c67db2938646629673d132f619c12e1ee9e9f32a1e90923e1bf80522",
@@ -1736,6 +1739,8 @@ _ACCEPTED_MELTING_K = {
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
+    # O-013/O-014 print the crystal <--> liquid transition at 2938 K.
+    "SrO": Decimal("2938"),
 }
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))

@@ -3804,6 +3804,7 @@ def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], 
     from simulator.battery.polymorph_dictionary import (
         JANAF_CRYSTAL_DICTIONARY,
         JANAF_CRYSTAL_TABLE_IDS,
+        JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS,
     )
 
     entries = load_manifest().get("entries")
@@ -3814,6 +3815,7 @@ def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], 
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
         for table_id in table_ids
     }
+    table_polymorphs.update(JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS)
     return tuple(
         (
             str(entry["formula_normalised"]),
