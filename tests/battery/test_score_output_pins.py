@@ -288,6 +288,7 @@ PIN_SUMMARY_JSON = """\
       "internal-analytical"
     ],
     "n_candidate_observations": 2,
+    "n_outside_census_not_emitted": 0,
     "n_quantity_unknown": 0,
     "quantities_no_engine_predicts": [],
     "rows": [
@@ -1081,7 +1082,7 @@ Measured tier only. Compilation refusals are in the compilation table.
 |---|---:|
 | `unsupported:fixture_unavailable` | 1 |
 
-Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0.
+Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0. Diagnostic and duplicate pairs outside the candidate census that this report does not emit: 0.
 
 ## Capability matrix
 
@@ -1159,6 +1160,7 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "internal-analytical"
     ],
     "n_candidate_observations": 2,
+    "n_outside_census_not_emitted": 0,
     "n_quantity_unknown": 0,
     "quantities_no_engine_predicts": [],
     "rows": [
@@ -1896,7 +1898,7 @@ Measured tier only. Compilation refusals are in the compilation table.
 |---|---:|
 | `unsupported:fixture_unavailable` | 1 |
 
-Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0.
+Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0. Diagnostic and duplicate pairs outside the candidate census that this report does not emit: 0.
 
 ## Capability matrix
 

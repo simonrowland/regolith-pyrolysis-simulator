@@ -14855,7 +14855,14 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     )
     default_partial = default_path.with_name(default_path.name + ".partial")
     default_rows = score_mod.load_residuals_jsonl(default_partial)
-    assert default_written == len(fixture_residuals)
+    # Internal-analytical does not declare S. The two relabeled entropy
+    # rows are capability-matrix cells, not residuals.
+    skipped_entropy = {
+        "fixture-scaled-max-first",
+        "fixture-scaled-max-second",
+    }
+    assert default_written == len(fixture_residuals) - len(skipped_entropy)
+    assert not any(row["reference"] in skipped_entropy for row in default_rows)
     assert score_mod.load_residuals_stamp(default_partial).get("static_refusals") is None
     assert any(row["reference"] == static_id for row in default_rows)
 

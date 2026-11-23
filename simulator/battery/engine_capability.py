@@ -3,7 +3,10 @@
 One table. Thermochemistry routing reads the thermo slice. The production
 score loop emits a residual only when the observation's quantity is in
 that engine's set, or a source-specific residue adapter binds. A pair
-outside the set is a capability-matrix cell, not a refusal.
+outside the set is a capability-matrix cell, not a refusal. Residue
+quantities stay out of that matrix: the adapter is the source, not the
+engine. Diagnostic and duplicate refs the loop skips are counted on
+their own line.
 
 The predict-time ladder (``_engine_lacks_quantity_capability``) is a
 different question: it still enters predict for fusion on every engine
@@ -91,6 +94,14 @@ def _cell_quantities(*, vapour: bool, thermo: frozenset[Quantity]) -> frozenset[
 
 # Residue quantities are intentionally absent. A Hashimoto, Sossi, or
 # Knudsen residue adapter is a call-site exception, not a generic cell.
+# The matrix walk skips these too, so a bound residual is not counted
+# as a pair the score loop did not emit.
+_RESIDUE_QUANTITIES = frozenset(
+    {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    }
+)
 ENGINE_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.VAPOROCK: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
     Engine.ALPHAMELTS: _cell_quantities(vapour=True, thermo=frozenset()),
@@ -148,13 +159,18 @@ def capability_summary(
     candidate census. It is not multiplied until the engine axis below.
     """
 
+    from simulator.battery.compilation_tier import _compilation_engines_for_scoring
     from simulator.battery.identity import Identity
     from simulator.battery.score import (
         ScoreContext,
+        _has_duplicate_observation_link,
+        _refusal_diagnostic_references,
         comparison_candidates,
+        diagnostic_references,
         quantity_token,
         rail_for_quantity,
     )
+    from simulator.battery.score_run import _residue_adapter_binds
 
     context = ScoreContext(
         {},
@@ -167,11 +183,14 @@ def capability_summary(
     callable_ids: set[str] = set()
     n_quantity_unknown = 0
     engine_list = tuple(engines)
-    for observation in comparison_candidates(context):
+    candidates = comparison_candidates(context)
+    for observation in candidates:
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is None:
             n_quantity_unknown += 1
+            continue
+        if quantity in _RESIDUE_QUANTITIES:
             continue
         formula = (
             identity.species.formula
@@ -186,6 +205,41 @@ def capability_summary(
             uncovered[(quantity.value, rail_token)] += 1
         for engine in engine_list:
             counts[(engine.value, quantity.value, rail_token)] += 1
+    seen = {observation.observation_id for observation in candidates}
+    outside: list[object] = []
+    for observation in diagnostic_references(context):
+        if observation.observation_id not in seen:
+            outside.append(observation)
+            seen.add(observation.observation_id)
+    for observation in _refusal_diagnostic_references(context):
+        if observation.observation_id not in seen:
+            outside.append(observation)
+            seen.add(observation.observation_id)
+    for observation in context.observations.values():
+        if observation.observation_id in seen:
+            continue
+        if _has_duplicate_observation_link(observation, context.experiments):
+            outside.append(observation)
+            seen.add(observation.observation_id)
+    n_outside_census_not_emitted = 0
+    for observation in outside:
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        if quantity is None:
+            continue
+        offered = _compilation_engines_for_scoring(
+            engine_list,
+            observation,
+            context.origins.get(observation.observation_id),
+            production_scoring=True,
+        )
+        experiment = context.experiments.get(observation.experiment_id)
+        for engine in offered:
+            if engine_covers_quantity(engine, quantity):
+                continue
+            if _residue_adapter_binds(observation, engine, experiment, quantity):
+                continue
+            n_outside_census_not_emitted += 1
     rows = [
         {
             "covered": engine_covers_quantity(Engine(engine), Quantity(quantity)),
@@ -208,6 +262,7 @@ def capability_summary(
             "n_candidate_observations": cross_product_total // len(engine_list)
             if engine_list
             else 0,
+            "n_outside_census_not_emitted": n_outside_census_not_emitted,
             "n_quantity_unknown": n_quantity_unknown,
             "quantities_no_engine_predicts": [
                 {"n_observations": n, "quantity": quantity, "rail": rail}

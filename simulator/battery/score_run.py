@@ -47,14 +47,14 @@ if TYPE_CHECKING:
     )
 
 
-def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
-    """Whether a source-specific residue predictor will run for this pair.
+def _residue_adapter_kinds(point, engine, experiment, quantity) -> tuple[object, ...]:
+    """Residue predictors this pair selects, in assignment order.
 
-    Residue quantities are not in the generic capability table. Hashimoto
-    and Sossi bind only on openimcc and internal-analytical. Knudsen binds
-    on every engine when the experiment method is Knudsen effusion. The
-    three assignments below this predicate still decide which predictor
-    wins; this only keeps that pair inside the score loop.
+    Hashimoto and Sossi bind only on openimcc and internal-analytical.
+    Knudsen binds on every engine when the experiment method is Knudsen
+    effusion, and it is last so it overwrites an earlier prediction.
+    Shard-failure and duplicate guards are not part of this choice: the
+    score loop applies those before it calls a predictor.
     """
 
     from simulator.battery.enums import Engine, MethodToken, Quantity
@@ -64,25 +64,34 @@ def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
         Quantity.RESIDUE_COMPONENT_COMPOSITION,
         Quantity.ELEMENT_RETENTION_RATIO,
     }:
-        return False
-    if not isinstance(point.identity, Identity):
-        return False
-    predictor = declared_residue_predictor(point.source_id)
+        return ()
+    if not isinstance(getattr(point, "identity", None), Identity):
+        return ()
+    kinds: list[object] = []
+    predictor = declared_residue_predictor(getattr(point, "source_id", None))
     if predictor == HASHIMOTO_RESIDUE_PREDICTOR and engine in {
         Engine.OPENIMCC,
         Engine.INTERNAL_ANALYTICAL,
     }:
-        return True
+        kinds.append(HASHIMOTO_RESIDUE_PREDICTOR)
     if predictor == SOSSI_RESIDUE_PREDICTOR and engine in {
         Engine.OPENIMCC,
         Engine.INTERNAL_ANALYTICAL,
     }:
-        return True
-    return bool(
+        kinds.append(SOSSI_RESIDUE_PREDICTOR)
+    if (
         experiment is not None
         and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-    )
+    ):
+        kinds.append(MethodToken.KNUDSEN_EFFUSION)
+    return tuple(kinds)
+
+
+def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
+    """Whether a source-specific residue predictor will run for this pair."""
+
+    return bool(_residue_adapter_kinds(point, engine, experiment, quantity))
 
 
 def _residue_cohort_selection(
@@ -596,19 +605,18 @@ def _score_store_with_decisions(
                                 refusal_detail={"reason": "diagnostic_population"},
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and declared_residue_predictor(point.source_id)
-                            == HASHIMOTO_RESIDUE_PREDICTOR
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
+                        residue_kinds = (
+                            ()
+                            if (
+                                _shard_failure_reason is not None
+                                or duplicate_detail is not None
+                                or predict is not None
+                            )
+                            else _residue_adapter_kinds(
+                                point, engine, experiment, quantity
+                            )
+                        )
+                        if HASHIMOTO_RESIDUE_PREDICTOR in residue_kinds:
                             prediction = _hashimoto_residue_prediction(
                                 context,
                                 point,
@@ -617,19 +625,7 @@ def _score_store_with_decisions(
                                 selected_experiment_ids=prepared.hashimoto_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and declared_residue_predictor(point.source_id)
-                            == SOSSI_RESIDUE_PREDICTOR
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
+                        if SOSSI_RESIDUE_PREDICTOR in residue_kinds:
                             prediction = _sossi_residue_prediction(
                                 context,
                                 point,
@@ -638,18 +634,7 @@ def _score_store_with_decisions(
                                 selected_experiment_ids=prepared.sossi_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and experiment is not None and experiment.method.is_value
-                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-                        ):
+                        if MethodToken.KNUDSEN_EFFUSION in residue_kinds:
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
                             )

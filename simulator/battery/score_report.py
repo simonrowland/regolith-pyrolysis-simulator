@@ -56,7 +56,10 @@ def capability_matrix_total_line(matrix: Mapping[str, object]) -> str:
         "Capability-matrix total (candidate observations × engines in this report): "
         f"{matrix['cross_product_total']}. "
         "Uncovered pairs not emitted as residuals: "
-        f"{matrix['uncovered_pair_total']}."
+        f"{matrix['uncovered_pair_total']}. "
+        "Diagnostic and duplicate pairs outside the candidate census that "
+        "this report does not emit: "
+        f"{matrix['n_outside_census_not_emitted']}."
     )
 
 
