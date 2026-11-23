@@ -199,6 +199,7 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
+from simulator.battery.uncertainty_conventions import printed_uncertainty_convention
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -6758,9 +6759,9 @@ def _stated_printed_confidence_level(
 ) -> str | None:
     raw = uncertainty.verbatim
     if isinstance(raw, Mapping):
-        confidence_level = raw.get("confidence_level", "not_stated")
-        if confidence_level != "not_stated":
-            return str(confidence_level)
+        convention = printed_uncertainty_convention(raw)
+        if convention is not None:
+            return convention[0]
     return _textual_printed_confidence_level(uncertainty)
 
 
@@ -7153,6 +7154,17 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
+    raw_declaration = uncertainty.verbatim
+    if converted is not None and isinstance(raw_declaration, Mapping):
+        convention = printed_uncertainty_convention(raw_declaration)
+        if convention is not None:
+            confidence_token, coverage_factor = convention
+            if (
+                "k" in raw_declaration
+                and confidence_token == "one_sigma"
+                and coverage_factor not in {Decimal(1), Decimal(2)}
+            ):
+                converted /= coverage_factor
     if converted is None:
         return _PrintedBandResolution(
             refusal={

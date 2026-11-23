@@ -85,6 +85,7 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery.uncertainty_conventions import printed_uncertainty_convention
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
@@ -30820,37 +30821,8 @@ class Migrator:
                     extra_unc_k = 2
             if extra_unc is None and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 parent_uncertainty = uncertainty.verbatim
-                confidence_level = (
-                    parent_uncertainty.get("confidence_level")
-                    if isinstance(parent_uncertainty, Mapping)
-                    else None
-                )
-                declared_kind = (
-                    parent_uncertainty.get("kind")
-                    if isinstance(parent_uncertainty, Mapping)
-                    else None
-                )
-                declared_k = (
-                    parent_uncertainty.get("k")
-                    if isinstance(parent_uncertainty, Mapping)
-                    else None
-                )
-                normalized_confidence = (
-                    confidence_level.strip().lower()
-                    if isinstance(confidence_level, str)
-                    else ""
-                )
-                normalized_kind = (
-                    declared_kind.strip().lower()
-                    if isinstance(declared_kind, str)
-                    else ""
-                )
-                numeric_k = _as_dec_or_none(declared_k)
                 uncertainty_declares_convention = (
-                    normalized_confidence
-                    not in {"", "none", "not", "not_stated", "unknown", "unspecified"}
-                    or normalized_kind in {"one_sigma", "two_sigma"}
-                    or (numeric_k is not None and numeric_k > 0)
+                    printed_uncertainty_convention(parent_uncertainty) is not None
                 )
                 if uncertainty_declares_convention:
                     standard_errors = raw_item.get("standard_errors")

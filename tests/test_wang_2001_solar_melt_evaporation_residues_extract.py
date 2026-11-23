@@ -192,7 +192,9 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
             elif error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
             else:
-                assert point.get("standard_errors", {}).get(formula) == expected_error, (label, sample)
+                assert point.get("standard_errors", {}).get(
+                    formula, ion_zero_widths.get((sample, formula))
+                ) == expected_error, (label, sample)
                 if group == "IM":
                     assert "sigma" not in point, (label, sample)
 
@@ -560,8 +562,13 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
     [
         ({"k": 2}, True),
         ({"kind": "two_sigma"}, True),
+        ({"kind": "one_sigma"}, True),
         ({"confidence_level": "not_stated"}, False),
         ({"kind": "printed"}, False),
+        ({"k": "Infinity"}, False),
+        ({"k": "NaN"}, False),
+        ({"k": 0}, False),
+        ({"confidence_level": "unknown convention"}, False),
     ],
 )
 def test_residue_component_parent_convention_controls_width_lookup(
@@ -600,5 +607,28 @@ def test_residue_component_parent_convention_controls_width_lookup(
         assert row.uncertainty.verbatim["sigma"] == "0.4"
         for key, value in declaration.items():
             assert row.uncertainty.verbatim[key] == value
+        from simulator.battery.score import (
+            _printed_uncertainty_band,
+            _stated_printed_confidence_level,
+            point_magnitude,
+        )
+
+        assert _stated_printed_confidence_level(row.uncertainty) == (
+            "one_sigma" if declaration.get("kind") == "one_sigma" else "two_sigma"
+        )
+        magnitude = point_magnitude(row.value)
+        assert magnitude is not None
+        resolution = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            row.uncertainty,
+            magnitude,
+            source_observation=row,
+        )
+        assert resolution.band is not None
+        assert resolution.notice is None
+        assert resolution.band.rule.startswith(
+            "printed_1sigma:" if declaration.get("kind") == "one_sigma"
+            else "printed_2sigma:"
+        )
     else:
         assert row.uncertainty.verbatim is None or "sigma" not in row.uncertainty.verbatim
