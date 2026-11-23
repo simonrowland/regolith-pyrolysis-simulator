@@ -15536,14 +15536,17 @@ def _predict_with_engine(
         except Exception as exc:
             return engine_call_failure(exc)
     notice_species = formula
+    selected_pressure_target: tuple[str, float] | None = None
     if quantity is Quantity.P_PARTIAL:
         initial_pressures = dict(
             getattr(cell, "gas_partial_pressures_Pa", None) or {}
         )
-        initial_target = match_reported_species(
+        selected_pressure_target = match_reported_species(
             formula, initial_pressures, species=identity.species
         )
-        notice_species = "" if initial_target is None else initial_target[0]
+        notice_species = (
+            "" if selected_pressure_target is None else selected_pressure_target[0]
+        )
     notices = union_notices(
         tuple(extra_notices),
         cell_notices(quantity, engine, cell, species=notice_species),
@@ -15700,9 +15703,7 @@ def _predict_with_engine(
         if invalid_refusal is not None:
             return invalid_refusal
         initial_pressures = pressures
-        initial_target = match_reported_species(
-            formula, initial_pressures, species=identity.species
-        )
+        initial_target = selected_pressure_target
         if initial_target is None:
             return missing_knudsen_target_refusal(
                 "seed",
@@ -15837,10 +15838,12 @@ def _predict_with_engine(
         updated_pressures = dict(
             getattr(cell, "gas_partial_pressures_Pa", None) or {}
         )
-        updated_target = match_reported_species(
+        selected_pressure_target = match_reported_species(
             formula, updated_pressures, species=identity.species
         )
-        notice_species = "" if updated_target is None else updated_target[0]
+        notice_species = (
+            "" if selected_pressure_target is None else selected_pressure_target[0]
+        )
         notices = union_notices(
             notices,
             cell_notices(quantity, engine, cell, species=notice_species),
@@ -15884,7 +15887,7 @@ def _predict_with_engine(
             quantity=quantity,
             species=notice_species,
         )
-        if updated_target is None:
+        if selected_pressure_target is None:
             return missing_knudsen_target_refusal(
                 "derived",
                 call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
@@ -15951,7 +15954,7 @@ def _predict_with_engine(
             )
             sensitivity_dex = math.inf
             before = initial_target[1]
-            after = updated_target[1]
+            after = selected_pressure_target[1]
             if (
                 math.isfinite(before)
                 and math.isfinite(after)
@@ -16230,6 +16233,12 @@ def _predict_with_engine(
             reported, compared,
         )
         magnitude = value
+    elif quantity is Quantity.P_PARTIAL:
+        magnitude = (
+            None
+            if selected_pressure_target is None
+            else selected_pressure_target[1]
+        )
     else:
         matched, activity_repair_warnings = _match_reported_species_with_notices(
             compared,

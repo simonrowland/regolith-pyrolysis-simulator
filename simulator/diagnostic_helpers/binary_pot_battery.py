@@ -1747,7 +1747,10 @@ def cell_score_authority(
     if refused:
         return "refused"
     authority = getattr(cell, "authority", None)
+    if authority and quantity is None:
+        return str(authority)
     scoped_authority = False
+    applicable_authorities: set[str] = set()
     for row in getattr(cell, "notices", None) or []:
         if not isinstance(row, Mapping) or not row.get("authority"):
             continue
@@ -1760,8 +1763,12 @@ def cell_score_authority(
             affected_species, species, species=True
         ):
             continue
-        return str(row["authority"])
-    if authority and (quantity is None or authority != AUTHORITY_EXTRAPOLATED):
+        applicable_authorities.add(str(row["authority"]))
+    if AUTHORITY_EXTRAPOLATED in applicable_authorities:
+        return AUTHORITY_EXTRAPOLATED
+    if applicable_authorities:
+        return min(applicable_authorities)
+    if authority and authority != AUTHORITY_EXTRAPOLATED:
         return str(authority)
     if authority == AUTHORITY_EXTRAPOLATED and scoped_authority:
         return "bridge"

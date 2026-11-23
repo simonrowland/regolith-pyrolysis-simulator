@@ -624,15 +624,16 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
     # Leading bytes are the chemistry-version pin (engine number, u16 version).
-    # b265 onto b-1244 moves internal-analytical to v3 and MAGEMin,
-    # alphaMELTS, and ThermoEngine to v4. The comparison rebuilds the
-    # header from ENGINE_CHEMISTRY_VERSION and checks the payload tail.
+    # Markova's internal-analytical v4 bump shares the train's max+1 version
+    # with this Holzheid v4 change, so the version-derived prefix must follow.
+    # The comparison rebuilds the header from ENGINE_CHEMISTRY_VERSION and
+    # keeps the payload tail pinned.
     snapshots = (
         (
             "internal-analytical default",
             "internal-analytical",
             None,
-            "0200030008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
+            "0200040008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
         ),
         (
             "openimcc default",

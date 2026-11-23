@@ -440,6 +440,35 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
     )
 
 
+def test_cell_score_authority_keeps_applicable_extrapolation_independent_of_order():
+    extrapolation = {
+        "authority": AUTHORITY_EXTRAPOLATED,
+        "kind": "out_of_certified_band",
+        "affected_quantities": [QUANTITY_PRESSURE],
+        "affected_species": ["Fe"],
+    }
+    unscoped = {"authority": "bridge", "kind": "fallback"}
+    results = []
+    for notices in ([unscoped, extrapolation], [extrapolation, unscoped]):
+        cell = SimpleNamespace(authority=AUTHORITY_EXTRAPOLATED, notices=notices)
+        results.append(
+            (
+                cell_score_authority(cell, refused=False),
+                cell_score_authority(
+                    cell, refused=False, quantity=QUANTITY_PRESSURE, species="Fe"
+                ),
+                cell_score_authority(
+                    cell, refused=False, quantity=QUANTITY_PRESSURE, species="Si"
+                ),
+            )
+        )
+
+    assert results == [
+        (AUTHORITY_EXTRAPOLATED, AUTHORITY_EXTRAPOLATED, "bridge"),
+        (AUTHORITY_EXTRAPOLATED, AUTHORITY_EXTRAPOLATED, "bridge"),
+    ]
+
+
 def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
     from engines.vaporock.provider import VapoRockProvider
