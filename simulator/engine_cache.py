@@ -1807,6 +1807,20 @@ def _initialize_cache(connection: sqlite3.Connection) -> None:
         connection.isolation_level = isolation_level
 
 
+# SQLite is built with DEFAULT_MMAP_SIZE=0, so a warm point lookup preads
+# every page and a cached score spends its kernel time there. The request is
+# larger than the compile-time cap; SQLite clamps it to MAX_MMAP_SIZE. The
+# page-cache cap holds interior pages past that prefix. Pages are allocated
+# only as they are read. Neither pragma changes the bytes a lookup returns.
+_LOOKUP_MMAP_BYTES = 1 << 62
+_LOOKUP_CACHE_KIB = 524288
+
+
+def _apply_lookup_pragmas(connection: sqlite3.Connection) -> None:
+    connection.execute(f"PRAGMA mmap_size={_LOOKUP_MMAP_BYTES}")
+    connection.execute(f"PRAGMA cache_size=-{_LOOKUP_CACHE_KIB}")
+
+
 def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     global _CONNECTION_PID, _CONNECTION_PATH, _CONNECTION_READONLY
     # Read-only is enforced here, before mkdir or a writable sqlite open.
@@ -1842,6 +1856,7 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
         )
         connection.execute(f"PRAGMA busy_timeout={_TIMEOUT_MS}")
     try:
+        _apply_lookup_pragmas(connection)
         incomplete = _check_cache_schema(connection, allow_empty=True)
         if incomplete and readonly:
             connection.close()
