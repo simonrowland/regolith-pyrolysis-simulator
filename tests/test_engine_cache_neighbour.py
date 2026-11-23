@@ -345,7 +345,7 @@ def test_optimizer_evaluate_runs_inside_the_neighbour_scope() -> None:
     tree = ast.parse(source_path.read_text(encoding="utf-8"))
     wrapped = False
     for node in ast.walk(tree):
-        if not isinstance(node, ast.FunctionDef) or node.name != "_evaluate_impl":
+        if not isinstance(node, ast.FunctionDef) or node.name != "evaluate":
             continue
         for child in ast.walk(node):
             if not isinstance(child, ast.With):
