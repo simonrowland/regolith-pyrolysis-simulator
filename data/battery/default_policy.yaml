@@ -43,7 +43,7 @@ policies:
     physical_basis: "dry-air O2 mole fraction 0.2095"
     bias: "humidity lowers it by < 2 %"
     flag: method_implied
-    ruling: "d-460, gap manual"
+    ruling: "gap manual"
     version: 1
     status: canonical
     proposed_by: null
@@ -308,7 +308,7 @@ policies:
     canonized_at: "2026-11-23"
     history: []
   - id: DP-019
-    condition: "vacuum method (Langmuir or free evaporation in vacuum) with no printed total pressure"
+    condition: 'vacuum method (Langmuir / free evaporation in vacuum, or "under vacuum") with no printed total pressure'
     formula: "the existing finite high-vacuum boundary in bar × PA_PER_BAR"
     formula_owner: "simulator.diagnostic_helpers.binary_pot_battery._DEFAULT_PRESSURE_BAR and simulator.physical_constants.PA_PER_BAR"
     units: Pa

@@ -1018,28 +1018,24 @@ class NoticePolicy:
     id: str
     version: str | int
     status: str
-    value: str | int | Decimal
+    value: str
     units: str
 
     def __post_init__(self) -> None:
         if not isinstance(self.id, str) or not self.id.startswith("DP-"):
-            raise ValueError("NoticePolicy.id must be a DP id")
+            raise ValueError("notice policy id must be a DP id")
         if (
             isinstance(self.version, bool)
             or not isinstance(self.version, (str, int))
             or not str(self.version)
-            or not self.status
-            or not isinstance(self.units, str)
-            or not self.units
-            or isinstance(self.value, bool)
-            or not isinstance(self.value, (str, int, Decimal))
-            or not str(self.value)
+            or not all(
+                isinstance(value, str) and value
+                for value in (self.value, self.units)
+            )
         ):
-            raise ValueError("NoticePolicy id, version, status, value, and units are required")
+            raise ValueError("notice policy requires id, version, value, and units")
         if self.status not in {"canonical", "proposed", "rejected"}:
-            raise ValueError("NoticePolicy.status must be canonical, proposed, or rejected")
-        if isinstance(self.value, bool) or not isinstance(self.value, (str, int, Decimal)):
-            raise TypeError("NoticePolicy.value must be str, int, or Decimal")
+            raise ValueError("notice policy status is not recognized")
 
 
 @dataclass(frozen=True)
@@ -1082,20 +1078,19 @@ class Notice:
                     "reference_phase_by_convention requires certification"
                 )
         if self.policy is not None:
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
             if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
                 raise ValueError("policy notice kind must name a default-policy flag")
-            if not self.policy.id.startswith("DP-"):
-                raise ValueError("Notice.policy.id must be a DP id")
-        if self.kind is NoticeKind.ASSUMED_PRESSURE and self.policy is None:
-            raise ValueError("assumed_pressure requires policy metadata")
+        if self.kind in {NoticeKind.ASSUMED_PRESSURE, NoticeKind.METHOD_IMPLIED}:
+            if self.policy is None:
+                raise ValueError(f"{self.kind.value} requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
             object.__setattr__(
                 self, "dropped_mass_fraction", as_decimal(self.dropped_mass_fraction)
             )
-        if self.policy is not None and not isinstance(self.policy, NoticePolicy):
-            raise TypeError("Notice.policy must be NoticePolicy or absent")
 
 
 SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"
