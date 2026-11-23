@@ -2299,6 +2299,9 @@ _HERO_ENGINE_COLORS = {
     "internal-analytical": "#eda100",
     "magemin": "#e87ba4",
     "alphamelts": "#6250d6",
+    # Compilation-tier reference evaluators (tabulated NASA-9 / catalog thermo), charted beside the engines.
+    "nasa_cea_9": "#8c564b",
+    "catalog_evaluator": "#7a7a7a",
 }
 _HERO_ENGINE_ORDER = tuple(_HERO_ENGINE_COLORS)
 
