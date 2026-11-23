@@ -166,6 +166,7 @@ from simulator.battery.enums import (
     METHOD_TOKEN_ALIASES,
     MethodToken,
     NoticeKind,
+    NON_EQUILIBRIUM_RUN_CAVEAT,
     PHASE_BASIS_TOKENS,
     PHASE_COMPOSITION_QUANTITIES,
     PHASE_ROW_QUANTITIES,
@@ -23253,17 +23254,33 @@ def _walk_printed_oxygen(
             )
             control_address = control.get("locator") if isinstance(control, Mapping) else None
             control_locator = locator_from_mapping(control_address)
+            printed_page = (
+                control_address.get("page")
+                if isinstance(control_address, Mapping)
+                else None
+            )
+            published_page = (
+                control_address.get("published_page")
+                if isinstance(control_address, Mapping)
+                else None
+            )
+            has_printed_page = any(
+                type(page) is int and page > 0
+                or isinstance(page, str)
+                and re.fullmatch(
+                    r"(?i)(?:page\s+)?(?:[a-z]*\d+(?:[.\-/–][a-z]*\d+)*|[ivxlcdm]+)(?:\.pdf)?(?:\s+of\s+\d+)?",
+                    page.strip(),
+                )
+                for page in (printed_page, published_page)
+            )
             if (
                 isinstance(control_text, str)
                 and isinstance(control, Mapping)
                 and control_locator is not None
                 and isinstance(control_address, Mapping)
                 and Locator._is_pdf_page_index(control_address.get("pdf_page_index"))
-                and any(
-                    (type(page) is int and page > 0)
-                    or (isinstance(page, str) and page.strip())
-                    for page in (control_locator.page, control_locator.published_page)
-                )
+                and has_printed_page
+                and control_locator.has_method_location()
                 and not _oxygen_node_rejected(control, control_text)
                 and control.get("inference") is None
                 and control.get("derivation") is None
@@ -32260,7 +32277,7 @@ class Migrator:
                 Notice(
                     kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(q_token_point,),
-                    reason=f"non_equilibrium_run: {regime.state.value}",
+                    reason=f"{NON_EQUILIBRIUM_RUN_CAVEAT}: {regime.state.value}",
                     origin=point_id,
                 )
             )

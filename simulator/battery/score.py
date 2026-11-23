@@ -67,6 +67,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     CellMaterial,
+    CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT,
     CONDENSED_PHASES,
     EQUILIBRIUM_FIT_QUANTITIES,
     ELEMENT_WT_PERCENT_BASIS,
@@ -82,6 +83,7 @@ from simulator.battery.enums import (
     MetricOperation,
     MethodToken,
     NoticeKind,
+    NON_EQUILIBRIUM_RUN_CAVEAT,
     PHASE_COMPOSITION_QUANTITIES,
     PROSE_MOLE_PERCENT_PHASE_COMPONENT,
     effective_phase_basis,
@@ -2546,7 +2548,10 @@ def _classify_flagged_notice_facts(
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     # These two caveats qualify comparison against a liquid equilibrium model.
-    for caveat in ("non_equilibrium_run", "crystal_bearing_bulk_composition"):
+    for caveat in (
+        NON_EQUILIBRIUM_RUN_CAVEAT,
+        CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT,
+    ):
         if any(
             kind == NoticeKind.ENGINE_MODEL_CAVEAT.value
             and isinstance(reason, str)
@@ -17801,7 +17806,7 @@ def _compile_residual_with_lineage(
                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                 affected_quantities=(quantity,),
                 reason=(
-                    "crystal_bearing_bulk_composition: prediction uses "
+                    f"{CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT}: prediction uses "
                     "the starting bulk composition as liquid"
                 ),
                 origin=reference.observation_id,
