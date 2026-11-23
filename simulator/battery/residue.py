@@ -861,13 +861,13 @@ def _residue_oxygen_channels(
         }
         redox_atoms = 0.0
         oxygen_per_metal = None
-        # Fe carries dynamic q today. CrO2's corner sign uses the optional
-        # reported valence through the named oxygen-per-Cr seam; absent producer
-        # speciation leaves the residual stoichiometric and the corner sign
-        # guard treats it as ambiguous.
         if set(metals) == {"Fe"}:
             redox_atoms = float(metals["Fe"])
             oxygen_per_metal = iron_mean_oxygen_per_atom
+        elif term.source.species == "CrO2" and set(metals) == {"Cr"}:
+            # CrO2 uses optional producer valence in the shared oxygen-demand
+            # owner; no Cr valence model is supplied when the response omits it.
+            redox_atoms = float(metals["Cr"])
         channels.append(
             _VacuumOxygenChannel(
                 species=term.source.species,
@@ -2280,20 +2280,24 @@ def _mass_loss_corner_bounds(
     # monotone increasing despite its own feedback (Fe(g) with O2 scales as
     # alpha^(2/3) in the single-channel limit). Each other unsourced j is 1
     # when n_s*(-c_j) raises the requested maximum or lowers the minimum, and
-    # 0 otherwise. c_j=0 (FeO(g) at q=0) is immaterial. This is 2 per target,
-    # O(n), with a further 2x per bracket-sign-ambiguous channel.
+    # 0 otherwise. c_j=0 (FeO(g) at q=0) is immaterial. For a negative-
+    # exponent target, also evaluate alpha_s=0 with the maximum assignments:
+    # this captures the zero-pO2 inventory-cap limit without attaching that
+    # cap to the minimum corner. Reuse the vector when it coincides with the
+    # minimum. The ordinary endpoints are 2 per target, O(n); cap candidates
+    # add at most one per negative-exponent target, also O(n).
     # The all-on solve supplies c at a positive root for the stable signs;
     # bracket-end evaluations below route sign-changing channels to binaries.
-    # Apply the existing parent-inventory ceiling to each root-zero, negative-
-    # exponent corner, including alpha_s=0. A sign change is physically possible
-    # only when o_vap,j lies strictly within the melt valence range (CrO2 with
-    # Cr6+ is the live example); differing bracket-end signs add a binary and
-    # corner_sign_ambiguous. Composition and q move along an extent, so its
-    # endpoint checks the selected extreme's single-flip neighbours; a larger
-    # neighbour replaces it and sets corner_not_extremal_on_path. For 13
-    # variable alphas an ordinary step is 26 primary corners and one sign
-    # probe; the endpoint check is 26 primary corners, 169 flips and one sign
-    # probe (196 total root solves there).
+    # Apply the existing parent-inventory ceiling to each maximizing root-zero,
+    # negative-exponent corner, including the alpha_s=0 candidate. A sign
+    # change is physically possible only when o_vap,j lies strictly within the
+    # melt valence range (CrO2 with Cr6+ is the live example). Opposite
+    # bracket signs add a binary and corner_sign_ambiguous. Composition and q
+    # move along an extent, so its endpoint checks the selected extreme's
+    # single-flip neighbours; a larger one replaces it and sets
+    # corner_not_extremal_on_path. Thirteen
+    # negative-exponent variable alphas use at most 39 primary corners, one
+    # sign probe and 169 endpoint flips (209 total root solves).
     try:
         all_on = tuple(
             replace(
@@ -2358,10 +2362,15 @@ def _mass_loss_corner_bounds(
                     ),
                 }
                 continue
-            cr_atoms = term_by_species[channel.species].atom_counts.get("Cr", 0.0)
-            c_low = channel.oxygen_atoms - low_cr_oxygen * cr_atoms
-            c_high = channel.oxygen_atoms - high_cr_oxygen * cr_atoms
-            c_root = channel.oxygen_atoms - root_cr_oxygen * cr_atoms
+            c_low = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+                channel, low_pressures,
+            )
+            c_high = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+                channel, high_pressures,
+            )
+            c_root = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+                channel, root_pressures,
+            )
         else:
             c_low = channel.oxygen_atoms - _channel_parent_oxygen_demand(
                 channel, low_pressures,
@@ -2454,7 +2463,6 @@ def _mass_loss_corner_bounds(
     for target in target_channels:
         bounds.setdefault(target.species, 0.0)
         variable_target = target.species in variable_species
-        alpha_options = (0.0, 1.0) if variable_target else (target.alpha,)
         ambiguous_others = tuple(
             channel for channel in variable_alpha_channels
             if channel.species != target.species
@@ -2466,8 +2474,15 @@ def _mass_loss_corner_bounds(
             and channel.species not in ambiguous_channels
         )
         exponent = pressure_exponents[target.species]
-        for target_alpha in alpha_options:
-            maximize = target_alpha == 1.0 or not variable_target
+        corner_specs = [(target.alpha, True)]
+        if variable_target:
+            corner_specs = [(1.0, True), (0.0, False)]
+            if exponent < 0.0:
+                corner_specs.append((0.0, True))
+        evaluated_vectors: dict[
+            tuple[tuple[str, float], ...], tuple[float, Mapping[str, float]]
+        ] = {}
+        for target_alpha, maximize in corner_specs:
             fixed_alpha = {
                 target.species: target_alpha,
                 **{
@@ -2485,14 +2500,20 @@ def _mass_loss_corner_bounds(
                     channel.species: float(bool(mask & (1 << index)))
                     for index, channel in enumerate(ambiguous_others)
                 })
-                root, rates = evaluate_corner(alpha_by_species)
-                primary_corner_count += 1
+                vector_key = tuple(sorted(alpha_by_species.items()))
+                if vector_key in evaluated_vectors:
+                    root, rates = evaluated_vectors[vector_key]
+                else:
+                    root, rates = evaluate_corner(alpha_by_species)
+                    evaluated_vectors[vector_key] = (root, rates)
+                    primary_corner_count += 1
                 term = term_by_species[target.species]
                 amount = 0.0
                 if (
                     root == 0.0
                     and target.pO2_exponent < 0.0
                     and (variable_target or target_alpha > 0.0)
+                    and maximize
                 ):
                     amount = (
                         float(inventory.get(term.source.parent_oxide or "", 0.0))
@@ -2501,7 +2522,7 @@ def _mass_loss_corner_bounds(
                     inventory_caps[target.species] = max(
                         inventory_caps.get(target.species, 0.0), amount,
                     )
-                elif target_alpha > 0.0:
+                elif target_alpha > 0.0 and maximize:
                     amount = (
                         rates.get(target.species, 0.0)
                         * duration_s * term.oxide_per_product_kg
