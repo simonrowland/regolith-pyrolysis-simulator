@@ -547,7 +547,8 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert fe.uncertainty.verbatim["sigma"] == "3"
     assert fe.uncertainty.verbatim["printed_units"] == "%"
     assert fe.uncertainty.value == Decimal("0.03")
-    assert fe.uncertainty.basis == "fraction"
+    assert fe.uncertainty.verbatim["units"] == "dimensionless"
+    assert fe.uncertainty.basis == "dimensionless"
     assert fe.uncertainty.verbatim["confidence_level"] == "not_stated"
     fe_band = _printed_uncertainty_band(
         fe.identity.quantity.value,
@@ -557,7 +558,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     )
     assert fe_band.refusal is None
     assert fe_band.band is not None
-    assert fe_band.band.value == Decimal("0.01322826573375514821563818833")
+    assert fe_band.band.value == Decimal("0.01902323731343039656308462938")
     fe_source = next(
         row
         for row in document["species"]["Fe"]["observations"]
