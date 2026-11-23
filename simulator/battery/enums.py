@@ -316,7 +316,6 @@ class NoticeKind(StrEnum):
     )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
-    ASSUMED_PRESSURE = "assumed_pressure"
     TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
@@ -396,6 +395,40 @@ class NoticeKind(StrEnum):
     BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS = (
         "buffer_band_unsized_beyond_all_calibrations"
     )
+    # d-460 default-policy flags. Policy metadata is stored separately on
+    # Notice.policy; each token names the applied table rule.
+    ASSUMED_PRESSURE = "assumed_pressure"
+    METHOD_IMPLIED = "method_implied"
+    EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
+    ALPHA_ASSUMED = "alpha_assumed"
+    KNOB_DEFAULTED = "knob_defaulted"
+    ASSUMED_FO2 = "assumed_fo2"
+    METHOD_ASSUMED = "method_assumed"
+    KEMS_CALIBRATION_BY_SOURCE = "kems_calibration_by_source"
+    BASIS_CONVERTED = "basis_converted"
+    INTERVAL_OBSERVATION = "interval_observation"
+    PHASE_INFERRED = "phase_inferred"
+    COMPOSITION_FROM_RUN_SIBLINGS = "composition_from_run_siblings"
+    COMPOSITION_FROM_ANALYSED_PHASE = "composition_from_analysed_phase"
+
+
+DEFAULT_POLICY_NOTICE_KINDS = frozenset(
+    {
+        NoticeKind.ASSUMED_PRESSURE,
+        NoticeKind.METHOD_IMPLIED,
+        NoticeKind.EFFUSION_REGIME_ASSUMED,
+        NoticeKind.ALPHA_ASSUMED,
+        NoticeKind.KNOB_DEFAULTED,
+        NoticeKind.ASSUMED_FO2,
+        NoticeKind.METHOD_ASSUMED,
+        NoticeKind.KEMS_CALIBRATION_BY_SOURCE,
+        NoticeKind.BASIS_CONVERTED,
+        NoticeKind.INTERVAL_OBSERVATION,
+        NoticeKind.PHASE_INFERRED,
+        NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
+        NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
+    }
+)
 
 
 class ReferenceStateConvention(StrEnum):

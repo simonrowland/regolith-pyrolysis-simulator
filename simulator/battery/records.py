@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
+    DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -1015,13 +1016,23 @@ class Derivation:
 @dataclass(frozen=True)
 class NoticePolicy:
     id: str
-    version: str
+    version: str | int
     status: str
     value: str
     units: str
 
     def __post_init__(self) -> None:
-        if not all((self.id, self.version, self.value, self.units)):
+        if not isinstance(self.id, str) or not self.id.startswith("DP-"):
+            raise ValueError("notice policy id must be a DP id")
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not all(
+                isinstance(value, str) and value
+                for value in (self.value, self.units)
+            )
+        ):
             raise ValueError("notice policy requires id, version, value, and units")
         if self.status not in {"canonical", "proposed", "rejected"}:
             raise ValueError("notice policy status is not recognized")
@@ -1066,6 +1077,11 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        if self.policy is not None:
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
         if self.kind is NoticeKind.ASSUMED_PRESSURE and self.policy is None:
             raise ValueError("assumed_pressure requires policy metadata")
         if self.original is not None:

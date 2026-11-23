@@ -1029,9 +1029,9 @@ Numeric measured rows stay visible. score_eligible and inside-band counts are re
 
 These numeric diagnostics carry an explicit source or apparatus flag. Flagged rows do not derive measurement bands or enter unflagged headlines. Cell-material-inferred residuals are still judged against the band; other flag kinds retain their existing scoring rules. A row carrying both flags appears in both strata.
 
-| stratum | policy_id | rail | engine | n | median dex | RMS dex |
-|---|---|---|---|---:|---:|---:|
-| (none) | — | — | — | 0 | — | — |
+| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |
+|---|---|---|---|---|---:|---:|---:|
+| (none) | — | — | — | — | 0 | — | — |
 
 ## Condition hull per rail × engine
 
@@ -1854,9 +1854,9 @@ Numeric measured rows stay visible. score_eligible and inside-band counts are re
 
 Flagged numeric diagnostics are excluded from the measured headline, bands, and band statistics.
 
-| stratum | policy_id | rail | engine | n | median dex | RMS dex |
-|---|---|---|---|---:|---:|---:|
-| (none) | — | — | — | 0 | — | — |
+| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |
+|---|---|---|---|---|---:|---:|---:|
+| (none) | — | — | — | — | 0 | — | — |
 
 ## Condition hull per rail × engine
 
@@ -2585,7 +2585,7 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
     )
 
     plain = score_mod.residual_to_plain(residual)
-    assert "quantity" not in plain["candidate_request"]
+    assert plain["candidate_request"]["quantity"] is None
     assert "candidate_observation" not in plain
     payload = json.loads(score_mod.dumps_residual_line(residual))
 
