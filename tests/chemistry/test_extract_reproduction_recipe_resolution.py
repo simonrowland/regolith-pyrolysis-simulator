@@ -275,11 +275,18 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
     assert all(
         observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.P_PARTIAL
+        and observation.identity.temperature_K.is_value
         and observation.identity.composition.is_value
         and len(observation.identity.composition.value.components) == 9
         and observation.identity.composition.value.proxy_flag == "initial_charge_only"
         and experiment.experiment_id.endswith("::experiment::demaria-1971-k-figure2")
         for observation, experiment in closure_calls
+    )
+    assert {
+        float(observation.identity.temperature_K.value): float(observation.value.point)
+        for observation, _experiment in closure_calls
+    } == pytest.approx(
+        {1366.12: 0.004526021577, 1314.06: 0.0025451684895}
     )
     assert len(melt_calls) == 2
     assert {call[1] for call in melt_calls} == {1366.12, 1314.06}
@@ -290,6 +297,11 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
     assert all(
         runtime.get("oxygen_closure", {}).get("owner")
         == "simulator/battery/score.py::_borrow_internal_analytical_effusion"
+        for runtime in runtimes
+        if runtime.get("temperature_K") in {1366.12, 1314.06}
+    )
+    assert all(
+        runtime["oxygen_closure"]["route"] == "effusion_oxygen_balance"
         for runtime in runtimes
         if runtime.get("temperature_K") in {1366.12, 1314.06}
     )

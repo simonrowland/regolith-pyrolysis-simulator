@@ -16312,11 +16312,18 @@ def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures()
 def test_demaria_1971_figure_2_locator_uses_physical_pdf_page_index() -> None:
     source = EXTRACTS / "kems-022-demaria-1971.yaml"
     extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    experiment = next(
+        row
+        for row in extract["experiments"]
+        if row["experiment_id"] == "demaria-1971-k-figure2"
+    )
     observation = next(
         row
         for row in extract["species"]["K"]["observations"]
         if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
     )
 
+    assert experiment["locator"]["published_page"] == 1370
+    assert experiment["locator"]["pdf_page_index"] == 3
     assert observation["locator"]["published_page"] == 1370
     assert observation["locator"]["pdf_page_index"] == 3

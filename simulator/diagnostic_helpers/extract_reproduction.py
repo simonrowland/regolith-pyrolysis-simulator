@@ -3097,6 +3097,37 @@ def _evaluate_psat(
     assert points is not None
     candidates = _engine_species_candidates(obs)
     standard_state_kind = _pressure_standard_state_kind(obs)
+    demaria_k_migrated_by_temperature: dict[float, tuple[Any, Any, Any]] = {}
+    if (
+        pO2 is None
+        and standard_state_kind == "melt"
+        and obs.source_id == "kems-022-demaria-1971"
+        and obs.species_id == "K"
+        and obs.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    ):
+        migrator = battery_migrate.Migrator(root=REPO_ROOT)
+        migrator._migrate_extract(EXTRACTS_DIR / f"{obs.source_id}.yaml")
+        migrator.finalize()
+        child_prefix = f"{obs.source_id}::{obs.observation_id}::T="
+        for migrated in migrator.result.observations.values():
+            if not migrated.observation_id.startswith(child_prefix):
+                continue
+            temperature = migrated.identity.temperature_K
+            if not temperature.is_value:
+                continue
+            experiment = migrator.result.experiments.get(migrated.experiment_id)
+            if experiment is None:
+                continue
+            bench = (
+                migrator.result.benches.get(experiment.bench_id)
+                if experiment.bench_id is not None
+                else None
+            )
+            demaria_k_migrated_by_temperature[float(temperature.value)] = (
+                migrated,
+                experiment,
+                bench,
+            )
     any_numeric = False
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
@@ -3180,6 +3211,8 @@ def _evaluate_psat(
                 last_refusal = melt_recipe_error or "missing_condition:melt_composition"
                 runtime["refusal"] = last_refusal
                 continue
+            point_pO2 = pO2
+            point_melt_recipe = melt_recipe
             if pO2 is None:
                 if (
                     standard_state_kind == "melt"
@@ -3188,31 +3221,86 @@ def _evaluate_psat(
                     and obs.observation_id
                     == "demaria_1971_k_psat_figure2_digitized"
                 ):
-                    # This extract adapter accepts numeric pO2 only. The
-                    # existing Knudsen oxygen closure belongs to the battery
-                    # scorer's migrated Observation/Experiment path.
-                    last_refusal = (
-                        "diagnostic_effusion_closure_via_scorer_only; "
-                        "owner=simulator/battery/score.py::_borrow_internal_analytical_effusion"
+                    migrated_context = demaria_k_migrated_by_temperature.get(T_K)
+                    if migrated_context is None:
+                        last_refusal = "missing_condition:migrated_scorer_observation"
+                        runtime["refusal"] = last_refusal
+                        continue
+                    migrated_observation, experiment, bench = migrated_context
+                    typed_composition = migrated_observation.identity.composition
+                    if not typed_composition.is_value:
+                        last_refusal = "missing_condition:migrated_scorer_composition"
+                        runtime["refusal"] = last_refusal
+                        continue
+
+                    from simulator.battery import score as battery_score
+                    from simulator.battery.enums import Engine
+
+                    closure_notices: list[Any] = []
+                    closure_engine = Engine.CATALOG_EVALUATOR
+                    po2_request = battery_score._borrow_internal_analytical_effusion(
+                        engine=closure_engine,
+                        channel=battery_score.ENGINE_CHANNELS[closure_engine],
+                        sources=battery_score.ENGINE_COEFFICIENT_SOURCES[
+                            closure_engine
+                        ],
+                        identity=migrated_observation.identity,
+                        requested=typed_composition,
+                        quantity=migrated_observation.identity.quantity.value,
+                        observation=migrated_observation,
+                        experiment=experiment,
+                        bench=bench,
+                        handles=None,
+                        isolated=None,
+                        notices=closure_notices,
                     )
-                    typed_gap = f"{_TYPED_SKIP_PREFIX}{last_refusal}"
+                    closure_owner = (
+                        "simulator/battery/score.py::"
+                        "_borrow_internal_analytical_effusion"
+                    )
+                    if isinstance(po2_request, battery_score.EnginePrediction):
+                        last_refusal = (
+                            "internal_analytical_oxygen_balance_unavailable"
+                        )
+                        runtime["oxygen_closure"] = {
+                            "owner": closure_owner,
+                            "status": "refused",
+                            "refusal_detail": dict(
+                                po2_request.refusal_detail or {}
+                            ),
+                        }
+                        runtime["refusal"] = last_refusal
+                        continue
+                    point_pO2 = float(po2_request.po2_bar)
+                    point_melt_recipe = {
+                        str(oxide): float(amount)
+                        for oxide, amount in typed_composition.value.components
+                    }
+                    runtime["pO2_bar"] = point_pO2
+                    runtime["melt_recipe_source"] = (
+                        "migrated Observation.identity.composition"
+                    )
+                    runtime["oxygen_closure"] = {
+                        "owner": closure_owner,
+                        "route": "effusion_oxygen_balance",
+                        "mode": getattr(
+                            po2_request.mode, "value", str(po2_request.mode)
+                        ),
+                        "notice_reasons": [
+                            notice.reason for notice in closure_notices
+                        ],
+                    }
+                else:
+                    last_refusal = "missing_condition:pO2_boundary"
                     runtime["refusal"] = last_refusal
-                    runtime["skip_reason"] = typed_gap
-                    unsupported = True
-                    if typed_gap not in evaluation.skip_reasons:
-                        evaluation.skip_reasons.append(typed_gap)
                     continue
-                last_refusal = "missing_condition:pO2_boundary"
-                runtime["refusal"] = last_refusal
-                continue
-            else:
-                P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
-                    species,
-                    T_K,
-                    pO2,
-                    vp_data,
-                    account_mol=melt_recipe,
-                )
+            P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
+                species,
+                T_K,
+                point_pO2,
+                vp_data,
+                account_mol=point_melt_recipe,
+            )
             runtime.setdefault("melt_attempts", {})[species] = {
                 "refusal": refuse_melt,
                 **{k: melt_rt.get(k) for k in ("provider_status", "oxide", "warnings")},
