@@ -4360,6 +4360,50 @@ def observation_matches_source_tokens(
     return any(token in folded_id or token in folded_source for token in tokens)
 
 
+def load_observation_origins(
+    root: Path | None = None,
+    *,
+    sources: Sequence[str] | None = None,
+) -> dict[str, str]:
+    """Map each observation id to its store-relative YAML path.
+
+    The path is relative to ``extracts-v2`` or ``observations-v2``, which is
+    the origin key the scorer has always stored. ``sources`` applies the same
+    path token and id token filters as ``load_migrated_store``.
+    """
+
+    root = root or REPO_ROOT
+    tokens = source_filter_tokens(sources)
+    origins: dict[str, str] = {}
+    literature = root / "data" / "literature"
+    for directory in (literature / "extracts-v2", literature / "observations-v2"):
+        if not directory.is_dir():
+            continue
+        for path in iter_observation_store_paths(directory):
+            if not path_matches_source_tokens(path, directory, tokens):
+                continue
+            doc = load_yaml(path)
+            if not isinstance(doc, Mapping):
+                continue
+            try:
+                origin_key = str(path.relative_to(directory))
+            except ValueError:
+                origin_key = path.name
+            for raw in doc.get("observations") or []:
+                if not isinstance(raw, Mapping) or not raw.get("observation_id"):
+                    continue
+                observation_id = str(raw["observation_id"])
+                raw_source = raw.get("source_id")
+                if not observation_matches_source_tokens(
+                    observation_id,
+                    None if raw_source is None else str(raw_source),
+                    tokens,
+                ):
+                    continue
+                origins[observation_id] = origin_key
+    return origins
+
+
 def load_migrated_store(
     root: Path | None = None,
     *,

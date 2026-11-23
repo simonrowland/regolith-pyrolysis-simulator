@@ -174,6 +174,7 @@ from simulator.battery.migrate import (
     load_migrated_benches,
     load_migrated_context,
     load_migrated_store,
+    load_observation_origins,
     load_yaml,
     _convert_compilation_amount,
     _log_fO2_to_pa,
@@ -324,6 +325,14 @@ from simulator.battery.validate import (
     _VAPOUR_EQUILIBRIUM,
     _build_validation_indexes,
     validate_corpus,
+)
+from simulator.battery.parsed_store_cache import (
+    active_parsed_store,
+    canonical_material,
+    code_token,
+    load_unfiltered_score_inputs,
+    read_reuse_pickle,
+    write_reuse_pickle,
 )
 from simulator.battery.validity import (
     GateCheck,
@@ -7445,7 +7454,7 @@ FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED = (
 _FORSTERITE_CRYSTAL_FORMULA = "Mg2SiO4"
 
 
-def _source_band_catalog(
+def _source_band_catalog_compute(
     context: ScoreContext,
     ratchet_entries: Mapping[str, Mapping[str, object]],
 ) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
@@ -7622,6 +7631,89 @@ def _source_band_catalog(
         })
     records.sort(key=lambda row: _group_token(row["group_key"]))
     return bands, records, no_band_reasons
+
+
+# The catalog walks score, the compilation series reader, and identity.
+# code_token also hashes the modules those files import.
+_SOURCE_BAND_CODE_FILES = (
+    "simulator/battery/score.py",
+    "simulator/battery/compilation_tier.py",
+    "simulator/battery/identity.py",
+)
+
+
+def _source_band_catalog(
+    context: ScoreContext,
+    ratchet_entries: Mapping[str, Mapping[str, object]],
+) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
+    """Return source bands, reusing them for one unchanged snapshot.
+
+    The catalog is a pure function of the parsed store and the ratchet
+    entries. Callers do not mutate the returned mappings; a cache hit
+    unpickles a fresh object. A context that is not the unfiltered
+    snapshot is computed and not stored.
+    """
+
+    from simulator.battery.parsed_store_cache import REUSE_SCHEMA
+
+    key = _source_band_reuse_key(context, ratchet_entries, schema=REUSE_SCHEMA)
+    if key is not None:
+        cached = _cached_source_band(read_reuse_pickle("source_band_catalog", key))
+        if cached is not None:
+            return cached
+    computed = _source_band_catalog_compute(context, ratchet_entries)
+    if key is not None:
+        write_reuse_pickle("source_band_catalog", key, computed)
+    return computed
+
+
+def _source_band_reuse_key(
+    context: ScoreContext,
+    ratchet_entries: Mapping[str, Mapping[str, object]],
+    *,
+    schema: int,
+) -> str | None:
+    parsed = active_parsed_store(context)
+    if parsed is None:
+        return None
+    try:
+        payload = {
+            "store": parsed.store_content_sha256,
+            "builder": parsed.builder_token,
+            "ratchet_file": _ratchet_file_token(context.root),
+            "entries": canonical_material(ratchet_entries),
+            "code": code_token(_SOURCE_BAND_CODE_FILES, schema=schema),
+        }
+    except (OSError, ValueError):
+        return None
+    if payload["entries"] is None:
+        return None
+    material = canonical_material(payload)
+    if material is None:
+        return None
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()
+
+
+def _ratchet_file_token(root: Path) -> str:
+    """The ratchet file is not part of the migrated-store content digest."""
+
+    path = root / DECISION_BAND_RATCHET_RELATIVE_PATH
+    if not path.is_file():
+        return "absent"
+    from simulator.battery.store_validation import hash_relative_files
+
+    return hash_relative_files(path.parent, [path])
+
+
+def _cached_source_band(
+    value: object,
+) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]] | None:
+    if not isinstance(value, tuple) or len(value) != 3:
+        return None
+    bands, records, reasons = value
+    if not isinstance(bands, dict) or not isinstance(records, list) or not isinstance(reasons, dict):
+        return None
+    return bands, records, reasons
 
 
 def update_decision_band_ratchet(context: ScoreContext) -> int:
@@ -19301,6 +19393,38 @@ def _gate_tables(
     return _table_payloads(reference, observations, table_index)
 
 
+def _load_extract_review(
+    root: Path,
+    tokens: tuple[str, ...] | None,
+) -> dict[str, str | None]:
+    """Review status from ``extracts/*.yaml``.
+
+    Those files are not inputs of the migrated-store content digest, so this
+    map is never taken from the parsed-store snapshot.
+    """
+
+    extract_review: dict[str, str | None] = {}
+    extracts = root / "data" / "literature" / "extracts"
+    if not extracts.is_dir():
+        return extract_review
+    for path in sorted(extracts.glob("*.yaml")):
+        if not path_matches_source_tokens(path, extracts, tokens):
+            continue
+        doc = load_yaml(path)
+        if not isinstance(doc, Mapping):
+            continue
+        source_id = str(doc.get("source_id") or path.stem)
+        extract_review[source_id] = (
+            None if doc.get("review_status") is None else str(doc.get("review_status"))
+        )
+    return extract_review
+
+
+# Captured at import so a test double that replaces this module's
+# load_migrated_store is not served the on-disk snapshot.
+_REAL_LOAD_MIGRATED_STORE = load_migrated_store
+
+
 def load_score_context(
     root: Path | None = None,
     *,
@@ -19318,6 +19442,20 @@ def load_score_context(
     tokens = source_filter_tokens(sources)
     # The unfiltered path keeps the historical call exactly, so callers and test
     # doubles that replace load_migrated_store(root) see no signature change.
+    # An unchanged store reuses one parsed snapshot; the patched name does not.
+    if sources is None and load_migrated_store is _REAL_LOAD_MIGRATED_STORE:
+        parsed = load_unfiltered_score_inputs(root)
+        return ScoreContext(
+            works=parsed.works,
+            experiments=parsed.experiments,
+            observations=parsed.observations,
+            origins=parsed.origins,
+            extract_review=_load_extract_review(root, tokens),
+            hostname=socket.gethostname(),
+            benches=parsed.benches,
+            root=root,
+            hard_issues_by_observation=parsed.hard_issues_by_observation,
+        )
     if sources is None:
         works, experiments, observations = load_migrated_store(root)
     else:
@@ -19352,45 +19490,8 @@ def load_score_context(
         benches=benches,
         context_rows=load_migrated_context(root),
     )
-    origins: dict[str, str] = {}
-    extract_review: dict[str, str | None] = {}
-    literature = root / "data" / "literature"
-    for directory in (literature / "extracts-v2", literature / "observations-v2"):
-        if not directory.is_dir():
-            continue
-        for path in iter_observation_store_paths(directory):
-            if not path_matches_source_tokens(path, directory, tokens):
-                continue
-            doc = load_yaml(path)
-            if not isinstance(doc, Mapping):
-                continue
-            try:
-                origin_key = str(path.relative_to(directory))
-            except ValueError:
-                origin_key = path.name
-            for raw in doc.get("observations") or []:
-                if isinstance(raw, Mapping) and raw.get("observation_id"):
-                    observation_id = str(raw["observation_id"])
-                    raw_source = raw.get("source_id")
-                    if not observation_matches_source_tokens(
-                        observation_id,
-                        None if raw_source is None else str(raw_source),
-                        tokens,
-                    ):
-                        continue
-                    origins[observation_id] = origin_key
-    extracts = literature / "extracts"
-    if extracts.is_dir():
-        for path in sorted(extracts.glob("*.yaml")):
-            if not path_matches_source_tokens(path, extracts, tokens):
-                continue
-            doc = load_yaml(path)
-            if not isinstance(doc, Mapping):
-                continue
-            source_id = str(doc.get("source_id") or path.stem)
-            extract_review[source_id] = (
-                None if doc.get("review_status") is None else str(doc.get("review_status"))
-            )
+    origins = load_observation_origins(root, sources=sources)
+    extract_review = _load_extract_review(root, tokens)
     return ScoreContext(
         works=works,
         experiments=experiments,

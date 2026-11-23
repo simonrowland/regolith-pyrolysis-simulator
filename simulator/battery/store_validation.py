@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from collections import Counter
+from collections.abc import Sequence
 from pathlib import Path
 
 from simulator.battery.enums import AdmissionStatus, NoticeKind
@@ -31,6 +32,27 @@ def _issue_shape(issue: ValidationIssue) -> str:
     return f"{issue.reason.value}:{issue.path.rsplit('.', 1)[-1]}"
 
 
+def hash_relative_files(root: Path, paths: Sequence[Path]) -> str:
+    """Hash relative paths and file bytes. This is the store digest's algorithm.
+
+    ``_migrated_store_content_sha256`` is this function over the migrated-store
+    paths. Callers that hash a different set are naming those inputs, not a
+    second store identity.
+    """
+
+    ordered = sorted(paths, key=lambda path: path.relative_to(root).as_posix())
+    digest = hashlib.sha256()
+    for path in ordered:
+        relative_path = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(len(relative_path).to_bytes(8, "big"))
+        digest.update(relative_path)
+        digest.update(path.stat().st_size.to_bytes(8, "big"))
+        with path.open("rb") as source:
+            while chunk := source.read(1024 * 1024):
+                digest.update(chunk)
+    return digest.hexdigest()
+
+
 def _migrated_store_content_sha256(root: Path | None = None) -> str:
     """Hash the relative paths and bytes loaded from the persisted store."""
 
@@ -42,18 +64,7 @@ def _migrated_store_content_sha256(root: Path | None = None) -> str:
         paths.extend(
             iter_observation_store_paths(literature_dir / directory_name)
         )
-    paths.sort(key=lambda path: path.relative_to(root).as_posix())
-
-    digest = hashlib.sha256()
-    for path in paths:
-        relative_path = path.relative_to(root).as_posix().encode("utf-8")
-        digest.update(len(relative_path).to_bytes(8, "big"))
-        digest.update(relative_path)
-        digest.update(path.stat().st_size.to_bytes(8, "big"))
-        with path.open("rb") as source:
-            while chunk := source.read(1024 * 1024):
-                digest.update(chunk)
-    return digest.hexdigest()
+    return hash_relative_files(root, paths)
 
 
 def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
