@@ -23,6 +23,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     AUTHORITY_EXTRAPOLATED,
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
+    DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
     FINDING_CLASS_FALLBACK_VS_SPECIATION,
     OPENIMCC_ENGINE_NAMES,
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
@@ -1269,6 +1270,24 @@ def test_extract_preserves_valid_partial_pressures_and_reports_invalid_names() -
     assert invalid_pressures == ("Na2",)
 
 
+def test_invalid_gas_channel_diagnostics_survive_the_backend_cache_codec():
+    from simulator.melt_backend.base import (
+        INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
+        EquilibriumResult,
+    )
+
+    result = EquilibriumResult(
+        status="non_authoritative",
+        diagnostics={INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS: ["O2"]},
+    )
+    result.vaporock_full_speciation_Pa = {"K": 100.0}
+    restored = EquilibriumResult.from_engine_cache_value(
+        result.to_engine_cache_value(engine_id="vaporock"), engine_id="vaporock",
+    )
+    assert extract_reported_quantities(result) == ({}, {"K": 100.0}, ("O2",))
+    assert extract_reported_quantities(restored) == extract_reported_quantities(result)
+
+
 def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     pot = BinaryPot(
         pot_id="fixture_pot",
@@ -1445,6 +1464,7 @@ def test_multivalent_not_an_input_keeps_alphamelts_intrinsic_refusal() -> None:
         pot,
         temperature_K=1673.15,
         po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        physical_pressure_bar=1.0,
         isolated=False,
         timeout_s=2.0,
     )
@@ -1536,6 +1556,7 @@ def test_not_an_input_refusal_stays_at_backend_boundary_for_multivalent_cell(
         pot,
         temperature_K=1673.15,
         po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        physical_pressure_bar=1.0,
         isolated=False,
         timeout_s=2.0,
     )
@@ -2633,6 +2654,7 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
         pot,
         temperature_K=1700.0,
         po2=po2,
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )
@@ -3335,6 +3357,7 @@ def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
         pot,
         temperature_K=1700.0,
         po2=po2,
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )
@@ -3409,6 +3432,7 @@ def _inline_death_cell(*, annotated: bool):
         pot,
         temperature_K=1700.0,
         po2=po2,
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )

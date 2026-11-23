@@ -200,7 +200,10 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
-from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.redox_fields import (
+    FERRIC_FRACTION_FIELDS,
+    independent_redox_conditions,
+)
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -9417,16 +9420,16 @@ def _closed_system_experiment(experiment: Experiment | None) -> bool:
     )
 
 
-def _dp108_sum_eligible(experiment: Experiment | None, identity: Identity) -> bool:
+def _dp108_sum_eligible(
+    experiment: Experiment | None,
+    identity: Identity,
+    composition: Composition | None,
+) -> bool:
     """Partial-pressure sum only for an unstated method with a condensed phase."""
 
     if experiment is not None and experiment.method.is_value:
         return False
-    return stated_pure_substance_reservoir(identity) is not None or (
-        identity.composition is not None
-        and identity.composition.is_value
-        and isinstance(identity.composition.value, Composition)
-    )
+    return composition is not None or stated_pure_substance_reservoir(identity) is not None
 
 
 def _oxide_reference_defined_pressure(
@@ -10081,7 +10084,12 @@ def _predict_redox(
         if isinstance(kress_basis, _FeRedoxRefusal):
             return refused(kress_basis.reason, kress_basis.detail)
 
-    fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    fo2_observation = observation
+    if quantity is Quantity.FE3_FE2_RATIO or _fe_valence_named_form(identity) in {
+        "ratio", "fraction"
+    }:
+        fo2_observation = independent_redox_conditions(observation)
+    fo2_log = _printed_fe_redox_fo2_log(fo2_observation, fo2_observation.identity)
     if fo2_log is None:
         from simulator.battery.fo2_ladder import (
             fo2_tier_notice,
@@ -10089,11 +10097,11 @@ def _predict_redox(
         )
 
         fo2_observation = replace(
-            observation,
+            fo2_observation,
             identity=(
-                replace(identity, total_pressure_Pa=pressure_pa)
+                replace(fo2_observation.identity, total_pressure_Pa=pressure_pa)
                 if pressure_pa is not None
-                else identity
+                else fo2_observation.identity
             ),
         )
         resolved_fo2 = resolve_row_fo2(
@@ -15807,6 +15815,26 @@ def _predict_with_engine(
                         )
                     )
 
+    if (
+        engine is Engine.INTERNAL_ANALYTICAL
+        and pressure_bar is None
+        and po2.mode == PO2_COMMANDED
+        and (engine, quantity) not in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+    ):
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": "internal_analytical_missing_total_pressure",
+                "quantity": quantity.value,
+            },
+            notices=tuple(input_notices),
+        )
+
     if shared_oxygen and po2.mode == PO2_OXYGEN_BALANCE_EFFUSION:
         input_notices.append(source_oxygen_closure_notice(quantity, observation))
 
@@ -16947,7 +16975,7 @@ def _predict_with_engine(
         quantity is Quantity.P_PARTIAL
         and pressure_bar is None
         and not _closed_system_experiment(experiment)
-        and _dp108_sum_eligible(experiment, identity)
+        and _dp108_sum_eligible(experiment, identity, composition_value)
     ):
         invalid_components = tuple(
             getattr(cell, "invalid_gas_partial_pressure_components", ())

@@ -135,6 +135,7 @@ from simulator.engine_pool import (
     WarmEngineWorker,
 )
 from simulator.melt_backend.base import (
+    INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
@@ -635,7 +636,7 @@ def _speciation_value_stats(
     for _species, raw in items:
         try:
             value = float(raw)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):
             stats['speciation_other_nonfinite_count'] += 1
             continue
         if math.isnan(value):
@@ -841,22 +842,16 @@ def _serialize_log10_bar_pressures(
     for species, log10_bar in items:
         try:
             value = float(log10_bar)
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(value):
-            out[str(species)] = value
-        elif math.isinf(value) and value < 0.0:
+        except (TypeError, ValueError, OverflowError):
+            value = float('nan')
+        if value == -math.inf:
             proven_empty.append(str(species))
-    if not out:
+        else:
+            out[str(species)] = value
+    if not stats['speciation_finite_count']:
         # Failed / all-nonfinite table. Do not attach the inventory
         # sidecar: -inf rows on a NaN table must not rehabilitate the
         # cell as an all-zero success.
-        if int(stats['speciation_finite_count']) != 0:
-            raise RuntimeError(
-                'serializer emptied a table that still had finite log10_bar '
-                'values; Pa conversion happens parent-side — add a '
-                'EmptySpeciationCause token'
-            )
         return {}, _serialize_cause_payload(
             EmptySpeciationCause.NO_FINITE_VALUES, stats
         )
@@ -1444,6 +1439,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_reason: Optional[str] = None
         self._last_empty_speciation_error: Optional[Dict[str, str]] = None
         self._last_silent_zero_notes: List[Dict[str, Any]] = []
+        self._last_invalid_pressure_components: set[str] = set()
         # Warm pool (DESIGN-REV5 §5.5 / VR-5). Opt-in: calibration runners
         # and live warm-path tests pass warm_worker=True. Default off so
         # the diagnostic shadow and corpus harnesses do not spawn a pool
@@ -2301,6 +2297,10 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['temperature_K'] = float(temperature_K)
             projection_diagnostics['sum_pressure_bar'] = float(sum_bar)
 
+        if self._last_invalid_pressure_components:
+            projection_diagnostics[INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS] = sorted(
+                self._last_invalid_pressure_components
+            )
         if self._last_silent_zero_notes:
             merge_notes_into_mapping(
                 projection_diagnostics, self._last_silent_zero_notes
@@ -2431,6 +2431,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_reason = None
         self._last_empty_speciation_error = None
         self._last_silent_zero_notes = []
+        self._last_invalid_pressure_components.clear()
 
     def _latch_empty_speciation(
         self,
@@ -2890,21 +2891,19 @@ class VapoRockBackend(MeltBackend):
             parent = _parent_oxide_for_vaporock_gas(raw_species)
             if parent is None:
                 parent = _parent_oxide_for_vaporock_gas(key)
-            if parent is not None and not _parent_oxide_is_empty(
-                composition_wt_pct, parent
-            ):
+            if parent is None or not _parent_oxide_is_empty(composition_wt_pct, parent):
+                self._last_invalid_pressure_components.add(key)
                 continue
             if key in pressures and pressures[key] != 0.0:
                 continue
             pressures[key] = 0.0
-            oxide_name = parent or 'unknown_parent_oxide'
             self._last_silent_zero_notes.append(
                 note_dict(
                     ZeroBecause.PROVEN_EMPTY_INVENTORY,
                     site='vaporock.eval_gas_abundances.inventory_mask',
                     species=key,
                     field='pressure_Pa',
-                    detail=_proven_empty_inventory_detail(oxide_name),
+                    detail=_proven_empty_inventory_detail(parent),
                     doctrine_category=CATEGORY_PROVEN_ZERO,
                 )
             )
@@ -2938,7 +2937,7 @@ class VapoRockBackend(MeltBackend):
         recovered.
 
         ``NaN`` on a species whose parent oxide is present is a failed
-        evaluation of that row and is dropped, not converted to zero.
+        evaluation of that row; its name is retained as an invalid channel.
         A table with no finite log10(bar) values (the 30 NaN + 8 -inf
         failed-solve shape) still refuses: the -inf rows must not
         rehabilitate the cell as an all-zero success. A species absent
@@ -2946,6 +2945,7 @@ class VapoRockBackend(MeltBackend):
         invented here.
         """
         self._last_silent_zero_notes = []
+        self._last_invalid_pressure_components.clear()
         if raw is None:
             if self._last_empty_speciation_cause is None:
                 self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
@@ -2972,16 +2972,20 @@ class VapoRockBackend(MeltBackend):
         pressures: Dict[str, float] = {}
         neginf_species: List[Any] = []
         for species, log10_bar in items:
+            key = self._strip_gas_suffix(species)
             try:
                 value = float(log10_bar)
-            except (TypeError, ValueError):
-                continue
-            if math.isfinite(value):
+                if value == -math.inf:
+                    neginf_species.append(species)
+                    continue
                 pressure_pa = (10.0 ** value) * PA_PER_BAR
-                if pressure_pa > 0.0:
-                    pressures[self._strip_gas_suffix(species)] = pressure_pa
-            elif math.isinf(value) and value < 0.0:
-                neginf_species.append(species)
+            except (TypeError, ValueError, OverflowError):
+                self._last_invalid_pressure_components.add(key)
+                continue
+            if math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                pressures[key] = pressure_pa
+            else:
+                self._last_invalid_pressure_components.add(key)
         if proven_empty_species:
             neginf_species.extend(proven_empty_species)
         if not pressures:

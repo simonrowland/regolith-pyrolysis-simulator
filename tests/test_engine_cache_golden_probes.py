@@ -238,6 +238,7 @@ def _clear_numeric_input_read_caches() -> None:
 def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
     from simulator.battery.enums import Engine
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         Po2Request,
         close_battery_engine_handle,
         equilibrate_cell,
@@ -312,6 +313,7 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
                 probe_pot,
                 temperature_K=1700.0,
                 po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
+                physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
                 timeout_s=90.0,
                 isolated=False,
             )

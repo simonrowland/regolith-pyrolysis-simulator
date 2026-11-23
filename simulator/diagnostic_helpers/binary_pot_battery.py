@@ -51,6 +51,7 @@ from simulator.physical_constants import (
 )
 from simulator.melt_backend.base import (
     ANTOINE_FALLBACK_SOURCE_PREFIX,
+    INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
     REDOX_MODE_NOT_AN_INPUT,
     _call_with_hard_timeout,
     vapor_pressure_source_code,
@@ -119,19 +120,21 @@ def _hostname() -> str:
 
 
 def _openimcc_gas_channels_and_omission_notices(
-    parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None
+    parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None,
+    *, temperature_K: float | None = None,
 ) -> tuple[list[Any], tuple[dict[str, Any], ...]]:
     """Return the active gas reactions and typed notices for omitted channels."""
 
     from openimcc.gas import _default_reactions
 
-    channels, default_omissions = _default_reactions(parent_oxides, datapack)
+    channels, default_omissions = _default_reactions(parent_oxides, datapack, temperature_K)
     omitted_channels = getattr(gas_result, "omitted_channels", default_omissions)
     table_path = str(datapack.gas_path)
     notices = tuple(
         {
             "kind": NoticeKind.INPUT_OMITTED.value,
             "authority": None,
+            "species": name,
             "reason": (
                 f"gas channel {name} omitted: {reason}; table_path_diagnostic: {table_path}"
             ),
@@ -1523,13 +1526,16 @@ def extract_reported_quantities(
         or {}
     )
     pressures: dict[str, float] = {}
-    invalid_pressure_components: list[str] = []
+    diagnostics = getattr(result, "diagnostics", None) or {}
+    invalid_pressure_components = set(
+        diagnostics.get(INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS, ())
+    )
     for name, value in dict(raw_pressures).items():
         number = finite_float(value)
         if number is not None and number > 0.0:
             pressures[str(name)] = number
         elif number is None or number < 0.0:
-            invalid_pressure_components.append(str(name))
+            invalid_pressure_components.add(str(name))
     return activities, pressures, tuple(sorted(invalid_pressure_components))
 
 
@@ -3270,6 +3276,7 @@ class _OpenImccBatteryBackend:
         gas_result = None
         solved_notice = None
         cell_oxide_sources: Mapping[str, Any] = {}
+        invalid_channels: set[str] = set()
         engine_binding_identity = self._identity.get("engine_binding_identity") or {}
         gas_table_lineage = (
             "openimcc-gas-table:sha256:"
@@ -3417,12 +3424,14 @@ class _OpenImccBatteryBackend:
                 gas_pressures = dict(gas_result)
 
         if gas_result is not None:
-            _channels, omission_notices = _openimcc_gas_channels_and_omission_notices(
-                result.parent_oxides, self._gas, gas_result
+            channels, omission_notices = _openimcc_gas_channels_and_omission_notices(
+                result.parent_oxides, self._gas, gas_result, temperature_K=temperature_K,
             )
             notices.extend(omission_notices)
             if solved_notice is not None:
                 notices.append(solved_notice)
+            invalid_channels.update(notice["species"] for notice in omission_notices)
+            invalid_channels.update(name for name, _ in channels if name not in gas_pressures)
             domain_flags = dict(getattr(gas_result, "domain_flags", {}))
             gas_diagnostics.update(
                 domain_flags=domain_flags,
@@ -3430,9 +3439,13 @@ class _OpenImccBatteryBackend:
             )
             for name, value in gas_pressures.items():
                 number = finite_float(value)
-                if number is None or number <= 0.0:
+                pressure = None if number is None else finite_float(number * PA_PER_BAR)
+                if pressure is None or pressure < 0.0:
+                    invalid_channels.add(str(name))
                     continue
-                pressures[str(name)] = number * PA_PER_BAR
+                if pressure == 0.0:
+                    continue
+                pressures[str(name)] = pressure
                 if name in cell_oxide_sources:
                     source = cell_oxide_sources[name]
                     vapor_sources[str(name)] = (
@@ -3472,6 +3485,8 @@ class _OpenImccBatteryBackend:
             "vapor_pressure_backend_status": "openimcc",
             "authoritative_for_requested_vapor_pressure": True,
         }
+        if invalid_channels:
+            diagnostics[INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS] = sorted(invalid_channels)
         reported_gammas = {
             str(name): float(row["value"])
             for name, row in result.activity_coefficients.items()
@@ -3642,12 +3657,6 @@ def _internal_analytical_vapor_pressure_adapter(
                 f"commanded pO2 must be finite and positive; got {po2_request.po2_bar!r}",
             )
         oxygen_source = "battery_observation_commanded_pO2"
-        if pressure is None:
-            raise _InternalAnalyticalInputRefusal(
-                1,
-                "internal_analytical_missing_total_pressure",
-                "commanded oxygen requires a total pressure",
-            )
     elif po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION:
         if oxygen_balance_backend is None:
             oxygen_balance_backend = _OpenImccBatteryBackend("openimcc")

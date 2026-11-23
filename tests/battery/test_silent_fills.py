@@ -1082,7 +1082,7 @@ def test_dp108_checks_openimcc_channels_from_the_gas_evaluator(monkeypatch, chan
     def gas_at_solved_oxygen(*_args, **_kwargs):
         calls.append("effusion")
         return 1e-5, raw, {
-            "residual": 0.0, "bracket_log10_bar": (-9.0, -3.0),
+            "residual": 0.0, "bracket": (-9.0, -3.0),
             "dominant_O_carriers": ("O2",), "dominant_metal_carriers": ("K",),
         }
 

@@ -748,6 +748,7 @@ def _qualification_handle(tmp_path: Path):
 def test_qualification_cao_sio2_crash_stays_engine_crash(tmp_path):
     """Lunar T makes the battery set qualification. The crash category must stay."""
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         REFUSAL_ENGINE_CRASH,
         BinaryPot,
         Po2Request,
@@ -767,6 +768,7 @@ def test_qualification_cao_sio2_crash_stays_engine_crash(tmp_path):
         pot,
         temperature_K=1993.0,
         po2=Po2Request(mode='commanded', po2_bar=1.0e-6),
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )
@@ -800,6 +802,7 @@ def test_qualification_does_not_launch_sio2_free_melt(
     """SiO2=0 is the basis gate. Qualification must not replace that gate."""
     from engines.domain_reason import OutOfDomainReason
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         REFUSAL_GATE_REFUSED_IN_ADAPTER,
         BinaryPot,
         Po2Request,
@@ -819,6 +822,7 @@ def test_qualification_does_not_launch_sio2_free_melt(
         pot,
         temperature_K=2278.0,
         po2=Po2Request(mode='commanded', po2_bar=1.0e-6),
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )
@@ -840,6 +844,7 @@ def test_qualification_worker_does_not_launch_sio2_free_melt(tmp_path):
     import json
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         run_isolated_cell_worker,
     )
 
@@ -852,6 +857,7 @@ def test_qualification_worker_does_not_launch_sio2_free_melt(tmp_path):
             'po2': {'mode': 'commanded', 'po2_bar': 1.0e-6},
             'engine': 'alphamelts',
             'qualification': True,
+            'physical_pressure_bar': DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
             'temperature_K': 2278.0,
             'timeout_s': 5.0,
             'arm': 'qualification',
@@ -868,6 +874,7 @@ def test_qualification_worker_does_not_launch_sio2_free_melt(tmp_path):
 def test_qualification_band_miss_with_iron_still_launches(tmp_path):
     """SiO2 outside [30, 80] is notice+run. Removing the bypass must not refuse it."""
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         BinaryPot,
         Po2Request,
         equilibrate_cell,
@@ -886,6 +893,7 @@ def test_qualification_band_miss_with_iron_still_launches(tmp_path):
         pot,
         temperature_K=1700.0,
         po2=Po2Request(mode='commanded', po2_bar=1.0e-6),
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )

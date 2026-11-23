@@ -1726,6 +1726,7 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
     import json
     from simulator import engine_cache
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         EngineHandle,
         _OpenImccBatteryBackend,
         Po2Request,
@@ -1937,6 +1938,7 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             "po2": Po2Request(mode="engine_default", po2_bar=None),
             "timeout_s": 90.0,
             "isolated": False,
+            "physical_pressure_bar": DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         }
     elif engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
         from simulator.diagnostic_helpers.binary_pot_battery import BinaryPot
@@ -1960,6 +1962,7 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             ),
             "timeout_s": 90.0,
             "isolated": False,
+            "physical_pressure_bar": float(conditions["pressure_bar"]),
         }
     elif engine is Engine.VAPOROCK:
         import yaml
@@ -2066,6 +2069,7 @@ def test_alphamelts_out_of_domain_cell_is_not_stored(
 ) -> None:
     from simulator import engine_cache
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         Po2Request,
         close_battery_engine_handle,
         equilibrate_cell,
@@ -2086,6 +2090,7 @@ def test_alphamelts_out_of_domain_cell_is_not_stored(
             pot,
             temperature_K=1700.0,
             po2=Po2Request(mode="engine_default", po2_bar=None),
+            physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
             timeout_s=90.0,
             isolated=False,
         )
