@@ -98,6 +98,12 @@ from simulator.core import (
     PyrolysisSimulator,
     read_high_t_melt_activity_fallback_notice,
 )
+from simulator.process_timestep import (
+    PROCESS_HOUR_S,
+    ProcessTimestepRefusal,
+    duration_step_count,
+    resolve_process_timestep,
+)
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
     gram_lab_exposed_melt_area_bridge,
@@ -314,6 +320,8 @@ class PresetRunSpec:
     lab_geometry: Mapping[str, Any]
     provenance: dict[str, Any]
     document: Mapping[str, Any]
+    process_dt_s: float = 3600.0
+    step_count: int | None = None
 
 
 @dataclass(frozen=True)
@@ -564,15 +572,42 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         f"pair.{requested_leg}.duration_h",
         provenance,
     )
-    hours = int(duration_h)
-    if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
+    process_dt_s = _preset_process_dt_s(leg_block, preset, provenance)
+    try:
+        timestep = resolve_process_timestep(process_dt_s)
+    except ProcessTimestepRefusal as exc:
         raise PresetRunnerError(
-            "malformed_preset: "
-            f"pair.{requested_leg}.duration_h={duration_h!r} cannot map "
-            "losslessly to the 1-hour simulator timestep; "
-            "runner --hours requires a whole number of hours",
+            f"malformed_preset: {exc.reason}: process_dt_s={process_dt_s!r}",
             provenance=provenance,
-        )
+        ) from exc
+    if timestep.is_one_hour:
+        hours = int(duration_h)
+        if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
+            raise PresetRunnerError(
+                "malformed_preset: "
+                "timestep_does_not_divide_duration: "
+                f"pair.{requested_leg}.duration_h={duration_h!r} cannot map "
+                "losslessly to the 1-hour simulator timestep; "
+                "runner --hours requires a whole number of hours "
+                f"(process_dt_s={timestep.dt_s!r})",
+                provenance=provenance,
+            )
+        spec_dt_s = 3600.0
+        spec_step_count = None
+    else:
+        try:
+            hours = duration_step_count(duration_h, timestep)
+        except ProcessTimestepRefusal as exc:
+            raise PresetRunnerError(
+                "malformed_preset: "
+                f"{exc.reason}: duration_h={duration_h!r} "
+                f"process_dt_s={timestep.dt_s!r}",
+                provenance=provenance,
+            ) from exc
+        provenance["process_dt_s"] = timestep.dt_s
+        provenance["step_count"] = hours
+        spec_dt_s = timestep.dt_s
+        spec_step_count = hours
 
     digests = preset.get("digests")
     if isinstance(digests, Mapping):
@@ -612,6 +647,8 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         lab_geometry=geometry,
         provenance=provenance,
         document=copy.deepcopy(dict(preset)),
+        process_dt_s=spec_dt_s,
+        step_count=spec_step_count,
     )
 
 
@@ -713,6 +750,28 @@ def _preset_duration_h(
             provenance=provenance,
         )
     return duration_h
+
+
+def _preset_process_dt_s(
+    leg_block: Mapping[str, Any],
+    preset: Mapping[str, Any],
+    provenance: Mapping[str, Any],
+) -> float:
+    """Seconds per process step. Absent means one hour."""
+
+    if "process_dt_s" in leg_block:
+        raw = leg_block.get("process_dt_s")
+    elif "process_dt_s" in preset:
+        raw = preset.get("process_dt_s")
+    else:
+        return float(PROCESS_HOUR_S)
+    try:
+        return resolve_process_timestep(raw).dt_s
+    except ProcessTimestepRefusal as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {exc.reason}: process_dt_s={raw!r}",
+            provenance=provenance,
+        ) from exc
 
 
 def _apply_leg_mitigation_to_schedule(
@@ -1042,6 +1101,7 @@ class PyrolysisRun:
     # authored hour budget. Not an EvalSpec field: the cache key stays
     # engine VERSION plus the request, and this branch bumps VERSION.
     until_campaign_complete: bool = False
+    process_dt_s: float = 3600.0
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -1078,6 +1138,12 @@ class PyrolysisRun:
                 )
             except ValueError as exc:
                 raise RunnerError(str(exc)) from exc
+        try:
+            self.process_dt_s = resolve_process_timestep(self.process_dt_s).dt_s
+        except ProcessTimestepRefusal as exc:
+            raise RunnerError(
+                f"{exc.reason}: process_dt_s={self.process_dt_s!r}"
+            ) from exc
 
     def _enforce_preset_comparison_contract(self) -> None:
         preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
@@ -1319,6 +1385,7 @@ class PyrolysisRun:
             imcc_activity_shadow=self.imcc_activity_shadow,
             high_t_melt_activity=high_t_melt_activity,
             until_campaign_complete=bool(self.until_campaign_complete),
+            process_dt_s=self.process_dt_s,
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
@@ -1435,6 +1502,12 @@ class PyrolysisRun:
             "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
+        timestep = resolve_process_timestep(self.process_dt_s)
+        if not timestep.is_one_hour:
+            run_metadata["process_dt_s"] = timestep.dt_s
+            run_metadata["duration_h"] = (
+                float(int(self.hours)) * timestep.dt_s / float(PROCESS_HOUR_S)
+            )
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
             session_config.setpoints
         )
@@ -2969,6 +3042,9 @@ def build_per_hour_summary(
     )
     if high_t_melt_activity:
         summary["high_t_melt_activity"] = _json_safe(high_t_melt_activity)
+    t_s = getattr(snapshot, "t_s", None)
+    if t_s is not None:
+        summary["t_s"] = float(t_s)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
@@ -6518,6 +6594,11 @@ def main(argv: Optional[list[str]] = None) -> int:
                     args.include_wall_deposit_rate_diagnostics
                 ),
                 run_metadata_overrides=metadata_overrides,
+                process_dt_s=(
+                    loaded_preset.process_dt_s
+                    if isinstance(loaded_preset, PresetRunSpec)
+                    else float(PROCESS_HOUR_S)
+                ),
             )
             result = run.run()
         if args.compare:

@@ -1377,6 +1377,18 @@ def _knudsen_report(
     }
 
 
+class ThermalTrainSubhourRefusal(ValueError):
+    """Snapshot count is the hourly run cost. A shorter step must not use it."""
+
+    reason = "subhour_hour_clock_refused"
+
+    def __init__(self, process_dt_h: float):
+        self.process_dt_h = float(process_dt_h)
+        super().__init__(
+            f"{self.reason}: thermal_train run_hours counts snapshots"
+        )
+
+
 def report_from_recorded_series(
     hot_species_kg_hr_series: Sequence[Mapping[str, float]],
     oxygen_mol_hr_series: Sequence[float | None],
@@ -1388,6 +1400,7 @@ def report_from_recorded_series(
     overhead_state_series: Sequence[Mapping[str, Any]] = (),
     parameters: ThermalTrainParameters | None = None,
     expected_refractory_trace_species: Sequence[str] = (),
+    process_dt_h: float = 1.0,
 ) -> dict[str, Any]:
     params = parameters or thermal_train_parameters_from_mapping()
     trace_authority = frozenset(str(species) for species in expected_refractory_trace_species)
@@ -1399,6 +1412,8 @@ def report_from_recorded_series(
     snapshot_count = max(len(hot_species_kg_hr_series), len(oxygen_mol_hr_series))
     if snapshot_count == 0:
         return empty_thermal_train_report("no_run_history")
+    if process_dt_h != 1.0:
+        raise ThermalTrainSubhourRefusal(process_dt_h)
     windows = condensation_stage_windows_K(setpoints)
     peak_hot_molar_by_species: dict[str, float] = {}
     hot_molar_rows: list[dict[str, float]] = []

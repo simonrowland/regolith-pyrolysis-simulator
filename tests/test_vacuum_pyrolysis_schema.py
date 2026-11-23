@@ -66,7 +66,7 @@ ROBINOT_EAC1_ELEMENTAL_WT_PCT = {
     "Ti": 2.0,
     "Fe": 3.0,
 }
-SESKO_PRESSURE_RUNTIME_FLOOR_MBAR = pytest.approx(1.0e-3)
+SESKO_PRESSURE_RUNTIME_ASSUMPTION_MBAR = pytest.approx(1.0e-3)
 SESKO_PRESSURE_REPORTED_MIN_MBAR = pytest.approx(1.0e-7)
 SESKO_PRESSURE_REPORTED_MAX_MBAR = pytest.approx(1.0e-2)
 SESKO_TEMP_MIN_C = pytest.approx(1476.85)
@@ -78,7 +78,7 @@ SESKO_DEPOSIT_THICKNESS_UM = pytest.approx(31.3)
 SESKO_TEMP_EMISSIVITY = pytest.approx(0.98)
 SESKO_TRACKING_INTERVAL_MIN = pytest.approx(5)
 SESKO_FIXED_MIRROR_ANGLE_DEG = pytest.approx(45)
-SESKO_PRESSURE_RUNTIME_DELTA_ID = "pressure_floor_delta_reported_uhv_min_to_runtime_floor"
+SESKO_PRESSURE_RUNTIME_DELTA_ID = "pressure_assumption_reported_uhv_min_to_initial_point"
 POMEROY_DURATION_H = pytest.approx(4.0)
 POMEROY_OUTGAS_END_H = pytest.approx(2.0)
 POMEROY_RAMP_END_H = pytest.approx(3.6666666666666665)
@@ -592,12 +592,20 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert feedstock_ids == {"lunar_eac_1a"}
     assert measurement["material_context"]["feedstock_id"] == "lunar_eac_1a"
     assert measurement["conditions_reported"]["feedstock"]["species"] == "EAC-1A"
+    pressure_digest = next(
+        row["digest"]
+        for row in preset["source_notes"]
+        if row["digest"].startswith("Reported exposure pressure spans")
+    )
+    assert "assumed initial schedule point" in pressure_digest
+    assert "not a time-resolved trace" in pressure_digest
+    assert "runtime floor" not in pressure_digest
 
     schedule = preset["lab_schedule"]
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
     assert schedule["melt_temperature_C"][-1]["value"] == SESKO_TEMP_MAX_C
     assert schedule["melt_temperature_C"][0]["unit"] == "C"
-    assert schedule["chamber_pressure_mbar"][0]["value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+    assert schedule["chamber_pressure_mbar"][0]["value"] == SESKO_PRESSURE_RUNTIME_ASSUMPTION_MBAR
     assert schedule["chamber_pressure_mbar"][0]["runtime_delta_annotation_id"] == SESKO_PRESSURE_RUNTIME_DELTA_ID
     assert schedule["chamber_pressure_mbar"][-1]["value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
     reported_profile = schedule["reported_exposure_profile"]["pressure_mbar"]
@@ -608,8 +616,8 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
         row["id"]: row for row in schedule["runtime_schedule_annotations"]
     }[SESKO_PRESSURE_RUNTIME_DELTA_ID]
     assert runtime_delta["reported_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
-    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
-    assert runtime_delta["reason"] == "normalize_lab_schedule_floor"
+    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_RUNTIME_ASSUMPTION_MBAR
+    assert runtime_delta["reason"] == "assumed_schedule_point_not_time_resolved"
     assert schedule["gas_boundary"]["background_gas"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["imposed_flow"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["pressure_control"]["mode"] == "pumped_dynamic_uhv_exposure"
@@ -632,8 +640,14 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     ]
     assert certification_block["status"] == "blocked"
     assert certification_block["code"] == (
-        "reported_dynamic_pressure_crosses_runtime_floor"
+        "pressure_trace_and_pump_throughput_unreported"
     )
+    assert "reported_pressure_range_does_not_establish_time_series" in certification_block[
+        "reasons"
+    ]
+    assert "pump_throughput_and_pressure_trace_are_not_reported" in certification_block[
+        "reasons"
+    ]
     assert "molecular_flow_transport_reproduction" in certification_block[
         "blocked_observables"
     ]

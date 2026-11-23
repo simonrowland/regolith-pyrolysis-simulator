@@ -424,7 +424,11 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
     monkeypatch.setattr(sim, "_get_equilibrium", fake_equilibrium)
     monkeypatch.setattr(sim, "_calculate_evaporation", fake_evaporation)
-    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        lambda flux, dt_hr=1.0: flux,
+    )
     monkeypatch.setattr(sim, "_configure_condensation_operating_conditions", lambda flux: None)
     monkeypatch.setattr(sim, "_apply_lab_surface_temperatures", lambda *, sample_time_h: None)
     monkeypatch.setattr(sim, "_route_to_condensation", fake_route)
@@ -714,6 +718,31 @@ def _seed_o2_bubbler_redox_state(
         melt_intrinsic_fO2_log=fO2_log,
         reference_T_K=temperature_C + 273.15,
     )
+
+
+@pytest.mark.parametrize(
+    ("pressure_mbar", "expected_fO2_log"),
+    [
+        (1.0e-323, -326.0051853474518),
+        (2.5e-321, -323.602064826276),
+    ],
+    ids=("quotient-underflows", "quotient-is-positive-subnormal"),
+)
+def test_controlled_o2_bubbler_log_accepts_positive_subnormal_pressure(
+    pressure_mbar: float,
+    expected_fO2_log: float,
+) -> None:
+    sim = _make_sim()
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = pressure_mbar
+
+    if pressure_mbar == 2.5e-321:
+        assert pressure_mbar / 1000.0 > 0.0
+
+    target, source = sim._o2_bubbler_target_fO2_log(None)
+
+    assert target == pytest.approx(expected_fO2_log, rel=0.0, abs=1e-10)
+    assert source == "controlled_o2_pO2_mbar"
 
 
 def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() -> None:

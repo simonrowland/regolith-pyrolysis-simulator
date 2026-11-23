@@ -809,7 +809,7 @@ def production_configured_condensation_route(monkeypatch):
 
     route = CondensationModel.route
 
-    def configured_route(model, evap_flux, melt):
+    def configured_route(model, evap_flux, melt, *, dt_h: float = 1.0):
         if not model._knudsen_policy_configured:
             segment_temperatures_C = {
                 segment.name: segment.wall_temperature_C
@@ -867,7 +867,7 @@ def production_configured_condensation_route(monkeypatch):
                 campaign_name=str(getattr(melt.campaign, "name", "")),
                 campaign_hour=float(getattr(melt, "campaign_hour", 0.0) or 0.0),
             )
-        return route(model, evap_flux, melt)
+        return route(model, evap_flux, melt, dt_h=dt_h)
 
     monkeypatch.setattr(CondensationModel, "route", configured_route)
 

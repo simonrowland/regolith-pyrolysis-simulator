@@ -26,22 +26,25 @@ The provider:
   ``request.control_inputs``:
 
   * ``species`` -- the vapor species name (e.g. ``"Na"``, ``"SiO"``),
-  * ``condensed_kg`` -- the kg of vapor projected to deposit this tick
-    (caller computes ``rate_kg_hr - remaining_kg_hr``, then applies the
-    same ``available_kg / oxide_removed`` scale the EVAPORATION_TRANSITION
-    caller applies, so the two transitions stay numerically consistent
-    on parent-oxide-limited ticks),
+  * ``condensed_kg`` -- kilograms of vapor deposited this step. The
+    caller passes ``(rate_kg_hr - remaining_kg_hr) * dt_hr`` after the
+    parent-oxide availability scale. At one hour ``dt_hr`` is 1, so
+    this is the hourly mass. This provider debits those kilograms and
+    does not divide or multiply them by ``dt_hr``.
   * ``sp_data`` -- the raw ``vapor_pressures.yaml`` metadata for the
     species (used only to look up
     ``condensation_products_mol_per_mol_vapor`` for the disproportionation
     branch; the provider re-uses the same product map the legacy path builds in
     :meth:`_condensed_products_for_vapor` -- the canonical SiO -> Si +
     SiO2 split lives here),
+  * ``wall_reaction_booking`` and ``stage3_reactive_alkali`` -- this
+    step's mol extents. The route books one hour of the kg/h flux; the
+    caller scales those mols by ``dt_hr`` before dispatch. At one hour
+    the booked mols are passed through unchanged.
   * ``wall_deposit_fraction`` and ``wall_deposit_account_fractions`` -- the
     same-tick wall split carried from ``CondensationRouteResult``,
-  * ``dt_hr`` -- the tick duration in hours (always 1.0 in the current
-    simulator; passed through explicitly so the provider stays unit-
-    correct if the simulator's tick step ever changes).
+  * ``dt_hr`` -- passed for unit symmetry. Unused here: the step length
+    is already in ``condensed_kg`` and the booked mols.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 :class:`LedgerTransitionProposal` (per-species debit/credit pair) and a
