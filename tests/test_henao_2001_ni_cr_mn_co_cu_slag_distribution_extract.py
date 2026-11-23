@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+from collections import Counter
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -326,6 +327,23 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
 ) -> None:
     document = _document()
     _assert_render_pins(document)
+    source_observations = _observations(document)
+    assert all(
+        not any(
+            key in row
+            for key in (
+                "phase",
+                "phase_as_published",
+                "phase_state_as_published",
+                "state_note_as_published",
+            )
+        )
+        for row in source_observations
+    )
+    assert Counter(row["values"]["phase_label"] for row in source_observations) == {
+        "slag": 298,
+        "metal": 133,
+    }
 
     contexts = [
         row
@@ -348,7 +366,7 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
         row.identity.species.phase.is_value
         and row.identity.species.phase.value is Phase.L
         for row in observations
-    )
+    ), "phase roles must fill only rows whose source-phase field is absent"
     assert not [entry for entry in result.queue if entry.source.endswith(EXTRACT.name)]
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     _assert_henao_pressure_pins(result.experiments, observations)

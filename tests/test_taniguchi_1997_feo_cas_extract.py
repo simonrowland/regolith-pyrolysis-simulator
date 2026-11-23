@@ -179,6 +179,26 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
 
     observations = list(migrator.result.observations.values())
     assert len(observations) == 141
+    source_rows = [
+        observation
+        for body in _document()["species"].values()
+        for observation in body["observations"]
+    ]
+    assert Counter(row["phase"] for row in source_rows) == {
+        "slag": 107,
+        "metal": 34,
+    }
+    migrated_by_id = {
+        item.observation_id.rsplit("::", 1)[-1]: item for item in observations
+    }
+    for source_row in source_rows:
+        migrated_phase = migrated_by_id[source_row["observation_id"]].identity.species.phase
+        assert migrated_phase.is_unknown, (
+            f"{source_row['observation_id']}: explicit source phase must remain unknown"
+        )
+        assert migrated_phase.reason == (
+            f"phase string {source_row['phase']!r} is not in the closed automatic map"
+        )
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     assert all(observation.admission.status.value == "admitted" for observation in observations)

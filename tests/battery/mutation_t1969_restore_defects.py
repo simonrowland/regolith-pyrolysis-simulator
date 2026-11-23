@@ -22,26 +22,74 @@ HENAO_TEST = ROOT / "tests/test_henao_2001_ni_cr_mn_co_cu_slag_distribution_extr
 ABDEYAZDAN_TEST = (
     ROOT / "tests/test_abdeyazdan_2026_na_sn_si_phase_thermodynamics_extract.py"
 )
+LI_TEST = ROOT / "tests/test_li_2005_na_al_dephos_extract.py"
+TANIGUCHI_TEST = ROOT / "tests/test_taniguchi_1997_feo_cas_extract.py"
+PHASE_ROWS_TEST = ROOT / "tests/battery/test_phase_composition_rows.py"
 
-TEST_BY_MUTATION = {
-    "phase-label": ABDEYAZDAN_TEST,
-    "alloy-capability": HENAO_TEST,
-    "test-local": HENAO_TEST,
-    "locator-row": HENAO_TEST,
+TESTS_BY_MUTATION = {
+    "phase-label": (ABDEYAZDAN_TEST,),
+    "phase-unknown": (LI_TEST, TANIGUCHI_TEST),
+    "phase-role": (HENAO_TEST,),
+    "basis-before-conversion": (PHASE_ROWS_TEST,),
+    "alloy-capability": (HENAO_TEST,),
+    "test-local": (HENAO_TEST,),
+    "locator-row": (HENAO_TEST,),
 }
-EXPECTED_FAILURE = {
-    "phase-label": "explicit source phase must outrank phase role",
-    "alloy-capability": (
-        "all original metal-alloy rows must receive the adapter capability refusal"
+EXPECTED_FAILURES = {
+    "phase-label": (
+        (
+            "test_isolated_migration_preserves_phase_conditions_and_printed_values",
+            "explicit source phase must outrank phase role",
+        ),
     ),
-    "test-local": "UnboundLocalError",
-    "locator-row": "AttributeError: 'Locator' object has no attribute 'row'",
-}
-EXPECTED_NODE = {
-    "phase-label": "test_isolated_migration_preserves_phase_conditions_and_printed_values",
-    "alloy-capability": "test_henao_tables_migrate_as_typed_compositions_with_conditions",
-    "test-local": "test_henao_tables_migrate_as_typed_compositions_with_conditions",
-    "locator-row": "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+    "phase-unknown": (
+        (
+            "test_li_2005_tables_render_values_and_migrated_conditions",
+            "explicit source phase must remain unknown",
+        ),
+        (
+            "test_isolated_migration_retains_typed_rows_and_located_conditions",
+            "explicit source phase must remain unknown",
+        ),
+    ),
+    "phase-role": (
+        (
+            "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+            "phase roles must fill only rows whose source-phase field is absent",
+        ),
+    ),
+    "basis-before-conversion": (
+        (
+            "test_mass_percent_basis_precedes_unparseable_component_conversion",
+            "mass-percent basis refusal must precede composition conversion",
+        ),
+        (
+            "test_all_zero_mass_percent_phase_keeps_basis_refusal",
+            "all-zero mass-percent phase must retain its basis refusal",
+        ),
+        (
+            "test_metal_capability_precedes_unparseable_component_conversion",
+            "metal-alloy capability refusal must precede composition conversion",
+        ),
+    ),
+    "alloy-capability": (
+        (
+            "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+            "all original metal-alloy rows must receive the adapter capability refusal",
+        ),
+    ),
+    "test-local": (
+        (
+            "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+            "UnboundLocalError",
+        ),
+    ),
+    "locator-row": (
+        (
+            "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+            "AttributeError: 'Locator' object has no attribute 'row'",
+        ),
+    ),
 }
 
 
@@ -52,16 +100,60 @@ def replace_once(path: Path, old: str, new: str) -> None:
     path.write_text(text.replace(old, new, 1))
 
 
+def _phase_role_fallback_block() -> str:
+    return (
+        "            if (\n"
+        "                phase_role_token is not None\n"
+        "                and source_phase_state is _PhaseSourceState.ABSENT\n"
+        "            ):\n"
+        "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n"
+        "                unmapped_phase = None\n"
+    )
+
+
 def restore(mutation: str) -> None:
     if mutation == "phase-label":
         replace_once(
             MIGRATE,
+            _phase_role_fallback_block(),
+            "            if phase_role_token is not None:\n"
+            "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n"
+            "                unmapped_phase = None\n",
+        )
+    elif mutation == "phase-unknown":
+        replace_once(
+            MIGRATE,
+            _phase_role_fallback_block(),
             "            if phase_role_token is not None and phase.is_unknown:\n"
-            "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n",
+            "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n"
+            "                unmapped_phase = None\n",
+        )
+    elif mutation == "phase-role":
+        replace_once(
+            MIGRATE,
+            _phase_role_fallback_block(),
             "            if phase_raw is None or phase_raw == \"\":\n"
             "                assert phase_role_token is not None\n"
-            "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n",
+            "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n"
+            "                unmapped_phase = None\n",
         )
+    elif mutation == "basis-before-conversion":
+        conversion = (
+            "    wt = composition_wt_pct(composition_state.value)\n"
+            "    if not wt:\n"
+            "        return refused(\n"
+            "            RefusalReason.IDENTITY_INCOMPLETE,\n"
+            '            {"reason": "missing_input", "input": "composition"},\n'
+            "            execution=ExecutionState.NOT_PROBED,\n"
+            "        )\n"
+        )
+        replace_once(SCORE, conversion, "")
+        basis_check = (
+            "    if (\n"
+            "        role is PhaseRole.METAL\n"
+            "        and composition.amount_basis is AmountBasis.MASS_PERCENT\n"
+        )
+        replace_once(SCORE, basis_check, conversion + basis_check)
     elif mutation == "alloy-capability":
         replace_once(
             SCORE,
@@ -80,7 +172,7 @@ def restore(mutation: str) -> None:
             "        row\n"
             "        for row in result.experiments.values()\n"
             "        if row.experiment_id.startswith(\n"
-            "            \"10.2320/matertrans.42.1959::experiment::henao:\"\n"
+            '            "10.2320/matertrans.42.1959::experiment::henao:"\n'
             "        )\n"
             "    ]\n"
         )
@@ -102,26 +194,26 @@ def restore(mutation: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "mutation",
-        choices=("phase-label", "alloy-capability", "test-local", "locator-row"),
-    )
+    parser.add_argument("mutation", choices=tuple(TESTS_BY_MUTATION))
     args = parser.parse_args()
     if not os.environ.get("TMPDIR"):
         parser.error("TMPDIR must point to the dispatch scratch directory")
 
     touched = {
         "phase-label": (MIGRATE,),
+        "phase-unknown": (MIGRATE,),
+        "phase-role": (MIGRATE,),
+        "basis-before-conversion": (SCORE,),
         "alloy-capability": (SCORE,),
         "test-local": (HENAO_TEST,),
         "locator-row": (PROVENANCE,),
     }[args.mutation]
+    test_paths = TESTS_BY_MUTATION[args.mutation]
     with tempfile.TemporaryDirectory(prefix="t1969-mutation-") as scratch:
         backups = {path: Path(scratch, path.name) for path in touched}
         for path, backup in backups.items():
             backup.write_bytes(path.read_bytes())
 
-        test_path = TEST_BY_MUTATION[args.mutation]
         command = [
             sys.executable,
             "-m",
@@ -131,7 +223,7 @@ def main() -> int:
             "4",
             "-p",
             "no:cacheprovider",
-            str(test_path),
+            *(str(test_path) for test_path in test_paths),
         ]
 
         def run_test() -> subprocess.CompletedProcess[str]:
@@ -147,12 +239,15 @@ def main() -> int:
             baseline = run_test()
             if baseline.returncode != 0:
                 print(
-                    f"unmodified regression test failed for {args.mutation}:\n"
+                    f"unmodified regression tests failed for {args.mutation}:\n"
                     f"{baseline.stdout}{baseline.stderr}",
                     file=sys.stderr,
                 )
                 return 1
-            print(f"unmodified regression test passed: {test_path.name}")
+            print(
+                "unmodified regression tests passed: "
+                + ", ".join(test_path.name for test_path in test_paths)
+            )
 
             restore(args.mutation)
             result = run_test()
@@ -160,23 +255,25 @@ def main() -> int:
             if result.returncode == 0:
                 print(f"mutation survived: {args.mutation}", file=sys.stderr)
                 return 1
-            expected = EXPECTED_FAILURE[args.mutation]
             failures = [
                 line for line in output.splitlines() if line.startswith("FAILED ")
             ]
             errors = [
                 line for line in output.splitlines() if line.startswith("ERROR ")
             ]
+            expected_failures = EXPECTED_FAILURES[args.mutation]
+            matched_failures = all(
+                any(node in line and reason in line for line in failures)
+                for node, reason in expected_failures
+            )
             if (
-                len(failures) != 1
+                len(failures) != len(expected_failures)
                 or errors
-                or EXPECTED_NODE[args.mutation] not in failures[0]
-                or expected not in failures[0]
+                or not matched_failures
             ):
                 print(
                     f"mutation failed for an unexpected reason: {args.mutation}; "
-                    f"expected only {EXPECTED_NODE[args.mutation]} to fail with "
-                    f"{expected!r}\n{output}",
+                    f"expected failures {expected_failures!r}\n{output}",
                     file=sys.stderr,
                 )
                 return 1

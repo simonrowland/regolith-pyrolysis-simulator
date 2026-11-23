@@ -1665,6 +1665,106 @@ def test_phase_rows_refuse_mass_percent_identity_as_engine_moles() -> None:
     assert prediction.refusal_detail["identity_amount_basis"] == "mass_percent"
 
 
+def test_mass_percent_basis_precedes_unparseable_component_conversion() -> None:
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    invalid_mass_percent = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("foobar", Decimal("50")), ("SiO2", Decimal("50"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    observation = F.observation(
+        "unparseable-mass-percent-phase",
+        "sample-1",
+        invalid_mass_percent,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+
+    try:
+        prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    except Exception as exc:
+        raise AssertionError(
+            "mass-percent basis refusal must precede composition conversion"
+        ) from exc
+
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH, (
+        "mass-percent basis refusal must precede composition conversion"
+    )
+
+
+def test_all_zero_mass_percent_phase_keeps_basis_refusal() -> None:
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    all_zero_mass_percent = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("SiO2", Decimal("0")), ("MgO", Decimal("0"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    observation = F.observation(
+        "all-zero-mass-percent-phase",
+        "sample-1",
+        all_zero_mass_percent,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH, (
+        "all-zero mass-percent phase must retain its basis refusal"
+    )
+
+
+def test_metal_capability_precedes_unparseable_component_conversion() -> None:
+    identity = _phase_identity(
+        "Fe", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL
+    )
+    unparseable_mole_map = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("foobar", Decimal("0.5")), ("SiO2", Decimal("0.5"))),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            )
+        ),
+    )
+    observation = F.observation(
+        "unparseable-metal-mole-map",
+        "sample-1",
+        unparseable_mole_map,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+
+    try:
+        prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    except Exception as exc:
+        raise AssertionError(
+            "metal-alloy capability refusal must precede composition conversion"
+        ) from exc
+
+    assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION, (
+        "metal-alloy capability refusal must precede composition conversion"
+    )
+
+
 def test_printed_experiment_pressure_reaches_the_scorer(
     tmp_path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

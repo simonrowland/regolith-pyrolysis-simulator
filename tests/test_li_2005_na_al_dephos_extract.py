@@ -67,6 +67,26 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
         "valence_ratio": 25,
         "log10_phosphate_capacity": 25,
     }
+    explicitly_unknown = [
+        observation
+        for observation in source_observations
+        if isinstance(observation.get("phase"), dict)
+        and observation["phase"].get("tag") == "unknown"
+    ]
+    assert len(explicitly_unknown) == 245
+    assert Counter(
+        observation["values"]["phase_label"] for observation in explicitly_unknown
+    ) == {"slag": 195, "metal": 50}
+    migrated_by_id = {
+        item.observation_id.rsplit("::", 1)[-1]: item
+        for item in result.observations.values()
+    }
+    for source_observation in explicitly_unknown:
+        phase = migrated_by_id[source_observation["observation_id"]].identity.species.phase
+        assert phase.is_unknown, (
+            f"{source_observation['observation_id']}: explicit source phase must remain unknown"
+        )
+        assert phase.reason == source_observation["phase"]["reason"]
 
     feo15_series = extract["species"]["FeO1.5"]["observations"]
     assert len(feo15_series) == 2

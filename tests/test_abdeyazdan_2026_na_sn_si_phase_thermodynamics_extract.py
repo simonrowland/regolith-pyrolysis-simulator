@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -96,6 +97,19 @@ def test_isolated_migration_preserves_phase_conditions_and_printed_values(tmp_pa
     result = migrate(isolated_root(tmp_path, document), write=False)
     assert len(result.observations) == 452
     assert not result.validation.hard_issues
+    assert Counter(
+        row.identity.species.phase.value
+        for row in result.observations.values()
+        if row.identity.species.phase.is_value
+    ) == {Phase.CR: 125, Phase.GLASS: 327}, (
+        "explicit source phase must outrank phase role"
+    )
+    assert all(
+        row.identity.species.phase.is_value for row in result.observations.values()
+    ), (
+        "resolved source phases must remain ahead of phase-role fallbacks; "
+        "explicit source phase must outrank phase role"
+    )
 
     model_context = next(
         row

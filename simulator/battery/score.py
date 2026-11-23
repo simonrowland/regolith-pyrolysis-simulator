@@ -12432,13 +12432,6 @@ def _predict_phase_row(
     if metal_charge is not None:
         reason, detail = metal_charge
         return refused(reason, detail)
-    wt = composition_wt_pct(composition_state.value)
-    if not wt:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "composition"},
-            execution=ExecutionState.NOT_PROBED,
-        )
     if (
         role is PhaseRole.METAL
         and composition.amount_basis is AmountBasis.MASS_PERCENT
@@ -12467,6 +12460,13 @@ def _predict_phase_row(
         and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
     ):
         return mass_percent_basis_refusal()
+    wt = composition_wt_pct(composition_state.value)
+    if not wt:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+        )
     if rewrite is not None and quantity is not None:
         scored_formula = (
             identity.species.formula if identity.species is not None else ""

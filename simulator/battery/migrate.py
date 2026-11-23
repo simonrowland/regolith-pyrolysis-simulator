@@ -10599,7 +10599,18 @@ def unknown_pressure_environment(reason: str) -> PressureEnvironment:
     )
 
 
+class _PhaseSourceState(Enum):
+    RESOLVED = "resolved"
+    EXPLICITLY_UNKNOWN = "explicitly_unknown"
+    ABSENT = "absent"
+
+
 def map_phase(raw: object) -> tuple[State[Phase], str | None]:
+    if isinstance(raw, Mapping) and raw.get("tag") == "unknown":
+        reason = raw.get("reason")
+        if isinstance(reason, str) and reason.strip():
+            return State.unknown(reason), None
+        return State.unknown("source explicitly marks phase unknown"), None
     if raw is None or raw == "":
         return State.unknown("source does not state phase"), "missing phase"
     text = str(raw).strip()
@@ -10612,6 +10623,18 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
         State.unknown(f"phase string {text!r} is not in the closed automatic map"),
         text,
     )
+
+
+def _phase_source_state(
+    source_phase: object,
+    phase: State[Phase],
+    transition_reason: str | None,
+) -> _PhaseSourceState:
+    if phase.is_value:
+        return _PhaseSourceState.RESOLVED
+    if source_phase not in (None, "") or transition_reason is not None:
+        return _PhaseSourceState.EXPLICITLY_UNKNOWN
+    return _PhaseSourceState.ABSENT
 
 
 def _printed_phase_names_sample_source(raw: object) -> bool:
@@ -26873,11 +26896,8 @@ class Migrator:
         observation_provenance = _provenance_from_extract(
             obs, values, provenance, quantity=q_token
         )
-        phase_raw = (
-            compilation_phase_text(values)
-            or compilation_phase_text(obs)
-            or values.get("phase_label")
-        )
+        source_phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
+        phase_raw = source_phase_raw or values.get("phase_label")
         observation_provenance = _provenance_with_printed_phase(
             observation_provenance, phase_raw
         )
@@ -26992,7 +27012,13 @@ class Migrator:
                 return
             phase_role_token = _phase_role_token(values.get("phase_label"))
             counter_phase_role_token = _phase_role_token(values.get("counter_phase_label"))
-            if phase_role_token is not None and phase.is_unknown:
+            source_phase_state = _phase_source_state(
+                source_phase_raw, phase, transition_reason
+            )
+            if (
+                phase_role_token is not None
+                and source_phase_state is _PhaseSourceState.ABSENT
+            ):
                 phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])
                 unmapped_phase = None
         if (
