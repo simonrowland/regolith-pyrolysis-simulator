@@ -822,6 +822,9 @@ _ENGINE_CACHE_PATH_OVERRIDE: ContextVar[str | None | object] = ContextVar(
 # Set by the pytest fixture from the runner environment. None outside pytest,
 # so scoring scripts keep the process mode and are not treated as test doubles.
 _RUNNER_CACHE_SNAPSHOT: tuple[str | None, str] | None = None
+# Paths that are the wrong schema or not a sqlite file. The process does not
+# open them again. Migration stays a manual command.
+_SCHEMA_MISMATCH_DISABLED: set[str] = set()
 _MISSING = object()
 
 ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
@@ -1350,6 +1353,69 @@ def _value_is_double(value: Any, seen: set[int], depth: int) -> bool:
     if inspect.isfunction(value):
         return _function_closes_over_double(value, seen, depth)
     return _instance_is_double(value, seen)
+
+
+def _cache_open_is_schema_mismatch(exc: BaseException) -> bool:
+    """True when the file itself is stale, wrong-schema, or not sqlite.
+
+    ``OperationalError`` (locked, busy) is not this: that open can be
+    retried. An exact ``DatabaseError`` is "file is not a database" or a
+    malformed image. Schema mismatch is the typed wrong-schema refusal.
+    """
+
+    if isinstance(exc, EngineCacheSchemaMismatch):
+        return True
+    return type(exc) is sqlite3.DatabaseError
+
+
+def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
+    """Stop opening this path, and say so once.
+
+    A cache problem must not stop the run. The solve is uncached. The file
+    is not migrated from the read path. The notice names the path, the
+    expected and found schema, and ``scripts/engine_cache_sync.py migrate``.
+    """
+
+    identity = _cache_path_identity(path_value) or path_value
+    with _LOCK:
+        first = identity not in _SCHEMA_MISMATCH_DISABLED
+        _SCHEMA_MISMATCH_DISABLED.add(identity)
+    if not first:
+        return
+    if isinstance(exc, EngineCacheSchemaMismatch):
+        where = exc.table
+        expected = ",".join(exc.expected_columns)
+        found = ",".join(exc.found_columns)
+    else:
+        where = "file"
+        expected = str(_CACHE_SCHEMA_VERSION)
+        found = "not-a-sqlite-database"
+    logging.getLogger(__name__).warning(
+        "engine_cache_schema_mismatch path=%s where=%s expected=%s found=%s "
+        "fix=scripts/engine_cache_sync.py migrate %s",
+        identity,
+        where,
+        expected,
+        found,
+        identity,
+    )
+
+
+def _schema_mismatch_disabled(path_value: str) -> bool:
+    identity = _cache_path_identity(path_value)
+    if identity is None:
+        return False
+    with _LOCK:
+        return identity in _SCHEMA_MISMATCH_DISABLED
+
+
+def _count_schema_mismatch(engine_id: str) -> None:
+    with _LOCK:
+        counts = _counter_bucket(engine_id)
+        counts["misses"] += 1
+        counts["not_stored:schema_mismatch"] = (
+            counts.get("not_stored:schema_mismatch", 0) + 1
+        )
 
 
 def _solve_is_test_double(solve: Any) -> bool:
@@ -2095,6 +2161,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     path_value = _configured_engine_cache_path()
     if not path_value:
         return live_hot(solve())
+    # A wrong-schema or non-sqlite file stays closed for this process.
+    # The run solves uncached. Do not migrate it from this path.
+    if _schema_mismatch_disabled(path_value):
+        _count_schema_mismatch(engine_id)
+        return live_hot(solve())
     readonly = _engine_cache_is_readonly(path_value)
     if (
         engine_id in ENGINE_CHEMISTRY_VERSION
@@ -2136,7 +2207,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     path = _expanded_cache_path(path_value)
     try:
         connection = _connect(path, readonly=readonly)
-    except (sqlite3.Error, OSError):
+    except (sqlite3.Error, OSError, EngineCacheSchemaMismatch) as exc:
+        if _cache_open_is_schema_mismatch(exc):
+            # One notice per path. Later calls skip the open entirely.
+            _disable_schema_mismatch(path_value, exc)
+            _count_schema_mismatch(engine_id)
+            return live_hot(solve())
         with _LOCK:
             counts = _counter_bucket(engine_id)
             counts["read_error"] += 1
