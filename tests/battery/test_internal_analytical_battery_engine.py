@@ -912,11 +912,8 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
         pot_id='internal-analytical-liquid-phase-contract',
         kato_1993_table4_system=None,
         why='real freeze-gate phase basis through equilibrate_cell',
-        # d-297 admits a projected liquidus only when the dropped bulk is
-        # within 1 wt%. MnO and P2O5 stay the dropped set; 1+1 wt% was over
-        # that cap, so the freeze gate returned no liquid fraction.
         composition_wt_pct={
-            'SiO2': 48.5,
+            'SiO2': 47.0,
             'Al2O3': 14.0,
             'FeO': 10.0,
             'MgO': 9.0,
@@ -925,8 +922,8 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             'K2O': 1.0,
             'TiO2': 2.0,
             'Cr2O3': 1.0,
-            'MnO': 0.25,
-            'P2O5': 0.25,
+            'MnO': 1.0,
+            'P2O5': 1.0,
         },
     )
     cell = equilibrate_cell(
@@ -973,10 +970,7 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             1950.0,
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
-            # Positive SiO2 outside [30, 80] wt% is a calibration notice
-            # (domain gate stays valid). The scored refusal is the engine
-            # mode-vector deficit, which the studio gate printed.
-            "magemin_mode_vector_mass_deficit",
+            "silicate_window",
             id="stolyarova-magemin-silicate-window-refusal",
         ),
         pytest.param(

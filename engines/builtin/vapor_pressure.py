@@ -437,10 +437,17 @@ def _record_reporting_threshold_omission(
         or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
     ):
         return
+    # Keep a binding saturation object so the publisher can read its
+    # notice. The publisher then stores the plain float.
+    from simulator.chemistry.ellingham_graph import retain_elemental_saturation
+
+    computed_pressure_Pa = retain_elemental_saturation(
+        pressure_Pa, float(pressure_Pa)
+    )
     omissions[str(species)] = {
         "species": str(species),
         "reporting_threshold_Pa": VAPOR_PRESSURE_REPORTING_THRESHOLD_PA,
-        "computed_pressure_Pa": float(pressure_Pa),
+        "computed_pressure_Pa": computed_pressure_Pa,
         "field": field,
         "pressure_rail": pressure_rail,
     }
@@ -2939,7 +2946,11 @@ def _require_finite_vapor_value(
             f"vapor_pressure_nonfinite: species={species} field={field} "
             f"value={value!r}"
         )
-    return checked
+    # A binding saturation cap carries the owner notice. float() would
+    # drop that notice before the publisher records it.
+    from simulator.chemistry.ellingham_graph import retain_elemental_saturation
+
+    return retain_elemental_saturation(value, checked)
 
 
 def _ellingham_authority_limit(
@@ -4636,6 +4647,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_eq_Pa",
                     pressure_rail="oxide_vapor",
                 )
+
+        # Copy a binding saturation notice onto the diagnostic before the
+        # provenance snapshot. A non-binding cap leaves the reaction notice.
+        from simulator.chemistry.ellingham_graph import (
+            record_binding_saturation_extrapolations,
+        )
+
+        record_binding_saturation_extrapolations(
+            vapor_pressures,
+            metal_extrapolations,
+            warnings,
+            vapor_pressure_sources,
+            omissions=below_reporting_threshold_omissions,
+            provenance=vapor_pressure_provenance,
+        )
 
         # The carrier adapter copies this field into its public extra. Keep its
         # notice aligned with the temperature-extrapolation diagnostic.

@@ -552,19 +552,24 @@ def equilibrium_to_hot(
     }
     status = values.get('status')
     # A commissioning notice is attached before the engine writes status.
-    # Missing status is the already-built hot projection. A present status
-    # outside {ok, non_authoritative} is still a refusal or uncacheable.
-    if (
-        engine_id == 'vaporock'
-        and status is not None
-        and status not in {'ok', 'non_authoritative'}
+    # Missing status with no refusal reason is that hot projection.
+    # Production EquilibriumResult always sets status. A present status
+    # outside {ok, non_authoritative}, or a missing status that already
+    # names a refusal, stays uncacheable.
+    named_refusal = None
+    if isinstance(diagnostics, Mapping):
+        named_refusal = (
+            diagnostics.get('backend_status_reason')
+            or diagnostics.get('backend_failure_reason_code')
+        )
+    if engine_id == 'vaporock' and (
+        (
+            status is not None
+            and status not in {'ok', 'non_authoritative'}
+        )
+        or (status is None and named_refusal is not None)
     ):
-        refusal_reason = None
-        if isinstance(diagnostics, Mapping):
-            refusal_reason = (
-                diagnostics.get('backend_status_reason')
-                or diagnostics.get('backend_failure_reason_code')
-            )
+        refusal_reason = named_refusal
         if refusal_reason is None:
             refusal_reason = {
                 'out_of_domain': OutOfDomainReason.OUT_OF_DOMAIN.value,

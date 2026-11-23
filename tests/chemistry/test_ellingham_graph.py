@@ -188,6 +188,104 @@ def test_every_catalog_metal_saturation_pressure_resolves(
             ).pressure_pa
 
 
+def test_sodium_saturation_cap_keeps_the_owner_extrapolation_notice(
+    vapor_pressure_data,
+):
+    """A binding cap below the certified band keeps the owner notice.
+
+    The pressure stays a float. The notice is the Browning-Potter record,
+    not a second evaluation of its formula. A reaction pressure under the
+    cap does not replace the reaction-band flag.
+    """
+
+    from engines.builtin.sodium_saturation import (
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+    from simulator.chemistry.ellingham_graph import (
+        ElementalSaturationPressure,
+        record_binding_saturation_extrapolations,
+    )
+
+    temperature_K = 400.0
+    block = sodium_saturation_block(vapor_pressure_data["metals"]["Na"])
+    assert block is not None
+    owner = sodium_saturation_pressure(block, temperature_K)
+    pressure = ellingham_graph.metal_saturation_pressure_Pa(
+        "Na",
+        temperature_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    assert isinstance(pressure, ElementalSaturationPressure)
+    assert pressure.authority == owner.authority == "extrapolated"
+    assert pressure.notice == owner.notice
+    assert pressure.certified_range_K == owner.certified_range_K
+    assert float(pressure) == owner.pressure_pa
+    assert temperature_K < pressure.certified_range_K[0]
+    capped = ellingham_graph._cap_elemental_metal_pressure_at_saturation_Pa(
+        "Na",
+        temperature_K,
+        1.0e6,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    assert isinstance(capped, ElementalSaturationPressure)
+    assert capped.notice == owner.notice
+    unbound = ellingham_graph._cap_elemental_metal_pressure_at_saturation_Pa(
+        "Na",
+        temperature_K,
+        owner.pressure_pa * 0.5,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    assert type(unbound) is float
+    extrapolations = {
+        "Na": {
+            "valid_range_K": ("reaction-band",),
+            "reason": "metal_vapor_pressure_out_of_validated_range",
+            "computed_pressure_Pa": 1.25,
+        }
+    }
+    warnings: list[str] = []
+    sources = {"Na": "builtin_authoritative:liquid_oxide_standard_reaction"}
+    published = {"Na": capped}
+    provenance = {"Na": {"P_eq_Pa": capped}}
+    record_binding_saturation_extrapolations(
+        published,
+        extrapolations,
+        warnings,
+        sources,
+        provenance=provenance,
+    )
+    assert extrapolations["Na"]["valid_range_K"] == owner.certified_range_K
+    assert extrapolations["Na"]["rail"] == "elemental_saturation"
+    assert extrapolations["Na"]["owner_notice"] == owner.notice
+    assert extrapolations["Na"]["computed_pressure_Pa"] == 1.25
+    assert warnings
+    assert sources["Na"].endswith("extrapolated_beyond_valid_range_K")
+    assert type(published["Na"]) is float
+    assert published["Na"] == owner.pressure_pa
+    assert type(provenance["Na"]["P_eq_Pa"]) is float
+    reaction_notice = {"Na": {"marker": "reaction-band"}}
+    record_binding_saturation_extrapolations(
+        {"Na": unbound},
+        reaction_notice,
+        [],
+        {},
+    )
+    assert reaction_notice == {"Na": {"marker": "reaction-band"}}
+    omitted = {"Na": {"computed_pressure_Pa": capped}}
+    omitted_notice: dict[str, dict[str, object]] = {}
+    record_binding_saturation_extrapolations(
+        {},
+        omitted_notice,
+        None,
+        None,
+        omissions=omitted,
+    )
+    assert omitted_notice["Na"]["valid_range_K"] == owner.certified_range_K
+    assert omitted_notice["Na"]["computed_pressure_Pa"] == owner.pressure_pa
+    assert type(omitted["Na"]["computed_pressure_Pa"]) is float
+
+
 @pytest.mark.parametrize("species", ("Mg", "Na", "K"))
 def test_elemental_metal_pressure_is_capped_at_pure_saturation(
     vapor_pressure_data,

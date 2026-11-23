@@ -284,6 +284,51 @@ def _antoine_reference_pressure_Pa(
     return 10.0 ** log_P
 
 
+class ElementalSaturationPressure(float):
+    """A saturation pressure that still carries the owner's authority.
+
+    Callers that only need pascals keep a float. The Browning-Potter
+    notice stays on the value so a binding cap cannot publish an
+    extrapolated number and drop the certified-band flag.
+    """
+
+    authority: str
+    notice: str | None
+    certified_range_K: tuple[float, float]
+    temperature_K: float
+
+    def __new__(
+        cls,
+        pressure_pa: float,
+        *,
+        authority: str,
+        notice: str | None,
+        certified_range_K: tuple[float, float],
+        temperature_K: float,
+    ) -> ElementalSaturationPressure:
+        value = float.__new__(cls, pressure_pa)
+        value.authority = authority
+        value.notice = notice
+        value.certified_range_K = (
+            float(certified_range_K[0]),
+            float(certified_range_K[1]),
+        )
+        value.temperature_K = float(temperature_K)
+        return value
+
+
+def retain_elemental_saturation(value: object, plain: float) -> float:
+    """Keep a binding cap so its owner notice can be recorded.
+
+    ``plain`` is the finite float the caller already checked. Any other
+    number is that plain float.
+    """
+
+    if isinstance(value, ElementalSaturationPressure):
+        return value
+    return plain
+
+
 def metal_saturation_pressure_Pa(
     species: str,
     temperature_K: float,
@@ -331,9 +376,9 @@ def metal_saturation_pressure_Pa(
     saturation_block = sodium_saturation_block(sp_data)
     if saturation_block is not None:
         try:
-            return sodium_saturation_pressure(
+            saturation = sodium_saturation_pressure(
                 saturation_block, float(temperature_K)
-            ).pressure_pa
+            )
         except SodiumSaturationError as exc:
             raise EllinghamPressureRefusal(
                 f"elemental saturation pressure unavailable for {species!r} "
@@ -341,6 +386,13 @@ def metal_saturation_pressure_Pa(
                 f"(missing/corrupt saturation record is not proof of "
                 f"nonvolatility)"
             ) from exc
+        return ElementalSaturationPressure(
+            saturation.pressure_pa,
+            authority=saturation.authority,
+            notice=saturation.notice,
+            certified_range_K=saturation.certified_range_K,
+            temperature_K=float(temperature_K),
+        )
     antoine, _src = wall_condensation_antoine_coefficients(
         sp_data,
         temperature_K=float(temperature_K),
@@ -367,14 +419,96 @@ def _cap_elemental_metal_pressure_at_saturation_Pa(
     data = _resolve_vapor_pressure_data(vapor_pressure_data)
     if species not in (data.get("metals", {}) or {}):
         return float(pressure_Pa)
-    return min(
-        float(pressure_Pa),
-        metal_saturation_pressure_Pa(
-            species,
-            temperature_K,
-            vapor_pressure_data=data,
-        ),
+    saturation = metal_saturation_pressure_Pa(
+        species,
+        temperature_K,
+        vapor_pressure_data=data,
     )
+    # A binding cap is the published number, so the owner's notice has to
+    # stay on that number. A lower reaction pressure is not the saturation
+    # result and must not carry its flag.
+    if float(pressure_Pa) > float(saturation):
+        return saturation
+    return float(pressure_Pa)
+
+
+def _coerce_published_saturation_pressures(mapping: object) -> None:
+    """Store plain floats once the owner notice has been copied off."""
+
+    if not isinstance(mapping, dict):
+        return
+    for key, item in list(mapping.items()):
+        if isinstance(item, ElementalSaturationPressure):
+            mapping[key] = float(item)
+            continue
+        if not isinstance(item, dict):
+            continue
+        for field in ("computed_pressure_Pa", "P_eq_Pa"):
+            inner = item.get(field)
+            if isinstance(inner, ElementalSaturationPressure):
+                item[field] = float(inner)
+
+
+def record_binding_saturation_extrapolations(
+    pressures: Mapping[str, object],
+    extrapolations: dict[str, Any],
+    warnings: list[str] | None = None,
+    sources: dict[str, str] | None = None,
+    omissions: Mapping[str, object] | None = None,
+    provenance: Mapping[str, object] | None = None,
+) -> None:
+    """Record the owner notice when the published pressure is the cap.
+
+    The reaction-band notice is left in place when the cap did not bind.
+    Replacing it is only for the value that was actually published.
+    An omission keeps the capped number that was not published.
+    After the notice is copied, published maps hold a plain float.
+    """
+
+    from engines.builtin.vapor_pressure import (
+        _vapor_pressure_temperature_extrapolation_notice,
+    )
+
+    carried = dict(pressures)
+    for species, row in (omissions or {}).items():
+        if species in carried or not isinstance(row, Mapping):
+            continue
+        carried[str(species)] = row.get("computed_pressure_Pa")
+    token = "extrapolated_beyond_valid_range_K"
+    for species, pressure in carried.items():
+        if not isinstance(pressure, ElementalSaturationPressure):
+            continue
+        if pressure.authority != "extrapolated" or not pressure.notice:
+            continue
+        notice = _vapor_pressure_temperature_extrapolation_notice(
+            temperature_K=pressure.temperature_K,
+            valid_range_K=pressure.certified_range_K,
+            reason="metal_vapor_pressure_out_of_validated_range",
+        )
+        notice["rail"] = "elemental_saturation"
+        notice["owner_notice"] = pressure.notice
+        previous = extrapolations.get(species)
+        if isinstance(previous, Mapping) and "computed_pressure_Pa" in previous:
+            notice["computed_pressure_Pa"] = float(
+                previous["computed_pressure_Pa"]
+            )
+        else:
+            notice["computed_pressure_Pa"] = float(pressure)
+        extrapolations[str(species)] = notice
+        if warnings is not None:
+            text = (
+                f"{species} elemental saturation extrapolated: "
+                f"{pressure.notice}"
+            )
+            if text not in warnings:
+                warnings.append(text)
+        if sources is None:
+            continue
+        source = str(sources.get(species) or "")
+        if source and token not in source.split(":"):
+            sources[str(species)] = f"{source}:{token}"
+    for mapping in (pressures, extrapolations, omissions, provenance):
+        _coerce_published_saturation_pressures(mapping)
 
 
 def effective_equilibrium_pressure_Pa(

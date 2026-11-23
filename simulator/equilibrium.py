@@ -1554,6 +1554,16 @@ class EquilibriumMixin:
 
             else:
                 _sz_below_threshold(name, P_sat, 'P_sat')
+        from simulator.chemistry.ellingham_graph import (
+            record_binding_saturation_extrapolations,
+        )
+
+        record_binding_saturation_extrapolations(
+            vapor_pressures,
+            metal_extrapolations,
+            warnings,
+            vapor_pressure_sources,
+        )
         _eq_diagnostics = {
             'activities_provider': 'internal_analytical_equilibrium',
             'activities_standard_state': {
@@ -1564,7 +1574,10 @@ class EquilibriumMixin:
                 'component_basis': 'raoultian_pure_endmember',
             },
             'activity_provenance': activity_provenance,
-            'extrapolated_beyond_valid_range_K': {**metal_extrapolations, **oxide_vapor_extrapolations},
+            'extrapolated_beyond_valid_range_K': {
+                **metal_extrapolations,
+                **oxide_vapor_extrapolations,
+            },
             'a_FeO_calphad': feo_activity_diagnostic,
             'ellingham_authority': ellingham_authority_diagnostic(
                 ellingham_extrapolations,
