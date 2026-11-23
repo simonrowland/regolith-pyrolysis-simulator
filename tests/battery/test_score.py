@@ -20493,7 +20493,17 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.OPENIMCC,)
     )
-    assert strata[0]["stratum"] == "cell-material-inferred"
+    # The census sorts strata by name (_flagged_census_sort_key), so position 0 is not
+    # "cell material first". The migrated Stolyarova row prints no total pressure, so
+    # the pressure resolver also attaches its registry pressure notice. Its stratum name
+    # depends on the pressure policy that resolves the row, so pin membership, not order:
+    # the cell-material stratum must be present, and so must a pressure-policy stratum.
+    names = [item["stratum"] for item in strata]
+    assert "cell-material-inferred" in names
+    assert any(
+        name in {"assumed_pressure", "method_implied", "effusion_regime_assumed"}
+        for name in names
+    ), names
 
 
 
