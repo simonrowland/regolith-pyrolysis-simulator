@@ -68,6 +68,7 @@ def _pdf_page_with_proof(pdf: Path, proof: str) -> int:
     )
     page_count_match = re.search(r"^Pages:\s*(\d+)$", info.stdout, re.MULTILINE)
     assert page_count_match is not None
+    normalized_proof = re.sub(r"\s+", " ", proof).strip()
     for page_number in range(1, int(page_count_match.group(1)) + 1):
         page_text = subprocess.run(
             [
@@ -76,7 +77,6 @@ def _pdf_page_with_proof(pdf: Path, proof: str) -> int:
                 str(page_number),
                 "-l",
                 str(page_number),
-                "-layout",
                 str(pdf),
                 "-",
             ],
@@ -84,7 +84,11 @@ def _pdf_page_with_proof(pdf: Path, proof: str) -> int:
             capture_output=True,
             text=True,
         ).stdout
-        if proof in re.sub(r"\s+", " ", page_text):
+        page_text = re.sub(r"(?m)^[ \t]*\d{1,3}[ \t]*\r?$", "", page_text)
+        page_text = re.sub(r"(?m)^[ \t]*\d{1,3}[ \t]+", "", page_text)
+        page_text = re.sub(r"(?<=\w)-[ \t]*\r?\n[ \t]*(?=\w)", "", page_text)
+        normalized_page_text = re.sub(r"\s+", " ", page_text).strip()
+        if normalized_proof in normalized_page_text:
             return page_number
     raise AssertionError(f"PDF proof was not found: {proof}")
 
