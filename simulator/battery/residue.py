@@ -439,6 +439,7 @@ class ResidueChannel:
     parent_oxide: str | None
     alpha: float
     alpha_source: str
+    parent_oxide_stoich: Mapping[str, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -505,6 +506,7 @@ class _HashimotoRunSetup:
     steps: int
     geometry_areas: dict[str, float]
     gas_channels: tuple[Any, ...]
+    gas_channel_omissions: tuple[dict[str, Any], ...]
     liquid_rows: tuple[dict[str, Any], ...]
     common_channels: tuple[ResidueChannel, ...]
     common_alpha_records: tuple[dict[str, Any], ...]
@@ -545,16 +547,30 @@ class _ChannelTerms:
     source: ResidueChannel
     molar_mass_kg_mol: float
     atom_counts: Mapping[str, float]
-    parent_moles_per_product: float
+    parent_moles_per_product: Mapping[str, float]
     parent_oxygen_demand: float
     oxide_per_product_kg: float
     o2_per_product_kg: float
 
+    @property
+    def neutral_pO2_exponent(self) -> float:
+        # Premise: each parent oxide supplies its oxygen congruently to the
+        # product's non-oxygen atoms. Algebra: pO2 power is
+        # (O_product - O_parent_demand)/2. Both terms are O atoms per product
+        # mole, so the exponent is dimensionless. AlSiO: (1 - 3.5)/2=-1.25;
+        # Si2O2 from SiO2: (2 - 4)/2=-1.0.
+        return (
+            self.atom_counts.get("O", 0.0) - self.parent_oxygen_demand
+        ) / 2.0
+
     def is_active(self, inventory: Mapping[str, float]) -> bool:
         """Parentless oxygen stays active, including the gas pack's '' token."""
         return (
-            self.parent_moles_per_product == 0.0
-            or inventory.get(self.source.parent_oxide or "", 0.0) > 0.0
+            not self.parent_moles_per_product
+            or all(
+                inventory.get(parent, 0.0) > 0.0
+                for parent in self.parent_moles_per_product
+            )
         )
 
 
@@ -603,12 +619,42 @@ def _channel_terms(
                 "residue_alpha_source_missing", f"alpha source missing for {channel.species!r}"
             )
         atom_counts, molar_mass = _formula_terms(channel.formula)
-        parent_moles_per_product = 0.0
+        parent_moles_per_product: dict[str, float] = {}
         parent_oxygen_demand = 0.0
         oxide_per_product_kg = 0.0
         o2_per_product_kg = 0.0
-        if channel.parent_oxide:
-            parent_atoms, parent_molar_mass = _formula_terms(channel.parent_oxide)
+        if channel.parent_oxide_stoich is not None:
+            raw_parent_stoich = channel.parent_oxide_stoich
+            if not isinstance(raw_parent_stoich, Mapping) or not raw_parent_stoich:
+                raise ResidueInventoryRefusal(
+                    "residue_stoichiometry_invalid",
+                    f"{channel.species!r} has empty or invalid parent stoichiometry",
+                )
+            for parent, raw_coefficient in raw_parent_stoich.items():
+                try:
+                    coefficient = float(raw_coefficient)
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise ResidueInventoryRefusal(
+                        "residue_stoichiometry_invalid",
+                        f"{channel.species!r} has invalid coefficient for {parent!r}",
+                    ) from exc
+                if not isinstance(parent, str) or not parent or not math.isfinite(coefficient) or coefficient <= 0.0:
+                    raise ResidueInventoryRefusal(
+                        "residue_stoichiometry_invalid",
+                        f"{channel.species!r} has invalid parent coefficient {parent!r}: {raw_coefficient!r}",
+                    )
+                parent_moles_per_product[parent] = coefficient
+            if (
+                channel.parent_oxide is not None
+                and channel.parent_oxide not in parent_moles_per_product
+            ):
+                raise ResidueInventoryRefusal(
+                    "residue_stoichiometry_invalid",
+                    f"{channel.species!r} primary parent {channel.parent_oxide!r} "
+                    "is absent from its parent stoichiometry",
+                )
+        elif channel.parent_oxide:
+            parent_atoms, _parent_molar_mass = _formula_terms(channel.parent_oxide)
             gas_metals = {
                 element: count
                 for element, count in atom_counts.items()
@@ -625,17 +671,47 @@ def _channel_terms(
                     f"{channel.species!r} and parent {channel.parent_oxide!r} do not share the same non-oxygen elements",
                 )
             ratios = [gas_metals[element] / parent_metals[element] for element in gas_metals]
-            parent_moles_per_product = ratios[0]
+            parent_moles_per_product[channel.parent_oxide] = ratios[0]
             if any(
-                not math.isclose(ratio, parent_moles_per_product, rel_tol=1.0e-12, abs_tol=1.0e-14)
+                not math.isclose(ratio, ratios[0], rel_tol=1.0e-12, abs_tol=1.0e-14)
                 for ratio in ratios[1:]
             ):
                 raise ResidueInventoryRefusal(
                     "residue_stoichiometry_invalid",
                     f"{channel.species!r} does not preserve parent non-oxygen atom ratios",
                 )
-            parent_oxygen_demand = parent_moles_per_product * parent_atoms.get("O", 0.0)
-            oxide_per_product_kg = parent_moles_per_product * parent_molar_mass / molar_mass
+        if parent_moles_per_product:
+            parent_formula_terms = {
+                parent: _formula_terms(parent)
+                for parent in parent_moles_per_product
+            }
+            reactant_nonoxygen_atoms: defaultdict[str, float] = defaultdict(float)
+            for parent, coefficient in parent_moles_per_product.items():
+                parent_atoms, parent_molar_mass = parent_formula_terms[parent]
+                for element, count in parent_atoms.items():
+                    if element != "O":
+                        reactant_nonoxygen_atoms[element] += coefficient * count
+                parent_oxygen_demand += coefficient * parent_atoms.get("O", 0.0)
+                oxide_per_product_kg += coefficient * parent_molar_mass / molar_mass
+            gas_nonoxygen_atoms = {
+                element: count for element, count in atom_counts.items() if element != "O"
+            }
+            if set(reactant_nonoxygen_atoms) != set(gas_nonoxygen_atoms) or any(
+                not math.isclose(
+                    reactant_nonoxygen_atoms[element], gas_nonoxygen_atoms[element],
+                    rel_tol=1.0e-12, abs_tol=1.0e-14,
+                )
+                for element in gas_nonoxygen_atoms
+            ):
+                raise ResidueInventoryRefusal(
+                    "residue_stoichiometry_invalid",
+                    f"{channel.species!r} parent stoichiometry does not conserve non-oxygen atoms",
+                )
+            # Premise: oxide-parent coefficients supply product cations; the
+            # remaining oxygen is released as O2. Algebra: νO2=(Σνj Oj−Og)/2;
+            # unit check: O atoms/product divided by O atoms/O2 gives O2/product.
+            # Known checks: AlSiO demand=0.5*3+1*2=3.5 O atoms/product, ν=-1.25;
+            # Si2O2 demand=2*2=4, ν=-1.0.
             oxygen_difference = parent_oxygen_demand - atom_counts.get("O", 0.0)
             _oxygen_atoms, oxygen_molar_mass = _formula_terms("O2")
             o2_per_product_kg = (
@@ -661,7 +737,7 @@ def _channel_terms(
                 source=channel,
                 molar_mass_kg_mol=molar_mass,
                 atom_counts=atom_counts,
-                parent_moles_per_product=parent_moles_per_product,
+                parent_moles_per_product=dict(parent_moles_per_product),
                 parent_oxygen_demand=parent_oxygen_demand,
                 oxide_per_product_kg=oxide_per_product_kg,
                 o2_per_product_kg=o2_per_product_kg,
@@ -674,6 +750,82 @@ def _channel_terms(
             "residue_oxygen_channels_missing", "vacuum closure requires an O or O2 channel"
         )
     return tuple(terms)
+
+
+def _openimcc_residue_channel(
+    species: str,
+    parent: str | None,
+    alpha: float,
+    alpha_source: str,
+) -> ResidueChannel:
+    """Translate a pinned OpenIMCC channel to residue-owned reactant stoich."""
+    parent_oxide_stoich = None
+    if species == "AlSiO":
+        if parent != "Al2O3":
+            raise ResidueInventoryRefusal(
+                "residue_stoichiometry_invalid",
+                f"AlSiO expected OpenIMCC primary parent Al2O3, got {parent!r}",
+            )
+        # Premise: OpenIMCC 9c327c2 declares 1/2 Al2O3 + SiO2 -> AlSiO + 5/4 O2.
+        # Algebra: the reactant coefficients are 0.5 and 1 per AlSiO product.
+        # Unit check: each coefficient is mol oxide / mol product. The product
+        # carries Al=1 and Si=1, matching 0.5*Al2 + 1*Si; oxygen is checked below.
+        parent_oxide_stoich = {"Al2O3": 0.5, "SiO2": 1.0}
+    return ResidueChannel(
+        species,
+        species,
+        parent,
+        alpha,
+        alpha_source,
+        parent_oxide_stoich=parent_oxide_stoich,
+    )
+
+
+def _openimcc_residue_channel_set(
+    raw_channels: Sequence[tuple[str, Sequence[Any]]],
+    initial_notices: Sequence[dict[str, Any]],
+    *,
+    engine: str,
+    alpha: float,
+    alpha_source: str,
+) -> tuple[list[tuple[str, Sequence[Any]]], tuple[ResidueChannel, ...], tuple[dict[str, Any], ...]]:
+    """Keep consumable OpenIMCC channels and type notices for individual omissions."""
+    from simulator.battery.enums import NoticeKind
+
+    accepted_reactions: list[tuple[str, Sequence[Any]]] = []
+    channels: list[ResidueChannel] = []
+    omissions = [dict(notice) for notice in initial_notices]
+    for species, reaction in raw_channels:
+        if engine == "internal-analytical" and species in {"AlSiO", "Si2O2"}:
+            # The internal analytical pressure path reads vapor_pressures.yaml,
+            # which has no rows for these two OpenIMCC-only channels.
+            omissions.append(
+                {
+                    "kind": NoticeKind.INPUT_OMITTED.value,
+                    "channel": str(species),
+                    "reason": "internal_analytical_vapor_pressure_catalog_missing",
+                }
+            )
+            continue
+        parent = str(reaction[0]) if reaction[0] else None
+        try:
+            channel = _openimcc_residue_channel(
+                str(species), parent, alpha, alpha_source
+            )
+            _channel_terms((channel,), require_oxygen_channels=False)
+        except ResidueInventoryRefusal as exc:
+            omissions.append(
+                {
+                    "kind": NoticeKind.INPUT_OMITTED.value,
+                    "channel": str(species),
+                    "reason": f"openimcc_residue_channel_omitted:{exc.reason}",
+                    "detail": exc.detail,
+                }
+            )
+            continue
+        accepted_reactions.append((str(species), reaction))
+        channels.append(channel)
+    return accepted_reactions, tuple(channels), tuple(omissions)
 
 
 def _atom_totals(
@@ -696,7 +848,7 @@ def _residue_oxygen_channels(
             molar_mass_kg_per_mol=term.molar_mass_kg_mol,
             oxygen_atoms=term.atom_counts.get("O", 0.0),
             parent_oxygen_demand=term.parent_oxygen_demand,
-            pO2_exponent=(term.atom_counts.get("O", 0.0) - term.parent_oxygen_demand) / 2.0,
+            pO2_exponent=term.neutral_pO2_exponent,
             alpha=float(term.source.alpha),
             alpha_source=term.source.alpha_source,
             active=term.is_active(inventory),
@@ -738,7 +890,7 @@ def _finite_step_fluxes(
     include_below_threshold: bool = False,
 ) -> dict[str, float]:
     """Run the authoritative HKL provider at the solved channel pressures."""
-    parent_channels = [term for term in terms if term.parent_moles_per_product > 0.0]
+    parent_channels = [term for term in terms if term.parent_moles_per_product]
     if not parent_channels:
         return {}
     provider = BuiltinEvaporationFluxProvider()
@@ -772,8 +924,23 @@ def _finite_step_fluxes(
                 for term in parent_channels
             },
             "available_oxide_kg": {
-                term.source.species: float(inventory_mol.get(term.source.parent_oxide or "", 0.0))
-                * _formula_terms(term.source.parent_oxide or "")[1]
+                # The provider only uses this for positive-availability checks.
+                # Keep the original single-parent arithmetic; mixed channels
+                # use the tightest reactant's product-equivalent capacity.
+                term.source.species: (
+                    float(inventory_mol.get(term.source.parent_oxide, 0.0))
+                    * _formula_terms(term.source.parent_oxide)[1]
+                    if len(term.parent_moles_per_product) == 1
+                    and term.source.parent_oxide is not None
+                    else min(
+                        float(inventory_mol.get(parent, 0.0)) / coefficient
+                        for parent, coefficient in term.parent_moles_per_product.items()
+                    )
+                    * math.fsum(
+                        coefficient * _formula_terms(parent)[1]
+                        for parent, coefficient in term.parent_moles_per_product.items()
+                    )
+                )
                 for term in parent_channels
             },
             "melt_surface_area_m2": area_m2,
@@ -853,8 +1020,8 @@ def integrate_residue_inventory(
 ) -> ResidueInventoryResult:
     """Integrate free evaporation with an engine-specific pressure callback.
 
-    Premise: a vacuum melt loses gas while each vapor channel debits the oxide
-    parent that supplies its non-oxygen atoms. At the start of every finite
+    Premise: a vacuum melt loses gas while each vapor channel debits its
+    declared oxide reactants, which supply the product's non-oxygen atoms. At the start of every finite
     sub-step the callback evaluates that engine's pressure laws at trial
     ``log10(pO2 / bar)`` and the shared R1a balance selects the congruent root.
     The builtin HKL provider then evaluates
@@ -866,9 +1033,10 @@ def integrate_residue_inventory(
 
     For a parent with inventory ``N`` mol and requested parent draw ``r`` mol
     s^-1, analytic depletion debits ``N * (1 - exp(-r*dt/N))`` mol during the
-    step. Concurrent channels sharing a parent divide that debit in proportion
-    to their HKL parent draw. Inventory and atom closure stay mol-native; gas
-    mass is never subtracted as oxide mass. After those finite parent debits,
+    step. Channels sharing a parent divide that allowance by their requested
+    parent draw; a mixed-parent product is scaled by its tightest reactant so
+    its reaction ratio is preserved. Inventory and atom closure stay mol-native;
+    gas mass is never subtracted as oxide mass. After those finite parent debits,
     the oxygen atom remainder is computed from the actual gas products and
     divided between O and O2 in the solved pressure-root flux ratio. This is
     the finite-step correction: ``nO_coproduct = Σ(nO_parent * parent_debit) -
@@ -923,9 +1091,9 @@ def integrate_residue_inventory(
         active_parent_terms = [
             term
             for term in terms
-            if term.parent_moles_per_product > 0.0
+            if term.parent_moles_per_product
             and term.source.alpha > 0.0
-            and inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
+            and term.is_active(inventory)
         ]
         if not active_parent_terms:
             pO2_steps.append(None)
@@ -1005,42 +1173,91 @@ def integrate_residue_inventory(
             species: rate_kg_s / term_by_species[species].molar_mass_kg_mol
             for species, rate_kg_s in requested_rates_kg_s.items()
         }
-        channels_by_parent: defaultdict[str, list[tuple[_ChannelTerms, float]]] = defaultdict(list)
+        requested_parent_rates: defaultdict[str, float] = defaultdict(float)
+        has_mixed_parent_product = False
         for species, product_rate in requested_product_mol_s.items():
             term = term_by_species[species]
-            parent = term.source.parent_oxide
-            if parent is None or product_rate <= 0.0:
+            if not term.parent_moles_per_product or product_rate <= 0.0:
                 continue
-            channels_by_parent[parent].append((term, product_rate))
+            has_mixed_parent_product |= len(term.parent_moles_per_product) > 1
+            for parent, coefficient in term.parent_moles_per_product.items():
+                requested_parent_rates[parent] += product_rate * coefficient
 
         actual_parent_debits: dict[str, float] = {}
         actual_products: dict[str, float] = {}
-        for parent, parent_channels in channels_by_parent.items():
-            available_parent = float(inventory.get(parent, 0.0))
-            requested_parent_rate = math.fsum(
-                product_rate * term.parent_moles_per_product
-                for term, product_rate in parent_channels
-            )
-            if available_parent <= 0.0 or requested_parent_rate <= 0.0:
-                continue
-            # Analytic first-order depletion in mol: 1-exp(-k*dt), with
-            # k = requested parent mol s^-1 / current parent mol.
-            debit = available_parent * -math.expm1(
-                -requested_parent_rate * dt_s / available_parent
-            )
-            debit = min(available_parent, max(0.0, debit))
-            actual_parent_debits[parent] = debit
-            inventory[parent] = max(0.0, available_parent - debit)
-            for term, product_rate in parent_channels:
-                share = (
-                    product_rate * term.parent_moles_per_product
-                    / requested_parent_rate
+        if not has_mixed_parent_product:
+            # Preserve the established single-parent debit and multiplication
+            # order exactly; only mixed-parent products need joint scaling.
+            channels_by_parent: defaultdict[
+                str, list[tuple[_ChannelTerms, float]]
+            ] = defaultdict(list)
+            for species, product_rate in requested_product_mol_s.items():
+                term = term_by_species[species]
+                if not term.parent_moles_per_product or product_rate <= 0.0:
+                    continue
+                parent, _coefficient = next(iter(term.parent_moles_per_product.items()))
+                channels_by_parent[parent].append((term, product_rate))
+
+            for parent, parent_channels in channels_by_parent.items():
+                available_parent = float(inventory.get(parent, 0.0))
+                requested_parent_rate = math.fsum(
+                    product_rate * next(iter(term.parent_moles_per_product.values()))
+                    for term, product_rate in parent_channels
                 )
-                product_mol = (
-                    debit * share / term.parent_moles_per_product
+                if available_parent <= 0.0 or requested_parent_rate <= 0.0:
+                    continue
+                # Analytic first-order depletion: N mol * (1-exp(-r*dt/N)),
+                # where r is the requested parent draw in mol s^-1.
+                debit = available_parent * -math.expm1(
+                    -requested_parent_rate * dt_s / available_parent
                 )
-                actual_products[term.source.species] = product_mol
-                evaporated[term.source.species] += product_mol
+                debit = min(available_parent, max(0.0, debit))
+                actual_parent_debits[parent] = debit
+                inventory[parent] = max(0.0, available_parent - debit)
+                for term, product_rate in parent_channels:
+                    coefficient = next(iter(term.parent_moles_per_product.values()))
+                    share = product_rate * coefficient / requested_parent_rate
+                    product_mol = debit * share / coefficient
+                    actual_products[term.source.species] = product_mol
+                    evaporated[term.source.species] += product_mol
+        else:
+            parent_scale: dict[str, float] = {}
+            for parent, requested_rate in requested_parent_rates.items():
+                available_parent = float(inventory.get(parent, 0.0))
+                if available_parent <= 0.0 or requested_rate <= 0.0:
+                    parent_scale[parent] = 0.0
+                    continue
+                # Analytic first-order depletion in mol: 1-exp(-r*dt/N), with
+                # r the total requested draw from this parent in mol s^-1.
+                allowed_debit = available_parent * -math.expm1(
+                    -requested_rate * dt_s / available_parent
+                )
+                parent_scale[parent] = min(
+                    1.0, max(0.0, allowed_debit / (requested_rate * dt_s))
+                )
+
+            actual_parent_debits = defaultdict(float)
+            for species, product_rate in requested_product_mol_s.items():
+                term = term_by_species[species]
+                if not term.parent_moles_per_product or product_rate <= 0.0:
+                    continue
+                # A mixed-parent product is capped by its tightest reactant.
+                # The common scale preserves its declared reaction ratio and
+                # keeps every parent debit within its depletion allowance.
+                scale = min(
+                    parent_scale[parent]
+                    for parent in term.parent_moles_per_product
+                )
+                product_mol = product_rate * dt_s * scale
+                actual_products[species] = product_mol
+                evaporated[species] += product_mol
+                for parent, coefficient in term.parent_moles_per_product.items():
+                    actual_parent_debits[parent] += product_mol * coefficient
+
+            for parent, debit in actual_parent_debits.items():
+                inventory[parent] = max(
+                    0.0, float(inventory.get(parent, 0.0)) - debit
+                )
 
         oxygen_removed_mol = math.fsum(
             debit
@@ -1249,8 +1466,8 @@ def integrate_knudsen_residue_inventory(
             oxygen_draw = 0.0
             for term in terms:
                 rate = products[term.source.species]
-                if term.source.parent_oxide is not None:
-                    parent_draw[term.source.parent_oxide] += rate * term.parent_moles_per_product
+                for parent, coefficient in term.parent_moles_per_product.items():
+                    parent_draw[parent] += rate * coefficient
                 oxygen_draw += rate * term.atom_counts.get("O", 0.0)
             if amounts[oxygen_index] == 0.0 and oxygen_draw > 0.0:
                 raise ResidueInventoryRefusal("knudsen_near_saturation_oxygen_exhausted", "oxygen absent from the weighed charge")
@@ -1259,7 +1476,9 @@ def integrate_knudsen_residue_inventory(
 
         while xi < stop:
             event_indices = [i for i, k in enumerate(parents)
-                             if state[i] > 0.0 and any(term.source.parent_oxide == k for term in terms)]
+                             if state[i] > 0.0 and any(
+                                 k in term.parent_moles_per_product for term in terms
+                             )]
             if state[oxygen_index] > 0.0:
                 event_indices.append(oxygen_index)
             events = []
@@ -1433,15 +1652,25 @@ def _make_residue_pressure_model(
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """Build the engine pressure closure shared by the residue cohorts."""
-    pressure_exponents = {
-        str(species): (
-            1.0
-            if str(species) == "O2"
-            else -float(reaction[2]) / float(reaction[1])
-        )
-        for species, reaction in gas_channels
-    }
+    pressure_exponents: dict[str, float] = {}
     if engine == "openimcc":
+        # OpenIMCC reaction tuples are normalized to a primary parent; for a
+        # mixed channel that parent coefficient is not the gas-product
+        # coefficient. Reuse the validated product-basis reactant map used by
+        # the residue debit and oxygen solver to get one exponent per product.
+        channels = tuple(
+            _openimcc_residue_channel(
+                str(species),
+                str(reaction[0]) if reaction[0] else None,
+                1.0,
+                "OpenIMCC residue pressure law",
+            )
+            for species, reaction in gas_channels
+        )
+        pressure_exponents = {
+            term.source.species: term.neutral_pO2_exponent
+            for term in _channel_terms(channels, require_oxygen_channels=False)
+        }
         from openimcc.kernel import ImccNonconvergenceError
 
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -1946,18 +2175,29 @@ def _mass_loss_corner_bounds(
     selected_pressures = {}
     inventory_caps = {}
     for term, channel in zip(terms, oxygen_channels):
-        if (term.source.parent_oxide is None or not channel.active
+        if (not term.parent_moles_per_product or not channel.active
                 or (channel.species not in unsourced and not include_sourced)):
             continue
         index = 0 if channel.pO2_exponent <= 0.0 else 1
         if roots[index] == 0.0 and channel.pO2_exponent < 0.0:
             # A negative-power pressure diverges at a supplier-free low
             # corner. Its physical finite-step ceiling is all available
-            # parent, never a zero flux or a clipped logarithmic root.
-            inventory_caps[channel.species] = (
-                float(inventory.get(term.source.parent_oxide, 0.0))
-                * _formula_terms(term.source.parent_oxide)[1]
-            )
+            # parent mixture, never a zero flux or a clipped logarithmic root.
+            if len(term.parent_moles_per_product) == 1:
+                parent = next(iter(term.parent_moles_per_product))
+                inventory_caps[channel.species] = (
+                    float(inventory.get(parent, 0.0))
+                    * _formula_terms(parent)[1]
+                )
+            else:
+                inventory_caps[channel.species] = (
+                    min(
+                        float(inventory.get(parent, 0.0)) / coefficient
+                        for parent, coefficient in term.parent_moles_per_product.items()
+                    )
+                    * term.oxide_per_product_kg
+                    * term.molar_mass_kg_mol
+                )
         else:
             selected_pressures[channel.species] = (
                 0.0 if roots[index] == 0.0 and channel.pO2_exponent > 0.0
@@ -2117,12 +2357,25 @@ def predict_knudsen_residue_composition(
         from simulator.diagnostic_helpers.binary_pot_battery import _openimcc_gas_channels_and_omission_notices
 
         gas_pack = load_gas_datapack()
-        gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(tuple(initial), gas_pack)
-        if omissions:
-            raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
-        channels = tuple(ResidueChannel(str(s), str(s), parent, 1.0,
-                        "near-saturated molecular effusion; common orifice factor cancels")
-                         for s, (parent, _, _) in gas_channels)
+        raw_gas_channels, source_omissions = _openimcc_gas_channels_and_omission_notices(
+            tuple(initial), gas_pack
+        )
+        gas_channels, channels, omissions = _openimcc_residue_channel_set(
+            raw_gas_channels,
+            source_omissions,
+            engine=engine,
+            alpha=1.0,
+            alpha_source="near-saturated molecular effusion; common orifice factor cancels",
+        )
+        for omission in omissions:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason=f"{omission.get('channel', 'OpenIMCC gas channel')}: {omission.get('reason')}",
+                    origin="OpenIMCC gas channel selection",
+                )
+            )
         flags, metadata = set(), {}
 
         def pressure_model(inventory, logp, temperature_K):
@@ -2252,11 +2505,15 @@ def predict_mass_loss_fraction(
     ):
         raise ResidueInventoryRefusal("initial_composition_invalid")
     # Printed oxide wt% are normalized only for source rounding: each m_i is
-    # m0*w_i/Σw. Dividing kg by kg mol^-1 yields mol on the sample-mass basis.
-    initial_inventory_mol = {
+    # m0*w_i/Σw. Preserve this mass for the shared-parent cap; converting m_i to
+    # moles and back can round above the physical sample-mass ceiling.
+    initial_oxide_mass_kg = {
         oxide: sample_mass_kg * (amount / total_wt_pct)
-        / _formula_terms(oxide)[1]
         for oxide, amount in wt_pct.items()
+    }
+    initial_inventory_mol = {
+        oxide: initial_oxide_mass_kg[oxide] / _formula_terms(oxide)[1]
+        for oxide in wt_pct
     }
     try:
         from openimcc import load_gas_datapack
@@ -2267,13 +2524,19 @@ def predict_mass_loss_fraction(
     )
 
     gas_pack = load_gas_datapack()
-    gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
+    raw_gas_channels, source_omissions = _openimcc_gas_channels_and_omission_notices(
         tuple(initial_inventory_mol), gas_pack
     )
-    if omissions:
-        raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
+    gas_channels, channel_templates, omissions = _openimcc_residue_channel_set(
+        raw_gas_channels,
+        source_omissions,
+        engine=engine,
+        alpha=1.0,
+        alpha_source="mass-loss residue channel",
+    )
     if not gas_channels:
         raise ResidueInventoryRefusal("residue_gas_channels_missing")
+    template_by_species = {channel.species: channel for channel in channel_templates}
     fits = _mass_loss_sourced_alphas(
         experiment, source_document or {}, float(temperature_K)
     )
@@ -2312,6 +2575,21 @@ def predict_mass_loss_fraction(
     preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
     corner_records = []
     inventory_capped_channels = set()
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    channel_omission_notices = [
+        Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+            reason=(
+                f"{omission.get('channel', 'OpenIMCC gas channel')}: "
+                f"{omission.get('reason')}"
+            ),
+            origin="OpenIMCC gas channel selection",
+        )
+        for omission in omissions
+    ]
     # The shared callback names residue composition for Knudsen and Hashimoto.
     # This path keeps those notices and retargets only the mass-loss quantity.
     omission_notices: list[Any] = []
@@ -2335,7 +2613,7 @@ def predict_mass_loss_fraction(
                 bucket.append(copied)
 
     def omission_payload() -> str | None:
-        if not omission_notices and not omission_records:
+        if not channel_omission_notices and not omission_notices and not omission_records:
             return None
         return json.dumps(
             {
@@ -2345,7 +2623,7 @@ def predict_mass_loss_fraction(
                         "reason": notice.reason,
                         "origin": notice.origin,
                     }
-                    for notice in omission_notices
+                    for notice in (*channel_omission_notices, *omission_notices)
                 ],
                 "records": omission_records,
             },
@@ -2354,10 +2632,11 @@ def predict_mass_loss_fraction(
 
     def attach_omissions(exc: BaseException) -> None:
         payload = omission_payload()
-        if payload is None:
-            return
-        setattr(exc, "notices", tuple(omission_notices))
-        setattr(exc, "below_threshold_omissions", payload)
+        all_notices = (*channel_omission_notices, *omission_notices)
+        if all_notices:
+            setattr(exc, "notices", all_notices)
+        if payload is not None:
+            setattr(exc, "below_threshold_omissions", payload)
 
     def run_segment(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
@@ -2379,7 +2658,13 @@ def predict_mass_loss_fraction(
                 alpha = 1.0 if unsourced_unity else 0.0
                 provenance = ("alpha<=1 joint/preheat arm; not sourced coefficient" if unsourced_unity
                               else "unsourced channel excluded from point loss")
-            channels.append(ResidueChannel(species, species, parent or None, alpha, provenance))
+            channels.append(
+                replace(
+                    template_by_species[species],
+                    alpha=alpha,
+                    alpha_source=provenance,
+                )
+            )
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
@@ -2411,11 +2696,23 @@ def predict_mass_loss_fraction(
             if result.refusal is not None:
                 raise result.refusal
             terms = _channel_terms(channels)
-            parent_loss = {
-                term.source.species: result.evaporated_mol.get(term.source.species, 0.0)
-                * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
-                for term in terms if term.source.parent_oxide is not None
-            }
+            parent_loss = {}
+            for term in terms:
+                if not term.parent_moles_per_product:
+                    continue
+                product_mol = result.evaporated_mol.get(term.source.species, 0.0)
+                if len(term.parent_moles_per_product) == 1:
+                    parent, coefficient = next(
+                        iter(term.parent_moles_per_product.items())
+                    )
+                    parent_loss[term.source.species] = (
+                        product_mol * coefficient * _formula_terms(parent)[1]
+                    )
+                else:
+                    parent_loss[term.source.species] = product_mol * math.fsum(
+                        coefficient * _formula_terms(parent)[1]
+                        for parent, coefficient in term.parent_moles_per_product.items()
+                    )
             return result.inventory_mol, math.fsum(parent_loss.values())
         finally:
             retain_omissions(pressure_model)
@@ -2445,29 +2742,127 @@ def predict_mass_loss_fraction(
                 except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
                     joint_refusal = {"reason": exc.reason, "detail": exc.detail}
             documented_loss_kg += loss
-        channel_parents = {str(species): parent for species, (parent, *_rest) in gas_channels if parent}
+        term_by_species = {
+            term.source.species: term
+            for term in _channel_terms(channel_templates, require_oxygen_channels=False)
+        }
+        parent_mass_share_by_channel = {
+            species: {
+                parent: coefficient * _formula_terms(parent)[1]
+                / (term.oxide_per_product_kg * term.molar_mass_kg_mol)
+                for parent, coefficient in term.parent_moles_per_product.items()
+            }
+            for species, term in term_by_species.items()
+            if term.parent_moles_per_product
+        }
+        capped_channels = set(inventory_capped_channels)
+        parent_channel_scales: dict[str, dict[str, float]] = {}
         inventory_bounds_by_parent = {}
-        # A divergent channel can remove at most its initial parent mass, ONCE:
+        # A divergent channel can consume at most each initial parent amount, ONCE:
         # splitting time or sharing that parent between gases creates no matter.
         # Cap the accumulated parent sum, including preheat, rather than shadow-
         # debiting the point state. This leaves the original trajectories intact.
-        # Proportional attribution preserves B=sum(channels)+preheat; it is not a
-        # physical debit. Two 60 s full-parent claims become m0, never 2*m0.
-        for parent in sorted({channel_parents[species] for species in inventory_capped_channels}):
-            species = [name for name, oxide in channel_parents.items() if oxide == parent]
-            total = math.fsum(mapping.get(name, 0.0)
-                              for mapping in (bounds_by_channel, preheat_bounds_by_channel)
-                              for name in species)
+        # Bounds are apportioned by each reactant's mass share. Finite channels
+        # keep priority while they fit; if their sum alone exceeds inventory,
+        # scale that finite group too and leave no mass for divergent channels.
+        # A mixed-parent gas uses the tightest scale from any parent it consumes.
+        for parent in sorted(
+            {
+                parent
+                for species in capped_channels
+                for parent in term_by_species[species].parent_moles_per_product
+            }
+        ):
+            species = [
+                name for name, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
+            ]
+            finite_total = math.fsum(
+                mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
+                for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                for name in species
+                if name not in capped_channels
+            )
+            capped_total = math.fsum(
+                mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
+                for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                for name in species
+                if name in capped_channels
+            )
+            total = finite_total + capped_total
+            # Keep the prior single-parent ceiling arithmetic: inventory is
+            # normalized to moles, then returned to mass.
             ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
-            scale = min(1.0, ceiling / total) if total > 0.0 else 1.0
+            if finite_total > ceiling:
+                finite_scale = ceiling / finite_total
+                capped_scale = 0.0
+            else:
+                finite_scale = 1.0
+                remaining = max(0.0, ceiling - finite_total)
+                capped_scale = (
+                    min(1.0, remaining / capped_total)
+                    if capped_total > 0.0 else 1.0
+                )
+            parent_channel_scales[parent] = {
+                "finite": finite_scale,
+                "capped": capped_scale,
+            }
             inventory_bounds_by_parent[parent] = {
                 "uncapped_bound_kg": total, "ceiling_kg": ceiling,
-                "applied_bound_kg": min(total, ceiling),
             }
-            for mapping in (bounds_by_channel, preheat_bounds_by_channel):
-                for name in species:
-                    if name in mapping:
-                        mapping[name] *= scale
+        channel_scales = {
+            species: min(
+                parent_channel_scales[parent][
+                    "capped" if species in capped_channels else "finite"
+                ]
+                for parent in term_by_species[species].parent_moles_per_product
+                if parent in parent_channel_scales
+            )
+            for species, term in term_by_species.items()
+            if any(
+                parent in parent_channel_scales
+                for parent in term.parent_moles_per_product
+            )
+        }
+        # Capture this while bounds are raw: another parent's tighter scale
+        # can zero a contributor after this parent's scale was selected.
+        parent_controls_every_species = {
+            parent: all(
+                channel_scales[name] == parent_channel_scales[parent][
+                    "capped" if name in capped_channels else "finite"
+                ]
+                for name, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
+                and (
+                    bounds_by_channel.get(name, 0.0) > 0.0
+                    or preheat_bounds_by_channel.get(name, 0.0) > 0.0
+                )
+            )
+            for parent in inventory_bounds_by_parent
+        }
+        for mapping in (bounds_by_channel, preheat_bounds_by_channel):
+            for species, scale in channel_scales.items():
+                if species in mapping:
+                    mapping[species] *= scale
+        for parent, cap in inventory_bounds_by_parent.items():
+            species = [
+                name for name, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
+            ]
+            applied_bound_kg = math.fsum(
+                mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
+                for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                for name in species
+            )
+            if (
+                cap["uncapped_bound_kg"] >= cap["ceiling_kg"]
+                and parent_controls_every_species[parent]
+            ):
+                # This parent cap determines every contribution, so its
+                # applied total is exactly the ceiling. Avoid a false shortfall
+                # from re-summing individually scaled floating-point bounds.
+                applied_bound_kg = cap["ceiling_kg"]
+            cap["applied_bound_kg"] = applied_bound_kg
         unsourced_bound_kg = math.fsum(bounds_by_channel.values())
         preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
         point_loss_kg = documented_loss_kg
@@ -2559,35 +2954,54 @@ def _hashimoto_liquid_row_provenance(
 ) -> tuple[dict[str, Any], ...]:
     rows: list[dict[str, Any]] = []
     for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
+        channel_terms = _channel_terms(
+            (
+                _openimcc_residue_channel(
+                    species,
+                    parent or None,
+                    1.0,
+                    "Hashimoto liquid-row provenance",
+                ),
+            ),
+            require_oxygen_channels=False,
+        )
+        parent_stoich = channel_terms[0].parent_moles_per_product
         gas_row = _hashimoto_table_row(
             gas_pack.gas_df, f"{species}(g)", temperature_K
         )
         gas_low = float(gas_row["T_min"])
         gas_high = float(gas_row["T_max"])
         liquid_record: dict[str, Any] | None = None
-        if parent:
-            liquid_name = f"{parent}(l)"
+        liquid_records: list[dict[str, Any]] = []
+        for parent_oxide, coefficient in parent_stoich.items():
+            liquid_name = f"{parent_oxide}(l)"
             liquid_row = _hashimoto_table_row(
                 gas_pack.oxide_df, liquid_name, temperature_K
             )
             liquid_low = float(liquid_row["T_min"])
             liquid_high = float(liquid_row["T_max"])
-            liquid_record = {
+            record = {
                 "row": liquid_name,
                 "source": str(liquid_row["Ref"]),
+                "moles_per_product": coefficient,
                 "T_fit_K": [liquid_low, liquid_high],
                 "extrapolated_below_floor": temperature_K < liquid_low,
             }
+            liquid_records.append(record)
+            if parent_oxide == parent:
+                liquid_record = record
         rows.append(
             {
                 "channel": species,
                 "parent": parent or None,
+                "parent_oxide_stoich": dict(parent_stoich),
                 "openimcc_gas_row": f"{species}(g)",
                 "gas_source": str(gas_row["Ref"]),
                 "gas_T_interval": int(gas_row.get("T_interval", 1)),
                 "gas_T_fit_K": [gas_low, gas_high],
                 "gas_extrapolated": not gas_low <= temperature_K <= gas_high,
                 "liquid_row": liquid_record,
+                "liquid_rows": tuple(liquid_records),
             }
         )
     return tuple(rows)
@@ -2654,6 +3068,7 @@ def _hashimoto_integrate_geometry(
     on_step: Callable[[Mapping[str, float], Sequence[ResidueChannel], float, float], None] | None = None,
 ) -> _HashimotoGeometryIntegration:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
+    channel_terms = _channel_terms(channels)
     sample_total_mol = math.fsum(inventory.values())
     exhaustion_floor_mol = _component_exhaustion_floor_mol(sample_total_mol)
     initial_mass_kg = math.fsum(
@@ -2718,10 +3133,9 @@ def _hashimoto_integrate_geometry(
             substep=substep,
         )
         active_channels = tuple(
-            channel
-            for channel in channels
-            if channel.parent_oxide is None
-            or channel.parent_oxide not in exhausted_mol
+            term.source
+            for term in channel_terms
+            if all(parent not in exhausted_mol for parent in term.parent_moles_per_product)
         )
         area_m2 = area_for_current_inventory()
         step = integrate_residue_inventory(
@@ -2755,7 +3169,7 @@ def _hashimoto_integrate_geometry(
         try:
             advance(dt_s, step_number=step_number, substep=0)
             elapsed_s += dt_s
-        except ResidueEngineNonconvergence as exc:
+        except ResidueEngineNonconvergence:
             # Retry the failed interval at half size, completing both halves
             # only if the engine converges at each refined composition.
             half_dt_s = dt_s / 2.0
@@ -2863,13 +3277,18 @@ def _hashimoto_run_setup(
         / _formula_terms(str(oxide))[1]
         for oxide, wt_pct in run_wt_pct.items()
     }
-    gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
+    raw_gas_channels, source_channel_omissions = _openimcc_gas_channels_and_omission_notices(
         tuple(initial_inventory_mol), gas_pack
     )
-    if channel_omissions:
-        raise ResidueInventoryRefusal(
-            "hashimoto_openimcc_channel_missing", str(channel_omissions)
+    gas_channels, common_channels_base, channel_omissions = (
+        _openimcc_residue_channel_set(
+            raw_gas_channels,
+            source_channel_omissions,
+            engine=engine,
+            alpha=1.0,
+            alpha_source=_HASHIMOTO_COMMON_UNITY_SOURCE,
         )
+    )
     if not gas_channels:
         raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
 
@@ -2893,17 +3312,22 @@ def _hashimoto_run_setup(
         active_matches = [
             item for item in matches if item[1].get("flux_dormant") is not True
         ]
-        if not matches:
-            raise ResidueInventoryRefusal(
-                "hashimoto_runtime_catalog_channel_missing",
-                f"no catalog row for {species}/{parent}",
-            )
-        catalog_matches[species] = (active_matches or matches)[0]
+        if matches:
+            catalog_matches[species] = (active_matches or matches)[0]
 
     common_channels: list[ResidueChannel] = []
     common_alpha_records: list[dict[str, Any]] = []
     common_liquid_rows: list[dict[str, Any]] = []
     row_by_channel = {str(row["channel"]): dict(row) for row in liquid_rows}
+    base_channel_by_species = {
+        channel.species: channel for channel in common_channels_base
+    }
+    base_terms_by_species = {
+        term.source.species: term
+        for term in _channel_terms(
+            common_channels_base, require_oxygen_channels=False
+        )
+    }
     for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
         if not parent:
             alpha_source = (
@@ -2912,11 +3336,14 @@ def _hashimoto_run_setup(
                 else "OpenIMCC gas channel with no parent oxide"
             )
             common_channels.append(
-                ResidueChannel(species, species, None, 1.0, alpha_source)
+                replace(base_channel_by_species[species], alpha_source=alpha_source)
             )
             common_alpha_records.append(
                 {
                     "channel": species,
+                    "parent_oxide_stoich": dict(
+                        base_terms_by_species[species].parent_moles_per_product
+                    ),
                     "alpha_value": 1.0,
                     "alpha_assumed": True,
                     "alpha_source": alpha_source,
@@ -2925,29 +3352,58 @@ def _hashimoto_run_setup(
             common_liquid_rows.append(row_by_channel[species])
             continue
 
-        catalog_name, catalog_row = catalog_matches[species]
-        if catalog_row.get("flux_dormant") is True:
+        catalog_match = catalog_matches.get(species)
+        if catalog_match is not None and catalog_match[1].get("flux_dormant") is True:
             continue
-        common_source = (
-            f"declared alpha=1 sensitivity; {catalog_name} runtime catalog row "
-            "is provenance only, not the common-unity alpha source"
-        )
+        if catalog_match is None:
+            common_source = (
+                "declared alpha=1 sensitivity; runtime catalog row unavailable"
+            )
+            common_alpha_records.append(
+                {
+                    "channel": species,
+                    "parent_oxide_stoich": dict(
+                        base_terms_by_species[species].parent_moles_per_product
+                    ),
+                    "alpha_value": 1.0,
+                    "alpha_source": common_source,
+                    "alpha_assumed": True,
+                    "author_ratio_assumption": "alpha_i/alpha_j=1",
+                    "runtime_catalog_row_available": False,
+                }
+            )
+        else:
+            catalog_name, _catalog_row = catalog_match
+            common_source = (
+                f"declared alpha=1 sensitivity; {catalog_name} runtime catalog row "
+                "is provenance only, not the common-unity alpha source"
+            )
+            common_alpha_records.append(
+                {
+                    "channel": species,
+                    "catalog_row": catalog_name,
+                    "parent_oxide_stoich": dict(
+                        base_terms_by_species[species].parent_moles_per_product
+                    ),
+                    "alpha_value": 1.0,
+                    "alpha_source": common_source,
+                    "alpha_assumed": True,
+                    "author_ratio_assumption": "alpha_i/alpha_j=1",
+                }
+            )
         common_channels.append(
-            ResidueChannel(species, species, parent, 1.0, common_source)
-        )
-        common_alpha_records.append(
-            {
-                "channel": species,
-                "catalog_row": catalog_name,
-                "alpha_value": 1.0,
-                "alpha_source": common_source,
-                "alpha_assumed": True,
-                "author_ratio_assumption": "alpha_i/alpha_j=1",
-            }
+            replace(
+                base_channel_by_species[species],
+                alpha=1.0,
+                alpha_source=common_source,
+            )
         )
         common_liquid_rows.append(row_by_channel[species])
 
-    if not any(channel.parent_oxide for channel in common_channels):
+    if not any(
+        term.parent_moles_per_product
+        for term in _channel_terms(common_channels)
+    ):
         raise ResidueInventoryRefusal("hashimoto_common_unity_channels_missing")
     engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
     pressure_model = _make_residue_pressure_model(
@@ -2977,6 +3433,7 @@ def _hashimoto_run_setup(
         steps=steps,
         geometry_areas=geometry_areas,
         gas_channels=tuple(gas_channels),
+        gas_channel_omissions=channel_omissions,
         liquid_rows=tuple(liquid_rows),
         common_channels=tuple(common_channels),
         common_alpha_records=tuple(common_alpha_records),
@@ -3010,6 +3467,8 @@ def _predict_hashimoto_residue_cohort(
     _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
+    from simulator.battery.enums import NoticeKind
+
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("hashimoto_engine_unsupported", engine)
     experiment_ids = {
@@ -3098,40 +3557,59 @@ def _predict_hashimoto_residue_cohort(
         runtime_channels: list[ResidueChannel] = []
         runtime_alpha_records: list[dict[str, Any]] = []
         runtime_omissions: list[dict[str, str]] = []
+        common_channel_by_species = {
+            channel.species: channel for channel in common_channels
+        }
+        common_terms_by_species = {
+            term.source.species: term
+            for term in _channel_terms(
+                common_channels, require_oxygen_channels=False
+            )
+        }
         active_liquid_rows: dict[str, list[dict[str, Any]]] = {
             "common": list(setup.common_liquid_rows),
             "runtime": [],
         }
         for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
             if not parent:
+                runtime_source = "assumed oxygen-gas alpha=1.0; not measured"
                 runtime_channels.append(
-                    ResidueChannel(
-                        species,
-                        species,
-                        None,
-                        1.0,
-                        "assumed oxygen-gas alpha=1.0; not measured",
+                    replace(
+                        common_channel_by_species[species],
+                        alpha=1.0,
+                        alpha_source=runtime_source,
                     )
                 )
                 runtime_alpha_records.append(
-                    {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
-                     "alpha_source": "assumed oxygen-gas alpha=1.0; not measured"}
+                    {"channel": species, "parent_oxide_stoich": {},
+                     "alpha_value": 1.0, "alpha_assumed": True,
+                     "alpha_source": runtime_source}
                 )
                 active_liquid_rows["runtime"].append(
                     row_by_channel[species]
                 )
                 continue
 
-            catalog_name, catalog_row = setup.catalog_matches[species]
+            catalog_match = setup.catalog_matches.get(species)
+            if catalog_match is None:
+                runtime_omissions.append(
+                    {
+                        "channel": species,
+                        "kind": NoticeKind.INPUT_OMITTED.value,
+                        "reason": "runtime_catalog_channel_missing",
+                    }
+                )
+                continue
+            catalog_name, catalog_row = catalog_match
             if catalog_row.get("flux_dormant") is True:
                 runtime_omissions.append(
-                    {"channel": species, "reason": "flux_dormant_reporting_only"}
+                    {"channel": species, "kind": NoticeKind.INPUT_OMITTED.value, "reason": "flux_dormant_reporting_only"}
                 )
                 continue
             alpha_spec = setup.alpha_specs.get(catalog_name)
             if alpha_spec is None:
                 runtime_omissions.append(
-                    {"channel": species, "reason": "runtime_catalog_alpha_missing"}
+                    {"channel": species, "kind": NoticeKind.INPUT_OMITTED.value, "reason": "runtime_catalog_alpha_missing"}
                 )
                 continue
             alpha_context: dict[str, Any] = {"coefficient_spec": alpha_spec}
@@ -3141,6 +3619,7 @@ def _predict_hashimoto_residue_cohort(
                 runtime_omissions.append(
                     {
                         "channel": species,
+                        "kind": NoticeKind.INPUT_OMITTED.value,
                         "reason": f"runtime_catalog_alpha_invalid:{exc}",
                     }
                 )
@@ -3152,18 +3631,22 @@ def _predict_hashimoto_residue_cohort(
                 else "runtime catalog"
             )
             runtime_channels.append(
-                ResidueChannel(
-                    species,
-                    species,
-                    parent,
-                    runtime_alpha,
-                    f"runtime catalog {catalog_name}: {source}; assumed outside Hashimoto system",
+                replace(
+                    common_channel_by_species[species],
+                    alpha=runtime_alpha,
+                    alpha_source=(
+                        f"runtime catalog {catalog_name}: {source}; "
+                        "assumed outside Hashimoto system"
+                    ),
                 )
             )
             runtime_alpha_records.append(
                 {
                     "channel": species,
                     "catalog_row": catalog_name,
+                    "parent_oxide_stoich": dict(
+                        common_terms_by_species[species].parent_moles_per_product
+                    ),
                     "alpha_value": runtime_alpha,
                     "alpha_source": source,
                     "alpha_assumed": True,
@@ -3180,7 +3663,10 @@ def _predict_hashimoto_residue_cohort(
                 row_by_channel[species]
             )
 
-        if not any(channel.parent_oxide for channel in runtime_channels):
+        if not any(
+            term.parent_moles_per_product
+            for term in _channel_terms(runtime_channels)
+        ):
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
 
         arm_channels = (
@@ -3320,10 +3806,10 @@ def _predict_hashimoto_residue_cohort(
                 },
             }
             extrapolated_liquids = [
-                row
+                liquid_row
                 for row in active_liquid_rows[row_key]
-                if row.get("liquid_row")
-                and row["liquid_row"].get("extrapolated_below_floor")
+                for liquid_row in row.get("liquid_rows", ())
+                if liquid_row.get("extrapolated_below_floor")
             ]
             assumption_flags = {
                 "alpha_assumed_unity_ratio_not_measured_alpha": (
@@ -3383,6 +3869,7 @@ def _predict_hashimoto_residue_cohort(
                     "active_for_this_arm": alpha_arm == "alpha_common_unity_sensitivity",
                 },
                 "alpha_by_channel": tuple(alpha_records),
+                "gas_channel_omissions": setup.gas_channel_omissions,
                 "runtime_catalog_omissions": tuple(runtime_omissions)
                 if alpha_arm == "alpha_runtime_catalog"
                 else (),
@@ -4208,7 +4695,6 @@ def _predict_sossi_residue_cohort(
             for element in supported_elements
         }
         primary_inventory = geometry_inventory_mol[_SOSSI_PRIMARY_GEOMETRY]
-        primary_buffer_exchange = geometry_buffer_exchange[_SOSSI_PRIMARY_GEOMETRY]
         printed_composition = sample.get("printed_composition", {})
         prediction_rows.append(
             _SossiResiduePrediction(

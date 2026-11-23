@@ -156,6 +156,36 @@ def dissociation_pO2_threshold(
     return K * (max(float(a_oxide), 0.0) ** n_ox)
 
 
+def ellingham_oxide_stoichiometry_for_formula(
+    oxide: str,
+    *,
+    oxide_to_metal: Mapping[str, tuple[str, float, float]],
+) -> tuple[float, float] | None:
+    """Return the ledger oxide's Ellingham ``(n_M, n_ox)`` per mol O2.
+
+    ``OXIDE_TO_METAL`` stores ``M_n O_m -> n M + m/2 O2``. Normalizing to
+    one mol O2 gives ``n_M=2n/m`` and ``n_ox=2/m``. These are dimensionless
+    molar ratios; the dissociation resolver evaluates ``K*a_oxide**n_ox`` in
+    bar. FeO gives ``(2, 2)`` and Al2O3 gives ``(4/3, 2/3)``. The mapping is
+    supplied by the caller so this chemistry owner does not depend on state.
+    """
+
+    stoich = oxide_to_metal.get(str(oxide))
+    if stoich is None:
+        return None
+    _metal, n_metal, n_oxygen = stoich
+    if n_oxygen <= 0:
+        return None
+    # OXIDE_TO_METAL stores M_n O_m -> n M + m/2 O2. Normalizing that
+    # reaction to one mol O2 gives n_M=2n/m and n_ox=2/m. These coefficients
+    # are dimensionless; the Ellingham resolver returns K*a_oxide**n_ox in bar.
+    # Sanity: FeO gives (2, 2), Na2O (4, 2), and Al2O3 (4/3, 2/3).
+    return (
+        2.0 * float(n_metal) / float(n_oxygen),
+        2.0 / float(n_oxygen),
+    )
+
+
 def metal_activity_factor(
     species: str,
     temperature_K: float,
@@ -260,10 +290,12 @@ def metal_saturation_pressure_Pa(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
-    """Pure-metal saturation pressure (Pa) from the catalog Antoine rail.
+    """Pure-metal saturation pressure (Pa) from the pure-component rail.
 
     This is *not* oxide-dissociation ``P_eff``. C7's Ca product is metal
-    vapor; the metallothermic vapor term needs condensed-metal ``P_sat``.
+    vapor; the metallothermic vapor term needs condensed-metal ``P_sat``. The
+    wall-condensation selector preserves the pure-metal sidecar when a melt
+    source reaction also declares an Antoine reference.
 
     Fail-closed categories (same three-way rule as
     :func:`_antoine_reference_pressure_Pa`):
@@ -273,7 +305,7 @@ def metal_saturation_pressure_Pa(
     (3) catalog ``consumer_status=inactive``: return ``0.0`` (proven zero).
     """
 
-    from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
+    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
 
     data = _resolve_vapor_pressure_data(vapor_pressure_data)
     metals = data.get("metals", {}) or {}
@@ -285,8 +317,9 @@ def metal_saturation_pressure_Pa(
     sp_data = metals[species] or {}
     if str(sp_data.get("consumer_status", "")).lower() == "inactive":
         return 0.0
-    antoine, _src = vapor_pressure_antoine_coefficients(
-        sp_data, temperature_K=float(temperature_K)
+    antoine, _src = wall_condensation_antoine_coefficients(
+        sp_data,
+        temperature_K=float(temperature_K),
     )
     P_sat = _antoine_reference_pressure_Pa(antoine, temperature_K)
     if P_sat is None:
@@ -331,13 +364,25 @@ def effective_equilibrium_pressure_Pa(
         row = (data.get("oxide_vapors", {}) or {}).get(species, {}) or {}
     if str(row.get("consumer_status", "")).lower() == "inactive":
         return 0.0
+
     catalog_payload = getattr(payload, "catalog_payload", payload)
+    is_schema_v2_catalog = (
+        isinstance(catalog_payload, Mapping)
+        and catalog_payload.get("schema_version") == 2
+        and "families" in catalog_payload
+    )
+    requires_catalog_source = bool(
+        row.get("liquid_oxide_standard_reaction")
+        or row.get("reference_pressure_model")
+    )
     reaction_evaluator = None
-    if (
-        catalog_payload.get("schema_version") == 2
-        and (row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"))
-    ):
-        reaction_evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(species)
+    if is_schema_v2_catalog and requires_catalog_source:
+        catalog = compiled_catalog_for(catalog_payload)
+        catalog_species = catalog.species.get(species)
+        # Availability probe only; pressure evaluation uses evaluator_for_hot_train.
+        # b-189-exempt: availability check only.
+        if catalog_species is not None and catalog_species.evaluator is not None:
+            reaction_evaluator = catalog.evaluator_for_hot_train(species)
     if reaction_evaluator is not None:
         if a_ox == 0.0:
             return 0.0
@@ -356,10 +401,10 @@ def effective_equilibrium_pressure_Pa(
                 stacklevel=2,
             )
         return evaluation.pressure_pa
-    if row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"):
+    if requires_catalog_source:
         raise EllinghamPressureRefusal(
-            f"{species!r} requires its catalog melt-source reaction; "
-            "the legacy projection alone lacks source inputs"
+            f"{species!r} requires a catalog melt-source evaluator; "
+            "the supplied vapor-pressure payload has no source evaluator"
         )
 
     metals = data.get("metals", {}) or {}

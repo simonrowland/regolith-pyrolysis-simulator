@@ -54,8 +54,8 @@ from simulator.config import (  # noqa: E402
 )
 from simulator.engine_pool import (  # noqa: E402
     EngineWorkerPool,
-    INHERIT_PROCESS_GROUP_ENV,
     WarmEngineWorker,
+    _inherit_process_group_for_worker_children,
 )
 # simulator.fe_redox is imported LAZILY (see kress91_partition_parameters and
 # kress91_partitioned_composition_mol): Kress partitioning runs only at
@@ -945,7 +945,7 @@ def _bootstrap_grid_worker(
     config: Mapping[str, Any],
     assumed_queued_run_mode: str | None,
 ) -> tuple[Any, str]:
-    os.environ[INHERIT_PROCESS_GROUP_ENV] = '1'
+    _inherit_process_group_for_worker_children()
     _worker_initialize(config, assumed_queued_run_mode)
     return _WORKER_BACKEND, _WORKER_ENGINE_VERSION
 

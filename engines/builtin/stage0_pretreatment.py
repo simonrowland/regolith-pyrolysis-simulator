@@ -157,7 +157,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
+from simulator.account_ids import (
+    OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+    SOLID_CHAR_CARBON_ACCOUNT,
+)
 
 from engines.yaml_loader import YAML12SafeLoader
 
@@ -210,7 +213,7 @@ VALID_REACTION_FAMILIES = frozenset({
 OXYGEN_SPECIES = "O2"
 CHAR_SPECIES = "C"
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
-FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
+FO2_BUFFER_ACCOUNT = OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 METAL_PHASE_ACCOUNT = "process.metal_phase"
 OFFGAS_ACCOUNT = "terminal.offgas"

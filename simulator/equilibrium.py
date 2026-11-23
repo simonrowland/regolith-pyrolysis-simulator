@@ -1302,14 +1302,15 @@ class EquilibriumMixin:
             # --- Effective vapor pressure ---                     [ELLI-4]
             #
             # Condensed-basis rows produce a Raoultian activity against the
-            # pure-component vapor pressure and may saturate at a metal pool.
-            # Gas-basis rows already produce f_M/p°; multiplying by P_sat again
-            # would double-count the vaporization equilibrium.
+            # pure-component vapor pressure. Gas-basis rows already produce
+            # f_M/p° and convert directly to Pa.
             if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 P_effective_Pa = metal_activity_root * _ELLINGHAM_STANDARD_PRESSURE_PA
             else:
                 assert P_reference_Pa is not None
-                P_effective_Pa = min(metal_activity_root, 1.0) * P_reference_Pa
+                P_effective_Pa = (
+                    min(metal_activity_root, 1.0) * P_reference_Pa
+                )
 
             P_effective_Pa = _require_finite_vapor_value(
                 P_effective_Pa,
