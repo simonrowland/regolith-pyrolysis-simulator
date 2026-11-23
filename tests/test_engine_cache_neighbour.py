@@ -586,6 +586,12 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
     light = _light_backend_status_trace(coarse)
     assert light is not None
     assert light["neighbour_hits"] == coarse.neighbour_hits
+    outside_scope = _call(
+        _request(1700.0 + quantum * 0.3),
+        {"answer": "outside-scope"},
+    )
+    assert outside_scope == {"answer": "outside-scope"}
+    assert not hasattr(outside_scope, "neighbour_hit")
     carrier = {
         "cache_state": "live_fill",
         "backend_name": "alphamelts",
