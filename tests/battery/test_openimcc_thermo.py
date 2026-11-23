@@ -950,7 +950,7 @@ def test_openimcc_symbolic_hydrate_and_unstated_phase_stay_typed(
         source_attempt = predict_thermo_attempt(Engine.OPENIMCC, source_row)
         assert source_attempt.value is None
         assert source_attempt.refusal_detail["reason"] == (
-            "openimcc-phase-unsupported"
+            f"compilation-source-phase-unresolved:{printed_phase}"
         )
 
 

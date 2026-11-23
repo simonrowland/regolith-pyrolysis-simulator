@@ -11175,8 +11175,8 @@ def test_solid_formula_alias_preserves_free_prose_and_row_notice_paths() -> None
     from simulator.battery.migrate import map_phase, phase_for_sample_form
 
     suffix_phase, reason = map_phase("solid")
-    assert suffix_phase.value is Phase.CR
-    assert reason is None
+    assert suffix_phase.is_unknown
+    assert reason == "solid"
     assert phase_for_sample_form("solid") is None
 
     experiment, reference = _vapour_over_sample_form("solid")

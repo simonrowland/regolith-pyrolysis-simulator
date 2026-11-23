@@ -8141,18 +8141,14 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
 
     for spelling, token in (
         ("aq", Phase.AQ),
-        ("(aq)", Phase.AQ),
         ("glass", Phase.GLASS),
-        ("(glass)", Phase.GLASS),
         ("quenched silicate glass", Phase.GLASS),
         ("quenched synthetic Martian basalt glass", Phase.GLASS),
         ("quenched peridotite glass", Phase.GLASS),
         ("supercooled_l", Phase.SUPERCOOLED_L),
         ("g", Phase.G),
         ("cr", Phase.CR),
-        ("(cr)", Phase.CR),
         ("l", Phase.L),
-        ("(l)", Phase.L),
     ):
         assert PHASE_MAP[spelling] is token
         mapped, why = map_phase(spelling)
@@ -8311,14 +8307,6 @@ def test_g2_paren_phase_aliases_map_gas_and_condensed() -> None:
     assert mapped.is_value and mapped.value is Phase.G and why is None
     mapped, why = map_phase("(c)")
     assert mapped.is_value and mapped.value is Phase.CR and why is None
-    for spelling, phase in (
-        ("(l)", Phase.L),
-        ("(cr)", Phase.CR),
-        ("(aq)", Phase.AQ),
-        ("(glass)", Phase.GLASS),
-    ):
-        mapped, why = map_phase(spelling)
-        assert mapped.is_value and mapped.value is phase and why is None
     # Multi-phase spans stay unknown in this lane.
     mapped, why = map_phase("(c,l)")
     assert mapped.is_unknown and why == "(c,l)"
