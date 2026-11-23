@@ -15,7 +15,7 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, TypedDict
 
 from engines.antoine import _antoine_log10_pressure, _read_antoine_coefficients
 from simulator.chemistry.ellingham_thermo import (
@@ -56,6 +56,14 @@ class EllinghamPressureRefusal(ValueError):
     Callers must not convert this into P_eff=0.0 / evolves=False without an
     independent physical proof of nonvolatility.
     """
+
+
+class ElementalMetalSaturationCapNotice(TypedDict):
+    code: Literal["elemental_metal_saturation_cap"]
+    species: str
+    uncapped_pressure_Pa: float
+    capped_pressure_Pa: float
+    saturation_owner: str
 
 
 def _physical_pO2_bar(pO2_bar: float) -> float:
@@ -352,6 +360,59 @@ def metal_saturation_pressure_Pa(
     return P_sat
 
 
+def _elemental_metal_saturation_owner(row: Mapping[str, Any]) -> str:
+    saturation = row.get("pure_component_saturation")
+    if isinstance(saturation, Mapping):
+        equation = str(saturation.get("equation") or "").strip()
+        if equation:
+            return equation.replace("_", "-").title()
+        source = saturation.get("source")
+        if source:
+            return str(source)
+    for key in ("pure_component_antoine", "antoine"):
+        coefficients = row.get(key)
+        if isinstance(coefficients, Mapping):
+            source = coefficients.get("source")
+            if source:
+                return str(source)
+    return "wall-condensation Antoine"
+
+
+def _cap_elemental_metal_pressure_at_saturation_Pa(
+    species: str,
+    temperature_K: float,
+    pressure_Pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    notices: list[ElementalMetalSaturationCapNotice] | None = None,
+) -> float:
+    """Cap elemental melt pressure and report a binding pure-metal ceiling."""
+
+    data = _resolve_vapor_pressure_data(vapor_pressure_data)
+    metals = data.get("metals", {}) or {}
+    if species not in metals:
+        return float(pressure_Pa)
+    uncapped_pressure_Pa = float(pressure_Pa)
+    capped_pressure_Pa = min(
+        uncapped_pressure_Pa,
+        metal_saturation_pressure_Pa(
+            species,
+            temperature_K,
+            vapor_pressure_data=data,
+        ),
+    )
+    if notices is not None and capped_pressure_Pa < uncapped_pressure_Pa:
+        row = metals[species] or {}
+        notices.append({
+            "code": "elemental_metal_saturation_cap",
+            "species": str(species),
+            "uncapped_pressure_Pa": uncapped_pressure_Pa,
+            "capped_pressure_Pa": capped_pressure_Pa,
+            "saturation_owner": _elemental_metal_saturation_owner(row),
+        })
+    return float(capped_pressure_Pa)
+
+
 def effective_equilibrium_pressure_Pa(
     species: str,
     temperature_K: float,
@@ -365,7 +426,34 @@ def effective_equilibrium_pressure_Pa(
 
     Declared catalog source reactions own the activity and oxygen terms.
     Rows without one retain their phase-correct Ellingham or fitted reaction
-    rail; a pure-element saturation sidecar cannot replace a source reaction.
+    rail. A pure-element saturation sidecar limits elemental pressure without
+    replacing a declared source reaction.
+    """
+
+    return _effective_equilibrium_pressure_Pa_with_notices(
+        species,
+        temperature_K,
+        pO2_bar,
+        vapor_pressure_data=vapor_pressure_data,
+        a_oxide=a_oxide,
+        vacuum_floor_bar=vacuum_floor_bar,
+    )
+
+
+def _effective_equilibrium_pressure_Pa_with_notices(
+    species: str,
+    temperature_K: float,
+    pO2_bar: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    a_oxide: float = 1.0,
+    vacuum_floor_bar: float = 1e-9,
+    cap_notices: list[ElementalMetalSaturationCapNotice] | None = None,
+) -> float:
+    """Effective pressure and receipts for any binding pure-metal cap.
+
+    The public scalar wrapper stays float-only; result-producing consumers
+    pass ``cap_notices`` and publish those beside their pressure maps.
     """
 
     from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
@@ -421,7 +509,13 @@ def effective_equilibrium_pressure_Pa(
                 "outside the certified range",
                 stacklevel=2,
             )
-        return evaluation.pressure_pa
+        return _cap_elemental_metal_pressure_at_saturation_Pa(
+            species,
+            T_K,
+            evaluation.pressure_pa,
+            vapor_pressure_data=data,
+            notices=cap_notices,
+        )
     if requires_catalog_source:
         raise EllinghamPressureRefusal(
             f"{species!r} requires a catalog melt-source evaluator; "
@@ -490,7 +584,13 @@ def effective_equilibrium_pressure_Pa(
                     float(gas_rail_rxn.get("pO2_reference_bar", 1.0) or 1.0),
                 )
                 P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
-            return max(P_eq_Pa, 0.0)
+            return _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                max(P_eq_Pa, 0.0),
+                vapor_pressure_data=data,
+                notices=cap_notices,
+            )
         if (
             fit_target != "standard_reaction_term"
             and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
@@ -505,7 +605,13 @@ def effective_equilibrium_pressure_Pa(
                 a_oxide=a_ox,
                 clamp=False,
             )
-            return a_M * ELLINGHAM_STANDARD_PRESSURE_PA
+            return _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                a_M * ELLINGHAM_STANDARD_PRESSURE_PA,
+                vapor_pressure_data=data,
+                notices=cap_notices,
+            )
         antoine, _ = vapor_pressure_antoine_coefficients(sp_data, temperature_K=T_K)
         P_reference_Pa = _antoine_reference_pressure_Pa(antoine, T_K)
         if P_reference_Pa is None:
@@ -526,7 +632,13 @@ def effective_equilibrium_pressure_Pa(
                     float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
                 )
                 P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
-            return max(P_eq_Pa, 0.0)
+            return _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                max(P_eq_Pa, 0.0),
+                vapor_pressure_data=data,
+                notices=cap_notices,
+            )
         assert metal_segment is not None
         a_M = _metal_activity_factor_from_segment(
             metal_segment,
@@ -535,7 +647,13 @@ def effective_equilibrium_pressure_Pa(
             a_oxide=a_ox,
             clamp=True,
         )
-        return a_M * P_reference_Pa
+        return _cap_elemental_metal_pressure_at_saturation_Pa(
+            species,
+            T_K,
+            a_M * P_reference_Pa,
+            vapor_pressure_data=data,
+            notices=cap_notices,
+        )
 
     oxide_vapors = data.get("oxide_vapors", {}) or {}
     if species in oxide_vapors:

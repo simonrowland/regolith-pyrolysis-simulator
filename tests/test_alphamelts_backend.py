@@ -9445,6 +9445,7 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     )
 
     assert set(pressures) == {'Na', 'K'}
+    assert type(pressures['Na']) is float
     from simulator.chemistry.ellingham_graph import metal_saturation_pressure_Pa
 
     assert pressures['Na'] == min(
@@ -9453,6 +9454,15 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
             'Na', 1873.15, vapor_pressure_data=vapor_pressure_data,
         ),
     )
+    na_cap_notice = next(
+        notice
+        for notice in backend._antoine_elemental_metal_saturation_caps
+        if notice['species'] == 'Na'
+    )
+    assert na_cap_notice['code'] == 'elemental_metal_saturation_cap'
+    assert na_cap_notice['uncapped_pressure_Pa'] == expected_na
+    assert na_cap_notice['capped_pressure_Pa'] == pressures['Na']
+    assert na_cap_notice['saturation_owner'] == 'Browning-Potter'
     # NIST's Fiock/Rodebush pure-K equation is log10(P_Pa) =
     # 9.45718 - 4691.58/(T_K + 24.195). At 1873.15 K it gives the
     # capped pure-metal pressure pinned here. This is an extrapolation far

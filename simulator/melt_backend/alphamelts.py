@@ -6968,6 +6968,13 @@ class _MELTSBackendSupport(MeltBackend):
             pressures,
             source,
         )
+        cap_notices = getattr(
+            self, "_antoine_elemental_metal_saturation_caps", None
+        ) or ()
+        if cap_notices:
+            payload["elemental_metal_saturation_caps"] = [
+                dict(notice) for notice in cap_notices
+            ]
         notices = getattr(self, "_antoine_floor_inversion_notices", None) or {}
         if notices:
             payload["pO2_floor_inversion_notices_by_species"] = {
@@ -6983,6 +6990,7 @@ class _MELTSBackendSupport(MeltBackend):
                 for species, notice in activity_sources.items()
             }
         self._antoine_activity_source_notices = {}
+        self._antoine_elemental_metal_saturation_caps = []
         if isinstance(source, VaporPressureActivityRefusal):
             payload['vapor_pressure_backend_status'] = 'refused'
             payload['vapor_pressure_backend_status_reason'] = source.reason
@@ -7032,13 +7040,15 @@ class _MELTSBackendSupport(MeltBackend):
         Pressure math belongs to the catalog/Ellingham owner, never to a
         pure-component wall-saturation sidecar in this adapter.
         """
+        self._antoine_elemental_metal_saturation_caps = []
         table = self._load_vapor_pressure_table()
         if not table or (not activities and not use_melt_activity_ladder):
             return {}
         from simulator.chemistry.ellingham_graph import (
+            ElementalMetalSaturationCapNotice,
             ELLINGHAM_THERMO,
             _antoine_reference_pressure_Pa,
-            effective_equilibrium_pressure_Pa,
+            _effective_equilibrium_pressure_Pa_with_notices,
         )
         from engines.builtin.vapor_pressure import (
             _standard_reaction_pressure_Pa,
@@ -7055,6 +7065,7 @@ class _MELTSBackendSupport(MeltBackend):
                 comp_wt
             )
         pressures: Dict[str, float] = {}
+        cap_notices: list[ElementalMetalSaturationCapNotice] = []
         missing_pO2_species: list[str] = []
         self._antoine_floor_inversion_notices = {}
         self._antoine_activity_source_notices = {}
@@ -7093,12 +7104,13 @@ class _MELTSBackendSupport(MeltBackend):
             pO2_value = validate_physical_pO2_bar(pO2_bar) if pO2_bar is not None else 1.0
             if self._antoine_uses_reaction_pressure(spec):
                 group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
-                p_i = effective_equilibrium_pressure_Pa(
+                p_i = _effective_equilibrium_pressure_Pa_with_notices(
                     species, T_K, pO2_value, a_oxide=float(raw_activity),
                     vapor_pressure_data=(
                         getattr(self, '_vapor_pressure_catalog_payload', {group: {species: spec}})
                         if uses_catalog else {group: {species: spec}}
                     ),
+                    cap_notices=cap_notices,
                 )
             else:
                 # Legacy fitted reaction references are not elemental
@@ -7126,6 +7138,9 @@ class _MELTSBackendSupport(MeltBackend):
                 str(species), spec, self._pseudo_vapor_pressure_warning_seen,
                 stacklevel=3,
             )
+        self._antoine_elemental_metal_saturation_caps = [
+            dict(notice) for notice in cap_notices
+        ]
         if missing_pO2_species:
             return VaporPressureActivityRefusal(
                 missing_precursor_species=tuple(missing_pO2_species),

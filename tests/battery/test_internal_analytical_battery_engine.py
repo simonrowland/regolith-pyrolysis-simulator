@@ -970,8 +970,11 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             1950.0,
             "openimcc_vapour_phase_signal_missing",
             "builtin_authoritative",
-            "silicate_window",
-            id="stolyarova-magemin-silicate-window-refusal",
+            # L predicts positive SiO2 outside MAGEMin's calibration band
+            # with an extrapolation notice, so the solver's downstream
+            # refusal is the observed mode-vector mass deficit.
+            "magemin_mode_vector_mass_deficit",
+            id="stolyarova-magemin-mode-vector-mass-deficit",
         ),
         pytest.param(
             "shornikov-2026-wollastonite-kems",

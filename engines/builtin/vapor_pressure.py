@@ -3025,6 +3025,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
         from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT
+        from simulator.chemistry.ellingham_graph import (
+            ElementalMetalSaturationCapNotice,
+            _cap_elemental_metal_pressure_at_saturation_Pa,
+        )
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             REACTION_PLANE_TRANSPORT_HEADSPACE,
@@ -3210,6 +3214,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
         vapor_pressures: dict[str, float] = {}
+        elemental_metal_saturation_caps: list[
+            ElementalMetalSaturationCapNotice
+        ] = []
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
         below_reporting_threshold_omissions: dict[str, dict[str, Any]] = {}
@@ -3478,6 +3485,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                    notices=elemental_metal_saturation_caps,
+                )
                 gamma_auth = _gamma_domain_authority(
                     parent_oxide, T_K, oxide_activity
                 )
@@ -3651,6 +3665,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                    notices=elemental_metal_saturation_caps,
+                )
                 if _publishes_vapor_pressure(
                     P_eq_Pa,
                     retain_subthreshold=retain_high_t_openimcc_carriers,
@@ -3818,6 +3839,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     P_eq_raw,
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
+                )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                    notices=elemental_metal_saturation_caps,
                 )
                 if _publishes_vapor_pressure(
                     P_eq_Pa,
@@ -4051,6 +4079,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_factor * pressure_reference_Pa,
                 species=species,
                 field="P_eq_Pa",
+            )
+            P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                P_eq_Pa,
+                vapor_pressure_data=self._vapor_pressure_data,
+                notices=elemental_metal_saturation_caps,
             )
             if species in metal_extrapolations:
                 metal_extrapolations[species]["computed_pressure_Pa"] = P_eq_Pa
@@ -4759,6 +4794,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             },
             "species_authority": species_authority,
         }
+        if elemental_metal_saturation_caps:
+            diagnostic["elemental_metal_saturation_caps"] = [
+                dict(notice) for notice in elemental_metal_saturation_caps
+            ]
         if high_t_activity_authority is not None:
             selected_parent_activities = {}
             selected_parent_provenance = {}

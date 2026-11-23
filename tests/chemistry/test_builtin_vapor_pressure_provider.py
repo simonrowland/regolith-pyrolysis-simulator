@@ -3436,6 +3436,114 @@ def test_legacy_fallback_grounds_mn_liquid_oxide_standard_reaction(
     assert "liquid_oxide_standard_reaction" in result.vapor_pressures_source["Mn"]
 
 
+def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
+    vapor_pressure_data,
+):
+    class _CrOnlyMelt:
+        temperature_C = 1423.15 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"Cr2O3": 100.0}
+
+    class _NaOnlyMelt:
+        temperature_C = 1423.15 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"Na2O": 100.0}
+
+    class _KOnlyMelt:
+        temperature_C = 1423.15 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"K2O": 100.0}
+
+    temperature_K = 1423.15
+    species_melts = (
+        ("Cr", _CrOnlyMelt()),
+        ("Mg", _MgOnlyMelt(temperature_K)),
+        ("Na", _NaOnlyMelt()),
+        ("K", _KOnlyMelt()),
+    )
+    # EquilibriumMixin reads the live intrinsic value from the melt when no
+    # redox reservoir is attached; _compute_intrinsic_melt_fO2 is not this
+    # seam. Apply the same pinned condition to every species fake.
+    for _, melt in species_melts:
+        melt.melt_fO2_log = -28.0
+
+    # At unit oxide activity (100 wt% single oxide) and pO2=1e-28 bar, the
+    # Na and K reactions produce pressures above pure-metal saturation.
+    for species, melt in species_melts:
+        result = _LegacyInternalAnalyticalModel(
+            vapor_pressure_data,
+            melt=melt,
+        )._internal_analytical_equilibrium()
+        pure_metal_saturation_Pa = (
+            ellingham_graph.metal_saturation_pressure_Pa(
+                species,
+                temperature_K,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+        )
+        pressure = result.vapor_pressures_Pa[species]
+        assert type(pressure) is float
+
+        if species == "Mg":
+            # JANAF Mg(g)/MgO at 1423.15 K gives ΔG≈−877.16 kJ/mol O2,
+            # K≈6.394e−33 bar and a_M≈7.996e−3 at pO2=1e−28 bar.
+            # Its 799.6039375676731 Pa pressure is below the pure-metal cap.
+            assert pressure == pytest.approx(
+                799.6039375676731,
+                rel=1e-12,
+                abs=1e-12,
+            )
+            assert pressure < pure_metal_saturation_Pa
+            assert "elemental_metal_saturation_caps" not in result.diagnostics
+        else:
+            assert pressure == pytest.approx(pure_metal_saturation_Pa)
+            notices = result.diagnostics["elemental_metal_saturation_caps"]
+            notice = next(
+                row for row in notices if row["species"] == species
+            )
+            assert notice["code"] == "elemental_metal_saturation_cap"
+            assert notice["uncapped_pressure_Pa"] > pressure
+            assert notice["capped_pressure_Pa"] == pressure
+            assert notice["saturation_owner"]
+            if species == "Na":
+                assert notice["saturation_owner"] == "Browning-Potter"
+
+
+def test_builtin_provider_reports_binding_elemental_metal_saturation_cap(
+    vapor_pressure_data,
+):
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Na2O": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1423.15 - 273.15,
+        pressure_bar=1e-3,
+        control_inputs={"pO2_bar": 1e-28, "intrinsic_fO2_log": -28.0},
+    )
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+
+    assert result.status == "ok"
+    pressure = result.diagnostic["vapor_pressures_Pa"]["Na"]
+    assert type(pressure) is float
+    notice = next(
+        row
+        for row in result.diagnostic["elemental_metal_saturation_caps"]
+        if row["species"] == "Na"
+    )
+    assert notice["code"] == "elemental_metal_saturation_cap"
+    assert notice["uncapped_pressure_Pa"] > pressure
+    assert notice["capped_pressure_Pa"] == pressure
+    assert notice["saturation_owner"] == "Browning-Potter"
+
+
 def test_legacy_and_provider_al_liquid_oxide_antoine_pins(vapor_pressure_data):
     legacy = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,

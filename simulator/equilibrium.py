@@ -371,6 +371,10 @@ class EquilibriumMixin:
         (see the shared SiO pressure owner).  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
+        from simulator.chemistry.ellingham_graph import (
+            ElementalMetalSaturationCapNotice,
+            _cap_elemental_metal_pressure_at_saturation_Pa,
+        )
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
@@ -435,6 +439,9 @@ class EquilibriumMixin:
             )
 
         vapor_pressures = {}
+        elemental_metal_saturation_caps: list[
+            ElementalMetalSaturationCapNotice
+        ] = []
         vapor_pressure_sources = {}
         activities = {}
         activity_provenance = {}
@@ -894,6 +901,13 @@ class EquilibriumMixin:
                         species=species,
                         field="P_effective_pO2",
                     )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                    notices=elemental_metal_saturation_caps,
+                )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
                     source_label = vapor_pressure_source_label(
@@ -1007,6 +1021,13 @@ class EquilibriumMixin:
                     P_eq_raw,
                     species=species,
                     field="P_effective_liquid_oxide_standard_reaction",
+                )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                    notices=elemental_metal_saturation_caps,
                 )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
@@ -1138,6 +1159,13 @@ class EquilibriumMixin:
                     P_eq_raw,
                     species=species,
                     field="P_effective_gas_rail_standard_reaction",
+                )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                    notices=elemental_metal_saturation_caps,
                 )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
@@ -1316,6 +1344,13 @@ class EquilibriumMixin:
                 P_effective_Pa,
                 species=species,
                 field="P_effective_Pa",
+            )
+            P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                P_effective_Pa,
+                vapor_pressure_data=self.vapor_pressures,
+                notices=elemental_metal_saturation_caps,
             )
 
             if species in metal_extrapolations:
@@ -1548,6 +1583,10 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
+        if elemental_metal_saturation_caps:
+            _eq_diagnostics["elemental_metal_saturation_caps"] = [
+                dict(notice) for notice in elemental_metal_saturation_caps
+            ]
         # This completed path sets status='ok'; invalid T/P already returned
         # out_of_domain above. Merge every typed omission note into its result.
         if silent_zero_notes:

@@ -1615,7 +1615,10 @@ def test_worker_timeout_exception_is_counted_and_not_stored(tmp_path, monkeypatc
             "ImccFerricInputUnsupportedError",
         ),
         (
-            {"SiO2": 1.0, "P2O5": 0.1},
+            # Keep the unmodelled P2O5 below OpenIMCC's trace cutoff so this
+            # receipt exercises the SP extension refusal, not the earlier
+            # trace-limit guard.
+            {"SiO2": 1.0, "P2O5": 0.005},
             "imcc_sp_extension_required",
             "ImccSPComponentRequiresExtensionError",
         ),
