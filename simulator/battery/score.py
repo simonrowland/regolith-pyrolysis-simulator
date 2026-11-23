@@ -187,7 +187,9 @@ from simulator.battery.migrate import (
     observation_matches_source_tokens,
     condition_identity_axis,
     condition_identity_value,
+    located_run_pressure,
     located_run_temperature,
+    redox_identity_sources,
     path_matches_source_tokens,
     _phase_for_sample_description,
     _phase_for_recorded_vapour_sample,
@@ -10031,6 +10033,8 @@ def _redox_input_view(
         condition_identity_axis=condition_identity_axis,
         condition_identity_value=condition_identity_value,
         temperature_selection=located_run_temperature,
+        pressure_selection=located_run_pressure,
+        identity_sources=redox_identity_sources(observation, experiment),
         experiment=experiment,
     )
 

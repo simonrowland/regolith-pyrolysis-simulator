@@ -146,6 +146,7 @@ from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     KRESS_FE2O3_WT_PCT_FIELD,
     KRESS_FEO_WT_PCT_FIELD,
+    inherited_row_locator,
 )
 from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
@@ -4299,6 +4300,15 @@ def observation_from_plain(payload: object) -> Observation:
             for k in ("crystal_system", "space_group", "transition_note")
         })
     raw_provenance = payload.get("provenance")
+    locator = _locator_from_plain(payload.get("locator"))
+    if (
+        point_conditions and locator is not None
+        and identity.quantity.value in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+        and not (
+            _is_mapping(raw_provenance) and "identity_condition_sources" in raw_provenance
+        )
+    ):
+        _recover_legacy_projection_addresses(point_conditions, locator)
     raw_uncertainty = payload.get("uncertainty")
     raw_derivation = payload.get("derivation")
     return Observation(
@@ -4314,7 +4324,7 @@ def observation_from_plain(payload: object) -> Observation:
         if _is_mapping(raw_provenance)
         else None,
         source_id=payload.get("source_id"),
-        locator=_locator_from_plain(payload.get("locator")),
+        locator=locator,
         read_from=payload.get("read_from"),
         point_conditions=point_conditions,
         derived_from=None if derived_from is None else tuple(str(x) for x in derived_from),
@@ -10125,8 +10135,41 @@ def _temperature_field_locator(
         return fallback
     raw = _temperature_field_value(payload, field_name)
     if isinstance(raw, Mapping):
-        return locator_from_mapping(raw.get("locator")) or fallback
-    return fallback
+        explicit = locator_from_mapping(raw.get("locator"))
+        if explicit is not None:
+            return explicit
+    return inherited_row_locator(fallback)
+
+
+def _recover_legacy_projection_addresses(
+    conditions: dict[str, Located[Any]], target: Locator,
+) -> None:
+    """Recover row-only addresses from the old migration's blanket stamps."""
+    row = inherited_row_locator(target)
+    if row == target:
+        return
+    for field, relation in (
+        ("temperature_K", "celsius_to_kelvin"),
+        ("composition", "wt_pct_to_mole_fraction"),
+    ):
+        projection = conditions.get(field)
+        if projection is None or projection.locator != target:
+            continue
+        inference = projection.inference
+        if (
+            inference is not None and inference.relation == relation
+            and inference.parameters
+            and any(name == "factor" or name.startswith("M_") for name, _ in inference.parameters)
+            and all(operand.locator == target for _, operand in inference.parameters)
+        ):
+            conditions[field] = replace(projection, locator=row, inference=replace(
+                inference, parameters=tuple(
+                    (name, replace(operand, locator=(
+                        None if name == "factor" or name.startswith("M_") else row
+                    )))
+                    for name, operand in inference.parameters
+                ),
+            ))
 
 
 # Extractor-written Kelvin sitting next to the printed Celsius. A field named
@@ -14212,6 +14255,7 @@ _PRESSURE_TOTAL_KEYS = (
     ("total_pressure_atm", "atm"),
     ("total_pressure_Torr", "Torr"),
 )
+_PRESSURE_CONDITION_UNITS = {**dict(_PRESSURE_TOTAL_KEYS), "pressure_MPa": "MPa"}
 _PRESSURE_SUM_KEYS = (
     "partial_pressures",
     "gas_partial_pressures",
@@ -21144,7 +21188,7 @@ def condition_identity_axis(name: str) -> str | None:
         return "temperature_K"
     if name in {"composition", "printed_composition"}:
         return "composition"
-    if any(name == field for field, _unit in _PRESSURE_TOTAL_KEYS):
+    if name in _PRESSURE_CONDITION_UNITS:
         return "total_pressure_Pa"
     if (
         name in _PRINTED_LOG_FO2_KEYS
@@ -21165,21 +21209,109 @@ def condition_identity_value(name: str, value: object) -> object:
     if axis == "temperature_K":
         return select_declared_source(AXIS_TEMPERATURE_K, None, {name: _temperature_number(value)}).amount
     if axis == "total_pressure_Pa":
-        unit = dict(_PRESSURE_TOTAL_KEYS)[name]
+        unit = _PRESSURE_CONDITION_UNITS[name]
         return convert_pressure_to_pa(_temperature_number(value), unit)[0]
     return value
 
 
 def located_run_temperature(conditions: Mapping[str, Located]) -> State[Decimal] | None:
     """Apply the migration temperature selection to retained run controls."""
+    selection = _located_temperature_selection(conditions)
+    return State.of(selection.amount) if selection.amount is not None else None
+
+
+def located_run_pressure(conditions: Mapping[str, Located]) -> Decimal | Value | None:
+    """Select a run pressure in the migration owner's declared field order."""
+    for field in _PRESSURE_CONDITION_UNITS:
+        condition = conditions.get(field)
+        if condition is not None and condition.state.is_value:
+            value = condition.state.value
+            if isinstance(value, Value) and value.kind is ValueKind.INTERVAL:
+                return value
+            pressure = condition_identity_value(field, value)
+            if pressure is not None:
+                return pressure
+    return None
+
+
+def _located_temperature_selection(conditions: Mapping[str, Located]) -> SourceSelection:
     payload = {
         key: value
         for key, condition in conditions.items()
         if condition.state.is_value and condition_identity_axis(key) == "temperature_K"
         and (value := _temperature_number(condition.state.value)) is not None
     }
-    selection = select_declared_source(AXIS_TEMPERATURE_K, None, payload)
-    return State.of(selection.amount) if selection.amount is not None else None
+    for key in ("T_units", "temperature_units"):
+        units = conditions.get(key)
+        if units is not None and units.state.is_value:
+            payload[key] = units.state.value
+    return select_declared_source(AXIS_TEMPERATURE_K, None, payload)
+
+
+def redox_identity_sources(
+    observation: Observation, experiment: Experiment | None, *,
+    oxygen_kind: str | None = None,
+) -> dict[str, tuple[str, ...]]:
+    """Resolve the located field paths that supplied each redox identity axis.
+
+    Extract migration records its selected sources in observation provenance.
+    Older stores carry the same located fields without that record. Resolve
+    those by source scope and field precedence, without matching magnitudes.
+    """
+    recorded = (observation.provenance or {}).get("identity_condition_sources")
+    sources: dict[str, tuple[str, ...]] = {}
+    available_paths: set[str] = set()
+    candidate_groups = [("point_conditions", observation.point_conditions or {})]
+    if experiment is not None:
+        candidate_groups.extend((
+            ("experiment.pressure_environment", {
+                "total_pressure_Pa": experiment.pressure_environment.total_pressure_Pa,
+            }),
+            ("experiment.conditions", experiment.conditions),
+            ("experiment.sample", {
+                "initial_composition": experiment.sample.initial_composition,
+                "printed_composition": experiment.sample.printed_composition,
+            }),
+        ))
+        if experiment.fO2_control is not None:
+            candidate_groups.append(("experiment.fO2_control", {
+                "oxygen_partial_pressure_Pa": experiment.fO2_control.oxygen_partial_pressure_Pa,
+                "buffer": experiment.fO2_control.buffer,
+            }))
+    for scope, candidates in candidate_groups:
+        located = {key: value for key, value in candidates.items()
+                   if value is not None and value.state.is_value}
+        available_paths.update(f"{scope}.{key}" for key in located)
+        if "temperature_K" not in sources:
+            temperature = _located_temperature_selection(located)
+            if temperature.available and temperature.field_name is not None:
+                sources["temperature_K"] = (f"{scope}.{temperature.field_name}",)
+        pressure = next((key for key in _PRESSURE_CONDITION_UNITS if key in located), None)
+        if pressure is not None:
+            sources.setdefault("total_pressure_Pa", (f"{scope}.{pressure}",))
+        composition = next((key for key in ("composition", "initial_composition", "printed_composition")
+                            if key in located), None)
+        if composition is not None:
+            sources.setdefault("composition", (f"{scope}.{composition}",))
+        oxygen = tuple(key for key in located if condition_identity_axis(key) == "fO2_Pa" or key == "buffer")
+        if oxygen and "fO2_Pa" not in sources:
+            preferred = ("fO2_Pa", "oxygen_partial_pressure_Pa") if oxygen_kind == "pressure" else (
+                "fO2_log", "log_fO2", "log10_fO2", "logfO2",
+            )
+            chosen = next((key for key in preferred if key in oxygen), oxygen[0])
+            paths = [f"{scope}.{chosen}"]
+            if oxygen_kind == "buffer":
+                paths = [f"{scope}.{key}" for key in oxygen]
+                paths.extend(sources.get("temperature_K", ()))
+                paths.extend(sources.get("total_pressure_Pa", ()))
+            sources["fO2_Pa"] = tuple(paths)
+    if isinstance(recorded, Mapping):
+        sources.update({
+            axis: tuple(paths)
+            for axis, paths in recorded.items()
+            if all(path in available_paths for path in paths)
+        })
+    return sources
 
 
 def _has_relative_buffer_marker(text: str) -> bool:
@@ -25581,6 +25713,7 @@ class Migrator:
         source_key: str,
         *,
         source_row_index: int | None = None,
+        oxygen_kind: str | None = None,
     ) -> None:
         identity = observation.identity
         basis_state = (
@@ -25704,6 +25837,16 @@ class Migrator:
                         ),
                     ),
                 )
+        if observation.identity.quantity.value in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+            sources = redox_identity_sources(
+                observation, self.result.experiments.get(observation.experiment_id),
+                oxygen_kind=oxygen_kind,
+            )
+            if sources:
+                observation = replace(observation, provenance={
+                    **(observation.provenance or {}),
+                    "identity_condition_sources": sources,
+                })
         oid = observation.observation_id
         existing = self.result.observations.get(oid)
         if existing is not None:
@@ -26844,7 +26987,8 @@ class Migrator:
             else values
         )
         projected_oxide_locator = (
-            locator_from_mapping(obs.get("locator"))
+            _printed_oxide_map_locator(values)
+            or inherited_row_locator(locator_from_mapping(obs.get("locator")))
             if row_oxide_map
             else sample_composition[1]
             if isinstance(sample_composition, tuple)
@@ -30155,7 +30299,10 @@ class Migrator:
             derived_from,
             value_derivation,
         )
-        self._add_observation(observation, source_key)
+        self._add_observation(
+            observation, source_key,
+            oxygen_kind=oxygen_decision.kind if oxygen_decision is not None else None,
+        )
 
     def _emit_mass_fraction_pair_ratio(
         self,
@@ -30787,7 +30934,8 @@ class Migrator:
                 point_printed_composition, point_composition_located = (
                     _located_printed_and_initial(
                         point_oxide_map,
-                        point_locator,
+                        _printed_oxide_map_locator(point_composition_context)
+                        or inherited_row_locator(point_locator),
                         closure_context=point_composition_context,
                         declared_component_map=point_declared_component_map,
                     )
@@ -32443,7 +32591,10 @@ class Migrator:
             derived_from,
             derivation,
         )
-        self._add_observation(observation, source_key)
+        self._add_observation(
+            observation, source_key,
+            oxygen_kind=oxygen_decision.kind if oxygen_decision is not None else None,
+        )
         children = self._exploded_children.setdefault(parent_id, [])
         if point_id not in children:
             children.append(point_id)

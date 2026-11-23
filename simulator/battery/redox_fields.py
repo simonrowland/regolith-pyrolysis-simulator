@@ -1,10 +1,10 @@
 """Source fields and information flow for predictive redox controls."""
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 
-from simulator.battery.enums import FO2Channel, NoticeKind, Quantity, ValueKind
+from simulator.battery.enums import FO2Channel, NoticeKind, Quantity
 from simulator.battery.records import Experiment, Located, Locator, Notice, Observation, State, Value
 
 FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
@@ -27,13 +27,32 @@ CONTROL_VARIABLE_FIELDS = {
 }
 
 
-def _cell_coordinates(locator: Locator) -> tuple[str | None, ...]:
+def _address_note_segments(locator: Locator) -> Iterator[tuple[str, str | None, str | None]]:
     # Migration stores row/column as note segments. Other notes are prose.
-    coordinates = {}
     for segment in (locator.note or "").split(";"):
         key, separator, value = segment.strip().partition("=")
-        if separator and key in {"row", "column"}:
-            coordinates[key] = value.strip() or None
+        yield segment, key.strip() if separator else None, value.strip() or None
+
+
+def inherited_row_locator(locator: Locator | None) -> Locator | None:
+    """An inherited observation locator locates the row, not another column."""
+    if locator is None or not locator.note:
+        return locator
+    parts = [segment for segment, key, _ in _address_note_segments(locator) if key != "column"]
+    note = ";".join(parts)
+    if note == locator.note:
+        return locator
+    try:
+        return replace(locator, note=note.strip() or None)
+    except ValueError:  # The inherited column was the only locator field.
+        return None
+
+
+def _cell_coordinates(locator: Locator) -> tuple[str | None, ...]:
+    coordinates = {}
+    for _, key, value in _address_note_segments(locator):
+        if key in {"row", "column"}:
+            coordinates[key] = value
     page = locator.pdf_page_index + 1 if locator.pdf_page_index is not None else locator.page
     return (
         locator.source_path, str(page) if page is not None else None,
@@ -45,21 +64,20 @@ def _cell_coordinates(locator: Locator) -> tuple[str | None, ...]:
 @dataclass(frozen=True)
 class _PrintedCell:
     address: tuple[str | None, ...]
-    value: str | Decimal | int
+    value: str | None
 
 
-def _printed_cell(value: Located, *, inherited_row: bool = False) -> _PrintedCell | None:
+def _printed_cell(value: Located, *, address_only: bool = False) -> _PrintedCell | None:
     if value.locator is None or not value.state.is_value:
         return None
     scalar = value.state.value
     if isinstance(scalar, Value):
         scalar = scalar.point
+    if address_only:
+        return _PrintedCell(_cell_coordinates(value.locator), None)
     if not isinstance(scalar, (str, Decimal, int)) or isinstance(scalar, bool):
         return None
-    address = _cell_coordinates(value.locator)
-    if inherited_row:
-        address = (*address[:-1], None)
-    return _PrintedCell(address, scalar)
+    return _PrintedCell(_cell_coordinates(value.locator), str(scalar))
 
 
 def same_printed_cell(a: _PrintedCell | None, b: _PrintedCell | None) -> str | None:
@@ -75,12 +93,12 @@ def same_printed_cell(a: _PrintedCell | None, b: _PrintedCell | None) -> str | N
         return None
     if left[5] is not None and right[5] is not None:
         return "same"
-    if isinstance(a.value, str) and a.value == b.value:
-        return "ambiguous"
+    if a.value is None or b.value is None:
+        return None
     try:
         first, second = Decimal(a.value), Decimal(b.value)
     except InvalidOperation:
-        return None
+        return "ambiguous" if a.value == b.value else None
     return (
         "ambiguous" if first.is_finite() and second.is_finite() and first == second else None
     )
@@ -112,31 +130,20 @@ def _is_imposed_oxygen_cell(value: Located, experiment: Experiment | None) -> bo
         and control.channel.is_value
         and control.channel.value is not FO2Channel.INTRINSIC
         and control.oxygen_partial_pressure_Pa is not None
-        and same_printed_cell(
-            _printed_cell(value), _printed_cell(_raw_printed_value(control.oxygen_partial_pressure_Pa)),
-        ) is not None
+        and _target_dependency(_printed_cell(value), control.oxygen_partial_pressure_Pa) is not None
     )
 
 
-def _target_dependency(
-    target: _PrintedCell | None, condition: Located, *, projected_axis: bool = False,
-    inherited_row: bool = False,
-) -> str | None:
-    if not projected_axis:
-        match = same_printed_cell(target, _printed_cell(
-            _raw_printed_value(condition), inherited_row=inherited_row,
-        ))
-        if match is not None:
-            return match
-    if condition.inference is not None:
-        for _, operand in condition.inference.parameters:
-            # Migration can stamp a whole projected axis and its operands with the
-            # observation's locator. That inherited column does not address the operand.
-            match = _target_dependency(
-                target, operand, inherited_row=(
-                    inherited_row or (projected_axis and operand.locator == condition.locator)
-                ),
-            )
+def _target_dependency(target: _PrintedCell | None, condition: Located) -> str | None:
+    inference = condition.inference
+    match = same_printed_cell(target, _printed_cell(
+        condition, address_only=inference is not None,
+    ))
+    if match is not None:
+        return match
+    if inference is not None:
+        for _, operand in inference.parameters:
+            match = _target_dependency(target, operand)
             if match is not None:
                 return "ambiguous" if match == "ambiguous" else "derived_from_target"
     return None
@@ -169,6 +176,8 @@ def independent_redox_conditions(
     condition_identity_axis: Callable[[str], str | None],
     condition_identity_value: Callable[[str, object], object],
     temperature_selection: Callable[[Mapping[str, Located]], State | None],
+    pressure_selection: Callable[[Mapping[str, Located]], Decimal | Value | None],
+    identity_sources: Mapping[str, tuple[str, ...]],
     experiment: Experiment | None = None,
 ) -> tuple[Observation, Experiment | None, tuple[Notice, ...]]:
     """Build the one permitted input view and retain the reason for each exclusion."""
@@ -181,6 +190,7 @@ def independent_redox_conditions(
     parameters = dict(derivation.parameters) if derivation is not None else {}
     excluded: dict[str, str] = {}
     correction_axes = set()
+    correction_pressure = None
     temperature_operand = False
     for field in _operand_fields(observation, conditions):
         axis = condition_identity_axis(field)
@@ -211,25 +221,26 @@ def independent_redox_conditions(
             key: condition_identity_value(key, condition.state.value)
             for key, condition in conditions.items()
             if condition.state.is_value and condition_identity_axis(key) == axis
+            and _target_dependency(target, condition) is None
         }
         projected_value = (
             projected.value if projected is not None and projected.is_value else None
         )
         run_value = None
         if experiment is not None:
-            run_condition = (
-                experiment.pressure_environment.total_pressure_Pa
-                if axis == "total_pressure_Pa" else experiment.conditions.get(axis)
-            )
-            if (
-                run_condition is not None and run_condition.state.is_value
-                and _target_dependency(target, run_condition) is None
-            ):
-                recorded = run_condition.state.value
-                run_value = (
-                    recorded if isinstance(recorded, Value) and recorded.kind is ValueKind.INTERVAL
-                    else condition_identity_value(axis, recorded)
-                )
+            run_conditions = {
+                key: condition for key, condition in experiment.conditions.items()
+                if _target_dependency(target, condition) is None
+            }
+            if axis == "temperature_K":
+                selected = temperature_selection(run_conditions)
+                if selected is not None:
+                    run_value = selected.value
+            else:
+                pressure = experiment.pressure_environment.total_pressure_Pa
+                if pressure.state.is_value and _target_dependency(target, pressure) is None:
+                    run_conditions[axis] = pressure
+                run_value = pressure_selection(run_conditions)
         if any(
             value not in (None, original_value)
             for value in (*axis_conditions.values(), projected_value, run_value)
@@ -240,21 +251,15 @@ def independent_redox_conditions(
             })
             if projected_value in (None, original_value):
                 correction_axes.add(axis)
+                if axis == "total_pressure_Pa" and isinstance(run_value, Decimal):
+                    correction_pressure = run_value
 
     for field, condition in conditions.items():
         if not condition.state.is_value:
             continue
         if field in {"sample_id", "quench_state", "quench_direction"}:
             continue
-        relation = _target_dependency(
-            target, condition, projected_axis=(
-                condition.inference is not None
-                and (
-                    condition_identity_axis(field) == "composition"
-                    or condition.inference.relation == "celsius_to_kelvin"
-                )
-            ),
-        )
+        relation = _target_dependency(target, condition)
         if relation is not None:
             excluded[field] = relation
         elif ferric_target and field in _FERRIC_CONDITION_FIELDS and (
@@ -263,39 +268,25 @@ def independent_redox_conditions(
             excluded[field] = "unlocated_ferric_assay"
 
     independent = {field: condition for field, condition in conditions.items() if field not in excluded}
-    invalid_axes = correction_axes | {
-        axis for field, reason in excluded.items()
-        if reason != "original_condition_differs_from_run"
-        and (axis := condition_identity_axis(field)) is not None
-    }
     located_inputs = {field: conditions[field] for field in excluded if field in conditions}
+    excluded_sources = {f"point_conditions.{field}" for field in excluded}
     if experiment is not None:
-        def independent_control(
-            field: str, condition: Located | None, identity_field: str | None = None,
-        ) -> Located | None:
+        def independent_control(field: str, condition: Located | None) -> Located | None:
             if condition is None or (reason := _target_dependency(target, condition)) is None:
                 return condition
             excluded[field] = reason
             located_inputs[field] = condition
-            if identity_field is not None and (axis := condition_identity_axis(identity_field)) is not None:
-                projected = getattr(identity, axis)
-                if projected is not None and projected.is_value and condition.state.is_value:
-                    scalar = condition.state.value
-                    if isinstance(scalar, Value):
-                        scalar = scalar.point
-                    value = condition_identity_value(identity_field, scalar)
-                    if projected.value == value:
-                        invalid_axes.add(axis)
+            excluded_sources.add(field)
             return None
 
         unavailable = Located(State.unknown("condition depends on the scored target"))
         run_conditions = {
-            field: independent_control(f"experiment.conditions.{field}", condition, field) or unavailable
+            field: independent_control(f"experiment.conditions.{field}", condition) or unavailable
             for field, condition in experiment.conditions.items()
         }
         environment = experiment.pressure_environment
         pressure = independent_control("experiment.pressure_environment.total_pressure_Pa",
-                                       environment.total_pressure_Pa, "total_pressure_Pa")
+                                       environment.total_pressure_Pa)
         sweep = independent_control("experiment.pressure_environment.sweep_gas",
                                     environment.sweep_gas)
         oxygen = experiment.fO2_control
@@ -308,21 +299,19 @@ def independent_redox_conditions(
                 gas_ratio=gas,
                 oxygen_partial_pressure_Pa=independent_control(
                     "experiment.fO2_control.oxygen_partial_pressure_Pa",
-                    oxygen.oxygen_partial_pressure_Pa, "oxygen_partial_pressure_Pa",
+                    oxygen.oxygen_partial_pressure_Pa,
                 ),
                 buffer=independent_control(
-                    "experiment.fO2_control.buffer", oxygen.buffer, "oxygen_buffer_as_published",
+                    "experiment.fO2_control.buffer", oxygen.buffer,
                 ),
             )
         sample = replace(
             experiment.sample,
             initial_composition=independent_control(
                 "experiment.sample.initial_composition", experiment.sample.initial_composition,
-                "composition",
             ),
             printed_composition=independent_control(
                 "experiment.sample.printed_composition", experiment.sample.printed_composition,
-                "printed_composition",
             ),
             container=independent_control("experiment.sample.container", experiment.sample.container),
         )
@@ -334,21 +323,24 @@ def independent_redox_conditions(
                 sweep_gas=sweep or unavailable,
             ),
         )
+    invalid_axes = correction_axes | {
+        axis for axis, sources in identity_sources.items()
+        if not excluded_sources.isdisjoint(sources)
+    }
     identity_fields = dict.fromkeys(invalid_axes)
-    if "temperature_K" in invalid_axes or temperature_operand:
+    if "temperature_K" in invalid_axes or (
+        temperature_operand and (identity.temperature_K is None or not identity.temperature_K.is_value)
+    ):
         selected_temperature = temperature_selection(independent)
         if selected_temperature is None and experiment is not None:
             selected_temperature = temperature_selection(experiment.conditions)
         if selected_temperature is not None:
             identity_fields["temperature_K"] = selected_temperature
     if "total_pressure_Pa" in correction_axes:
-        candidates = (
-            condition_identity_value(field, condition.state.value)
-            for field, condition in independent.items()
-            if condition.state.is_value and condition_identity_axis(field) == "total_pressure_Pa"
-        )
-        replacement = next((candidate for candidate in candidates if candidate is not None), None)
-        if replacement is not None:
+        replacement = pressure_selection(independent)
+        if replacement is None:
+            replacement = correction_pressure
+        if isinstance(replacement, Decimal):
             identity_fields["total_pressure_Pa"] = State.of(replacement)
 
     notices = tuple(
