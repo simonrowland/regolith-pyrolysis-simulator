@@ -12,6 +12,8 @@ from simulator.engine_cache import _engine_cache_path_scope
 from scripts import battery_cache_equivalence as gate
 from scripts import battery_score
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 @pytest.mark.parametrize(
     ("scoped_path", "flag_path", "expected_path"),

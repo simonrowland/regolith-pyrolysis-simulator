@@ -1238,6 +1238,102 @@ def _with_solve_timeout(timeout_s: float | None):
         _EVALUATE_SOLVE_TIMEOUT_S.reset(token)
 
 
+# The residue worker pickles the exception class name, not its code.
+# These names are the input refusals above. Solver and datapack-load
+# names are absent: the pipe cannot show that those are deterministic.
+ISOLATED_OPENIMCC_CACHEABLE_ERRORS = {
+    "ImccCompositionIncompleteError": "imcc_composition_incomplete",
+    "ImccFerricInputUnsupportedError": "imcc_ferric_input_unsupported",
+    "ImccComponentOutsideDomainError": "imcc_component_outside_domain",
+    "ImccSpeciesNotFoundError": "imcc_species_not_found",
+    "ImccSPComponentRequiresExtensionError": "imcc_sp_extension_required",
+    "ImccCompositionOutsideValidatedEnvelopeError": (
+        "imcc_composition_outside_validated_envelope"
+    ),
+    "ImccTOutsideDatapackDomainError": "imcc_T_outside_datapack_domain",
+}
+
+
+def _cacheable_openimcc_refusal_payload(exc: BaseException) -> dict[str, str] | None:
+    """Return a storeable refusal, or None when the error must keep escaping.
+
+    The caller stores this dict and then raises the same exception class,
+    so a later hit still fails the call.
+    """
+
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+    code = getattr(exc, "code", None)
+    if not isinstance(code, str) or code not in CACHEABLE_REFUSAL_CODES:
+        return None
+    detail = str(exc)
+    if isinstance(exc, OpenImccCompositionPolicyRefusal):
+        prefix = f"reason={code}: "
+        if detail.startswith(prefix):
+            detail = detail[len(prefix):]
+    return {
+        "status": "refusal",
+        "refusal_reason": code,
+        "engine_status": "out_of_domain",
+        "detail": detail,
+    }
+
+
+def _imcc_refusal_class(code: str) -> type[Exception] | None:
+    from openimcc.gas import (
+        ImccGasInvalidFugacityError,
+        ImccGasSpeciesNotFoundError,
+        ImccGasTemperatureOutsideDomainError,
+    )
+    from openimcc.kernel import (
+        ImccComponentOutsideDomainError,
+        ImccCompositionIncompleteError,
+        ImccFerricInputUnsupportedError,
+        ImccSpeciesNotFoundError,
+        ImccTOutsideDatapackDomainError,
+    )
+    from openimcc.model import (
+        ImccCompositionOutsideValidatedEnvelopeError,
+        ImccSPComponentRequiresExtensionError,
+    )
+
+    classes: dict[str, type[Exception]] = {
+        ImccCompositionIncompleteError.code: ImccCompositionIncompleteError,
+        ImccFerricInputUnsupportedError.code: ImccFerricInputUnsupportedError,
+        ImccComponentOutsideDomainError.code: ImccComponentOutsideDomainError,
+        ImccSpeciesNotFoundError.code: ImccSpeciesNotFoundError,
+        ImccSPComponentRequiresExtensionError.code: (
+            ImccSPComponentRequiresExtensionError
+        ),
+        ImccCompositionOutsideValidatedEnvelopeError.code: (
+            ImccCompositionOutsideValidatedEnvelopeError
+        ),
+        ImccTOutsideDatapackDomainError.code: ImccTOutsideDatapackDomainError,
+        ImccGasSpeciesNotFoundError.code: ImccGasSpeciesNotFoundError,
+        ImccGasTemperatureOutsideDomainError.code: (
+            ImccGasTemperatureOutsideDomainError
+        ),
+        ImccGasInvalidFugacityError.code: ImccGasInvalidFugacityError,
+    }
+    return classes.get(code)
+
+
+def _reraise_cached_openimcc_refusal(payload: Any) -> None:
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("status") == "refusal"
+        and payload.get("refusal_reason")
+    ):
+        return
+    code = str(payload["refusal_reason"])
+    detail = str(payload.get("detail") or "")
+    if code.startswith("openimcc_composition_"):
+        raise OpenImccCompositionPolicyRefusal(code, detail)
+    refusal_class = _imcc_refusal_class(code)
+    if refusal_class is not None:
+        raise refusal_class(detail)
+
+
 def _evaluate_with_timeout(
     composition_mol: Mapping[str, float] | None = None,
     temperature_K: float | None = None,
@@ -1261,14 +1357,20 @@ def _evaluate_with_timeout(
         allow_out_of_envelope=allow_out_of_envelope,
     )
     def solve() -> Any:
-        return _evaluate_uncached(
-            composition_mol=composition_mol,
-            temperature_K=temperature_K,
-            composition_kg=composition_kg,
-            pack=pack,
-            allow_extrapolation=allow_extrapolation,
-            allow_out_of_envelope=allow_out_of_envelope,
-        ).to_hot()
+        try:
+            return _evaluate_uncached(
+                composition_mol=composition_mol,
+                temperature_K=temperature_K,
+                composition_kg=composition_kg,
+                pack=pack,
+                allow_extrapolation=allow_extrapolation,
+                allow_out_of_envelope=allow_out_of_envelope,
+            ).to_hot()
+        except Exception as exc:
+            payload = _cacheable_openimcc_refusal_payload(exc)
+            if payload is None:
+                raise
+            return payload
 
     payload = cached_engine_call(
         "openimcc",
@@ -1279,6 +1381,7 @@ def _evaluate_with_timeout(
             else lambda: _call_with_hard_timeout(solve, solve_timeout_s)
         ),
     )
+    _reraise_cached_openimcc_refusal(payload)
     return OpenImccBridgeResult.from_hot(payload)
 
 
@@ -1326,18 +1429,26 @@ def evaluate_gas(
         "parent_oxides": None if parent_oxides is None else tuple(parent_oxides),
         "allow_extrapolation": allow_extrapolation,
     }
-    return cached_engine_call(
-        "openimcc",
-        request,
-        lambda: dict(openimcc_evaluate_gas(
-            parent_oxide_activities,
-            temperature_K,
-            pressure_bar,
-            gas_pack,
-            parent_oxides=parent_oxides,
-            allow_extrapolation=allow_extrapolation,
-        )),
-    )
+    def solve() -> Any:
+        try:
+            return dict(openimcc_evaluate_gas(
+                parent_oxide_activities,
+                temperature_K,
+                pressure_bar,
+                gas_pack,
+                parent_oxides=parent_oxides,
+                allow_extrapolation=allow_extrapolation,
+            ))
+        except Exception as exc:
+            payload = _cacheable_openimcc_refusal_payload(exc)
+            if payload is None:
+                raise
+            return payload
+
+    payload = cached_engine_call("openimcc", request, solve)
+    _reraise_cached_openimcc_refusal(payload)
+    return payload
+
 
 def evaluate_redox(
     inventory: Mapping[str, float],
@@ -1374,21 +1485,30 @@ def evaluate_redox(
     }
 
     def solve() -> Any:
-        if entry == "openimcc.redox.evaluate_redox":
-            import openimcc.redox as openimcc_redox
+        try:
+            if entry == "openimcc.redox.evaluate_redox":
+                import openimcc.redox as openimcc_redox
 
-            result = openimcc_redox.evaluate_redox(inventory, temperature_K, mode)
-        else:
-            result = openimcc.evaluate_redox(
-                inventory,
-                temperature_K,
-                mode,
-                lambda_imposed=lambda_imposed,
-            )
-        lean = OpenImccRedoxResult.from_engine_result(result)
-        return lean.to_hot()
+                result = openimcc_redox.evaluate_redox(
+                    inventory, temperature_K, mode,
+                )
+            else:
+                result = openimcc.evaluate_redox(
+                    inventory,
+                    temperature_K,
+                    mode,
+                    lambda_imposed=lambda_imposed,
+                )
+            lean = OpenImccRedoxResult.from_engine_result(result)
+            return lean.to_hot()
+        except Exception as exc:
+            payload = _cacheable_openimcc_refusal_payload(exc)
+            if payload is None:
+                raise
+            return payload
 
     payload = cached_engine_call("openimcc", request, solve)
+    _reraise_cached_openimcc_refusal(payload)
     return OpenImccRedoxResult.from_hot(payload)
 
 

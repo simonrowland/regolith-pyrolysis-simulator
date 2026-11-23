@@ -6,6 +6,8 @@ from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from simulator.battery.enums import AmountBasis, Engine, MethodToken, Phase, Quantity, Rail
 from simulator.battery.records import (
     Admission,
@@ -31,6 +33,8 @@ from simulator.battery.identity import Identity
 from simulator.battery.score import ScoreContext, _score_store_to_jsonl
 from tests.battery.test_engine_cache_equivalence import _canonical_residual_rows
 from tests.battery import factories as F
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 ROOT = Path(__file__).resolve().parents[2]

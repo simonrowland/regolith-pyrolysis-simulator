@@ -718,6 +718,8 @@ def _candidate_redox_result(**moles: float):
     return SimpleNamespace(**payload)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -808,6 +810,8 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     assert prediction.value == Decimal("0.037")
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -914,6 +918,8 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert prediction.value == Decimal("0.023")
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_candidate_zero_fraction_and_ratio_are_scored_but_empty_inputs_refuse(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -1048,6 +1054,8 @@ def test_openimcc_candidate_zero_fraction_and_ratio_are_scored_but_empty_inputs_
     }
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_candidate_negative_log10_ratio_stays_a_score(
     monkeypatch: pytest.MonkeyPatch,
 ):

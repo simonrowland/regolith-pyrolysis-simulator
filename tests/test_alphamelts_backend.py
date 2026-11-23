@@ -194,6 +194,8 @@ def test_petthermotools_blank_and_none_preserve_base_model_keywords() -> None:
     assert blank_backend._melts_model_code() == 1
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('model_name', ['not-a-model', 'MELTSv1.O.2'])
 def test_petthermotools_unknown_model_refuses_before_worker_start(
     monkeypatch,
@@ -286,6 +288,8 @@ def test_petthermotools_resolver_rejects_non_string_models(model_name) -> None:
         resolver(model_name)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> None:
     backend = AlphaMELTSBackend(model_name='pMELTS')
     backend._import_petthermotools = lambda: object()
@@ -326,6 +330,8 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
     assert backend._melts_model_code() == 73
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     'model_name',
     [
@@ -451,6 +457,8 @@ def test_petthermotools_model_keyword_preserves_base_payload_bytes(
     assert calls[0][1]['kwargs']['Model'] == base_model_keyword
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ('model_name', 'expected_code', 'base_model_keyword'),
     [
@@ -515,6 +523,8 @@ def test_petthermotools_cold_worker_keeps_base_model_payload_and_code(
     assert process_calls[0]['args'][4]['Model'] == base_model_keyword
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
@@ -621,6 +631,8 @@ def test_decompression_worker_receives_owner_model_code(
         assert launch[2] == expected_code
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
@@ -799,6 +811,8 @@ def test_petthermotools_initial_start_propagates_untagged_local_error(
         backend._initialize_petthermotools(require_petthermotools=False)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
@@ -854,6 +868,8 @@ def test_petthermotools_warm_worker_keeps_base_model_payload_and_code(
     assert calls == [expected_code, {'Model': str(model_name), 'melts': expected_code}]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('warm', [False, True])
 def test_petthermotools_refuses_padded_model_before_worker_construction(
     monkeypatch,
@@ -1771,6 +1787,8 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_liquidus_pins_single_absolute_melts_request(
     monkeypatch,
 ):
@@ -1819,6 +1837,8 @@ def test_alphamelts_subprocess_liquidus_pins_single_absolute_melts_request(
     assert float(offset_line.split(':', 1)[1]) == -9.0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_liquidus_refuses_buffer_offset(monkeypatch):
     backend, _captured_env, launches = _prepare_subprocess_launch_probe(
         monkeypatch,
@@ -1900,6 +1920,8 @@ def test_subprocess_model_resolver_maps_default_model_to_verified_mode():
     assert mode == "MELTS"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_blank_and_explicit_default_launch_the_same_resolved_mode(monkeypatch):
     blank_backend, blank_env, _ = _prepare_subprocess_launch_probe(
         monkeypatch,
@@ -1920,6 +1942,8 @@ def test_blank_and_explicit_default_launch_the_same_resolved_mode(monkeypatch):
     ]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_unverified_subprocess_model_refuses_before_launch(monkeypatch):
     backend, _captured, launches = _prepare_subprocess_launch_probe(
         monkeypatch,
@@ -1935,6 +1959,8 @@ def test_unverified_subprocess_model_refuses_before_launch(monkeypatch):
     assert launches == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_none_subprocess_model_keeps_its_existing_refusal(monkeypatch):
     backend, _captured, launches = _prepare_subprocess_launch_probe(
         monkeypatch,
@@ -1950,6 +1976,8 @@ def test_none_subprocess_model_keeps_its_existing_refusal(monkeypatch):
     assert launches == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_conflicting_ambient_calc_mode_refuses_before_launch(monkeypatch):
     backend, _captured, launches = _prepare_subprocess_launch_probe(
         monkeypatch,
@@ -1966,6 +1994,8 @@ def test_conflicting_ambient_calc_mode_refuses_before_launch(monkeypatch):
     assert launches == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_agreeing_ambient_calc_mode_passes_to_subprocess(monkeypatch):
     backend, captured, launches = _prepare_subprocess_launch_probe(
         monkeypatch,
@@ -2234,6 +2264,8 @@ def test_clamped_operating_point_never_upgrades_a_degrading_status(
     assert (result.diagnostics or {}).get('backend_status') != 'out_of_domain'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_subbar_pressure_refuses_before_execution(
     monkeypatch,
 ):
@@ -2295,6 +2327,8 @@ def test_production_alphamelts_fe2o3_absent_or_subthreshold_still_launches(
         assert result[1]['Fe2O3'] > 0.0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_requires_explicit_run_mode(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
@@ -2549,6 +2583,8 @@ def test_hour4_positive_liquid_below_400k_empty_vapor_map_is_typed():
     assert BUILTIN_VAPOR_BELOW_400K_LIMIT_K == 400.0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_hour4_typed_vapor_outcome_is_visible_on_equilibrium_diagnostics(
     monkeypatch,
 ):
@@ -2797,6 +2833,8 @@ def test_builtin_subprocess_vapor_projection_unavailable_paths_are_typed(
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     monkeypatch,
 ):
@@ -3117,6 +3155,8 @@ def test_alphamelts_binary32_channel_string_round_trips_to_same_binary32():
         assert serialize_melts_file_temperature_C(reparsed) == contract
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_binary32_collapse_trio_shares_one_contract_key_and_string(
     monkeypatch,
 ):
@@ -3314,6 +3354,8 @@ def test_alphamelts_distinct_binary32_buckets_yield_distinct_cache_keys():
     assert keys[0] != keys[1]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
     """Production path: raw grid T shares one binary32 identity across the channel.
 
@@ -3476,6 +3518,8 @@ def test_alphamelts_temperature_contract_matches_cache_key_value(monkeypatch):
     assert guard_T == pytest.approx(queued_T)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_emits_contract_T_to_melts_and_env(monkeypatch):
     """Boundary serializes once; melts file + MINT/MAXT share that value."""
     backend = AlphaMELTSBackend()
@@ -3994,6 +4038,8 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
     assert vapor_calls == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_keeps_activity_when_fO2_is_not_an_input(
     monkeypatch,
 ):
@@ -4081,6 +4127,8 @@ def test_alphamelts_intrinsic_none_still_refuses_without_redox_mode():
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_not_an_input_na_silica_below_crash_floor_refuses_before_binary(
     monkeypatch,
 ):
@@ -4212,6 +4260,8 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     assert any('clamped operating point' in warning for warning in result.warnings)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_signal_exit_returns_typed_crash_without_mode_flip(
     monkeypatch,
 ):
@@ -4286,6 +4336,8 @@ def test_alphamelts_subprocess_signal_exit_returns_typed_crash_without_mode_flip
     assert len(calls) == 2
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_timeout_returns_typed_status_without_mode_flip(
     monkeypatch,
 ):
@@ -4322,6 +4374,8 @@ def test_alphamelts_subprocess_timeout_returns_typed_status_without_mode_flip(
     assert backend._mode == 'subprocess'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.skipif(os.name != 'posix', reason='POSIX process-group contract')
 def test_alphamelts_timeout_cleanup_oserror_is_secondary_to_typed_status(
     monkeypatch,
@@ -4489,6 +4543,8 @@ def test_alphamelts_cleanup_reaps_launcher_after_retry_kill(monkeypatch):
     assert events[3][1] <= 0.2
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_below_certified_t_notices_and_still_launches(
     monkeypatch,
 ):
@@ -4573,6 +4629,8 @@ def test_alphamelts_subprocess_below_certified_t_notices_and_still_launches(
     assert backend._mode == 'subprocess'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_operating_floor_is_inclusive(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
@@ -4604,6 +4662,8 @@ def test_alphamelts_subprocess_operating_floor_is_inclusive(monkeypatch):
     assert calls[0][1]['timeout'] == 20.0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_python_native_hang_is_killed_and_marks_unavailable(
     monkeypatch,
 ):
@@ -4676,6 +4736,8 @@ def test_alphamelts_python_native_hang_is_killed_and_marks_unavailable(
     ]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
     events = []
 
@@ -4712,6 +4774,8 @@ def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
     assert events == ['close', 'close']
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_petthermotools_warm_worker_is_opt_in_with_cold_fallback(monkeypatch):
     observed = []
 
@@ -4792,6 +4856,8 @@ def test_petthermotools_warm_handler_rebuilds_mutable_native_payload():
     assert len(loader_calls) == 2
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_python_worker_revalidates_timeout_before_spawn(
     monkeypatch,
 ):
@@ -4811,6 +4877,8 @@ def test_alphamelts_python_worker_revalidates_timeout_before_spawn(
         backend._run_petthermotools_isolated('equilibrate_MELTS')
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
@@ -4868,6 +4936,8 @@ def test_alphamelts_timeout_config_must_be_finite_and_positive(
         backend.initialize({'mode': 'subprocess', 'timeout_s': timeout_s})
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
@@ -4938,6 +5008,8 @@ def test_alphamelts_subprocess_unconfigured_binary_reports_missing_binary():
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
     monkeypatch,
 ):
@@ -4975,6 +5047,8 @@ def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
     assert backend._mode == 'subprocess'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
     monkeypatch,
 ):
@@ -5087,6 +5161,8 @@ def test_alphamelts_capabilities_surface_engine_version(monkeypatch):
     assert backend.capabilities()['engine_version'] == 'petthermotools 0.test'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_initialize_requires_petthermotools_payload(monkeypatch):
     backend = AlphaMELTSBackend()
     fake_ptt = types.SimpleNamespace(__version__='0.test')
@@ -5124,6 +5200,8 @@ def test_alphamelts_petthermotools_loader_is_not_constructed_in_process():
     assert backend._pet_payload_preloaded is True
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
@@ -5260,6 +5338,8 @@ def test_alphamelts_initialize_defaults_to_subprocess_when_binary_available(
     assert backend._mode == 'subprocess'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch):
     class FakeThermoEngineTransport:
         engine_version = 'thermoengine fake'
@@ -5292,6 +5372,8 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("config", "adapter_model", "forwarded_model", "transport_model"),
     [
@@ -5580,6 +5662,8 @@ def test_alphamelts_results_carry_backend_and_engine_provenance():
     assert result.engine_version == 'alphamelts fake-v1'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
     monkeypatch,
 ):
@@ -5627,6 +5711,8 @@ def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
     assert len(calls) == 4
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_smoke_timeout_reason_is_derived_from_token_not_absence(monkeypatch):
     """DEFECT 1: a TimeoutExpired smoke wall is unfinished, not missing."""
 
@@ -5655,6 +5741,8 @@ def test_smoke_timeout_reason_is_derived_from_token_not_absence(monkeypatch):
     assert classify_thermoengine_timeout_message(legacy) is cause
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_initialize_smoke_timeout_raises_typed_timeout_not_import_error(
     monkeypatch,
 ):
@@ -5706,6 +5794,8 @@ def test_timeout_cause_closed_set_forbids_absence_and_unclassified_raises():
         ThermoEngineTimeoutError('not_a_real_cause', timeout_s=1.0)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_health_timeout_default_is_contention_robust_and_overridable(
     monkeypatch,
 ):
@@ -5748,6 +5838,8 @@ def test_health_timeout_default_is_contention_robust_and_overridable(
         transport.health_check(timeout_s=float('inf'))
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_backend_health_timeout_config_reaches_transport(monkeypatch):
     class FakeThermoEngineTransport:
         engine_version = 'thermoengine fake'
@@ -6208,6 +6300,8 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker(monkeypatc
     assert transport._worker_connection is None
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ('solved_fO2_log', 'expected_ok', 'echo_tolerance'),
     [
@@ -7148,6 +7242,8 @@ def test_thermoengine_equilibrate_refuses_in_process_fallback(monkeypatch):
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch):
     class FakeMelts:
         bulk_wt: dict[str, float] | None = None
@@ -7721,6 +7817,8 @@ _IMPORT_ERROR_QUOTING_REFUSAL_MARK = ImportError(
 )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_initialize_ood_smoke_closes_and_raises_typed_refusal(monkeypatch):
     """Init-time OOD-marked smoke failure is a typed refusal, not ImportError.
 
@@ -7782,6 +7880,8 @@ def test_initialize_ood_smoke_closes_and_raises_typed_refusal(monkeypatch):
     assert backend.transport_close_count() == 0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_initialize_worker_timeout_raises_typed_timeout_not_import_error(
     monkeypatch,
 ):
@@ -10600,6 +10700,8 @@ def _expected_transport_oxygen_notice(pO2_bar, floor_bar, admission='environment
     ))
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('gas_bar', [1e-10, 1e-9, 2e-9, 1e-6])
 def test_alphamelts_transport_config_pin_before_shared_validation(
     monkeypatch, gas_bar,
@@ -10623,6 +10725,8 @@ def test_alphamelts_transport_config_pin_before_shared_validation(
         assert expected is None
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_thermoengine_public_config_subfloor_oxygen_is_predicted_and_flagged(
     monkeypatch,
 ):
@@ -10643,6 +10747,8 @@ def test_thermoengine_public_config_subfloor_oxygen_is_predicted_and_flagged(
     assert 'authority_level=extrapolated' in expected
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('gas_bar', [0.0, float('nan'), float('inf')])
 def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
     monkeypatch, gas_bar,
@@ -10654,6 +10760,8 @@ def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_thermoengine_public_config_reaches_gas_resolver(backend_cls, monkeypatch):
     backend = backend_cls()
@@ -10673,6 +10781,8 @@ def test_thermoengine_public_config_reaches_gas_resolver(backend_cls, monkeypatc
     assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('gas_bar', [0.0, float('nan'), float('inf')])
 def test_melts_public_config_rejects_invalid_transport_oxygen(
@@ -10684,6 +10794,8 @@ def test_melts_public_config_rejects_invalid_transport_oxygen(
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_live_transport_control_can_cross_simulator_boundary(backend_cls, monkeypatch):
     backend = backend_cls()
@@ -10725,6 +10837,8 @@ def test_live_transport_control_can_cross_simulator_boundary(backend_cls, monkey
         assert helper.calls[-1]['fO2_log'] == pytest.approx(expected_log)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_melts_transport_admission_rejects_unknown_mode(backend_cls, monkeypatch):
     backend = backend_cls()
@@ -10733,6 +10847,8 @@ def test_melts_transport_admission_rejects_unknown_mode(backend_cls, monkeypatch
         backend.equilibrate(temperature_C=1600.0, vapor_transport_pO2_admission='unknown')
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('gas_bar', [1.3e-12, 3.7e-7])
 def test_battery_melts_observation_reaches_gas_projection_and_resets(
@@ -10811,6 +10927,8 @@ def test_battery_melts_observation_reaches_gas_projection_and_resets(
         assert helper.calls[-1]['fO2_log'] == pytest.approx(-6.0)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
 def test_battery_melts_invalid_observation_refuses_before_native(
@@ -10841,6 +10959,8 @@ def test_battery_melts_invalid_observation_refuses_before_native(
         assert cell.engine_status == 'ValueError'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('route', ['direct', 'kernel'])
 def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeypatch):
@@ -10942,6 +11062,8 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     assert helper.calls[-1]['fO2_log'] == pytest.approx(-6.0)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_live_transport_predicts_below_active_environment_floor(backend_cls, monkeypatch):
     from simulator.environment import vacuum_floor_bar_for_environment
@@ -11006,6 +11128,8 @@ def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
     assert calls == ['isothermal', None]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
 def test_live_transport_refuses_nonpositive_or_nonfinite_oxygen(
@@ -11023,6 +11147,8 @@ def test_live_transport_refuses_nonpositive_or_nonfinite_oxygen(
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_configured_lunar_transport_floor_reaches_vaporock(backend_cls, monkeypatch):
     from simulator.environment import vacuum_floor_bar_for_environment

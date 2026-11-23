@@ -219,7 +219,7 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
 CACHE_SITES: dict[str, dict[str, Any]] = {
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 103,
+        "line": 112,
         "kind": 'lru',
         "name": '_string_bytes',
         "carries_disclosure": False,
@@ -227,23 +227,15 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:_key_float_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 113,
+        "line": 122,
         "kind": 'lru',
         "name": '_key_float_bytes',
         "carries_disclosure": False,
         "how": 'Memoized HOT key float encoding. It returns bytes, not an evaluated vapour-law result.',
     },
-    'lru:simulator/engine_cache.py:_engine_cache_input_identity_digest': {
-        "path": 'simulator/engine_cache.py',
-        "line": 568,
-        "kind": 'lru',
-        "name": '_engine_cache_input_identity_digest',
-        "carries_disclosure": False,
-        "how": 'Memoized digest of declared engine-cache inputs. It returns bytes for the cache key, not an evaluated vapour-law result.',
-    },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 1097,
+        "line": 1574,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -267,7 +259,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 672,
+        "line": 741,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -275,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 1284,
+        "line": 1771,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
@@ -867,7 +859,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 3822,
+        "line": 3895,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
@@ -875,7 +867,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_state_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 1363,
+        "line": 1452,
         "kind": 'store',
         "name": 'pressure_state_cache',
         "carries_disclosure": True,
