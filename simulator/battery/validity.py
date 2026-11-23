@@ -20,8 +20,9 @@ Ambiguity resolutions:
 - Apparatus determinants are those the actual derivation needs: calibrated
   source-reduced KEMS pressures, activities, pressure ratios, and partial
   molar enthalpies need no reconstructed sensitivity or orifice geometry;
-  absolute-flux effusion and Langmuir pressure/alpha use their respective
-  geometry. Determinants must be grounded VALUES, physically valid (area > 0,
+  absolute-flux effusion and Langmuir total-rate/yield rows use their respective
+  geometry. Langmuir pressure and alpha do not depend on sample area. Determinants
+  must be grounded VALUES, physically valid (area > 0,
   Clausing in (0, 1]), and
   present for TGA/solar/vacuum kinetic area. A printed positive orifice
   diameter interval (locator, no inference) is usable for source-reduced KEMS
@@ -70,6 +71,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     State,
     Value,
@@ -115,6 +117,16 @@ _KEMS_REDUCED_QUANTITIES = frozenset(
         Quantity.LOG10_K_STAR,
         Quantity.PARTIAL_MOLAR_ENTHALPY,
     }
+)
+_DP_004_REGIME_CONDITION = (
+    "molecular effusion inside the cell; vacuum outside; "
+    "P_total(cell) = Σ measured partials; never 1 atm"
+)
+# DP-011 uses the quantity definition: equilibrium pressure is compared as an
+# equilibrium value, while a flux or mass-loss rate uses HKL with DP-005.
+_DP_011_METHOD_INFERENCE = (
+    "infer from printed quantity: equilibrium pressure -> equilibrium comparison; "
+    "flux or mass-loss rate -> HKL with DP-005"
 )
 
 
@@ -406,6 +418,16 @@ def _kems_calibration_check(
         None if calibrated else _calibration_not_grounded_detail(calibration)
     )
     calibration_flagged = not calibrated and quantity in _KEMS_REDUCED_QUANTITIES
+    if calibrated:
+        calibration_reason = None
+    elif quantity in {Quantity.ION_INTENSITY, Quantity.ION_INTENSITY_RATIO}:
+        calibration_reason = (
+            "ion intensity without calibration cannot become pressure"
+        )
+    elif calibration_flagged:
+        calibration_reason = "the source already reports a reduced numeric quantity"
+    else:
+        calibration_reason = "calibration is required to produce pressure"
     check = GateCheck(
         "kems_calibration",
         calibrated or calibration_flagged,
@@ -413,9 +435,7 @@ def _kems_calibration_check(
             "missing": [] if calibrated or calibration_flagged else ["calibration"],
             "method": MethodToken.KNUDSEN_EFFUSION.value,
             "quantity": quantity.value,
-            "reason": None
-            if calibrated
-            else "the source already reports a reduced numeric quantity",
+            "reason": calibration_reason,
             **(
                 {
                     "flag": "kems_calibration_by_source",
@@ -492,16 +512,6 @@ def _is_kems_calibrated_pressure(method: MethodToken, quantity: Quantity) -> boo
     return method is MethodToken.KNUDSEN_EFFUSION and quantity in {
         Quantity.P_SAT,
         Quantity.P_PARTIAL,
-    }
-
-
-def _is_langmuir_pressure_or_alpha(method: MethodToken, quantity: Quantity) -> bool:
-    return method is MethodToken.LANGMUIR_FREE_EVAPORATION and quantity in {
-        Quantity.P_SAT,
-        Quantity.P_PARTIAL,
-        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
-        Quantity.EVAPORATION_RATE,
-        Quantity.MASS_LOSS_RATE,
     }
 
 
@@ -620,6 +630,7 @@ def underdetermined_apparatus(
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
     missing: list[str] = []
     invalid: tuple[str, ...] = ()
+    area_reason: str | None = None
     if _is_kems_calibrated_pressure(method, quantity):
         # Raw Knudsen-effusion ion intensities use P_i = k_i I_i^+ T, where
         # k_i comes from a calibration. A printed reduced pressure already
@@ -749,14 +760,22 @@ def underdetermined_apparatus(
             checks.append(calibration_check)
         if not calibrated and not calibration_flagged:
             missing.append("calibration")
+    elif method is MethodToken.KNUDSEN_EFFUSION and quantity in {
+        Quantity.ION_INTENSITY,
+        Quantity.ION_INTENSITY_RATIO,
+    }:
+        calibration_check, calibrated, _calibration_flagged = (
+            _kems_calibration_check(experiment, quantity)
+        )
+        checks.append(calibration_check)
+        if not calibrated:
+            missing.append("calibration")
     elif method is MethodToken.KNUDSEN_EFFUSION and quantity in _KEMS_REDUCED_QUANTITIES:
         calibration_check, _calibrated, _calibration_flagged = (
             _kems_calibration_check(experiment, quantity)
         )
         checks.append(calibration_check)
-    if _is_langmuir_pressure_or_alpha(method, quantity):
-        if geometry is None or _finite_positive(geometry.exposed_area_m2) is None:
-            missing.append("exposed_area_m2")
+    defaulted_area: dict[str, object] | None = None
     if _is_kinetic_or_yield(quantity) and method in {
         MethodToken.KNUDSEN_EFFUSION,
         MethodToken.LANGMUIR_FREE_EVAPORATION,
@@ -791,16 +810,68 @@ def underdetermined_apparatus(
             # source row and otherwise uses EquipmentDesigner.size_crucible;
             # apparatus.geometry.exposed_area_m2 is not its input contract.
             pass
+        elif quantity is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+            # Alpha is a flux coefficient; exposed sample face area does not
+            # enter the dimensionless coefficient itself.
+            pass
+        elif method is MethodToken.LANGMUIR_FREE_EVAPORATION:
+            sample_area = _finite_positive(experiment.sample.surface_area_m2)
+            geometry_area = (
+                None if geometry is None else _finite_positive(geometry.exposed_area_m2)
+            )
+            has_point_area = sample_area is not None or geometry_area is not None
+            area_candidates = (
+                experiment.sample.surface_area_m2,
+                None if geometry is None else geometry.exposed_area_m2,
+            )
+            area_value_invalid = any(
+                located is not None
+                and located.state.is_value
+                and _finite_positive(located) is None
+                for located in area_candidates
+            )
+            if not has_point_area and not area_value_invalid:
+                sample_mass = _finite_positive(experiment.sample.mass_kg)
+                if sample_mass is not None:
+                    # DP-007 takes the same runtime crucible face used by
+                    # design-teststand; EquipmentDesigner owns the geometry.
+                    from simulator.equipment import (
+                        DP_007_AREA_DEFAULT_SOURCE,
+                        EquipmentDesigner,
+                    )
+
+                    area_m2 = EquipmentDesigner().size_crucible(
+                        float(sample_mass)
+                    ).melt_surface_area_m2
+                    defaulted_area = {
+                        "flag": "knob_defaulted",
+                        "knob": "exposed_area_m2",
+                        "value": area_m2,
+                        "units": "m2",
+                        "original_reason": "exposed_area_not_stated",
+                        "default_source": DP_007_AREA_DEFAULT_SOURCE,
+                        "policy_id": "DP-007",
+                    }
+                else:
+                    if "exposed_area_m2" not in missing:
+                        missing.append("exposed_area_m2")
+                    if quantity in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
+                        area_reason = (
+                            "absolute rate needs an area: no area and no sample mass printed"
+                        )
+            elif area_value_invalid and "exposed_area_m2" not in missing:
+                missing.append("exposed_area_m2")
         elif geometry is None or (
             _finite_positive(geometry.exposed_area_m2) is None
             and _finite_positive(geometry.orifice_area_m2) is None
         ):
-            if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
-                if "exposed_area_m2" not in missing:
-                    missing.append("exposed_area_m2")
-            elif "exposed_area_m2" not in missing:
+            if "exposed_area_m2" not in missing:
                 missing.append("exposed_area_m2")
     detail = {"missing": missing, "method": method.value, "quantity": quantity.value}
+    if defaulted_area is not None:
+        detail.update(defaulted_area)
+    if area_reason is not None:
+        detail["reason"] = area_reason
     if (
         method is MethodToken.KNUDSEN_EFFUSION
         and quantity is Quantity.MASS_LOSS_RATE
@@ -808,6 +879,14 @@ def underdetermined_apparatus(
     ):
         detail["reason"] = (
             "orifice_area_required_to_convert_mass_loss_rate_to_pressure"
+        )
+    elif (
+        method is MethodToken.KNUDSEN_EFFUSION
+        and quantity in {Quantity.ION_INTENSITY, Quantity.ION_INTENSITY_RATIO}
+        and "calibration" in missing
+    ):
+        detail["reason"] = (
+            "ion intensity without calibration cannot become pressure"
         )
     if invalid:
         detail["invalid"] = list(invalid)
@@ -896,8 +975,7 @@ def effusion_regime_unverified(
             {
                 "flag": flag,
                 "condition": (
-                    "molecular_effusion_inside_cell; vacuum_outside; "
-                    "total_pressure=sum_of_partial_pressures"
+                    _DP_004_REGIME_CONDITION
                     if method_implies_effusion
                     else "equilibrium_comparison_from_printed_pressure_quantity"
                 ),
@@ -1766,6 +1844,13 @@ def knudsen_effusion_pressure_from_mass_rate(
                 "thin-orifice limit; real C < 1, so C = 1 underestimates derived pressure"
             ),
             origin=origin,
+            policy=NoticePolicy(
+                id="DP-006",
+                version="v1",
+                status="canonical",
+                value=clausing,
+                units="dimensionless",
+            ),
         )
         if clausing_defaulted
         else None

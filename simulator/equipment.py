@@ -152,6 +152,13 @@ class PlantDesign:
     lab_geometry_id: str = ""
 
 
+# DP-007 uses the runtime equipment designer's crucible face as the missing
+# gram-lab evaporating area. Keep its source token beside that implementation.
+DP_007_AREA_DEFAULT_SOURCE = (
+    "EquipmentDesigner.size_crucible(sample_mass_kg).melt_surface_area_m2"
+)
+
+
 class EquipmentDesigner:
     """
     Auto-sizes the refinery equipment for a given batch.
