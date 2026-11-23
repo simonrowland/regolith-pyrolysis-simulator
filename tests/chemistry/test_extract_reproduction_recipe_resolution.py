@@ -106,6 +106,32 @@ def test_located_mole_fraction_composition_overrides_parent_recipe() -> None:
     assert recipe == pytest.approx({"SiO2": 0.6, "MgO": 0.4})
 
 
+def test_effective_point_role_defaults_only_unknown_usable_composition() -> None:
+    effective = battery_migrate._effective_point_composition_role
+    assert effective(
+        "datum_state", None, usable_composition=True
+    ) == ("datum_state", None, None)
+    assert effective(
+        "initial_charge_only", None, usable_composition=True
+    ) == ("initial_charge_only", None, None)
+    assert effective(
+        None,
+        "composition_role 'unreported' is unknown",
+        usable_composition=False,
+    ) == (None, None, None)
+    assert effective(
+        None,
+        "composition_role 'unreported' is unknown",
+        usable_composition=True,
+    ) == (
+        "initial_charge_only",
+        "composition_role_defaulted_to_initial_charge_only",
+        "typed-refusal:composition_role_defaulted_to_initial_charge_only: "
+        "default=initial_charge_only; original_reason=composition_role "
+        "'unreported' is unknown",
+    )
+
+
 def test_unknown_point_composition_role_defaults_for_usable_assays(monkeypatch) -> None:
     obs = _adopted_observation(
         "kems-022-demaria-1971",
@@ -473,6 +499,13 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         and experiment.experiment_id.endswith("::experiment::demaria-1971-k-figure2")
         for observation, experiment in closure_calls
     )
+    assert all(
+        not any(
+            "composition_role_defaulted_to_initial_charge_only" in notice.reason
+            for notice in observation.notices
+        )
+        for observation, _experiment in closure_calls
+    )
     assert {
         float(observation.identity.temperature_K.value): float(observation.value.point)
         for observation, _experiment in closure_calls
@@ -580,6 +613,8 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
     assert all(
         observation.identity.composition.is_value
         and observation.identity.composition.value.proxy_flag is None
+        and observation.identity.composition.value.basis
+        == "oxide_mole_fraction_as_published"
         for observation, _experiment in closure_calls
     )
     assert len(datum_evaluation.records) == 10
@@ -599,3 +634,108 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
     assert datum_entry["comparable_points"] == 0
     assert datum_entry["gap_points"] == 10
     assert "melt-only oxygen balance" in datum_entry["primary_skip_reason"]
+
+    unknown_role_document = deepcopy(document)
+    unknown_role_observation = next(
+        row
+        for row in unknown_role_document["species"]["K"]["observations"]
+        if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
+    )
+    for point in unknown_role_observation["values"]["points"]:
+        role = point.get("composition_role")
+        if not isinstance(role, dict) or role.get("value") != "initial_charge_only":
+            continue
+        point["composition_role"] = {**role, "value": "unreported"}
+        assert "composition_mol" not in point
+    unknown_role_dir = tmp_path / "unknown-role-extracts"
+    unknown_role_dir.mkdir()
+    (unknown_role_dir / source_path.name).write_text(
+        yaml.safe_dump(unknown_role_document, sort_keys=False), encoding="utf-8"
+    )
+    unknown_role_obs = next(
+        row
+        for row in load_adopted_observations(extracts_dir=unknown_role_dir)
+        if row.source_id == "kems-022-demaria-1971"
+        and row.species_id == "K"
+        and row.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    )
+    closure_calls.clear()
+    melt_calls.clear()
+    runtimes.clear()
+
+    unknown_role_evaluation = evaluate_observation(
+        unknown_role_obs, vapor_pressure_data={}
+    )
+    unknown_role_coverage = extract_reproduction.coverage_summary(
+        [unknown_role_evaluation]
+    )["entries"][0]
+
+    assert len(closure_calls) == 2
+    assert len(melt_calls) == 2
+    assert all(
+        observation.identity.composition.is_value
+        and observation.identity.composition.value.proxy_flag == "initial_charge_only"
+        and any(
+            "typed-refusal:composition_role_defaulted_to_initial_charge_only"
+            in notice.reason
+            for notice in observation.notices
+        )
+        for observation, _experiment in closure_calls
+    )
+    assert sum(
+        record.status == "assumed-input"
+        for record in unknown_role_evaluation.records
+    ) == 2
+    assert sum(
+        record.status == "unsupported-speciation"
+        for record in unknown_role_evaluation.records
+    ) == 8
+    assert unknown_role_coverage["comparable_points"] == 0
+    assert unknown_role_coverage["gap_points"] == 10
+    assert any(
+        runtime.get("input_assumption", {}).get("flag")
+        == "composition_role_defaulted_to_initial_charge_only"
+        for runtime in runtimes
+    )
+
+    partial_document = deepcopy(unknown_role_document)
+    partial_observation = next(
+        row
+        for row in partial_document["species"]["K"]["observations"]
+        if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
+    )
+    for point in partial_observation["values"]["points"]:
+        role = point.get("composition_role")
+        if not isinstance(role, dict) or role.get("value") != "unreported":
+            continue
+        composition = point["point_conditions"]["composition"]["state"]["value"]
+        composition["components"] = [["Na2O", "0.23"]]
+    partial_dir = tmp_path / "partial-assay-extracts"
+    partial_dir.mkdir()
+    (partial_dir / source_path.name).write_text(
+        yaml.safe_dump(partial_document, sort_keys=False), encoding="utf-8"
+    )
+    partial_obs = next(
+        row
+        for row in load_adopted_observations(extracts_dir=partial_dir)
+        if row.source_id == "kems-022-demaria-1971"
+        and row.species_id == "K"
+        and row.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    )
+    closure_calls.clear()
+    melt_calls.clear()
+    runtimes.clear()
+
+    partial_evaluation = evaluate_observation(partial_obs, vapor_pressure_data={})
+
+    assert not closure_calls
+    assert not melt_calls
+    assert sum(
+        record.status == "unsupported-speciation"
+        for record in partial_evaluation.records
+    ) == 10
+    assert all(
+        "partial analysis" in runtime.get("refusal", "")
+        for runtime in runtimes
+        if runtime.get("temperature_K") in {1366.12, 1314.06}
+    )

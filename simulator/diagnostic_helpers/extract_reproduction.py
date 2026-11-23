@@ -98,9 +98,6 @@ KEMS_SOURCE_PREFIX = "kems-"
 # Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 1 atm.
 # JANAF construction boiling temperatures are 1-bar (fugacity = 1), not 1 atm.
 STANDARD_BAR_PA = PA_PER_BAR
-_UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT = (
-    battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
-)
 
 # Documented defaults when an observation carries no usable numeric uncertainty.
 # These are stated per-observation on the comparison record (defaulted=true).
@@ -3160,40 +3157,41 @@ def _evaluate_psat(
         composition_role, composition_role_refusal = (
             battery_migrate._declared_composition_role(pt, obs.values)
         )
+        (
+            effective_composition_role,
+            role_default_flag,
+            role_default_reason,
+        ) = battery_migrate._effective_point_composition_role(
+            composition_role,
+            composition_role_refusal,
+            usable_composition=melt_recipe is not None,
+        )
         initial_charge_only = (
-            composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
+            effective_composition_role
+            == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
         )
-        defaulted_composition_role = (
-            composition_role_refusal is not None and melt_recipe is not None
-        )
+        defaulted_composition_role = role_default_flag is not None
         typed_input_reason: str | None = None
         point_melt_only_assumption: str | None = None
         if defaulted_composition_role:
-            role_flag = (
-                "composition_role_defaulted_to_"
-                f"{_UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT}"
-            )
             runtime["input_assumption"] = {
-                "flag": role_flag,
-                "default_role": _UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT,
+                "flag": role_default_flag,
+                "default_role": effective_composition_role,
                 "original_reason": composition_role_refusal,
             }
-            typed_input_reason = (
-                f"{_TYPED_SKIP_PREFIX}{role_flag}: "
-                f"default={_UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT}; "
-                f"original_reason={composition_role_refusal}"
-            )
+            typed_input_reason = role_default_reason
             runtime["typed_input_reason"] = typed_input_reason
         if initial_charge_only:
-            role_reason = battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE
-            runtime["input_assumption"] = {
-                "flag": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG,
-                "reason": role_reason,
-            }
-            typed_input_reason = (
-                f"typed-refusal:{battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
-                f"{role_reason}"
-            )
+            if not defaulted_composition_role:
+                role_reason = battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE
+                runtime["input_assumption"] = {
+                    "flag": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                    "reason": role_reason,
+                }
+                typed_input_reason = (
+                    f"typed-refusal:{battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+                    f"{role_reason}"
+                )
             pairing = obs.values.get("fO2_pairing")
             if (
                 pO2 is not None

@@ -8851,6 +8851,9 @@ def _located_printed_and_initial(
 
 
 _COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, "datum_state"})
+_UNKNOWN_POINT_ROLE_DEFAULT_FLAG = (
+    "composition_role_defaulted_to_initial_charge_only"
+)
 
 
 def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
@@ -8879,6 +8882,24 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
             f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
         )
     return None, None
+
+
+def _effective_point_composition_role(
+    role: str | None,
+    refusal: str | None,
+    *,
+    usable_composition: bool,
+) -> tuple[str | None, str | None, str | None]:
+    """Default an unknown role only when a usable point recipe can be carried."""
+
+    if refusal is None or not usable_composition:
+        return role, None, None
+    flag = _UNKNOWN_POINT_ROLE_DEFAULT_FLAG
+    typed_reason = (
+        f"typed-refusal:{flag}: default={INITIAL_CHARGE_ONLY_PROXY_FLAG}; "
+        f"original_reason={refusal}"
+    )
+    return INITIAL_CHARGE_ONLY_PROXY_FLAG, flag, typed_reason
 
 
 # A closed-system equilibrium experiment's printed starting bulk is the
@@ -30470,6 +30491,7 @@ class Migrator:
         point_composition_refusal: list[str] = []
         point_composition_refusal_classifications: list[_CompositionRefusal] = []
         point_composition_located: Located[Composition] | None = None
+        point_condition_composition: Located[Any] | None = None
         point_composition_omitted_components: tuple[str, ...] = ()
         point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
@@ -30707,6 +30729,33 @@ class Migrator:
                 if point_composition is None
                 else Located(State.of(point_composition), locator=point_locator)
             )
+            if (
+                q_for_species is Quantity.P_PARTIAL
+                and point_composition_located is None
+                and (
+                    point_composition_role == "datum_state"
+                    or point_composition_role_refusal is not None
+                )
+            ):
+                raw_point_conditions = raw_item.get("point_conditions")
+                raw_composition_condition = (
+                    raw_point_conditions.get("composition")
+                    if isinstance(raw_point_conditions, Mapping)
+                    else None
+                )
+                if raw_composition_condition is not None:
+                    point_condition_composition = _point_condition_from_plain(
+                        raw_composition_condition,
+                        key="composition",
+                        closure_context=raw_item,
+                    )
+                    if (
+                        point_condition_composition.state.is_value
+                        and isinstance(
+                            point_condition_composition.state.value, Composition
+                        )
+                    ):
+                        point_composition_located = point_condition_composition
             if (
                 q_for_species in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
                 and point_oxide_map is not None
@@ -31772,7 +31821,12 @@ class Migrator:
             raw_point_conditions = raw_item.get("point_conditions")
             if isinstance(raw_point_conditions, Mapping):
                 explicit_point_conditions = {
-                    str(key): _point_condition_from_plain(value, key=str(key))
+                    str(key): (
+                        point_condition_composition
+                        if key == "composition"
+                        and point_condition_composition is not None
+                        else _point_condition_from_plain(value, key=str(key))
+                    )
                     for key, value in raw_point_conditions.items()
                 }
                 if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -32152,12 +32206,30 @@ class Migrator:
                     origin=point_id,
                 )
             )
+        point_composition_is_usable = isinstance(q_token_point, Quantity) and (
+            point_composition_located is not None
+            and point_composition_located.state.is_value
+            and isinstance(point_composition_located.state.value, Composition)
+            or (
+                point_map_explicit
+                and identity.composition is not None
+                and identity.composition.is_value
+                and isinstance(identity.composition.value, Composition)
+            )
+        )
+        effective_point_composition_role, role_default_flag, role_default_reason = (
+            _effective_point_composition_role(
+                point_composition_role,
+                point_composition_role_refusal,
+                usable_composition=point_composition_is_usable,
+            )
+        )
         identity, point_conditions, child_notices = (
             _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 child_notices,
-                role=point_composition_role,
+                role=effective_point_composition_role,
                 initial_charge_context=(
                     parent_values if isinstance(parent_values, Mapping) else None
                 ),
@@ -32199,6 +32271,19 @@ class Migrator:
                 ),
             )
         )
+        if (
+            role_default_flag is not None
+            and role_default_reason is not None
+            and isinstance(q_token_point, Quantity)
+        ):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(q_token_point,),
+                    reason=role_default_reason,
+                    origin=point_id,
+                )
+            )
         if notice_composition_located is None:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"
