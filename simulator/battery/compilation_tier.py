@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.source_declarations import B677_SOURCE_ID, SOURCE_DECLARATIONS
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
@@ -1197,12 +1198,6 @@ def _attach_basis_default(
         attempt,
         notices=union_notices(attempt.notices, (notice,)),
     )
-
-
-# DP-100: when the migrated identity carries no per-basis, use the called
-# thermochemistry engine's native per-mole-species denominator. The policy
-# stays proposed until source basis evidence is carried into this scorer path.
-DP_100_DEFAULT_PER = PerBasis.MOL_SPECIES
 
 
 @lru_cache(maxsize=1)
@@ -3643,14 +3638,9 @@ def predict_thermo_attempt(
         # −161.387 kJ/mol K2O. The extracted observation omits its unit, so this
         # remains proposed and flagged; a different denominator has unquantified
         # bias. The equal-basis limit is factor 1 and no numeric change.
-        default_per = DP_100_DEFAULT_PER
-        basis_policy = NoticePolicy(
-            id="DP-100",
-            version=1,
-            status="proposed",
-            value=default_per.value,
-            units="per-mol-species",
-        )
+        basis_default = resolve_default_policy("DP-100")
+        default_per = PerBasis(str(basis_default.value))
+        basis_policy = NoticePolicy(**basis_default.payload["policy"])
         basis_notice = Notice(
             kind=NoticeKind.BASIS_ASSUMED,
             affected_quantities=(quantity,),
