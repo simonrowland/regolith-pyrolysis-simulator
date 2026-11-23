@@ -4108,6 +4108,12 @@ def test_species_formula_parser_refuses_malformed_ascii_adducts() -> None:
     ) == score_mod.formula_composition("Fe0.947O")
 
 
+def test_species_formula_parser_preserves_normalized_decimal_stoichiometry() -> None:
+    expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula("MgAl1.5SiO3") == expected
+    assert parse_species_formula("MgAl₁.₅SiO₃") == expected
+
+
 def test_species_formula_parser_keeps_adjacent_parenthesized_groups() -> None:
     assert parse_species_formula("(CO)(C)") == (("C", 2.0), ("O", 1.0))
 

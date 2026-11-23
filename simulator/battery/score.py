@@ -1159,6 +1159,18 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
     return species is not None and phase_token(species) is phase
 
 
+def _accounting_formula_composition(
+    formula: str,
+) -> tuple[tuple[str, float], ...] | None:
+    from simulator.accounting.formulas import parse_formula
+
+    try:
+        elements = parse_formula(formula, species=formula).elements
+    except ValueError:
+        return None
+    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
+
+
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
@@ -1191,6 +1203,10 @@ def parse_species_formula(
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = fold_subscript_digits(text)
+    if re.search(r"[₀₁₂₃₄₅₆₇₈₉]\.[₀₁₂₃₄₅₆₇₈₉]", formula):
+        normalized_decimal = formula_composition(text)
+        if normalized_decimal is not None:
+            return normalized_decimal
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1262,13 +1278,7 @@ def parse_species_formula(
         if _is_integer_compound_adduct(
             text, require_explicit_multipliers=True
         ):
-            try:
-                elements = parse_formula(text, species=text).elements
-            except ValueError:
-                return None
-            return tuple(
-                sorted((str(symbol), float(count)) for symbol, count in elements.items())
-            )
+            return _accounting_formula_composition(text)
 
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)
@@ -1315,13 +1325,7 @@ def parse_species_formula(
         return parsed
     if "." in text:
         return None
-    try:
-        from simulator.accounting.formulas import parse_formula
-
-        elements = parse_formula(text, species=text).elements
-    except ValueError:
-        return None
-    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
+    return _accounting_formula_composition(text)
 
 
 def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:

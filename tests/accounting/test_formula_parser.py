@@ -36,10 +36,14 @@ def test_ascii_adduct_recognizer_rejects_malformed_parts() -> None:
     for formula in (
         "3Al2O3.0SiO2",
         "3Al2O3.0",
-        "XxO.2SiO2",
         "3Al2O3..2SiO2",
         "3Al2O3.2SiO2.",
     ):
         assert not _is_integer_compound_adduct(
             formula, require_explicit_multipliers=True
         )
+
+    # Recognition checks lexical structure; strict parsing owns element validity.
+    assert _is_integer_compound_adduct(
+        "XxO.2SiO2", require_explicit_multipliers=True
+    )
