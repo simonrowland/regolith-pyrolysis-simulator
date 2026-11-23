@@ -161,6 +161,12 @@ def _rewrite(
     return path
 
 
+def _without_loaded_files(request: dict) -> dict:
+    copied = copy.deepcopy(request)
+    copied.pop("loaded_files", None)
+    return copied
+
+
 def _key(request: dict) -> bytes:
     version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
     return engine_cache.engine_cache_key("simulator", version, request)
@@ -372,6 +378,19 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
     assert holder_curve[-1]["value"] == pytest.approx(1500.0)
     assert robinot_deck.preset_digest.startswith("sha256:")
     assert robinot_deck.preset_digest not in blob
+    loaded = request["loaded_files"]
+    for role in (
+        "preset",
+        "setpoints",
+        "feedstocks",
+        "vapor_pressures",
+        "foulant_thermo",
+        "materials",
+        "species_catalog",
+    ):
+        assert len(loaded[role]) == 64
+        assert "/" not in role
+    assert all("/" not in name for name in loaded)
 
     session = request["session"]
     assert session["backend_name"] == "internal-analytical"
@@ -575,7 +594,12 @@ def test_comparison_metadata_leaves_the_request_and_observable_unchanged(
     count: int,
 ) -> None:
     mutant = build_deck_request(_rewrite(tmp_path, old, new, count=count))
-    assert mutant.cache_request == robinot_deck.cache_request
+    assert mutant.cache_request["loaded_files"]["preset"] != (
+        robinot_deck.cache_request["loaded_files"]["preset"]
+    )
+    assert _without_loaded_files(mutant.cache_request) == _without_loaded_files(
+        robinot_deck.cache_request
+    )
     assert _observable(mutant.cache_request) == _observable(robinot_deck.cache_request)
     blob = json.dumps(mutant.cache_request)
     for token in _MEASURED_YIELDS:
@@ -679,7 +703,12 @@ def test_point_source_class_changes_lineage_only(
         1,
     )
     mutant = build_deck_request(_rewrite(tmp_path, old, new, count=1))
-    assert mutant.cache_request == robinot_deck.cache_request
+    assert mutant.cache_request["loaded_files"]["preset"] != (
+        robinot_deck.cache_request["loaded_files"]["preset"]
+    )
+    assert _without_loaded_files(mutant.cache_request) == _without_loaded_files(
+        robinot_deck.cache_request
+    )
     assert mutant.lineage != robinot_deck.lineage
     point = mutant.lineage["schedule"]["melt_temperature_C"][0]
     assert point["source_class"] == "literature_sidecar"
@@ -1215,10 +1244,11 @@ def test_cache_hit_must_be_a_complete_ok(
 def test_quoted_holder_diameters_change_the_resolved_surface_key(
     tmp_path: Path,
 ) -> None:
-    """Quoted holder diameters the runner admits must not share a key.
+    """Quoted holder diameters the runner admits pack as the same number.
 
-    The same number, quoted or not, is one key. A different number is not.
-    The packed value is the surface's ``equivalent_diameter_m``.
+    The file bytes still differ, so the deck keys differ. A different
+    number is a different packed value and a different key. The packed
+    value is the surface's ``equivalent_diameter_m``.
     """
 
     from simulator.lab_geometry import parse_lab_geometry
@@ -1233,7 +1263,13 @@ def test_quoted_holder_diameters_change_the_resolved_surface_key(
     ))
     quoted_same = build_deck_request(same)
     checked_in = build_deck_request(REPO / ROBINOT_PRESET)
-    assert _key(quoted_same.cache_request) == _key(checked_in.cache_request)
+    assert _without_loaded_files(quoted_same.cache_request) == _without_loaded_files(
+        checked_in.cache_request
+    )
+    assert quoted_same.cache_request["loaded_files"]["preset"] != (
+        checked_in.cache_request["loaded_files"]["preset"]
+    )
+    assert _key(quoted_same.cache_request) != _key(checked_in.cache_request)
     decks = []
     diameters = []
     packed = []
@@ -1704,6 +1740,45 @@ def test_pump_speed_changes_the_cache_key(
         pytest.approx(0.003)
     )
     assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
+
+
+def test_edited_vapor_table_bytes_change_the_cache_key(
+    robinot_deck: DeckRequest,
+    tmp_path: Path,
+) -> None:
+    """A vapor-file edit is in the key even when the parsed tree is unchanged."""
+
+    source = REPO / "data" / "vapor_pressures.yaml"
+    edited = tmp_path / "vapor_pressures.yaml"
+    edited.write_bytes(source.read_bytes() + b"\n# byte-identity probe\n")
+    mutant = build_deck_request(
+        REPO / ROBINOT_PRESET,
+        vapor_pressures_path=edited,
+    )
+    assert mutant.cache_request["loaded_files"]["vapor_pressures"] != (
+        robinot_deck.cache_request["loaded_files"]["vapor_pressures"]
+    )
+    assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
+    assert _without_loaded_files(mutant.cache_request) == _without_loaded_files(
+        robinot_deck.cache_request
+    )
+
+
+def test_deck_configuration_is_frozen_at_key_time(
+    robinot_deck: DeckRequest,
+) -> None:
+    """The object the key read cannot be replaced or edited afterwards."""
+
+    with pytest.raises(TypeError):
+        robinot_deck.run.lab_schedule = {}
+    with pytest.raises(TypeError):
+        robinot_deck.run.mass_kg = 1.0
+    with pytest.raises(TypeError):
+        robinot_deck.run.lab_schedule["duration_h"] = 2.0
+    with pytest.raises(TypeError):
+        robinot_deck.run.lab_schedule["melt_temperature_C"][0]["value"] = 30
+    with pytest.raises(TypeError):
+        robinot_deck.run.lab_schedule["melt_temperature_C"].append({})
 
 
 def test_species_poison_is_partial_and_keeps_the_bad_rate(

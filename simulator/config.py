@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from contextvars import ContextVar, Token
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
@@ -26,6 +27,48 @@ from simulator.scalar_boundary import is_declared_real_scalar
 DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DEFAULT_ALPHAMELTS_MODEL = "MELTSv1.0.2"
 ENGINE_MODEL_UNAVAILABLE = "unknown"
+
+# Bytes the active deck load has read, keyed by loader role. Absent means
+# nobody is recording. Two different hashes for one role are ambiguous.
+_RECORDED_FILE_BYTES: ContextVar[dict[str, str] | None] = ContextVar(
+    "regolith_recorded_file_bytes",
+    default=None,
+)
+
+
+def begin_file_byte_record() -> Token[dict[str, str] | None]:
+    """Start recording sha256 of file bytes read on this load."""
+
+    return _RECORDED_FILE_BYTES.set({})
+
+
+def finish_file_byte_record(token: Token[dict[str, str] | None]) -> dict[str, str]:
+    """Stop recording and return role to sha256, sorted by role."""
+
+    recorded = _RECORDED_FILE_BYTES.get()
+    _RECORDED_FILE_BYTES.reset(token)
+    if not isinstance(recorded, dict):
+        return {}
+    return dict(sorted(recorded.items()))
+
+
+def note_loaded_file_bytes(role: str, raw: bytes) -> None:
+    """Record one file the loader just read. A no-op when nothing is recording.
+
+    The same role read twice must be the same bytes. A second different
+    payload would make the deck key ambiguous.
+    """
+
+    slot = _RECORDED_FILE_BYTES.get()
+    if slot is None:
+        return
+    digest = sha256(raw).hexdigest()
+    previous = slot.get(role)
+    if previous is not None and previous != digest:
+        raise ValueError(
+            f"loaded file {role} was read twice with different bytes"
+        )
+    slot[role] = digest
 
 
 def resolve_alphamelts_subprocess_model(
@@ -250,10 +293,13 @@ def _load_required_yaml(
     path: Path,
     *,
     functional_digest: bool = False,
+    role: str | None = None,
 ) -> tuple[dict[str, Any], str]:
     if not path.exists():
         raise FileNotFoundError(f"required config file missing: {path}")
     raw = path.read_bytes()
+    if role is not None:
+        note_loaded_file_bytes(role, raw)
     loaded, digest = _parse_required_yaml(raw, functional_digest, path)
     # Cached parse results never escape: callers historically receive a fresh,
     # mutable mapping on every load and may safely modify it in-place.
@@ -488,6 +534,7 @@ def load_config_bundle(
         loaded[name], digests[name] = _load_required_yaml(
             path,
             functional_digest=name in _FUNCTIONAL_DATA_DIGEST_CONFIGS,
+            role=name,
         )
     from simulator.vapour_rail.catalog import (
         validate_species_catalog,

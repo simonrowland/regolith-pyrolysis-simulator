@@ -9,9 +9,9 @@ The chemistry version for engine ``simulator`` lives in
 changes. The cache key is the runner's resolved configuration after the
 one load, minus the exact metadata paths below. A new prediction field,
 including a user-named curve, is in the key without a version bump.
-Paths are matched exactly: not by name, prefix, or suffix. The runner
-file hash and the preset digest are provenance and stay out of the
-cache key.
+Paths are matched exactly: not by name, prefix, or suffix. ``loaded_files``
+is the sha256 of every file byte that load read. The runner file hash
+and the preset digest field are provenance and stay out of the cache key.
 """
 
 from __future__ import annotations
@@ -24,6 +24,11 @@ from pathlib import Path
 from typing import Any
 
 from simulator.condensation import LabGeometryError
+from simulator.config import (
+    begin_file_byte_record,
+    finish_file_byte_record,
+    note_loaded_file_bytes,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.engine_cache import (
     EngineCacheValue,
@@ -536,7 +541,9 @@ def assert_cache_request_has_no_measurement(request: Mapping[str, Any]) -> None:
 
 def _read_preset_document(path: Path) -> Mapping[str, Any]:
     try:
-        document = load_cached_safe_yaml(path.read_bytes()) or {}
+        raw = path.read_bytes()
+        note_loaded_file_bytes("preset", raw)
+        document = load_cached_safe_yaml(raw) or {}
     except (OSError, UnicodeDecodeError) as exc:
         raise IntegratedBenchContractError(
             f"preset {path} is unreadable",
@@ -557,51 +564,58 @@ def build_deck_request(
     *,
     leg: str = "faithful",
     feedstocks_path: Path | None = None,
+    vapor_pressures_path: Path | None = None,
 ) -> DeckRequest:
-    """Build the allowlisted request from the inputs the runner resolves.
+    """Build the request from the inputs the runner resolves.
 
     Comparison provenance is not attached, so the fast-tier comparison
     contract is not a numeric input and does not ban the analytical backend.
+    The run is frozen before the load, and the key is that same object.
     """
 
-    document = _read_preset_document(preset_path)
-    _refuse_uncacheable_preset(document)
-    spec = _load_vacuum_preset_run_spec(preset_path, leg)
-    run = PyrolysisRun(
-        feedstock_id=spec.feedstock_id,
-        campaign="C0",
-        hours=spec.hours,
-        mass_kg=spec.mass_kg,
-        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-        setpoints_patch={"lab_geometry": spec.lab_geometry},
-        lab_schedule=spec.lab_schedule,
-        track="pyrolysis",
-        feedstocks_path=feedstocks_path,
-        process_dt_s=spec.process_dt_s,
-    )
-    # One load. ``run`` freezes the bundle here; ``run()`` reuses it.
-    # The key is that whole resolved tree, minus metadata. No field allowlist.
+    token = begin_file_byte_record()
     try:
-        resolved = run.resolved_configuration(
-            spec.document,
-            leg=str(leg),
-            mitigation=_mitigation_token(spec, leg),
+        document = _read_preset_document(preset_path)
+        _refuse_uncacheable_preset(document)
+        spec = _load_vacuum_preset_run_spec(preset_path, leg)
+        run = PyrolysisRun(
+            feedstock_id=spec.feedstock_id,
+            campaign="C0",
+            hours=spec.hours,
+            mass_kg=spec.mass_kg,
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            setpoints_patch={"lab_geometry": spec.lab_geometry},
+            lab_schedule=spec.lab_schedule,
+            track="pyrolysis",
+            feedstocks_path=feedstocks_path,
+            vapor_pressures_path=vapor_pressures_path,
+            process_dt_s=spec.process_dt_s,
         )
-    except LabGeometryError as exc:
-        raise IntegratedBenchContractError(
-            str(exc),
-            kind="missing_capability",
-            reason=str(exc.code),
-        ) from exc
-    except RunnerError as exc:
-        if not str(exc).startswith("feedstock "):
-            raise
-        raise IntegratedBenchContractError(
-            str(exc),
-            kind="no_deck",
-            reason="no_usable_composition",
-        ) from exc
-    schedule_lineage = _schedule_lineage(run.lab_schedule)
+        run.freeze_configuration()
+        try:
+            resolved = run.resolved_configuration(
+                spec.document,
+                leg=str(leg),
+                mitigation=_mitigation_token(spec, leg),
+            )
+        except LabGeometryError as exc:
+            raise IntegratedBenchContractError(
+                str(exc),
+                kind="missing_capability",
+                reason=str(exc.code),
+            ) from exc
+        except RunnerError as exc:
+            if not str(exc).startswith("feedstock "):
+                raise
+            raise IntegratedBenchContractError(
+                str(exc),
+                kind="no_deck",
+                reason="no_usable_composition",
+            ) from exc
+        schedule_lineage = _schedule_lineage(run.lab_schedule)
+    finally:
+        loaded_files = finish_file_byte_record(token)
+    resolved["loaded_files"] = loaded_files
     cache_request = cache_key_document(resolved)
     assert_cache_request_has_no_measurement(cache_request)
     if spec.feedstock_id == "lunar_eac_1a":

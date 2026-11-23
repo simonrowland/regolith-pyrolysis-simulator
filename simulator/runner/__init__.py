@@ -40,6 +40,7 @@ import weakref
 from dataclasses import dataclass, field, fields, is_dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping, Optional
 
 import yaml
@@ -56,6 +57,7 @@ from simulator.config import (
     ConfigBundle,
     _load_setpoints_file,
     load_config_bundle,
+    note_loaded_file_bytes,
 )
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
@@ -471,6 +473,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             provenance=base_provenance,
         ) from exc
 
+    note_loaded_file_bytes("preset", raw_bytes)
     digest = hashlib.sha256(raw_bytes).hexdigest()
     provenance = {
         **base_provenance,
@@ -1139,10 +1142,58 @@ def _plain_resolved(value: Any) -> Any:
     )
 
 
+class _FrozenList(list):
+    """A list the deck configuration cannot append to or assign into."""
+
+    def _reject(self, *_args: Any, **_kwargs: Any) -> Any:
+        raise TypeError("frozen configuration list")
+
+    append = _reject
+    extend = _reject
+    insert = _reject
+    pop = _reject
+    remove = _reject
+    clear = _reject
+    reverse = _reject
+    sort = _reject
+    __setitem__ = _reject
+    __delitem__ = _reject
+    __iadd__ = _reject
+    __imul__ = _reject
+
+
+def _freeze_value(value: Any) -> Any:
+    """Mappings and lists become immutable. Scalars pass through."""
+
+    if isinstance(value, MappingProxyType):
+        return value
+    if isinstance(value, Mapping):
+        return MappingProxyType({
+            key: _freeze_value(item) for key, item in value.items()
+        })
+    if isinstance(value, list) and not isinstance(value, _FrozenList):
+        return _FrozenList(_freeze_value(item) for item in value)
+    if isinstance(value, tuple):
+        return tuple(_freeze_value(item) for item in value)
+    return value
+
+
+def _mutable_copy(value: Any) -> Any:
+    """Deep mutable copy. Frozen mappings and lists become dicts and lists."""
+
+    if isinstance(value, Mapping):
+        return {key: _mutable_copy(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_mutable_copy(item) for item in value]
+    if isinstance(value, tuple):
+        return [_mutable_copy(item) for item in value]
+    return value
+
+
 def _resolved_power_schedule(schedule: Mapping[str, Any]) -> dict[str, Any]:
     """The runner's schedule, with the power trace reduced to its curve."""
 
-    resolved = copy.deepcopy(dict(schedule))
+    resolved = _mutable_copy(schedule)
     driver = resolved.get(FURNACE_POWER_DRIVER_KEY)
     if not isinstance(driver, Mapping):
         return resolved
@@ -1283,6 +1334,40 @@ class PyrolysisRun:
                 f"{exc.reason}: process_dt_s={self.process_dt_s!r}"
             ) from exc
 
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name[:1] != "_" and getattr(self, "_configuration_frozen", False):
+            raise TypeError(
+                f"PyrolysisRun.{name} is frozen with the deck key"
+            )
+        object.__setattr__(self, name, value)
+
+    def freeze_configuration(self) -> None:
+        """Freeze the configuration the deck key and the solve both read.
+
+        Later assignment of a public field raises. Item assignment on a
+        frozen mapping or list raises. Private cache fields may still
+        be filled. A run that never calls this stays mutable.
+        """
+
+        if getattr(self, "_configuration_frozen", False):
+            return
+        for name in (
+            "engines",
+            "additives_kg",
+            "setpoints_patch",
+            "runtime_campaign_overrides",
+            "setpoints_overrides",
+            "lab_schedule",
+            "chemistry_kernel",
+            "run_metadata_overrides",
+            "reduced_real_cache",
+        ):
+            value = getattr(self, name)
+            if value is None:
+                continue
+            object.__setattr__(self, name, _freeze_value(value))
+        object.__setattr__(self, "_configuration_frozen", True)
+
     def _enforce_preset_comparison_contract(self) -> None:
         preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
         if not isinstance(preset, Mapping):
@@ -1420,7 +1505,10 @@ class PyrolysisRun:
         bundle = self._load_config_bundle()
         feedstocks = bundle.feedstocks
         setpoints = copy.deepcopy(bundle.setpoints)
-        setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
+        setpoints = _deep_merge_setpoints(
+            setpoints,
+            _mutable_copy(self.setpoints_patch),
+        )
         if self.high_t_melt_activity is not None:
             setpoints = _deep_merge_setpoints(
                 setpoints,
@@ -1478,8 +1566,10 @@ class PyrolysisRun:
         )
         mass_kg = _positive_mass_kg(self.mass_kg)
         runtime_overrides = {
-            str(campaign): dict(fields)
-            for campaign, fields in dict(self.runtime_campaign_overrides).items()
+            str(campaign): block
+            for campaign, block in _mutable_copy(
+                self.runtime_campaign_overrides or {}
+            ).items()
         }
         if self.lab_schedule is not None:
             campaign_overrides = runtime_overrides.setdefault(campaign_name, {})
@@ -1488,7 +1578,9 @@ class PyrolysisRun:
                     "lab_schedule conflicts with runtime_campaign_overrides "
                     f"{campaign_name}.{LAB_SCHEDULE_OVERRIDE_KEY}"
                 )
-            campaign_overrides[LAB_SCHEDULE_OVERRIDE_KEY] = dict(self.lab_schedule)
+            campaign_overrides[LAB_SCHEDULE_OVERRIDE_KEY] = _mutable_copy(
+                self.lab_schedule
+            )
         try:
             CampaignManager.validate_runtime_campaign_overrides(runtime_overrides)
         except ValueError as exc:
@@ -1579,6 +1671,8 @@ class PyrolysisRun:
             if isinstance(self.setpoints_patch, Mapping)
             else None
         )
+        if isinstance(raw_geometry, Mapping):
+            raw_geometry = _mutable_copy(raw_geometry)
         bridge = gram_lab_exposed_melt_area_bridge(
             raw_geometry if isinstance(raw_geometry, Mapping) else None
         )

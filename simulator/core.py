@@ -13193,8 +13193,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         cached = getattr(self, "_cached_carbon_partition_config", None)
         if cached is None:
-            with self._carbon_partition_path().open(encoding="utf-8") as handle:
-                cached = load_cached_safe_yaml(handle.read()) or {}
+            raw = self._carbon_partition_path().read_bytes()
+            from simulator.config import note_loaded_file_bytes
+
+            note_loaded_file_bytes("stage0_carbon_partition", raw)
+            cached = load_cached_safe_yaml(raw.decode("utf-8")) or {}
             self._cached_carbon_partition_config = cached
         return cached
 
