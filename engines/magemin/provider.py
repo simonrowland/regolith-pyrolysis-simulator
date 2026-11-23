@@ -54,7 +54,7 @@ import weakref
 from dataclasses import replace
 from typing import Any, Mapping, Optional
 
-from engines.magemin.domain import MAGEMinDomainGate
+from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG, MAGEMinDomainGate
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
 from engines.magemin.result import MAGEMinShadowDiagnostics
 from simulator.chemistry.kernel.capabilities import (
@@ -595,7 +595,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             fO2_log=(
                 float(request.fO2_log)
                 if request.fO2_log is not None
-                else -9.0
+                else MAGEMIN_NOMINAL_FO2_LOG
             ),
             composition_mol_by_account=composition_mol_by_account,
             species_formula_registry=species_registry,
@@ -624,7 +624,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         )
         return finder(
             pressure_bar=float(request.pressure_bar),
-            fO2_log=(float(fO2_log) if fO2_log is not None else -9.0),
+            fO2_log=(float(fO2_log) if fO2_log is not None else MAGEMIN_NOMINAL_FO2_LOG),
             redox_state=redox_state,
             composition_mol_by_account=composition_mol_by_account,
             species_formula_registry=species_registry,
