@@ -345,6 +345,54 @@ def test_markova_knudsen_extent_prediction_uses_migrated_panel_and_ignores_scale
     assert exc.value.reason == "measured_mass_loss_fraction_missing_or_invalid"
 
 
+def test_markova_partial_residue_score_records_exponent_refusal(
+    fresh_mass_loss_extracts,
+) -> None:
+    from simulator.battery.score_metrics import metric_operation_for_identity
+
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    context = score_module.ScoreContext(
+        markova_result.works,
+        markova_result.experiments,
+        markova_result.observations,
+    )
+    reference = next(
+        row
+        for row in markova_result.observations.values()
+        if row.experiment_id.endswith("::VI")
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.identity.species.formula == "SiO2"
+        and row.identity.temperature_K.value == Decimal("2156.15")
+    )
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+    assert reference.value.point == Decimal("13.6")
+    assert metric_operation_for_identity(reference.identity) is MetricOperation.ABSOLUTE
+    point_composition = reference.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=91.43 wt% is below 95 wt%" in point_composition.state.reason
+
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert (
+        residual.refusal.detail["reason"]
+        == "residue_pressure_law_exponent_mismatch"
+    )
+    assert str(residual.refusal.detail["detail"]).startswith(
+        "pressure law exponent mismatch for 'Fe': declared -0.5, observed "
+    )
+    assert {
+        NoticeKind.OUT_OF_CERTIFIED_BAND,
+        NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.INPUT_OMITTED,
+    } <= {notice.kind for notice in residual.notices}
+
+
 def test_untyped_richter_final_map_never_becomes_initial(mass_loss_rows) -> None:
     _richter, _experiment, _markova, _markova_experiment, r14, r14_experiment = (
         mass_loss_rows
