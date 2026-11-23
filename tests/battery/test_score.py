@@ -12781,6 +12781,43 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
     ) == residual_line_without_cache
 
 
+def test_scoring_lineage_relation_cache_keys_by_compact_identities() -> None:
+    """Relation memo keys stay small when either ancestry has many ids."""
+
+    from simulator.battery.validate import Ancestry
+
+    work = F.work("relation-cache-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="relation-cache-exp", work_id=work.work_id
+    )
+    reference = F.observation(
+        "relation-cache-reference",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="janaf-4th",
+    )
+    context = _context(work, experiment, reference)
+    resolver = score_mod._ScoringLineageResolver(context)
+    sources = (work.work_id,)
+    reference_ids = {f"reference-ancestor-{index}" for index in range(2048)}
+    candidate_ids = {f"candidate-ancestor-{index}" for index in range(2048)}
+    resolver.indexes.observation_lineages[reference.observation_id] = (
+        Ancestry.of(reference_ids)
+    )
+    resolver.indexes.candidate_lineages[sources] = (
+        True,
+        Ancestry.of(candidate_ids),
+    )
+
+    assert resolver.for_reference(reference, sources) == (
+        True,
+        SourceRelation.INDEPENDENT,
+    )
+    assert tuple(resolver._source_relations) == ((reference.observation_id, sources),)
+
+
 def test_nasa9_comparisons_reuse_one_work_lineage_index(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

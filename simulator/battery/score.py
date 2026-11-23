@@ -5662,7 +5662,7 @@ class _ScoringLineageResolver:
                 context.works, context.observations, context.experiments
             )
         self._source_relations: dict[
-            tuple[tuple[str, ...], tuple[str, ...]], SourceRelation
+            tuple[str, tuple[str, ...]], SourceRelation
         ] = {}
 
     def _candidate_lineage(
@@ -5682,7 +5682,8 @@ class _ScoringLineageResolver:
     def for_reference(
         self, reference: Observation, sources: Sequence[str]
     ) -> tuple[bool, SourceRelation]:
-        complete, candidate_lineage = self._candidate_lineage(sources)
+        source_key = tuple(sources)
+        complete, candidate_lineage = self._candidate_lineage(source_key)
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
@@ -5706,10 +5707,7 @@ class _ScoringLineageResolver:
         ):
             return complete, SourceRelation.UNKNOWN
 
-        relation_key = (
-            tuple(sorted(reference_lineage.ids)),
-            tuple(sorted(candidate_lineage.ids)),
-        )
+        relation_key = (reference.observation_id, source_key)
         relation = self._source_relations.get(relation_key)
         if relation is None:
             relation = _source_relation_from_lineages(
