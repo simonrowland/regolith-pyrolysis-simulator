@@ -112,6 +112,23 @@ def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: flo
     return max(0.0, pressure_Pa - background_pressure_Pa)
 
 
+def _channel_parent_oxygen_demand(
+    channel: _VacuumOxygenChannel,
+    model_pressures: Mapping[str, float],
+) -> float:
+    """Return melt oxygen demand; Fe channels use this evaluation's valence."""
+    # o_bar_M = sum_v x_v * v/2 is O atoms per metal atom. Fe(g) releases
+    # o_bar and FeO(g) releases o_bar - 1. No q keeps formula stoichiometry.
+    q = getattr(model_pressures, "fe3_over_sum_fe", None)
+    if (
+        q is None
+        or channel.oxygen_per_metal_atom is None
+        or channel.redox_metal_atoms <= 0.0
+    ):
+        return channel.parent_oxygen_demand
+    return float(channel.oxygen_per_metal_atom(float(q))) * channel.redox_metal_atoms
+
+
 def _solve_vacuum_oxygen_balance(
     pressure_model: Callable[[float], Mapping[str, float]],
     channels: Sequence[_VacuumOxygenChannel],
@@ -217,20 +234,6 @@ def _solve_vacuum_oxygen_balance(
             2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
         )
 
-    def parent_demand(channel: _VacuumOxygenChannel, model_pressures: Mapping[str, float]) -> float:
-        # o_bar_M = sum_v x_v * v/2 is O atoms per metal atom. The residual
-        # uses that demand per vapour molecule: Fe(g) releases o_bar, FeO(g)
-        # releases o_bar - 1. q is read from this pressure evaluation, so the
-        # root is the self-consistent pO2. No speciation keeps the formula demand.
-        q = getattr(model_pressures, "fe3_over_sum_fe", None)
-        if (
-            q is None
-            or channel.oxygen_per_metal_atom is None
-            or channel.redox_metal_atoms <= 0.0
-        ):
-            return channel.parent_oxygen_demand
-        return float(channel.oxygen_per_metal_atom(float(q))) * channel.redox_metal_atoms
-
     def evaluate(
         logp: float, model_pressures: Mapping[str, float] | None = None,
     ) -> tuple[
@@ -262,7 +265,7 @@ def _solve_vacuum_oxygen_balance(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
-            demand = parent_demand(channel, model_pressures)
+            demand = _channel_parent_oxygen_demand(channel, model_pressures)
             if not math.isfinite(demand) or demand < 0.0:
                 raise ValueError(
                     f"parent oxygen demand is invalid for {channel.species!r}"
