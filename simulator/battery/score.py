@@ -2483,6 +2483,7 @@ def _classify_flagged_notice_facts(
 ) -> tuple[str, ...]:
     from simulator.vacuum_oxygen_balance import (
         RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
         RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
     )
 
@@ -2515,6 +2516,7 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if any(
         reason == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK
+        or reason == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO
         or reason == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
         for _kind, reason in notices
     ):
@@ -2565,19 +2567,52 @@ def _residue_redox_flag_notices(
     *,
     quantity: Quantity,
     origin: str,
+    pressure_law_diagnostics: Sequence[Mapping[str, object]] = (),
 ) -> tuple[Notice, ...]:
     """Translate the residue engine's redox flags into scored evidence."""
 
     from simulator.vacuum_oxygen_balance import (
         RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
         RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
     )
 
     notices = []
+    detailed_reasons: set[str] = set()
+    for diagnostic in pressure_law_diagnostics:
+        species = diagnostic.get("species")
+        declared = diagnostic.get("declared")
+        observed = diagnostic.get("observed")
+        expected = diagnostic.get("expected")
+        reason = diagnostic.get("reason")
+        if (
+            not isinstance(species, str)
+            or not all(isinstance(value, (int, float)) for value in (
+                declared, observed, expected
+            ))
+            or reason != RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        ):
+            continue
+        detailed_reasons.add(str(reason))
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(quantity,),
+                reason=str(reason),
+                origin=(
+                    f"{origin}; species={species}; declared={declared!r}; "
+                    f"observed={observed!r}; expected={expected!r}"
+                ),
+            )
+        )
     for flag in flags:
         if flag == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK:
             kind = NoticeKind.FALLBACK
+        elif flag == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO:
+            kind = NoticeKind.FALLBACK
         elif flag == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE:
+            if flag in detailed_reasons:
+                continue
             kind = NoticeKind.ENGINE_MODEL_CAVEAT
         else:
             continue
@@ -2586,7 +2621,11 @@ def _residue_redox_flag_notices(
                 kind=kind,
                 affected_quantities=(quantity,),
                 reason=flag,
-                origin=origin,
+                origin=(
+                    f"{origin}; default=1 O/Fe"
+                    if flag == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO
+                    else origin
+                ),
             )
         )
     return tuple(notices)
@@ -12694,6 +12733,10 @@ def _predict_mass_loss_with_residue(
         result.engine_flags,
         quantity=Quantity.MASS_LOSS_FRACTION,
         origin=f"engine:{engine.value}",
+        pressure_law_diagnostics=tuple(
+            diagnostic.as_record()
+            for diagnostic in result.pressure_law_diagnostics
+        ),
     )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
@@ -16796,6 +16839,13 @@ def _hashimoto_residue_prediction(
                 tuple(primary_provenance.get("engine_flags") or ()),
                 quantity=reported_quantity,
                 origin=f"engine:{engine.value}",
+                pressure_law_diagnostics=tuple(
+                    diagnostic
+                    for diagnostic in primary_provenance.get(
+                        "pressure_law_diagnostics"
+                    ) or ()
+                    if isinstance(diagnostic, Mapping)
+                ),
             )
         )
         notices.extend(

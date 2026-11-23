@@ -13,6 +13,9 @@ from typing import Literal
 OxygenBalanceBracketBoundary = Literal["lower", "upper"]
 RESIDUE_PRESSURE_LAW_REDOX_ACTIVE = "residue_pressure_law_redox_active"
 RESIDUE_FE_SPECIATION_KRESS91_FALLBACK = "residue_fe_speciation_kress91_fallback"
+RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO = (
+    "residue_fe_speciation_unavailable_stoichiometric_feo"
+)
 _OXYGEN_GAS_ALPHA = 1.0
 _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
@@ -52,6 +55,25 @@ class PressureLawChannelDiagnostic:
     expected: float
     reason: str
 
+    def as_record(self) -> dict[str, str | float]:
+        return {
+            "species": self.species,
+            "declared": self.declared,
+            "observed": self.observed,
+            "expected": self.expected,
+            "reason": self.reason,
+        }
+
+    def evidence_text(self) -> str:
+        return (
+            f"species={self.species}; declared={self.declared!r}; "
+            f"observed={self.observed!r}; expected={self.expected!r}"
+        )
+
+
+class PressureLawExponentMismatch(ValueError):
+    """A declared pressure exponent does not match the evaluated law."""
+
 
 class PressureEvaluation(dict):
     """Species pressures in Pa, plus Fe speciation from that same evaluation.
@@ -67,11 +89,13 @@ class PressureEvaluation(dict):
         fe3_over_sum_fe: float | None = None,
         fe_activity: float | None = None,
         speciation_source: str | None = None,
+        below_threshold_omissions: Mapping[str, Mapping[str, object]] | None = None,
     ) -> None:
         super().__init__(pressures)
         self.fe3_over_sum_fe = fe3_over_sum_fe
         self.fe_activity = fe_activity
         self.speciation_source = speciation_source
+        self.below_threshold_omissions = dict(below_threshold_omissions or {})
 
 
 @dataclass(frozen=True)

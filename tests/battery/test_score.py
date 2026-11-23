@@ -11372,7 +11372,17 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
             provenance = {
                 "experiment_id": experiment_id,
                 "engine": engine,
-                "engine_flags": ("residue_fe_speciation_kress91_fallback",),
+                "engine_flags": (
+                    "residue_fe_speciation_kress91_fallback",
+                    "residue_fe_speciation_unavailable_stoichiometric_feo",
+                ),
+                "pressure_law_diagnostics": ({
+                    "species": "Fe",
+                    "declared": -0.5,
+                    "observed": -0.6,
+                    "expected": -0.598,
+                    "reason": "residue_pressure_law_redox_active",
+                },),
                 "oxygen_model": f"own oxygen balance: {engine}",
                 "surface_pO2_balance_floor": (
                     {
@@ -11446,6 +11456,23 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
             and notice.reason == "residue_fe_speciation_kress91_fallback"
             for notice in first_prediction.notices
         )
+        unavailable = next(
+            notice for notice in first_prediction.notices
+            if notice.reason == "residue_fe_speciation_unavailable_stoichiometric_feo"
+        )
+        assert unavailable.kind is NoticeKind.FALLBACK
+        assert "default=1 O/Fe" in unavailable.origin
+        assert score.flagged_strata((unavailable,)) == (
+            score.FLAGGED_STRATUM_RESIDUE_REDOX,
+        )
+        redox_diagnostic = next(
+            notice for notice in first_prediction.notices
+            if notice.reason == "residue_pressure_law_redox_active"
+            and "species=Fe" in notice.origin
+        )
+        assert "declared=-0.5" in redox_diagnostic.origin
+        assert "observed=-0.6" in redox_diagnostic.origin
+        assert "expected=-0.598" in redox_diagnostic.origin
         assert score.FLAGGED_STRATUM_RESIDUE_REDOX in score.flagged_strata(
             first_prediction.notices
         )
