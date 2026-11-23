@@ -2819,9 +2819,9 @@ def _finite_float_or_none(value: Any) -> float | None:
 
 
 def _replace_trace_snapshots(trace: Any, snapshots: tuple[Any, ...]) -> Any:
-    if isinstance(trace, _TraceAttributeOverlay):
+    if isinstance(trace, (_TraceAttributeOverlay, _TraceOverlay)):
         original_trace = _replace_trace_snapshots(trace.original_trace, snapshots)
-        return _TraceAttributeOverlay(original_trace, trace.overrides)
+        return type(trace)(original_trace, trace.overrides)
     try:
         return replace(trace, snapshots=snapshots)
     except TypeError:

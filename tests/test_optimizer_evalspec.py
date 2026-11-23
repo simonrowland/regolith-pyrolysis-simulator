@@ -829,6 +829,37 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
             assert getattr(restored, field.name) == getattr(spec, field.name)
 
 
+def test_b272_evalspec_reduce_shapes_restore_without_control_quantization() -> None:
+    for spec, rebuild, base_arity in (
+        (
+            _base_spec(control_quantization="coarse"),
+            evalspec_module._rebuild_eval_spec,
+            evalspec_module._EVALSPEC_REDUCE_ARG_COUNT,
+        ),
+        (
+            _prefix_spec(control_quantization="coarse"),
+            evalspec_module._rebuild_prefix_eval_spec,
+            evalspec_module._PREFIX_EVALSPEC_REDUCE_ARG_COUNT,
+        ),
+    ):
+        reducer, current_args = spec.__reduce__()
+        # f59a6b280 ended at resolved_engine_identity; control_quantization
+        # was appended later, so dropping that final field makes the real
+        # reduce payload shape from that commit.
+        legacy_args = current_args[:-1]
+
+        assert reducer is rebuild
+        assert len(legacy_args) == base_arity + 6
+        restored = rebuild(*legacy_args)
+
+        assert type(restored) is type(spec)
+        assert restored.control_quantization == ""
+        for field in fields(type(spec)):
+            if field.name == "control_quantization":
+                continue
+            assert getattr(restored, field.name) == getattr(spec, field.name)
+
+
 def test_fallback_provider_id_is_not_keyed_when_fallback_disabled() -> None:
     first = _base_spec(
         allow_fallback_vapor=False,
