@@ -677,8 +677,14 @@ def compare_values(
     if status_override is not None:
         if status_override not in COMPARISON_STATUSES:
             raise ValueError(f"unsupported comparison status: {status_override!r}")
-        if status_override in SCORING_STATUSES and expected_uncertainty is None:
-            raise ValueError("scoring status overrides require cited uncertainty")
+        if status_override in SCORING_STATUSES:
+            # A scoring verdict grades an observation against its cited band, so it
+            # needs both: a numeric observation AND a valid comparator band. An empty
+            # or metadata-only band (e.g. {"temperature_K": 5.0}) is not a band, and
+            # an absent observation has nothing to grade.
+            if expected_value is None or expected_uncertainty is None:
+                raise ValueError("scoring status overrides require cited uncertainty")
+            _validated_uncertainty(expected_uncertainty)
         status = status_override
     elif out_of_domain:
         status = "out-of-domain"
