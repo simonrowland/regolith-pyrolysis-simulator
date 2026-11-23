@@ -251,7 +251,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 16473,
+        "line": 16475,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
@@ -323,7 +323,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_cached_table_property_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 3524,
+        "line": 3526,
         "kind": 'lru',
         "name": '_cached_table_property_points',
         "carries_disclosure": False,
@@ -331,7 +331,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_element_reference_schedule': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 1135,
+        "line": 1136,
         "kind": 'lru',
         "name": '_element_reference_schedule',
         "carries_disclosure": False,
@@ -339,7 +339,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_element_reference_state': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 1198,
+        "line": 1199,
         "kind": 'lru',
         "name": '_element_reference_state',
         "carries_disclosure": False,
@@ -347,7 +347,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_fusion_enthalpy_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2937,
+        "line": 2939,
         "kind": 'lru',
         "name": '_fusion_enthalpy_points',
         "carries_disclosure": False,
@@ -355,7 +355,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_fusion_entropy_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2969,
+        "line": 2971,
         "kind": 'lru',
         "name": '_fusion_entropy_points',
         "carries_disclosure": False,
@@ -363,7 +363,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_gas_table_ids': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 3070,
+        "line": 3072,
         "kind": 'lru',
         "name": '_janaf_gas_table_ids',
         "carries_disclosure": False,
@@ -371,7 +371,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_pure_solid_table_index': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2664,
+        "line": 2666,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_index',
         "carries_disclosure": False,
@@ -379,7 +379,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_pure_solid_table_temperature_range': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2686,
+        "line": 2688,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_temperature_range',
         "carries_disclosure": False,
@@ -467,7 +467,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_b1259_tridymite_cristobalite_offset_rows': {
         "path": 'simulator/battery/score.py',
-        "line": 3860,
+        "line": 3862,
         "kind": 'lru',
         "name": '_b1259_tridymite_cristobalite_offset_rows',
         "carries_disclosure": False,
@@ -475,7 +475,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_e15_binding_log10_k': {
         "path": 'simulator/battery/score.py',
-        "line": 20600,
+        "line": 20602,
         "kind": 'lru',
         "name": '_e15_binding_log10_k',
         "carries_disclosure": False,
@@ -483,7 +483,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_iron_saturated_feo_calibration': {
         "path": 'simulator/battery/score.py',
-        "line": 4560,
+        "line": 4562,
         "kind": 'lru',
         "name": '_iron_saturated_feo_calibration',
         "carries_disclosure": False,
@@ -499,7 +499,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_janaf_pure_solid_table_temperature_range': {
         "path": 'simulator/battery/score.py',
-        "line": 3833,
+        "line": 3835,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_temperature_range',
         "carries_disclosure": False,
@@ -803,7 +803,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/generators/janaf.py:formation_basis_cache': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2211,
+        "line": 2212,
         "kind": 'store',
         "name": 'formation_basis_cache',
         "carries_disclosure": False,
@@ -875,7 +875,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:_row_metadata_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 24943,
+        "line": 24945,
         "kind": 'store',
         "name": '_row_metadata_cache',
         "carries_disclosure": False,
@@ -1163,7 +1163,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_liquid_element_table_ids': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 3103,
+        "line": 3105,
         "kind": 'lru',
         "name": '_janaf_liquid_element_table_ids',
         "carries_disclosure": False,
@@ -1171,7 +1171,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:janaf_liquid_element_reference_at_temperature': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 3140,
+        "line": 3142,
         "kind": 'lru',
         "name": 'janaf_liquid_element_reference_at_temperature',
         "carries_disclosure": False,
@@ -1179,7 +1179,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:janaf_solid_stability_transitions': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2864,
+        "line": 2866,
         "kind": 'lru',
         "name": 'janaf_solid_stability_transitions',
         "carries_disclosure": False,
@@ -1203,7 +1203,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_catalog_score_rows': {
         "path": 'simulator/battery/score.py',
-        "line": 13598,
+        "line": 13600,
         "kind": 'lru',
         "name": '_catalog_score_rows',
         "carries_disclosure": False,
@@ -1275,7 +1275,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reference_data/janaf.py:_fusion_table_points': {
         "path": 'simulator/reference_data/janaf.py',
-        "line": 1742,
+        "line": 1747,
         "kind": 'lru',
         "name": '_fusion_table_points',
         "carries_disclosure": False,
@@ -1283,7 +1283,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reference_data/janaf.py:_fusion_missing_gibbs_temperatures': {
         "path": 'simulator/reference_data/janaf.py',
-        "line": 1782,
+        "line": 1787,
         "kind": 'lru',
         "name": '_fusion_missing_gibbs_temperatures',
         "carries_disclosure": False,
