@@ -248,6 +248,7 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "PASS"
     assert receipt["rms_band"] == "0.00"
+    assert list(receipt["groups"][0]["native_rms"].values()) == ["0"]
     oid, obs = next(iter(args[4].items()))
     args[4][oid] = replace(obs, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED, verbatim={"value": "0", "unit": "wt%"}))
@@ -258,9 +259,10 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
 
 
 def test_zero_rms_receipt_uses_fixed_decimal_precision() -> None:
-    from simulator.battery.reproduction_cards import _rms_text
+    from simulator.battery.reproduction_cards import _band_rms_text, _rms_text
 
-    assert _rms_text([Decimal("0")]) == "0.00"
+    assert _band_rms_text([Decimal("0")]) == "0.00"
+    assert _rms_text([Decimal("0")]) == "0"
 
 
 @pytest.mark.parametrize("mutation", ["row", "group", "band", "attestation", "assumption",

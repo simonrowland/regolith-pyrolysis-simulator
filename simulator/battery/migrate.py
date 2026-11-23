@@ -92,6 +92,7 @@ from simulator.battery.uncertainty_conventions import (
     paired_width_unit,
     printed_uncertainty_convention,
     resolve_width_unit_basis,
+    standard_uncertainty_width,
     uncertainty_exact_fields,
 )
 from simulator.battery import schema_gap as sg
@@ -31449,7 +31450,9 @@ class Migrator:
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
                 if numeric_extra_unc is not None:
                     if extra_unc_k is not None:
-                        numeric_extra_unc /= Decimal(extra_unc_k)
+                        numeric_extra_unc = standard_uncertainty_width(
+                            numeric_extra_unc, Decimal(extra_unc_k)
+                        )
                     unc = replace(
                         unc,
                         value=_log_width_in_dex(

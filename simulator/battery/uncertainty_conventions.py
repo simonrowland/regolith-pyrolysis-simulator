@@ -34,6 +34,18 @@ _NO_DECLARATION = frozenset(
 )
 
 
+def standard_uncertainty_width(
+    printed_half_width: Decimal, coverage_factor: Decimal
+) -> Decimal:
+    """Convert a printed half-width at coverage k to its 1σ half-width.
+
+    A printed half-width w covers k standard deviations, so σ = w/k. A
+    two-sigma band is ±2σ; callers apply their metric transform once to that
+    width. For example, 80 kPa at k=2 gives σ=40 kPa.
+    """
+    return printed_half_width / coverage_factor
+
+
 class UncertaintyConventionConflict(ValueError):
     """Raised when declared uncertainty conventions imply different factors."""
 
