@@ -2600,14 +2600,15 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
+    strata = _classify_flagged_notice_facts(
+        tuple((notice.kind.value, notice.reason) for notice in notices)
+    )
     if any(
         notice.policy is not None and notice.policy.get("status") == "proposed"
         for notice in notices
-    ):
-        return (FLAGGED_STRATUM_PROPOSED_POLICY,)
-    return _classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason) for notice in notices)
-    )
+    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
 
 
 def _classify_flagged_notice_facts(
@@ -24516,18 +24517,19 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
             raise ValueError(
                 "policy-bearing notice kind must name its default-policy flag"
             )
+    notices = tuple(
+        (str(notice.get("kind") or ""), notice.get("reason"))
+        for notice in raw_notices
+    )
+    strata = _classify_flagged_notice_facts(notices)
     if any(
         notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
         and isinstance(notice.get("policy"), Mapping)
         and notice["policy"].get("status") == "proposed"
         for notice in raw_notices
-    ):
-        return (FLAGGED_STRATUM_PROPOSED_POLICY,)
-    notices = tuple(
-        (str(notice.get("kind") or ""), notice.get("reason"))
-        for notice in raw_notices
-    )
-    return _classify_flagged_notice_facts(notices)
+    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:
