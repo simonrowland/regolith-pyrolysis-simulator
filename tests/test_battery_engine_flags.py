@@ -10,6 +10,7 @@ from __future__ import annotations
 import types
 from dataclasses import replace
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
 
@@ -42,6 +43,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     engine_flags_from_result,
     identity_battery_pot,
     open_battery_engine,
+    cell_score_authority,
 )
 from simulator.diagnostic_helpers.binary_pot_scoring import (
     ActivityComparator,
@@ -300,7 +302,7 @@ def test_openimcc_temperature_notice_survives_cell_notices() -> None:
     )
 
 
-def test_nested_provider_notice_reaches_score_visible_cell() -> None:
+def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
     handle = open_battery_engine("internal-analytical")
     try:
         outputs = {}
@@ -330,11 +332,46 @@ def test_nested_provider_notice_reaches_score_visible_cell() -> None:
             cell = types.SimpleNamespace(notices=flags, authority=authority)
             outputs[fO2_log] = (
                 diagnostic,
-                cell_notices(
-                    Quantity.P_PARTIAL, Engine.INTERNAL_ANALYTICAL, cell
-                ),
+                cell,
                 result,
             )
+
+        reducing_result = outputs[-12.0][2]
+        from simulator import fe_redox
+
+        original_gamma_band = fe_redox.holzheid_stoich_feo_gamma_band
+
+        def changed_gamma_band(temperature_K):
+            band = dict(original_gamma_band(temperature_K))
+            band["central"] = 1.5
+            return band
+
+        core = handle.backend._core
+        core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -12.0
+        core.melt.melt_fO2_log = -12.0
+        with patch.object(
+            fe_redox,
+            "holzheid_stoich_feo_gamma_band",
+            changed_gamma_band,
+        ):
+            mutated_result = handle.backend.equilibrate(
+                temperature_C=1605.0,
+                composition_kg={"FeO": 0.2, "Na2O": 0.2, "SiO2": 0.6},
+                composition_mol={
+                    "FeO": 2.7838093647,
+                    "Na2O": 3.2269234585,
+                    "SiO2": 9.9861857763,
+                },
+                fO2_log=-12.0,
+                pressure_bar=1e-6,
+                po2_request=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=1.0e-12,
+                ),
+            )
+        mutated_diagnostic = mutated_result.diagnostics[
+            "vapor_pressure_diagnostic"
+        ]["a_FeO_calphad"]
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
             close_battery_engine_handle,
@@ -342,13 +379,41 @@ def test_nested_provider_notice_reaches_score_visible_cell() -> None:
 
         close_battery_engine_handle(handle)
 
-    reducing_diag, reducing_notices, reducing_result = outputs[-12.0]
+    reducing_diag, reducing_cell, reducing_result = outputs[-12.0]
     assert reducing_diag["authority"]["calphad_weight"] == 1.0
-    assert any(
-        notice.reason
-        == "Holzheid stoichiometric FeO gamma conversion extrapolated"
-        for notice in reducing_notices
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    assert reducing_diag["gamma_FeO"]["holzheid"]["notice"]["reason"] == reason
+    assert reducing_diag["affected_species"] == ["FeO"]
+    assert reducing_diag["affected_quantities"] == []
+    assert reducing_diag["a_FeO_authoritative"] == pytest.approx(
+        0.4837615049051221
     )
+    assert not any(row.get("reason") == reason for row in reducing_cell.notices)
+    assert mutated_diagnostic["a_FeO_authoritative"] == pytest.approx(
+        0.2578487477042083
+    )
+    assert mutated_diagnostic["gamma_FeO"]["holzheid"]["notice"]["reason"] == reason
+    assert dict(reducing_result.vapor_pressures_Pa) == dict(
+        mutated_result.vapor_pressures_Pa
+    )
+    assert reducing_result.vapor_pressures_Pa["Fe"] == pytest.approx(
+        16.38797577954487
+    )
+    assert not any(
+        notice.reason == reason
+        for notice in cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            reducing_cell,
+            species="Fe",
+        )
+    )
+    assert cell_score_authority(
+        reducing_cell,
+        refused=False,
+        quantity=Quantity.P_PARTIAL.value,
+        species="Fe",
+    ) != AUTHORITY_EXTRAPOLATED
     reducing_flags, reducing_authority, _ = engine_flags_from_result(
         reducing_result
     )
@@ -365,7 +430,7 @@ def test_nested_provider_notice_reaches_score_visible_cell() -> None:
         )
     )
 
-    oxidizing_diag, oxidizing_notices, _oxidizing_result = outputs[-6.17939589339]
+    oxidizing_diag, oxidizing_cell, _oxidizing_result = outputs[-6.17939589339]
     assert oxidizing_diag["authority"]["calphad_weight"] == 0.0
     assert oxidizing_diag["a_FeO_authoritative"] == pytest.approx(
         oxidizing_diag["a_FeO_kress91"]
@@ -373,8 +438,57 @@ def test_nested_provider_notice_reaches_score_visible_cell() -> None:
     assert not any(
         notice.reason
         == "Holzheid stoichiometric FeO gamma conversion extrapolated"
-        for notice in oxidizing_notices
+        for notice in cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            oxidizing_cell,
+            species="Fe",
+        )
     )
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("FeO", Decimal("0.2")),
+            ("Na2O", Decimal("0.2")),
+            ("SiO2", Decimal("0.6")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    fe_identity = replace(
+        F.activity_identity(
+            formula="FeO",
+            T_K=Decimal("1878.15"),
+            component_basis="FeO",
+            composition=composition,
+            fO2_Pa=Decimal("1e-7"),
+        ),
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+    )
+    fe_observation = F.observation(
+        "fe-pressure-holzheid", "holzheid-scope", fe_identity, Decimal("0.4")
+    )
+    from simulator.engine_cache import _without_engine_cache
+
+    with _without_engine_cache():
+        fe_prediction = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL, fe_observation, isolated=False
+        )
+        with patch.object(
+            fe_redox,
+            "holzheid_stoich_feo_gamma_band",
+            changed_gamma_band,
+        ):
+            mutated_fe_prediction = predict_with_engine(
+                Engine.INTERNAL_ANALYTICAL, fe_observation, isolated=False
+            )
+    assert fe_prediction.value == Decimal("16.38797577954487")
+    assert mutated_fe_prediction.value == fe_prediction.value
+    assert fe_prediction.authority is not Authority.EXTRAPOLATED
+    assert mutated_fe_prediction.authority is not Authority.EXTRAPOLATED
+    assert not any(notice.reason == reason for notice in fe_prediction.notices)
+    assert not any(notice.reason == reason for notice in mutated_fe_prediction.notices)
 
 
 def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:

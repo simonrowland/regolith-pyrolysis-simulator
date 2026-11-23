@@ -7725,6 +7725,9 @@ def _flags_from_scored_cell(
     cell: object,
     authority: Authority,
     certified_band: Mapping[str, tuple[float, float]] | None,
+    *,
+    quantity: Quantity | None = None,
+    species: str | None = None,
 ) -> tuple[Authority, Mapping[str, tuple[float, float]] | None]:
     """Upgrade a bridge default from the cell. Never downgrades a flag."""
 
@@ -7733,7 +7736,12 @@ def _flags_from_scored_cell(
         cell_score_authority,
     )
 
-    if cell_score_authority(cell, refused=False) == AUTHORITY_EXTRAPOLATED:
+    if cell_score_authority(
+        cell,
+        refused=False,
+        quantity=None if quantity is None else quantity.value,
+        species=species,
+    ) == AUTHORITY_EXTRAPOLATED:
         authority = Authority.EXTRAPOLATED
     if certified_band is None:
         band = _interval_certified_band(getattr(cell, "certified_band", None))
@@ -7746,6 +7754,8 @@ def cell_notices(
     quantity: Quantity,
     engine: Engine,
     cell: object,
+    *,
+    species: str | None = None,
 ) -> tuple[Notice, ...]:
     from simulator.diagnostic_helpers.binary_pot_battery import (
         AUTHORITY_EXTRAPOLATED,
@@ -7763,6 +7773,13 @@ def cell_notices(
             isinstance(affected_quantities, (list, tuple, set, frozenset))
             and affected_quantities
             and quantity.value not in affected_quantities
+        ):
+            continue
+        affected_species = row.get("affected_species")
+        if (
+            isinstance(affected_species, (list, tuple, set, frozenset))
+            and affected_species
+            and (species is None or species not in affected_species)
         ):
             continue
         kind = str(row.get("kind") or "")
@@ -15532,8 +15549,13 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
-    notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
-    authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
+    notices = union_notices(
+        tuple(extra_notices),
+        cell_notices(quantity, engine, cell, species=formula),
+    )
+    authority, certified_band = _flags_from_scored_cell(
+        cell, authority, certified_band, quantity=quantity, species=formula
+    )
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
     call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
@@ -15817,7 +15839,9 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
-        notices = union_notices(notices, cell_notices(quantity, engine, cell))
+        notices = union_notices(
+            notices, cell_notices(quantity, engine, cell, species=formula)
+        )
         if getattr(cell, "status", None) != "ok":
             return EnginePrediction(
                 engine=engine,
@@ -15851,7 +15875,7 @@ def _predict_with_engine(
         if invalid_refusal is not None:
             return invalid_refusal
         authority, certified_band = _flags_from_scored_cell(
-            cell, authority, certified_band
+            cell, authority, certified_band, quantity=quantity, species=formula
         )
         updated_pressures = dict(
             getattr(cell, "gas_partial_pressures_Pa", None) or {}

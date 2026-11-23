@@ -1591,19 +1591,34 @@ def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
     """Collect typed notices nested under diagnostic ``notice`` fields."""
 
     notices: list[dict[str, Any]] = []
-    pending = [value]
+    pending = [(value, None, None)]
     while pending:
-        current = pending.pop()
+        current, inherited_species, inherited_quantities = pending.pop()
         if isinstance(current, Mapping):
+            species_scope = current.get("affected_species", inherited_species)
+            quantity_scope = current.get("affected_quantities", inherited_quantities)
             nested_notice = current.get("notice")
-            if isinstance(nested_notice, Mapping) and nested_notice.get("kind"):
+            has_scored_quantity_scope = not (
+                isinstance(quantity_scope, (list, tuple, set, frozenset))
+                and not quantity_scope
+            )
+            if (
+                isinstance(nested_notice, Mapping)
+                and nested_notice.get("kind")
+                and has_scored_quantity_scope
+            ):
                 row = _plain_data(nested_notice)
                 if (
                     not row.get("authority")
                     and row.get("authority_level") == AUTHORITY_EXTRAPOLATED
                 ):
                     row["authority"] = AUTHORITY_EXTRAPOLATED
-                row.setdefault("affected_quantities", ["p_partial"])
+                row.setdefault(
+                    "affected_quantities",
+                    quantity_scope if quantity_scope is not None else ["p_partial"],
+                )
+                if species_scope is not None:
+                    row.setdefault("affected_species", species_scope)
                 notices.append(row)
             authority = current.get("authority")
             calphad_weight = (
@@ -1612,12 +1627,15 @@ def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
                 else None
             )
             pending.extend(
-                child
+                (child, species_scope, quantity_scope)
                 for key, child in current.items()
                 if not (key == "gamma_FeO" and calphad_weight == 0)
             )
         elif isinstance(current, (list, tuple)):
-            pending.extend(current)
+            pending.extend(
+                (child, inherited_species, inherited_quantities)
+                for child in current
+            )
     return notices
 
 
@@ -1704,18 +1722,39 @@ def engine_flags_from_result(
     return notices, authority, certified_band
 
 
-def cell_score_authority(cell: Any, *, refused: bool) -> str:
-    """Envelope authority from the cell. Bridge only when the engine set none."""
+def cell_score_authority(
+    cell: Any,
+    *,
+    refused: bool,
+    quantity: str | None = None,
+    species: str | None = None,
+) -> str:
+    """Cell authority, filtered to the selected result when a scope is supplied."""
 
     if refused:
         return "refused"
     authority = getattr(cell, "authority", None)
-    if authority:
+    if authority and (authority != "bridge" or quantity is None):
         return str(authority)
     for row in getattr(cell, "notices", None) or []:
-        if isinstance(row, Mapping) and row.get("authority"):
-            return str(row["authority"])
-    return "bridge"
+        if not isinstance(row, Mapping) or not row.get("authority"):
+            continue
+        affected_quantities = row.get("affected_quantities")
+        if (
+            isinstance(affected_quantities, (list, tuple, set, frozenset))
+            and affected_quantities
+            and (quantity is None or quantity not in affected_quantities)
+        ):
+            continue
+        affected_species = row.get("affected_species")
+        if (
+            isinstance(affected_species, (list, tuple, set, frozenset))
+            and affected_species
+            and (species is None or species not in affected_species)
+        ):
+            continue
+        return str(row["authority"])
+    return str(authority or "bridge")
 
 
 def cell_score_notice_kinds(cell: Any) -> tuple[str, ...]:
@@ -3799,6 +3838,8 @@ def _internal_analytical_vapor_pressure_adapter(
                         "authority": AUTHORITY_EXTRAPOLATED,
                         "reason": f"{field_name}:{species}:{detail}",
                         "band": str(detail),
+                        "affected_species": [species],
+                        "affected_quantities": ["p_partial"],
                     }
                 )
     for authority_field in ("vapor_pressure_authority", "ellingham_authority"):
@@ -3816,6 +3857,8 @@ def _internal_analytical_vapor_pressure_adapter(
                         "authority": AUTHORITY_EXTRAPOLATED,
                         "reason": f"{authority_field}:{species}:{detail}",
                         "band": str(detail),
+                        "affected_species": [species],
+                        "affected_quantities": ["p_partial"],
                     }
                 )
     floor_notices = core_diagnostic.get("pO2_floor_inversion_notices_by_species")
@@ -3826,6 +3869,8 @@ def _internal_analytical_vapor_pressure_adapter(
                     "kind": "floor_inversion",
                     "authority": AUTHORITY_EXTRAPOLATED,
                     "reason": f"{_FLOOR_INVERSION_REASON}:{species}:{detail}",
+                    "affected_species": [species],
+                    "affected_quantities": ["p_partial"],
                 }
             )
     core_flags.extend(_nested_notice_flags(core_diagnostic))
@@ -3858,7 +3903,7 @@ def _internal_analytical_vapor_pressure_adapter(
         "authoritative_for_requested_vapor_pressure": authority_is_authoritative,
         "authority": (
             AUTHORITY_EXTRAPOLATED
-            if core_flags
+            if any(not flag.get("affected_species") for flag in core_flags)
             else "bridge" if authority_is_authoritative else authority_status
         ),
         "vapor_pressure_diagnostic": core_diagnostic,

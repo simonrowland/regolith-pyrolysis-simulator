@@ -4599,6 +4599,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 high_t_activity_authority
             )
         if feo_activity_diagnostic is not None:
+            feo_activity_diagnostic["affected_species"] = ["FeO"]
+            feo_activity_diagnostic["affected_quantities"] = []
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
 
         return IntentResult(
