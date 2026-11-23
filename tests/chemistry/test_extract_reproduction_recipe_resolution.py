@@ -114,18 +114,18 @@ def test_located_mole_fraction_composition_overrides_parent_recipe() -> None:
 
 @pytest.mark.parametrize("shape", ["parent", "point", "flat", "pressure"])
 @pytest.mark.parametrize(
-    ("token", "usable", "status", "flags"),
+    ("token", "tier", "status", "flags"),
     [
-        ("datum_state", True, composition_roles.RoleStatus.DECLARED, ()),
-        ("unreported", True, composition_roles.RoleStatus.DEFAULTED,
+        ("datum_state", "clean", composition_roles.RoleStatus.DECLARED, ()),
+        ("unreported", "flagged", composition_roles.RoleStatus.DEFAULTED,
          (composition_roles.ROLE_DEFAULT_FLAG,)),
-        ("unreported", False, composition_roles.RoleStatus.UNKNOWN, ()),
+        ("unreported", "refused", composition_roles.RoleStatus.UNKNOWN, ()),
     ],
 )
-def test_role_resolution_matrix(shape, token, usable, status, flags) -> None:
+def test_role_resolution_matrix(shape, token, tier, status, flags) -> None:
     from types import SimpleNamespace
 
-    amounts = {"SiO2": 60, "MgO": 40} if usable else {"SiO2": "bad", "MgO": 40}
+    amounts = {"SiO2": "bad" if tier == "refused" else 60, "MgO": 40}
     values = {"composition_role": {"value": token}}
     point = None
     if shape == "parent":
@@ -143,8 +143,8 @@ def test_role_resolution_matrix(shape, token, usable, status, flags) -> None:
     )
     assert role.status is status
     assert role.flags == flags
-    assert role.callable is usable
-    if not usable:
+    assert ("refused" if not role.callable else "flagged" if role.flags else "clean") == tier
+    if not role.callable:
         assert role.composition.is_unknown
     elif shape == "flat":
         assert source == "extract flat run composition"
@@ -192,10 +192,9 @@ def test_pressure_with_inherited_unknown_role_predicts_in_flagged_tier(monkeypat
         return 1.0, None, {"provider_status": "ok"}
 
     monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", melt_stub)
+    monkeypatch.setattr(extract_reproduction, "resolve_pO2_bar", lambda _obs: (5e-9, "fixture"))
     assert observation_admission_reason(obs) is None
-    result = extract_reproduction._evaluate_psat(
-        obs, extract_reproduction.ObservationEvaluation(obs), {}, 5e-9
-    )
+    result = evaluate_observation(obs)
     assert calls == [{"SiO2": 0.6, "MgO": 0.4}]
     assert [record.status for record in result.records] == ["assumed-input"]
     assert composition_roles.is_role_default_reason(result.skip_reason)

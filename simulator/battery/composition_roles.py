@@ -125,7 +125,7 @@ def resolve_composition_role(
     role_notices = tuple(
         notice
         for notice in notices
-        if is_initial_charge_only_proxy_notice(notice)
+        if (has_proxy and is_initial_charge_only_proxy_notice(notice))
         or (
             notice.kind is NoticeKind.SOURCE_DISAGREEMENT
             and is_role_default_reason(notice.reason)
@@ -174,7 +174,7 @@ def resolve_composition_role(
         role == INITIAL_CHARGE_ONLY_PROXY_FLAG
         and composition.is_value
         and quantity is not None
-        and (has_proxy or is_initial_charge_composition(composition))
+        and has_proxy
         and not any(is_initial_charge_only_proxy_notice(n) for n in role_notices)
     ):
         role_notices += (initial_charge_only_proxy_notice(quantity, origin),)

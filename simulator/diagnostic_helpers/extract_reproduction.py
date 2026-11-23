@@ -65,9 +65,9 @@ from simulator.physical_constants import (
 )
 from simulator.battery import composition_roles
 from simulator.battery import migrate as battery_migrate
-from simulator.battery.composition_roles import RoleResolution, RoleStatus
-from simulator.state_types import State
+from simulator.battery.composition_roles import COMPOSITION_ROLE_FIELD, RoleResolution, RoleStatus
 from simulator.battery.enums import Quantity
+from simulator.state_types import State
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_STATUSES,
@@ -1002,12 +1002,33 @@ def _literature_pressure_points(
                 )
                 continue
             parsed_point = {
-                **pt,
                 "T_K": T_f,
                 "P_Pa": P_f,
                 "units": units_hint,
                 "point_index": idx,
+                "note": pt.get("note"),
+                "source_point": pt,
             }
+            parsed_point.update(
+                {
+                    key: pt[key]
+                    for key in (
+                        "composition_mol",
+                        "melt_composition_mol",
+                        "composition_wt_pct",
+                        "melt_composition_wt_pct",
+                        "sample_oxide_composition_wt_pct",
+                        "sample_Na2O_wt_pct",
+                        "sample_K2O_wt_pct",
+                        "composition_source_observation_id",
+                        "composition_source_gap",
+                        COMPOSITION_ROLE_FIELD,
+                        "point_conditions",
+                        "sample",
+                    )
+                    if key in pt
+                }
+            )
             out.append(parsed_point)
         if out:
             return out, None, drops
@@ -3906,6 +3927,7 @@ def _melt_recipe_mol(
 
     values = dict(obs.values)
     if point is not None:
+        source_point = point.get("source_point", point)
         point_recipe_keys = (
             "composition_mol",
             "melt_composition_mol",
@@ -3936,12 +3958,12 @@ def _melt_recipe_mol(
             not point_has_located_composition
             and not point_has_named_recipe
             and battery_migrate._flat_run_composition_columns(
-                point, obs.values, getattr(obs, "units", None)
+                source_point, obs.values, getattr(obs, "units", None)
             )
         ):
             errors: list[str] = []
             flat = battery_migrate._oxide_map_from_mapping(
-                point, declared_map=True, refusal_reason=errors
+                source_point, declared_map=True, refusal_reason=errors
             )
             source = "extract flat run composition"
             if flat is None:
