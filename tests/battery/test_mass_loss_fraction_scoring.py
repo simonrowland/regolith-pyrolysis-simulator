@@ -412,23 +412,13 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
         )
         if fields.get("species") == "Fe":
             fe_diagnostics.append((fields, notice))
-    assert {fields["arm"] for fields, _notice in fe_diagnostics} >= {
-        "POINT", "JOINT",
+    assert len(fe_diagnostics) == 1
+    diagnostic_fields = fe_diagnostics[0][0]
+    assert set(diagnostic_fields) == {"species", "declared", "observed", "expected"}
+    diagnostic_numbers = {
+        key: float(diagnostic_fields[key])
+        for key in ("declared", "observed", "expected")
     }
-    assert sum(fields["arm"] == "POINT" for fields, _notice in fe_diagnostics) == 1
-    assert sum(fields["arm"] == "JOINT" for fields, _notice in fe_diagnostics) == 1
-    point_numbers = next(
-        {key: float(fields[key]) for key in ("declared", "observed", "expected")}
-        for fields, _notice in fe_diagnostics
-        if fields["arm"] == "POINT"
-    )
-    joint_numbers = next(
-        {key: float(fields[key]) for key in ("declared", "observed", "expected")}
-        for fields, _notice in fe_diagnostics
-        if fields["arm"] == "JOINT"
-    )
-    assert point_numbers["observed"] != pytest.approx(joint_numbers["observed"])
-    diagnostic_numbers = point_numbers
     assert diagnostic_numbers["declared"] == pytest.approx(-0.5)
     assert diagnostic_numbers["expected"] < diagnostic_numbers["declared"]
     assert diagnostic_numbers["observed"] == pytest.approx(
@@ -448,6 +438,74 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
         NoticeKind.UNVERIFIED_APPARATUS,
         NoticeKind.INPUT_OMITTED,
     } <= {notice.kind for notice in residual.notices}
+
+
+def test_bulk_mass_loss_score_keeps_distinct_redox_arms(
+    fresh_mass_loss_extracts, monkeypatch,
+) -> None:
+    from simulator.battery import residue
+    from simulator.vacuum_oxygen_balance import (
+        PressureLawChannelDiagnostic,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    row = next(
+        row
+        for row in markova_result.observations.values()
+        if row.experiment_id.endswith("::VI")
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.value.point == 0
+    )
+    experiment = markova_result.experiments[row.experiment_id]
+    monkeypatch.setattr(
+        residue,
+        "predict_mass_loss_fraction",
+        lambda *_args, **_kwargs: residue.ResidueMassLossPrediction(
+            mass_loss_fraction=0.0,
+            engine_flags=(),
+            engine_metadata={"alpha_sources": "[]"},
+            pressure_law_diagnostics=(
+                PressureLawChannelDiagnostic(
+                    "Fe", -0.5, -0.601, -0.603,
+                    RESIDUE_PRESSURE_LAW_REDOX_ACTIVE, arm="POINT",
+                ),
+                PressureLawChannelDiagnostic(
+                    "Fe", -0.5, -0.604, -0.606,
+                    RESIDUE_PRESSURE_LAW_REDOX_ACTIVE, arm="JOINT",
+                ),
+            ),
+        ),
+    )
+
+    prediction = score_module._predict_mass_loss_with_residue(
+        Engine.OPENIMCC,
+        row.identity,
+        "bulk_mass_loss",
+        (),
+        experiment,
+        row,
+    )
+
+    fe_notices = [
+        notice for notice in prediction.notices
+        if notice.reason == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        and "species=Fe" in notice.origin
+    ]
+    assert len(fe_notices) == 2
+    fields_by_arm = {
+        part.strip().split("=", 1)[1]: dict(
+            fragment.strip().split("=", 1)
+            for fragment in notice.origin.split(";")
+            if "=" in fragment
+        )
+        for notice in fe_notices
+        for part in notice.origin.split(";")
+        if part.strip().startswith("arm=")
+    }
+    assert set(fields_by_arm) == {"POINT", "JOINT"}
+    assert fields_by_arm["POINT"]["observed"] == "-0.601"
+    assert fields_by_arm["JOINT"]["observed"] == "-0.604"
 
 
 def test_untyped_richter_final_map_never_becomes_initial(mass_loss_rows) -> None:

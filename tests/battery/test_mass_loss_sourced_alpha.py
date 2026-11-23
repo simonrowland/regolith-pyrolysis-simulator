@@ -330,13 +330,30 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
         )
 
     pressure.declares_fixed_activities = True
-    selected_pressures = {}
+    pressures_by_corner = {}
+    roots_by_corner = {}
+    production_solver = residue._solve_vacuum_oxygen_balance
+
+    def capture_root(model, selected, *, temperature_K):
+        corner = tuple(
+            (channel.species, channel.alpha)
+            for channel in selected if channel.species in {"Fe", "FeO"}
+        )
+        result = production_solver(model, selected, temperature_K=temperature_K)
+        roots_by_corner[corner] = result.pO2_bar
+        return result
+
     production_flux = residue._finite_step_fluxes
 
     def capture_flux(terms, inventory, **kwargs):
-        selected_pressures.update(kwargs["pressures_Pa"])
+        corner = tuple(
+            (term.source.species, term.source.alpha)
+            for term in terms if term.source.species in {"Fe", "FeO"}
+        )
+        pressures_by_corner[corner] = dict(kwargs["pressures_Pa"])
         return production_flux(terms, inventory, **kwargs)
 
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", capture_root)
     monkeypatch.setattr(residue, "_finite_step_fluxes", capture_flux)
     area_m2 = 1.0e-4
     duration_s = 1.0
@@ -344,8 +361,17 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
         {"FeO": 1.0}, channels, pressure, unsourced=("Fe", "FeO"),
         temperature_K=1800.0, area_m2=area_m2, duration_s=duration_s,
     )
-    assert corners["pO2_low_bar"] == pytest.approx(6.071549282154776e-7, rel=1e-9)
-    assert selected_pressures["Fe"] >= 0.1283
+    positive_corner = (("Fe", 1.0), ("FeO", 0.0))
+    zero_corner = (("Fe", 0.0), ("FeO", 0.0))
+    assert roots_by_corner[zero_corner] == 0.0
+    assert roots_by_corner[positive_corner] == pytest.approx(
+        6.071549282154776e-7, rel=1e-9,
+    )
+    assert corners["pO2_low_bar"] == 0.0
+    assert pressures_by_corner[positive_corner]["Fe"] == pytest.approx(
+        0.12833651381197933, rel=1e-9,
+    )
+    assert pressures_by_corner[zero_corner]["Fe"] == 0.0
     fe_term = residue._channel_terms(
         (channels[0],), require_oxygen_channels=False,
     )

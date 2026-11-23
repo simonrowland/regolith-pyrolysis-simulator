@@ -77,9 +77,9 @@ def _channels(gas="FeO"):
 
 
 def _preserve_pressure_contract(source, wrapper):
-    for name in ("declares_fixed_activities", "declares_redox_active", "engine_flags"):
-        if hasattr(source, name):
-            setattr(wrapper, name, getattr(source, name))
+    from simulator.battery.residue import _inherit_residue_pressure_contract
+
+    _inherit_residue_pressure_contract(wrapper, source)
     return wrapper
 
 
