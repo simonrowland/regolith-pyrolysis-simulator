@@ -353,7 +353,7 @@ def cacheable_refusal(result) -> bool:
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 3,
-    "vaporock": 1,
+    "vaporock": 2,
     "magemin": 4,
     "alphamelts": 4,
     "thermoengine": 4,
@@ -368,6 +368,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
+# vaporock v2: 2026-11-23 t-1923 pressure/fO2 car, round 7 - retain gas-channel completeness for DP-108
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)

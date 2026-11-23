@@ -41,8 +41,9 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import Composition, Located, Locator, State, Value
+from simulator.battery.records import Composition, Derivation, Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
+from simulator.physical_constants import BAR_PA_DECIMAL
 from tests.battery.factories import migrate_one_extract
 
 
@@ -1977,7 +1978,11 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
 
 
-def test_internal_analytical_redox_prediction_is_independent_of_measured_target():
+@pytest.mark.parametrize("control", (
+    "ferric", "annotated-ferric", "pressure-operand", "projected-pressure",
+    "oxygen-log", "projected-buffer", "projected-offset", "same-row-assay",
+))
+def test_internal_analytical_redox_prediction_is_independent_of_measured_target(control):
     location = Locator(page=2, record="Fe3+/Fe2+ cell")
     row = _without_printed_fo2(_borisov_row4())
     row = replace(
@@ -1985,22 +1990,88 @@ def test_internal_analytical_redox_prediction_is_independent_of_measured_target(
         identity=replace(row.identity, total_pressure_Pa=State.of(Decimal("100000"))),
     )
 
-    def predict(ratio, ferric_location):
+    def predict(ratio, pressure, assay):
         candidate = replace(
-            row, value=Value.point_of(ratio),
-            point_conditions={"Fe3_over_Fe2": Located(State.of(ratio), ferric_location)},
+            row, value=Value.point_of(ratio), point_conditions={},
         )
+        if control in {"pressure-operand", "projected-pressure"}:
+            projected = control == "projected-pressure"
+            field = "P_total_bar" if projected else "total_pressure_Pa"
+            operand = Located(
+                State.of(pressure / BAR_PA_DECIMAL if projected else pressure),
+                Locator(page=3, record="pressure operand"),
+            )
+            candidate = replace(
+                candidate,
+                identity=replace(candidate.identity, total_pressure_Pa=(
+                    State.of(pressure) if projected else None
+                )),
+                point_conditions={field: operand},
+                derivation=Derivation(
+                    "redox conversion", (), ((f"original_{field}", operand),), "1",
+                ),
+            )
+        elif control in {"projected-buffer", "projected-offset"}:
+            field, oxygen = (
+                ("fO2_control", f"IW+{ratio}") if control == "projected-buffer"
+                else ("delta_IW", ratio)
+            )
+            candidate = replace(
+                candidate,
+                identity=replace(candidate.identity, fO2_Pa=State.of(ratio)),
+                point_conditions={field: Located(State.of(oxygen), location)},
+            )
+        else:
+            field = "fO2_log" if control == "oxygen-log" else "Fe3_over_Fe2"
+            if control == "same-row-assay":
+                candidate = replace(candidate, locator=replace(location, note="column=target"))
+                condition_location = replace(location, note="column=assay")
+                ratio = assay
+            elif control == "annotated-ferric":
+                candidate = replace(candidate, locator=replace(location, note="column=target"))
+                condition_location = replace(location, note="transcribed; column=target")
+            else:
+                condition_location = location
+            candidate = replace(candidate, point_conditions={
+                field: Located(State.of(ratio), condition_location),
+            })
         return predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
 
-    predictions = [predict(ratio, location) for ratio in (Decimal("0.25"), Decimal("1.0"))]
+    predictions = [
+        predict(Decimal("0.25"), Decimal("25000000"), Decimal("1.0")),
+        predict(Decimal("1.0"), Decimal("100000000"), Decimal("0.25")),
+    ]
+    if control == "same-row-assay":
+        assert all(p.value is not None for p in predictions)
+        assert [float(p.value) for p in predictions] == pytest.approx([1.0, 0.25])
+        assert all(
+            any(n.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO for n in p.notices)
+            for p in predictions
+        )
+        return
     assert predictions[0].value is not None
     assert predictions[0].value == predictions[1].value
+    if control in {"pressure-operand", "projected-pressure"}:
+        assert predictions[0].value == Decimal("1.8449565575523237")
+        assert all(any(n.policy and n.policy.id == "DP-001" for n in p.notices) for p in predictions)
+    else:
+        assert predictions[0].value == Decimal("1.8449575445556925")
     for prediction in predictions:
         assert any(n.policy and n.policy.id == "DP-010" for n in prediction.notices)
 
-    independent = predict(Decimal("0.25"), Locator(page=3, record="independent assay"))
-    assert independent.value is not None
-    assert any(n.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO for n in independent.notices)
+
+def test_internal_analytical_redox_requires_target_independent_material():
+    row = _borisov_row4()
+    composition = Located(row.identity.composition, inference=Derivation(
+        "target-derived composition", (f"observation[{row.observation_id}].value",), (), "1",
+    ))
+    row = replace(row, point_conditions={**row.point_conditions, "composition": composition})
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row, isolated=False)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_input", "input": "composition"}
 
 
 def test_melts_fe_redox_uses_dp010_without_independent_oxygen(monkeypatch):

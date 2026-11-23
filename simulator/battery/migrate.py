@@ -21135,6 +21135,27 @@ def _relative_buffer_for_field(name: str) -> str | None:
     return family if family in set(_BUFFER_FAMILY.values()) else None
 
 
+def condition_identity_axis(name: str) -> str | None:
+    """Identity axis that can be filled by a located source condition."""
+    if name in {"T_C", "T_K", "temperature_K"}:
+        return "temperature_K"
+    if name in {"composition", "printed_composition"}:
+        return "composition"
+    if any(name == field for field, _unit in _PRESSURE_TOTAL_KEYS):
+        return "total_pressure_Pa"
+    if (
+        name in _PRINTED_LOG_FO2_KEYS
+        or name in _PRINTED_PO2_KEYS
+        or name in {
+            "fO2_log", "fO2_Pa", "oxygen_partial_pressure_Pa", "fO2_control",
+            "oxygen_fugacity_buffer_relation", "oxygen_buffer_as_published",
+        }
+        or _relative_buffer_for_field(name) is not None
+    ):
+        return "fO2_Pa"
+    return None
+
+
 def _has_relative_buffer_marker(text: str) -> bool:
     """Detect markers in prose/units independently of valid field-name syntax."""
 

@@ -962,8 +962,18 @@ def _call_system_eval_gas_abundances(
                 ln_activity,
                 composition_wt_pct=composition,
             )
+        else:
+            logP = eval_gas_abundances(temperature, log_fO2)
+        # System builds the gas table on the installed reaction index.
+        # Represent omissions as invalid rows before the warm worker flattens it.
+        if hasattr(logP, 'reindex'):
+            reactions = getattr(getattr(system, 'vapor', None), 'rxn_coefs', None)
+            if hasattr(reactions, 'index'):
+                missing = reactions.index.difference(logP.index)
+                if len(missing):
+                    logP = logP.reindex(logP.index.union(missing, sort=False))
+        if include_oxide_activities:
             return logP, oxide_activity
-        logP = eval_gas_abundances(temperature, log_fO2)
     except Exception as exc:
         if isinstance(exc, VapoRockCallError):
             raise
@@ -3000,6 +3010,10 @@ class VapoRockBackend(MeltBackend):
         self._retain_proven_empty_inventory(
             pressures, neginf_species, composition_wt_pct
         )
+        # The System contract always reports molecular oxygen. A warm
+        # payload missing that row cannot establish a complete gas sum.
+        if 'O2' not in pressures:
+            self._last_invalid_pressure_components.add('O2')
         return pressures
 
     @staticmethod

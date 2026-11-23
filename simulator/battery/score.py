@@ -185,6 +185,7 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
+    condition_identity_axis,
     path_matches_source_tokens,
     _phase_for_sample_description,
     _phase_for_recorded_vapour_sample,
@@ -10057,12 +10058,19 @@ def _predict_redox(
     if circular is not None:
         return refused(circular[0], circular[1])
 
+    quantity = quantity_token(identity) or Quantity.FE3_FE2_RATIO
+    observation = independent_redox_conditions(
+        observation,
+        ferric_target=quantity is Quantity.FE3_FE2_RATIO
+        or _fe_valence_named_form(identity) in {"ratio", "fraction"},
+        condition_identity_axis=condition_identity_axis,
+    )
+    identity = observation.identity
     material = _fe_redox_material(observation, identity, experiment)
     if isinstance(material, _FeRedoxRefusal):
         return refused(material.reason, material.detail)
     material_notices.extend(material.notices)
 
-    quantity = quantity_token(identity) or Quantity.FE3_FE2_RATIO
     pressure_bar, pressure_pa, pressure_notice, pressure_invalid = (
         _resolve_score_total_pressure(
             identity,
@@ -10085,25 +10093,17 @@ def _predict_redox(
         if isinstance(kress_basis, _FeRedoxRefusal):
             return refused(kress_basis.reason, kress_basis.detail)
 
-    fo2_observation = observation
-    if quantity is Quantity.FE3_FE2_RATIO or _fe_valence_named_form(identity) in {
-        "ratio", "fraction"
-    }:
-        fo2_observation = independent_redox_conditions(observation)
-    fo2_log = _printed_fe_redox_fo2_log(fo2_observation, fo2_observation.identity)
+    fo2_log = _printed_fe_redox_fo2_log(observation, identity)
     if fo2_log is None:
         from simulator.battery.fo2_ladder import (
             fo2_tier_notice,
             resolve_row_fo2,
         )
 
-        fo2_observation = replace(
-            fo2_observation,
-            identity=(
-                replace(fo2_observation.identity, total_pressure_Pa=pressure_pa)
-                if pressure_pa is not None
-                else fo2_observation.identity
-            ),
+        fo2_observation = (
+            replace(observation, identity=replace(identity, total_pressure_Pa=pressure_pa))
+            if pressure_pa is not None
+            else observation
         )
         resolved_fo2 = resolve_row_fo2(
             experiment,

@@ -4506,6 +4506,7 @@ def test_magemin_live_iron_free_phase_output_is_oxygen_insensitive(request, monk
         assert result.phases_present and result.phase_masses_kg
         assert result.liquid_fraction is not None
         prediction = score.predict_with_engine(Engine.MAGEMIN, row)
+        # W2 / d-446 owns the native per-phase composition pin.
         assert prediction.value is None
         assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
         assert prediction.refusal_detail["reason"] == "phase_composition_unavailable"

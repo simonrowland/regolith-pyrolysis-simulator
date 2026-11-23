@@ -3239,7 +3239,7 @@ def test_nan_on_present_oxide_is_not_converted_to_proven_empty_zero():
     backend = VapoRockBackend()
     backend._clear_empty_speciation()
     pressures = backend._log10_bar_pressures_to_pa(
-        {"Na(g)": float("nan"), "SiO(g)": -6.0, "Cr(g)": float("-inf")},
+        {"Na(g)": float("nan"), "SiO(g)": -6.0, "O2(g)": -9.0, "Cr(g)": float("-inf")},
         composition_wt_pct={"SiO2": 50.0, "Na2O": 3.0},
     )
 
@@ -3785,15 +3785,25 @@ def test_vaporock_absent_status_reports_unavailable_not_ok():
     assert result.diagnostic["backend_status"] == "unavailable"
 
 
-def test_system_call_warm_and_cold_paths_match_float_hex_golden():
+@pytest.mark.parametrize("missing_channel", (False, True), ids=("complete", "missing-channel"))
+def test_system_call_warm_and_cold_paths_match_float_hex_golden(missing_channel):
+    import pandas as pd
+
     class FakeSystem:
+        vapor = types.SimpleNamespace(
+            rxn_coefs=pd.DataFrame(index=["Na(g)", "SiO(g)", "O2(g)"]),
+        )
+
         def set_melt_comp(self, composition):
             assert composition == {"Na2O": 100.0}
 
         def eval_gas_abundances(self, temperature, log_fO2):
             assert temperature == 1600.0
             assert log_fO2 == -8.0
-            return {"Na(g)": -0.5, "SiO(g)": -1.25}
+            pressures = {"Na(g)": -0.5, "SiO(g)": -1.25, "O2(g)": -5.0}
+            if missing_channel:
+                pressures.pop("Na(g)")
+            return pd.DataFrame.from_dict(pressures, orient="index")
 
     request = {
         "composition_wt_pct": {"Na2O": 100.0},
@@ -3820,14 +3830,21 @@ def test_system_call_warm_and_cold_paths_match_float_hex_golden():
     cold = backend._call_vaporock(
         {"Na2O": 100.0}, 1600.0, 1e-6, -8.0
     )
+    expected_invalid = {"Na"} if missing_channel else set()
+    assert backend._last_invalid_pressure_components == expected_invalid
     warm_pa = backend._log10_bar_pressures_to_pa(
         warm["log10_bar"], composition_wt_pct={"Na2O": 100.0}
     )
+    assert backend._last_invalid_pressure_components == expected_invalid
 
-    assert {key: value.hex() for key, value in cold.items()} == {
+    expected = {
         "Na": "0x1.ee1b1b3d78c7bp+14",
         "SiO": "0x1.5f769cae07281p+12",
+        "O2": "0x1.0000000000000p+0",
     }
+    if missing_channel:
+        expected.pop("Na")
+    assert {key: value.hex() for key, value in cold.items()} == expected
     assert warm_pa == cold
 
 

@@ -48,6 +48,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _DEFAULT_FO2_LOG,
     _fo2_log_for_request,
     equilibrate_cell,
+    normalize_engine_settings,
 )
 from tests.battery import factories as F
 
@@ -1019,29 +1020,47 @@ def test_internal_oxide_reference_without_defined_pressure_keeps_pressure_guard(
     assert prediction.refusal_detail["reason"] == "internal_analytical_missing_total_pressure"
 
 
-@pytest.mark.parametrize("oxygen_log", (float("nan"), -math.inf, -5.0), ids=("nan", "unproven-zero", "complete"))
-def test_dp108_checks_vaporock_channels_from_the_warm_payload(monkeypatch, oxygen_log):
+def _vaporock_warm_prediction(oxygen_logs):
     from simulator.melt_backend.vaporock import VapoRockBackend, _serialize_log10_bar_pressures
 
     backend = VapoRockBackend()
     backend._available = True
-    log10_bar, sidecar = _serialize_log10_bar_pressures(
-        {"K(g)": -3.0, "O2(g)": oxygen_log, "Na(g)": -math.inf}
+    logs = iter(oxygen_logs)
+
+    def submit(*_args, **_kwargs):
+        oxygen_log = next(logs)
+        raw = {"K(g)": -3.0, "Na(g)": -math.inf}
+        if oxygen_log is not None:
+            raw["O2(g)"] = oxygen_log
+        log10_bar, sidecar = _serialize_log10_bar_pressures(raw)
+        return types.SimpleNamespace(result=lambda: {"log10_bar": log10_bar, **sidecar})
+
+    backend._warm_pool = types.SimpleNamespace(submit=submit)
+    handle = EngineHandle(
+        "vaporock", backend, True, None, True, False,
+        engine_settings=normalize_engine_settings("vaporock", None),
     )
-    backend._warm_pool = types.SimpleNamespace(
-        submit=lambda *_args, **_kwargs: types.SimpleNamespace(
-            result=lambda: {"log10_bar": log10_bar, **sidecar}
+    row, experiment = _partial_without_total_pressure(None, fO2_Pa=Decimal("1000"))
+
+    def predict():
+        return predict_with_engine(
+            Engine.VAPOROCK, row, experiment=experiment, handles={"vaporock": handle},
+            isolated=False,
         )
-    )
-    handle = EngineHandle("vaporock", backend, True, None, True, False)
+
+    return backend, predict
+
+
+@pytest.mark.parametrize(
+    "oxygen_log", (None, math.nan, -math.inf, -5.0),
+    ids=("absent", "nan", "unproven-zero", "complete"),
+)
+def test_dp108_checks_vaporock_channels_from_the_warm_payload(monkeypatch, oxygen_log):
     # The warm worker here is a raw-output fixture and has no lifecycle to close.
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
-    row, experiment = _partial_without_total_pressure(None, fO2_Pa=Decimal("1000"))
-    prediction = predict_with_engine(
-        Engine.VAPOROCK, row, experiment=experiment, handles={"vaporock": handle},
-        isolated=False,
-    )
-    if math.isfinite(oxygen_log):
+    _, predict = _vaporock_warm_prediction((oxygen_log,))
+    prediction = predict()
+    if oxygen_log is not None and math.isfinite(oxygen_log):
         assert prediction.value == Decimal("100")
         assert prediction.identity.total_pressure_Pa == State.of(Decimal("101"))
         return
@@ -1054,6 +1073,49 @@ def test_dp108_checks_vaporock_channels_from_the_warm_payload(monkeypatch, oxyge
         "target_partial_pressure_Pa": 100.0,
     }
     assert prediction.identity.total_pressure_Pa.is_unknown
+
+
+def test_dp108_vaporock_recomputes_legacy_incomplete_disk_payload(monkeypatch, tmp_path):
+    from simulator import engine_cache
+
+    backend, predict = _vaporock_warm_prediction((None, math.nan, math.nan))
+    convert = backend._log10_bar_pressures_to_pa
+
+    def legacy_conversion(*args, **kwargs):
+        pressures = convert(*args, **kwargs)
+        backend._last_invalid_pressure_components.clear()
+        return pressures
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "legacy.sqlite"))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    with monkeypatch.context() as legacy:
+        legacy.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "vaporock", 1)
+        with monkeypatch.context() as prior_wire:
+            prior_wire.setattr(backend, "_log10_bar_pressures_to_pa", legacy_conversion)
+            predict()
+        engine_cache._MEMORY_CACHE.clear()
+        old_hit = predict()
+        assert old_hit.value == Decimal("100")
+        assert old_hit.identity.total_pressure_Pa == State.of(Decimal("100"))
+
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    recomputed = predict()
+    counts = engine_cache.engine_cache_counters(reset=True)["vaporock"]
+    assert (counts["hits"], counts["misses"], counts["stores"]) == (0, 1, 1)
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cold.sqlite"))
+    cold = predict()
+    assert recomputed.value is cold.value is None
+    assert recomputed.identity.total_pressure_Pa.is_unknown
+    assert recomputed.identity == cold.identity
+    assert recomputed.refusal_reason is cold.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert recomputed.refusal_detail == cold.refusal_detail == {
+        "reason": "partial_pressure_sum_incomplete_gas_map",
+        "policy": "DP-108",
+        "invalid_components": ["O2"],
+        "target_partial_pressure_Pa": 100.0,
+    }
 
 
 @pytest.mark.parametrize("commanded", (True, False), ids=("commanded", "effusion"))
