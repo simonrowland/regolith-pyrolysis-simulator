@@ -76,6 +76,13 @@ def _channels(gas="FeO"):
             ResidueChannel("O2", "O2", None, 1.0, "equilibrium effusion"))
 
 
+def _preserve_pressure_contract(source, wrapper):
+    from simulator.battery.residue import _inherit_residue_pressure_contract
+
+    _inherit_residue_pressure_contract(wrapper, source)
+    return wrapper
+
+
 @pytest.mark.parametrize("pressure", (1e-9, 1e6))
 def test_single_volatile_limit_is_exact_and_scale_free(pressure):
     result = integrate_knudsen_residue_inventory(
@@ -88,6 +95,18 @@ def test_single_volatile_limit_is_exact_and_scale_free(pressure):
     assert result.residue_mol["FeO"] == pytest.approx(0.75, abs=2e-14)
     assert result.evaporated_mol["FeO"] == pytest.approx(0.25, abs=2e-14)
     assert result.retained_oxygen_atoms_mol == pytest.approx(0.75)
+
+
+def test_knudsen_extent_refuses_non_equilibrium_channel_alpha():
+    channels = (replace(_channels()[0], alpha=0.5), *_channels()[1:])
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        integrate_knudsen_residue_inventory(
+            {"FeO": 1.0}, channels,
+            lambda n, p, t: {"FeO": 1.0, "O2": 0.0},
+            temperature_path=((0.25, 2000.0),), measured_mass_loss_fraction=0.25,
+            near_saturated=True, source_fO2_log_by_interval=(-10.0,),
+        )
+    assert exc.value.reason == "knudsen_equilibrium_channels_required"
 
 
 def test_oxygen_only_loss_advances_xi_without_debiting_cations():
@@ -402,7 +421,8 @@ def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels
     channels = tuple(channels) + tuple(extra_channels)
     pressure_model = _make_residue_pressure_model(
         "internal-analytical", channels, pack, temperature_K=temperature_K, total_pressure_Pa=0,
-        engine_metadata={}, engine_flags=set(), missing_channels_reason="residue_pressure_channels_missing",
+        engine_metadata={}, engine_flags=set(), starting_inventory=inventory,
+        missing_channels_reason="residue_pressure_channels_missing",
         caller="Knudsen regression",
     )
     return inventory, channels, pressure_model
@@ -504,6 +524,7 @@ def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failur
     pressure = _make_residue_pressure_model(
         "internal-analytical", [("O", (None, 1, -0.5)), ("O2", (None, 1, -1))], None,
         temperature_K=2000, total_pressure_Pa=0, engine_metadata={}, engine_flags=set(),
+        starting_inventory={"FeO": 1.0},
         missing_channels_reason="residue_pressure_channels_missing", caller="oxygen failure regression",
     )
     with pytest.raises(ResidueInventoryRefusal) as exc:
@@ -554,24 +575,51 @@ def test_active_parent_pressure_is_still_required_and_validated(pressures, reaso
     assert exc.value.reason == reason
 
 
-def test_real_analytical_closure_and_extent_preserve_exponent_contract_refusal():
+def test_real_analytical_closure_and_extent_carry_redox_diagnostic():
     from simulator.battery.residue import _channel_terms, _residue_oxygen_balance
     inventory, gas_channels, pressure = _real_analytical_cmas_pressure(1905.15)
     channels = tuple(ResidueChannel(s, s, parent, 1.0, "real analytical closure")
                      for s, (parent, _, _) in gas_channels)
-    with pytest.raises(ResidueInventoryRefusal) as root:
-        _residue_oxygen_balance(_channel_terms(channels), inventory,
-                                lambda p: pressure(inventory, p), 1905.15)
-    assert root.value.reason == "residue_pressure_law_exponent_mismatch"
-    assert "'Fe': declared -0.5, observed " in root.value.detail
-    with pytest.raises(ResidueInventoryRefusal) as extent:
-        integrate_knudsen_residue_inventory(
-            inventory, channels, lambda n, p, temperature: pressure(n, p),
-            temperature_path=((0.01, 1905.15),), measured_mass_loss_fraction=0.01,
-            near_saturated=True, source_fO2_log_by_interval=(None,),
-        )
-    assert extent.value.reason == root.value.reason
-    assert extent.value.detail == root.value.detail
+    pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(inventory, p),
+    )
+    balance = _residue_oxygen_balance(
+        _channel_terms(channels), inventory, pressure_at, 1905.15,
+    )
+    iron = [row for row in balance.pressure_law_diagnostics if row.species == "Fe"]
+    assert len(iron) == 1
+    assert iron[0].reason == "residue_pressure_law_redox_active"
+    assert iron[0].declared == -0.5
+    integrate_pressure = _preserve_pressure_contract(
+        pressure, lambda n, p, temperature: pressure(n, p),
+    )
+    result = integrate_knudsen_residue_inventory(
+        inventory, channels, integrate_pressure,
+        temperature_path=((0.01, 1905.15),), measured_mass_loss_fraction=0.01,
+        near_saturated=True, source_fO2_log_by_interval=(None,),
+    )
+    assert any(
+        row.species == "Fe" and row.reason == "residue_pressure_law_redox_active"
+        for row in result.pressure_law_diagnostics
+    )
+    endpoint_pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(result.residue_mol, p),
+    )
+    endpoint_balance = _residue_oxygen_balance(
+        _channel_terms(channels), result.residue_mol,
+        endpoint_pressure_at, 1905.15,
+    )
+    endpoint_iron = [
+        row for row in endpoint_balance.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    extent_iron = [
+        row for row in result.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    assert len(endpoint_iron) == len(extent_iron) == 1
+    assert extent_iron[0] == endpoint_iron[0]
+    assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-9
 
 
 @pytest.mark.parametrize("oxygen_parent", (None, ""))
@@ -600,35 +648,60 @@ def test_parentless_oxygen_pressure_is_required_and_validated(oxygen_parent, oxy
     (1748.15, 0.0146, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, 0.0117, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
-def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusal(temperature_K, extent, wt):
-    """Al is no longer a missing channel. The iron pressure-law refusal remains."""
+def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperature_K, extent, wt):
+    """Al stays a below-threshold omission. Iron's exponent mismatch is now a redox diagnostic."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.residue import _channel_terms, _residue_oxygen_balance
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
     inventory, gas_channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)
     channels = tuple(ResidueChannel(s, s, parent, 1.0, "printed Markova first interval")
                      for s, (parent, _, _) in gas_channels)
-    with pytest.raises(ResidueInventoryRefusal) as root:
-        _residue_oxygen_balance(_channel_terms(channels), inventory,
-                                lambda p: pressure(inventory, p), temperature_K)
-    assert root.value.reason == "residue_pressure_law_exponent_mismatch"
-    assert root.value.detail.startswith(
-        "pressure law exponent mismatch for 'Fe': declared -0.5, observed "
+    pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(inventory, p),
     )
+    balance = _residue_oxygen_balance(
+        _channel_terms(channels), inventory, pressure_at, temperature_K,
+    )
+    iron = [row for row in balance.pressure_law_diagnostics if row.species == "Fe"]
+    assert len(iron) == 1
+    assert iron[0].reason == "residue_pressure_law_redox_active"
+    assert iron[0].declared == -0.5
     al_notices = [
         notice for notice in pressure.below_threshold_omission_notices
         if notice.reason.startswith("Al ")
     ]
     assert len(al_notices) == 1
     assert "below_reporting_threshold_omissions" in al_notices[0].reason
-    with pytest.raises(ResidueInventoryRefusal) as result:
-        integrate_knudsen_residue_inventory(
-            inventory, channels, lambda n, p, t: pressure(n, p),
-            temperature_path=((extent, temperature_K),), measured_mass_loss_fraction=extent,
-            near_saturated=True, source_fO2_log_by_interval=(None,),
-        )
-    assert result.value.reason == root.value.reason
-    assert result.value.detail == root.value.detail
+    integrate_pressure = _preserve_pressure_contract(
+        pressure, lambda n, p, t: pressure(n, p),
+    )
+    result = integrate_knudsen_residue_inventory(
+        inventory, channels, integrate_pressure,
+        temperature_path=((extent, temperature_K),), measured_mass_loss_fraction=extent,
+        near_saturated=True, source_fO2_log_by_interval=(None,),
+    )
+    assert any(
+        row.species == "Fe" and row.reason == "residue_pressure_law_redox_active"
+        for row in result.pressure_law_diagnostics
+    )
+    endpoint_pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(result.residue_mol, p),
+    )
+    endpoint_balance = _residue_oxygen_balance(
+        _channel_terms(channels), result.residue_mol,
+        endpoint_pressure_at, temperature_K,
+    )
+    endpoint_iron = [
+        row for row in endpoint_balance.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    extent_iron = [
+        row for row in result.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    assert len(endpoint_iron) == len(extent_iron) == 1
+    assert extent_iron[0] == endpoint_iron[0]
+    assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-9
 
 
 @pytest.mark.parametrize("temperature_K,wt", (
