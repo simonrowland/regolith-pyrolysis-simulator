@@ -22,7 +22,10 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.input_provenance import PRINTED_STARTING_BULK
-from simulator.battery.migrate import wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    _wt_percent_conversion_or_refusal,
+    wt_pct_to_mole_fraction,
+)
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -31,6 +34,29 @@ SOURCE_ID = "rusiecka-2026-chlorine-data"
 EXTRACT_NAME = f"{SOURCE_ID}.yaml"
 EXTRACT_PATH = REPO_ROOT / "data" / "literature" / "extracts" / EXTRACT_NAME
 WORKBOOK_NAME = "rusiecka-2026-chlorine-data.xlsx"
+
+
+def _phase_assay_product(wt: dict[str, Decimal]):
+    result = _wt_percent_conversion_or_refusal(
+        wt,
+        closure_context={
+            "quantity": Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value,
+        },
+        declared_component_map=wt,
+    )
+    assert result.composition is not None
+    assert result.refusal is None
+    return result.composition
+
+
+def _assert_phase_assay_product(actual, expected) -> None:
+    actual_components = dict(actual.components)
+    expected_components = dict(expected.components)
+    assert actual_components.keys() == expected_components.keys()
+    assert all(
+        abs(actual_components[name] - expected_components[name]) < Decimal("1e-24")
+        for name in actual_components
+    )
 
 
 def _workbook_or_skip() -> Path:
@@ -79,9 +105,13 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
         assert printed_composition.state.value == source_components
         assert printed_composition.locator is not None
         assert printed_composition.locator.record == (
-            f"sheet data, cells B{row_number}:R{row_number}"
+            source["locator"]["record"]
         )
         point_composition = row.point_conditions["composition"]
+        assert point_composition.locator is not None
+        assert point_composition.locator.record == (
+            f"sheet data, cells B{row_number}:R{row_number}"
+        )
         if row_number in {58, 59}:
             excluded_re = "4.36" if row_number == 58 else "4.32"
             analysis_total = "94.66" if row_number == 58 else "93.53"
@@ -122,7 +152,7 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             assert composition.components == initial.state.value.components
         elif Decimal(source_components["Cl"]) > 0:
             assert projected["Cl"] > 0
-        expected_product = wt_pct_to_mole_fraction(
+        expected_product = _phase_assay_product(
             {
                 name: Decimal(str(amount))
                 for name, amount in printed_composition.state.value.items()
@@ -130,7 +160,9 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
         )
         assert point_composition.state.is_value
         assert point_composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
-        assert point_composition.state.value.components == expected_product.components
+        _assert_phase_assay_product(
+            point_composition.state.value, expected_product
+        )
         if row_number == 81:
             assert Decimal(str(printed_composition.state.value["Cl"])) == Decimal("1.83")
             assert dict(point_composition.state.value.components)["Cl"].quantize(
@@ -397,7 +429,13 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert printed.state.is_value
         assert printed.state.value == observation["values"]["composition_wt_pct"]
         assert printed.locator is not None
-        assert printed.locator.record == observation["values"]["composition_locator"]["record"]
+        assert printed.locator.record == observation["locator"]["record"]
+        bound_rows.add(row_number)
+        located = row.point_conditions["composition"]
+        assert located.locator is not None
+        assert located.locator.record == (
+            f"sheet data, cells B{row_number}:R{row_number}"
+        )
         if row_number in {58, 59}:
             analysis_total = "94.66" if row_number == 58 else "93.53"
             assert row.identity.composition.is_unknown
@@ -417,23 +455,20 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
             assert composition.components == initial.state.value.components
         elif Decimal(expected_composition["Cl"]) > 0:
             assert "Cl" in projected
-        located = row.point_conditions["composition"]
         assert located.state.is_value
         assert located.state.value.amount_basis is AmountBasis.MOLE_FRACTION
-        expected_product = wt_pct_to_mole_fraction(
+        expected_product = _phase_assay_product(
             {
                 name: Decimal(str(amount))
                 for name, amount in printed.state.value.items()
             }
         )
-        assert located.state.value.components == expected_product.components
+        _assert_phase_assay_product(located.state.value, expected_product)
         if row_number == 81:
             assert Decimal(str(printed.state.value["Cl"])) == Decimal("1.83")
             assert dict(located.state.value.components)["Cl"].quantize(
                 Decimal("0.000000000001")
             ) == Decimal("0.034009940171")
-        assert located.locator is not None
-        assert located.locator.record == f"sheet data, cells B{row_number}:R{row_number}"
         assert located.inference is not None
         assert located.inference.relation == "wt_pct_to_mole_fraction"
         assert located.inference.output_unit == "mole_fraction"
@@ -746,19 +781,21 @@ def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None
         assert printed_product.state.is_value
         assert printed_product.state.value == source_glass["values"]["composition_wt_pct"]
         assert printed_product.locator is not None
-        assert printed_product.locator.record == source_glass["values"][
-            "composition_locator"
-        ]["record"]
+        assert printed_product.locator.record == source_glass["locator"]["record"]
         product_composition = row.point_conditions["composition"]
         assert product_composition.state.is_value
         assert product_composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
-        expected_product = wt_pct_to_mole_fraction(
+        assert product_composition.locator is not None
+        assert product_composition.locator.record == source_glass["values"][
+            "composition_locator"
+        ]["record"]
+        expected_product = _phase_assay_product(
             {
                 name: Decimal(str(amount))
                 for name, amount in printed_product.state.value.items()
             }
         )
-        assert product_composition.state.value.components == expected_product.components
+        _assert_phase_assay_product(product_composition.state.value, expected_product)
         if raw_id == "rusiecka_2026_data_row81_sio2":
             assert Decimal(str(printed_product.state.value["Cl"])) == Decimal("1.83")
             assert dict(product_composition.state.value.components)["Cl"].quantize(
