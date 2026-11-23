@@ -57,6 +57,7 @@ from engines.builtin.metallothermic_step import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
 )
+from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.chemistry.ellingham_thermo import (
     _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
@@ -3351,10 +3352,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         )
         metal_phase_fe_mol = math.fsum(
             sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
-            for account in sorted(account_balances)
-            if account == "process.metal_phase"
-            or account.startswith("process.metal_bottom_pool")
-            or account.startswith("process.metal_float_layer")
+            for account in METAL_PHASE_ACCOUNTS
         )
         tap_fe_mol = float(
             sim.atom_ledger.atom_moles_by_account(
@@ -3409,17 +3407,17 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
             f"destinations: extracted={extracted_fe_mol:.9g} mol, "
             f"destinations={destinations_fe_mol}"
         )
-        # Characterize this pre-t-1884 condenser geometry: its undersized
-        # Stage 1 surface captures less Fe than exits in the offgas. The
-        # process-sized condenser train is expected to move this split; re-pin
-        # it when t-1884 lands.
+        # Studio split at d74e77a: Fe retained as metal is stratified into
+        # process.metal_phase_bottom_pool (METAL_PHASE_ACCOUNTS). The
+        # Antoine-era pins were stage1 765.7171825887217 and offgas
+        # 1408.7658314279117. Re-pin again when the condenser split moves.
         assert stage1_fe_mol == pytest.approx(
-            765.7171825887217,
+            703.3448958103764,
             rel=1e-9,
             abs=1e-6,
         )
         assert offgas_fe_mol == pytest.approx(
-            1408.7658314279117,
+            200.44379618020935,
             rel=1e-9,
             abs=1e-6,
         )

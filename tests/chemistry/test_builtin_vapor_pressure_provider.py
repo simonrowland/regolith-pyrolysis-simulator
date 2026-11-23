@@ -1291,10 +1291,12 @@ def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch)
 
 
 @pytest.mark.parametrize("temperature_K", [400.0, 410.0])
-def test_sodium_provider_omits_nonphysical_pole_branch(
+def test_sodium_provider_flags_extrapolated_saturation_cap(
     vapor_pressure_data,
     temperature_K,
 ):
+    """Low-band Na remains predicted and carries the reaction extrapolation."""
+
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -1310,6 +1312,17 @@ def test_sodium_provider_omits_nonphysical_pole_branch(
     result = provider.dispatch(request)
 
     assert result.status == "ok"
+    notice = result.diagnostic["extrapolated_beyond_valid_range_K"]["Na"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == "metal_vapor_pressure_out_of_validated_range"
+    low, high = notice["valid_range_K"]
+    assert temperature_K < low or temperature_K > high
+    assert any("extrapolated" in warning for warning in result.warnings)
+    omission = result.diagnostic["below_reporting_threshold_omissions"]["Na"]
+    assert omission["pressure_rail"] == "liquid_oxide_standard_reaction"
+    computed = omission["computed_pressure_Pa"]
+    assert math.isfinite(computed)
+    assert 0.0 < computed <= omission["reporting_threshold_Pa"]
     assert "Na" not in result.diagnostic["vapor_pressures_Pa"]
 
 
