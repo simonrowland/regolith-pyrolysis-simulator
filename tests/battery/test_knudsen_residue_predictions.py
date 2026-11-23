@@ -168,6 +168,31 @@ def test_composition_dependent_high_loss_matches_independent_analytic_solution()
     assert _hashimoto_project_oxide_wt_pct(result.residue_mol)["FeO"] == pytest.approx(26.481341729689376, abs=1e-5)
 
 
+def test_trace_parent_pressure_tracks_actual_inventory():
+    channels = (*_channels(), ResidueChannel("MgO", "MgO", "MgO", 1.0, "effusion"))
+    initial_feo = 1e-10
+    iron_pressures = []
+
+    def pressure(inventory, _logp, _temperature):
+        feo = inventory.get("FeO", 0.0)
+        iron_pressures.append(feo)
+        return {"FeO": feo, "MgO": 1.0, "O2": 0.0}
+
+    result = integrate_knudsen_residue_inventory(
+        {"FeO": initial_feo, "MgO": 1.0}, channels, pressure,
+        temperature_path=((0.2, 2000.0),), measured_mass_loss_fraction=0.2,
+        near_saturated=True, source_fO2_log_by_interval=(-10.0,),
+    )
+    # Per mol MgO lost, dnFeO/ds = -sqrt(M_MgO/M_FeO) * nFeO.
+    # The trace contributes < 2e-10 of the charge mass, so at s ≈ 0.2
+    # the exponential retains 86.0881% of FeO and never depletes in finite s.
+    retained = initial_feo * math.exp(-0.2 * math.sqrt(40.304 / 71.844))
+    assert iron_pressures[0] == initial_feo
+    assert all(0 < p <= initial_feo for p in iron_pressures)
+    assert result.residue_mol["FeO"] == pytest.approx(retained, rel=1e-7, abs=0)
+    assert result.evaporated_mol["FeO"] == pytest.approx(initial_feo - retained, rel=1e-7, abs=0)
+
+
 @pytest.mark.parametrize("changes,reason", (
     ({"near_saturated": False}, "knudsen_near_saturation_invalid"),
     ({"temperature_path": None}, "printed_temperature_path_missing_or_invalid"),
@@ -534,8 +559,8 @@ def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(ox
         measured_mass_loss_fraction=0.2, near_saturated=True, source_fO2_log_by_interval=(None,),
     )
     # After Fe exhaustion all remaining condensed mass is MgO.
+    # Rejected solver stages may evaluate both sides of the event.
     assert iron_active[0] and not iron_active[-1]
-    assert sorted(iron_active, reverse=True) == iron_active
     assert result.residue_mol["FeO"] == 0.0
     assert result.evaporated_mol["Fe"] == pytest.approx(initial_feo, rel=1e-5, abs=1e-15)
     expected_mgo = 0.8 * (initial_feo * 0.071844 + 0.040304) / 0.040304

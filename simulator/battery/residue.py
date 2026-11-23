@@ -1319,7 +1319,6 @@ def integrate_knudsen_residue_inventory(
     previous_endpoint, previous_temperature = 0.0, path[0][1]
     initial_total_mol = math.fsum(inventory.values())
     absolute_tolerance = 1e-12 * initial_total_mol
-    pressure_floor = _component_exhaustion_floor_mol(initial_total_mol)
     volatile_parents = {term.source.parent_oxide for term in terms}
     active_parents = {
         k for k in parents if k in volatile_parents and inventory[k] > 0.0
@@ -1346,25 +1345,19 @@ def integrate_knudsen_residue_inventory(
                     f"ending at mass-loss fraction {stop:g}",
                 )
             evaluations += 1
-            # Extend the pressure law through zero during trial stages, where
-            # a trace parent can disappear from the engine's pressure output.
-            # Only an accepted zero crossing turns off its channels.
-            # The same integrated flux debits the parent and oxygen and credits
-            # the vapour through that event, closing both atom and mass ledgers.
-            current = {}
-            for k, v in zip(parents, amounts):
-                if k in active_parents:
-                    current[k] = max(pressure_floor, float(v))
-                elif k not in volatile_parents:
-                    current[k] = float(v)
-            active = {k: v for k, v in current.items() if v > 0.0}
+            # A trial stage can overshoot zero. Omit those parents from the
+            # pressure solve and let the accepted zero event deactivate them.
+            current = {
+                k: float(v) for k, v in zip(parents, amounts)
+                if v > 0.0 and (k in active_parents or k not in volatile_parents)
+            }
             current_temperature = temperature
             if linear_temperature:
                 fraction = (extent - previous_endpoint) / (endpoint - previous_endpoint)
                 current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
 
             def pressure_at(p):
-                pressures = pressure_model(active, p, current_temperature)
+                pressures = pressure_model(current, p, current_temperature)
                 _inherit_residue_pressure_contract(pressure_at, pressure_model)
                 return pressures
 
