@@ -65,6 +65,7 @@ from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
     PROXY_BRIDGE_ALPHA_STATUS,
+    _DP_005_ALPHA,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
@@ -74,12 +75,6 @@ from simulator.physical_constants import PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
-_DP_005_ALPHA = {
-    "form": "scalar",
-    "value": 1.0,
-    ALPHA_AUTHORITY_STATUS_FIELD: ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
-    "source": "Hertz-Knudsen-Langmuir alpha=1 upper bound; no species-specific alpha available",
-}
 _NONTRIVIAL_FLUX_KG_HR = 1.0e-12
 DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
