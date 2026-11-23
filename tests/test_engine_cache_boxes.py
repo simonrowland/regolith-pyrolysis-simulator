@@ -4,6 +4,8 @@ import pytest
 
 from simulator import engine_cache
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def test_readwrite_refuses_an_empty_box_before_creating_a_store(tmp_path, monkeypatch):
     path = tmp_path / "cache.sqlite"

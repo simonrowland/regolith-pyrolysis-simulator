@@ -174,20 +174,23 @@ def _cache_storage_report(path: Path) -> list[str]:
         return []
     with sqlite3.connect(path) as connection:
         rows = connection.execute(
-            "SELECT engine, key, length(value) FROM engine_outputs"
+            "SELECT engine, row_seq, length(value), length(key) FROM engine_outputs"
         ).fetchall()
 
     cold_path = Path(str(path) + ".cold")
     cold_sizes = {}
     if cold_path.exists():
         with sqlite3.connect(cold_path) as connection:
-            cold_sizes = dict(connection.execute("SELECT key,length(value) FROM engine_values"))
+            # COLD is keyed by HOT row_seq. The key blob is not stored again.
+            cold_sizes = dict(
+                connection.execute("SELECT row_seq, length(value) FROM engine_values")
+            )
 
     sizes: dict[str, list[int]] = {}
     cold_by_engine: dict[str, list[int]] = {}
-    for engine, key, hot_bytes in rows:
+    for engine, row_seq, hot_bytes, _key_bytes in rows:
         sizes.setdefault(str(engine), []).append(int(hot_bytes))
-        cold_by_engine.setdefault(str(engine), []).append(int(cold_sizes.get(key, 0)))
+        cold_by_engine.setdefault(str(engine), []).append(int(cold_sizes.get(row_seq, 0)))
     report = []
     for engine in ENGINE_ORDER:
         values = sizes.get(engine.value, [])
@@ -216,8 +219,10 @@ def _cache_storage_report(path: Path) -> list[str]:
         if candidate.exists()
     )
     if rows:
-        mean_hot_row = sum(len(row[1]) + int(row[2]) for row in rows) / len(rows)
-        mean_cold_row = sum(cold_sizes.get(row[1], 0) for row in rows) / len(rows)
+        # HOT payload is the key blob plus the value. COLD no longer repeats
+        # the key, so its mean is the value length joined by row_seq.
+        mean_hot_row = sum(int(row[2]) + int(row[3]) for row in rows) / len(rows)
+        mean_cold_row = sum(int(cold_sizes.get(row[1], 0)) for row in rows) / len(rows)
         report.append(
             f"cache-size observed_hot_payload_projection_B="
             f"1M:{mean_hot_row * 1_000_000:.0f}"

@@ -201,6 +201,8 @@ def extent_point(monkeypatch):
     return reference, experiment, rows
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     reference, experiment, rows = extent_point
     result = predict_knudsen_residue_composition("internal-analytical", reference, experiment, rows)
@@ -219,6 +221,8 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     assert {r["source"] for r in result["oxygen_sources"]} == {"d142_closure"}
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
     from simulator.battery import source_oxygen
     reference, experiment, rows = extent_point
@@ -233,6 +237,8 @@ def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
     assert not any("SC-360" in n.reason for n in result["notices"])
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_cell_ratio_precedes_flagged_closure(extent_point, monkeypatch):
     from simulator.battery import source_oxygen
     from simulator.battery.records import Derivation
@@ -281,6 +287,8 @@ def test_extent_comparison_preserves_ordinary_identity_guards(extent_point):
     assert _same_row_knudsen_residue_identity_equal(left, right).kind is IdentityEqualKind.IDENTITY_MISMATCH
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(extent_point):
     from simulator.battery.score import ScoreContext, compile_residual
     reference, experiment, rows = extent_point
@@ -293,6 +301,8 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("change,reason", (
     ("no_path", "printed_temperature_path_missing_or_invalid"),
     ("no_extent", "measured_mass_loss_fraction_missing_or_invalid"),
@@ -326,6 +336,8 @@ def test_prediction_boundary_refuses_missing_inputs(extent_point, change, reason
     assert exc.value.reason == reason
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_printed_oxygen_is_identical_on_shared_trajectory_prefix(extent_point):
     reference, experiment, rows = extent_point
     earlier = replace(reference, observation_id="earlier-residue",
@@ -339,6 +351,8 @@ def test_printed_oxygen_is_identical_on_shared_trajectory_prefix(extent_point):
     assert "earlier-residue" in later["oxygen_sources"][0]["used_observations"]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_conflicting_printed_interval_oxygen_is_flagged(extent_point):
     reference, experiment, rows = extent_point
     conflict = replace(reference, observation_id="other-column",
@@ -349,6 +363,8 @@ def test_conflicting_printed_interval_oxygen_is_flagged(extent_point):
     assert any("several_candidates_survive" in n.reason for n in result["notices"])
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("engine_failure", (False, True))
 def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point, monkeypatch, engine_failure):
     import simulator.battery.residue as residue
@@ -398,7 +414,24 @@ def _read_markova_residue_cache_in_fresh_process(
     temperature_K: float,
     inventory: dict[str, float],
 ) -> None:
+    # This child reads the cache file the parent stored. Same request, same
+    # answer. Put the previous value back so the assignment does not leak.
+    previous = os.environ.get("REGOLITH_ENGINE_CACHE")
     os.environ["REGOLITH_ENGINE_CACHE"] = cache_path
+    try:
+        _read_markova_residue_cache(result_path, temperature_K, inventory)
+    finally:
+        if previous is None:
+            os.environ.pop("REGOLITH_ENGINE_CACHE", None)
+        else:
+            os.environ["REGOLITH_ENGINE_CACHE"] = previous
+
+
+def _read_markova_residue_cache(
+    result_path: str,
+    temperature_K: float,
+    inventory: dict[str, float],
+) -> None:
     from simulator import engine_cache
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -602,6 +635,7 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusa
     (1748.15, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
+@pytest.mark.engine_cache_off
 def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     temperature_K,
     wt,
@@ -619,6 +653,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
         internal_analytical_residue_vapor_pressure,
     )
 
+    # First call is the live solve. The file below is this test's own cache.
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
     inventory, _channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)

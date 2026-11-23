@@ -5,6 +5,8 @@ import threading
 from pathlib import Path
 from typing import Any, Mapping
 
+import pytest
+
 from simulator import engine_cache
 from simulator.battery.score import is_store_stamp_payload
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -12,6 +14,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     normalize_engine_settings,
 )
 from scripts.battery_cache_equivalence import _without_cache_counters
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def _canonical_residual_rows(path: Path) -> bytes:

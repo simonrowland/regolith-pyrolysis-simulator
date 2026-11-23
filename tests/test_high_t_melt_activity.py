@@ -473,6 +473,8 @@ def test_certified_edge_selects_openimcc(temperature_K, expected) -> None:
         assert _physics(result) == _physics(legacy)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
     pack = openimcc_bridge_module._load_pack("default")
     shifted_pack = SimpleNamespace(
@@ -542,6 +544,8 @@ def test_vapour_channel_switch_move_does_not_move_vaporock_band(monkeypatch) -> 
     assert notice["certified_band"] == {"temperature_K": [1350.0, 1950.0]}
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) -> None:
     def refuse(**_kwargs):
         raise openimcc_bridge_module.OpenImccUnavailableError()
@@ -607,6 +611,8 @@ def _call_record(engine: str, index: int) -> dict:
     return _BRIDGE_REFERENCE["records"][f"{engine}:{index}"]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_h133_nonconvergence_uses_temperature_neighbors_without_activity_seam(
     monkeypatch,
 ) -> None:
@@ -663,6 +669,8 @@ def test_h133_nonconvergence_uses_temperature_neighbors_without_activity_seam(
     assert abs(activities["ordinary"] - activities["quantized"]) <= 1e-5
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
     monkeypatch,
 ) -> None:
@@ -805,6 +813,8 @@ def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
     ).activity
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_one_sided_25k_hold_stays_within_measured_call62_bound(monkeypatch) -> None:
     """A single +25 K solve holds within the measured worst call-62 error."""
 
@@ -868,6 +878,8 @@ def _temperature_neighbor_test_result() -> OpenImccBridgeResult:
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("available_offset_K", "selected_offset_K"),
     [(50.0, 50.0), (75.0, 75.0), (76.0, None)],
@@ -1102,6 +1114,8 @@ def _score_independent_cells(order):
     return records
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_independent_battery_cells_match_in_either_order(monkeypatch) -> None:
     """A then B and B then A return the same pressures and notices.
 
@@ -1143,6 +1157,8 @@ def test_independent_battery_cells_match_in_either_order(monkeypatch) -> None:
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_cell_without_same_composition_bridge_keeps_typed_fallback(
     monkeypatch,
 ) -> None:
@@ -1663,6 +1679,8 @@ def test_k2o_unknown_pack_notice_has_no_other_pack_evaluation() -> None:
         assert printed_value not in reason
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_missing_present_parent_refuses_and_labels_provider_fallback(
     monkeypatch,
 ) -> None:
@@ -1710,6 +1728,8 @@ def test_missing_present_parent_refuses_and_labels_provider_fallback(
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_unexpected_openimcc_activity_error_propagates(monkeypatch) -> None:
     def fail(**kwargs):
         raise RuntimeError("unexpected evaluator bug")
@@ -1813,6 +1833,8 @@ def test_openimcc_absent_parent_keeps_zero_composition_activity(
     assert activity.evidence_tier == legacy.evidence_tier
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("returned_activity", "warning_code"),
     (
@@ -1922,6 +1944,8 @@ def test_openimcc_parent_fallback_warning_reaches_residual_activity_row() -> Non
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_fallback_status_remains_on_warning_without_authority_status_fields(
     monkeypatch,
 ) -> None:
@@ -1956,6 +1980,8 @@ def test_fallback_status_remains_on_warning_without_authority_status_fields(
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> None:
     diagnostics = {"iterations": 8, "residual_inf": 0.25}
     real_evaluate = openimcc_bridge_module.evaluate
@@ -2534,6 +2560,8 @@ def test_projected_solve_warns_above_five_percent_without_a_ceiling(
         assert tiers[0] in result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]["projected_composition_solve"]["warning_tiers"]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_projected_nonconvergence_uses_projected_composition_temperature_neighbors(
     monkeypatch,
 ) -> None:
@@ -2618,6 +2646,8 @@ def test_feo_alias_collision_keeps_typed_c3_fallback_reason() -> None:
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_provider_provenance_records_typed_refusal(
     monkeypatch,
 ) -> None:
@@ -2814,6 +2844,8 @@ print(json.dumps({
     }
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_domain_edge_mutation_makes_openimcc_binding_test_red(monkeypatch) -> None:
     monkeypatch.setattr(
         openimcc_bridge_module, "_temperature_domain_K",

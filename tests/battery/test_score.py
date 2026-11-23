@@ -8696,7 +8696,9 @@ def test_studio_dispatch_uses_caller_host(
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    # Dispatch passes the cache path as an argument. It must not publish or
+    # clear the runner cache in this process. CI sets that variable on purpose.
+    cache_before = os.environ.get("REGOLITH_ENGINE_CACHE")
     engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
@@ -8728,7 +8730,7 @@ def test_studio_dispatch_uses_caller_host(
                 str(engine_cache_path),
             ]
         )
-    assert "REGOLITH_ENGINE_CACHE" not in os.environ
+    assert os.environ.get("REGOLITH_ENGINE_CACHE") == cache_before
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
@@ -11583,6 +11585,8 @@ def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
     assert prediction.refusal_detail["reason"] == reason
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
     (

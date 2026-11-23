@@ -1938,7 +1938,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=diagnostics,
             )
         if not comp_wt:
-            # No oxide species in MAGEMin's basis after the account split.
+            # Empty basis is invalid input, decided before any binary call.
+            empty_diagnostics = dict(projection_diagnostics)
+            empty_diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.INVALID_INPUT.value
+            )
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -1949,21 +1953,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
-                diagnostics=projection_diagnostics,
+                diagnostics=empty_diagnostics,
             )
 
         try:
             bulk_projection = self._build_db_bulk_projection(comp_wt)
         except MeltCompositionError as exc:
+            # Projection failed before any binary call.
             message = f'MAGEMin bulk projection failed: {exc}'
             self._last_error = message
+            failed_diagnostics = dict(projection_diagnostics)
+            failed_diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.INVALID_INPUT.value
+            )
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='out_of_domain',
                 warnings=[*prior_warnings, message],
-                diagnostics=projection_diagnostics,
+                diagnostics=failed_diagnostics,
             )
 
         result_diagnostics = projection_diagnostics_for_melt_input(

@@ -317,6 +317,8 @@ def test_missing_table_is_typed_error(tmp_path: Path) -> None:
         parse_engine_commissioning_file(missing)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_in_band_pot_has_no_notice_and_calls_engine(monkeypatch) -> None:
     backend = AlphaMELTSBackend()
     calls = _install_alphamelts_transport_spy(monkeypatch, backend)
@@ -334,6 +336,8 @@ def test_in_band_pot_has_no_notice_and_calls_engine(monkeypatch) -> None:
     assert result.diagnostics.get('authority') is None
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_out_of_band_pot_notices_and_still_calls_engine(monkeypatch) -> None:
     backend = AlphaMELTSBackend()
     calls = _install_alphamelts_transport_spy(monkeypatch, backend)
@@ -507,6 +511,8 @@ def _install_thermoengine_transport_spy(monkeypatch, backend):
     return calls
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     'composition',
     [
@@ -552,6 +558,8 @@ def test_in_band_sliver_below_observed_floor_still_calls_transport(
     assert 'commissioning_notice' not in result.diagnostics
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sio2_free_pot_is_not_a_crash_floor_refusal(monkeypatch) -> None:
     """C01: SiO2-free pots follow the ordinary SiO2=0 basis gate, not a floor."""
     composition = {'CaO': 50.0, 'Al2O3': 50.0}
@@ -575,6 +583,8 @@ def test_sio2_free_pot_is_not_a_crash_floor_refusal(monkeypatch) -> None:
     assert result.diagnostics.get('backend_failure_category') != 'engine_crash'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_alphamelts_subprocess_death_below_observed_floor_annotates_engine_reason(
     monkeypatch,
 ) -> None:
@@ -624,6 +634,8 @@ def test_alphamelts_subprocess_death_below_observed_floor_annotates_engine_reaso
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_provider_band_only_high_silica_reaches_backend_and_notices(
     monkeypatch,
 ) -> None:
@@ -1047,6 +1059,8 @@ def test_python_api_hot_in_band_composition_notices(monkeypatch) -> None:
     _assert_structured_commissioning(result)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_native_liquidus_notices_at_returned_temperature(monkeypatch) -> None:
     """D02 / Codex R2: native finder classifies the returned liquidus, not the seed."""
     backend = AlphaMELTSBackend()
@@ -1071,6 +1085,8 @@ def test_native_liquidus_notices_at_returned_temperature(monkeypatch) -> None:
     _assert_structured_commissioning(result)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_native_liquidus_in_band_omits_notice(monkeypatch) -> None:
     """Returned in-band liquidus carries none of the three commissioning fields."""
     backend = AlphaMELTSBackend()
