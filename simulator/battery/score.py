@@ -2618,7 +2618,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
-    if NoticeKind.ASSUMED_PRESSURE.value in kinds:
+    if (
+        NoticeKind.ASSUMED_PRESSURE.value in kinds
+        and FLAGGED_STRATUM_ASSUMED_PRESSURE not in strata
+    ):
         strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
