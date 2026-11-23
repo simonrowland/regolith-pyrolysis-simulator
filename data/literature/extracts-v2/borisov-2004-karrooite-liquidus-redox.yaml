@@ -11,12 +11,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -80,6 +79,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -103,12 +125,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -172,6 +193,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32a_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32a_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -232,12 +276,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -301,6 +344,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32c_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32c_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -361,12 +427,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -430,6 +495,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32f_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32f_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -490,12 +578,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -559,6 +646,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32m_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32m_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -619,12 +729,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -688,6 +797,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32n_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32n_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -748,12 +880,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -817,6 +948,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32p_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32p_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -877,12 +1031,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -946,6 +1099,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32r_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32r_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1006,12 +1182,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1075,6 +1250,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46h_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46h_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1135,12 +1333,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1204,6 +1401,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46i_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46i_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1264,12 +1484,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1333,6 +1552,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid melt Di An TiO2; original_reason=phase
+      string ''liquid_melt_Di_An_TiO2'' is not in the closed automatic map'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46j_activity_coefficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46j_activity_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1468,7 +1710,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_11_ti4_ti3::T=1574.15:row=dat32-11:h=6263993a6f74
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -1637,6 +1890,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_11_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -1789,6 +2053,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_11_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -1957,7 +2232,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_16_ti4_ti3::T=1573.15:row=dat32-16:h=41feeaa8c0ab
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -2126,6 +2412,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_16_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2278,6 +2575,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_16_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2446,7 +2754,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17_ti4_ti3::T=1573.15:row=dat32-17:h=c5d723e7d85b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -2615,6 +2934,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2767,6 +3097,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2935,7 +3276,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17a_ti4_ti3::T=1573.15:row=dat32-17a:h=6ee8fa5ae9ac
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -3104,6 +3456,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17a_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3256,6 +3619,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17a_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3424,7 +3798,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17b_ti4_ti3::T=1573.15:row=dat32-17b:h=36510a3369ea
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -3593,6 +3978,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17b_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3745,6 +4141,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_17b_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3913,7 +4320,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_18_ti4_ti3::T=1573.15:row=dat32-18:h=c1ffcb7c0c45
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -4082,6 +4500,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_18_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4234,6 +4663,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_18_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4402,7 +4842,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_18a_ti4_ti3::T=1573.15:row=dat32-18a:h=fc50e0fc7347
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -4571,6 +5022,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_18a_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4723,6 +5185,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_18a_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4891,7 +5364,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_5_ti4_ti3::T=1571.15:row=dat32-5:h=d50026431e17
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -5060,6 +5544,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_5_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5212,6 +5707,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_5_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5380,7 +5886,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_6_ti4_ti3::T=1573.15:row=dat32-6:h=623f31254654
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -5549,6 +6066,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_6_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5701,6 +6229,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_6_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5869,7 +6408,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_7_ti4_ti3::T=1573.15:row=dat32-7:h=929320800603
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-karrooite-liquidus-redox
   locator:
     page: 4
@@ -6038,6 +6588,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_7_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -6190,6 +6751,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_3_dat32_7_tio2_excess
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition

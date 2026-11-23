@@ -11284,7 +11284,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_mn2o3_unreported
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: muan-1959-manganese-silica-air
   locator:
     page: 17
@@ -11477,7 +11488,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_mno_unreported
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: muan-1959-manganese-silica-air
   locator:
     page: 17
@@ -11679,7 +11701,18 @@ observations:
         pdf_page_index: 16
         table: Summary of “Invariant”\* Situations in the System Manganese Oxide—SiO₂ in Air
         note: Table 2 row 16; 1723 °C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: muan-1959-manganese-silica-air::muan1959_t2_r16_liquid1_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: muan-1959-manganese-silica-air
   locator:
     page: 17

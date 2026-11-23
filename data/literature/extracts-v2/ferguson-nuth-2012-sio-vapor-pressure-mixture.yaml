@@ -4799,12 +4799,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4824,7 +4823,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1433:h=02561241b9d3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -4888,12 +4908,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4913,7 +4932,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1433:h=42420563105a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -4977,12 +5017,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5002,7 +5041,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1433:h=bf0613095443
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5066,12 +5126,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5091,7 +5150,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1433:h=fdb711cba028
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5155,12 +5235,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5180,7 +5259,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1443:h=16c904ab1ece
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5244,12 +5344,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5269,7 +5368,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1443:h=5147e8986e02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5333,12 +5453,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5358,7 +5477,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1443:h=691f6026fe72
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5422,12 +5562,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5447,7 +5586,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1443:h=6d5cf62e503f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5511,12 +5671,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5536,7 +5695,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1453:h=44042a1a6830
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5600,12 +5780,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5625,7 +5804,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1453:h=7f8c19ea5672
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5689,12 +5889,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5714,7 +5913,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1453:h=ab613ad06c72
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5778,12 +5998,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5803,7 +6022,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1453:h=eb8ce800f987
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5867,12 +6107,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5892,7 +6131,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1462:h=041747466068
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -5956,12 +6216,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5981,7 +6240,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1462:h=69f9cf8883a8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6045,12 +6325,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6070,7 +6349,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1462:h=9f0b02f9eb06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6134,12 +6434,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6159,7 +6458,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1462:h=d95c10bdf499
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6223,12 +6543,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6248,7 +6567,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1472:h=807dde3e1aab
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6312,12 +6652,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6337,7 +6676,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1472:h=abfb00ea2346
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6401,12 +6761,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6426,7 +6785,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1472:h=c176fb6d43c5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6490,12 +6870,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6515,7 +6894,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1472:h=fac572003ed4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6579,12 +6979,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6604,7 +7003,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1481:h=7fac4c46c2db
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6668,12 +7088,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6693,7 +7112,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1481:h=9e320c361331
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6757,12 +7197,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6782,7 +7221,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1481:h=d21bac36983b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6846,12 +7306,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6871,7 +7330,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1481:h=fa09589d3b45
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -6935,12 +7415,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6960,7 +7439,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1491:h=0f353f3c6684
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7024,12 +7524,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7049,7 +7548,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1491:h=364f286a4170
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7113,12 +7633,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7138,7 +7657,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1491:h=a44a410d7211
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7202,12 +7742,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7227,7 +7766,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1491:h=af611f011c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7291,12 +7851,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7316,7 +7875,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1500:h=4220ad35dc22
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7380,12 +7960,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7405,7 +7984,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1500:h=8424c6523cc8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7469,12 +8069,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7494,7 +8093,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1500:h=b2f7b12198ba
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7558,12 +8178,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7583,7 +8202,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1500:h=f294ecc46f9e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7647,12 +8287,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7672,7 +8311,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1510:h=43bbb4d0a2b6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7736,12 +8396,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7761,7 +8420,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1510:h=77ec783aa109
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7825,12 +8505,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7850,7 +8529,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1510:h=ba04dc43151d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -7914,12 +8614,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7939,7 +8638,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1510:h=e0699148dae7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8003,12 +8723,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8028,7 +8747,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1519:h=65616439287b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8092,12 +8832,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8117,7 +8856,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1519:h=8ed2c7ec2c01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8181,12 +8941,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8206,7 +8965,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1519:h=fc9eac27b53d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8270,12 +9050,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8295,7 +9074,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1520:h=424b7b278023
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8359,12 +9159,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8384,7 +9183,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1530:h=3a8342640863
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8448,12 +9268,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8473,7 +9292,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1530:h=748ecf76b881
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8537,12 +9377,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8562,7 +9401,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1530:h=b2fc51e46bcd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8626,12 +9486,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8651,7 +9510,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1530:h=ed5cab075986
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8715,12 +9595,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8740,7 +9619,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1540:h=67a30bf12198
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8804,12 +9704,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8829,7 +9728,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1540:h=82904202616d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8893,12 +9813,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8918,7 +9837,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1540:h=c06319639375
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -8982,12 +9922,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9007,7 +9946,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1540:h=f74b297bb6c7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9071,12 +10031,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9096,7 +10055,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1549:h=117082783470
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9160,12 +10140,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9185,7 +10164,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1549:h=bfae77aa922b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9249,12 +10249,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9274,7 +10273,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1549:h=ed273554d3ed
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9338,12 +10358,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9363,7 +10382,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1549:h=f37518a3da7f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9427,12 +10467,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9452,7 +10491,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1560:h=5b2ba005d8b4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9516,12 +10576,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9541,7 +10600,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1560:h=a2f87593f88e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9605,12 +10685,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9630,7 +10709,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1560:h=c4d908c39ea6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9694,12 +10794,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9719,7 +10818,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1560:h=d9df5933d28b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9783,12 +10903,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9808,7 +10927,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1570:h=26fb891765f9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9872,12 +11012,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9897,7 +11036,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1570:h=a04ac79a77dd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -9961,12 +11121,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9986,7 +11145,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1570:h=efa87862620d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 4
@@ -10050,12 +11230,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10075,7 +11254,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1579:h=595a589dd1b8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10139,12 +11339,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10164,7 +11363,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1579:h=7a65d61192ba
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10228,12 +11448,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10253,7 +11472,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1579:h=ebc32206ce6c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10317,12 +11557,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10342,7 +11581,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1589:h=07025348ac88
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10406,12 +11666,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10431,7 +11690,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1589:h=158dd234b79d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10495,12 +11775,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10520,7 +11799,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1589:h=6dc811cc5974
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10584,12 +11884,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10609,7 +11908,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1598:h=a62b71139233
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10673,12 +11993,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10698,7 +12017,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1598:h=b08183804424
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10762,12 +12102,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10787,7 +12126,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1598:h=f301180bd3fa
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10851,12 +12211,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10876,7 +12235,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1608:h=72bf24769f57
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -10940,12 +12320,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10965,7 +12344,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1608:h=a20d87cf4f1b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11029,12 +12429,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11054,7 +12453,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table1_raw_effusion_rows::T=1608:h=ab199a49f4d4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11118,12 +12538,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11143,7 +12562,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1433:h=66691c89b86c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11170,12 +12610,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11195,7 +12634,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1443:h=5066e384575f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11222,12 +12682,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11247,7 +12706,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1453:h=389d9fbe6960
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11274,12 +12754,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11299,7 +12778,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1462:h=383c52f3d0a0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11326,12 +12826,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11351,7 +12850,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1472:h=61db6065618c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11378,12 +12898,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11403,7 +12922,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1481:h=509843078822
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11430,12 +12970,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11455,7 +12994,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1491:h=374cade94a8f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11482,12 +13042,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11507,7 +13066,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1500:h=aee710bf7808
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11534,12 +13114,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11559,7 +13138,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1510:h=206eb617d088
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11586,12 +13186,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11611,7 +13210,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1520:h=62dee97d219b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11638,12 +13258,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11663,7 +13282,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1530:h=a27223040904
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11690,12 +13330,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11715,7 +13354,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1540:h=c092685cf0af
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11742,12 +13402,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11767,7 +13426,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1549:h=5499ca94b76a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11794,12 +13474,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11819,7 +13498,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1560:h=22e85837e04b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11846,12 +13546,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11871,7 +13570,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1570:h=f97116f6e8bc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11898,12 +13618,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11923,7 +13642,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1579:h=32a96d262b7f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -11950,12 +13690,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11975,7 +13714,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1589:h=8bb9e3bd0cb6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -12002,12 +13762,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12027,7 +13786,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1598:h=e2e111abb6ad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5
@@ -12054,12 +13834,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12079,7 +13858,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ferguson-nuth-2012-sio-vapor-pressure-mixture::ferguson_nuth_2012_table2_equilibrium_pressure_rows::T=1608:h=c76b6725d348
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
   locator:
     page: 5

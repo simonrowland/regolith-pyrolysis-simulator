@@ -38,7 +38,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq13_reaction_gibbs_caFe2o4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: forsberg-2002-ca-fe-o-incongruent-melting
   locator:
     page: 4
@@ -109,7 +119,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq14_reaction_gibbs_ca2fe2o5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: forsberg-2002-ca-fe-o-incongruent-melting
   locator:
     page: 4
@@ -223,7 +243,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq19_dfG_caFe2o4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: forsberg-2002-ca-fe-o-incongruent-melting
   locator:
     page: 4
@@ -338,7 +369,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq20_dfG_ca2fe2o5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: forsberg-2002-ca-fe-o-incongruent-melting
   locator:
     page: 4
@@ -410,7 +452,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq24_dfH298_caFe2o4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: forsberg-2002-ca-fe-o-incongruent-melting
   locator:
     page: 6

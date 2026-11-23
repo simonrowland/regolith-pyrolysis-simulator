@@ -11,12 +11,11 @@ observations:
     species:
       formula: Mg2Cl4
       phase:
-        tag: unknown
-        reason: phase string 'MgCl2_system_to_Mg2Cl4_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgCl2_system_to_Mg2Cl4_g'' is not in the closed automatic map'
+    origin: pending-mg2cl4::anchor_Mg2Cl4_dimer_partial
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pending-mg2cl4::anchor_Mg2Cl4_dimer_partial
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pending-mg2cl4
   locator:
     note: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)

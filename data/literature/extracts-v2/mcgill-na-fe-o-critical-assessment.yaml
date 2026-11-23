@@ -36,7 +36,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_alpha_beta_transition_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: mcgill-na-fe-o-critical-assessment
   locator:
     page: 5
@@ -164,6 +174,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -300,6 +321,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S
@@ -389,7 +421,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_beta_gamma_transition_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: mcgill-na-fe-o-critical-assessment
   locator:
     page: 5
@@ -517,6 +559,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_fusion_temperature_exp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -626,6 +679,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_delta_fH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -735,6 +799,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_quoted_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S

@@ -106,7 +106,18 @@ observations:
         page: 6
         figure: '9'
         note: 24h O2 bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_24h_oxygen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -347,7 +358,18 @@ observations:
         page: 6
         figure: '9'
         note: 2h Ar bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_2h_argon
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -594,6 +616,17 @@ observations:
     - equilibrium_phase_composition
     reason: invalid total pressure for printed air fO2; no value assigned
     origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_4h_air
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_4h_air
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -849,7 +882,18 @@ observations:
         page: 6
         figure: '9'
         note: 6h O2 bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_6h_oxygen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -1090,7 +1134,18 @@ observations:
         page: 6
         figure: '9'
         note: 2h O2 bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_prose_cr_loss_2h_oxygen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -1331,7 +1386,18 @@ observations:
         page: 5
         table: IV
         note: row=Matrix; column=Cr
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_table4_matrix_cr
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 5
@@ -1572,7 +1638,18 @@ observations:
         page: 5
         table: IV
         note: row=Spinel; column=Cr
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_table4_spinel_cr
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 5

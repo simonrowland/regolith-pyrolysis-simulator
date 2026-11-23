@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82,6 +81,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig5_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -105,12 +127,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -176,6 +197,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig6_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig6_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -199,12 +243,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -270,6 +313,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig7_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig7_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -293,12 +359,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -364,6 +429,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig1_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig1_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -387,12 +475,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -458,6 +545,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig2_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig2_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -481,12 +591,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -552,6 +661,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig3_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig3_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -575,12 +707,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -646,6 +777,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig5_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -669,12 +823,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -740,6 +893,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig7_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig7_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -763,12 +939,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -834,6 +1009,30 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid CaO coefficients
+      are model-derived; the caption attributes iron-ratio data to Yang and Belton (1998); not digitised.; original_reason=phase
+      string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig8_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig8_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -857,12 +1056,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -928,6 +1126,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig3_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig3_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -951,12 +1172,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1022,6 +1242,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig6_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig6_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -1045,12 +1288,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1116,6 +1358,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig7_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig7_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -1139,12 +1404,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1211,6 +1475,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_sio2_fig3_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_sio2_fig3_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity_coefficient
@@ -1234,12 +1521,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1306,6 +1592,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CMAS liquid plotted model calculations;
+      not digitised; original_reason=phase string ''CMAS_liquid'' is not in the closed automatic map'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_sio2_fig4_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beckett-2002-silicate-melt-activities::beckett_2002_sio2_fig4_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity

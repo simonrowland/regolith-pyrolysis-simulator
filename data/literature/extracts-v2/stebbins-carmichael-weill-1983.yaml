@@ -11,12 +11,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39,7 +38,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''inverse_drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     note: tables=['1', '5']; pages=PDF pp. 4 and 6 / printed pp. 720 and 722
@@ -56,12 +77,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_liquid_and_disordered_crystalline_albite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -126,6 +146,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_liquid_and_disordered_crystalline_albite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_abstract
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_abstract
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -164,12 +207,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_liquid_and_disordered_crystalline_albite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -234,6 +276,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_liquid_and_disordered_crystalline_albite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_discussion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_discussion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -272,12 +337,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_liquid_and_disordered_crystalline_albite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -348,6 +412,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_liquid_and_disordered_crystalline_albite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''inverse_drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -396,12 +484,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_liquid_and_crystalline_disordered_albite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -466,6 +553,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_liquid_and_crystalline_disordered_albite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_robie_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_robie_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -502,12 +612,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -525,7 +634,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_4_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_4_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 6 / printed p. 722
@@ -556,12 +686,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -581,7 +710,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_6_vitrification_quotes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_6_vitrification_quotes
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
@@ -598,12 +748,11 @@ observations:
     species:
       formula: NaAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSi3O8_liquid_and_crystalline_disordered_albite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -668,6 +817,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSi3O8_liquid_and_crystalline_disordered_albite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_weill_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_weill_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -704,11 +876,11 @@ observations:
     species:
       formula: CaAl2Si2O8
       phase:
-        tag: unknown
-        reason: phase string 'CaAl2Si2O8_glass_and_crystalline_anorthite' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: anorthite
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -732,7 +904,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaAl2Si2O8_glass_and_crystalline_anorthite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_calorimetry_measured_table_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''inverse_drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_calorimetry_measured_table_1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     note: tables=['1', '7']; pages=PDF pp. 4 and 7 / printed pp. 720 and 723
@@ -749,11 +943,11 @@ observations:
     species:
       formula: CaAl2Si2O8
       phase:
-        tag: unknown
-        reason: phase string 'CaAl2Si2O8_glass_and_crystalline_anorthite' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: anorthite
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -820,6 +1014,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaAl2Si2O8_glass_and_crystalline_anorthite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_robie_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_robie_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -856,11 +1073,11 @@ observations:
     species:
       formula: CaAl2Si2O8
       phase:
-        tag: unknown
-        reason: phase string 'CaAl2Si2O8_glass_and_crystalline_anorthite' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: anorthite
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -927,6 +1144,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaAl2Si2O8_glass_and_crystalline_anorthite'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_table_7_fusion_quotes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_table_7_fusion_quotes
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -963,12 +1203,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_glass_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -992,7 +1231,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_glass_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''inverse_drop_calorimetry_DSC_and_drop_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     note: tables=['1', '2', '3']; pages=PDF pp. 4-5 / printed pp. 720-721
@@ -1009,12 +1270,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1079,6 +1339,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_entropy_of_fusion_discussion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_entropy_of_fusion_discussion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -1117,12 +1400,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1187,6 +1469,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_ferrier_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_ferrier_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1223,12 +1528,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1299,6 +1603,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''inverse_drop_calorimetry_DSC_and_drop_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1347,12 +1675,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1417,6 +1744,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_robie_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_robie_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1453,12 +1803,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_glass_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1476,7 +1825,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_glass_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_4_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_4_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 6 / printed p. 722
@@ -1502,12 +1872,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_glass_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1526,7 +1895,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_glass_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_6_vitrification_quotes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_6_vitrification_quotes
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
@@ -1543,12 +1933,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1613,6 +2002,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaMgSi2O6_liquid_and_crystalline_diopside'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_weill_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_weill_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1649,11 +2061,11 @@ observations:
     species:
       formula: NaAlSiO4
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: gamma
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1677,7 +2089,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     note: tables=['3']; pages=PDF p. 5 / printed p. 721
@@ -1694,12 +2128,11 @@ observations:
     species:
       formula: NaAlSiO4
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1770,6 +2203,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_entropy_of_fusion_discussion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_entropy_of_fusion_discussion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -1808,11 +2264,11 @@ observations:
     species:
       formula: NaAlSiO4
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: gamma
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1883,6 +2339,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1931,11 +2411,11 @@ observations:
     species:
       formula: NaAlSiO4
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: gamma
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1953,7 +2433,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_4_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_4_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 6 / printed p. 722
@@ -1979,11 +2480,11 @@ observations:
     species:
       formula: NaAlSiO4
       phase:
-        tag: unknown
-        reason: phase string 'NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: gamma
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2002,7 +2503,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_6_vitrification_quotes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_6_vitrification_quotes
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
@@ -2019,12 +2541,11 @@ observations:
     species:
       formula: KAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'KAlSi3O8_glass_liquid_and_crystalline_sanidine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2045,7 +2566,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''KAlSi3O8_glass_liquid_and_crystalline_sanidine'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     note: tables=['3']; pages=PDF p. 5 / printed p. 721
@@ -2062,12 +2605,11 @@ observations:
     species:
       formula: KAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'KAlSi3O8_liquid_and_crystalline_sanidine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2132,6 +2674,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''KAlSi3O8_liquid_and_crystalline_sanidine'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_entropy_of_fusion_abstract
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_entropy_of_fusion_abstract
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -2170,12 +2735,11 @@ observations:
     species:
       formula: KAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'KAlSi3O8_liquid_and_crystalline_sanidine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2246,6 +2810,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''KAlSi3O8_liquid_and_crystalline_sanidine'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_calorimetry_and_compiled_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -2294,12 +2882,11 @@ observations:
     species:
       formula: KAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'KAlSi3O8_liquid_and_crystalline_sanidine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2364,6 +2951,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''KAlSi3O8_liquid_and_crystalline_sanidine'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_robie_table_7_fusion_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_robie_table_7_fusion_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -2400,12 +3010,11 @@ observations:
     species:
       formula: KAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'KAlSi3O8_glass_liquid_and_crystalline_sanidine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2423,7 +3032,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''KAlSi3O8_glass_liquid_and_crystalline_sanidine'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_4_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_4_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 6 / printed p. 722
@@ -2455,12 +3085,11 @@ observations:
     species:
       formula: KAlSi3O8
       phase:
-        tag: unknown
-        reason: phase string 'KAlSi3O8_glass_liquid_and_crystalline_sanidine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2481,7 +3110,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''KAlSi3O8_glass_liquid_and_crystalline_sanidine'' is not in the closed automatic map'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_6_vitrification_quotes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_6_vitrification_quotes
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723

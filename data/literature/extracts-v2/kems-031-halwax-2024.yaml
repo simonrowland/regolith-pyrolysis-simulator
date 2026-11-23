@@ -345,12 +345,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -380,7 +379,18 @@ observations:
         section: III. EXPERIMENTAL
         line_range: 220-230
         source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     section: III. EXPERIMENTAL
@@ -398,11 +408,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: lime
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -436,7 +446,18 @@ observations:
         line_range: 595-607
         note: Third-law standard formation enthalpy for pure solid CaO
         source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     table: IV
@@ -455,12 +476,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_MgO_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -488,7 +508,18 @@ observations:
       evidence:
         paragraph: Ir Knudsen cell geometry; explicitly not HKL α
         source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_MgO_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     paragraph: Ir Knudsen cell geometry; explicitly not HKL α
@@ -505,12 +536,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_MgO_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -534,7 +564,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_MgO_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 5
@@ -889,12 +930,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -927,7 +967,18 @@ observations:
         line_range: 220-230
         note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
         source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     section: III. EXPERIMENTAL
@@ -946,11 +997,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: periclase
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -984,7 +1035,18 @@ observations:
         line_range: 595-607
         note: Third-law standard formation enthalpy for pure solid MgO
         source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     table: IV
@@ -1003,12 +1065,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1034,7 +1095,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 5
@@ -1091,12 +1163,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1122,7 +1193,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 5
@@ -1179,12 +1261,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1210,7 +1291,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 5
@@ -1267,12 +1359,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1298,7 +1389,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 5
@@ -1355,12 +1457,11 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: unknown
-        reason: phase string 'pure_Ni' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1398,7 +1499,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_Ni'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -1418,12 +1530,11 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: unknown
-        reason: phase string 'pure_Ni' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1453,7 +1564,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_Ni'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_this_study
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -1486,12 +1608,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'calibration_constants' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1521,7 +1642,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calibration_constants'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iii_ionization_cross_sections
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -1541,12 +1673,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1572,7 +1703,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_cao_1st_measurement
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1593,12 +1735,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1624,7 +1765,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_cao_2nd_measurement
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1645,12 +1797,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1703,7 +1854,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_cao_literature_and_factps
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1723,11 +1885,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: lime
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1753,7 +1915,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_cao_mean
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1774,12 +1947,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1805,7 +1977,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_mgo_1st_measurement
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1826,12 +2009,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1857,7 +2039,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_mgo_2nd_measurement
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1878,12 +2071,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1936,7 +2128,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_mgo_literature_and_factps
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -1956,11 +2159,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
-      polymorph:
         tag: value
-        value: periclase
+        value: unspecified
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1988,7 +2191,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_iv_mgo_mean
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -2009,12 +2223,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'Ca_metal_sample_ref_11' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2046,7 +2259,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ca_metal_sample_ref_11'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_v_huber_holley_ca_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 10
@@ -2066,12 +2290,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2101,7 +2324,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_CaO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_vi_liang_cao_solution_reactions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 11
@@ -2121,12 +2355,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2160,7 +2393,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_solid_MgO'' is not in the closed automatic map'
+    origin: kems-031-halwax-2024::halwax_2024_table_vii_shomate_huffman_reactions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-031-halwax-2024
   locator:
     page: 13

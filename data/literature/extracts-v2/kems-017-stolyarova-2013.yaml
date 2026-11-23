@@ -11,12 +11,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-B2O3-SiO2_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45,7 +44,18 @@ observations:
         published_page: '62'
         figure: '1'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-B2O3-SiO2_melt'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig1_mgo_activity_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '62'
@@ -63,12 +73,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_GLTAS_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97,7 +106,18 @@ observations:
         published_page: '62'
         figure: '2'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_GLTAS_model'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig2_bao_gltas_contours_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '62'
@@ -115,12 +135,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -149,7 +168,18 @@ observations:
         published_page: '62'
         figure: '2'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_melt'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig2_bao_kems_contours_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '62'
@@ -167,12 +197,11 @@ observations:
     species:
       formula: B2O3
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_GLTAS_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -202,7 +231,18 @@ observations:
         figure: '3'
         note: Solid GLTAS model contours at 1650 K; printed log10 activity levels -8, -6, -4, -1
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_GLTAS_model'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig3_b2o3_gltas_contours_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '63'
@@ -221,12 +261,11 @@ observations:
     species:
       formula: B2O3
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -256,7 +295,18 @@ observations:
         figure: '3'
         note: Dotted KEMS contours at 1650 K; printed log10 activity levels -5, -4, -3, -2
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_melt'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig3_b2o3_kems_contours_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '63'
@@ -275,12 +325,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_GLTAS_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -309,7 +358,18 @@ observations:
         published_page: '63'
         figure: '4'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_GLTAS_model'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig4_sio2_gltas_contours_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '63'
@@ -327,12 +387,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -361,7 +420,18 @@ observations:
         published_page: '63'
         figure: '4'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_melt'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig4_sio2_kems_contours_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '63'
@@ -379,12 +449,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_GLTAS_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -413,7 +482,18 @@ observations:
         published_page: '64'
         figure: '5'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_GLTAS_model'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig5_gibbs_gltas_contours_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '64'
@@ -431,12 +511,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BaO-B2O3-SiO2_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -465,7 +544,18 @@ observations:
         published_page: '64'
         figure: '5'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BaO-B2O3-SiO2_melt'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig5_gibbs_kems_contours_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '64'
@@ -483,12 +573,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO_SrO_BaO_borosilicate_GLTAS_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -516,7 +605,18 @@ observations:
         published_page: '65'
         figure: '6'
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaO_SrO_BaO_borosilicate_GLTAS_models'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_fig6_gibbs_gltas_model_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     published_page: '65'
@@ -534,12 +634,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'ternary_silicate_melts_various_systems' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -560,7 +659,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ternary_silicate_melts_various_systems'' is not in the closed automatic map'
+    origin: kems-017-stolyarova-2013::stolyarova_2013_ternary_silicate_vapour_species_map_table1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-017-stolyarova-2013
   locator:
     table: '1'

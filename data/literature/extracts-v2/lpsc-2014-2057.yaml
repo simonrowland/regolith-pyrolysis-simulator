@@ -11,12 +11,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35,7 +34,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calcium_perchlorate_iron_mineral_mixture'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_chlorine_release_windows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_chlorine_release_windows
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -52,12 +73,11 @@ observations:
     species:
       formula: Cl
       phase:
-        tag: unknown
-        reason: phase string 'pyrite_and_HWMK919_calcium_perchlorate_mixtures' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -76,7 +96,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pyrite_and_HWMK919_calcium_perchlorate_mixtures'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_cl_qualitative_release
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_cl_qualitative_release
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -93,12 +135,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -117,7 +158,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calcium_perchlorate_iron_mineral_mixture'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_dsc_peak_shifts
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_dsc_peak_shifts
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 1
@@ -134,12 +197,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -158,7 +220,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calcium_perchlorate_iron_mineral_mixture'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_dsc_qms_method_difference
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_dsc_qms_method_difference
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -175,12 +259,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -199,7 +282,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calcium_perchlorate_iron_mineral_mixture'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_figure_only_oxygen_and_thermal_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_figure_only_oxygen_and_thermal_curves
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -216,12 +321,11 @@ observations:
     species:
       formula: HCl
       phase:
-        tag: unknown
-        reason: phase string 'fayalite_calcium_perchlorate_mixture' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -239,7 +343,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''fayalite_calcium_perchlorate_mixture'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_hcl_qualitative_release
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_hcl_qualitative_release
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -256,12 +382,11 @@ observations:
     species:
       formula: HWMK919
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_martian_soil_analog' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -280,7 +405,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_martian_soil_analog'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_hwmk919_material_characterisation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_hwmk919_material_characterisation
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 1
@@ -297,12 +444,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -321,7 +467,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calcium_perchlorate_iron_mineral_mixture'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_qms_peak_shifts
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_qms_peak_shifts
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -338,12 +506,11 @@ observations:
     species:
       formula: magnetite
       phase:
-        tag: unknown
-        reason: phase string 'Rocknest_eolian_deposit' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -363,7 +530,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Rocknest_eolian_deposit'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_fe_oxide_abundance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_fe_oxide_abundance
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -380,12 +569,11 @@ observations:
     species:
       formula: hematite
       phase:
-        tag: unknown
-        reason: phase string 'Rocknest_eolian_deposit' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -405,7 +593,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Rocknest_eolian_deposit'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_hematite_abundance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_hematite_abundance
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 2
@@ -422,12 +632,11 @@ observations:
     species:
       formula: Ca(ClO4)2
       phase:
-        tag: unknown
-        reason: phase string 'dehydrated_calcium_perchlorate_mixed_with_iron_phase' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -449,7 +658,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''dehydrated_calcium_perchlorate_mixed_with_iron_phase'' is not in the closed automatic map'
+    origin: lpsc-2014-2057::lpsc_2014_2057_thermal_program
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpsc-2014-2057
   locator:
     page: 1

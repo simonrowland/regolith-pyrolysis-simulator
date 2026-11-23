@@ -11,12 +11,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -94,7 +93,19 @@ observations:
         figure: '2'
         note: 'Caption series 2, the red stroke, calculated in the present study. 600 dpi render of PDF page 3: continuous
           stroke, no marker centre.; panel=A'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: shornikov-2024-iron-phosphate-melts::shornikov_2024_feo_p4o10_fig2a_series2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2024-iron-phosphate-melts
   locator:
     page: 3
@@ -115,12 +126,11 @@ observations:
     species:
       formula: P4O10
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -198,7 +208,19 @@ observations:
         figure: '2'
         note: 'Caption series 5, the red stroke, calculated in the present study. 600 dpi render of PDF page 3: continuous
           stroke, no marker centre.; panel=B'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: shornikov-2024-iron-phosphate-melts::shornikov_2024_feo_p4o10_fig2b_series5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2024-iron-phosphate-melts
   locator:
     page: 3
@@ -1028,12 +1050,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1111,7 +1132,19 @@ observations:
         figure: '4'
         note: 'Caption series 7, FeO activity at 1673 K, calculated in the present study. 600 dpi render of PDF page 4: continuous
           red stroke, no marker centre.; panel=B'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: shornikov-2024-iron-phosphate-melts::shornikov_2024_feo_p4o10_fig4_feo_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2024-iron-phosphate-melts
   locator:
     page: 4
@@ -1364,12 +1397,11 @@ observations:
     species:
       formula: P4O10
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1447,7 +1479,19 @@ observations:
         figure: '4'
         note: 'Caption series 8, P4O10 activity at 1673 K. 600 dpi render of PDF page 4: continuous purple stroke, no marker
           centre.; panel=B'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: shornikov-2024-iron-phosphate-melts::shornikov_2024_feo_p4o10_fig4_p4o10_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2024-iron-phosphate-melts
   locator:
     page: 4

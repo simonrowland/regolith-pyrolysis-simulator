@@ -2556,7 +2556,18 @@ observations:
         pdf_page_index: 2
         equation: '17'
         note: Footnote below Eq. (17), PDF page 3 render.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sanders-1977-water-vapour-na-vaporization::sanders_1977_quoted_naoh_pressure_1e5_atm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sanders-1977-water-vapour-na-vaporization
   locator:
     page: 3

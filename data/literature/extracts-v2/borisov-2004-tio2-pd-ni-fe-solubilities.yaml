@@ -20170,7 +20170,18 @@ observations:
         pdf_page_index: 2
         section: Accuracy and reproducibility
         note: The Pd content of MP3 was found to be 2.15 ± 0.17 ppm
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-tio2-pd-ni-fe-solubilities::borisov2004_text_mp3_session1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-tio2-pd-ni-fe-solubilities
   locator:
     page: 3
@@ -20308,7 +20319,18 @@ observations:
         pdf_page_index: 2
         section: Accuracy and reproducibility
         note: the Pd content of MP3 was found to be 1.65 ± 0.22 ppm
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-tio2-pd-ni-fe-solubilities::borisov2004_text_mp3_session2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-tio2-pd-ni-fe-solubilities
   locator:
     page: 3
@@ -20446,7 +20468,18 @@ observations:
         pdf_page_index: 2
         section: Accuracy and reproducibility
         note: The Pd content in NIST SRM 612 glass is 1.31 ± 0.26 ppm
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: borisov-2004-tio2-pd-ni-fe-solubilities::borisov2004_text_nist612_session1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: borisov-2004-tio2-pd-ni-fe-solubilities
   locator:
     page: 3

@@ -48,7 +48,17 @@ observations:
         published_page: 126
         pdf_page_index: 5
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_amount_flux_E
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 6
@@ -200,7 +210,17 @@ observations:
         published_page: 126
         pdf_page_index: 5
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_increment_flux_E
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 6
@@ -353,7 +373,17 @@ observations:
         published_page: 126
         pdf_page_index: 5
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_measured_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 6
@@ -482,7 +512,17 @@ observations:
         published_page: 123
         pdf_page_index: 2
         note: Text says final Na2O decreased from 31% as T.Fe increased from 9%.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 3
@@ -586,7 +626,17 @@ observations:
         published_page: 123
         pdf_page_index: 2
         note: Text says final Na2O decreased to 20% as T.Fe increased to 31%.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 3
@@ -686,7 +736,17 @@ observations:
         published_page: 125
         pdf_page_index: 4
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_carbon_bound
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 5
@@ -805,7 +865,17 @@ observations:
         published_page: 125
         pdf_page_index: 4
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_flux_C2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 5
@@ -950,7 +1020,17 @@ observations:
         published_page: 125
         pdf_page_index: 4
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 5
@@ -1127,6 +1207,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_A
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1281,6 +1372,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_B
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1435,6 +1537,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1589,6 +1702,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_D
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction

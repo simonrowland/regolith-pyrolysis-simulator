@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -100,7 +99,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al2O row at 1933 K; scale p_Al2O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al2o_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -142,12 +153,11 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -231,7 +241,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al2O row at 1983 K; scale p_Al2O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al2o_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -273,12 +295,11 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -362,7 +383,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al2O row at 2033 K; scale p_Al2O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al2o_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -404,12 +437,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -493,7 +525,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al row at 1833 K; scale p_Al × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -535,12 +579,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -624,7 +667,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al row at 1933 K; scale p_Al × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -666,12 +721,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -755,7 +809,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al row at 1983 K; scale p_Al × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -797,12 +863,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -886,7 +951,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_Al row at 2033 K; scale p_Al × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -928,12 +1005,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1017,7 +1093,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_AlO row at 1933 K; scale p_AlO × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_alo_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1059,12 +1147,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1148,7 +1235,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_AlO row at 1983 K; scale p_AlO × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_alo_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1190,12 +1289,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1279,7 +1377,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_AlO row at 2033 K; scale p_AlO × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_alo_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1321,12 +1431,11 @@ observations:
     species:
       formula: AlSiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1410,7 +1519,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_AlSiO row at 1933 K; scale p_AlSiO × 10^10 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_alsio_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1452,12 +1573,11 @@ observations:
     species:
       formula: AlSiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1541,7 +1661,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_AlSiO row at 1983 K; scale p_AlSiO × 10^10 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_alsio_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1583,12 +1715,11 @@ observations:
     species:
       formula: AlSiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1672,7 +1803,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_AlSiO row at 2033 K; scale p_AlSiO × 10^10 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_alsio_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1714,12 +1857,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1803,7 +1945,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO2 row at 1833 K; scale p_MoO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1845,12 +1999,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1934,7 +2087,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO2 row at 1933 K; scale p_MoO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -1976,12 +2141,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2065,7 +2229,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO2 row at 1983 K; scale p_MoO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2107,12 +2283,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2196,7 +2371,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO2 row at 2033 K; scale p_MoO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2238,12 +2425,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2327,7 +2513,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO3 row at 1833 K; scale p_MoO3 × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2369,12 +2567,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2458,7 +2655,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO3 row at 1933 K; scale p_MoO3 × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2500,12 +2709,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2589,7 +2797,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO3 row at 1983 K; scale p_MoO3 × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2631,12 +2851,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2720,7 +2939,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_MoO3 row at 2033 K; scale p_MoO3 × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2852,7 +3083,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O2 row at 1833 K; scale p_O2 × 10^11 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -2994,7 +3237,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O2 row at 1933 K; scale p_O2 × 10^11 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3136,7 +3391,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O2 row at 1983 K; scale p_O2 × 10^11 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3278,7 +3545,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O2 row at 2033 K; scale p_O2 × 10^11 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3420,7 +3699,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O row at 1833 K; scale p_O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3564,7 +3855,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O row at 1933 K; scale p_O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3708,7 +4011,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O row at 1983 K; scale p_O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3852,7 +4167,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_O row at 2033 K; scale p_O × 10^9 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -3906,12 +4233,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3995,7 +4321,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO2 row at 1833 K; scale p_SiO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4037,12 +4375,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4126,7 +4463,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO2 row at 1933 K; scale p_SiO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4168,12 +4517,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4257,7 +4605,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO2 row at 1983 K; scale p_SiO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4299,12 +4659,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4388,7 +4747,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO2 row at 2033 K; scale p_SiO2 × 10^8 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4430,12 +4801,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4519,7 +4889,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO row at 1833 K; scale p_SiO × 10^5 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4561,12 +4943,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4650,7 +5031,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO row at 1933 K; scale p_SiO × 10^5 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4692,12 +5085,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4781,7 +5173,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO row at 1983 K; scale p_SiO × 10^5 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4823,12 +5227,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4912,7 +5315,19 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: Table 2, p_SiO row at 2033 K; scale p_SiO × 10^5 atm.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 2
@@ -4954,12 +5369,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5053,7 +5467,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 Al2O3 row at 1833 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -5107,12 +5533,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5206,7 +5631,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 Al2O3 row at 1933 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -5260,12 +5697,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5359,7 +5795,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 Al2O3 row at 1983 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -5413,12 +5861,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5512,7 +5959,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 Al2O3 row at 2033 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -5566,12 +6025,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5665,7 +6123,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 SiO2 row at 1833 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_1833k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -5719,12 +6189,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5818,7 +6287,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 SiO2 row at 1933 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_1933k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -5872,12 +6353,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5971,7 +6451,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 SiO2 row at 1983 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_1983k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3
@@ -6025,12 +6517,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6124,7 +6615,19 @@ observations:
         pdf_page_index: 2
         table: '6'
         note: Table 6 SiO2 row at 2033 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_2033k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shults-1994-mullite-evaporation
   locator:
     page: 3

@@ -100,7 +100,18 @@ observations:
         published_page: 213
         pdf_page_index: 252
         section: 6.6.3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: panda-2019-ten-oxide-thermodynamics::panda2019_quoted_gamma_mn_ag_ito_1723k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: panda-2019-ten-oxide-thermodynamics
   locator:
     page: 253
@@ -218,7 +229,18 @@ observations:
         published_page: 213
         pdf_page_index: 252
         section: 6.6.3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: panda-2019-ten-oxide-thermodynamics::panda2019_quoted_gamma_mn_ag_jung_1723k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: panda-2019-ten-oxide-thermodynamics
   locator:
     page: 253
