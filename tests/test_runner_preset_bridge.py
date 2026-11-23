@@ -57,10 +57,13 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     assert sample["exposed_melt_area_basis"] == (
         "assumed_pellet_top_face_from_reported_diameter"
     )
-    assert preset.provenance["notice"]["kind"] == "knob_defaulted"
-    assert preset.provenance["notice"]["policy_class"] == "DP-007"
-    assert preset.provenance["notice"]["original_reason"] == (
-        "exposed_melt_area_not_printed"
+    assert preset.provenance["notice"]["kind"] == "deck_declared_assumption"
+    assert preset.provenance["notice"]["ruling_ref"] == "t-1892_2026-11-22"
+    assert preset.provenance["notice"]["derivation"] == (
+        "pi*(D/2)^2 from the reported D=13 mm"
+    )
+    assert preset.provenance["notice"]["reason"] == (
+        "liquid_footprint_not_printed"
     )
     driver = preset.lab_schedule[runner_module.FURNACE_POWER_DRIVER_KEY]
     assert driver["exposed_area_m2"] is None
@@ -97,13 +100,16 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     assert session.simulator.campaign_mgr._power_temperature_for_step[
         "time_s"
     ] == 60.0
-    assert notice["kind"] == "knob_defaulted"
-    assert notice["knob"] == "exposed_melt_area_m2"
+    assert notice["kind"] == "deck_declared_assumption"
+    assert notice["field"] == "exposed_melt_area_m2"
     assert notice["value"] == pytest.approx(0.00013273228961416876)
     assert notice["unit"] == "m2"
-    assert notice["policy_class"] == "DP-007"
     assert notice["basis"] == "assumed_pellet_top_face_from_reported_diameter"
-    assert notice["original_reason"] == "exposed_melt_area_not_printed"
+    assert notice["ruling_ref"] == "t-1892_2026-11-22"
+    assert notice["derivation"] == "pi*(D/2)^2 from the reported D=13 mm"
+    assert notice["reason"] == "liquid_footprint_not_printed"
+    assert "policy" not in notice
+    assert "policy_class" not in notice
 
 
 def _assert_subhour_preset_refuses(preset_path: Path) -> None:

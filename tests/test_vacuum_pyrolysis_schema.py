@@ -412,8 +412,15 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert sample["exposed_melt_area_source_class"] == (
         "assumption_with_sensitivity_marker"
     )
-    assert sample["exposed_melt_area_notice"]["kind"] == "knob_defaulted"
-    assert sample["exposed_melt_area_notice"]["policy_class"] == "DP-007"
+    assert sample["exposed_melt_area_notice"]["kind"] == (
+        "deck_declared_assumption"
+    )
+    assert sample["exposed_melt_area_notice"]["ruling_ref"] == (
+        "t-1892_2026-11-22"
+    )
+    assert sample["exposed_melt_area_notice"]["derivation"] == (
+        "pi*(D/2)^2 from the reported D=13 mm"
+    )
     assert "exposed_melt_area_m2" not in sample["named_missing_fields"]
     assert "sample_mass_g" not in preset["lab_geometry"]["sample"]["named_missing_fields"]
     assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_RUN_DURATION_H

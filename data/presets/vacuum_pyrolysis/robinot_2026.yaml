@@ -116,7 +116,7 @@ lab_geometry:
     pellet_source_class: literature_sidecar
     pellet_citation_id: robinot_2026
     pellet_digest: "Section 3.2 prints a pellet 13 mm in diameter and 10 mm in height, pressed at 2.5 tons. Those dimensions are not an exposed-area measurement."
-    # DP-007/knob_defaulted assumption: use the pellet top face as the
+    # Deck-declared assumption: use the pellet top face as the
     # evaporating area because the liquid footprint is not printed. Section
     # 3.2 reports D=13 mm: A=pi*(D/2)^2=pi*(0.013 m/2)^2=0.00013273228961416876 m2.
     # The units are m2, and A tends to zero as D tends to zero.
@@ -125,13 +125,14 @@ lab_geometry:
     exposed_melt_area_source_class: assumption_with_sensitivity_marker
     exposed_melt_area_source_ref: robinot_2026_methods
     exposed_melt_area_citation_id: robinot_2026
-    exposed_melt_area_digest: "The top face from the reported 13 mm pellet diameter is an explicit DP-007 assumption, not a measured liquid footprint."
+    exposed_melt_area_digest: "The top face from the reported 13 mm pellet diameter is an explicit deck assumption, not a measured liquid footprint."
     exposed_melt_area_notice:
-      kind: knob_defaulted
-      knob: exposed_melt_area_m2
-      policy_class: DP-007
+      kind: deck_declared_assumption
+      field: exposed_melt_area_m2
       basis: assumed_pellet_top_face_from_reported_diameter
-      original_reason: exposed_melt_area_not_printed
+      ruling_ref: t-1892_2026-11-22
+      derivation: "pi*(D/2)^2 from the reported D=13 mm"
+      reason: liquid_footprint_not_printed
       source: "Robinot section 3.2 reports the 13 mm pellet diameter; its top face is assumed as the evaporating area."
     crucible_opening_area_m2: null
     crucible_opening_area_reason: not_printed
