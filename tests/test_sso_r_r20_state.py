@@ -140,13 +140,17 @@ def test_quenched_redox_reference_survives_pressure_cycle() -> None:
     sim.melt.oxygen_reservoir.reference_T_K = 1873.15
     sim._sync_oxygen_reservoir_mirror()
     assert sim._apply_fe_redox_respeciation()["status"] == "ok"
+    published = sim._current_melt_redox_fO2_log()
+    assert published == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(1873.15)
+    )
     before = copy.deepcopy(sim.atom_ledger.mol_by_account())
     transition_count = len(sim.atom_ledger.transitions)
     sim.melt.temperature_C = 1000.0
     for pressure in (10.0, 0.2, 10.0):
         sim.melt.p_total_mbar = pressure
         sim._re_reference_melt_fO2_to_temperature(gate_authority=None)
-        assert sim._current_melt_redox_fO2_log() == -2.1
+        assert sim._current_melt_redox_fO2_log() == published
         assert sim.melt.oxygen_reservoir.reference_T_K == 1873.15
     assert len(sim.atom_ledger.transitions) == transition_count
     assert sim.atom_ledger.mol_by_account() == before
@@ -667,9 +671,14 @@ def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
     assert seen_control_inputs[-1]["intrinsic_fO2_log"] == pytest.approx(-6.25)
 
 
-def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
+def test_reductant_source_term_books_ferric_and_publishes_the_ledger(
+    monkeypatch,
+) -> None:
+    from engines.builtin.fe_redox_respeciation import fe2o3_mol_for_ferric_o2
+
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
     # 4 mol Fe2O3 books 2 mol O2, so the 1 mol sink is inside the couple.
@@ -679,18 +688,26 @@ def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
         source="test ferric inventory for an in-inventory reductant sink",
         material_origin="feedstock",
     )
-    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
 
     sim._apply_oxygen_reservoir_redox_source_terms(
         {"test_reductant_sink": -1.0},
         exchange_direction="redox_source:test_reductant_sink",
+        temperature_K=temperature_K,
     )
 
-    after_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    after_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
-    assert after_fO2 < before_fO2
-    assert after_native > before_native
+    published = sim._ledger_consistent_melt_fO2_log(temperature_K)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        published
+    )
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+        pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(1.0))
+    )
 
 
 def _configure_o2_bubbler(
@@ -2673,9 +2690,14 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
         assert exchange["exchange_clamped"] is True
 
 
-def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
+def test_headspace_exchange_cannot_instantly_erase_reductant_dose(
+    monkeypatch,
+) -> None:
+    from engines.builtin.fe_redox_respeciation import fe2o3_mol_for_ferric_o2
+
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
@@ -2683,20 +2705,34 @@ def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    # The 1 mol sink has to be inside the ferric couple or the tangent
-    # does not move and there is no dose for the exchange to fail to erase.
+    # The 1 mol sink is inside the ferric couple. The dose books that
+    # O2 and publishes the ledger; the exchange must not restore the
+    # pre-dose fO2.
     sim.atom_ledger.load_external_mol(
         "process.cleaned_melt",
         {"Fe2O3": 4.0},
         source="test ferric inventory for a reductant dose the exchange must not erase",
         material_origin="feedstock",
     )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
 
     sim._apply_oxygen_reservoir_redox_source_terms(
         {"test_reductant_sink": -1.0},
         exchange_direction="redox_source:test_reductant_sink",
+        temperature_K=temperature_K,
     )
     reduced_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    assert reduced_fO2 == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(temperature_K)
+    )
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+        pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(1.0))
+    )
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 0.05},
