@@ -8852,6 +8852,7 @@ def test_gate_memo_replay_return_is_not_written_to_core_memo(
     def replay_gate_curve(target, *, fO2_log):
         replay_calls.append(fO2_log)
         target._last_reduced_real_replay_notices = []
+        store._accepted_hit_disclosures = []
         return dict(curve)
 
     monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
@@ -8866,11 +8867,15 @@ def test_gate_memo_replay_return_is_not_written_to_core_memo(
     assert sim._establish_melt_redox_gate_authority_for_current_hour() == curve
 
     assert len(replay_calls) == 2
+    assert sim._resolved_melt_redox_gate_authority() == curve
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
-    assert sim._melt_redox_gate_authority_this_tick is prior_authority
-    assert sim._melt_redox_gate_authority_tick_hour is None
+    assert sim._melt_redox_gate_authority_this_tick is not prior_authority
+    assert (
+        sim._melt_redox_gate_authority_this_tick['disposition'] == 'replay'
+    )
+    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
 
 
 @pytest.mark.parametrize('foreign_member', ['pid', 'configuration'])
@@ -9208,7 +9213,7 @@ def test_replay_gate_curve_is_not_written_to_core_memo(
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
 
 
-def test_replay_gate_curve_is_not_pinned_as_tick_authority(
+def test_accepted_replay_gate_curve_is_pinned_as_tick_authority(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -9232,19 +9237,23 @@ def test_replay_gate_curve_is_not_pinned_as_tick_authority(
     def replay_gate_curve(target, *, fO2_log):
         replay_calls.append(fO2_log)
         target._last_reduced_real_replay_notices = []
+        store._accepted_hit_disclosures = []
         return dict(curve)
 
     monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
     sim.configure_pt0_determinism_store(store)
     prior_authority = object()
-    prior_tick_hour = -1
     sim._melt_redox_gate_authority_this_tick = prior_authority
-    sim._melt_redox_gate_authority_tick_hour = prior_tick_hour
 
     assert sim._establish_melt_redox_gate_authority_for_current_hour() == curve
     assert len(replay_calls) == 1
-    assert sim._melt_redox_gate_authority_this_tick is prior_authority
-    assert sim._melt_redox_gate_authority_tick_hour == prior_tick_hour
+    assert sim._melt_redox_gate_authority_this_tick is not prior_authority
+    assert (
+        sim._melt_redox_gate_authority_this_tick['disposition'] == 'replay'
+    )
+    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
+    assert sim._resolved_melt_redox_gate_authority() == curve
+    assert len(replay_calls) == 1
 
 
 @pytest.mark.parametrize(
