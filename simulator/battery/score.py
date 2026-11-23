@@ -54,6 +54,7 @@ from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import (
     _air_composition_quote,
     _dp002_pressure_default,
+    _dp112_receipts,
     log10_fo2_to_pa,
     _resolve_score_time_buffer_identity,
 )
@@ -932,6 +933,8 @@ def _engine_lacks_quantity_capability(
 
     if _is_quantity_not_predicted(quantity):
         return True
+    from simulator.battery.engine_capability import phase_route_entered
+
     if (
         quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
         or (engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM)
@@ -941,12 +944,7 @@ def _engine_lacks_quantity_capability(
             Quantity.WALL_DEPOSIT_AREAL_RATE,
             Quantity.TRANSITION_TEMPERATURE,
         }
-        or quantity in PRINTED_CAPACITY_QUANTITIES
-        or quantity is Quantity.DISTRIBUTION_RATIO
-        or (
-            quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-            and effective_phase_basis(phase_basis) is not None
-        )
+        or phase_route_entered(quantity, phase_basis)
         or quantity in _ENGINE_CELL_PREDICTED_QUANTITIES
     ):
         return False
@@ -11403,9 +11401,15 @@ def _condensed_pressure_for_score(
     if pressure_bar is not None:
         return identity, pressure_bar, ()
     if experiment is not None:
-        from simulator.battery.waypoints import pressure_boundary
+        from simulator.battery.waypoints import (
+            _prediction_pressure_waypoint,
+            pressure_boundary,
+        )
 
-        waypoint = pressure_boundary(experiment, bench, observation).selected
+        waypoint = _prediction_pressure_waypoint(
+            pressure_boundary(experiment, bench, observation),
+            experiment.method,
+        )
         if waypoint is not None and waypoint.value.kind is ValueKind.POINT:
             pressure_pa = as_decimal(waypoint.value.point)
             if pressure_pa.is_finite() and pressure_pa > 0:
@@ -11414,6 +11418,19 @@ def _condensed_pressure_for_score(
                     pressure_pa / PA_PER_BAR_DEC,
                     (),
                 )
+        policy_pa, policy_notice = _dp002_pressure_default(
+            experiment.ambient_pressure_evidence,
+            quantity,
+            atmosphere_condition=(observation.point_conditions or {}).get(
+                "atmosphere"
+            ),
+        )
+        if policy_pa is not None:
+            return (
+                replace(identity, total_pressure_Pa=State.of(policy_pa)),
+                policy_pa / PA_PER_BAR_DEC,
+                () if policy_notice is None else (policy_notice,),
+            )
     resolved = resolve_default_policy("DP-001")
     pressure_pa = as_decimal(resolved.value)
     policy_notice = Notice(
@@ -11469,28 +11486,12 @@ def _liquid_pair_target(observation: Observation) -> tuple[str, str] | None:
         match = _SOURCE_PHASE_LABEL_PATTERN.search(locator_note)
         raw_label = None if match is None else match.group(1)
     label = " ".join(str(raw_label).split()) if raw_label is not None else ""
-    assemblage = provenance.get("phase_assemblage_as_printed")
-    source_text = " ".join(
-        value.casefold().replace("-", " ")
-        for value in (assemblage, locator_note)
-        if isinstance(value, str)
-    )
-    marker_present = any(
-        marker in source_text
-        for marker in ("immiscib", "coexisting liquid", "two liquid", "liquid pair")
-    )
-    # These labels are the source's explicit names for coexisting liquids;
-    # their vocabulary carries the pair relation even when a migrated locator
-    # retains the phase label but not the full assemblage field. The TEM and
-    # Liql source rows explicitly say no unique Lfe/Lsi pair was inferred.
-    if label.casefold() not in _LIQUID_PAIR_CONJUGATES and not marker_present:
+    # Assemblage prose can name two liquids without saying which one this row
+    # is. The guard fires only for a source label of one conjugate. TEM and
+    # Liql stay in the map and do not name a unique Lfe/Lsi partner.
+    if label.casefold() not in _LIQUID_PAIR_CONJUGATES:
         return None
-    if not label:
-        label = "reported liquid"
-    conjugate = _LIQUID_PAIR_CONJUGATES.get(
-        label.casefold(), "the other coexisting liquid"
-    )
-    return label, conjugate
+    return label, _LIQUID_PAIR_CONJUGATES[label.casefold()]
 
 
 def _is_liquid_phase_name(name: object) -> bool:
@@ -11580,24 +11581,14 @@ def _resolve_row_fo2(
             return identity, Decimal(str(fo2_log)), ()
 
     if experiment is not None:
+        from simulator.battery.fo2_ladder import admitted_score_oxygen
         from simulator.battery.waypoints import oxygen_condition
 
         oxygen = oxygen_condition(experiment, bench, observation)
-        typed_run_routes = {
-            "oxygen_partial_pressure_to_log_fO2",
-            "oxygen_sweep_partial_pressure",
-            "oxygen_sweep_component_partial_pressure",
-        }
-        waypoint = next(
-            (route for route in oxygen.routes if route.route in typed_run_routes),
-            oxygen.selected,
-        )
-        if waypoint is not None and waypoint.authority.value == "derived":
-            try:
-                run_oxygen_log = as_decimal(waypoint.value.point)
-            except (AttributeError, TypeError, ValueError, ArithmeticError):
-                run_oxygen_log = None
-            if run_oxygen_log is not None and run_oxygen_log.is_finite():
+        waypoint = admitted_score_oxygen(oxygen, observation)
+        if waypoint is not None:
+            run_oxygen_log = as_decimal(waypoint.value.point)
+            if run_oxygen_log.is_finite():
                 return (
                     replace(identity, fO2_Pa=State.of(log10_fo2_to_pa(run_oxygen_log))),
                     run_oxygen_log,
@@ -11625,7 +11616,11 @@ def _resolve_row_fo2(
         ),
     )
     resolved_identity = resolved_observation.identity
-    fo2_log = _printed_fo2_log10_bar(resolved_identity)
+    fo2_log = (
+        _printed_fo2_log10_bar(resolved_identity)
+        if _dp112_receipts(resolved_observation)
+        else None
+    )
     if fo2_log is not None:
         policy_notices = tuple(
             notice
@@ -14630,18 +14625,13 @@ def _predict_with_engine(
             experiment=experiment,
             bench=bench,
         )
+    from simulator.battery.engine_capability import phase_route_entered
+
     phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
     # phase rows. They stay on the not-predicted path. A closed prose
     # weight-percent or mole-percent subtype is the same phase row.
-    if (
-        quantity in PRINTED_CAPACITY_QUANTITIES
-        or quantity is Quantity.DISTRIBUTION_RATIO
-        or (
-            quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-            and effective_phase_basis(phase_basis) is not None
-        )
-    ):
+    if phase_route_entered(quantity, phase_basis):
         return _predict_phase_row(
             engine,
             observation,

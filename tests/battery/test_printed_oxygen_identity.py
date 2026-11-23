@@ -1758,10 +1758,26 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
     assert _air_composition_quote(atmospheric_argon) is None
     assert _dp002_applicability(atmospheric_argon) is None
     printed_air = Located(State.of("Air"), locator=locator)
+    printed_air_token = Located(State.of("air"), locator=locator)
     printed_argon = Located(State.of("Ar"), locator=locator)
     assert _air_composition_quote(
         None, atmosphere_condition=printed_air
     ) == "Air"
+    # Borisov–Behrens–Holtz stores the located atmosphere value `air`.
+    assert _air_composition_quote(
+        None, atmosphere_condition=printed_air_token
+    ) == "air"
+    for negated in (
+        "The sample was not equilibrated in air.",
+        "Air was excluded during equilibration.",
+    ):
+        negated_evidence = AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            negated,
+            locator,
+        )
+        assert _air_composition_quote(negated_evidence) is None, negated
+        assert _dp002_applicability(negated_evidence) is None
     assert _dp002_applicability(
         None, atmosphere_condition=printed_air
     ) == 'experiment "in air"'
@@ -1782,6 +1798,116 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
     assert _air_composition_quote(
         atmospheric_air, atmosphere_condition=printed_argon
     ) is None
+
+
+def test_registered_method_pressure_precedes_the_unbound_default() -> None:
+    from simulator.battery.score import PA_PER_BAR_DEC, _condensed_pressure_for_score
+    from tests.battery import factories as F
+
+    identity = replace(
+        F.activity_identity(),
+        total_pressure_Pa=State.unknown("unprinted total pressure"),
+    )
+
+    def without_run_pressure(experiment):
+        return replace(
+            experiment,
+            pressure_environment=replace(
+                experiment.pressure_environment,
+                total_pressure_Pa=Located(
+                    State.unknown("unprinted total pressure"),
+                    locator=experiment.locator,
+                ),
+            ),
+        )
+
+    def resolve(experiment, point_conditions=None):
+        observation = F.observation(
+            "pressure-row",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+        )
+        if point_conditions is not None:
+            observation = replace(observation, point_conditions=point_conditions)
+        return _condensed_pressure_for_score(
+            identity,
+            observation,
+            experiment,
+            None,
+            Quantity.ACTIVITY,
+        )
+
+    gas = replace(
+        without_run_pressure(F.tabulation_experiment(experiment_id="gas-mix")),
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.GAS_MIXING,
+            "Experiments were conducted in a gas-mixing furnace.",
+            Locator(page=1),
+        ),
+    )
+    wire = replace(
+        without_run_pressure(F.tabulation_experiment(experiment_id="wire-loop")),
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.GAS_FLOW,
+            "Samples were equilibrated on a wire-loop.",
+            Locator(page=1),
+        ),
+    )
+    air = without_run_pressure(F.tabulation_experiment(experiment_id="in-air"))
+    unbound = without_run_pressure(F.tabulation_experiment(experiment_id="unbound"))
+    knudsen = F.kems_experiment(total_P=Decimal("1e-6"))
+
+    for experiment, marker in (
+        (gas, "gas-mixing furnace"),
+        (wire, "wire-loop equilibration"),
+    ):
+        resolved, pressure_bar, notices = resolve(experiment)
+        assert resolved.total_pressure_Pa == State.of(Decimal("101325"))
+        assert pressure_bar == Decimal("101325") / PA_PER_BAR_DEC
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-002" and marker in notice.reason
+            for notice in notices
+        )
+        assert not any(
+            notice.policy is not None and notice.policy.id == "DP-001"
+            for notice in notices
+        )
+
+    air_identity, air_bar, air_notices = resolve(
+        air,
+        {"atmosphere": Located(State.of("air"), locator=Locator(note="located air"))},
+    )
+    assert air_identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert air_bar == Decimal("101325") / PA_PER_BAR_DEC
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-002"
+        and 'experiment "in air"' in notice.reason
+        for notice in air_notices
+    )
+
+    unbound_identity, unbound_bar, unbound_notices = resolve(unbound)
+    assert unbound_identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert unbound_bar == Decimal("101325") / PA_PER_BAR_DEC
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-001"
+        and notice.kind is NoticeKind.ASSUMED_PRESSURE
+        for notice in unbound_notices
+    )
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-002"
+        for notice in unbound_notices
+    )
+
+    chamber_identity, _chamber_bar, chamber_notices = resolve(knudsen)
+    assert chamber_identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert chamber_identity.total_pressure_Pa != State.of(Decimal("1e-6"))
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in chamber_notices
+    )
 
 
 def test_neuman_printed_run_pressure_resolves_without_a_bench(monkeypatch) -> None:
@@ -2208,6 +2334,71 @@ def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
         for notice in printed_prediction.notices
     )
 
+    def without_target_label(observation):
+        provenance = {
+            key: value
+            for key, value in (observation.provenance or {}).items()
+            if key != "liquid_label_as_published"
+        }
+        locator = observation.locator
+        if locator is not None and isinstance(locator.note, str):
+            locator = replace(
+                locator,
+                note=re.sub(
+                    r"\bphase\s+[A-Za-z0-9-]+\b",
+                    "assemblage",
+                    locator.note,
+                    flags=re.IGNORECASE,
+                ),
+            )
+        return replace(observation, provenance=provenance, locator=locator)
+
+    unlabelled = without_target_label(lfe)
+    assert _liquid_pair_target(unlabelled) is None
+    unlabelled_prediction, _unlabelled_with_bulk = predict_single_liquid(unlabelled)
+    assert (
+        unlabelled_prediction.refusal_reason
+        is not RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert unlabelled_prediction.value is not None
+
+    from simulator.battery.composition import element_wt_percent_of_oxide_phase
+    from simulator.battery.enums import ELEMENT_WT_PERCENT_BASIS, Phase
+    from simulator.battery.records import Species
+
+    silicon = element_wt_percent_of_oxide_phase({"SiO2": Decimal("100")}, "Si")
+    oxygen = element_wt_percent_of_oxide_phase({"SiO2": Decimal("100")}, "O")
+    assert silicon is not None and oxygen is not None
+    elemental = replace(
+        lfe,
+        identity=replace(
+            lfe.identity,
+            subtype=State.of(ELEMENT_WT_PERCENT_BASIS),
+            species=Species("Si", Phase.L),
+        ),
+        point_conditions={
+            **(lfe.point_conditions or {}),
+            ELEMENT_WT_PERCENT_BASIS: Located(
+                State.of(
+                    Composition(
+                        "element_wt_percent",
+                        (("Si", silicon), ("O", oxygen)),
+                        AmountBasis.MASS_PERCENT,
+                    )
+                ),
+                locator=Locator(note="test-only exact silica element map"),
+            ),
+        },
+    )
+    assert _liquid_pair_target(elemental) == ("Lfe", "Lsi")
+    elemental_prediction, _elemental_with_bulk = predict_single_liquid(elemental)
+    assert (
+        elemental_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert elemental_prediction.refusal_detail["target_phase"] == "Lfe"
+    assert elemental_prediction.refusal_detail["conjugate_phase"] == "Lsi"
+
 
 def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     monkeypatch: pytest.MonkeyPatch,
@@ -2321,6 +2512,27 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     )
     assert experiment_log == Decimal("-12")
 
+    partial_experiment = replace(
+        context.experiments[observation.experiment_id],
+        conditions={
+            **context.experiments[observation.experiment_id].conditions,
+            "oxygen_partial_pressure_Pa": Located(
+                State.of(Decimal("1E-7")),
+                locator=Locator(note="test-only located experiment pO2"),
+            ),
+        },
+    )
+    _partial_resolved, partial_log, partial_notices = score._resolve_row_fo2(
+        experiment_identity,
+        observation,
+        partial_experiment,
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert partial_log == Decimal("-12")
+    assert partial_notices == ()
+
     typed_control_experiment = replace(
         located_experiment,
         conditions={
@@ -2368,6 +2580,33 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     )
     assert derived_log == Decimal("-9")
     assert any(item.policy is not None and item.policy.id == "DP-010" for item in derived_notices)
+
+    derived_run = replace(
+        context.experiments[observation.experiment_id],
+        conditions={
+            **context.experiments[observation.experiment_id].conditions,
+            "fO2_Pa": Located(
+                State.of(Decimal("1E-7")),
+                locator=Locator(note="derived condition"),
+                inference=Derivation("derived test oxygen", (), (), "Pa"),
+            ),
+        },
+    )
+    _derived_run_identity, derived_run_log, derived_run_notices = (
+        score._resolve_row_fo2(
+            experiment_identity,
+            observation,
+            derived_run,
+            {"SiO2": 100.0},
+            Decimal("1673.15"),
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        )
+    )
+    assert derived_run_log == Decimal("-9")
+    assert any(
+        item.policy is not None and item.policy.id == "DP-010"
+        for item in derived_run_notices
+    )
 
     monkeypatch.setattr(score, "_equilibrate_phase_assemblage", one_liquid)
     predict_with_engine(
@@ -2429,6 +2668,8 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     for counterexample in (
         "Air was displaced with flowing argon before equilibration.",
         "The furnace was equilibrated under argon, then quenched in air.",
+        "The sample was not equilibrated in air.",
+        "Air was excluded during equilibration.",
     ):
         counterexample_experiment = replace(
             air_experiment,

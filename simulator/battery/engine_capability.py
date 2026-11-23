@@ -26,11 +26,13 @@ from simulator.battery.enums import (
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
     PHASE_ROW_QUANTITIES,
+    PRINTED_CAPACITY_QUANTITIES,
     PURE_STANDARD_THERMO,
     EQUILIBRIUM_FIT_QUANTITIES,
     Engine,
     Quantity,
     ResidualStatus,
+    effective_phase_basis,
 )
 from simulator.battery.validate import _VAPOUR_EQUILIBRIUM
 
@@ -148,6 +150,40 @@ def engine_covers_scoring_route(engine: Engine, quantity: Quantity) -> bool:
     return engine_covers_quantity(engine, quantity)
 
 
+def phase_route_entered(quantity: Quantity, phase_basis: str | None) -> bool:
+    """Whether predict_with_engine enters the phase-row predictor.
+
+    Equilibrium phase composition enters only for a closed basis. Capacity
+    and distribution rows enter, then the adapter may refuse the solute.
+    A free-text equilibrium ratio shares the quantity and does not enter.
+    """
+
+    if (
+        quantity in PRINTED_CAPACITY_QUANTITIES
+        or quantity is Quantity.DISTRIBUTION_RATIO
+    ):
+        return True
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return effective_phase_basis(phase_basis) is not None
+    return False
+
+
+def observation_route_covered(
+    engine: Engine, quantity: Quantity, phase_basis: str | None
+) -> bool:
+    """Census and emission coverage for one observation's phase route.
+
+    Quantity membership stays on ``engine_covers_scoring_route``. A phase
+    quantity whose basis does not enter the predictor is not callable.
+    """
+
+    if quantity in PHASE_ROW_QUANTITIES and not phase_route_entered(
+        quantity, phase_basis
+    ):
+        return False
+    return engine_covers_scoring_route(engine, quantity)
+
+
 def engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
     """Thermochemistry slice of the declared set. Empty when undeclared."""
 
@@ -190,6 +226,7 @@ def capability_summary(
         ScoreContext,
         _has_duplicate_observation_link,
         _refusal_diagnostic_references,
+        _subtype_text,
         comparison_candidates,
         diagnostic_references,
         quantity_token,
@@ -225,8 +262,11 @@ def capability_summary(
         )
         rail = rail_for_quantity(quantity, species_formula=formula)
         rail_token = NO_HEADLINE_RAIL if rail is None else rail.value
+        phase_basis = (
+            _subtype_text(identity) if isinstance(identity, Identity) else None
+        )
         if any(
-            engine_covers_scoring_route(engine, quantity)
+            observation_route_covered(engine, quantity, phase_basis)
             for engine in engine_list
         ):
             callable_ids.add(observation.observation_id)
@@ -264,8 +304,11 @@ def capability_summary(
             production_scoring=True,
         )
         experiment = context.experiments.get(observation.experiment_id)
+        phase_basis = (
+            _subtype_text(identity) if isinstance(identity, Identity) else None
+        )
         for engine in offered:
-            if engine_covers_scoring_route(engine, quantity):
+            if observation_route_covered(engine, quantity, phase_basis):
                 continue
             if _residue_adapter_binds(observation, engine, experiment, quantity):
                 continue

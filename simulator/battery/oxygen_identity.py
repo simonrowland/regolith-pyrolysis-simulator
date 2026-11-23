@@ -107,6 +107,20 @@ def _dp002_applicability(
     return None
 
 
+# Negated or excluded air is not a run atmosphere. The categorical token is
+# matched before this, so a located value "air" is not sent through prose.
+_AIR_NEGATION = re.compile(
+    r"(?:"
+    r"\b(?:not|never|without|no|n't)\b(?:\s+\w+){0,6}\s+equilibrat"
+    r"|"
+    r"\bair\b(?:\s+\w+){0,8}\s+(?:excluded|displaced|replaced|removed|absent)\b"
+    r"|"
+    r"\b(?:excluded|displaced|replaced|removed|without|not|no)\b"
+    r"(?:\s+\w+){0,8}\s+air\b"
+    r")"
+)
+
+
 def _air_composition_quote(
     evidence: AmbientPressureEvidence | None,
     *,
@@ -135,6 +149,11 @@ def _air_composition_quote(
         return None
     source_quote = quote
     normalized_quote = " ".join(quote.casefold().replace("-", " ").split())
+    atmosphere = _atmosphere_kind(normalized_quote)
+    if atmosphere is not None and atmosphere[0] == "air":
+        return source_quote
+    if _AIR_NEGATION.search(normalized_quote):
+        return None
     # A source quote establishes the dry-air rung only when it places the
     # sample in air during equilibration. Air displaced before the run and an
     # air quench after an inert run are not atmosphere evidence for DP-003.
@@ -198,6 +217,18 @@ def log10_fo2_to_pa(
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
+def _dp112_receipts(observation: Observation) -> tuple[Notice, ...]:
+    """Score-time notices that record a DP-112 buffer evaluation."""
+
+    return tuple(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        and notice.policy is not None
+        and notice.policy.id == "DP-112"
+    )
+
+
 def _resolve_score_time_buffer_identity(
     observation: Observation,
     *,
@@ -220,13 +251,7 @@ def _resolve_score_time_buffer_identity(
     ):
         return observation
 
-    if any(
-        notice.kind
-        is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
-        and notice.policy is not None
-        and notice.policy.id == "DP-112"
-        for notice in observation.notices
-    ):
+    if _dp112_receipts(observation):
         return observation
     marker = next(
         (

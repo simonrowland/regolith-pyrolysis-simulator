@@ -1846,6 +1846,51 @@ def _is_pressure_unit_conversion(inference: object) -> bool:
     )
 
 
+# Names owned here. fo2_ladder and the scorer import these sets; they do not
+# restate the literals.
+ROUTE_OXYGEN_PARTIAL_PRESSURE = "oxygen_partial_pressure_to_log_fO2"
+ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE = "oxygen_sweep_partial_pressure"
+ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE = (
+    "oxygen_sweep_component_partial_pressure"
+)
+ROUTE_EXPERIMENT_FO2_PA = "experiment_fO2_Pa_to_log_fO2"
+ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA = (
+    "experiment_oxygen_partial_pressure_Pa_to_log_fO2"
+)
+TYPED_RUN_OXYGEN_ROUTES = frozenset({
+    ROUTE_OXYGEN_PARTIAL_PRESSURE,
+    ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE,
+    ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE,
+})
+EXPERIMENT_RUN_OXYGEN_ROUTES = frozenset({
+    ROUTE_EXPERIMENT_FO2_PA,
+    ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA,
+})
+
+
+def _printed_run_oxygen_pa(experiment: Experiment, name: str) -> Value | None:
+    """Located experiment oxygen in Pa, when the print is not an inference.
+
+    A pure unit conversion stays. A note that the condition was derived does not.
+    """
+
+    located = experiment.conditions.get(name)
+    if located is None or not located.state.is_value:
+        return None
+    if located.inference is not None and not _is_pressure_unit_conversion(
+        located.inference
+    ):
+        return None
+    note = located.locator.note if located.locator is not None else None
+    if isinstance(note, str) and "derived condition" in note.casefold():
+        return None
+    raw = located.state.value
+    try:
+        return raw if isinstance(raw, Value) else Value.point_of(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
 
 
 def oxygen_condition(
@@ -1873,14 +1918,14 @@ def oxygen_condition(
         if pressure is not None:
             value = _log_pressure(pressure)
             if value is not None:
-                routes.append(Waypoint("oxygen_condition", value, "oxygen_partial_pressure_to_log_fO2",
+                routes.append(Waypoint("oxygen_condition", value, ROUTE_OXYGEN_PARTIAL_PRESSURE,
                     WaypointAuthority.DERIVED, ("experiment.fO2_control.oxygen_partial_pressure_Pa",)))
     sweep = experiment.pressure_environment.sweep_gas
     if (sweep.state.is_value and sweep.state.value.alternatives is None
             and sweep.state.value.species == "O2" and sweep.state.value.partial_pressure_Pa.is_value):
         value = _log_pressure(Value.point_of(sweep.state.value.partial_pressure_Pa.value))
         if value is not None:
-            routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_partial_pressure",
+            routes.append(Waypoint("oxygen_condition", value, ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE,
                 WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
     if (sweep.state.is_value and sweep.state.value.alternatives is None
             and sweep.state.value.components is not None):
@@ -1893,8 +1938,28 @@ def oxygen_condition(
         if len(printed_o2) == 1:
             value = _log_pressure(Value.point_of(printed_o2[0].partial_pressure_Pa.value))
             if value is not None:
-                routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_component_partial_pressure",
+                routes.append(Waypoint("oxygen_condition", value, ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE,
                     WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
+    for name, route_name in (
+        ("fO2_Pa", ROUTE_EXPERIMENT_FO2_PA),
+        (
+            "oxygen_partial_pressure_Pa",
+            ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA,
+        ),
+    ):
+        printed_pa = _printed_run_oxygen_pa(experiment, name)
+        if printed_pa is None:
+            continue
+        value = _log_pressure(printed_pa)
+        if value is None:
+            continue
+        routes.append(Waypoint(
+            "oxygen_condition",
+            value,
+            route_name,
+            WaypointAuthority.DERIVED,
+            (f"experiment.conditions.{name}",),
+        ))
     gas = (observation.point_conditions or {}).get("gas_composition") if observation else None
     if gas is not None and gas.state.is_value:
         from simulator.battery.records import Composition

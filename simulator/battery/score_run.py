@@ -424,6 +424,7 @@ def _score_store_with_decisions(
         _prepare_score_run,
         _source_alignment_group_key,
         _sossi_residue_prediction,
+        _subtype_text,
         _validated_score_engines,
         is_compilation_source,
         is_internal_consistency,
@@ -471,7 +472,7 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
-    from simulator.battery.engine_capability import engine_covers_scoring_route
+    from simulator.battery.engine_capability import observation_route_covered
     from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
@@ -590,11 +591,16 @@ def _score_store_with_decisions(
                             if quantity is None
                             else _scoring_quantity(point, quantity)
                         )
+                        phase_basis = (
+                            _subtype_text(point.identity)
+                            if isinstance(point.identity, Identity)
+                            else None
+                        )
                         if (
                             predict is None
                             and offered_quantity is not None
-                            and not engine_covers_scoring_route(
-                                engine, offered_quantity
+                            and not observation_route_covered(
+                                engine, offered_quantity, phase_basis
                             )
                             and not _residue_adapter_binds(
                                 point, engine, experiment, quantity

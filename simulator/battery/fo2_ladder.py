@@ -60,6 +60,8 @@ from simulator.battery.records import (
 )
 from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
+    EXPERIMENT_RUN_OXYGEN_ROUTES,
+    TYPED_RUN_OXYGEN_ROUTES,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
@@ -68,11 +70,7 @@ from simulator.battery.waypoints import (
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
 from simulator.physical_constants import PA_PER_BAR
 
-_TIER1_DIRECT_ROUTES = frozenset({
-    "oxygen_partial_pressure_to_log_fO2",
-    "oxygen_sweep_partial_pressure",
-    "oxygen_sweep_component_partial_pressure",
-})
+_TIER1_DIRECT_ROUTES = TYPED_RUN_OXYGEN_ROUTES | EXPERIMENT_RUN_OXYGEN_ROUTES
 _TIER3_ATMOSPHERE_ROUTES = (
     "observation_gas_composition",
     "observation_gas_couple_equilibrium",
@@ -532,6 +530,30 @@ def _log_point(value: object) -> float | None:
     if not math.isfinite(number):
         return None
     return number
+
+
+def admitted_score_oxygen(
+    oxygen: WaypointResult, observation: Observation | None
+) -> Waypoint | None:
+    """First score-time oxygen route in the waypoint owner's order.
+
+    Tier 1 is a printed log, a provenance-valid observation pressure, or a
+    registered run route. Tier 3 is a gas mixture or buffer calculation.
+    An inferred observation pressure is neither: it needs a DP-112 receipt
+    or it falls through to the score-time defaults.
+    """
+
+    for route in oxygen.routes:
+        if _is_tier1(route, observation) and _log_point(route.value) is not None:
+            return route
+    for route in oxygen.routes:
+        if (
+            route.route in _TIER3_ATMOSPHERE_ROUTES
+            and route.authority is WaypointAuthority.DERIVED
+            and _log_point(route.value) is not None
+        ):
+            return route
+    return None
 
 
 def _printed_identity_bar(
