@@ -607,6 +607,7 @@ METHOD_TOKEN_ALIASES = MappingProxyType(
         "KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).": MethodToken.KNUDSEN_EFFUSION,
         "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
         "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
+        "vacuum_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
         "solar_furnace": MethodToken.SOLAR_FURNACE_PYROLYSIS,
         "solar_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
         "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,

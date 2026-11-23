@@ -65,6 +65,7 @@ def test_new_method_tokens_round_trip(token: MethodToken) -> None:
             "Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti",
             MethodToken.WET_CHEMICAL_ANALYSIS,
         ),
+        ("vacuum_evaporation", MethodToken.LANGMUIR_FREE_EVAPORATION),
         (
             "high_pressure_anhydrous_piston_cylinder",
             MethodToken.PISTON_CYLINDER,
@@ -131,6 +132,51 @@ def test_wrapped_pankratz_method_alias_resolves_from_production_yaml(
 
     assert mapped.is_value
     assert mapped.value is MethodToken.DROP_CALORIMETRY
+
+
+def test_vacuum_evaporation_migrates_yakovlev_without_creating_observations() -> None:
+    path = (
+        migrate.REPO_ROOT
+        / "data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml"
+    )
+    migrator = migrate.Migrator(root=migrate.REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+
+    experiment = next(
+        experiment
+        for experiment in migrator.result.experiments.values()
+        if experiment.experiment_id.endswith(
+            "::experiment::yakovlev-shornikov-2021-vacuum-evaporation"
+        )
+    )
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+    assert not any(
+        observation.experiment_id == experiment.experiment_id
+        for observation in migrator.result.observations.values()
+    )
+
+
+def test_gibson_hubbard_source_stays_on_vacuum_chamber_pyrolysis() -> None:
+    path = (
+        migrate.REPO_ROOT
+        / "data/literature/extracts/kems-024-gibson-hubbard-1972.yaml"
+    )
+    document = migrate.load_yaml(path)
+    experiment = next(
+        experiment
+        for experiment in document["experiments"]
+        if experiment["experiment_id"] == "lunar-volatilization-series"
+    )
+
+    mapped = map_method(experiment["method"])
+
+    assert METHOD_TOKEN_ALIASES["vacuum_chamber_pyrolysis"] is (
+        MethodToken.VACUUM_CHAMBER_PYROLYSIS
+    )
+    assert mapped.is_value
+    assert mapped.value is MethodToken.VACUUM_CHAMBER_PYROLYSIS
 
 
 @pytest.mark.parametrize(

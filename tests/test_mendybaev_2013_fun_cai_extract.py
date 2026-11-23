@@ -5,12 +5,32 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/mendybaev-2013-fun-cai-evaporation.yaml"
+
+
+def test_vacuum_evaporation_experiments_migrate_to_langmuir_method() -> None:
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    experiment_methods = {
+        experiment.experiment_id.rsplit("::", 1)[-1]: experiment.method
+        for experiment in migrator.result.experiments.values()
+    }
+    assert set(experiment_methods) == {
+        "mendybaev-fun1-vacuum-evaporation",
+        "mendybaev-fun2-vacuum-evaporation",
+    }
+    assert all(
+        method.is_value
+        and method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        for method in experiment_methods.values()
+    )
 
 
 def test_table_1_fun1_3_residue_composition_and_conditions_migrate() -> None:
