@@ -6,16 +6,28 @@ from decimal import Decimal, InvalidOperation
 
 # Two-sided normal coverage factor for a 95% interval.
 NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
-_CONVENTION_FACTORS: dict[str, Decimal | None] = {
-    "one_sigma": Decimal(1),
-    "two_sigma": Decimal(2),
-    "ci95": NORMAL_95_TICKET_MULTIPLIER,
-    "range_half_width": None,
+_CONVENTION_FACTORS: dict[str, tuple[str, Decimal | None]] = {
+    "one_sigma": ("one_sigma", Decimal(1)),
+    "two_sigma": ("two_sigma", Decimal(2)),
+    "ci95": ("ci95", NORMAL_95_TICKET_MULTIPLIER),
+    "95%": ("ci95", NORMAL_95_TICKET_MULTIPLIER),
+    "range_half_width": ("range_half_width", None),
 }
 _COVERAGE_FACTOR_TOLERANCE = Decimal("0.001")
-_DESCRIPTIVE_KINDS = frozenset({"printed", "replicate_error"})
+_DESCRIPTIVE_KINDS = frozenset(
+    {
+        "absolute",
+        "categorical",
+        "derived",
+        "point",
+        "printed",
+        "read",
+        "replicate_error",
+        "standard_deviation",
+    }
+)
 _NO_DECLARATION = frozenset(
-    {"", "none", "not", "not_stated", "unknown", "unspecified"}
+    {"", "none", "not", "not stated", "not_stated", "unknown", "unspecified"}
 )
 
 
@@ -25,7 +37,9 @@ class UncertaintyConventionConflict(ValueError):
 
 def printed_uncertainty_convention(
     declaration: object,
-) -> tuple[str | None, Decimal] | None:
+    *,
+    fallback_token: str | None = None,
+) -> tuple[str | None, Decimal | None] | None:
     """Return the stated confidence token and its coverage factor, if valid.
 
     ``None`` means no convention was declared. Unsupported tokens, invalid
@@ -37,7 +51,9 @@ def printed_uncertainty_convention(
     the width has been reduced to standard uncertainty by the caller.
     """
     if not isinstance(declaration, Mapping):
-        return None
+        if fallback_token is None:
+            return None
+        declaration = {}
 
     factors: list[Decimal] = []
     confidence_token: str | None = None
@@ -55,13 +71,28 @@ def printed_uncertainty_convention(
             continue
         if token not in _CONVENTION_FACTORS:
             raise UncertaintyConventionConflict(f"unrecognized {key} token {token!r}")
-        mapped_factor = _CONVENTION_FACTORS[token]
+        canonical_token, mapped_factor = _CONVENTION_FACTORS[token]
         if mapped_factor is None:
             declared_range = True
         else:
             factors.append(mapped_factor)
         if confidence_token is None:
-            confidence_token = token
+            confidence_token = canonical_token
+
+    if confidence_token is None and fallback_token is not None:
+        token = fallback_token.strip().lower()
+        if token in _NO_DECLARATION:
+            token = ""
+        if token and token not in _CONVENTION_FACTORS:
+            raise UncertaintyConventionConflict(
+                f"unrecognized fallback confidence token {token!r}"
+            )
+        if token:
+            confidence_token, mapped_factor = _CONVENTION_FACTORS[token]
+            if mapped_factor is None:
+                declared_range = True
+            else:
+                factors.append(mapped_factor)
 
     if "k" in declaration and declaration.get("k") is not None:
         try:
@@ -76,6 +107,8 @@ def printed_uncertainty_convention(
         raise UncertaintyConventionConflict(
             "uncertainty_convention_conflict: range_half_width with coverage factor"
         )
+    if declared_range:
+        return "range_half_width", None
     if not factors:
         if confidence_token is None:
             return None
@@ -89,9 +122,16 @@ def printed_uncertainty_convention(
         )
 
     factor = factors[0]
-    if confidence_token is None or _CONVENTION_FACTORS[confidence_token] is None:
+    if (
+        confidence_token is None
+        or _CONVENTION_FACTORS[confidence_token][1] is None
+    ):
         confidence_token = next(
-            (token for token, value in _CONVENTION_FACTORS.items() if value == factor),
+            (
+                canonical_token
+                for canonical_token, mapped_factor in _CONVENTION_FACTORS.values()
+                if mapped_factor == factor
+            ),
             "one_sigma",
         )
     return confidence_token, factor

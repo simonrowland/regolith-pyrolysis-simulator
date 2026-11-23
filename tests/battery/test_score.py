@@ -1687,6 +1687,7 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     expected_sigma_log10_ratio = Decimal("0.02") / (
         Decimal(10).ln() * Decimal("0.72") * Decimal("0.28")
     )
+    assert abs(printed.standard_uncertainty_dex - expected_sigma_log10_ratio) < Decimal("1e-20")
     assert abs(
         printed.band.value
         - expected_sigma_log10_ratio * score_mod.NORMAL_95_TICKET_MULTIPLIER
@@ -1745,6 +1746,192 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert numeric is not None
     assert numeric.value.is_finite()
     assert numeric.decision_band is None
+
+
+@pytest.mark.parametrize(
+    ("declaration", "override", "expected_sigma", "expected_ticket"),
+    (
+        (
+            {"value": "0.1", "units": "dex", "confidence_level": "one_sigma"},
+            None,
+            Decimal("0.1"),
+            Decimal("0.1") * score_mod.NORMAL_95_TICKET_MULTIPLIER,
+        ),
+        (
+            {"value": "0.1", "units": "dex", "confidence_level": "not_stated"},
+            "two_sigma",
+            Decimal("0.05"),
+            Decimal("0.05") * score_mod.NORMAL_95_TICKET_MULTIPLIER,
+        ),
+        (
+            {"value": "0.1", "units": "dex", "confidence_level": "not_stated"},
+            "ci95",
+            Decimal("0.1") / score_mod.NORMAL_95_TICKET_MULTIPLIER,
+            Decimal("0.1"),
+        ),
+        (
+            {"value": "0.3", "units": "dex", "k": 3},
+            None,
+            Decimal("0.1"),
+            Decimal("0.1") * score_mod.NORMAL_95_TICKET_MULTIPLIER,
+        ),
+    ),
+)
+def test_dex_printed_width_keeps_print_and_ticket_factors_separate(
+    declaration: dict[str, object],
+    override: str | None,
+    expected_sigma: Decimal,
+    expected_ticket: Decimal,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species("FeO", Phase.L),
+    )
+    observation = replace(
+        F.observation(
+            "dex-width-factor-separation",
+            "dex-width-factor-separation-experiment",
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="dex-width-factor-separation-source",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim=declaration,
+        ),
+    )
+    printed = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        observation.uncertainty,
+        Decimal("0.5"),
+        source_observation=observation,
+        confidence_level_override=override,
+    )
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.standard_uncertainty_dex == expected_sigma
+    assert printed.band.value == expected_ticket
+
+
+def test_dex_print_ticket_factor_swap_mutation_changes_the_pins(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species("FeO", Phase.L),
+    )
+    observation = replace(
+        F.observation(
+            "dex-factor-swap-mutation",
+            "dex-factor-swap-mutation-experiment",
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="dex-factor-swap-mutation-source",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "value": "0.1",
+                "units": "dex",
+                "confidence_level": "one_sigma",
+            },
+        ),
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "printed_uncertainty_convention",
+        lambda _declaration, **_kwargs: (
+            "one_sigma",
+            Decimal("1.959963984540054"),
+        ),
+    )
+    monkeypatch.setattr(score_mod, "NORMAL_95_TICKET_MULTIPLIER", Decimal(1))
+    mutated = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        observation.uncertainty,
+        Decimal("0.5"),
+        source_observation=observation,
+    )
+    assert mutated.band is not None
+    assert mutated.standard_uncertainty_dex != Decimal("0.1")
+    assert mutated.band.value != Decimal("0.1") * Decimal("1.959963984540054")
+
+
+def test_norris_standard_deviation_metadata_preserves_all_printed_bands() -> None:
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+    _, _, observations = load_migrated_store(
+        REPO_ROOT, sources=("norris-2016-trace-volatility-thesis",)
+    )
+    affected = [
+        observation
+        for observation in observations.values()
+        if isinstance(observation.uncertainty.verbatim, dict)
+        and observation.uncertainty.verbatim.get("kind") == "standard_deviation"
+    ]
+    assert len(affected) == 64
+    banded = 0
+    for observation in affected:
+        reference = point_magnitude(observation.value)
+        assert reference is not None
+        printed = _printed_uncertainty_band(
+            Quantity.ELEMENT_RETENTION_RATIO,
+            observation.uncertainty,
+            reference,
+            source_observation=observation,
+        )
+        assert printed.refusal is None
+        assert printed.band is not None
+        assert printed.notice is not None
+        assert printed.notice.reason == "confidence_level_not_stated"
+        banded += 1
+        if observation.observation_id.endswith("_zn_logfo2_neg13"):
+            assert printed.band.value == Decimal("0.4804748967272502428014170047")
+    assert banded == 64
+
+
+def test_full_store_printed_width_band_census_matches_green() -> None:
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+    _, _, observations = load_migrated_store(REPO_ROOT)
+    width_count = 0
+    band_count = 0
+    conflict_ids: list[str] = []
+    for observation in observations.values():
+        quantity = quantity_token(observation.identity)
+        reference = point_magnitude(observation.value)
+        if quantity is None or reference is None:
+            continue
+        resolution = _printed_uncertainty_band(
+            quantity,
+            observation.uncertainty,
+            reference,
+            source_observation=observation,
+        )
+        if (
+            resolution.refusal is not None
+            and resolution.refusal.get("reason") == "unparseable_printed_uncertainty"
+        ):
+            continue
+        if resolution.band is not None or resolution.refusal is not None:
+            width_count += 1
+        if resolution.band is not None:
+            band_count += 1
+        if (
+            resolution.refusal is not None
+            and resolution.refusal.get("reason") == "uncertainty_convention_conflict"
+        ):
+            conflict_ids.append(observation.observation_id)
+    assert (width_count, band_count, tuple(sorted(conflict_ids))) == (21202, 13533, ())
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
@@ -2078,7 +2265,16 @@ def test_source_method_uncertainty_supplies_a_source_method_band(
             "two_sigma",
             "The standard deviation of log10(a) is 0.10.",
             "0.2",
-            "0.20",
+            str(Decimal("0.10") * Decimal("1.959963984540054")),
+            "printed_2sigma",
+        ),
+        (
+            "log10_dex",
+            "0.10",
+            "ci95",
+            "The reported width is a 95% confidence interval.",
+            "0.2",
+            "0.10",
             "printed_2sigma",
         ),
         (
@@ -2104,7 +2300,7 @@ def test_source_method_activity_band_uses_explicit_basis_and_meaning(
     # Independently, a 10% relative width spans log10(0.9) to log10(1.1);
     # the larger magnitude is log10(10/9), then the 95% one-sigma multiplier
     # gives 0.08968303352185472833542869883. This is the metric's conservative
-    # dex width and does not use the production uncertainty converter.
+    # dex width before its normal-95 ticket conversion.
     experiment = F.kems_experiment()
     identity = F.activity_identity(endmember_phase=Phase.L)
     reference = F.observation(

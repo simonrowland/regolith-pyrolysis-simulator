@@ -6729,7 +6729,7 @@ def _textual_printed_confidence_level(
         text = " ".join(
             str(value)
             for key, value in raw.items()
-            if key not in {"confidence_level", "locator", "parent", "k"}
+            if key not in {"confidence_level", "kind", "locator", "parent", "k"}
             and isinstance(value, str)
         )
     elif isinstance(raw, str):
@@ -7178,19 +7178,11 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
-    confidence_token, coverage_factor = convention or (confidence_level, Decimal(1))
-    numeric_k_has_scaled_width = (
-        convention is not None
-        and isinstance(raw_declaration, Mapping)
-        and "k" in raw_declaration
-        and confidence_token == "one_sigma"
-        and coverage_factor not in {Decimal(1), Decimal(2)}
+    effective_convention = convention or printed_uncertainty_convention(
+        raw_declaration, fallback_token=confidence_level
     )
-    width_coverage_factor = (
-        Decimal(1) if numeric_k_has_scaled_width else coverage_factor
-    )
-    if converted is not None and convention is not None and numeric_k_has_scaled_width:
-        converted /= coverage_factor
+    confidence_token, k_print = effective_convention or (None, None)
+    k_ticket = NORMAL_95_TICKET_MULTIPLIER if k_print is not None else Decimal(1)
     if converted is None:
         return _PrintedBandResolution(
             refusal={
@@ -7201,6 +7193,7 @@ def _printed_uncertainty_band(
             }
         )
 
+    standard_width = converted / k_print if k_print is not None else converted
     fraction_derivation = None
     if quantity is Quantity.FE3_FE2_RATIO and source_observation is not None:
         fraction_derivation = source_observation.derivation
@@ -7260,8 +7253,7 @@ def _printed_uncertainty_band(
                         "operation": operation.value,
                     }
                 )
-            confidence_width_scale = width_coverage_factor
-            sigma_r = converted / confidence_width_scale
+            sigma_r = standard_width
             # FE3/Fe2 residuals use log10 distance, so propagate directly to
             # dex at the reduction owner before the scorer applies its band policy.
             sigma_log10_r, refusal_reason = (
@@ -7280,16 +7272,36 @@ def _printed_uncertainty_band(
                         "distance_to_r_one": str(Decimal(1) - fraction_r),
                     }
                 )
-            converted = sigma_log10_r * confidence_width_scale
+            standard_width = sigma_log10_r
             converted_unit = "dex"
 
-    ticket = _metric_uncertainty_width(
+    metric_standard_width = _metric_uncertainty_width(
         operation,
         quantity,
         reference,
-        converted,
+        standard_width,
         converted_unit or QUANTITY_UNITS[quantity],
     )
+    ticket = metric_standard_width
+    exact_ticket_input = (
+        k_print == k_ticket
+        and fraction_derivation is None
+        and (
+            operation in {MetricOperation.ABSOLUTE, MetricOperation.RELATIVE}
+            or (operation is MetricOperation.DEX and converted_unit == "dex")
+        )
+    )
+    if exact_ticket_input:
+        ticket = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            converted,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+    else:
+        if ticket is not None:
+            ticket *= k_ticket
     if ticket is None or ticket < 0 or not ticket.is_finite():
         return _PrintedBandResolution(
             refusal={
@@ -7297,9 +7309,7 @@ def _printed_uncertainty_band(
                 "quantity": quantity.value,
                 "original": raw_text,
             }
-    )
-    if confidence_level == "one_sigma" and kind == "printed_1sigma":
-        ticket *= NORMAL_95_TICKET_MULTIPLIER
+        )
     unit = (
         "dimensionless"
         if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
@@ -7326,12 +7336,11 @@ def _printed_uncertainty_band(
     standard_uncertainty_dex = None
     standard_uncertainty = None
     standard_uncertainty_unit = None
-    if convention is not None and confidence_token != "range_half_width":
-        standard_uncertainty = converted / width_coverage_factor
+    if k_print is not None and confidence_token != "range_half_width":
+        standard_uncertainty = standard_width
         standard_uncertainty_unit = converted_unit
-    if operation is MetricOperation.DEX:
-        if confidence_token in {"one_sigma", "two_sigma", "ci95"}:
-            standard_uncertainty_dex = ticket / width_coverage_factor
+    if operation is MetricOperation.DEX and k_print is not None:
+        standard_uncertainty_dex = metric_standard_width
     two_sigma_band = None
     if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
         two_sigma_band = DecisionBand(

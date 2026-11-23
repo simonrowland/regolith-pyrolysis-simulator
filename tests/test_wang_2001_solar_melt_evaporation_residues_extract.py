@@ -560,13 +560,23 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
 @pytest.mark.parametrize(
     ("declaration", "expected_token", "expected_sigma", "expected_band"),
     [
-        ({"k": 2}, "two_sigma", Decimal("0.2"), Decimal("0.4")),
-        ({"kind": "two_sigma"}, "two_sigma", Decimal("0.2"), Decimal("0.4")),
+        (
+            {"k": 2},
+            "two_sigma",
+            Decimal("0.2"),
+            Decimal("0.2") * Decimal("1.959963984540054"),
+        ),
+        (
+            {"kind": "two_sigma"},
+            "two_sigma",
+            Decimal("0.2"),
+            Decimal("0.2") * Decimal("1.959963984540054"),
+        ),
         (
             {"confidence_level": "two_sigma", "k": 2},
             "two_sigma",
             Decimal("0.2"),
-            Decimal("0.4"),
+            Decimal("0.2") * Decimal("1.959963984540054"),
         ),
         (
             {"confidence_level": "one_sigma", "kind": "replicate_error"},
@@ -729,3 +739,27 @@ def test_convention_resolver_checks_every_field_pair_and_token() -> None:
                             assert abs(resolved[1] - first_factor) <= Decimal("0.001")
     with pytest.raises(UncertaintyConventionConflict):
         printed_uncertainty_convention({"kind": "ci95", "k": 3})
+    assert printed_uncertainty_convention({"confidence_level": "95%"}) == (
+        "ci95",
+        Decimal("1.959963984540054"),
+    )
+    for descriptive_kind in (
+        "absolute",
+        "categorical",
+        "derived",
+        "point",
+        "printed",
+        "read",
+        "replicate_error",
+        "standard_deviation",
+        "none",
+    ):
+        assert printed_uncertainty_convention(
+            {"kind": descriptive_kind, "confidence_level": "not_stated"}
+        ) is None
+    assert printed_uncertainty_convention(
+        {
+            "kind": "standard_deviation",
+            "confidence_level": "not_stated",
+        }
+    ) is None
