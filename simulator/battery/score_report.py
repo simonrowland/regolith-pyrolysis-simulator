@@ -14,6 +14,7 @@ from typing import Iterable, Mapping, Protocol, Sequence
 from simulator.battery.enums import Engine
 from simulator.battery.records import Observation
 from simulator.battery.score_report_data import (
+    DefaultPolicyCensus,
     ElementRetentionReportData,
     EligibilityFailureCensus,
     Nasa9FitComparisonData,
@@ -21,6 +22,28 @@ from simulator.battery.score_report_data import (
 
 
 REPORT_HEADING = "# Battery score report (schema v2.1)"
+
+
+def format_default_policy_census_report(
+    report: str, census: DefaultPolicyCensus
+) -> str:
+    lines = [
+        "",
+        "## Default policy census",
+        "",
+        "Numeric flagged residuals, grouped by the applied policy id and status.",
+        "",
+        "| policy_id | status | flagged residuals |",
+        "|---|---|---:|",
+    ]
+    if not census.rows:
+        lines.append("| (none) | — | 0 |")
+    else:
+        lines.extend(
+            f"| {policy_id} | {status} | {count} |"
+            for policy_id, status, count in census.rows
+        )
+    return report.rstrip() + "\n" + "\n".join(lines) + "\n"
 
 
 def format_assumed_band_report(report: str, data: Mapping[str, object]) -> str:

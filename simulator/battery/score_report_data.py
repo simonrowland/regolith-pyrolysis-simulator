@@ -7,7 +7,12 @@ from collections import defaultdict
 from decimal import Decimal
 from typing import Callable, Iterable, Mapping, NamedTuple
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import (
+    DEFAULT_POLICY_NOTICE_KINDS,
+    Quantity,
+    ResidualStatus,
+    ValueKind,
+)
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Observation, Residual, Uncertainty
 
@@ -125,6 +130,76 @@ class EligibilityFailureCensus(NamedTuple):
 
     rows: tuple[tuple[str, str, str, int, int, int], ...]
     engine_counts: tuple[tuple[str, str, int, int, int | None], ...]
+
+
+class DefaultPolicyCensus(NamedTuple):
+    """Numeric flagged residual counts grouped by policy id and status."""
+
+    rows: tuple[tuple[str, str, int], ...]
+
+
+def default_policy_census(
+    rows: Iterable[Residual | Mapping[str, object]],
+) -> DefaultPolicyCensus:
+    """Count numeric residuals carrying a typed default-policy notice."""
+
+    counts: dict[tuple[str, str], int] = defaultdict(int)
+    known_flags = {kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS}
+    required_fields = {"id", "version", "status", "value", "units"}
+    for row in rows:
+        if isinstance(row, Residual):
+            if row.numeric is None or row.status is ResidualStatus.REFUSED:
+                continue
+            notices = row.notices
+        else:
+            numeric = row.get("numeric")
+            if (
+                not isinstance(numeric, Mapping)
+                or row.get("status") == ResidualStatus.REFUSED.value
+            ):
+                continue
+            notices = row.get("notices") or ()
+
+        policies: set[tuple[str, str]] = set()
+        for notice in notices:
+            if isinstance(row, Residual):
+                policy = notice.policy
+                kind = notice.kind.value
+            elif isinstance(notice, Mapping):
+                policy = notice.get("policy")
+                kind = str(notice.get("kind") or "")
+            else:
+                continue
+            if policy is None:
+                continue
+            if not isinstance(policy, Mapping) or set(policy) != required_fields:
+                raise ValueError("default-policy notice metadata is malformed")
+            policy_id, policy_status = policy.get("id"), policy.get("status")
+            if kind not in known_flags:
+                raise ValueError("default-policy notice kind is not a table flag")
+            if not isinstance(policy_id, str) or not policy_id.startswith("DP-"):
+                raise ValueError("default-policy notice id must be a DP id")
+            if policy_status not in {"canonical", "proposed", "rejected"}:
+                raise ValueError("default-policy notice status is invalid")
+            policy_version = policy.get("version")
+            if not isinstance(policy_version, (int, str)) or not str(policy_version):
+                raise ValueError("default-policy notice version is required")
+            if (
+                not isinstance(policy.get("units"), str)
+                or not policy.get("units")
+                or policy.get("value") is None
+            ):
+                raise ValueError("default-policy notice value and units are required")
+            policies.add((policy_id, str(policy_status)))
+        for policy in policies:
+            counts[policy] += 1
+
+    return DefaultPolicyCensus(
+        tuple(
+            (policy_id, status, count)
+            for (policy_id, status), count in sorted(counts.items())
+        )
+    )
 
 
 class AssumedBandReport:
