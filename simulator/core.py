@@ -5029,7 +5029,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # unset default is 0, and that 0 must not replace the stashed
         # count. A bare negative bleed has no path; the terms the
         # solve wrote supply both.
-        from simulator.capacity_coupling import CapacityShadowRefusal
+        from simulator.capacity_coupling import (
+            CapacityShadowRefusal,
+            refusal_keeping_nonconvergence_diagnostics,
+        )
 
         if refusal.reason not in {
             "headspace_negative_bleed",
@@ -5054,16 +5057,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ):
                 iterations = passed
         self.atom_ledger._overhead_o2_write_listener = None
-        return CapacityShadowRefusal(
-            refusal.reason,
-            iterations,
-            authoritative=refusal.authoritative,
-            cap=refusal.cap,
-            flux_evaluations=refusal.flux_evaluations,
-            integrator_evaluations=refusal.integrator_evaluations,
-            path=path,
-            species_balance=balance,
-            overhead_o2_writes=writes,
+        return refusal_keeping_nonconvergence_diagnostics(
+            CapacityShadowRefusal(
+                refusal.reason,
+                iterations,
+                authoritative=refusal.authoritative,
+                cap=refusal.cap,
+                flux_evaluations=refusal.flux_evaluations,
+                integrator_evaluations=refusal.integrator_evaluations,
+                path=path,
+                species_balance=balance,
+                overhead_o2_writes=writes,
+            ),
+            refusal,
         )
 
     def _headspace_inventory_mismatch_refusal(self):
@@ -8653,6 +8659,105 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             opening_fo2 = float(raw_fo2)
         state['extent_holder']['_opening_fo2_log'] = opening_fo2
 
+        def _evaporation_drive_rows(diagnostic, carried, partials_Pa, controls):
+            # Sign of (p_eq - p_bulk) and whether the law's signed
+            # kilogram rate is negative. p_eq and the cleaned-melt
+            # parent kilograms are recorded only for a recondensing
+            # species. A species the publisher skipped because p_eq
+            # is not positive still gets a sign: the bulk gate is the
+            # publisher's, and the flux stays zero.
+            from engines.builtin.evaporation_flux import (
+                resolve_gas_resistance_enabled,
+                species_drive_bulk_Pa,
+            )
+
+            drive = dict(diagnostic.get('evaporation_driving_delta_Pa') or {})
+            series = diagnostic.get('evaporation_series_resistance') or {}
+            if not isinstance(series, Mapping):
+                series = {}
+            zero_net = diagnostic.get('zero_net_evaporation_flux') or {}
+            below_wrap = diagnostic.get('below_threshold_evaporation_flux') or {}
+            below = {}
+            if isinstance(below_wrap, Mapping):
+                raw_below = below_wrap.get('fluxes_kg_hr') or {}
+                if isinstance(raw_below, Mapping):
+                    below = raw_below
+            published = diagnostic.get('evaporation_flux_kg_hr') or {}
+            pressures = dict(
+                controls.get('vapour_batch_flux_pressures_Pa') or {}
+            )
+            available = controls.get('available_oxide_kg') or {}
+            stoich_map = controls.get('stoich_by_species') or {}
+            series_config = controls.get('evaporation_series_resistance') or {}
+            if not isinstance(series_config, Mapping):
+                series_config = {}
+            gas_on = resolve_gas_resistance_enabled(series_config, controls)
+            hkl = frozenset(
+                str(species)
+                for species in (
+                    controls.get('hkl_upper_bound_transport_species') or ()
+                )
+            )
+            oxygen_bound = controls.get('surface_oxygen_bound') is True
+            names = set()
+            for mapping in (
+                drive, series, zero_net, below, published, carried, pressures,
+            ):
+                if isinstance(mapping, Mapping):
+                    names.update(str(species) for species in mapping)
+            rows = []
+            for species in sorted(names):
+                delta = None
+                if species in drive:
+                    delta = float(drive[species])
+                elif species in pressures:
+                    equilibrium_pa = float(pressures[species])
+                    if equilibrium_pa <= 0.0:
+                        bulk = species_drive_bulk_Pa(
+                            species,
+                            float(partials_Pa.get(species, 0.0) or 0.0),
+                            gas_resistance_enabled=gas_on,
+                            hkl_upper_bound=species in hkl,
+                            surface_oxygen_bound=oxygen_bound,
+                        )
+                        delta = equilibrium_pa - bulk
+                if delta is None or not math.isfinite(delta):
+                    sign = None
+                elif delta > 0.0:
+                    sign = 1
+                elif delta < 0.0:
+                    sign = -1
+                else:
+                    sign = 0
+                rate = None
+                if species in carried:
+                    rate = float(carried[species])
+                recondensing = rate is not None and rate < 0.0
+                row = {
+                    'species': species,
+                    'drive_sign': sign,
+                    'recondensing': recondensing,
+                }
+                if recondensing:
+                    species_stoich = stoich_map.get(species) or {}
+                    parent = ''
+                    if isinstance(species_stoich, Mapping):
+                        parent = str(species_stoich.get('parent_oxide') or '')
+                    inventory = available.get(species)
+                    equilibrium_pa = None
+                    entry = series.get(species)
+                    if isinstance(entry, Mapping) and 'P_eq_Pa' in entry:
+                        equilibrium_pa = float(entry['P_eq_Pa'])
+                    elif species in pressures:
+                        equilibrium_pa = float(pressures[species])
+                    row['parent_oxide'] = parent
+                    row['parent_inventory_kg'] = (
+                        None if inventory is None else float(inventory)
+                    )
+                    row['p_eq_Pa'] = equilibrium_pa
+                rows.append(row)
+            return rows
+
         def _dispatch_gross(partials_Pa):
             iteration_controls = dict(controls)
             iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
@@ -8728,6 +8833,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             for species, rate in debit.items():
                 carried[str(species)] = float(rate)
+            # Observation only. A failure here must not change the rate
+            # the solver integrates.
+            try:
+                state['_pending_evaporation_drive_rows'] = (
+                    _evaporation_drive_rows(
+                        diagnostic,
+                        carried,
+                        partials_Pa,
+                        iteration_controls,
+                    )
+                )
+            except Exception:
+                state['_pending_evaporation_drive_rows'] = None
             return carried
 
         def _buffer_credit_mol(gross):
@@ -9064,6 +9182,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'gross_kg_hr',
                     '_capture_fractions',
                     '_evaporation_driving_delta_Pa',
+                    '_evaporation_drive_rows',
                 ):
                     saved_holder[key] = (
                         _copy.deepcopy(holder[key]) if key in holder else absent
@@ -9124,6 +9243,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     holder['_evaporation_driving_delta_Pa'] = dict(
                         drive_delta
                     )
+                drive_rows = state.pop(
+                    '_pending_evaporation_drive_rows', None,
+                )
+                if frozen_gross is not None or not isinstance(drive_rows, list):
+                    holder.pop('_evaporation_drive_rows', None)
+                else:
+                    holder['_evaporation_drive_rows'] = drive_rows
             # One route defines C. Later trials scale C/P inside G.
             # The condenser is not routed on every residual sample:
             # that made a shut-pipe hour a few hundred seconds.

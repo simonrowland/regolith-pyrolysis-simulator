@@ -102,6 +102,7 @@ class _DiagnosticLawSample:
             law.paired_redox_mol_s,
             law.accepted_redox_key,
             law._last_evaporation_drive_delta_Pa,
+            law.evaporation_drive_at_refusal,
         )
         return self._sample.__enter__()
 
@@ -121,6 +122,7 @@ class _DiagnosticLawSample:
                     law.paired_redox_mol_s,
                     law.accepted_redox_key,
                     law._last_evaporation_drive_delta_Pa,
+                    law.evaporation_drive_at_refusal,
                 ) = saved
         finally:
             self._sample.__exit__(exc_type, exc, tb)
@@ -231,11 +233,14 @@ class CapacityShadowRefusal:
     fo2_log: float | None = None
     pipe_piece: dict[str, Any] | None = None
     capture_fraction: dict[str, float] | None = None
-    # Collected on the slow path and attached only for this cap.
-    # None when the cap fired before Radau ran. accepted_step_sizes_s
-    # is the last _STIFFNESS_STEPS accepted steps, in seconds.
-    # rejected_steps counts error-test rejections, not Newton
-    # failures, and it is not the length of the dominator list.
+    # Collected on the slow path. The work cap attaches them, and so
+    # does headspace_balance_nonconvergence. None when that refusal
+    # fired before Radau ran. accepted_step_sizes_s is the last
+    # _STIFFNESS_STEPS accepted steps, in seconds. rejected_steps
+    # counts error-test rejections, not Newton failures, and it is
+    # not the length of the dominator list. A nonconvergence tape
+    # leaves the eigenvalue fields unset: filling them evaluates
+    # another Jacobian, which is another flux call.
     # A dominator names the component with the largest |error|/scale
     # on one of the last rejections: species, block (n, A, B, and G
     # or R when the hour tracks them), the proposed value, and the
@@ -307,6 +312,16 @@ class CapacityShadowRefusal:
     # only. The hour notice carries the same dict. The comparison does
     # not read it. excess_integrated is inside the dict, by that name.
     buffer_release: dict[str, Any] | None = None
+    # Last flux evaluation of a headspace_balance_nonconvergence.
+    # One row per vapour the publisher priced. drive_sign is the sign
+    # of (p_eq - p_bulk) at that evaluation: 1, 0, -1, or None when
+    # the publisher did not form a drive. recondensing is true when
+    # the signed kilogram rate the headspace law integrated is
+    # negative. A recondensing row also carries parent_oxide,
+    # parent_inventory_kg (cleaned-melt kilograms of that oxide), and
+    # p_eq_Pa. Other refusals leave the list unset. The ledger
+    # species_balance is not this list.
+    evaporation_drive_at_refusal: list[dict[str, Any]] | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -1416,6 +1431,105 @@ def _hour_cost_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
     }
 
 
+# Fields the work-cap hour-cost and Radau tape carry. A
+# headspace_balance_nonconvergence refusal copies these through the
+# ledger rebuild. species_balance is not in this list.
+_NONCONVERGENCE_DIAGNOSTIC_FIELDS = (
+    "accepted_step_sizes_s",
+    "rejected_steps",
+    "rejected_error_dominators",
+    "jacobian_abs_eigenvalue_min",
+    "jacobian_abs_eigenvalue_max",
+    "tau_s",
+    "dt_over_tau",
+    "composition_tau_s",
+    "dt_over_composition_tau",
+    "flux_per_rhs_min",
+    "flux_per_rhs_median",
+    "flux_per_rhs_max",
+    "pstar_warm_newton",
+    "pstar_brent_band",
+    "pstar_sign_scan",
+    "reduced_rhs_calls",
+    "reduced_jacobian_builds",
+    "reduced_ift_residual_check_rejections",
+    "reduced_second_corrections",
+    "reduced_resolver_warm_root_fallbacks",
+    "reduced_resolver_bracket_fallbacks",
+    "reduced_shut_branch_hits",
+    "reduced_evaporation_drive_probe_evaluations",
+    "reduced_evaporation_drive_near_zero_evaluations",
+    "reduced_evaporation_drive_near_zero_species_counts",
+    "reduced_evaporation_drive_jacobian_crossing_counts",
+    "reduced_evaporation_drive_stage_crossing_counts",
+    "reduced_rejections_with_evaporation_drive_crossing",
+    "reduced_rejection_evaporation_drive_crossing_fraction",
+    "reduced_rejection_evaporation_drive_crossing_species_counts",
+    "reduced_evaporation_drive_band_Pa",
+    "reduced_error_test_rejections",
+    "reduced_newton_nonconvergence_failures",
+    "reduced_error_test_top3_component_counts",
+    "reduced_newton_failure_diagnostics",
+    "reduced_accepted_steps",
+    "reduced_rejected_steps",
+    "reduced_step_size_min_s",
+    "reduced_step_size_median_s",
+    "reduced_step_size_max_s",
+    "reduced_time_covered_s",
+    "full_system_radau_time_covered_s",
+    "handoff_time_s",
+    "evaporation_drive_at_refusal",
+)
+
+
+def _nonconvergence_stiffness_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
+    """Step sizes and the rejection split from the Radau tape.
+
+    The eigenvalue span is not evaluated. A missing tape leaves the
+    fields out, so the refusal keeps them unset.
+    """
+
+    diagnostic = law.stiffness_diagnostic
+    if not isinstance(diagnostic, Mapping):
+        return {}
+    step_sizes = diagnostic.get("accepted_step_sizes_s")
+    raw_dominators = diagnostic.get("rejected_error_dominators")
+    return {
+        "accepted_step_sizes_s": (
+            None if step_sizes is None else [float(step) for step in step_sizes]
+        ),
+        "rejected_steps": diagnostic.get("rejected_steps"),
+        "rejected_error_dominators": (
+            None
+            if raw_dominators is None
+            else [dict(row) for row in raw_dominators]
+        ),
+        "jacobian_abs_eigenvalue_min": diagnostic.get(
+            "jacobian_abs_eigenvalue_min"
+        ),
+        "jacobian_abs_eigenvalue_max": diagnostic.get(
+            "jacobian_abs_eigenvalue_max"
+        ),
+    }
+
+
+def refusal_keeping_nonconvergence_diagnostics(rebuilt, source):
+    """Copy the reduced tape onto a ledger rebuild of the same refusal.
+
+    The hour wrapper replaces a nonconvergence with the ledger balance.
+    That rebuild does not take the reduced counters. Copying them here
+    is what the walk serialises. Any other reason is returned as built.
+    """
+
+    if getattr(source, "reason", None) != "headspace_balance_nonconvergence":
+        return rebuilt
+    payload = {
+        name: getattr(source, name, None)
+        for name in _NONCONVERGENCE_DIAGNOSTIC_FIELDS
+    }
+    return replace(rebuilt, **payload)
+
+
 def _refused_shadow(
     law: _HeadspaceLaw,
     refused: _BalanceRefused,
@@ -1448,9 +1562,23 @@ def _refused_shadow(
         path=law.balance_path,
         **payload,
     )
-    if refused.reason != "headspace_balance_work_cap":
+    if refused.reason == "headspace_balance_work_cap":
+        return replace(shadow, **cost)
+    if refused.reason != "headspace_balance_nonconvergence":
         return shadow
-    return replace(shadow, **cost)
+    # Same reduced counters, Newton dominators, step sizes, and
+    # rejection split as the work cap. species_balance stays unset
+    # here so the hour wrapper can still attach the ledger balance.
+    # The stiffness fields are the Radau tape. |λ| stays unset.
+    rows = law.evaporation_drive_at_refusal
+    return replace(
+        shadow,
+        **cost,
+        **_nonconvergence_stiffness_payload(law),
+        evaporation_drive_at_refusal=(
+            None if rows is None else [dict(row) for row in rows]
+        ),
+    )
 
 
 @dataclass
@@ -1580,7 +1708,9 @@ class _HeadspaceLaw:
         self.accepted_step_redox: dict[str, float] | None = None
         self.accepted_pipe_piece: tuple | None = None
         self.accepted_capture_fractions: dict[str, float] | None = None
-        # Slow-path tape. Set only when a work cap fires inside Radau.
+        # Slow-path tape. The work cap stores it, including |λ|. A
+        # nonconvergence stores the step sizes and the rejection split
+        # and leaves |λ| unset.
         self.stiffness_diagnostic: dict[str, Any] | None = None
         # This hour already declined the fixed-point hold. A later
         # step must not try again: the integrator is the remaining
@@ -1640,6 +1770,10 @@ class _HeadspaceLaw:
         self.reduced_rejection_evaporation_drive_crossing_fraction: float | None = None
         self.reduced_rejection_evaporation_drive_crossing_species_counts: dict[str, int] = {}
         self._last_evaporation_drive_delta_Pa: dict[str, float] | None = None
+        # Last publisher drive rows. The nonconvergence refusal copies
+        # this list. A diagnostic sample restores it with the other
+        # law marks, so an opening probe does not become the refusal.
+        self.evaporation_drive_at_refusal: list[dict[str, Any]] | None = None
         self.reduced_error_test_rejections: int | None = None
         self.reduced_newton_nonconvergence_failures: int | None = None
         self.reduced_error_test_top3_component_counts: dict[str, int] | None = None
@@ -1883,6 +2017,15 @@ class _HeadspaceLaw:
                     if math.isfinite(delta):
                         drive_delta[str(species)] = delta
                 self._last_evaporation_drive_delta_Pa = drive_delta
+        raw_rows = None
+        if isinstance(self.extent_holder, dict):
+            raw_rows = self.extent_holder.get("_evaporation_drive_rows")
+        if isinstance(raw_rows, list):
+            self.evaporation_drive_at_refusal = [
+                dict(row) for row in raw_rows if isinstance(row, Mapping)
+            ]
+        else:
+            self.evaporation_drive_at_refusal = None
         out: dict[str, float] = {}
         for name, rate in raw.items():
             if name not in self.masses or name not in self.redox_mol_s:
@@ -3312,6 +3455,20 @@ def _store_stiffness(law, recorder: _StiffnessRecord, jacobian) -> None:
             diagnostic["jacobian_abs_eigenvalue_min"] = span[0]
             diagnostic["jacobian_abs_eigenvalue_max"] = span[1]
     law.stiffness_diagnostic = diagnostic
+
+
+def _remember_radau_tape(law, recorder: _StiffnessRecord) -> None:
+    """Keep the Radau step tape. Does not evaluate the Jacobian.
+
+    The work cap's eigenvalue span is another flux evaluation. On a
+    nonconvergence that call would move the last drive snapshot and
+    the flux counters, so the tape is stored without it. |λ| stays
+    unset. A tape the work cap already stored is left as it is.
+    """
+
+    if law.stiffness_diagnostic is not None:
+        return
+    law.stiffness_diagnostic = recorder.payload()
 
 
 def _recording_radau(
@@ -5213,43 +5370,50 @@ def _slow_converge(
         _remember_balance_iterations(law, law.integrator_evaluations)
         if refused.reason == "headspace_balance_work_cap":
             _store_stiffness(law, recorder, jacobian)
+        elif refused.reason == "headspace_balance_nonconvergence":
+            _remember_radau_tape(law, recorder)
         raise
     iterations = max(int(solution.nfev), 1)
     _remember_balance_iterations(law, iterations)
     if not solution.success:
+        _remember_radau_tape(law, recorder)
         raise _BalanceRefused("headspace_balance_nonconvergence")
-    y_end = solution.y[:, -1]
-    hit = (
-        solution.t_events is not None
-        and len(solution.t_events) > 0
-        and len(solution.t_events[0]) > 0
-    )
-    if hit:
-        return _land_open_pipe_on_downstream(
+    try:
+        y_end = solution.y[:, -1]
+        hit = (
+            solution.t_events is not None
+            and len(solution.t_events) > 0
+            and len(solution.t_events[0]) > 0
+        )
+        if hit:
+            return _land_open_pipe_on_downstream(
+                law,
+                n0,
+                dt_s,
+                y_end,
+                float(solution.t[-1]),
+                iterations,
+                track_extent=track_extent,
+            )
+        end, added_mol, bled_mol, extent_kwargs = _integrated_holdup(
             law,
             n0,
-            dt_s,
             y_end,
-            float(solution.t[-1]),
-            iterations,
             track_extent=track_extent,
         )
-    end, added_mol, bled_mol, extent_kwargs = _integrated_holdup(
-        law,
-        n0,
-        y_end,
-        track_extent=track_extent,
-    )
-    return law.step_from_moles(
-        n0,
-        dt_s,
-        end,
-        iterations,
-        _SLOW_ATOL_PA,
-        added_mol=added_mol,
-        bled_mol_in=bled_mol,
-        **extent_kwargs,
-    )
+        return law.step_from_moles(
+            n0,
+            dt_s,
+            end,
+            iterations,
+            _SLOW_ATOL_PA,
+            added_mol=added_mol,
+            bled_mol_in=bled_mol,
+            **extent_kwargs,
+        )
+    except _BalanceRefused:
+        _remember_radau_tape(law, recorder)
+        raise
 
 
 def _integrated_holdup(
