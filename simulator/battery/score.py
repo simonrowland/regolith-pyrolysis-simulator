@@ -12320,6 +12320,16 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "phase_role"},
             execution=ExecutionState.NOT_PROBED,
         )
+    if role is PhaseRole.METAL:
+        return refused(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                "engine": engine.value,
+                "phase_role": role.value,
+                "detail": "the melt adapters do not model metal-alloy phases",
+            },
+        )
     counter = _phase_role_value(identity, "counter_phase_role")
     if quantity is Quantity.DISTRIBUTION_RATIO and counter is None:
         return refused(

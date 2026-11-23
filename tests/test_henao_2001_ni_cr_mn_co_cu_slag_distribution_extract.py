@@ -12,7 +12,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AmountBasis, Engine, NoticeKind
+from simulator.battery.enums import (
+    AmountBasis,
+    Engine,
+    NoticeKind,
+    PhaseRole,
+    RefusalReason,
+)
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _predict_with_engine
 
@@ -265,7 +271,9 @@ def test_printed_phase_assays_are_bound_and_iron_valence_stays_unknown() -> None
         _assert_composition_bindings(mutated)
 
 
-def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
+def test_henao_tables_migrate_as_typed_compositions_with_conditions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     document = _document()
     _assert_render_pins(document)
 
@@ -406,6 +414,41 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
         row.identity.composition.value.input_provenance is None
         for row in observations
         if row.identity.composition.is_value
+    )
+    metal_rows = [
+        row
+        for row in observations
+        if row.identity.phase_role is not None
+        and row.identity.phase_role.is_value
+        and row.identity.phase_role.value is PhaseRole.METAL
+    ]
+    assert len(metal_rows) == 133
+
+    def engine_must_not_be_called(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("no melt adapter predicts a metal-alloy phase")
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        engine_must_not_be_called,
+    )
+    metal_engine_outcomes = [
+        _predict_with_engine(
+            engine,
+            row,
+            experiment=result.experiments[row.experiment_id],
+        )
+        for row in metal_rows
+        for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN)
+    ]
+    assert len(metal_engine_outcomes) == 399
+    assert all(
+        prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+        for prediction in metal_engine_outcomes
+    )
+    assert all(
+        prediction.execution.state.value == "unsupported"
+        for prediction in metal_engine_outcomes
     )
     assert all(row.locator and row.locator.page and row.locator.published_page for row in observations)
     migrated_contexts = [
