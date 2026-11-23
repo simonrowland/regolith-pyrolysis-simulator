@@ -90,6 +90,7 @@ from simulator.melt_backend.base import (
     imposed_absolute_fo2_without_iron_couple,
     liquid_fraction_from_phase_masses,
     other_redox_without_iron_couple_refusal,
+    signal_is_binary_fault,
 )
 from simulator.engine_pool import (
     EngineWorkerRemoteError,
@@ -199,6 +200,11 @@ def _h2_melt_envelope_diagnostics(temperature_C: float) -> dict[str, Any]:
 
 ALPHAMELTS_REASON_TIMEOUT = 'timeout'
 ALPHAMELTS_REASON_SUBPROCESS_DIED = 'subprocess_died'
+# External kill. Not the binary's own fault, and not a cacheable crash.
+# SIGKILL is the timeout reaper. SIGPROF is the CPU-budget timer. The
+# cell category stays engine_crash so the score cell's refusal_reason
+# does not change.
+ALPHAMELTS_REASON_EXIT_SIGNAL = 'exit_signal'
 ALPHAMELTS_REASON_NONZERO_EXIT = 'nonzero_exit'
 ALPHAMELTS_REASON_NO_CONVERGENCE = 'no_convergence'
 ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT = 'parse_empty_output'
@@ -325,6 +331,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_TIMEOUT: OutOfDomainReason.NOT_CONVERGED.value,
     ALPHAMELTS_REASON_SUBPROCESS_DIED: 'engine_crash',
+    ALPHAMELTS_REASON_EXIT_SIGNAL: 'engine_crash',
     ALPHAMELTS_REASON_NONZERO_EXIT: OutOfDomainReason.NOT_CONVERGED.value,
     ALPHAMELTS_REASON_NO_CONVERGENCE: 'out_of_domain',
     ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT: OutOfDomainReason.NOT_CONVERGED.value,
@@ -351,6 +358,9 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ALPHAMELTS_REASON_TIMEOUT: 'AlphaMELTS subprocess timed out',
     ALPHAMELTS_REASON_SUBPROCESS_DIED: (
         'AlphaMELTS subprocess exited before producing a result'
+    ),
+    ALPHAMELTS_REASON_EXIT_SIGNAL: (
+        'AlphaMELTS subprocess was killed by an external signal'
     ),
     ALPHAMELTS_REASON_NONZERO_EXIT: (
         'AlphaMELTS subprocess returned a nonzero exit code'
@@ -4270,18 +4280,29 @@ class _MELTSBackendSupport(MeltBackend):
                 }
                 # PetThermoTools worker deaths (warm exit, cold start, cold
                 # EOF) stay unchanged: those paths have no .melts input
-                # and no alphaMELTS stderr.
+                # and no alphaMELTS stderr. They raise, they do not return
+                # this result.
                 failure.update(_subprocess_died_diagnostics(
                     melts_path,
                     result.stderr,
                 ))
+                # SIGABRT, SIGSEGV, and SIGBUS are the binary failing on
+                # this input. SIGKILL, SIGPROF, and every other signal are
+                # an external kill and must not be stored as that crash.
+                # The category of both reasons is engine_crash, so the
+                # score cell's refusal_reason stays engine_crash.
+                reason_code = (
+                    ALPHAMELTS_REASON_SUBPROCESS_DIED
+                    if signal_is_binary_fault(signal_name)
+                    else ALPHAMELTS_REASON_EXIT_SIGNAL
+                )
                 return self._subprocess_operational_failure_result(
                     temperature_C=requested_temperature_C,
                     pressure_bar=requested_pressure_bar,
                     fO2_log=fO2_log,
                     warnings=result_warnings,
                     diagnostics=diagnostics,
-                    reason_code=ALPHAMELTS_REASON_SUBPROCESS_DIED,
+                    reason_code=reason_code,
                     failure=failure,
                     detail=f'{signal_name} (returncode {result.returncode})',
                 )

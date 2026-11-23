@@ -30,6 +30,8 @@ from benchmarks.engine_throughput_bench import (
     reblessed_payload,
 )
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def _power_state(
     *,

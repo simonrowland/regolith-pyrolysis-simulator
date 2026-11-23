@@ -45,6 +45,8 @@ def _single_oxide_view(sim, oxide: str, *, oxide_mol: float = 10.0):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_product_phase_refusal_omits_uncomputed_quantities(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):

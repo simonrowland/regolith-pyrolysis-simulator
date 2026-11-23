@@ -234,6 +234,8 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     }
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

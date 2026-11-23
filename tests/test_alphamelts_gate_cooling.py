@@ -102,6 +102,8 @@ def test_terminal_input_outcome_pin_before_owner_reuse(reason):
     assert gate_curve_provider_outcome_for_status('ok', {'reason': reason}).value == 'failed'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_exit_zero_without_rows_is_a_failed_provider(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'

@@ -3,9 +3,13 @@
 import sqlite3
 import zlib
 
+import pytest
+
 from simulator import engine_cache
 from simulator.engine_cache import unpack
 from simulator.melt_backend.base import EquilibriumResult
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_equilibrium_hot_round_trip_is_exact_and_cold_is_numeric(tmp_path, monkeypatch):
@@ -26,11 +30,15 @@ def test_equilibrium_hot_round_trip_is_exact_and_cold_is_numeric(tmp_path, monke
         restored = EquilibriumResult.from_hot(value, engine_id="magemin")
         assert restored.activity_coefficients["FeO"].hex() == number.hex()
     with sqlite3.connect(path) as connection:
-        key, hot = connection.execute("SELECT key,value FROM engine_outputs").fetchone()
+        hot, row_seq = connection.execute(
+            "SELECT value,row_seq FROM engine_outputs"
+        ).fetchone()
         assert len(hot) < 200
         assert b"console noise" not in hot
     with sqlite3.connect(str(path) + ".cold") as connection:
-        cold = connection.execute("SELECT value FROM engine_values WHERE key=?", (key,)).fetchone()[0]
+        cold = connection.execute(
+            "SELECT value FROM engine_values WHERE row_seq=?", (row_seq,)
+        ).fetchone()[0]
     assert unpack(zlib.decompress(cold)) == {"system_enthalpy": -1234.5}
     assert len(cold) <= 300
 

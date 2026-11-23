@@ -39,6 +39,8 @@ def _call(core):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_refusal_does_not_depend_on_previous_call_on_a_reused_core(monkeypatch):
     warm_core = _new_internal_analytical_core()
     successful = _call(warm_core)
