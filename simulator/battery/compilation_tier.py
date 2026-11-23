@@ -2751,35 +2751,11 @@ def _openimcc_phase_from_source_file(
     if not isinstance(document, Mapping):
         return None, "compilation-source-phase-record-unavailable"
 
-    # Keep printed phase extraction in the migration owner; no phase is
-    # inferred from a formula, section title, or neighbouring observation.
+    # Keep phase extraction in the migration owner. It walks the source
+    # container hierarchy once; no phase is inferred from a title or peer row.
     from simulator.battery.migrate import compilation_phase_text, map_phase
 
     printed = compilation_phase_text(document)
-    if printed in (None, ""):
-        table = document.get("table")
-        if isinstance(table, Mapping):
-            index_entry = table.get("index_entry")
-            printed = (
-                index_entry.get("state")
-                if isinstance(index_entry, Mapping)
-                else None
-            )
-            if printed in (None, ""):
-                printed = table.get("phase") or table.get("phase_as_published")
-    if printed in (None, ""):
-        for container_name in ("section", "series", "table"):
-            container = document.get(container_name)
-            if not isinstance(container, Mapping):
-                continue
-            printed = compilation_phase_text(container)
-            if printed in (None, ""):
-                printed = (
-                    container.get("state")
-                    or container.get("state_as_published")
-                )
-            if printed not in (None, ""):
-                break
     if isinstance(printed, Mapping) and printed.get("tag") == "value":
         printed = printed.get("value")
     if printed in (None, ""):
@@ -2891,124 +2867,6 @@ def _openimcc_species_input(
         )
     return formula, phase, None
 
-
-def _openimcc_compilation_input_census(context) -> dict[str, object]:
-    """Count every numeric compilation Cp/S/H cell before any engine call."""
-
-    from simulator.accounting.formulas import canonicalize_formula
-    from simulator.chemistry.formula_text import fold_subscript_digits
-
-    quantities = {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
-    total = requestable = 0
-    cells_by_quantity: Counter[str] = Counter()
-    refused: Counter[str] = Counter()
-    classes: dict[str, dict[str, object]] = {}
-    resolved_inputs: dict[
-        tuple[object, str | None],
-        tuple[str | None, Phase | None, _OpenIMCCBridgeRefusal | None],
-    ] = {}
-
-    def tally(
-        name: str,
-        input_refusal: _OpenIMCCBridgeRefusal | None,
-        cell_count: int,
-    ) -> None:
-        row = classes.setdefault(
-            name,
-            {
-                "affected_rows": 0,
-                "requestable_after": 0,
-                "typed_refused_after": 0,
-                "refusal_reasons": Counter(),
-            },
-        )
-        row["affected_rows"] += cell_count
-        if input_refusal is None:
-            row["requestable_after"] += cell_count
-        else:
-            row["typed_refused_after"] += cell_count
-            reasons = row["refusal_reasons"]
-            assert isinstance(reasons, Counter)
-            reasons[input_refusal.code] += cell_count
-
-    for parent in context.observations.values():
-        if not is_compilation_evidence(parent):
-            continue
-        quantity = quantity_token(parent.identity)
-        if quantity not in quantities:
-            continue
-        origin = context.origins.get(parent.observation_id)
-        slots = _compilation_series_slots(parent, origin)
-        if slots is None:
-            value = parent.value.point
-            cell_count = int(value is not None and value.is_finite())
-        else:
-            cell_count = sum(
-                1 for _temperature, magnitude, _occurrence in slots
-                if magnitude.is_finite()
-            )
-        if cell_count == 0:
-            continue
-        total += cell_count
-        cells_by_quantity[quantity.value] += cell_count
-        source_path = (
-            None if parent.locator is None else parent.locator.source_path
-        )
-        species = (
-            parent.identity.species
-            if isinstance(parent.identity, Identity)
-            else None
-        )
-        input_key = (species, source_path)
-        resolved_input = resolved_inputs.get(input_key)
-        if resolved_input is None:
-            resolved_input = _openimcc_species_input(parent)
-            resolved_inputs[input_key] = resolved_input
-        formula, phase, input_refusal = resolved_input
-        if input_refusal is None:
-            assert formula is not None and phase is not None
-            requestable += cell_count
-        else:
-            refused[input_refusal.code] += cell_count
-        identity = parent.identity
-        species = identity.species if isinstance(identity, Identity) else None
-        raw_formula = "" if species is None else species.formula
-        canonical, suffix_phase, _formula_error = canonicalize_formula(raw_formula)
-        if suffix_phase is not None:
-            tally("formula_phase_suffix", input_refusal, cell_count)
-        if "·" in raw_formula:
-            tally("hydrate_dot", input_refusal, cell_count)
-        formula_text = re.sub(r"\s+", "", raw_formula.strip())
-        group_formula = formula_text
-        if suffix_phase is not None:
-            group_formula = formula_text[: -(len(suffix_phase) + 2)]
-        if (
-            canonical is not None
-            and any(token in group_formula for token in "()[]{}")
-            and canonical != fold_subscript_digits(group_formula)
-        ):
-            tally("parenthesized_group", input_refusal, cell_count)
-        phase_token_value = phase_token(species) if species is not None else None
-        if (
-            phase_token_value not in {Phase.G, Phase.L, Phase.CR}
-            or suffix_phase in {"aq", "glass"}
-        ):
-            tally("source_phase", input_refusal, cell_count)
-
-    return {
-        "numeric_cp_s_h_cells": total,
-        "cells_by_quantity": dict(sorted(cells_by_quantity.items())),
-        "requestable_after": requestable,
-        "typed_refused_after": sum(refused.values()),
-        "refusal_reasons_after": dict(sorted(refused.items())),
-        "classes": {
-            name: {
-                **{key: value for key, value in row.items() if key != "refusal_reasons"},
-                "refusal_reasons_after": dict(sorted(row["refusal_reasons"].items())),
-            }
-            for name, row in sorted(classes.items())
-        },
-    }
 
 
 def _fraction_decimal(value: Fraction) -> Decimal:

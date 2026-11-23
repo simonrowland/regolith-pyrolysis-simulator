@@ -283,9 +283,10 @@ def canonicalize_formula(formula: str) -> tuple[str | None, str | None, str | No
         return None, phase_suffix, "species-formula-unparsed"
     if not any(char in text for char in "()[]{}·"):
         return text, phase_suffix, None
-    element_order = tuple(dict.fromkeys(re.findall(r"[A-Z][a-z]?", text)))
-    if set(element_order) != set(counts):
-        return None, phase_suffix, "species-formula-unparsed"
+    # parse_formula stores elements in the same sorted order as JANAF's
+    # formula_elements helper, so expanded groups and hydrates use the exact
+    # lookup-key order already established by the formula owner.
+    element_order = tuple(counts)
     parts = []
     for element in element_order:
         count = counts[element]

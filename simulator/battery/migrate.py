@@ -515,9 +515,15 @@ PHASE_MAP: dict[str, Phase] = {
     "gas": Phase.G,
     "condensed_solid": Phase.CR,
     "condensed_liquid": Phase.L,
+    "c": Phase.CR,
     "g": Phase.G,
     "cr": Phase.CR,
+    "s": Phase.CR,
+    "solid": Phase.CR,
     "l": Phase.L,
+    "liq": Phase.L,
+    "liquid": Phase.L,
+    "vapor": Phase.G,
     "liquid_sodium": Phase.L,
     "liquid sodium": Phase.L,
     "liquid iron oxide": Phase.L,
@@ -4328,54 +4334,6 @@ def observation_from_plain(payload: object) -> Observation:
         authority=payload.get("authority"),
     )
 
-
-def _load_compilation_thermo_observations(
-    root: Path | None = None,
-) -> dict[str, Observation]:
-    """Load only compilation-assessed Cp/S/H observations for the scorer census."""
-
-    root = root or REPO_ROOT
-    quantities = {Quantity.CP.value, Quantity.S.value, Quantity.H_MINUS_H298.value}
-    observations: dict[str, Observation] = {}
-    literature = root / "data" / "literature"
-    for directory in (
-        literature / "extracts-v2",
-        literature / "observations-v2",
-    ):
-        if not directory.is_dir():
-            continue
-        for path in iter_observation_store_paths(directory):
-            document = load_yaml(path)
-            if not isinstance(document, Mapping):
-                continue
-            for raw in document.get("observations") or ():
-                if not isinstance(raw, Mapping):
-                    continue
-                identity = raw.get("identity")
-                quantity = (
-                    identity.get("quantity")
-                    if isinstance(identity, Mapping)
-                    else None
-                )
-                evidence = raw.get("evidence")
-                evidence_class = (
-                    evidence.get("class")
-                    if isinstance(evidence, Mapping)
-                    else None
-                )
-                if (
-                    not isinstance(quantity, Mapping)
-                    or quantity.get("tag") != "value"
-                    or quantity.get("value") not in quantities
-                    or not isinstance(evidence_class, Mapping)
-                    or evidence_class.get("tag") != "value"
-                    or evidence_class.get("value")
-                    != EvidenceClass.COMPILATION_ASSESSED.value
-                ):
-                    continue
-                observation = observation_from_plain(raw)
-                observations[observation.observation_id] = observation
-    return observations
 
 
 def source_filter_tokens(sources: Sequence[str] | None) -> tuple[str, ...] | None:
@@ -11280,30 +11238,69 @@ def _phase_evidence_text(*candidates: object) -> str | None:
 def compilation_phase_text(doc: Mapping[str, Any]) -> object:
     """First nonempty printed phase field. Empty string is absence, not a token."""
 
-    for key in ("phase", "phase_as_published"):
-        raw = doc.get(key)
+    def direct_phase(
+        container: Mapping[str, Any], *, include_phase_fields: bool = True
+    ) -> object:
+        if include_phase_fields:
+            for key in ("phase", "phase_as_published"):
+                raw = container.get(key)
+                if isinstance(raw, str) and raw.strip():
+                    return raw
+                if raw not in (None, "", [], {}):
+                    return raw
+        raw = container.get("phase_state_as_published")
+        if isinstance(raw, list):
+            parts = [str(x).strip() for x in raw if x not in (None, "")]
+            if parts:
+                return " ".join(parts)
         if isinstance(raw, str) and raw.strip():
             return raw
-        if raw not in (None, "", [], {}):
+        raw = container.get("state_note_as_published")
+        if isinstance(raw, str) and raw.strip():
             return raw
-    raw = doc.get("phase_state_as_published")
-    if isinstance(raw, list):
-        parts = [str(x).strip() for x in raw if x not in (None, "")]
-        if parts:
-            return " ".join(parts)
-    if isinstance(raw, str) and raw.strip():
-        return raw
-    raw = doc.get("state_note_as_published")
-    if isinstance(raw, str) and raw.strip():
-        return raw
-    rows = doc.get("rows")
-    if isinstance(rows, list):
-        phases = list(dict.fromkeys(
-            str(row["phase_as_published"]).strip()
-            for row in rows if isinstance(row, Mapping) and row.get("phase_as_published")
-        ))
-        if phases:
-            return "multi-phase table: " + "; ".join(phases)
+        rows = container.get("rows")
+        if isinstance(rows, list):
+            phases = list(dict.fromkeys(
+                str(row["phase_as_published"]).strip()
+                for row in rows if isinstance(row, Mapping) and row.get("phase_as_published")
+            ))
+            if phases:
+                return "multi-phase table: " + "; ".join(phases)
+        return None
+
+    printed = direct_phase(doc)
+    if printed not in (None, ""):
+        return printed
+
+    table = doc.get("table")
+    if isinstance(table, Mapping):
+        index_entry = table.get("index_entry")
+        if isinstance(index_entry, Mapping):
+            raw = index_entry.get("state")
+            if raw not in (None, ""):
+                return raw
+        raw = table.get("phase") or table.get("phase_as_published")
+        if raw not in (None, ""):
+            return raw
+
+    for container_name in ("section", "series"):
+        container = doc.get(container_name)
+        if not isinstance(container, Mapping):
+            continue
+        printed = direct_phase(container)
+        if printed not in (None, ""):
+            return printed
+        raw = container.get("state") or container.get("state_as_published")
+        if raw not in (None, ""):
+            return raw
+
+    if isinstance(table, Mapping):
+        printed = direct_phase(table, include_phase_fields=False)
+        if printed not in (None, ""):
+            return printed
+        raw = table.get("state") or table.get("state_as_published")
+        if raw not in (None, ""):
+            return raw
     return None
 
 

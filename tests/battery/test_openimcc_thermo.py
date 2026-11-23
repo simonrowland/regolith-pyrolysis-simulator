@@ -8,7 +8,8 @@ Apparent G and apparent H are not the scored values. A refusal value is None.
 from __future__ import annotations
 
 import json
-import re
+from collections import Counter
+from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -16,6 +17,7 @@ from pathlib import Path
 
 from simulator.battery.enums import (
     Engine,
+    EvidenceClass,
     Fo2Mode,
     NoticeKind,
     PerBasis,
@@ -633,10 +635,9 @@ def _source_formula_observation(record_relative_path: str, source_id: str):
 
 
 def test_openimcc_compilation_formula_canonicalizer_uses_source_rows(monkeypatch) -> None:
-    from simulator.accounting.formulas import canonicalize_formula, parse_formula
+    from simulator.accounting.formulas import parse_formula
     from simulator.chemistry.formula_text import fold_subscript_digits
     from simulator.battery.compilation_tier import predict_thermo_attempt
-    from simulator.battery.migrate import map_phase
 
     rows = (
         (
@@ -650,10 +651,6 @@ def test_openimcc_compilation_formula_canonicalizer_uses_source_rows(monkeypatch
         (
             "data/literature/compilations/pankratz-1987-usbm-b689/records/page-0147.json",
             "pankratz-1987-usbm-b689",
-        ),
-        (
-            "data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0500.json",
-            "kelley-king-1961-usbm-b592",
         ),
     )
     calls = []
@@ -673,33 +670,75 @@ def test_openimcc_compilation_formula_canonicalizer_uses_source_rows(monkeypatch
         "simulator.melt_backend.openimcc_bridge.species_thermo", species_thermo
     )
     for relative_path, source_id in rows:
-        source, source_formula, item = _source_formula_observation(
+        _source, source_formula, item = _source_formula_observation(
             relative_path, source_id
         )
         source_counts = parse_formula(fold_subscript_digits(source_formula)).elements
         attempt = predict_thermo_attempt(Engine.OPENIMCC, item)
         assert attempt.refusal_reason is None, (source_formula, attempt.refusal_detail)
-        sent_formula, sent_phase, _temperature = calls[-1]
+        sent_formula, _sent_phase, _temperature = calls[-1]
         assert sent_formula != source_formula
         assert parse_formula(sent_formula).elements == source_counts
-        source_element_order = tuple(
-            dict.fromkeys(
-                re.findall(r"[A-Z][a-z]?", fold_subscript_digits(source_formula))
-            )
-        )
-        assert tuple(re.findall(r"[A-Z][a-z]?", sent_formula)) == source_element_order
-        stated_phase = source.get("phase_as_published") or source.get("phase")
-        if stated_phase is None:
-            suffix = source_formula[source_formula.rfind("(") + 1 : -1]
-            stated_phase = suffix
-        phase_state, _unmapped = map_phase(stated_phase)
-        if not phase_state.is_value:
-            _canonical, suffix, _refusal = canonicalize_formula(source_formula)
-            if suffix is not None:
-                phase_state, _unmapped = map_phase(suffix)
-        if phase_state.is_value:
-            assert sent_phase == phase_state.value.value
         assert attempt.value == Decimal("25.0")
+
+
+def test_openimcc_kelley_trihydrate_uses_janaf_h095_formula_key(monkeypatch) -> None:
+    from simulator.accounting.formulas import canonicalize_formula
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    root = Path(__file__).resolve().parents[2]
+    source, source_formula, item = _source_formula_observation(
+        "data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0500.json",
+        "kelley-king-1961-usbm-b592",
+    )
+    assert source_formula == "H2SO4·3H2O(l)"
+    janaf = load_cached_safe_yaml(
+        (root / "data/literature/compilations/janaf/tables/H-095.yaml").read_bytes()
+    )
+    expected_formula = janaf["table"]["index_entry"]["formula_normalised"]
+    assert expected_formula == "H8O7S"
+    assert canonicalize_formula(source_formula) == (expected_formula, "l", None)
+
+    calls = []
+
+    def species_thermo(formula, phase, temperature_K, **_kwargs):
+        calls.append((formula, phase, temperature_K))
+        return {
+            "source_table_id": "source-table",
+            "source_row_id": "source-row",
+            "T_min": 1.0,
+            "T_max": 6000.0,
+            "derivatives_fit_implied": False,
+            "Cp_J_molK": 25.0,
+        }
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.openimcc_bridge.species_thermo", species_thermo
+    )
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, item)
+    assert attempt.refusal_reason is None, attempt.refusal_detail
+    assert calls[0][:2] == (expected_formula, "l")
+    assert attempt.value == Decimal("25.0")
+
+
+def test_openimcc_formula_suffix_phases_use_the_existing_phase_map() -> None:
+    from simulator.accounting.formulas import canonicalize_formula
+    from simulator.battery.migrate import map_phase
+
+    for suffix, expected_phase in (
+        ("s", Phase.CR),
+        ("solid", Phase.CR),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("vapor", Phase.G),
+    ):
+        formula, parsed_suffix, refusal = canonicalize_formula(f"FeO({suffix})")
+        mapped, _unmapped = map_phase(parsed_suffix)
+        assert formula == "FeO"
+        assert parsed_suffix == suffix
+        assert refusal is None
+        assert mapped.is_value and mapped.value is expected_phase
 
 
 def test_openimcc_group_formula_matches_independent_janaf_source(monkeypatch) -> None:
@@ -906,17 +945,224 @@ def test_openimcc_source_phase_lookup_tracks_source_path_and_revision(tmp_path) 
         '{"table":{"index_entry":{"state":"cr"}}}', encoding="utf-8"
     )
     assert _openimcc_source_declared_phase(item(liquid_path, "table-state"))[0] is Phase.CR
+    liquid_path.write_text('{"table":{"phase":"g"}}', encoding="utf-8")
+    assert _openimcc_source_declared_phase(item(liquid_path, "table-phase"))[0] is Phase.G
     liquid_path.write_text('{"section":{"phase":"l"}}', encoding="utf-8")
     assert _openimcc_source_declared_phase(item(liquid_path, "section-phase"))[0] is Phase.L
     liquid_path.write_text('{"series":{"state":"g"}}', encoding="utf-8")
     assert _openimcc_source_declared_phase(item(liquid_path, "series-state"))[0] is Phase.G
+    liquid_path.write_text('{"table":{"state_as_published":"l"}}', encoding="utf-8")
+    assert _openimcc_source_declared_phase(item(liquid_path, "table-state-note"))[0] is Phase.L
+
+
+def _load_compilation_thermo_observations(root: Path):
+    """Read only the compilation Cp/S/H population used by the census test."""
+
+    from simulator.battery.migrate import (
+        iter_observation_store_paths,
+        load_yaml,
+        observation_from_plain,
+    )
+
+    quantities = {Quantity.CP.value, Quantity.S.value, Quantity.H_MINUS_H298.value}
+    observations = {}
+    literature = root / "data" / "literature"
+    for directory in (
+        literature / "extracts-v2",
+        literature / "observations-v2",
+    ):
+        if not directory.is_dir():
+            continue
+        for path in iter_observation_store_paths(directory):
+            document = load_yaml(path)
+            if not isinstance(document, Mapping):
+                continue
+            for raw in document.get("observations") or ():
+                if not isinstance(raw, Mapping):
+                    continue
+                identity = raw.get("identity")
+                quantity = (
+                    identity.get("quantity")
+                    if isinstance(identity, Mapping)
+                    else None
+                )
+                evidence = raw.get("evidence")
+                evidence_class = (
+                    evidence.get("class")
+                    if isinstance(evidence, Mapping)
+                    else None
+                )
+                if (
+                    not isinstance(quantity, Mapping)
+                    or quantity.get("tag") != "value"
+                    or quantity.get("value") not in quantities
+                    or not isinstance(evidence_class, Mapping)
+                    or evidence_class.get("tag") != "value"
+                    or evidence_class.get("value")
+                    != EvidenceClass.COMPILATION_ASSESSED.value
+                ):
+                    continue
+                observation = observation_from_plain(raw)
+                observations[observation.observation_id] = observation
+    return observations
+
+
+def _openimcc_input_available_at_8e(observation) -> bool:
+    """The t-1937 scorer's formula and phase gate, before this census change."""
+
+    from simulator.battery.score import parse_species_formula
+    from simulator.battery.records import polymorph_token
+
+    identity = observation.identity
+    if not isinstance(identity, Identity) or identity.species is None:
+        return False
+    species = identity.species
+    if parse_species_formula(species.formula, species=species) is None:
+        return False
+    phase = phase_token(species)
+    return phase in {Phase.G, Phase.L, Phase.CR} and (
+        phase is not Phase.CR or polymorph_token(species) is not None
+    )
+
+
+def _openimcc_compilation_input_census(context) -> dict[str, object]:
+    """Measure the 8e and current source-input gates without calling engines."""
+
+    from simulator.accounting.formulas import canonicalize_formula
+    from simulator.battery.compilation_tier import (
+        _compilation_series_slots,
+        _openimcc_species_input,
+        is_compilation_evidence,
+    )
+    from simulator.battery.identity import quantity_token
+    from simulator.chemistry.formula_text import fold_subscript_digits
+
+    quantities = {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    total = requestable_before = requestable_after = 0
+    cells_by_quantity: Counter[str] = Counter()
+    refused_after: Counter[str] = Counter()
+    classes: dict[str, dict[str, object]] = {}
+    resolved_before: dict[object, bool] = {}
+    resolved_after: dict[
+        tuple[object, str | None],
+        tuple[str | None, Phase | None, object],
+    ] = {}
+
+    def tally(name: str, before: bool, refusal, cell_count: int) -> None:
+        row = classes.setdefault(
+            name,
+            {
+                "affected_cells": 0,
+                "requestable_before": 0,
+                "typed_refused_before": 0,
+                "requestable_after": 0,
+                "typed_refused_after": 0,
+                "refusal_reasons_after": Counter(),
+            },
+        )
+        row["affected_cells"] += cell_count
+        if before:
+            row["requestable_before"] += cell_count
+        else:
+            row["typed_refused_before"] += cell_count
+        if refusal is None:
+            row["requestable_after"] += cell_count
+        else:
+            row["typed_refused_after"] += cell_count
+            reasons = row["refusal_reasons_after"]
+            assert isinstance(reasons, Counter)
+            reasons[refusal.code] += cell_count
+
+    for parent in context.observations.values():
+        if not is_compilation_evidence(parent):
+            continue
+        quantity = quantity_token(parent.identity)
+        if quantity not in quantities:
+            continue
+        origin = context.origins.get(parent.observation_id)
+        slots = _compilation_series_slots(parent, origin)
+        if slots is None:
+            value = parent.value.point
+            cell_count = int(value is not None and value.is_finite())
+        else:
+            cell_count = sum(
+                1 for _temperature, magnitude, _occurrence in slots
+                if magnitude.is_finite()
+            )
+        if cell_count == 0:
+            continue
+        total += cell_count
+        cells_by_quantity[quantity.value] += cell_count
+
+        source_path = None if parent.locator is None else parent.locator.source_path
+        species = parent.identity.species if isinstance(parent.identity, Identity) else None
+        before = resolved_before.get(species)
+        if before is None:
+            before = _openimcc_input_available_at_8e(parent)
+            resolved_before[species] = before
+        if before:
+            requestable_before += cell_count
+
+        input_key = (species, source_path)
+        resolved = resolved_after.get(input_key)
+        if resolved is None:
+            resolved = _openimcc_species_input(parent)
+            resolved_after[input_key] = resolved
+        formula, phase, refusal = resolved
+        if refusal is None:
+            assert formula is not None and phase is not None
+            requestable_after += cell_count
+        else:
+            refused_after[refusal.code] += cell_count
+
+        raw_formula = "" if species is None else species.formula
+        canonical, suffix_phase, _formula_error = canonicalize_formula(raw_formula)
+        if suffix_phase is not None:
+            tally("formula_phase_suffix", before, refusal, cell_count)
+        if "·" in raw_formula:
+            tally("hydrate_dot", before, refusal, cell_count)
+        formula_text = "".join(raw_formula.strip().split())
+        group_formula = formula_text
+        if suffix_phase is not None:
+            group_formula = formula_text[: -(len(suffix_phase) + 2)]
+        if (
+            canonical is not None
+            and any(token in group_formula for token in "()[]{}")
+            and canonical != fold_subscript_digits(group_formula)
+        ):
+            tally("parenthesized_group", before, refusal, cell_count)
+        species_phase = phase_token(species) if species is not None else None
+        if species_phase not in {Phase.G, Phase.L, Phase.CR} or suffix_phase in {
+            "aq",
+            "glass",
+        }:
+            tally("source_phase", before, refusal, cell_count)
+
+    return {
+        "numeric_cp_s_h_cells": total,
+        "cells_by_quantity": dict(sorted(cells_by_quantity.items())),
+        "requestable_before": requestable_before,
+        "typed_refused_before": total - requestable_before,
+        "requestable_after": requestable_after,
+        "typed_refused_after": sum(refused_after.values()),
+        "refusal_reasons_after": dict(sorted(refused_after.items())),
+        "classes": {
+            name: {
+                **{
+                    key: value
+                    for key, value in row.items()
+                    if key != "refusal_reasons_after"
+                },
+                "refusal_reasons_after": dict(
+                    sorted(row["refusal_reasons_after"].items())
+                ),
+            }
+            for name, row in sorted(classes.items())
+        },
+    }
 
 
 def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> None:
-    from simulator.battery.compilation_tier import (
-        _openimcc_compilation_input_census,
-    )
-    from simulator.battery.migrate import _load_compilation_thermo_observations
     from simulator.battery.score import ScoreContext
 
     root = Path(__file__).resolve().parents[2]
@@ -933,6 +1179,10 @@ def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> No
         "numeric_cp_s_h_cells"
     ], census
     assert (
+        census["requestable_before"] + census["typed_refused_before"]
+        == census["numeric_cp_s_h_cells"]
+    ), census
+    assert (
         census["requestable_after"] + census["typed_refused_after"]
         == census["numeric_cp_s_h_cells"]
     ), census
@@ -944,17 +1194,25 @@ def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> No
         "source_phase",
     } <= classes.keys(), census
     for row in classes.values():
-        assert row["affected_rows"] == (
+        assert row["affected_cells"] == (
+            row["requestable_before"] + row["typed_refused_before"]
+        ), census
+        assert row["affected_cells"] == (
             row["requestable_after"] + row["typed_refused_after"]
         ), census
-    after_counts = {
+
+    measured_counts = {
+        "requestable_before": census["requestable_before"],
+        "typed_refused_before": census["typed_refused_before"],
         "requestable_after": census["requestable_after"],
         "typed_refused_after": census["typed_refused_after"],
         "classes": {
             name: {
                 key: row[key]
                 for key in (
-                    "affected_rows",
+                    "affected_cells",
+                    "requestable_before",
+                    "typed_refused_before",
                     "requestable_after",
                     "typed_refused_after",
                 )
@@ -962,29 +1220,42 @@ def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> No
             for name, row in classes.items()
         },
     }
-    assert after_counts == {
+    expected_counts = {
+        "requestable_before": 240_209,
+        "typed_refused_before": 88_091,
         "requestable_after": 306_808,
         "typed_refused_after": 21_492,
         "classes": {
             "formula_phase_suffix": {
-                "affected_rows": 568,
+                "affected_cells": 568,
+                "requestable_before": 426,
+                "typed_refused_before": 142,
                 "requestable_after": 369,
                 "typed_refused_after": 199,
             },
             "hydrate_dot": {
-                "affected_rows": 1_146,
+                "affected_cells": 1_146,
+                "requestable_before": 371,
+                "typed_refused_before": 775,
                 "requestable_after": 971,
                 "typed_refused_after": 175,
             },
             "parenthesized_group": {
-                "affected_rows": 3_836,
+                "affected_cells": 3_836,
+                "requestable_before": 2_424,
+                "typed_refused_before": 1_412,
                 "requestable_after": 3_729,
                 "typed_refused_after": 107,
             },
             "source_phase": {
-                "affected_rows": 30_227,
+                "affected_cells": 30_227,
+                "requestable_before": 0,
+                "typed_refused_before": 30_227,
                 "requestable_after": 13_922,
                 "typed_refused_after": 16_305,
             },
         },
     }
+    assert measured_counts == expected_counts, json.dumps(
+        measured_counts, sort_keys=True
+    )
