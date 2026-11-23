@@ -256,6 +256,7 @@ class AdoptedObservation:
     source_doi: str | None = None
     # Preserve source spellings until the extract schema canonicalizes them.
     admission_metadata: Mapping[str, Any] = field(default_factory=dict)
+    reservoir: Mapping[str, Any] | None = None
 
     @property
     def case_id(self) -> str:
@@ -575,8 +576,11 @@ def observation_admission_reason(obs: AdoptedObservation) -> str | None:
         return refusal
     if obs.obs_type != "psat_series":
         return refusal
+    raw_points = obs.values.get("points")
+    if not isinstance(raw_points, list) or not raw_points:
+        return refusal
     points, _skip, _drops = _literature_pressure_points(obs)
-    if not points:
+    if not points or not any(point.get("point_index") is not None for point in points):
         return refusal
     ignored_tokens = frozenset({"figure_only"})
     return _refusal_marker_reason(
@@ -678,12 +682,19 @@ def load_adopted_observations(
             else:
                 t_range_out = None
             dex = dex_by_key.get((str(species_id), otype, source_id))
+            raw_observation = raw_observations[
+                (source_id, str(species_id), str(obs.get("observation_id") or ""))
+            ]
             raw_form = obs.get("condensed_form")
             condensed_form: Mapping[str, Any] | None
             if isinstance(raw_form, Mapping):
                 condensed_form = dict(raw_form)
             else:
                 condensed_form = None
+            raw_reservoir = raw_observation.get("reservoir")
+            reservoir = (
+                dict(raw_reservoir) if isinstance(raw_reservoir, Mapping) else None
+            )
             adopted.append(
                 AdoptedObservation(
                     species_id=str(species_id),
@@ -721,15 +732,14 @@ def load_adopted_observations(
                     admission_metadata={
                         "review_status": _evidence_marker(obs, "review_status"),
                         **{
-                            key: value for key, value in raw_observations[
-                                (source_id, str(species_id), str(obs.get("observation_id") or ""))
-                            ].items()
+                            key: value for key, value in raw_observation.items()
                             if key in {"supersedes", "admission_metadata"}
                             or key in _EVIDENCE_VOCABULARY
                         },
                     },
                     condensed_form=condensed_form,
                     source_doi=doi_by_source.get(source_id),
+                    reservoir=reservoir,
                 )
             )
     adopted.sort(key=lambda row: (row.species_id, row.source_id, row.observation_id))
@@ -2303,10 +2313,16 @@ def _emit_point_drop_records(
 def _pressure_standard_state_kind(obs: AdoptedObservation) -> str | None:
     """Classify the literature pressure basis without crossing standard states."""
 
+    reservoir_text = (
+        " ".join(str(value) for value in obs.reservoir.values())
+        if isinstance(obs.reservoir, Mapping)
+        else ""
+    )
     text = " ".join(
         str(value)
         for value in (
             obs.standard_state,
+            reservoir_text,
             obs.phase,
             obs.values.get("standard_state"),
             obs.values.get("quantity"),
@@ -3100,15 +3116,44 @@ def _evaluate_psat(
             "standard_state_kind": standard_state_kind,
             "melt_recipe_source": melt_recipe_source,
         }
-        initial_charge_only = (
-            f"({battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG})"
-            in melt_recipe_source
+        composition_role, composition_role_refusal = (
+            battery_migrate._declared_composition_role(pt, obs.values)
         )
+        initial_charge_only = (
+            composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
+        typed_input_reason: str | None = None
         if initial_charge_only:
+            role_reason = battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE
             runtime["input_assumption"] = {
                 "flag": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG,
-                "reason": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+                "reason": role_reason,
             }
+            typed_input_reason = (
+                f"typed-refusal:{battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+                f"{role_reason}"
+            )
+            pairing = obs.values.get("fO2_pairing")
+            if (
+                pO2 is not None
+                and isinstance(pairing, Mapping)
+                and pairing.get("status")
+                == "unavailable_same_temperature_measured_pair"
+            ):
+                pairing_reason = str(
+                    pairing.get("reason")
+                    or "oxygen reading is not paired to the figure point temperature or run"
+                )
+                runtime["input_assumption"].update(
+                    {
+                        "pO2_bar": pO2,
+                        "pO2_reason": f"contextual: {pairing_reason}",
+                    }
+                )
+                typed_input_reason += (
+                    f"; pO2_bar={pO2:g} bar is contextual: {pairing_reason}"
+                )
+            runtime["typed_input_reason"] = typed_input_reason
         unsupported = False
         out_of_domain = False
         matched_species: str | None = None
@@ -3228,6 +3273,17 @@ def _evaluate_psat(
             assumed_input=initial_charge_only and actual is not None,
         )
         evaluation.records.append(record)
+        if typed_input_reason is not None:
+            if evaluation.skip_reason is None:
+                evaluation.skip_reason = typed_input_reason
+            if typed_input_reason not in evaluation.skip_reasons:
+                evaluation.skip_reasons.append(typed_input_reason)
+        if composition_role_refusal is not None:
+            role_reason = f"{_TYPED_SKIP_PREFIX}{composition_role_refusal}"
+            if evaluation.skip_reason is None:
+                evaluation.skip_reason = role_reason
+            if role_reason not in evaluation.skip_reasons:
+                evaluation.skip_reasons.append(role_reason)
         if record.status == "mismatch":
             residual_dex = None
             if expected > 0 and actual is not None and actual > 0:
@@ -3658,9 +3714,19 @@ def _melt_recipe_mol(
             "sample_oxide_composition_wt_pct",
         )
         point_conditions = point.get("point_conditions")
+        located_composition = (
+            point_conditions.get("composition")
+            if isinstance(point_conditions, Mapping)
+            else None
+        )
+        located_state = (
+            located_composition.get("state")
+            if isinstance(located_composition, Mapping)
+            else None
+        )
         point_has_located_composition = (
-            isinstance(point_conditions, Mapping)
-            and isinstance(point_conditions.get("composition"), Mapping)
+            isinstance(located_state, Mapping)
+            and located_state.get("tag") == "value"
         )
         if point_has_located_composition or any(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
@@ -3744,9 +3810,11 @@ def _melt_recipe_mol(
             "extract composition_source_gap",
             "missing_condition:melt_composition",
         )
-    composition_role = values.get("composition_role")
-    if isinstance(composition_role, Mapping):
-        composition_role = composition_role.get("value")
+    composition_role, role_refusal = battery_migrate._declared_composition_role(
+        point, obs.values
+    )
+    if role_refusal is not None:
+        return None, "extract composition_role", role_refusal
     if composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG and (
         located_composition is not None or isinstance(raw_wt, Mapping)
     ):
