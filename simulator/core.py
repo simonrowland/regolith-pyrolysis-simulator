@@ -1322,7 +1322,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._engine_commissioning_steps: list[dict[str, Any]] = []
         self._sulfur_saturation_steps: list[dict[str, Any]] = []
-        self._dp007_area_notice: dict[str, Any] | None = None
+        self._dp007_area_default: dict[str, Any] | None = None
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -17039,21 +17039,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # face directly preserves units; as the sized face tends to
                 # zero, its area-scaled rate tends to zero. A printed area
                 # continues to take the declared-area branch above.
-                from simulator.battery import default_policy
-
-                entry = default_policy.load_policy_table()["DP-007"]
-                policy = {
-                    "id": entry["id"],
-                    "version": entry["version"],
-                    "status": entry["status"],
-                    "value": str(crucible_area_m2),
-                    "units": entry["units"],
-                }
-                self._dp007_area_notice = {
-                    'kind': entry["flag"],
+                self._dp007_area_default = {
+                    'area_m2': crucible_area_m2,
                     'reason': area_default_reason,
                     'detail': area_default_detail,
-                    'policy': policy,
                 }
 
         pipe = self._equipment.pipe

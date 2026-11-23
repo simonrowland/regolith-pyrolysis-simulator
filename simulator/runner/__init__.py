@@ -1575,8 +1575,23 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
-        dp007_area_notice = getattr(sim, "_dp007_area_notice", None)
-        if dp007_area_notice is not None:
+        dp007_area_default = getattr(sim, "_dp007_area_default", None)
+        if dp007_area_default is not None:
+            from simulator.battery import default_policy
+
+            entry = default_policy.load_policy_table()["DP-007"]
+            dp007_area_notice = {
+                "kind": entry["flag"],
+                "reason": dp007_area_default["reason"],
+                "detail": dp007_area_default["detail"],
+                "policy": {
+                    "id": entry["id"],
+                    "version": entry["version"],
+                    "status": entry["status"],
+                    "value": str(dp007_area_default["area_m2"]),
+                    "units": entry["units"],
+                },
+            }
             run_metadata["runtime_notices"] = _safe_failure_value(
                 lambda: _json_safe([dp007_area_notice]),
                 section="run_metadata.runtime_notices",

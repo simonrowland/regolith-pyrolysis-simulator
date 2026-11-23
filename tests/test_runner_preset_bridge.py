@@ -14,9 +14,6 @@ import yaml
 
 from simulator import runner as runner_module
 from simulator import condensation as condensation_module
-from simulator.battery.default_policy import (
-    load_policy_table,
-)
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
@@ -348,19 +345,10 @@ def test_null_exposed_melt_area_uses_sized_crucible_face_with_flag() -> None:
         assert crucible_area_m2 > 0.0
         assert crucible_area_m2 == pytest.approx(expected_sized_area_m2)
         assert sim.melt.melt_surface_area_m2 == pytest.approx(crucible_area_m2)
-        notice = sim._dp007_area_notice
-        assert notice is not None
-        assert notice["kind"] == "knob_defaulted"
-        assert notice["reason"] == "exposed_melt_area_not_printed"
-        entry = load_policy_table()["DP-007"]
-        expected_policy = {
-            "id": entry["id"],
-            "version": entry["version"],
-            "status": entry["status"],
-            "value": str(crucible_area_m2),
-            "units": entry["units"],
-        }
-        assert notice["policy"] == expected_policy
+        area_default = sim._dp007_area_default
+        assert area_default is not None
+        assert area_default["area_m2"] == pytest.approx(crucible_area_m2)
+        assert area_default["reason"] == "exposed_melt_area_not_printed"
 
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
@@ -430,7 +418,7 @@ def test_c0_start_installs_printed_area_before_the_bridge(
     assert omitted_sim.melt.melt_surface_area_m2 == pytest.approx(
         omitted_sized_area_m2
     )
-    assert omitted_sim._dp007_area_notice is not None
+    assert omitted_sim._dp007_area_default is not None
     assert len(forecast_areas) == 2
     assert forecast_areas[0] == pytest.approx(0.000123)
     assert forecast_areas[1] == pytest.approx(omitted_sized_area_m2)
