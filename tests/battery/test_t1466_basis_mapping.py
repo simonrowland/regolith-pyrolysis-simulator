@@ -491,8 +491,8 @@ def test_shornikov_solid_k2o_uses_proposed_native_per_basis(tmp_path: Path) -> N
         notice.kind is NoticeKind.BASIS_ASSUMED
         and notice.reason == f"{RefusalReason.UNSUPPORTED.value}:{_MISSING_PER}"
         and notice.policy is not None
-        and notice.policy["id"] == "DP-102"
-        and notice.policy["status"] == "proposed"
+        and notice.policy.id == "DP-100"
+        and notice.policy.status == "proposed"
         for notice in attempt.notices
     )
 

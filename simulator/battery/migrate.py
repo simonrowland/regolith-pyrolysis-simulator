@@ -248,6 +248,7 @@ from simulator.battery.records import (
     Located,
     Locator,
     Notice,
+    NoticePolicy,
     Observation,
     PressureEnvironment,
     QuotedFrom,
@@ -3572,7 +3573,9 @@ def _notice_from_plain(payload: object) -> Notice:
         transform=payload.get("transform"),
         source_conversion_cited=payload.get("source_conversion_cited"),
         policy=(
-            None if payload.get("policy") is None else dict(payload["policy"])
+            None
+            if payload.get("policy") is None
+            else NoticePolicy.from_payload(payload["policy"])
         ),
     )
 

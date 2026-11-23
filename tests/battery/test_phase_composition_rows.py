@@ -2205,10 +2205,7 @@ def _assemblage_hook(store: list[dict]):
 def test_closed_mole_fraction_reaches_the_assemblage_and_the_hand_reference(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator.battery.score import (
-        FLAGGED_STRATUM_BASIS_CONVERTED,
-        flagged_strata,
-    )
+    from simulator.battery.score import flagged_strata
 
     calls: list[dict] = []
     monkeypatch.setattr(
@@ -2303,9 +2300,7 @@ def test_closed_mole_fraction_reaches_the_assemblage_and_the_hand_reference(
     assert converted[0].from_basis == "mole_fraction"
     assert converted[0].to_basis == "wt_percent"
     assert converted[0].source_conversion_cited is False
-    assert (
-        FLAGGED_STRATUM_BASIS_CONVERTED in flagged_strata(residual.notices)
-    )
+    assert "basis_converted" in flagged_strata(residual.notices)
 
 
 def test_unclosed_mole_fraction_siblings_do_not_call_the_assemblage(

@@ -75,6 +75,7 @@ from simulator.battery.polymorph_dictionary import (
 from simulator.battery.records import (
     DecisionBand,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     State,
@@ -1167,22 +1168,6 @@ def _refuse(
     )
 
 
-# DP-102 is a proposal for a missing printed per-basis. Thermochemistry
-# engines return these quantities per mole of species; the default therefore
-# applies an identity factor of 1. Unit check: the assumed mol-species unit is
-# unchanged. The limiting case is exactly the printed numeric value. If the
-# source used another denominator, the bias is unquantified, so this stays in
-# the proposed-policy tier.
-DP_102_DEFAULT_PER = PerBasis.MOL_SPECIES
-DP_102_POLICY: Mapping[str, object] = {
-    "id": "DP-102",
-    "version": "v1",
-    "status": "proposed",
-    "value": DP_102_DEFAULT_PER.value,
-    "units": "per-mol-species",
-}
-
-
 def _missing_per_reason(engine: Engine, quantity: Quantity) -> str:
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         reason = "pure-phase-per-basis-mismatch"
@@ -1212,6 +1197,12 @@ def _attach_basis_default(
         attempt,
         notices=union_notices(attempt.notices, (notice,)),
     )
+
+
+# DP-100: when the migrated identity carries no per-basis, use the called
+# thermochemistry engine's native per-mole-species denominator. The policy
+# stays proposed until source basis evidence is carried into this scorer path.
+DP_100_DEFAULT_PER = PerBasis.MOL_SPECIES
 
 
 @lru_cache(maxsize=1)
@@ -3643,14 +3634,31 @@ def predict_thermo_attempt(
     if quantity in _THERMO_QUANTITIES and (
         identity.per is None or identity.per.is_unknown
     ):
+        # Premise: a thermochemistry engine reports the property per mole of the
+        # listed species, the narrowest callable basis available here.
+        # Algebra: E_engine = E_printed × 1 when the source denominator is also
+        # per mole of that species. Unit check: kJ/mol-species × 1 =
+        # kJ/mol-species. Sanity: Shornikov et al. (2013), Table 3, p. 110,
+        # lists solid K2O ΔfG(1500 K) = −161.387 kJ/mole; applying 1 leaves
+        # −161.387 kJ/mol K2O. The extracted observation omits its unit, so this
+        # remains proposed and flagged; a different denominator has unquantified
+        # bias. The equal-basis limit is factor 1 and no numeric change.
+        default_per = DP_100_DEFAULT_PER
+        basis_policy = NoticePolicy(
+            id="DP-100",
+            version=1,
+            status="proposed",
+            value=default_per.value,
+            units="per-mol-species",
+        )
         basis_notice = Notice(
             kind=NoticeKind.BASIS_ASSUMED,
             affected_quantities=(quantity,),
             reason=_missing_per_reason(engine, quantity),
             origin=origin,
-            policy=DP_102_POLICY,
+            policy=basis_policy,
         )
-        identity = replace(identity, per=State.of(DP_102_DEFAULT_PER))
+        identity = replace(identity, per=State.of(default_per))
         observation = replace(observation, identity=identity)
     if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
         if engine is not Engine.INTERNAL_ANALYTICAL:

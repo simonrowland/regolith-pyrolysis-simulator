@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
+    DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -1013,6 +1014,45 @@ class Derivation:
 
 
 @dataclass(frozen=True)
+class NoticePolicy:
+    id: str
+    version: str | int
+    status: str
+    value: str
+    units: str
+
+    @classmethod
+    def from_payload(cls, payload: Mapping[str, object]) -> NoticePolicy:
+        """Build the typed notice policy from the resolver's payload fields."""
+
+        if set(payload) != {"id", "version", "status", "value", "units"}:
+            raise ValueError("notice policy payload has unexpected fields")
+        return cls(
+            id=str(payload["id"]),
+            version=payload["version"],  # type: ignore[arg-type]
+            status=str(payload["status"]),
+            value=str(payload["value"]),
+            units=str(payload["units"]),
+        )
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.id, str) or not self.id.startswith("DP-"):
+            raise ValueError("notice policy id must be a DP id")
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not all(
+                isinstance(value, str) and value
+                for value in (self.value, self.units)
+            )
+        ):
+            raise ValueError("notice policy requires id, version, value, and units")
+        if self.status not in {"canonical", "proposed", "rejected"}:
+            raise ValueError("notice policy status is not recognized")
+
+
+@dataclass(frozen=True)
 class Notice:
     kind: NoticeKind
     affected_quantities: tuple[Quantity, ...]
@@ -1031,7 +1071,7 @@ class Notice:
     to_basis: str | None = None
     transform: str | None = None
     source_conversion_cited: bool | None = None
-    policy: Mapping[str, object] | None = None
+    policy: NoticePolicy | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1079,29 +1119,12 @@ class Notice:
         elif any(value is not None for value in basis_payload):
             raise ValueError("basis-conversion payload requires basis_converted")
         if self.policy is not None:
-            if not isinstance(self.policy, Mapping) or set(self.policy) != {
-                "id",
-                "version",
-                "status",
-                "value",
-                "units",
-            }:
-                raise ValueError(
-                    "policy requires id, version, status, value, and units"
-                )
-            if any(
-                not isinstance(self.policy[field], str) or not self.policy[field]
-                for field in ("id", "version", "status", "units")
-            ):
-                raise ValueError("policy id, version, status, and units must be nonempty")
-            if self.policy["status"] not in {"canonical", "proposed"}:
-                raise ValueError("policy status must be canonical or proposed")
-            value = self.policy["value"]
-            if isinstance(value, bool) or not isinstance(
-                value, (str, int, float, Decimal)
-            ):
-                raise ValueError("policy value must be a scalar")
-            object.__setattr__(self, "policy", dict(self.policy))
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
+        if self.kind is NoticeKind.ASSUMED_PRESSURE and self.policy is None:
+            raise ValueError("assumed_pressure requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
@@ -1935,8 +1958,10 @@ class Observation:
 
 @dataclass(frozen=True)
 class CandidateRequest:
+    """Requested engine comparison; quantity is None when identity is unknown."""
+
     experiment_id: str
-    quantity: Quantity
+    quantity: Quantity | None
     engine: Engine
     channel: str
 
@@ -2045,9 +2070,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.to_basis,
                 notice.transform,
                 notice.source_conversion_cited,
-                None
-                if notice.policy is None
-                else tuple(sorted(notice.policy.items())),
+                notice.policy,
             )
             if fingerprint in seen:
                 continue

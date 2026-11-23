@@ -3157,10 +3157,8 @@ def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
 
 def test_basis_conversion_notice_round_trips_and_enters_flagged_stratum() -> None:
     from simulator.battery.migrate import _notice_from_plain, to_plain
-    from simulator.battery.score import (
-        FLAGGED_STRATUM_BASIS_CONVERTED,
-        flagged_strata,
-    )
+    from simulator.battery.records import NoticePolicy
+    from simulator.battery.score import flagged_strata
 
     notice = Notice(
         kind=NoticeKind.BASIS_CONVERTED,
@@ -3171,17 +3169,17 @@ def test_basis_conversion_notice_round_trips_and_enters_flagged_stratum() -> Non
         to_basis="wt_percent",
         transform="phase_mole_fraction_to_wt_percent_via_oxide_molar_masses",
         source_conversion_cited=False,
-        policy={
-            "id": "DP-013",
-            "version": "v1",
-            "status": "canonical",
-            "value": "phase_mole_fraction_to_wt_percent_via_oxide_molar_masses",
-            "units": "wt_percent",
-        },
+        policy=NoticePolicy(
+            id="DP-013",
+            version="v1",
+            status="canonical",
+            value="phase_mole_fraction_to_wt_percent_via_oxide_molar_masses",
+            units="engine-required basis",
+        ),
     )
     restored = _notice_from_plain(to_plain(notice))
     assert restored == notice
-    assert flagged_strata((restored,)) == (FLAGGED_STRATUM_BASIS_CONVERTED,)
+    assert flagged_strata((restored,)) == ("basis_converted",)
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:
