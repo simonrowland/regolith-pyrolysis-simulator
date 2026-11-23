@@ -17068,6 +17068,44 @@ def test_unnamed_cao_reference_phase_infers_the_only_janaf_solid(
     assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
+def test_unnamed_sro_reference_phase_uses_janaf_crystal_liquid_pair() -> None:
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import fusion_comparison_reference
+
+    temperature = Decimal("2000")
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SrO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="SrO",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "sro-unknown-polymorph-at-2000K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unknown-sro-polymorph",
+    )
+
+    stable = _janaf_stable_crystal_set("SrO", temperature)
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert ("SrO", "O-013", Polymorph.CRYSTALLINE) in _janaf_pure_solid_table_index()
+    assert stable.selected.table_id == "O-013"
+    assert stable.selected.polymorph is Polymorph.CRYSTALLINE
+    assert stable.alternatives == ()
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted.notices
+    )
+
+
 def test_stated_silica_polymorph_is_not_reinferred() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
