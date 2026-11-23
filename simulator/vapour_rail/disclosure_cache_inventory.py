@@ -219,7 +219,7 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
 CACHE_SITES: dict[str, dict[str, Any]] = {
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 126,
+        "line": 133,
         "kind": 'lru',
         "name": '_string_bytes',
         "carries_disclosure": False,
@@ -227,7 +227,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:_key_float_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 136,
+        "line": 143,
         "kind": 'lru',
         "name": '_key_float_bytes',
         "carries_disclosure": False,
@@ -235,7 +235,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 1654,
+        "line": 1665,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -259,7 +259,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 757,
+        "line": 768,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -267,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 1851,
+        "line": 1864,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
@@ -283,7 +283,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/optimize/results_store.py:ResultStore': {
         "path": 'simulator/optimize/results_store.py',
-        "line": 188,
+        "line": 189,
         "kind": 'class',
         "name": 'ResultStore',
         "carries_disclosure": True,
@@ -291,7 +291,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 1525,
+        "line": 1530,
         "kind": 'class',
         "name": 'PT1PersistentEquilibriumStore',
         "carries_disclosure": True,
@@ -299,7 +299,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'fn:simulator/optimize/study.py:_scored_result_from_journal_payload': {
         "path": 'simulator/optimize/study.py',
-        "line": 2265,
+        "line": 2273,
         "kind": 'fn',
         "name": '_scored_result_from_journal_payload',
         "carries_disclosure": True,
@@ -659,7 +659,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/evaluate.py:_resolved_engine_identity_for_eval': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 3032,
+        "line": 3139,
         "kind": 'lru',
         "name": '_resolved_engine_identity_for_eval',
         "carries_disclosure": False,
@@ -667,7 +667,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 3891,
+        "line": 4001,
         "kind": 'lru',
         "name": '_vapor_pressure_provider_code_fingerprint',
         "carries_disclosure": False,
@@ -715,7 +715,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 4729,
+        "line": 4734,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,
@@ -1043,7 +1043,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/evaluate.py:_VAPOROCK_AVAILABLE_CACHE': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 3864,
+        "line": 3974,
         "kind": 'store',
         "name": '_VAPOROCK_AVAILABLE_CACHE',
         "carries_disclosure": False,
@@ -1051,7 +1051,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/evaluate.py:per_hour_cache': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 6781,
+        "line": 6898,
         "kind": 'store',
         "name": 'per_hour_cache',
         "carries_disclosure": False,
@@ -1059,7 +1059,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/study.py:prefix_replay_cache': {
         "path": 'simulator/optimize/study.py',
-        "line": 722,
+        "line": 723,
         "kind": 'store',
         "name": 'prefix_replay_cache',
         "carries_disclosure": False,
@@ -1067,7 +1067,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:physics_bucket_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 372,
+        "line": 377,
         "kind": 'store',
         "name": 'physics_bucket_entries',
         "carries_disclosure": False,
