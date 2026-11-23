@@ -5518,6 +5518,7 @@ def _frozen_composition_hour(
     except _BalanceRefused as refused:
         _refuse_unless_work_or_roots(refused)
         return None
+    dt_over_tau = dt_s / composition_time
     for name in law.species:
         start_y = float(fractions[name])
         end_y = float(end_fractions[name])
@@ -5544,6 +5545,15 @@ def _frozen_composition_hour(
         delta_s = abs(delta_s_signed)
         mole_err = delta_s * t_rem / 2.0
         bound_pa = mole_err * pa_per_mol
+        # Premise: the exact error / triangle ratio is
+        # 1 + (2λ − 1)r/6 + λ(λ − 1)r²/12 + O(r³). For 0 ≤ λ ≤ 1,
+        # the quadratic term is nonpositive. If λ > 0.5, the positive
+        # linear term is at most λr/6, leaving 5λr/6 of margin; for
+        # λ ≤ 0.5 it is nonpositive. At r ≤ 1e-3 that margin covers the
+        # higher-order remainder, so 1 + λr bounds the ratio here.
+        # Unit check: r and λ are dimensionless. Limit: λ ≤ 0 leaves
+        # the original triangle unchanged; λ = 1 gets a 1 + r margin.
+        bound_pa *= 1.0 + max(lambda_i, 0.0) * dt_over_tau
         partial_pa = abs(float(end_fractions[name]) * float(root))
         tol = _SLOW_ATOL_PA + _SLOW_RTOL * partial_pa
         if not math.isfinite(bound_pa) or bound_pa > tol:

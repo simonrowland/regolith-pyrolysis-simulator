@@ -5540,12 +5540,13 @@ def test_y_dependent_source_inside_the_gate_follows_the_ode():
     assert abs(result.partial_pressures_Pa["A"] - frozen_pa) > 1.0e-6
 
 
-def test_frozen_composition_falls_back_for_growing_sources_only():
-    """The end-sample slope gates unstable sources without rejecting restoring ones.
+def test_frozen_composition_error_bound_covers_growing_sources():
+    """The end-sample slope guards instability and inflates the triangle.
 
     Mutation: deleting the lambda > 1 guard leaves the review's 8000-slope
-    false pass on frozen_composition; rejecting lambda <= 1 also rejects
-    the restoring source, whose bound is below tolerance.
+    false pass frozen; deleting the inflation leaves the lambda=0.9 case
+    frozen even though its exact error exceeds the tolerance. The restoring
+    lambda=-1 case must remain frozen.
     """
 
     temperature_K = _FROZEN_T_K
@@ -5562,16 +5563,21 @@ def test_frozen_composition_falls_back_for_growing_sources_only():
     tau = math.fsum(n_star.values()) / s_total
     ratio = 9.9e-4
     dt_s = tau * ratio
-    s0 = 0.5000006376868968
     assert ratio < capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
 
-    for source_slope, expected_path in (
-        (8000.0, "radau_fallback"),
-        (-1.0, "frozen_composition"),
+    for source_slope, source_share, expected_path in (
+        (8000.0, 0.5000006376868968, "radau_fallback"),
+        (-1.0, 0.5000006376868968, "frozen_composition"),
+        (0.9, 0.5113372232865628, "radau_fallback"),
     ):
         holder: dict = {}
 
-        def flux(partials, *, slope=source_slope):
+        def flux(
+            partials,
+            *,
+            slope=source_slope,
+            initial_share=source_share,
+        ):
             total = math.fsum(
                 float(partials.get(name, 0.0)) for name in masses
             )
@@ -5580,7 +5586,7 @@ def test_frozen_composition_falls_back_for_growing_sources_only():
                 if total <= 0.0
                 else float(partials.get("A", 0.0)) / total
             )
-            source_a = s0 + slope * (y_a - y0)
+            source_a = initial_share + slope * (y_a - y0)
             return {
                 "A": source_a * s_total * mass * 3600.0,
                 "B": (1.0 - source_a) * s_total * mass * 3600.0,
@@ -5610,7 +5616,7 @@ def test_frozen_composition_falls_back_for_growing_sources_only():
             extent_holder=holder,
         ))
         assert holder["_balance_terms"]["path"] == expected_path
-        if source_slope < 0.0:
+        if expected_path == "frozen_composition":
             assert len(_frozen_notices(result)) == 1
         else:
             assert _frozen_notices(result) == []
