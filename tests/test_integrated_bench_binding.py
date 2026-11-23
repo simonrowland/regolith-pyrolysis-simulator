@@ -805,7 +805,9 @@ def test_one_scoring_call_per_deck_then_a_warm_hit(
     second = score_bound_decks([FEED, MASS], solve=solve)
     assert calls["n"] == 1
     assert second.projections == first.projections
-    assert _stored_rows(path) == [("simulator", "2")]
+    assert _stored_rows(path) == [(
+        "simulator", str(engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]),
+    )]
 
 
 def test_unbound_rows_do_not_call_the_solver() -> None:
@@ -862,7 +864,9 @@ def test_configured_cache_round_trip_survives_a_cleared_process(
     second = run_cached_deck(robinot_deck, solve)
     assert calls["n"] == 1
     assert second == first
-    assert _stored_rows(path) == [("simulator", "2")]
+    assert _stored_rows(path) == [(
+        "simulator", str(engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]),
+    )]
 
     engine_cache._close_connections()
     cold_path = Path(str(path) + ".cold")
@@ -1565,8 +1569,16 @@ def test_unavailable_active_engine_identity_bypasses_cache_with_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", tmp_path)
-    _write_openimcc_declaration(tmp_path, "1" * 40)
-    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", lambda _engine: "unavailable")
+    declared = "1" * 40
+    _write_openimcc_declaration(tmp_path, declared)
+    monkeypatch.setattr(
+        engine_cache,
+        "_compute_runtime_identity",
+        lambda _engine: f"commit:{declared}",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge, "imported_openimcc_commit", lambda: "unavailable"
+    )
     engine_cache.runtime_identity.cache_clear()
     deck = build_deck_request(REPO / ROBINOT_PRESET)
     assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
@@ -1616,11 +1628,11 @@ def test_dirty_tree_runs_uncached_with_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     database = _configure(monkeypatch, tmp_path)
+    deck = build_deck_request(REPO / ROBINOT_PRESET)
+    assert deck.cache_bypass is None
     monkeypatch.setattr(
         integrated_bench, "_working_tree_clean_against", lambda _commit: False
     )
-    deck = build_deck_request(REPO / ROBINOT_PRESET)
-    assert deck.cache_bypass is None
     seeded = _ok_document(deck.requested_steps)
     seeded["per_hour_summary"][0]["P_total_bar"] = 0.021
     version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
@@ -2412,7 +2424,13 @@ def test_failed_or_refused_keeps_the_incoming_reason(status: str) -> None:
     assert hot["reason"] == "solver_stopped"
 
 
-@pytest.mark.parametrize("slot", integrated_bench.MEASUREMENT_SLOT_KEYS)
+@pytest.mark.parametrize("slot", (
+    "measurement_id",
+    "measurement_selectors",
+    "comparison_contract",
+    "trajectory_comparison",
+    "comparison_points",
+))
 def test_prediction_projector_rejects_each_measurement_slot(slot: str) -> None:
     malformed = _ok_document(1)
     malformed[slot] = {"id": "uncertainty"}
