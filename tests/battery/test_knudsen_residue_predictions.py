@@ -452,6 +452,7 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(
         expected_threshold = 1e-6
     else:
         expected_threshold = 0.1 * float(Decimal("0.1")) / 0.2
+    expected_threshold *= precision_multiplier
     assert tail["material_threshold"] == expected_threshold
     if component_case:
         expected_component_threshold = (
@@ -495,25 +496,58 @@ def test_approximate_component_tail_uses_relative_effect_threshold():
     assert notices[0].certification == "material"
 
 
-def test_approximate_mass_loss_tail_between_tolerances_is_material():
-    from simulator.battery.residue import _knudsen_trace_tail_notices
+def _predict_and_classify_mass_loss_tail(extent_point, monkeypatch, *, approximate, loss_fraction):
+    from simulator.battery import residue
 
-    trace_tail = {
-        "fraction_of_measured_mass_loss": 2e-6,
-        "material_threshold": 1e-6,
-        "bound_wt_pct_by_component": {},
-        "retained_kg_by_parent": {"FeO": 1e-12},
-        "measured_loss_kg": 1e-3,
-        "residue_oxide_mass_kg": 1e-2,
-    }
-    reference = SimpleNamespace(
-        value=SimpleNamespace(point=Decimal("0.2"), approximate=True),
-        identity=SimpleNamespace(species=SimpleNamespace(formula="FeO")),
+    reference, experiment, rows = extent_point
+    # Set the trace FeO mass directly through its mole fraction; Mg carries the
+    # printed loss while FeO remains below the analytical loader cutoff.
+    feo_mass_fraction = loss_fraction * 0.2
+    feo_mole_fraction = (
+        feo_mass_fraction * 40.304
+        / (71.844 * (1.0 - feo_mass_fraction) + feo_mass_fraction * 40.304)
+    )
+    composition = Composition(
+        "trace", (("FeO", Decimal(str(feo_mole_fraction))),
+                  ("MgO", Decimal(str(1.0 - feo_mole_fraction)))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    reference = replace(reference, identity=replace(
+        reference.identity, composition=State.of(composition),
+    ))
+    experiment = replace(experiment, sample=replace(
+        experiment.sample,
+        mass_kg=Located(State.of(Value.point_of("1e-9")), reference.locator),
+        initial_composition=Located(State.of(composition), reference.locator),
+    ))
+    rows = (*rows[:1], replace(rows[-1], value=replace(
+        Value.point_of("0.2"), approximate=approximate,
+    )))
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    monkeypatch.setattr(battery, "_openimcc_gas_channels_and_omission_notices",
+                        lambda *a: ([("FeO", ("FeO", 1, 0)), ("Mg", ("MgO", 1, 0)),
+                                     ("O2", (None, 1, -1))], ()))
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *a, **k:
+                        lambda n, p: {"FeO": 1.0, "Mg": 1.0, "O2": 0.0})
+    oxygen = Located(State.of(Value.point_of("0.00001")), reference.locator)
+    reference = replace(reference, point_conditions={"fO2_Pa": oxygen})
+    rows = tuple(replace(row, point_conditions={"fO2_Pa": oxygen}) for row in rows)
+    prediction = predict_knudsen_residue_composition(
+        "internal-analytical", reference, experiment, rows,
+    )
+    tail = prediction["trace_tail"]
+    assert tail["fraction_of_measured_mass_loss"] == pytest.approx(loss_fraction, rel=1e-7)
+    notices = residue._knudsen_trace_tail_notices(tail, reference, oxide_wt_pct=False)
+    return notices, tail
+
+
+def test_approximate_mass_loss_tail_between_tolerances_is_material(extent_point, monkeypatch):
+    notices, tail = _predict_and_classify_mass_loss_tail(
+        extent_point, monkeypatch, approximate=True, loss_fraction=2e-6,
     )
 
-    notices = _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=False)
-
-    assert trace_tail["material"]
+    assert tail["material_threshold"] == 1e-6
+    assert tail["material"]
     assert notices[0].certification == "material"
 
 
@@ -539,26 +573,14 @@ def test_exact_component_tail_uses_tenth_of_last_printed_digit():
     assert not trace_tail["material"]
 
 
-def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic():
-    from simulator.battery.residue import _knudsen_trace_tail_notices
-
-    trace_tail = {
-        "fraction_of_measured_mass_loss": 0.05,
-        "material_threshold": 0.1 * float(Decimal("0.1")) / 0.2,
-        "bound_wt_pct_by_component": {"FeO": 0.0},
-        "retained_kg_by_parent": {"FeO": 1e-12},
-        "measured_loss_kg": 1e-3,
-        "residue_oxide_mass_kg": 1e-2,
-    }
-    reference = SimpleNamespace(
-        value=SimpleNamespace(point=Decimal("99"), approximate=False),
-        identity=SimpleNamespace(species=SimpleNamespace(formula="FeO")),
+def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic(extent_point, monkeypatch):
+    notices, tail = _predict_and_classify_mass_loss_tail(
+        extent_point, monkeypatch, approximate=False, loss_fraction=0.05,
     )
 
-    _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=False)
-
-    assert trace_tail["material_threshold"] == 0.05000000000000001
-    assert not trace_tail["material"]
+    assert tail["material_threshold"] == 0.05000000000000001
+    assert not tail["material"]
+    assert notices[0].certification == "immaterial"
 
 
 def test_knudsen_tail_uses_the_real_ledger_loader_cutoff(monkeypatch):

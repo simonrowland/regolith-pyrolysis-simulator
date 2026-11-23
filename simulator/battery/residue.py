@@ -2798,11 +2798,7 @@ def predict_knudsen_residue_composition(
             loss_fraction = tail_mass_kg / measured_loss_kg
             wt_pct_bound = 100.0 * tail_mass_kg / residue_oxide_mass_kg
             mass_loss_value = anchors[target_temperature][1].value
-            if mass_loss_value.approximate:
-                threshold = 1e-6
-            else:
-                printed_quantum = Decimal(1).scaleb(mass_loss_value.point.as_tuple().exponent)
-                threshold = 0.1 * float(printed_quantum) / target
+            threshold = _trace_tail_precision_threshold(mass_loss_value, divisor=target)
             trace_tail = {
                 "retained_kg_by_parent": dict(primary.trace_tail_kg),
                 "measured_loss_kg": measured_loss_kg,
@@ -2868,11 +2864,15 @@ def _knudsen_trace_tail_notices(trace_tail, reference, *, oxide_wt_pct: bool):
     )
 
 
-def _trace_tail_precision_threshold(value, *, magnitude: float = 1.0) -> float:
+def _trace_tail_precision_threshold(
+    value, *, magnitude: float = 1.0, divisor: float = 1.0,
+) -> float:
     """Return the trace-tail tolerance at the value's stated precision."""
     if value.approximate:
         return magnitude * 1e-6
     printed_quantum = Decimal(1).scaleb(value.point.as_tuple().exponent)
+    if divisor != 1.0:
+        return 0.1 * float(printed_quantum) / divisor
     return float(printed_quantum) / 10.0
 
 
