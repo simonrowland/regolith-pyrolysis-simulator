@@ -203,6 +203,7 @@ from simulator.battery.uncertainty_conventions import (
     NORMAL_95_TICKET_MULTIPLIER,
     UncertaintyConventionConflict,
     printed_uncertainty_convention,
+    standard_uncertainty_width,
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
@@ -7280,7 +7281,9 @@ def _printed_uncertainty_band(
                 }
             )
         standard_width = (
-            converted / k_print if k_print is not None else converted
+            standard_uncertainty_width(converted, k_print)
+            if k_print is not None
+            else converted
         )
         sigma_r = standard_width
         # FE3/Fe2 residuals use log10 distance, so propagate directly to
@@ -7304,6 +7307,25 @@ def _printed_uncertainty_band(
                 }
             )
         standard_width = sigma_log10_r
+        two_sigma_r_width = standard_uncertainty_width(converted, Decimal(2))
+        two_sigma_standard_width, refusal_reason = (
+            _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                fraction_r,
+                two_sigma_r_width,
+                printed_half_width=converted,
+            )
+        )
+        if two_sigma_standard_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": refusal_reason
+                    or "ferric_fraction_uncertainty_propagation_unavailable",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "sigma_r": str(two_sigma_r_width),
+                    "distance_to_r_one": str(Decimal(1) - fraction_r),
+                }
+            )
         converted_unit = "dex"
     else:
         printed_interval_metric_width = _metric_uncertainty_width(
@@ -7321,7 +7343,11 @@ def _printed_uncertainty_band(
                     "original": raw_text,
                 }
             )
-        standard_width = converted / k_print if k_print is not None else converted
+        standard_width = (
+            standard_uncertainty_width(converted, k_print)
+            if k_print is not None
+            else converted
+        )
 
     metric_standard_width = _metric_uncertainty_width(
         operation,
@@ -7396,8 +7422,27 @@ def _printed_uncertainty_band(
         standard_uncertainty_dex = metric_standard_width
     two_sigma_band = None
     if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
+        if not has_ferric_fraction:
+            two_sigma_standard_width = standard_uncertainty_width(
+                converted, Decimal(2)
+            )
+        two_sigma_metric_width = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            two_sigma_standard_width,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if two_sigma_metric_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_outside_metric_domain",
+                    "quantity": quantity.value,
+                    "original": raw_text,
+                }
+            )
         two_sigma_band = DecisionBand(
-            ticket / NORMAL_95_TICKET_MULTIPLIER,
+            two_sigma_metric_width * NORMAL_95_TICKET_MULTIPLIER,
             unit,
             f"printed_2sigma_reading: source-printed uncertainty; original={raw_text}",
             band_basis=band_basis,
@@ -19017,7 +19062,7 @@ def _compile_residual_with_lineage(
                 two_sigma_band = printed.two_sigma_band
                 if two_sigma_band is not None:
                     two_sigma_measurement_dex = (
-                        printed.standard_uncertainty_dex / Decimal(2)
+                        two_sigma_band.value / NORMAL_95_TICKET_MULTIPLIER
                     )
                     two_sigma_total_dex = (
                         _combine_independent_standard_uncertainties(

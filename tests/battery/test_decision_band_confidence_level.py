@@ -83,6 +83,43 @@ def test_confidence_metadata_preserves_units_printed_in_scalar_value() -> None:
     assert resolved.band.unit == "dimensionless"
 
 
+def test_assumed_and_explicit_two_sigma_use_the_same_transformed_band() -> None:
+    width_pa = Decimal("80000")
+    reference_pa = Decimal("100000")
+    assumed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 80000 Pa",
+        ),
+        reference_pa,
+    )
+    explicit = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "value": width_pa,
+                "unit": "Pa",
+                "confidence_level": "two_sigma",
+            },
+        ),
+        reference_pa,
+    )
+
+    assert assumed.two_sigma_band is not None
+    assert explicit.band is not None
+    assert assumed.two_sigma_band.value == explicit.band.value
+    assert assumed.two_sigma_band.unit == explicit.band.unit == "dimensionless"
+    half_width_pa = width_pa / Decimal(2)
+    expected_dex = max(
+        abs((reference_pa + half_width_pa).ln() - reference_pa.ln()),
+        abs((reference_pa - half_width_pa).ln() - reference_pa.ln()),
+    ) / Decimal(10).ln()
+    expected_band = expected_dex * Decimal("1.959963984540054")
+    assert abs(assumed.two_sigma_band.value - expected_band) < Decimal("1e-27")
+
+
 def test_denial_that_uncertainty_is_not_printed_is_not_a_width() -> None:
     # Kress & Carmichael 1988 Table 1. The sentence names 0.8 and 8.0% as
     # the spread of major-element analyses and says the row uncertainty
