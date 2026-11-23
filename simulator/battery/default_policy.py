@@ -165,13 +165,15 @@ def _resolved_value(
         return context["runtime_default"]
     if policy_id == "DP-019":
         from simulator.diagnostic_helpers.binary_pot_battery import (
-            _DEFAULT_PRESSURE_BAR,
+            DP_019_VACUUM_BOUNDARY_BAR,
         )
         from simulator.physical_constants import PA_PER_BAR
 
         # The vacuum method has a finite engine boundary in bar. Multiplying
         # bar by Pa/bar returns Pa; the source boundary is the limiting vacuum.
-        return Decimal(str(_DEFAULT_PRESSURE_BAR)) * Decimal(str(PA_PER_BAR))
+        return Decimal(str(DP_019_VACUUM_BOUNDARY_BAR)) * Decimal(
+            str(PA_PER_BAR)
+        )
     if policy_id == "DP-012" and "printed_value" in context:
         return context["printed_value"]
     if "value" in context:

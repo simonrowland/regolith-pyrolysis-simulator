@@ -14,7 +14,6 @@ from typing import Iterable, Mapping, Protocol, Sequence
 from simulator.battery.enums import Engine
 from simulator.battery.records import Observation
 from simulator.battery.score_report_data import (
-    DefaultPolicyCensus,
     ElementRetentionReportData,
     EligibilityFailureCensus,
     Nasa9FitComparisonData,
@@ -22,28 +21,6 @@ from simulator.battery.score_report_data import (
 
 
 REPORT_HEADING = "# Battery score report (schema v2.1)"
-
-
-def format_default_policy_census_report(
-    report: str, census: DefaultPolicyCensus
-) -> str:
-    lines = [
-        "",
-        "## Default policy census",
-        "",
-        "Numeric flagged residuals, grouped by the applied policy id and status.",
-        "",
-        "| policy_id | status | flagged residuals |",
-        "|---|---|---:|",
-    ]
-    if not census.rows:
-        lines.append("| (none) | — | 0 |")
-    else:
-        lines.extend(
-            f"| {policy_id} | {status} | {count} |"
-            for policy_id, status, count in census.rows
-        )
-    return report.rstrip() + "\n" + "\n".join(lines) + "\n"
 
 
 def format_assumed_band_report(report: str, data: Mapping[str, object]) -> str:
@@ -615,16 +592,17 @@ def render_legacy_score_report_markdown(
             "flag kinds retain their existing scoring rules. A row carrying both flags "
             "appears in both strata.",
             "",
-            "| stratum | rail | engine | n | median dex | RMS dex |",
-            "|---|---|---|---:|---:|---:|",
+            "| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |",
+            "|---|---|---|---|---|---:|---:|---:|",
         ]
     )
     if not flagged_rows:
-        lines.append("| (none) | — | — | 0 | — | — |")
+        lines.append("| (none) | — | — | — | — | 0 | — | — |")
     else:
         for row in flagged_rows:
             lines.append(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
+                f"{row.get('policy_id', '—')} | {row.get('policy_status', '—')} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
     lines.extend(["", *condition_lines])
@@ -853,16 +831,17 @@ def render_payload_score_report_markdown(
             "Flagged numeric diagnostics are excluded from the measured headline, "
             "bands, and band statistics.",
             "",
-            "| stratum | rail | engine | n | median dex | RMS dex |",
-            "|---|---|---|---:|---:|---:|",
+            "| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |",
+            "|---|---|---|---|---|---:|---:|---:|",
         ]
     )
     if not flagged_rows:
-        lines.append("| (none) | — | — | 0 | — | — |")
+        lines.append("| (none) | — | — | — | — | 0 | — | — |")
     else:
         for row in flagged_rows:
             lines.append(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
+                f"{row.get('policy_id', '—')} | {row.get('policy_status', '—')} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
     if condition_lines is not None:

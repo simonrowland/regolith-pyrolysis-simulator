@@ -310,7 +310,7 @@ policies:
   - id: DP-019
     condition: "vacuum method (Langmuir or free evaporation in vacuum) with no printed total pressure"
     formula: "the existing finite high-vacuum boundary in bar × PA_PER_BAR"
-    formula_owner: "simulator.diagnostic_helpers.binary_pot_battery._DEFAULT_PRESSURE_BAR and simulator.physical_constants.PA_PER_BAR"
+    formula_owner: "simulator.diagnostic_helpers.binary_pot_battery.DP_019_VACUUM_BOUNDARY_BAR and simulator.physical_constants.PA_PER_BAR"
     units: Pa
     physical_basis: "the method states vacuum, and the engine needs a finite pressure"
     bias: "for condensed equilibria negligible (V·ΔP/RT); for evaporation, the gas-film resistance vanishes, consistent with the vacuum method"

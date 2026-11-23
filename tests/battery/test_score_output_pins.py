@@ -34,13 +34,20 @@ from simulator.battery.enums import (
     AdmissionStatus,
     Engine,
     EvidenceClass,
+    NoticeKind,
     Phase,
     Quantity,
     Rail,
     ResidualStatus,
 )
 from simulator.battery.identity import State
-from simulator.battery.records import CandidateRequest, Species, Value
+from simulator.battery.records import (
+    CandidateRequest,
+    Notice,
+    NoticePolicy,
+    Species,
+    Value,
+)
 import simulator.battery.score as score_mod
 from tests.battery import factories as F
 from tests.battery.test_score import _predict, _streaming_score_fixture
@@ -972,9 +979,9 @@ Numeric measured rows stay visible. score_eligible and inside-band counts are re
 
 These numeric diagnostics carry an explicit source or apparatus flag. Flagged rows do not derive measurement bands or enter unflagged headlines. Cell-material-inferred residuals are still judged against the band; other flag kinds retain their existing scoring rules. A row carrying both flags appears in both strata.
 
-| stratum | rail | engine | n | median dex | RMS dex |
-|---|---|---|---:|---:|---:|
-| (none) | — | — | 0 | — | — |
+| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |
+|---|---|---|---|---|---:|---:|---:|
+| (none) | — | — | — | — | 0 | — | — |
 
 ## Condition hull per rail × engine
 
@@ -1730,9 +1737,9 @@ Numeric measured rows stay visible. score_eligible and inside-band counts are re
 
 Flagged numeric diagnostics are excluded from the measured headline, bands, and band statistics.
 
-| stratum | rail | engine | n | median dex | RMS dex |
-|---|---|---|---:|---:|---:|
-| (none) | — | — | 0 | — | — |
+| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |
+|---|---|---|---|---|---:|---:|---:|
+| (none) | — | — | — | — | 0 | — | — |
 
 ## Condition hull per rail × engine
 
@@ -1829,19 +1836,8 @@ Applicability / conversion refusals:
 
 None.
 """
-PIN_DEFAULT_POLICY_CENSUS_SECTION = """\
-## Default policy census
-
-Numeric flagged residuals, grouped by the applied policy id and status.
-
-| policy_id | status | flagged residuals |
-|---|---|---:|
-| (none) | — | 0 |
-"""
 PIN_REPORT += "\n" + PIN_ASSUMED_BAND_SECTION
 PIN_PAYLOAD_REPORT += "\n" + PIN_ASSUMED_BAND_SECTION
-PIN_REPORT += "\n" + PIN_DEFAULT_POLICY_CENSUS_SECTION
-PIN_PAYLOAD_REPORT += "\n" + PIN_DEFAULT_POLICY_CENSUS_SECTION
 
 PIN_ELEMENT_RETENTION_SECTION = """\
 ## Element retention diagnostics
@@ -2420,3 +2416,61 @@ def test_changed_report_heading_misses_the_output_pins(
     assert _without_certified_counts(got["payload_report"]) != _without_certified_counts(
         PIN_PAYLOAD_REPORT
     )
+
+
+def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
+    residual = F.residual(
+        "unknown-quantity::none::nasa-cea-9",
+        "unknown-quantity",
+        quantity=Quantity.P_SAT,
+    )
+    residual = replace(
+        residual,
+        candidate_request=CandidateRequest(
+            "exp-1", None, Engine.NASA_CEA_9, "cea"
+        ),
+    )
+
+    payload = json.loads(score_mod.dumps_residual_line(residual))
+
+    assert payload["candidate_request"] == {
+        "channel": "cea",
+        "engine": Engine.NASA_CEA_9.value,
+        "experiment_id": "exp-1",
+        "quantity": None,
+    }
+
+
+def test_assumed_pressure_notice_token_is_pinned() -> None:
+    assert NoticeKind.ASSUMED_PRESSURE.value == "assumed_pressure"
+
+    notice = Notice(
+        kind=NoticeKind.ASSUMED_PRESSURE,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="observation does not carry total_pressure_Pa",
+        origin="score:predict_with_engine",
+        policy=NoticePolicy(
+            id="DP-101",
+            version="v1",
+            status="proposed",
+            value="1e-06",
+            units="bar",
+        ),
+    )
+    residual = replace(
+        F.residual(
+            "assumed-pressure::partial",
+            "assumed-pressure",
+            quantity=Quantity.P_PARTIAL,
+        ),
+        notices=(notice,),
+    )
+    payload = json.loads(score_mod.dumps_residual_line(residual))
+
+    assert payload["notices"][0]["policy"] == {
+        "id": "DP-101",
+        "version": "v1",
+        "status": "proposed",
+        "value": "1e-06",
+        "units": "bar",
+    }
