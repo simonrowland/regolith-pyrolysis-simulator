@@ -1521,7 +1521,7 @@ def test_numeric_activity_executes_melt_activity_model(
     assert not comparable
     assert {r.status for r in evaluation.records} == {"assumed-input"}
     assert (
-        "typed-refusal:missing_condition:source_sample_composition"
+        "typed-refusal:missing_condition:melt_composition"
         in evaluation.skip_reasons
     )
 

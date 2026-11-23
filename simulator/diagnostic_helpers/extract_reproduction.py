@@ -502,11 +502,8 @@ _EVIDENCE_VOCABULARY = {
     })},
     "measurement_status": dict(_MARKER_REFUSALS),
     "alpha_role": dict(_MARKER_REFUSALS),
-    # Per-point role tokens are interpreted by migrate.py's typed role reader;
-    # unknown point tokens remain eligible for its flagged default path.
-    "composition_role": dict.fromkeys(
-        sorted(battery_migrate._COMPOSITION_ROLE_TOKENS)
-    ),
+    # composition_role is intentionally absent: migrate.py's typed role reader
+    # resolves it after observation admission, including mapping-backed roles.
     "review_status": {
         "draft": None,  # ames-walsh-white-1967: source review pending.
         "reviewed": None,  # ivtan-mno-coo-thermo: source reviewed.

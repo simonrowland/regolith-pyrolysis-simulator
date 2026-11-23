@@ -132,6 +132,25 @@ def test_effective_point_role_defaults_only_unknown_usable_composition() -> None
     )
 
 
+def test_mapping_backed_composition_role_is_resolved_after_admission() -> None:
+    obs = _adopted_observation(
+        "kems-007-costa-2015",
+        "Fe",
+        "costa_2015_fe_vaporization_coefficient_alpha_digitized",
+    )
+    point = next(
+        point
+        for point in obs.values["points"]
+        if isinstance(point.get("composition_role"), Mapping)
+    )
+
+    assert battery_migrate._declared_composition_role(point) == (
+        "initial_charge_only",
+        None,
+    )
+    assert observation_admission_reason(obs) is None
+
+
 def test_unknown_point_composition_role_defaults_for_usable_assays(monkeypatch) -> None:
     obs = _adopted_observation(
         "kems-022-demaria-1971",
@@ -561,6 +580,10 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         for row in datum_document["species"]["K"]["observations"]
         if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
     )
+    datum_observation["values"]["composition_wt_pct"] = {
+        "SiO2": 55.0,
+        "MgO": 45.0,
+    }
     for point in datum_observation["values"]["points"]:
         composition_role = point.get("composition_role")
         if (
@@ -682,7 +705,9 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         if float(point["T_K"]) in {1366.12, 1314.06}
     }
     point_locators = {
-        float(point["T_K"]): point["point_conditions"]["composition"].get("locator")
+        float(point["T_K"]): battery_migrate._locator_from_plain(
+            point["point_conditions"]["composition"].get("locator")
+        )
         for point in _literature_pressure_points(unknown_role_obs)[0]
         if float(point["T_K"]) in {1366.12, 1314.06}
     }

@@ -9547,22 +9547,25 @@ def _initial_charge_only_composition_proxy(
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
+    point_composition_value = (
+        point_composition.state.value
+        if isinstance(point_composition, Located)
+        and point_composition.state.is_value
+        and isinstance(point_composition.state.value, Composition)
+        else None
+    )
     existing_initial_charge_proxy = (
         identity.composition is not None
         and identity.composition.is_value
         and isinstance(identity.composition.value, Composition)
         and identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
     ) or (
-        isinstance(point_composition, Located)
-        and point_composition.state.is_value
-        and isinstance(point_composition.state.value, Composition)
-        and point_composition.state.value.proxy_flag
-        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        point_composition_value is not None
+        and point_composition_value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
     )
     outside_initial_charge_proxy_scope = (
         role != INITIAL_CHARGE_ONLY_PROXY_FLAG
         and not existing_initial_charge_proxy
-        and not run_composition_columns_declared
     )
     if outside_initial_charge_proxy_scope:
         malformed_state_reason = None
@@ -9671,6 +9674,15 @@ def _initial_charge_only_composition_proxy(
     if run_composition_columns_declared:
         classification = _CompositionProxyInputClass.VALID_RUN
     if classification is _CompositionProxyInputClass.VALID_RUN:
+        if (
+            point_composition_value is not None
+            and point_composition_value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ):
+            return (
+                replace(identity, composition=point_composition.state),
+                point_conditions,
+                list(notices),
+            )
         # Flat columns the parent declared are the run composition. A valid
         # map is not re-stamped as the initial-charge proxy.
         declared_map = point_oxide_map or point_declared_component_map
@@ -9746,14 +9758,12 @@ def _initial_charge_only_composition_proxy(
             conditions["composition"] = unknown
             return replace(identity, composition=unknown.state), conditions, list(notices)
 
-    if isinstance(point_composition, Located) and point_composition.state.is_value:
-        candidate = point_composition.state.value
-        if isinstance(candidate, Composition):
-            composition = replace(
-                candidate,
-                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
-            )
-            composition_locator = point_composition.locator or locator
+    if point_composition_value is not None:
+        composition = replace(
+            point_composition_value,
+            proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        )
+        composition_locator = point_composition.locator or locator
 
     if composition is None and initial_charge_context is not None:
         initial_map = _named_printed_composition_map(initial_charge_context)
