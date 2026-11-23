@@ -21550,29 +21550,38 @@ def test_series_null_point_is_queued_and_scalar_sibling_migrates(
     row["units"] = "%"
     row["values"] = {
         "quantity": "valence_ratio",
+        "valence_basis": {
+            "numerator_oxidation_states": [3],
+            "denominator_kind": "total_element",
+            "value_form": "fraction",
+        },
         "method_class": "measured_direct",
         "admission_status": "admitted",
-        "points": [None, 74.5],
+        "points": [None, 74.5, {"value": "74.5"}],
     }
 
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
 
-    assert len(result.observations) == 2
-    unavailable = next(
+    assert len(result.observations) == 3
+    unavailable = [
         observation
         for observation in result.observations.values()
         if observation.value.kind is ValueKind.UNAVAILABLE
-    )
+    ]
     scalar = next(
         observation
         for observation in result.observations.values()
         if observation.value.kind is ValueKind.POINT
     )
     assert scalar.value.point == Decimal("0.745")
-    assert any(
-        entry.observation_id == unavailable.observation_id
-        and "value" in (entry.axes or ())
-        for entry in result.queue
+    assert len(unavailable) == 2
+    assert all(
+        any(
+            entry.observation_id == observation.observation_id
+            and "value" in (entry.axes or ())
+            for entry in result.queue
+        )
+        for observation in unavailable
     )
 
 
@@ -21592,7 +21601,7 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
         probe, exact_fields=(Quantity.VALENCE_RATIO.value,)
     ) == ("3", None)
     absolute = _uncertainty_for_value_selection(
-        uncertainty_for(probe), selection, "%", "70%"
+        uncertainty_for(probe), selection, Quantity.VALENCE_RATIO, "70%"
     )
     assert absolute.value == Decimal("0.03")
     assert absolute.basis == "dimensionless"
@@ -21602,11 +21611,11 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
             {
                 "value": "0.03",
                 "units": "dimensionless",
-                "as_printed": "±0.03 dimensionless",
+                "as_printed": "+-0.03 dimensionless",
             }
         ),
         selection,
-        "%",
+        Quantity.VALENCE_RATIO,
         "70%",
     )
     assert already_fractional.value == Decimal("0.03")
@@ -21616,14 +21625,14 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
         {"value": "3", "units": "dex", "as_printed": "±3 dex"}
     )
     assert _uncertainty_for_value_selection(
-        dex_width, selection, "%", "70%"
+        dex_width, selection, Quantity.VALENCE_RATIO, "70%"
     ) == dex_width
 
     ambiguous = uncertainty_for(
         {"value": "3", "units": "%", "as_printed": "±3%"}
     )
     assert _uncertainty_for_value_selection(
-        ambiguous, selection, "%", "70%"
+        ambiguous, selection, Quantity.VALENCE_RATIO, "70%"
     ) == ambiguous
 
     relative = _uncertainty_for_value_selection(
@@ -21636,12 +21645,27 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
             }
         ),
         selection,
-        "%",
+        Quantity.VALENCE_RATIO,
         "70%",
     )
     assert relative.value == Decimal("0.1")
     assert relative.basis == "relative"
     assert relative.verbatim["units"] == "%"
+
+    relative_fraction = _uncertainty_for_value_selection(
+        uncertainty_for(
+            {
+                "value": "0.03",
+                "units": "dimensionless",
+                "basis": "relative",
+            }
+        ),
+        selection,
+        Quantity.VALENCE_RATIO,
+        "70%",
+    )
+    assert relative_fraction.value == Decimal("0.03")
+    assert relative_fraction.basis == "relative"
 
 
 def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path) -> None:

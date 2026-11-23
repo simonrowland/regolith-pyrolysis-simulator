@@ -201,6 +201,15 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
+from simulator.battery.uncertainty import (
+    UNCERTAINTY_NUMBER as _UNCERTAINTY_NUMBER,
+    UNCERTAINTY_PAIR_RE as _UNCERTAINTY_PAIR_RE,
+    UNCERTAINTY_RANGE_RE as _UNCERTAINTY_RANGE_RE,
+    UNCERTAINTY_SCALAR_RE as _UNCERTAINTY_SCALAR_RE,
+    mapping_uncertainty_unit as _mapping_uncertainty_unit,
+    mapping_uncertainty_value as _mapping_uncertainty_value,
+    uncertainty_scalar_from_text as _uncertainty_scalar_from_text,
+)
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     INITIAL_CHARGE_ONLY_PROXY_NOTICE,
@@ -6143,21 +6152,12 @@ def _decision_band_kind(
     } else "other"
 
 
-_UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
 # "Row-specific uncertainties are not printed" is a denial, not a width.
 # Up to six words may sit between the noun and "not printed".
 _UNCERTAINTY_NOT_PRINTED_RE = re.compile(
     r"\buncertaint(?:y|ies)\b(?:\s+\w+){0,6}\s+not\s+printed\b",
     re.IGNORECASE,
 )
-_UNCERTAINTY_RANGE_RE = re.compile(
-    rf"[\[(]\s*({_UNCERTAINTY_NUMBER})\s*[,;–—]\s*({_UNCERTAINTY_NUMBER})\s*[\])]"
-)
-_UNCERTAINTY_PAIR_RE = re.compile(
-    rf"({_UNCERTAINTY_NUMBER})\s+(?:–|—|to)\s+({_UNCERTAINTY_NUMBER})",
-    re.IGNORECASE,
-)
-_UNCERTAINTY_SCALAR_RE = re.compile(_UNCERTAINTY_NUMBER)
 _LOG10_ACTIVITY_STANDARD_DEVIATION_RE = re.compile(
     r"\bstandard\s+deviation\s+(?:of|in)\s+log\s*10\s*(?:\(\s*a\s*\)|a\b|activity\b)",
     re.IGNORECASE,
@@ -6203,104 +6203,6 @@ def _uncertainty_scope_covers_cell(uncertainty: Uncertainty, observation: object
     ):
         return True
     return False
-
-
-def _mapping_uncertainty_value(
-    mapping: Mapping[str, object],
-    *,
-    exact_fields: Sequence[str] = (),
-) -> tuple[object | None, str | None]:
-    for field_name in exact_fields:
-        if field_name not in mapping:
-            continue
-        value = mapping[field_name]
-        if isinstance(value, (tuple, list)) and len(value) == 2:
-            return value, "range"
-        try:
-            as_decimal(value)
-        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-            if isinstance(value, str):
-                scalar = _uncertainty_scalar_from_text(value)
-                if scalar is not None:
-                    unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
-                    return scalar, unit
-            return None, None
-        else:
-            return value, None
-    for key, value in mapping.items():
-        if str(key).casefold() in {"value", "amount", "error_value", "uncertainty_value"}:
-            if isinstance(value, (tuple, list)) and len(value) == 2:
-                return value, "range"
-            try:
-                as_decimal(value)
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                if isinstance(value, str):
-                    scalar = _uncertainty_scalar_from_text(value)
-                    if scalar is not None:
-                        unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
-                        return scalar, unit
-            else:
-                return value, None
-    for key, value in mapping.items():
-        name = str(key).casefold()
-        if name in {"range", "bounds", "interval", "limits"} and isinstance(value, (tuple, list)) and len(value) == 2:
-            return value, "range"
-        if isinstance(value, Mapping):
-            nested, unit = _mapping_uncertainty_value(value)
-            if nested is not None:
-                return nested, unit or ("dex" if "dex" in name else None)
-        if isinstance(value, (tuple, list)) and len(value) == 2:
-            try:
-                as_decimal(value[0]); as_decimal(value[1])
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                continue
-            return value, "range"
-        if any(token in name for token in ("uncert", "error", "sigma", "std", "dex", "width", "range")):
-            try:
-                as_decimal(value)
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                if isinstance(value, str):
-                    scalar = _uncertainty_scalar_from_text(value)
-                    if scalar is not None:
-                        unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
-                        return scalar, "dex" if "dex" in name else unit
-                continue
-            return value, "dex" if "dex" in name else None
-    return None, None
-
-
-def _mapping_uncertainty_unit(mapping: Mapping[str, object]) -> str | None:
-    for key, value in mapping.items():
-        if str(key).casefold() in {"unit", "units", "basis_unit"} and isinstance(value, str):
-            return value
-    return None
-
-
-def _uncertainty_scalar_from_text(raw: str) -> str | None:
-    # Prefer the number attached to ±. Otherwise remove numeric kind labels
-    # (1-sigma, 2-sigma, 95% CI) before selecting the printed width.
-    match = re.search(rf"(?:±|\+/-)\s*({_UNCERTAINTY_NUMBER})", raw)
-    if match is not None:
-        return match.group(1)
-    match = re.search(
-        rf"(?:standard\s+error|standard\s+deviation|\bsigma\b|\berror\b|\buncertainty\b)\s*[:=]?\s*({_UNCERTAINTY_NUMBER})",
-        raw,
-        re.IGNORECASE,
-    )
-    if match is not None:
-        return match.group(1)
-    without_kind = re.sub(
-        r"\b95\s*%\s*(?:ci|confidence interval)\b", " ", raw,
-        flags=re.IGNORECASE,
-    )
-    without_kind = re.sub(
-        r"\b95\s*(?:ci|confidence interval)\b|\b[12]\s*-?\s*(?:sigma|σ)\b",
-        " ",
-        without_kind,
-        flags=re.IGNORECASE,
-    )
-    match = _UNCERTAINTY_SCALAR_RE.search(without_kind)
-    return None if match is None else match.group(0)
 
 
 def _printed_uncertainty_source(
