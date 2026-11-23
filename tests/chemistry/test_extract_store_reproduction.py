@@ -1978,7 +1978,6 @@ def test_battery_rollup_matches_committed_model_limitations(
         f"regenerate with {REGEN_ENV}=1"
     )
     if committed_section.strip() != generated_section.strip():
-        print(generated_section)
         # Produce a short diagnostic without dumping the whole doc.
         c_lines = committed_section.strip().splitlines()
         g_lines = generated_section.strip().splitlines()
