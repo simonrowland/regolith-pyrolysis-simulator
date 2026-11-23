@@ -14,8 +14,11 @@ from simulator.battery.residue import (
     ResidueChannel,
     ResidueInventoryRefusal,
     _channel_terms,
+    _engine_fe_speciation,
+    _inherit_residue_pressure_contract,
     _make_residue_pressure_model,
     _mass_loss_corner_bounds,
+    _pressure_with_fe_speciation,
     _residue_oxygen_balance,
     integrate_knudsen_residue_inventory,
     integrate_residue_inventory,
@@ -63,6 +66,7 @@ def _balance(*, q: float | None, activity_slope: float = 0.0, iron_exponent: flo
         )
 
     pressure.declares_fixed_activities = fixed
+    pressure.declares_redox_active = q is not None
     return _residue_oxygen_balance(
         _channel_terms(_channels()),
         {"FeO": 1.0},
@@ -75,6 +79,124 @@ def _fe_diagnostic(balance):
     rows = [row for row in balance.pressure_law_diagnostics if row.species == "Fe"]
     assert len(rows) == 1
     return rows[0]
+
+
+def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery import residue
+
+    response = SimpleNamespace(
+        diagnostics={
+            "fe_redox_split": {"fe3": 0.25, "a_FeO": 0.91},
+            "vapor_pressure_diagnostic": {
+                "a_FeO_calphad": 0.37,
+                "kress91_split": {"fe3_over_sigma_fe": 0.5},
+            }
+        }
+    )
+    monkeypatch.setattr(
+        residue,
+        "_kress91_fe_speciation",
+        lambda *_args, **_kwargs: pytest.fail("same-call speciation must win"),
+    )
+    flags: set[str] = set()
+    evaluated = _pressure_with_fe_speciation(
+        SimpleNamespace(),
+        {"Fe": 1.0},
+        {"FeO": 1.0},
+        -8.0,
+        temperature_K=1800.0,
+        total_pressure_Pa=100_000.0,
+        engine_flags=flags,
+        engine_response=response,
+    )
+    assert _engine_fe_speciation(response) == (0.5, 0.37)
+    assert evaluated.fe3_over_sum_fe == 0.5
+    assert evaluated.fe_activity == 0.37
+    assert evaluated.speciation_source == "engine"
+    assert flags == set()
+
+
+def test_zero_oxygen_boundary_uses_redox_dependent_feo_demand() -> None:
+    channels = (
+        ResidueChannel("FeO", "FeO", "FeO", 1.0, "FeO vapour"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen coproduct"),
+    )
+
+    def pressure(logp: float) -> PressureEvaluation:
+        return PressureEvaluation(
+            {"FeO": 1.0, "O2": 100_000.0 * 10.0**logp},
+            fe3_over_sum_fe=0.5,
+            speciation_source="test",
+        )
+
+    pressure.declares_redox_active = True
+    balance = _residue_oxygen_balance(
+        _channel_terms(channels), {"FeO": 1.0}, pressure, 1800.0
+    )
+    # At q=0.5, o_bar=1.25, but FeO(g) carries one O atom, so its net
+    # contribution is -0.25 J_FeO. The root obeys 2 J_O2=0.25 J_FeO;
+    # the HKL molecular-mass factors give the independent 8.3424e-7 bar.
+    assert balance.pO2_bar == pytest.approx(8.3424e-7, rel=1e-4)
+    assert balance.parent_oxygen_demand_at_root["FeO"] == pytest.approx(1.25)
+    assert balance.bracket_boundary is None
+
+
+def test_true_zero_oxygen_limit_preserves_q_at_the_boundary() -> None:
+    channels = (
+        ResidueChannel("FeO2", "FeO2", "FeO", 1.0, "oxygen-rich Fe vapour"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen coproduct"),
+    )
+
+    def pressure(logp: float) -> PressureEvaluation:
+        pO2_bar = 10.0**logp
+        return PressureEvaluation(
+            {"FeO2": 10.0 * pO2_bar, "O2": 100_000.0 * pO2_bar},
+            fe3_over_sum_fe=0.5,
+            speciation_source="test",
+        )
+
+    pressure.declares_redox_active = True
+    balance = _residue_oxygen_balance(
+        _channel_terms(channels), {"FeO": 1.0}, pressure, 1800.0
+    )
+    assert balance.pO2_bar == 0.0
+    assert balance.pressures_Pa["FeO2"] == 0.0
+    assert balance.pressures_Pa["O2"] == 0.0
+    assert balance.parent_oxygen_demand_at_root["FeO2"] == 1.25
+    assert balance.relative_residual == 0.0
+
+
+def test_varying_q_multichannel_root_moves_up_with_more_ferric_iron() -> None:
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "Fe metal vapour"),
+        ResidueChannel("FeO", "FeO", "FeO", 1.0, "FeO vapour"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen coproduct"),
+    )
+
+    def balance(q_offset: float):
+        def pressure(logp: float) -> PressureEvaluation:
+            q = q_offset + 0.2 * (logp + 30.0) / 30.0
+            pO2 = 10.0**logp
+            return PressureEvaluation(
+                {
+                    "Fe": 1.0e-4 * pO2**-0.5,
+                    "FeO": 1.0e-5,
+                    "O2": 100_000.0 * pO2,
+                },
+                fe3_over_sum_fe=q,
+                speciation_source="varying-q fixture",
+            )
+
+        pressure.declares_redox_active = True
+        return _residue_oxygen_balance(
+            _channel_terms(channels), {"FeO": 1.0}, pressure, 1800.0
+        )
+
+    less_ferric = balance(0.05)
+    more_ferric = balance(0.55)
+    assert more_ferric.pO2_bar > less_ferric.pO2_bar
 
 
 def test_q_zero_is_one_oxygen_per_iron_and_exponent_minus_one_half() -> None:
@@ -140,7 +262,7 @@ def test_fixed_activity_wrong_exponent_still_refuses() -> None:
             area_m2=1.0e-4,
             duration_s=1.0,
         )
-    assert corner.value.reason == "residue_oxygen_balance_failed"
+    assert corner.value.reason == "residue_pressure_law_exponent_mismatch"
     assert "pressure law exponent mismatch for 'Fe'" in corner.value.detail
 
 
@@ -148,6 +270,39 @@ def test_fixed_activity_matching_exponent_keeps_the_root() -> None:
     balance = _balance(q=None, fixed=True)
     assert balance.pressure_law_diagnostics == ()
     assert balance.pO2_bar > 0.0
+
+
+def test_undeclared_pressure_law_keeps_the_hard_exponent_check() -> None:
+    def pressure(logp: float):
+        return _law(
+            logp,
+            q=None,
+            activity_slope=0.0,
+            iron_exponent=-0.4,
+        )
+
+    with pytest.raises(ResidueInventoryRefusal) as refusal:
+        _residue_oxygen_balance(
+            _channel_terms(_channels()),
+            {"FeO": 1.0},
+            pressure,
+            1800.0,
+        )
+    assert refusal.value.reason == "residue_pressure_law_exponent_mismatch"
+
+
+def test_pressure_contract_forwarding_keeps_factory_declaration() -> None:
+    source = lambda *_args: {}
+    source.declares_fixed_activities = True
+    source.declares_redox_active = True
+    flags: set[str] = set()
+    source.engine_flags = flags
+    target = lambda *_args: {}
+
+    _inherit_residue_pressure_contract(target, source)
+    assert target.declares_fixed_activities is True
+    assert target.declares_redox_active is True
+    assert target.engine_flags is flags
 
 
 def test_q_positive_demand_is_the_valence_mean_and_moves_the_root() -> None:
@@ -163,10 +318,10 @@ def test_q_positive_demand_is_the_valence_mean_and_moves_the_root() -> None:
     assert not math.isclose(
         redox.pO2_bar, stoichiometric.pO2_bar, rel_tol=1.0e-4, abs_tol=0.0
     )
-    sloped = _balance(q=q, activity_slope=-0.05)
+    sloped = _balance(q=q, activity_slope=-0.098)
     fe = _fe_diagnostic(sloped)
     assert fe.declared == -0.5
-    assert fe.expected == pytest.approx(-0.55, abs=1.0e-9)
+    assert fe.expected == pytest.approx(-0.598, abs=1.0e-9)
     assert fe.observed == pytest.approx(fe.expected, abs=1.0e-8)
     assert fe.reason == "residue_pressure_law_redox_active"
 
@@ -205,6 +360,7 @@ def test_exhausted_iron_parent_omits_its_vapour_as_zero_pressure(monkeypatch) ->
         total_pressure_Pa=0.0,
         engine_metadata={},
         engine_flags=flags,
+        starting_inventory={"FeO": 1.0, "SiO2": 1.0},
         missing_channels_reason="residue_pressure_channels_missing",
         caller="exhausted parent regression",
     )
@@ -217,10 +373,9 @@ def test_exhausted_iron_parent_omits_its_vapour_as_zero_pressure(monkeypatch) ->
     assert absent["FeO"] == 0.0
     assert "residue_fe_speciation_kress91_fallback" in flags
     drop_iron["value"] = True
-    omitted = model({"FeO": 1.0, "SiO2": 1.0}, -8.0)
-    assert omitted["Fe"] == 0.0
-    assert omitted["FeO"] == 0.0
-    assert "residue_omitted_vapour_pressure_zero" in flags
+    with pytest.raises(ResidueInventoryRefusal) as after_priming:
+        model({"FeO": 1.0, "SiO2": 1.0}, -8.0)
+    assert after_priming.value.reason == "residue_pressure_channels_missing"
     unseen = _make_residue_pressure_model(
         "internal-analytical",
         channels,
@@ -229,10 +384,22 @@ def test_exhausted_iron_parent_omits_its_vapour_as_zero_pressure(monkeypatch) ->
         total_pressure_Pa=0.0,
         engine_metadata={},
         engine_flags=set(),
+        starting_inventory={"FeO": 1.0, "SiO2": 1.0},
         missing_channels_reason="residue_pressure_channels_missing",
         caller="unseen iron channel",
     )
-    with pytest.raises(ResidueInventoryRefusal) as missing:
+    with pytest.raises(ResidueInventoryRefusal) as before_priming:
         unseen({"FeO": 1.0, "SiO2": 1.0}, -8.0)
-    assert missing.value.reason == "residue_pressure_channels_missing"
-    assert missing.value.detail == "Fe, FeO"
+    drop_iron["value"] = False
+    primed = unseen({"FeO": 1.0, "SiO2": 1.0}, -8.0)
+    assert primed["Fe"] == pytest.approx(3.0)
+    drop_iron["value"] = True
+    with pytest.raises(ResidueInventoryRefusal) as after_priming_same_callback:
+        unseen({"FeO": 1.0, "SiO2": 1.0}, -8.0)
+    assert before_priming.value.reason == "residue_pressure_channels_missing"
+    assert (
+        before_priming.value.detail
+        == after_priming.value.detail
+        == after_priming_same_callback.value.detail
+        == "Fe, FeO"
+    )

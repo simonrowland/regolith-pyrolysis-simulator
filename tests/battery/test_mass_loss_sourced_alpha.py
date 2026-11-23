@@ -495,6 +495,47 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
+def test_redox_fallback_flag_reaches_mass_loss_prediction(
+    fig3_source, r11_inputs, prescribed_pressure_engine, monkeypatch,
+):
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_RESIDUE_REDOX,
+        flagged_strata,
+    )
+
+    row, experiment = r11_inputs
+    fallback_flag = "residue_fe_speciation_kress91_fallback"
+
+    def pressure_factory(_engine, _channels, _pack, **kwargs):
+        temperature_K = kwargs["temperature_K"]
+        engine_flags = kwargs["engine_flags"]
+        engine_flags.add(fallback_flag)
+
+        def pressure(_inventory, logp):
+            p = 10.0**logp
+            factor = (temperature_K / 2073.15) ** 20
+            return {
+                "Mg": 0.00001 * factor / p**0.5,
+                "O2": 100000.0 * p,
+            }
+
+        pressure.declares_fixed_activities = True
+        pressure.engine_flags = engine_flags
+        return pressure
+
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", pressure_factory)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=experiment,
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    fallback = [notice for notice in prediction.notices if notice.reason == fallback_flag]
+    assert len(fallback) == 1
+    assert fallback[0].kind is NoticeKind.FALLBACK
+    assert FLAGGED_STRATUM_RESIDUE_REDOX in flagged_strata(prediction.notices)
+
+
 def test_full_prediction_refuses_non_negligible_unsourced_channel(
     r11_inputs, prescribed_pressure_engine,
 ):
@@ -509,10 +550,10 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
     assert detail["unsourced_channels"] == ["Ca"]
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("gases", [("Ca",), ("Ca", "Ca2")],
                          ids=["single-gas", "shared-parent-gases"])
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     gases, prescribed_pressure_engine, fig3_source, r11_inputs, monkeypatch,
 ):
@@ -634,8 +675,6 @@ def test_non_negligible_preheat_is_not_mislabelled_missing_alpha():
     assert failure.value.reason == "preheat_bound_not_negligible"
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_stated_bulk_uncertainty_refuses_even_below_one_percent(
     r11_inputs, prescribed_pressure_engine,
 ):

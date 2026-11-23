@@ -414,7 +414,8 @@ def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels
     channels = tuple(channels) + tuple(extra_channels)
     pressure_model = _make_residue_pressure_model(
         "internal-analytical", channels, pack, temperature_K=temperature_K, total_pressure_Pa=0,
-        engine_metadata={}, engine_flags=set(), missing_channels_reason="residue_pressure_channels_missing",
+        engine_metadata={}, engine_flags=set(), starting_inventory=inventory,
+        missing_channels_reason="residue_pressure_channels_missing",
         caller="Knudsen regression",
     )
     return inventory, channels, pressure_model
@@ -516,6 +517,7 @@ def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failur
     pressure = _make_residue_pressure_model(
         "internal-analytical", [("O", (None, 1, -0.5)), ("O2", (None, 1, -1))], None,
         temperature_K=2000, total_pressure_Pa=0, engine_metadata={}, engine_flags=set(),
+        starting_inventory={"FeO": 1.0},
         missing_channels_reason="residue_pressure_channels_missing", caller="oxygen failure regression",
     )
     with pytest.raises(ResidueInventoryRefusal) as exc:
@@ -587,6 +589,20 @@ def test_real_analytical_closure_and_extent_carry_redox_diagnostic():
         row.species == "Fe" and row.reason == "residue_pressure_law_redox_active"
         for row in result.pressure_law_diagnostics
     )
+    endpoint_balance = _residue_oxygen_balance(
+        _channel_terms(channels), result.residue_mol,
+        lambda p: pressure(result.residue_mol, p), 1905.15,
+    )
+    endpoint_iron = [
+        row for row in endpoint_balance.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    extent_iron = [
+        row for row in result.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    assert len(endpoint_iron) == len(extent_iron) == 1
+    assert extent_iron[0] == endpoint_iron[0]
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-9
 
 
@@ -646,6 +662,20 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperatu
         row.species == "Fe" and row.reason == "residue_pressure_law_redox_active"
         for row in result.pressure_law_diagnostics
     )
+    endpoint_balance = _residue_oxygen_balance(
+        _channel_terms(channels), result.residue_mol,
+        lambda p: pressure(result.residue_mol, p), temperature_K,
+    )
+    endpoint_iron = [
+        row for row in endpoint_balance.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    extent_iron = [
+        row for row in result.pressure_law_diagnostics
+        if row.species == "Fe"
+    ]
+    assert len(endpoint_iron) == len(extent_iron) == 1
+    assert extent_iron[0] == endpoint_iron[0]
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-9
 
 

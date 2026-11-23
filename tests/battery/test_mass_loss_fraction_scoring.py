@@ -371,31 +371,47 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
     assert point_composition.state.is_unknown
     assert "kept sum=91.43 wt% is below 95 wt%" in point_composition.state.reason
 
-    residual, _ = compile_residual(
+    residual, candidate = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
     )
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
-    iron = [
-        notice
+    assert candidate is not None
+    assert candidate.value.kind is ValueKind.POINT
+    assert candidate.value.point is not None
+    expected_numeric, reason, _detail = score_module.populate_numeric(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        candidate=candidate.value.point,
+        reference=reference.value.point,
+        source_relation=residual.source_relation,
+        operation_override=metric_operation_for_identity(reference.identity),
+    )
+    assert reason is None and expected_numeric is not None
+    assert (
+        residual.numeric.operation,
+        residual.numeric.unit,
+        residual.numeric.value,
+    ) == (
+        expected_numeric.operation,
+        expected_numeric.unit,
+        expected_numeric.value,
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "residue_pressure_law_redox_active"
         for notice in residual.notices
-        if notice.reason.startswith("residue_pressure_law_redox_active species=Fe ")
-    ]
-    assert len(iron) == 1
-    assert iron[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
-    assert "declared=" in iron[0].reason
-    assert "observed=" in iron[0].reason
-    assert "expected=" in iron[0].reason
+    )
+    assert score_module.FLAGGED_STRATUM_RESIDUE_REDOX in score_module.flagged_strata(
+        residual.notices
+    )
     fallback = [
         notice
         for notice in residual.notices
         if notice.reason == "residue_fe_speciation_kress91_fallback"
     ]
-    assert len(fallback) == 1
-    assert fallback[0].kind is NoticeKind.FALLBACK
-    assert fallback[0].origin == "simulator.fe_redox:kress91_split"
+    assert fallback == []
     assert {
         NoticeKind.OUT_OF_CERTIFIED_BAND,
         NoticeKind.UNVERIFIED_APPARATUS,
