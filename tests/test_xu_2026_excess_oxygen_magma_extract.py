@@ -3,6 +3,9 @@ from __future__ import annotations
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
+import re
+import subprocess
+from zipfile import ZipFile
 
 import pytest
 import yaml
@@ -14,20 +17,25 @@ from simulator.battery.enums import (
     Quantity,
     RawInputStatus,
     UncertaintyKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
     ValueKind,
 )
 from simulator.battery.composition import (
     _element_wt_percent_stoichiometric_oxide_projection,
 )
 from simulator.battery.identity import celsius_to_kelvin
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 from tests.battery.literature_extract_grids import (
     assert_observation_grid_matches,
     decimal_text,
     read_observation_grid_fixture,
 )
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ID = "xu-2026-excess-oxygen-magma"
 EXTRACT = ROOT / "data/literature/extracts/xu-2026-excess-oxygen-magma.yaml"
 TABLE1_GRID = ROOT / "tests/fixtures/xu-2026-table1-render-grid.tsv"
 S2_GRID = ROOT / "tests/fixtures/xu-2026-table-s2-glass-grid.tsv"
@@ -52,6 +60,60 @@ GRID_FIELDS = (
 NUMERIC_FIELDS = ("T_C", "total_pressure_Pa", "component_amount", "sigma")
 def _fixture(path: Path) -> list[dict[str, str]]:
     return read_observation_grid_fixture(path, NUMERIC_FIELDS)
+
+
+def _pdf_page_with_proof(pdf: Path, proof: str) -> int:
+    info = subprocess.run(
+        ["pdfinfo", str(pdf)], check=True, capture_output=True, text=True
+    )
+    page_count_match = re.search(r"^Pages:\s*(\d+)$", info.stdout, re.MULTILINE)
+    assert page_count_match is not None
+    for page_number in range(1, int(page_count_match.group(1)) + 1):
+        page_text = subprocess.run(
+            [
+                "pdftotext",
+                "-f",
+                str(page_number),
+                "-l",
+                str(page_number),
+                "-layout",
+                str(pdf),
+                "-",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        if proof in re.sub(r"\s+", " ", page_text):
+            return page_number
+    raise AssertionError(f"PDF proof was not found: {proof}")
+
+
+def _supplement_pdf(tmp_path: Path) -> Path:
+    support = Path.home() / "Repos/regolith-sources/_supporting" / SOURCE_ID
+    direct_pdf = support / "XuEtAl_Suppl_0820.pdf"
+    if direct_pdf.is_file():
+        return direct_pdf
+    archive = support / "publisher-supplement.zip"
+    if not archive.is_file():
+        archive = (
+            Path.home()
+            / "Repos/regolith-sources/_incoming"
+            / SOURCE_ID
+            / "supporting/publisher-supplement.zip"
+        )
+    if not archive.is_file():
+        pytest.skip("Xu supplementary PDF archive is absent")
+    with ZipFile(archive) as source:
+        matches = [
+            name
+            for name in source.namelist()
+            if Path(name).name == "XuEtAl_Suppl_0820.pdf"
+        ]
+        assert len(matches) == 1
+        target = tmp_path / "XuEtAl_Suppl_0820.pdf"
+        target.write_bytes(source.read(matches[0]))
+    return target
 
 
 def _extract_grid(document: dict, prefixes: tuple[str, ...]) -> list[dict[str, str]]:
@@ -124,10 +186,13 @@ def test_independent_render_and_workbook_grids_reject_both_mutations() -> None:
         _assert_grid(changed_extract, ("xu_2026_table1_",), table1)
 
 
-def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points() -> None:
+def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points(
+    tmp_path: Path,
+) -> None:
     table1 = _fixture(TABLE1_GRID)
     s2 = _fixture(S2_GRID)
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    assert "assumed_valence_Fe" not in EXTRACT.read_text(encoding="utf-8")
     experiments = {row["experiment_id"]: row for row in document["experiments"]}
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -142,12 +207,154 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         for species in document["species"].values()
         for observation in species.get("observations", [])
     }
-    assert len(observations) == len(table1) + len(s2) + 1
+    assert len(table1) + len(s2) == 1461
+    phase_ids = {row["observation_id"] for row in table1 + s2}
+    assert len({row["experiment"] for row in table1}) == 21
+    fe_observation_id = "xu_2026_moessbauer_starting_glass_fe3_fet"
+    numeric_observations = {
+        key: row
+        for key, row in observations.items()
+        if key in phase_ids
+        or key == fe_observation_id
+        or key.startswith(f"{fe_observation_id}::")
+    }
+    assert len(phase_ids) == 1461
+    assert len(numeric_observations) == len(phase_ids) + 1
+    target_experiment_ids = {
+        observations[row["observation_id"]].experiment_id
+        for row in table1 + s2
+    }
+    assert len(target_experiment_ids) == 21
+    assert all(
+        experiment_id in migrator.result.experiments
+        and migrator.result.experiments[experiment_id].sample.initial_composition
+        is not None
+        and migrator.result.experiments[
+            experiment_id
+        ].sample.initial_composition.state.is_value
+        for experiment_id in target_experiment_ids
+    )
 
     contexts = {
         record["observation_id"]: record
         for record in document["species"]["SiO2"]["context"]
     }
+    starting_context = contexts["xu_2026_table1_starting_composition_context"]
+    starting_values = starting_context["values"]
+    assert starting_context["locator"]["table"] == "1"
+    assert starting_context["locator"]["page"] == 3
+    assert starting_context["locator"]["pdf_page_index"] == 2
+    assert starting_values["composition_role"] == "initial bulk"
+    assert starting_values["composition_basis"] == "elemental wt.% as printed"
+    assert starting_values["printed_standard_deviation_confidence"] == "one_sigma"
+    assert starting_values["analysis_counts"] == {"EMPA": 10, "SIMS": 6}
+    assert starting_values["element_wt_percent_means"]["Si"] == "23.54"
+    assert starting_values["element_wt_percent_means"]["FeT"] == "8.36"
+    assert starting_values["element_wt_percent_means"]["Cl"] == "0.00"
+    assert starting_values["element_wt_percent_printed_1sd"]["FeT"] == "0.16"
+    assert starting_values["element_wt_percent_means"] == {
+        "Si": "23.54",
+        "Ti": "0.59",
+        "Al": "7.94",
+        "FeT": "8.36",
+        "Mg": "4.58",
+        "Ca": "8.10",
+        "Na": "2.03",
+        "K": "0.17",
+        "O": "44.46",
+        "Pt": "0.00",
+        "Cl": "0.00",
+    }
+    assert starting_values["element_wt_percent_printed_1sd"] == {
+        "Si": "0.26",
+        "Ti": "0.03",
+        "Al": "0.10",
+        "FeT": "0.16",
+        "Mg": "0.03",
+        "Ca": "0.06",
+        "Na": "0.07",
+        "K": "0.01",
+        "O": "0.30",
+    }
+    assert starting_values["total_wt_percent"] == "99.76"
+    assert starting_values["CO2_wt_percent"] == "0.00"
+    assert starting_values["CO2_sigma"] == "0.00"
+    assert starting_values["H2O_wt_percent"] == "0.04"
+    assert starting_values["H2O_sigma"] == "0.00"
+    assert starting_values["EO_wt_percent_as_published"] == "-0.4"
+    assert (
+        _pdf_page_with_proof(
+            regolith_corpus_root()
+            / "raw"
+            / SOURCE_ID
+            / f"{SOURCE_ID}.pdf",
+            "23.54 0.59 7.94 8.36 4.58 8.10 2.03 0.17 44.46 0.00 0.00 99.76",
+        )
+        == starting_context["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            regolith_corpus_root()
+            / "raw"
+            / SOURCE_ID
+            / f"{SOURCE_ID}.pdf",
+            "Standard deviations (1 sd) are based on multiple analyses and are given in Italics",
+        )
+        == 3
+    )
+    assert (
+        _pdf_page_with_proof(
+            regolith_corpus_root()
+            / "raw"
+            / SOURCE_ID
+            / f"{SOURCE_ID}.pdf",
+            "EO values in experimental samples are calculated assuming all iron is trivalent",
+        )
+        == 3
+    )
+    assert (
+        _pdf_page_with_proof(
+            regolith_corpus_root()
+            / "raw"
+            / SOURCE_ID
+            / f"{SOURCE_ID}.pdf",
+            "no PtO2 is present in the samples after the experiments",
+        )
+        == 7
+    )
+    product_quench_page = _pdf_page_with_proof(
+        regolith_corpus_root()
+        / "raw"
+        / SOURCE_ID
+        / f"{SOURCE_ID}.pdf",
+        "Some EO may have degassed during the temperature quenching process",
+    )
+    assert product_quench_page == 2
+    assert (
+        _pdf_page_with_proof(
+            regolith_corpus_root()
+            / "raw"
+            / SOURCE_ID
+            / f"{SOURCE_ID}.pdf",
+            "Page 2 of 9",
+        )
+        == product_quench_page
+    )
+    first_run_proof = (
+        "23.40 0.58 7.55 8.15 4.43 8.07 2.02 0.20 43.93 0.00 0.62 98.9"
+    )
+    first_run_page = _pdf_page_with_proof(
+        regolith_corpus_root()
+        / "raw"
+        / SOURCE_ID
+        / f"{SOURCE_ID}.pdf",
+        first_run_proof,
+    )
+    first_run_si = next(
+        row for row in table1 if row["observation_id"] == "xu_2026_table1_lvp_1_si"
+    )
+    assert first_run_page == first_run_si["page"] == "3"
+    assert first_run_si["component_amount_as_published"] == "23.40"
     table1_context = contexts["xu_2026_table1_run_product_context_lvp_1"]
     assert table1_context["experiment"] == "xu_2026_lvp_1"
     assert table1_context["units"] == "wt.% element"
@@ -209,30 +416,37 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         observation = observations[row["observation_id"]]
         raw_values = raw_observations[row["observation_id"]]["values"]
         assert raw_values["oxygen_source_as_published"] == row["oxygen_source"]
-        assert (
-            raw_observations[row["observation_id"]]["point_conditions"][
-                "composition"
-            ]["state"]["tag"]
-            == "value"
+        quench = raw_values["quench_statement"]
+        assert quench["preservation"] == "not_stated"
+        assert quench["quench_direction"] == "not_stated"
+        assert quench["locator"]["page"] == product_quench_page
+        assert quench["locator"]["pdf_page_index"] == 1
+        assert "composition" not in raw_observations[row["observation_id"]].get(
+            "point_conditions", {}
         )
         assert observation.identity.composition.is_value
         composition = observation.identity.composition.value
         assert composition.basis == "stoichiometric_oxide_projection"
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
-        located_composition = observation.point_conditions["composition"]
-        assert located_composition.inference is not None
+        experiment = migrator.result.experiments[observation.experiment_id]
+        initial_composition = experiment.sample.initial_composition
+        assert initial_composition is not None and initial_composition.state.is_value
+        assert composition == initial_composition.state.value
+        assert initial_composition.locator is not None
+        assert initial_composition.locator.page == 3
+        assert initial_composition.locator.pdf_page_index == 2
+        assert initial_composition.locator.table == "1"
+        assert initial_composition.locator.row == "MORB starting comp."
+        assert initial_composition.inference is not None
         assert (
-            located_composition.inference.relation
+            initial_composition.inference.relation
             == "element_wt_percent_stoichiometric_oxide_projection"
         )
-        assert located_composition.inference.output_unit == "mole_fraction"
-        group_prefix = row["observation_id"].rsplit("_", 1)[0]
-        expected_inputs = {
-            "xu-2026-excess-oxygen-magma::" + observation_id
-            for observation_id in raw_observations
-            if observation_id.rsplit("_", 1)[0] == group_prefix
+        assert initial_composition.inference.output_unit == "mole_fraction"
+        assert set(initial_composition.inference.inputs) == {
+            "xu-2026-excess-oxygen-magma::xu_2026_table1_starting_composition_context",
+            "xu-2026-excess-oxygen-magma::xu_2026_moessbauer_starting_glass_fe3_fet",
         }
-        assert set(located_composition.inference.inputs) == expected_inputs
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -246,6 +460,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         assert observation.identity.total_pressure_Pa.value == Decimal(
             row["total_pressure_Pa"]
         )
+        assert observation.identity.fO2_Pa.is_unknown
 
         temperature = observation.point_conditions["T_C"]
         assert temperature.state.value == Decimal(row["T_C"])
@@ -281,6 +496,11 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
                 row["sigma"]
             )
             assert observation.uncertainty.verbatim["units"] == "wt.%"
+            if row["table"] == "1":
+                assert (
+                    observation.uncertainty.verbatim["confidence_level"]
+                    == "one_sigma"
+                )
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
 
@@ -292,87 +512,173 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
             assert observation.locator.page is None
             assert "cell " in observation.locator.record
 
-    fe = observations["xu_2026_moessbauer_starting_glass_fe3_fet"]
+    assert sum(bool(row["sigma"]) for row in table1) == 262
+
+    fe_matches = [
+        row
+        for key, row in numeric_observations.items()
+        if key == fe_observation_id or key.startswith(f"{fe_observation_id}::")
+    ]
+    assert len(fe_matches) == 1
+    fe = fe_matches[0]
     assert fe.value.kind is ValueKind.POINT
-    assert fe.value.point == Decimal(7) / Decimal(3)
-    assert fe.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    assert fe.value.point == Decimal("0.70")
+    assert fe.identity.quantity.value is Quantity.VALENCE_RATIO
     assert fe.identity.species.formula == "Fe"
     assert fe.identity.species.phase.value is Phase.GLASS
-    assert fe.uncertainty.kind is UncertaintyKind.NONE
+    assert fe.identity.valence_basis.is_value
+    valence_basis = fe.identity.valence_basis.value
+    assert valence_basis.numerator_oxidation_states == (3,)
+    assert valence_basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    assert valence_basis.value_form is ValenceValueForm.FRACTION
+    assert fe.uncertainty.kind is UncertaintyKind.PRINTED
+    assert Decimal(str(fe.uncertainty.verbatim["sigma"])) == Decimal("0.03")
+    assert fe.uncertainty.verbatim["confidence_level"] == "not_stated"
     fe_source = next(
         row
         for row in document["species"]["Fe"]["observations"]
         if row["observation_id"] == "xu_2026_moessbauer_starting_glass_fe3_fet"
     )
-    assert fe_source["values"]["value_as_published"] == "70(3)%"
-    assert "±0.03 applies to the ferric fraction" in fe_source["values"]["note"]
+    fe_point = fe_source["values"]["points"][0]
+    fe_table_context = next(
+        context
+        for context in document["species"]["Fe"]["context"]
+        if context["observation_id"] == "xu_2026_table_s1_hyperfine_context"
+    )
+    assert fe_table_context["locator"]["page"] == 22
+    assert fe_table_context["values"]["Fe3_plus"]["relative_area_percent"] == "70(3)"
+    assert fe_point["value"] == "70"
+    assert fe_point["value_as_published"] == "70(3)%"
+    assert fe_point["sigma"] == "3"
+    assert fe_point["unit"] == "%"
+    assert fe_source["locator"]["page"] == 22
+    assert fe_source["locator"]["pdf_page_index"] == 21
+    assert fe_point["locator"]["page"] == 22
+    starting_glass_quench = fe_source["values"]["quench_statement"]
+    assert starting_glass_quench["preservation"] == "not_stated"
+    assert starting_glass_quench["quench_direction"] == "not_stated"
+    assert starting_glass_quench["locator"]["page"] == 3
     assert fe.derivation is not None
     assert fe.derivation.raw_inputs is not None
     assert fe.derivation.raw_inputs.state.value is RawInputStatus.NOT_PRINTED
     assert fe.derivation.raw_inputs.locator is not None
-    assert fe.derivation.raw_inputs.locator.pdf_page_index == 2
-    assert fe.derivation.raw_inputs.locator.page == 3
-    assert fe.derivation.raw_inputs.locator.section == "Mössbauer spectroscopic analysis"
+    assert fe.derivation.raw_inputs.locator.figure == "S7"
+    assert fe.derivation.raw_inputs.locator.pdf_page_index == 19
+    assert fe.derivation.raw_inputs.locator.page == 20
+    assert not fe.derivation.inputs
+    assert fe.derivation.locator is not None
+    assert fe.derivation.locator.pdf_page_index == 4
+    assert fe.derivation.locator.page == 5
+    assert fe.derivation.locator.section == "Mössbauer spectroscopic analysis"
+    supplement_pdf = _supplement_pdf(tmp_path)
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Starting material was a synthetic mid-ocean ridge basalt (MORB)",
+        )
+        == 3
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Twenty-one high pressure and temperature experiments (Table 1) were conducted",
+        )
+        == 3
+    )
+    assert _pdf_page_with_proof(supplement_pdf, "logfO2 ≈ 0") == 3
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "The melts were quenched rapidly by immersing the bottom of Pt crucible in water",
+        )
+        == starting_glass_quench["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Table S1. Hyperfine parameters derived from room temperature spectrum of synthetic MORB glass starting material",
+        )
+        == fe_source["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(supplement_pdf, "area (%) 70(3)")
+        == fe_source["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Fe3+/ΣFe was determined from relative areas to be 0.70",
+        )
+        == fe.derivation.locator.page
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Fig. S7. Room temperature Mössbauer spectrum of MORB glass starting material",
+        )
+        == fe.derivation.raw_inputs.locator.page
+    )
     assert not fe.derived_from
     assert not fe.notices
 
-    table1_lvp1 = [
-        raw_observations[row["observation_id"]]
-        for row in table1
-        if row["experiment"] == "xu_2026_lvp_1"
+    start_elements = {
+        formula: Decimal(value)
+        for formula, value in starting_values["element_wt_percent_means"].items()
+    }
+    fe_total = start_elements.pop("FeT")
+    start_elements["H2O"] = Decimal(starting_values["H2O_wt_percent"])
+    base_projection = _element_wt_percent_stoichiometric_oxide_projection(
+        start_elements,
+        valence_by_element={
+            "Si": 4,
+            "Ti": 4,
+            "Al": 3,
+            "Mg": 2,
+            "Ca": 2,
+            "Na": 1,
+            "K": 1,
+            "Pt": 4,
+        },
+        retained_components=("Cl", "CO2", "H2O"),
+    )
+    fe2_projection = _element_wt_percent_stoichiometric_oxide_projection(
+        {"Fe": fe_total * (Decimal("1") - fe.value.point)},
+        valence_by_element={"Fe": 2},
+    )
+    fe3_projection = _element_wt_percent_stoichiometric_oxide_projection(
+        {"Fe": fe_total * fe.value.point},
+        valence_by_element={"Fe": 3},
+    )
+    oxide_weights = dict(base_projection.projected_component_mass)
+    oxide_weights.update(dict(fe2_projection.projected_component_mass))
+    oxide_weights.update(dict(fe3_projection.projected_component_mass))
+    expected_starting_composition = wt_pct_to_mole_fraction(oxide_weights)
+    first_experiment = migrator.result.experiments[
+        f"{SOURCE_ID}::experiment::xu_2026_lvp_1"
     ]
-    elemental_wt_percent = {
-        row["values"]["formula"]: row["values"]["component_amount_as_published"]
-        for row in table1_lvp1
-    }
-    lvp1_composition = observations[table1_lvp1[0]["observation_id"].split("::", 1)[-1]]
-    projection_derivation = lvp1_composition.point_conditions["composition"].inference
-    projection_parameters = dict(projection_derivation.parameters)
-    assert "source_formula_valence_Fe" not in projection_parameters
-    assert projection_parameters["assumed_valence_Fe"].state.value == 3
-    valences = {
-        name.removeprefix("source_formula_valence_"): int(parameter.state.value)
-        for name, parameter in projection_derivation.parameters
-        if name.startswith("source_formula_valence_")
-    }
-    valences["Fe"] = int(projection_parameters["assumed_valence_Fe"].state.value)
-    retained_components = tuple(
-        name for name in ("Cl", "CO2", "H2O") if name in elemental_wt_percent
+    initial = first_experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert dict(initial.state.value.components) == dict(
+        expected_starting_composition.components
     )
-    projected = _element_wt_percent_stoichiometric_oxide_projection(
-        elemental_wt_percent,
-        valence_by_element=valences,
-        retained_components=retained_components,
-    )
-    assert dict(lvp1_composition.identity.composition.value.components) == dict(
-        projected.components
-    )
-    assert dict(projected.components)["Cl"] > 0
-    assert projection_parameters[
-        "oxygen_closure_residual_wt_percent"
-    ].state.value == projected.oxygen_closure_residual_wt_percent
-    oxygen_changed = dict(elemental_wt_percent)
-    oxygen_changed["O"] = str(Decimal(oxygen_changed["O"]) + 1)
-    oxygen_check_only = _element_wt_percent_stoichiometric_oxide_projection(
-        oxygen_changed,
-        valence_by_element=valences,
-        retained_components=retained_components,
-    )
-    assert oxygen_check_only.components == projected.components
-    assert (
-        oxygen_check_only.oxygen_closure_residual_wt_percent
-        == projected.oxygen_closure_residual_wt_percent + 1
-    )
-    cation_changed = dict(elemental_wt_percent)
-    cation_changed["Si"] = str(Decimal(cation_changed["Si"]) + 1)
-    assert _element_wt_percent_stoichiometric_oxide_projection(
-        cation_changed,
-        valence_by_element=valences,
-        retained_components=retained_components,
-    ).components != projected.components
+    assert "all-Fe3" in starting_values["iron_valence_note"]
 
-    all_observations = list(observations.values())
+    identity_axis_pins = (
+        "xu_2026_table1_lvp_1_si",
+        "xu_2026_table1_lvp_2_si",
+        "xu_2026_s2_row_100_o",
+    )
+    for observation_id in identity_axis_pins:
+        observation = observations[observation_id]
+        assert observation.identity.composition.is_value
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.total_pressure_Pa.is_value
+        assert observation.identity.fO2_Pa.is_unknown
+
+    all_observations = list(numeric_observations.values())
     assert all(row.value.kind is ValueKind.POINT for row in all_observations)
+    assert all(row.identity.quantity.is_value for row in all_observations)
+    assert all(row.identity.species.phase.is_value for row in all_observations)
     assert all(
         "fO2_log" not in (row.point_conditions or {}) for row in all_observations
     )
@@ -405,6 +711,31 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         if record.get("type") == "model_results"
     )
     assert len(model["values"]["printed_rows"]) == 25
+
+
+def test_mutating_starting_bulk_changes_migrated_phase_identity(tmp_path: Path) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    base_migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    base_migrator.finalize()
+    observation_key = f"{SOURCE_ID}::xu_2026_table1_lvp_1_si"
+    original = base_migrator.result.observations[observation_key]
+    original_components = dict(original.identity.composition.value.components)
+
+    changed_document = deepcopy(document)
+    start = changed_document["experiments"][0]["sample"]["initial_composition"]
+    components = start["state"]["value"]["components"]
+    components[0][1] = str(Decimal(components[0][1]) - Decimal("0.01"))
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(
+        yaml.safe_dump(changed_document, sort_keys=False), encoding="utf-8"
+    )
+    mutated_migrator = migrate_one_extract(
+        ROOT, mutated_extract, index={}, aliases={}
+    )
+    mutated_migrator.finalize()
+    assert not mutated_migrator.result.validation.hard_issues
+    mutated = mutated_migrator.result.observations[observation_key]
+    assert dict(mutated.identity.composition.value.components) != original_components
 
 
 def test_lvp1_table1_redox_cell_is_empty_in_excess_oxygen_context() -> None:
