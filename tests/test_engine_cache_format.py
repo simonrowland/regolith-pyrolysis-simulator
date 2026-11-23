@@ -67,7 +67,7 @@ def test_key_namespace_is_explicit_and_store_is_without_rowid(tmp_path: Path, mo
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     engine_cache.cached_engine_call("openimcc", {"temperature_K": 1700.0}, lambda: {"answer": 1.0})
     with sqlite3.connect(path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
         schema = connection.execute("SELECT sql FROM sqlite_master WHERE name='engine_outputs'").fetchone()[0]
         assert "WITHOUT ROWID" in schema
 
@@ -170,10 +170,16 @@ def test_partial_cache_schema_is_repaired_or_missed(
                         "SELECT name FROM sqlite_master WHERE type IN ('table', 'index')"
                     )
                 }
-            assert {"engine_outputs", "provenance", "box_sequences"} <= names
+            assert {
+                "engine_outputs",
+                "provenance",
+                "box_sequences",
+                "engine_output_species",
+            } <= names
             assert {
                 "engine_outputs_box_seq",
                 "engine_outputs_engine_version",
+                "engine_output_species_species",
             } <= names
     finally:
         engine_cache._close_connections()
