@@ -30,6 +30,7 @@ from simulator.battery.score import (
     composition_wt_pct,
     predict_with_engine,
 )
+from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
 from simulator.diagnostic_helpers.binary_pot_battery import (
     AUTHORITY_EXTRAPOLATED,
     BinaryPot,
@@ -38,6 +39,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     equilibrate_cell,
     extract_reported_quantities,
     composition_kg_and_mol,
+    _nested_notice_flags,
+    engine_flags_from_result,
     identity_battery_pot,
     open_battery_engine,
 )
@@ -296,6 +299,41 @@ def test_openimcc_temperature_notice_survives_cell_notices() -> None:
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in warm_cell_notices
     )
+
+
+def test_nested_provider_notice_reaches_score_visible_cell() -> None:
+    provider_diagnostic = {
+        "a_FeO_calphad": calphad_ferrous_feo_activity_diagnostic(
+            comp_wt={"FeO": 20.0, "Na2O": 20.0, "SiO2": 60.0},
+            fO2_log=-12.0,
+            T_K=1605.0 + 273.15,
+            pressure_bar=1e-6,
+        )
+    }
+    flags = _nested_notice_flags(provider_diagnostic)
+    result = types.SimpleNamespace(
+        diagnostics={
+            "authority": AUTHORITY_EXTRAPOLATED,
+            "imcc_notices": flags,
+        }
+    )
+    notices, authority, _band = engine_flags_from_result(result)
+    cell = types.SimpleNamespace(
+        notices=notices,
+        authority=authority,
+    )
+
+    scored = cell_notices(Quantity.P_PARTIAL, Engine.INTERNAL_ANALYTICAL, cell)
+
+    diagnostic = provider_diagnostic["a_FeO_calphad"]
+    gamma = diagnostic["gamma_FeO"]["holzheid"]
+    assert diagnostic["a_FeO_authoritative"] > 0.0
+    assert gamma["conversion_status"] == "extrapolated_above_verified_range"
+    assert gamma["notice"]["kind"] == "out_of_certified_band"
+    assert authority == AUTHORITY_EXTRAPOLATED
+    assert len(scored) == 1
+    assert scored[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert scored[0].reason == "Holzheid stoichiometric FeO gamma conversion extrapolated"
 
 
 def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:

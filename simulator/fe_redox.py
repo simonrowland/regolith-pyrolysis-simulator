@@ -480,6 +480,22 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         edge_T_K = edge_C + CELSIUS_TO_KELVIN_OFFSET
         edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * edge_multiplier
         edge_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * edge_multiplier
+        log_max_float = math.log(float.fromhex("0x1.fffffffffffffp+1023"))
+        log_min_subnormal = math.log(math.nextafter(0.0, 1.0))
+
+        def exp_representable(log_value: float, field: str) -> float:
+            if (
+                not math.isfinite(log_value)
+                or log_value > log_max_float
+                or log_value < log_min_subnormal
+            ):
+                raise Kress91InvalidControls(
+                    "Holzheid stoichiometric FeO gamma extrapolation "
+                    f"unrepresentable for {field} at {temperature_K:g} K"
+                )
+            return math.exp(log_value)
+
+        temperature_ratio = edge_T_K / temperature_K
         # Premise: regular-solution RT ln(gamma) = W with T-independent excess
         # enthalpy. Holding W at the nearest edge gives
         # ln(gamma(T)) = ln(gamma(T_edge)) * T_edge/T; W is J/mol, R is
@@ -488,30 +504,30 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         # 2.822; the 1600 C edge gives W=16.157 kJ/mol. Since the ratio
         # T_edge/T is one at the edge, this joins continuously to the
         # unchanged linear interpolation over 1300-1600 C.
-        central = math.exp(math.log(edge_gamma) * edge_T_K / temperature_K)
+        central_log = math.log(edge_gamma) * temperature_ratio
+        central = exp_representable(central_log, "central gamma")
         multiplier = central / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
 
         # Carry the nearest edge's printed uncertainty limits through the same
         # regular-solution relation and preserve the adjacent printed spread.
-        scaled_low = math.exp(
-            math.log(edge_gamma - edge_sigma) * edge_T_K / temperature_K
-        )
-        scaled_high = math.exp(
-            math.log(edge_gamma + edge_sigma) * edge_T_K / temperature_K
-        )
+        scaled_low_log = math.log(edge_gamma - edge_sigma) * temperature_ratio
+        scaled_high_log = math.log(edge_gamma + edge_sigma) * temperature_ratio
         edge_points = points[:2] if below else points[-2:]
         edge_segment_spread = abs(
             HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
             * (edge_points[1][1] - edge_points[0][1])
         )
-        sigma_band = max(
-            central - scaled_low,
-            scaled_high - central,
-            edge_segment_spread,
+        segment_log_ratio = math.log(edge_segment_spread) - central_log
+        segment_log_spread = (
+            segment_log_ratio + math.log1p(math.exp(-segment_log_ratio))
+            if segment_log_ratio > 0.0
+            else math.log1p(math.exp(segment_log_ratio))
         )
+        log10_scale = math.log(10.0)
         sigma_band_log10 = max(
-            math.log10(central / (central - sigma_band)),
-            math.log10((central + sigma_band) / central),
+            (central_log - scaled_low_log) / log10_scale,
+            (scaled_high_log - central_log) / log10_scale,
+            segment_log_spread / log10_scale,
         )
 
         # The printed 1400 C point is scatter around the constant-W curve, not
@@ -540,11 +556,12 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         uncertainty_band_log10 = math.sqrt(
             sigma_band_log10**2 + model_scatter_log10**2
         )
-        measurement_low = 10.0 ** (
-            math.log10(central) - uncertainty_band_log10
+        uncertainty_log = uncertainty_band_log10 * log10_scale
+        measurement_low = exp_representable(
+            central_log - uncertainty_log, "lower uncertainty bound"
         )
-        measurement_high = 10.0 ** (
-            math.log10(central) + uncertainty_band_log10
+        measurement_high = exp_representable(
+            central_log + uncertainty_log, "upper uncertainty bound"
         )
         sigma = max(central - measurement_low, measurement_high - central)
         excess_enthalpy_J_mol = GAS_CONSTANT * edge_T_K * math.log(edge_gamma)
@@ -580,7 +597,10 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         # Keep each printed point exact, including the high edge whose clamp
         # previously returned the source value without interpolation arithmetic.
         for point_C, point_multiplier in points:
-            if T_C == point_C:
+            if (
+                T_K == point_C + CELSIUS_TO_KELVIN_OFFSET
+                or T_C == point_C
+            ):
                 multiplier = point_multiplier
                 break
         else:

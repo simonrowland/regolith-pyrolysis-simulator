@@ -171,6 +171,20 @@ def test_holzheid_gamma_refuses_non_finite_or_non_positive_temperature(
         holzheid_stoich_feo_gamma_band(temperature_K)
 
 
+def test_holzheid_cold_extrapolation_stays_log_finite_or_refuses_typed() -> None:
+    band = holzheid_stoich_feo_gamma_band(20.0)
+
+    assert band["central"] > 0.0
+    assert math.isfinite(band["central"])
+    assert math.isfinite(band["measurement_low"])
+    assert math.isfinite(band["measurement_high"])
+    assert band["conversion_status"] == "extrapolated_below_verified_range"
+    assert band["authority_level"] == "extrapolated"
+    assert band["notice"]["kind"] == "out_of_certified_band"
+    with pytest.raises(Kress91InvalidControls, match="unrepresentable"):
+        holzheid_stoich_feo_gamma_band(3.0)
+
+
 def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
     return {
         oxide: wt / 100.0 / (MOLAR_MASS[oxide] / 1000.0)

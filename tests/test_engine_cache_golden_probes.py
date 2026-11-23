@@ -30,7 +30,7 @@ from simulator import engine_cache
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
-    "internal-analytical": (3, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
+    "internal-analytical": (4, "49dd7f2e51075e428ab8a59d2e029bc3eb8c7bf851bce67a4ad68a60302aa9c0"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
     "alphamelts": (4, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
@@ -310,7 +310,12 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             cell = equilibrate_cell(
                 handle,
                 probe_pot,
-                temperature_K=1700.0,
+                # d-339 changes Fe activity beyond the 1600 C Holzheid edge.
+                temperature_K=(
+                    1605.0 + 273.15
+                    if engine_name == "internal-analytical"
+                    else 1700.0
+                ),
                 po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
                 timeout_s=90.0,
                 isolated=False,

@@ -1587,6 +1587,29 @@ def _plain_data(value: Any) -> Any:
     return value
 
 
+def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
+    """Collect typed notices nested under diagnostic ``notice`` fields."""
+
+    notices: list[dict[str, Any]] = []
+    pending = [value]
+    while pending:
+        current = pending.pop()
+        if isinstance(current, Mapping):
+            nested_notice = current.get("notice")
+            if isinstance(nested_notice, Mapping) and nested_notice.get("kind"):
+                row = _plain_data(nested_notice)
+                if (
+                    not row.get("authority")
+                    and row.get("authority_level") == AUTHORITY_EXTRAPOLATED
+                ):
+                    row["authority"] = AUTHORITY_EXTRAPOLATED
+                notices.append(row)
+            pending.extend(current.values())
+        elif isinstance(current, (list, tuple)):
+            pending.extend(current)
+    return notices
+
+
 def engine_flags_from_result(
     result: Any,
 ) -> tuple[list[dict[str, Any]], str | None, dict[str, Any] | None]:
@@ -3794,6 +3817,7 @@ def _internal_analytical_vapor_pressure_adapter(
                     "reason": f"{_FLOOR_INVERSION_REASON}:{species}:{detail}",
                 }
             )
+    core_flags.extend(_nested_notice_flags(core_diagnostic))
 
     imcc_notices = [*oxygen_notices]
     imcc_notices.extend(core_flags)
