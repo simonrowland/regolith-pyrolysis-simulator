@@ -823,16 +823,12 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     )
 
     from simulator.battery.score import (
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
         flagged_stratum_rows,
         headline_rows,
     )
 
-    assert flagged_strata(residual.notices) == (
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.METHOD_IMPLIED.value,
-    )
+    assert flagged_strata(residual.notices) == (NoticeKind.METHOD_IMPLIED.value,)
     assert [
         (
             row["stratum"],
@@ -845,7 +841,6 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         )
     ] == [
         (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
-        (FLAGGED_STRATUM_UNVERIFIED_APPARATUS, None, None, 1),
     ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
@@ -860,7 +855,6 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         for row in serialized_strata
     ] == [
         (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
-        (FLAGGED_STRATUM_UNVERIFIED_APPARATUS, None, None, 1),
     ]
     clean_residual = replace(
         residual,
@@ -4716,12 +4710,6 @@ def test_unknown_method_on_vapour_scores_with_assumed_equilibrium_pressure() -> 
     )
 
     exp = _unknown_method_experiment()
-    gate = underdetermined_apparatus(exp, Quantity.P_SAT)
-    assert gate.passed is False
-    assert gate.reason is RefusalReason.METHOD_UNKNOWN
-    assert gate.primary_check == "method"
-    assert gate.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
-
     ident = F.psat_identity("Na")
     ref = F.observation(
         "yakovlev-psat",
@@ -4731,6 +4719,14 @@ def test_unknown_method_on_vapour_scores_with_assumed_equilibrium_pressure() -> 
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="work-1",
     )
+    gate = underdetermined_apparatus(exp, Quantity.P_SAT, observation=ref)
+    assert gate.passed is True
+    assert gate.reason is None
+    method_check = next(check for check in gate.checks if check.name == "method")
+    assert method_check.passed is True
+    assert method_check.detail["flag"] == "method_assumed"
+    assert method_check.detail["assumed_method"] == "equilibrium_partial_pressure"
+
     residual, _ = _compile(ref, exp, _predict(Decimal("0.1"), ident))
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
@@ -5519,12 +5515,15 @@ def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:
 def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
     quantity: Quantity,
 ) -> None:
+    from simulator.battery.default_policy import load_policy_table
     from simulator.battery.score import (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
+        headline_rows,
     )
 
     experiment = _unknown_method_experiment()
+    comparison_statement = load_policy_table()["DP-011"]["physical_basis"]
     identity = replace(
         F.activity_identity(
             formula="CaO",
@@ -5542,6 +5541,17 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="published-activity-work",
     )
+    activity_gate = underdetermined_apparatus(
+        experiment, quantity, observation=activity
+    )
+    assert activity_gate.passed is True
+    activity_method_check = next(
+        check for check in activity_gate.checks if check.name == "method"
+    )
+    assert activity_method_check.passed is True
+    assert activity_method_check.detail["flag"] == "method_assumed"
+    assert activity_method_check.detail["assumed_method"] == comparison_statement
+
     residual, _candidate = _compile(
         activity,
         experiment,
@@ -5557,15 +5567,26 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
         for item in residual.notices
         if item.kind is NoticeKind.METHOD_ASSUMED
     )
-    assert "assumed_method=quantity_defined_equilibrium_activity" in notice.reason
+    assert f"assumed_method={comparison_statement}" in notice.reason
+    assert notice.policy == NoticePolicy(
+        id="DP-011",
+        version=1,
+        status="canonical",
+        value=str(comparison_statement),
+        units="method token",
+    )
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         NoticeKind.METHOD_ASSUMED.value,
     )
+    assert headline_rows(
+        (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
 
     pressure_identities = (
         (F.psat_identity("Na"), Decimal("0.1")),
         (_partial_identity(), Decimal("1")),
+        (F.pref_identity(), Decimal("1")),
     )
     for index, (pressure_identity, value) in enumerate(pressure_identities):
         pressure = F.observation(
@@ -5576,6 +5597,18 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id="published-pressure-work",
         )
+        pressure_gate = underdetermined_apparatus(
+            experiment, quantity_token(pressure.identity), observation=pressure
+        )
+        assert pressure_gate.passed is True
+        pressure_method_check = next(
+            check for check in pressure_gate.checks if check.name == "method"
+        )
+        assert pressure_method_check.passed is True
+        assert pressure_method_check.detail["flag"] == "method_assumed"
+        assert pressure_method_check.detail["assumed_method"] == (
+            "equilibrium_partial_pressure"
+        )
         predicted, _candidate = _compile(
             pressure,
             experiment,
@@ -5585,11 +5618,25 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
         assert predicted.status is not ResidualStatus.REFUSED
         assert predicted.numeric is not None
         assert predicted.score_eligible is False
-        assert any(
-            notice.kind is NoticeKind.METHOD_ASSUMED
-            and "assumed_method=equilibrium_partial_pressure" in notice.reason
+        pressure_notice = next(
+            notice
             for notice in predicted.notices
+            if notice.kind is NoticeKind.METHOD_ASSUMED
         )
+        assert "assumed_method=equilibrium_partial_pressure" in pressure_notice.reason
+        assert pressure_notice.policy == NoticePolicy(
+            id="DP-011",
+            version=1,
+            status="canonical",
+            value="equilibrium_partial_pressure",
+            units="method token",
+        )
+        assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(
+            predicted.notices
+        )
+        assert headline_rows(
+            (predicted,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )[0]["n"] == 0
 
     untyped_identity = replace(
         identity,
@@ -6644,7 +6691,8 @@ def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert residual.refusal is not None
-    assert residual.refusal.reason is not RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["fields"] == ["composition"]
 
 
 @pytest.mark.parametrize(
@@ -6913,13 +6961,7 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
         assert residual.numeric is not None
         assert residual.refusal is None
         assert any(
-            notice.kind
-            in {
-                NoticeKind.EFFUSION_REGIME_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_VIOLATED,
-                NoticeKind.METHOD_IMPLIED,
-                NoticeKind.UNVERIFIED_APPARATUS,
-            }
+            notice.kind is NoticeKind.EFFUSION_REGIME_VIOLATED
             for notice in residual.notices
         )
     else:
@@ -6935,8 +6977,10 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
         assert residual.status is ResidualStatus.REFUSED
         assert residual.numeric is None
         assert residual.refusal is not None
-        assert residual.refusal.reason is not RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        if composition_source == "malformed_own":
+        if composition_source == "sample_only":
+            assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+            assert residual.refusal.detail["fields"] == ["composition"]
+        else:
             assert residual.refusal.reason is RefusalReason.INVALID_SOURCE
             assert residual.refusal.detail["composition_scope_details"] == [
                 "composition component amount is not a decimal"
@@ -8777,7 +8821,7 @@ def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
         status="canonical",
         value=(
             "molecular effusion inside the cell; vacuum outside; "
-            "total pressure is the sum of partials in the cell, NOT 1 atm"
+            "P_total(cell) = Σ measured partials. Never 1 atm"
         ),
         units="Pa",
     )
@@ -8786,7 +8830,7 @@ def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
         version=1,
         status="canonical",
         value=(
-            "vacuum outside; total pressure is the sum of partials in the cell, NOT 1 atm"
+            "molecular effusion regime inside the cell; vacuum outside"
         ),
         units="method-implied condition units",
     )
@@ -8806,8 +8850,14 @@ def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
         ]
     }
     assert _flagged_payload_strata(payload) == flagged_strata(regime_notices)
-    assert all("original_reason=orifice was not printed" in notice.reason
-               for notice in regime_notices)
+    assert (
+        "molecular effusion inside the cell; vacuum outside; "
+        "P_total(cell) = Σ measured partials. Never 1 atm"
+    ) in regime_notices[1].reason
+    assert all(
+        "original_reason=orifice was not printed" in notice.reason
+        for notice in regime_notices
+    )
     assert all("policy_id" not in notice.reason for notice in regime_notices)
 
     violated_notices = apparatus_prediction_notices(
@@ -8822,13 +8872,13 @@ def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
         origin="d460-regime-violated",
     )
     assert violated_notices[0].policy == NoticePolicy(
-        id="DP-100",
+        id="DP-109",
         version=1,
         status="proposed",
         value=(
             "retain numeric pressure residual; measured pressure is below equilibrium pressure"
         ),
-        units="Pa",
+        units="retention rule",
     )
     assert flagged_strata(violated_notices) == (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -8838,8 +8888,34 @@ def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
     )
 
     from simulator.battery.validity import _method_assumption_detail
+    from simulator.battery.default_policy import resolve as resolve_default_policy
 
     experiment = _unknown_method_experiment()
+    activity_reference = F.observation(
+        "unknown-method-activity-text-inference",
+        experiment.experiment_id,
+        F.activity_identity(formula="CaO"),
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="method-text-is-read-from-experiment-field",
+    )
+    knudsen_experiment = replace(
+        experiment,
+        method=State.unknown("source method is Knudsen effusion"),
+    )
+    knudsen_detail = _method_assumption_detail(
+        knudsen_experiment, activity_reference, Quantity.ACTIVITY
+    )
+    assert knudsen_detail["assumed_method"] == MethodToken.KNUDSEN_EFFUSION.value
+    hkl_experiment = replace(
+        experiment,
+        method=State.unknown("source method is Hertz-Knudsen-Langmuir (HKL)"),
+    )
+    hkl_detail = _method_assumption_detail(
+        hkl_experiment, activity_reference, Quantity.ACTIVITY
+    )
+    assert hkl_detail["assumed_method"] == "hertz_knudsen_langmuir"
+
     rate_reference = F.observation(
         "unknown-method-mass-loss-rate",
         experiment.experiment_id,
@@ -8851,6 +8927,13 @@ def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
     rate_detail = _method_assumption_detail(
         experiment, rate_reference, Quantity.MASS_LOSS_RATE
     )
+    alpha_policy = resolve_default_policy("DP-005")
+    assert rate_detail["alpha_assumption"]["physical_basis"] == (
+        alpha_policy.payload["physical_basis"]
+    )
+    assert rate_detail["alpha_assumption"]["bias"] == alpha_policy.payload[
+        "bias"
+    ]
     rate_notices = apparatus_prediction_notices(
         rate_detail["flag"],
         rate_detail,

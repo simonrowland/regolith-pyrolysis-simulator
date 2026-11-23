@@ -380,14 +380,7 @@ def test_zaitsev_1999_table1_error_scope_and_scored_bands():
         assert after_residual.numeric.metric_uncertainty.kind is UncertaintyKind.PRINTED
         assert before_residual.numeric.value == after_residual.numeric.value
         assert any(
-            notice.kind
-            in {
-                NoticeKind.METHOD_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_VIOLATED,
-                NoticeKind.METHOD_IMPLIED,
-                NoticeKind.UNVERIFIED_APPARATUS,
-            }
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
             for notice in after_residual.notices
         )
         assert any(

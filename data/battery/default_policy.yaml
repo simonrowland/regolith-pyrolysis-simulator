@@ -26,7 +26,7 @@ policies:
   physical_basis: these furnaces run at ambient pressure
   bias: none known
   flag: method_implied
-  ruling: gap manual
+  ruling: d-460, gap manual
   version: 1
   status: canonical
   proposed_by: null
@@ -43,7 +43,7 @@ policies:
   physical_basis: dry-air O2 mole fraction 0.2095
   bias: humidity lowers it by < 2 %
   flag: method_implied
-  ruling: d-460, gap manual
+  ruling: gap manual
   version: 1
   status: canonical
   proposed_by: null
@@ -54,9 +54,10 @@ policies:
   history: []
 - id: DP-004
   condition: Knudsen-cell (KEMS / Knudsen mass loss) row; regime check cannot run
-  value: molecular effusion inside the cell; vacuum outside; total pressure is the sum of
-    partials in the cell, NOT 1 atm
-  units: method-implied conditions
+  formula: molecular effusion inside the cell; vacuum outside; P_total(cell) = Σ measured
+    partials. Never 1 atm
+  formula_owner: simulator.battery.score._sum_gas_partial_pressures_pa
+  units: Pa
   physical_basis: the method is defined by molecular effusion
   bias: if the regime is transitional, the measured P understates P_eq (the comment
     says why)
@@ -369,7 +370,7 @@ policies:
     flow
   value: retain numeric pressure residual; measured pressure is below equilibrium
     pressure
-  units: Pa
+  units: retention rule
   physical_basis: Collisional transport through an orifice below the molecular Knudsen
     regime reduces the measured effusive signal relative to the cell equilibrium pressure;
     the scorer retains the printed pressure as the observed value and marks the known
@@ -377,7 +378,7 @@ policies:
   bias: the measured pressure underestimates equilibrium pressure, shifting log10(measured/engine)
     residuals downward
   flag: effusion_regime_violated
-  id: DP-100
+  id: DP-109
   ruling: null
   version: 1
   status: proposed

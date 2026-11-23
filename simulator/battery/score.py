@@ -2561,9 +2561,7 @@ def _classify_flagged_notice_facts(
         for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    prediction_kinds = kinds & {
-        kind.value for kind in APPARATUS_PREDICTION_NOTICE_KINDS
-    }
+    prediction_kinds = kinds & APPARATUS_PREDICTION_FLAGS
     if (
         prediction_kinds
         and FLAGGED_STRATUM_UNVERIFIED_APPARATUS not in strata
