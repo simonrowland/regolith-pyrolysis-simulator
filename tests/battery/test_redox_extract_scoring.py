@@ -34,13 +34,16 @@ from simulator.battery.migrate import (
     _experiment_from_plain,
     _point_condition_from_plain,
     _with_target_print,
+    condition_identity_value,
     convert_pressure_to_pa,
     experiment_from_plain,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     load_yaml,
+    located_run_temperature,
     observation_from_plain,
     pressure_from_equipment,
+    select_declared_source,
     to_plain,
     write_outputs,
 )
@@ -2300,7 +2303,7 @@ def test_redox_temperature_selection_keeps_actual_run_controls(corrected):
         if corrected:
             conditions["T_C"] = Located(State.of(Decimal("1300")), Locator(page=4, record="run temperature"))
             conditions["temperature_K"] = Located(
-                State.of(score_module.condition_identity_value("temperature_C", celsius)),
+                State.of(condition_identity_value("temperature_C", celsius)),
                 operand.locator,
             )
         candidate = replace(
@@ -2540,6 +2543,22 @@ def test_generic_temperature_correction_uses_its_printed_unit_and_run_temperatur
         notice.kind is NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH
         for notice in prediction.notices
     )
+
+
+@pytest.mark.parametrize(("payload", "field", "expected"), [
+    ({"T_K": "1473.15", "T_C": "1200", "T": "1300", "T_units": "C"}, "T_C", "1473.15"),
+    ({"T_K": "1473", "T_C": "1200", "temperature": "1700"}, "T_K", "1473"),
+    ({"temperature": "1500", "T": "1300", "T_units": "C"}, "temperature", "1500"),
+    ({"T": "1300", "T_units": "C", "temperature_units": "K"}, "T", "1573.15"),
+    ({"T": "1300", "temperature_units": "C"}, "T", "1573.15"),
+])
+def test_retained_and_ingested_temperature_use_the_same_precedence(payload, field, expected):
+    ingested = select_declared_source("temperature_K", None, payload)
+    retained = located_run_temperature({key: Located(State.of(raw)) for key, raw in payload.items()})
+
+    assert ingested.field_name == field
+    assert ingested.value.point == Decimal(expected)
+    assert retained == State.of(Decimal(expected))
 
 
 @pytest.mark.parametrize("column", ("O2 setpoint", None), ids=("explicit", "omitted"))

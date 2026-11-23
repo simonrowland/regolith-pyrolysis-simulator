@@ -138,22 +138,12 @@ def _operand_fields(observation: Observation, conditions: Mapping[str, Located])
     }
 
 
-def _temperature_unit(field: str, conditions: Mapping[str, Located]) -> str | None:
-    if field != "T":
-        return None
-    return next((
-        str(conditions[key].state.value)
-        for key in ("T_units", "temperature_units")
-        if key in conditions and conditions[key].state.is_value
-    ), None)
-
-
 def independent_redox_conditions(
     observation: Observation, *,
     quantity: Quantity,
     ferric_target: bool,
     condition_identity_axis: Callable[[str], str | None],
-    condition_identity_value: Callable[..., object],
+    condition_identity_value: Callable[[str, object, Mapping[str, Located]], object],
     temperature_selection: Callable[[Mapping[str, Located]], State | None],
     pressure_selection: Callable[[Mapping[str, Located]], Decimal | Value | None],
     identity_sources: Mapping[str, tuple[str, ...]],
@@ -194,14 +184,14 @@ def independent_redox_conditions(
         ):
             continue
         original_value = condition_identity_value(
-            field, original.state.value, _temperature_unit(field, conditions)
+            field, original.state.value, conditions
         )
         projected = getattr(identity, axis)
         if original_value is None:
             continue
         axis_conditions = {
             key: condition_identity_value(
-                key, condition.state.value, _temperature_unit(key, conditions)
+                key, condition.state.value, conditions
             )
             for key, condition in conditions.items()
             if condition.state.is_value and condition_identity_axis(key) == axis

@@ -186,7 +186,7 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     condition_identity_axis,
-    condition_identity_value,
+    located_condition_identity_value,
     located_run_pressure,
     located_run_temperature,
     redox_identity_sources,
@@ -10062,7 +10062,7 @@ def _redox_input_view(
         or (quantity is Quantity.VALENCE_RATIO
             and _fe_valence_named_form(observation.identity) in {"ratio", "fraction"}),
         condition_identity_axis=condition_identity_axis,
-        condition_identity_value=condition_identity_value,
+        condition_identity_value=located_condition_identity_value,
         temperature_selection=located_run_temperature,
         pressure_selection=located_run_pressure,
         identity_sources=redox_identity_sources(observation, experiment),

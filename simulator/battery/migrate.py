@@ -10349,14 +10349,26 @@ def _prefer_printed_temperature(
     return found[0]
 
 
-def _select_temperature_field(
-    found: list[tuple[str, object, Decimal, str]],
-    available_fallbacks: Iterable[str],
-) -> str | None:
-    """Choose one source using the migration's shared temperature precedence."""
-    if found:
-        return _prefer_printed_temperature(found)[0]
-    return next(iter(available_fallbacks), None)
+def _temperature_candidates(
+    fields: Iterable[tuple[str, str | None]],
+    read: Callable[[str, str | None], tuple[object, str | None] | None],
+) -> Iterable[tuple[str, object, Decimal | None, str]]:
+    for field, default_unit in fields:
+        if (source := read(field, default_unit)) is not None:
+            raw, unit = source
+            amount, trail = convert_temperature_to_k(raw, unit)
+            yield field, raw, amount, trail or "identity:K"
+
+
+def _generic_temperature_unit(read: Callable[[str], Any], fallback: str | None = None) -> str | None:
+    return read("T_units") or read("temperature_units") or fallback
+
+
+def _temperature_fallbacks(
+    read: Callable[[str, str | None], tuple[object, str | None] | None],
+    generic_unit: str | None,
+) -> Iterable[tuple[str, object, Decimal | None, str]]:
+    return _temperature_candidates((("temperature", "K"), ("T", generic_unit)), read)
 
 
 # Printed-unit recovery for a Located whose note (or as_published block)
@@ -18399,16 +18411,16 @@ def select_declared_source(
     unused = _unused_ancillary(payload, None)
 
     if declared == AXIS_TEMPERATURE_K:
-        found_temperatures: list[tuple[str, object, Decimal, str]] = []
-        for key, unit in _TEMPERATURE_FIELDS:
+        def read_temperature(key: str, unit: str | None) -> tuple[object, str | None] | None:
             if key not in payload:
-                continue
+                return None
             raw = payload.get(key)
-            use_unit = unit
-            if isinstance(raw, Mapping):
-                use_unit = str(raw.get("units") or unit)
-                raw = raw.get("value")
-            amount, trail = convert_temperature_to_k(raw, use_unit)
+            if key != "T" and isinstance(raw, Mapping):
+                return raw.get("value"), str(raw.get("units") or unit)
+            return raw, unit
+
+        found_temperatures: list[tuple[str, object, Decimal, str]] = []
+        for key, raw, amount, trail in _temperature_candidates(_TEMPERATURE_FIELDS, read_temperature):
             if amount is None:
                 return _unavailable_selection(
                     trail or f"{key} is not numeric",
@@ -18416,7 +18428,7 @@ def select_declared_source(
                     field_name=key,
                     unit_trail=trail or "identity",
                 )
-            found_temperatures.append((key, raw, amount, trail or "identity:K"))
+            found_temperatures.append((key, raw, amount, trail))
         nested_temperature_unknown: tuple[str, str] | None = None
         point_conditions = payload.get("point_conditions")
         if isinstance(point_conditions, Mapping):
@@ -18452,14 +18464,8 @@ def select_declared_source(
                 found_temperatures.append(
                     (f"point_conditions.{key}", raw, amount, trail or "identity:K")
                 )
-        selected_field = _select_temperature_field(
-            found_temperatures,
-            (key for key in ("temperature", "T") if key in payload),
-        )
-        if found_temperatures and selected_field is not None:
-            key, _raw, amount, trail = next(
-                item for item in found_temperatures if item[0] == selected_field
-            )
+        if found_temperatures:
+            key, _raw, amount, trail = _prefer_printed_temperature(found_temperatures)
             return _point_selection(amount, key, trail, payload, condition_ranges)
         if nested_temperature_unknown is not None:
             key, reason = nested_temperature_unknown
@@ -18469,34 +18475,18 @@ def select_declared_source(
                 field_name=key,
                 unit_trail="identity",
             )
-        if selected_field == "temperature":
-            raw = payload.get("temperature")
-            unit = "K"
-            if isinstance(raw, Mapping):
-                unit = str(raw.get("units") or "K")
-                raw = raw.get("value")
-            amount, trail = convert_temperature_to_k(raw, unit)
+        for key, _, amount, trail in _temperature_fallbacks(
+            read_temperature, _generic_temperature_unit(payload.get, units),
+        ):
             if amount is not None:
-                return _point_selection(
-                    amount, "temperature", trail or "identity:K", payload, condition_ranges
+                return _point_selection(amount, key, trail, payload, condition_ranges)
+            if key == "T":
+                return _unavailable_selection(
+                    trail,
+                    condition_ranges=condition_ranges,
+                    field_name=key,
+                    unit_trail=trail,
                 )
-            selected_field = _select_temperature_field(
-                [], ("T",) if "T" in payload else ()
-            )
-        if selected_field == "T":
-            t_unit = payload.get("T_units") or payload.get("temperature_units") or units
-            amount, trail = convert_temperature_to_k(payload.get("T"), t_unit)
-            if amount is not None:
-                return _point_selection(
-                    amount, "T", trail or "identity:K", payload, condition_ranges
-                )
-            return _unavailable_selection(
-                trail
-                or "series T is not grounded in a source unit (T_K / T_C required)",
-                condition_ranges=condition_ranges,
-                field_name="T",
-                unit_trail=trail or "identity",
-            )
         if condition_ranges:
             name, lo, hi = condition_ranges[0]
             if lo == hi:
@@ -21360,6 +21350,19 @@ def condition_identity_value(
     return value
 
 
+def _located_generic_temperature_unit(conditions: Mapping[str, Located]) -> str | None:
+    def read(field: str) -> str | None:
+        condition = conditions.get(field)
+        return str(condition.state.value) if condition is not None and condition.state.is_value else None
+
+    return _generic_temperature_unit(read)
+
+
+def located_condition_identity_value(name: str, value: object, conditions: Mapping[str, Located]) -> object:
+    unit = _located_generic_temperature_unit(conditions) if name == "T" else None
+    return condition_identity_value(name, value, unit)
+
+
 def located_run_temperature(conditions: Mapping[str, Located]) -> State[Decimal] | None:
     """Apply the migration temperature selection to retained run controls."""
     selection = _located_temperature_selection(conditions)
@@ -21386,44 +21389,25 @@ def _located_temperature_selection(
     conditions: Mapping[str, Located],
 ) -> tuple[str, Decimal] | None:
     """Convert retained controls with the migration temperature unit owner."""
-    found: list[tuple[str, object, Decimal, str]] = []
-    for field, default_unit in _TEMPERATURE_FIELDS:
+    def read_temperature(field: str, unit: str | None) -> tuple[object, str | None] | None:
         condition = conditions.get(field)
         if condition is None or not condition.state.is_value:
-            continue
-        raw = _temperature_number(condition.state.value)
-        if raw is None:
             return None
-        amount, trail = convert_temperature_to_k(raw, default_unit)
+        return _temperature_number(condition.state.value), unit
+
+    found: list[tuple[str, object, Decimal, str]] = []
+    for field, raw, amount, trail in _temperature_candidates(_TEMPERATURE_FIELDS, read_temperature):
         if amount is None:
             return None
-        found.append((field, raw, amount, trail or "identity:K"))
-    selected_field = _select_temperature_field(
-        found,
-        (key for key in ("temperature", "T") if key in conditions),
-    )
-    if found and selected_field is not None:
-        field, _raw, amount, _trail = next(
-            item for item in found if item[0] == selected_field
-        )
+        found.append((field, raw, amount, trail))
+    if found:
+        field, _, amount, _ = _prefer_printed_temperature(found)
         return field, amount
-    temperature = conditions.get("temperature")
-    if temperature is not None and temperature.state.is_value:
-        raw = _temperature_number(temperature.state.value)
-        amount, _trail = convert_temperature_to_k(raw, "K")
+    for field, _, amount, _ in _temperature_fallbacks(
+        read_temperature, _located_generic_temperature_unit(conditions),
+    ):
         if amount is not None:
-            return "temperature", amount
-    generic = conditions.get("T")
-    units = next((
-        str(conditions[key].state.value)
-        for key in ("T_units", "temperature_units")
-        if key in conditions and conditions[key].state.is_value
-    ), None)
-    if generic is not None and generic.state.is_value:
-        raw = _temperature_number(generic.state.value)
-        amount, _trail = convert_temperature_to_k(raw, units)
-        if amount is not None:
-            return "T", amount
+            return field, amount
     return None
 
 
