@@ -236,7 +236,7 @@ def test_failed_cold_write_rolls_back_the_entire_solve(tmp_path, monkeypatch):
 @pytest.mark.parametrize("retry_kind", ["cold", "empty_cold", "hot_only"])
 def test_failure_after_legacy_cold_commit_retry_keeps_matching_pair(tmp_path, monkeypatch, retry_kind):
     live, snapshot, master = (tmp_path / name for name in ("live", "snapshot", "master"))
-    key = cache.engine_cache_key("openimcc", 1, {"request": 1})
+    key = cache.engine_cache_key("openimcc", cache.ENGINE_CHEMISTRY_VERSION["openimcc"], {"request": 1})
     cache._connect(live, readonly=False)
     # Reproduce the persisted orphan left by the old independent COLD commit.
     with sqlite3.connect(str(live) + ".cold") as cold:

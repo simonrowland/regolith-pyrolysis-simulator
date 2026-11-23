@@ -351,7 +351,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
+    "openimcc": 2,
     "internal-analytical": 3,
     "vaporock": 2,
     "magemin": 4,
@@ -371,6 +371,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # vaporock v2: 2026-11-23 t-1923 pressure/fO2 car, round 7 - retain gas-channel completeness for DP-108
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# openimcc v2: 2026-11-23 t-1923 pressure/fO2 car, round 11 - retain isolated-cell gas-channel completeness for DP-108
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)

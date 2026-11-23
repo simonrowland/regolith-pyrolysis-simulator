@@ -1,6 +1,7 @@
 """Cache seams must preserve live predictions and retry transient failures."""
 
 import sqlite3
+from dataclasses import replace
 from threading import Lock
 from types import SimpleNamespace
 
@@ -48,6 +49,58 @@ def test_isolated_request_keys_cover_all_consumed_physics_inputs(engine, monkeyp
     ):
         worker.request({**request, name: changed}, timeout_s=5)
         assert keys[-1] != keys[0], (engine, name)
+
+
+def test_openimcc_isolated_cell_rejects_legacy_incomplete_gas_map(tmp_path, monkeypatch):
+    from simulator.battery.score import _sum_gas_partial_pressures_pa
+
+    worker = object.__new__(battery._IsolatedCellWorker)
+    worker.engine = "openimcc"
+    worker.engine_settings = battery.normalize_engine_settings(worker.engine, None)
+    worker._lock = Lock()
+    oxygen = battery.Po2Request(battery.PO2_COMMANDED, 1e-8)
+    request = {
+        "composition_wt_pct": {"SiO2": 60.0, "MgO": 40.0},
+        "temperature_K": 1700.0,
+        "physical_pressure_bar": 1e-6,
+        "po2": oxygen.as_payload(),
+    }
+    legacy = battery.EquilibrateCell(
+        pot_id="legacy", engine=worker.engine, temperature_K=1700.0, po2=oxygen,
+        status="ok", refusal_reason=None, engine_status="ok", engine_reason=None,
+        melt_activities={}, gas_partial_pressures_Pa={"Na": 2.0}, liquid_fraction=1.0,
+        wall_s=0.0, cpu_s=0.0, hostname="test",
+    )
+    calls = []
+
+    def solve(payload, *, timeout_s):
+        calls.append((payload, timeout_s))
+        return replace(legacy, invalid_gas_partial_pressure_components=("SiO",)).as_payload()
+
+    worker._worker = SimpleNamespace(call=solve)
+    cache_path = str(tmp_path / "openimcc.sqlite")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", cache_path)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    version_one = engine_cache.engine_cache_key(worker.engine, 1, {
+        **request,
+        "engine_settings": engine_cache.engine_cache_settings(worker.engine, worker.engine_settings),
+    })
+    with engine_cache._without_engine_cache():
+        cold = worker.request(request, timeout_s=5)
+    engine_cache._prepare_memory_cache()
+    monkeypatch.setitem(engine_cache._MEMORY_CACHE, (cache_path, version_one, True),
+                        engine_cache.live_hot(legacy.to_hot()))
+    warm = worker.request(request, timeout_s=5)
+
+    def admissible_sum(payload):
+        if payload["invalid_gas_partial_pressure_components"]:
+            return None
+        return _sum_gas_partial_pressures_pa(payload["gas_partial_pressures_Pa"])
+
+    assert _sum_gas_partial_pressures_pa(legacy.gas_partial_pressures_Pa) == 2.0
+    assert warm["invalid_gas_partial_pressure_components"] == cold["invalid_gas_partial_pressure_components"] == ["SiO"]
+    assert admissible_sum(warm) is admissible_sum(cold) is None
+    assert len(calls) == 2
 
 
 @pytest.mark.parametrize("seam", ["inline", "isolated"])
