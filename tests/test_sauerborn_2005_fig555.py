@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import shutil
+from inspect import signature
 
 import pytest
 
 from simulator.corpus_paths import regolith_corpus_root
+from simulator.diagnostic_helpers.reproduction_compare import (
+    TimeSeriesComparisonRefusal,
+)
 from simulator.diagnostic_helpers.sauerborn_2005 import (
     SAUERBORN_FIG555_FILES,
     SauerbornCorpusError,
+    compare_sauerborn_o2_partial_pressure_time_series,
     load_sauerborn_fig555_path_series,
 )
 
@@ -64,3 +69,69 @@ def test_reader_rejects_a_changed_corpus_sha256(tmp_path, trace: str) -> None:
 
     with pytest.raises(SauerbornCorpusError, match=f"SHA-256 mismatch for {trace}"):
         load_sauerborn_fig555_path_series(tmp_path)
+
+
+def test_sauerborn_comparison_refuses_missing_runtime_pressure_series() -> None:
+    assert "argon_flow_nl_min" not in signature(
+        compare_sauerborn_o2_partial_pressure_time_series
+    ).parameters
+
+    with pytest.raises(TimeSeriesComparisonRefusal) as refusal:
+        compare_sauerborn_o2_partial_pressure_time_series(
+            case_id="sauerborn_2005_fig555",
+            source_id="kems-035-sauerborn-2005",
+            observable_id="sauerborn_o2_partial_pressure_time_series",
+            observation_points=(),
+            runtime_pressure_samples=None,
+            pre_high_temperature_base_mbar=1e-7,
+            evidence_scope="QMS-cross O2 partial pressure",
+            source_locator={"figure": "5.55"},
+            recipe={},
+            observation={},
+            runtime={},
+        )
+
+    assert refusal.value.reason_code == "qms_po2_series_missing"
+
+
+def test_sauerborn_comparison_scales_from_base_before_pointwise_compare() -> None:
+    records = compare_sauerborn_o2_partial_pressure_time_series(
+        case_id="sauerborn_2005_fig555",
+        source_id="kems-035-sauerborn-2005",
+        observable_id="sauerborn_o2_partial_pressure_time_series",
+        observation_points=(
+            {
+                "time_s": 0.0,
+                "expected_value_mbar": 1e-7,
+                "expected_uncertainty": {"kind": "absolute", "value": 0.0},
+                "source_locator": {"point_index": 0},
+            },
+            {
+                "time_s": 60.0,
+                # The pinned ZnO curve has a 1.1218782056e-4 mbar plateau.
+                "expected_value_mbar": 1.1218782056e-4,
+                "expected_uncertainty": {"kind": "absolute", "value": 0.0},
+                "source_locator": {"point_index": 1},
+            },
+        ),
+        runtime_pressure_samples=(
+            {"time_s": 0.0, "value_mbar": 2e-7},
+            {"time_s": 60.0, "value_mbar": 2e-4},
+        ),
+        pre_high_temperature_base_mbar=2e-7,
+        evidence_scope="QMS-cross O2 partial pressure",
+        source_locator={"figure": "5.55"},
+        recipe={},
+        observation={},
+        runtime={},
+    )
+
+    assert len(records) == 2
+    assert [record.units for record in records] == ["mbar", "mbar"]
+    assert [record.actual_value for record in records] == pytest.approx(
+        [1e-7, 1e-4]
+    )
+    assert records[0].coordinate == {"time_s": 0.0}
+    assert records[1].coordinate == {"time_s": 60.0}
+    # A gain fitted to the ZnO plateau changes the baseline or second value.
+    assert [record.status for record in records] == ["match", "mismatch"]

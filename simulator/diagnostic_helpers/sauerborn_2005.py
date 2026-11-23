@@ -5,12 +5,24 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import math
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
 from simulator.corpus_paths import regolith_corpus_root
+from simulator.diagnostic_helpers.reproduction_compare import (
+    ComparisonRecord,
+    TimeSeriesComparisonRefusal,
+    _interpolate_runtime_sample,
+    _normalise_observation_points,
+    _normalise_runtime_samples,
+    _series_point_locator,
+    compare_values,
+)
 
 
+SAUERBORN_NORMALIZED_BASE_PRESSURE_MBAR = 1e-7
 SAUERBORN_FIG555_FILES = {
     "CaO": (
         "tables/kems-035-sauerborn-2005/fig5-55-CaO.csv",
@@ -91,3 +103,89 @@ def load_sauerborn_fig555_path_series(
             )
         series[trace] = tuple(path_rows)
     return series
+
+
+def compare_sauerborn_o2_partial_pressure_time_series(
+    *,
+    case_id: str,
+    source_id: str,
+    observable_id: str,
+    observation_points: Sequence[Mapping[str, Any]],
+    runtime_pressure_samples: Sequence[Mapping[str, Any]] | None,
+    pre_high_temperature_base_mbar: float,
+    evidence_scope: str,
+    source_locator: Mapping[str, Any] | str,
+    recipe: Mapping[str, Any],
+    observation: Mapping[str, Any],
+    runtime: Mapping[str, Any],
+) -> tuple[ComparisonRecord, ...]:
+    """Normalize a QMS pressure trace by its own base, then compare points.
+
+    Times are seconds and pressures are mbar. The pre-high-temperature base is
+    supplied by the runtime; this function does not infer it from the peak.
+    """
+
+    if not runtime_pressure_samples:
+        raise TimeSeriesComparisonRefusal(
+            "qms_po2_series_missing",
+            "runtime exposes no QMS-cross O2 partial-pressure samples",
+        )
+
+    base_pressure_mbar = float(pre_high_temperature_base_mbar)
+    if not math.isfinite(base_pressure_mbar) or base_pressure_mbar <= 0.0:
+        raise ValueError(
+            "pre-high-temperature base pressure must be finite and positive"
+        )
+    scale = SAUERBORN_NORMALIZED_BASE_PRESSURE_MBAR / base_pressure_mbar
+
+    normalized_runtime = []
+    for index, sample in enumerate(runtime_pressure_samples):
+        if not isinstance(sample, Mapping):
+            raise ValueError(f"runtime_pressure_samples[{index}] must be a mapping")
+        pressure_mbar = sample.get("value_mbar")
+        normalized_runtime.append(
+            {
+                "time_min": float(sample["time_s"]) / 60.0,
+                "value": (
+                    None
+                    if pressure_mbar is None
+                    else float(pressure_mbar) * scale
+                ),
+            }
+        )
+    samples = _normalise_runtime_samples(normalized_runtime)
+    sample_times = [time_min for time_min, _ in samples]
+
+    normalized_observations = [
+        {
+            "time_min": float(point["time_s"]) / 60.0,
+            "expected_value": point["expected_value_mbar"],
+            "expected_uncertainty": point.get("expected_uncertainty"),
+            "source_locator": point.get("source_locator"),
+        }
+        for point in observation_points
+    ]
+    observations = _normalise_observation_points(normalized_observations)
+
+    records = []
+    for time_min, expected, uncertainty, point_locator in observations:
+        actual = _interpolate_runtime_sample(time_min, samples, sample_times)
+        records.append(
+            compare_values(
+                case_id=case_id,
+                source_id=source_id,
+                observable_id=observable_id,
+                species="O2",
+                coordinate={"time_s": time_min * 60.0},
+                expected_value=expected,
+                expected_uncertainty=uncertainty,
+                actual_value=actual,
+                units="mbar",
+                evidence_scope=evidence_scope,
+                source_locator=_series_point_locator(source_locator, point_locator),
+                recipe=recipe,
+                observation=observation,
+                runtime=runtime,
+            )
+        )
+    return tuple(records)
