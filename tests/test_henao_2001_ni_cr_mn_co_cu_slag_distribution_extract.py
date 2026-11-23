@@ -288,6 +288,11 @@ def _assert_henao_pressure_pins(experiments: dict, observations: list) -> None:
         for row in henao_experiments
     )
     assert all(
+        row.pressure_environment.regime.regime_class.is_unknown
+        and row.pressure_environment.regime.regime_class.reason == "not_published"
+        for row in henao_experiments
+    )
+    assert all(
         row.identity.total_pressure_Pa is not None
         and row.identity.total_pressure_Pa.is_value
         and row.identity.total_pressure_Pa.value == Decimal("101300")
