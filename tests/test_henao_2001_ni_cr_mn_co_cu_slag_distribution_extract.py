@@ -181,12 +181,16 @@ def _assert_composition_bindings(document: dict) -> None:
     }
     assert by_group[("henao:C-18", "metal")]["Co"] == "3.68"
     assert by_group[("henao:C-28", "metal")]["Co"] == "1.63"
+    # The assay map preserves the printed `< 0.03` detection bound. Use that
+    # independently of the metadata being guarded so metadata cannot define
+    # its own expected rows.
     bounded_rows = [
         observation
         for observation in observations
-        if "composition_missing_components" in observation["values"]
+        if observation["values"]["composition_wt_pct"].get("Ni") == "< 0.03"
     ]
     assert len(bounded_rows) == 18
+    bounded_ids = {observation["observation_id"] for observation in bounded_rows}
     for observation in bounded_rows:
         values = observation["values"]
         assert values["composition_missing_components"] == [
@@ -197,6 +201,14 @@ def _assert_composition_bindings(document: dict) -> None:
             }
         ]
         assert "Ni was printed as <0.03 wt% and excluded." in values["note"]
+    for observation in observations:
+        values = observation["values"]
+        if observation["observation_id"] in bounded_ids:
+            assert "composition_missing_components" in values
+            assert "Ni was printed as <0.03 wt% and excluded." in values["note"]
+        else:
+            assert "composition_missing_components" not in values
+            assert "note" not in values
     assert all(
         "composition_status" not in observation["values"]
         for observation in observations
@@ -246,6 +258,19 @@ def test_printed_phase_assays_are_bound_and_iron_valence_stays_unknown() -> None
     document = _document()
     _assert_composition_bindings(document)
     _assert_slag_compositions_remain_unknown(document)
+
+    # Keep the count at 18 while moving one bounded row's metadata and note
+    # onto an assay with a printed Ni value. The printed assay set must reject it.
+    mutated = deepcopy(document)
+    observations = {
+        row["observation_id"]: row for row in _observations(mutated)
+    }
+    donor = observations["henao_2001_t2_B-5_slag_Cr"]["values"]
+    recipient = observations["henao_2001_t1_A-1_slag_Ni"]["values"]
+    for key in ("composition_missing_components", "note"):
+        recipient[key] = donor.pop(key)
+    with pytest.raises(AssertionError):
+        _assert_composition_bindings(mutated)
 
 
 def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
