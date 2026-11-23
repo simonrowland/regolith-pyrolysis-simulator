@@ -498,16 +498,16 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
 def test_unsourced_alpha_uses_the_builtin_runtime_default(
     r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
 ):
-    import engines.builtin.evaporation_flux as evaporation_flux
+    import simulator.alpha_kinetics as alpha_kinetics
     import simulator.battery.residue as residue
 
     row, experiment = r11_inputs
     source = deepcopy(fig3_source)
     for block in source["species"].values():
         block["context"] = []
-    monkeypatch.setitem(evaporation_flux._DP_005_ALPHA, "value", 0.37)
+    monkeypatch.setitem(alpha_kinetics._DP_005_ALPHA, "value", 0.37)
     monkeypatch.setitem(
-        evaporation_flux._DP_005_ALPHA,
+        alpha_kinetics._DP_005_ALPHA,
         "source",
         "test mutation of the built-in HKL default",
     )

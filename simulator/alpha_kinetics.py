@@ -19,6 +19,19 @@ ANALYTICAL_UPPER_BOUND_ALPHA_STATUS = "analytical_upper_bound"
 PROXY_BRIDGE_ALPHA_STATUS = "proxy/bridge"
 ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
 
+# DP-005 is the one-sided fallback for an unsourced evaporation coefficient.
+# Keep the scalar and its authority provenance beside the shared alpha
+# validation rules so the engine adapter and battery scorer use one owner.
+_DP_005_ALPHA = {
+    "form": "scalar",
+    "value": 1.0,
+    ALPHA_AUTHORITY_STATUS_FIELD: ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    "source": (
+        "Hertz-Knudsen-Langmuir alpha=1 upper bound; "
+        "no species-specific alpha available"
+    ),
+}
+
 
 def _evaluate_extracted_arrhenius_alpha(
     alpha_form: Mapping[str, Any], temperature_K: float,

@@ -14,12 +14,12 @@ from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
 
-from engines.builtin.evaporation_flux import (
-    BuiltinEvaporationFluxProvider,
+from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+from simulator.alpha_kinetics import (
     _DP_005_ALPHA,
+    _evaluate_extracted_arrhenius_alpha,
 )
 from simulator.accounting.formulas import parse_formula
-from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     OxygenBalanceBracketBoundary,
     _VacuumOxygenChannel,
