@@ -17,6 +17,7 @@ import math
 
 import pytest
 
+from engines.builtin.fe_redox_respeciation import ferric_couple_o2_mol
 from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
 from simulator.feedstock_composition import iron_oxide_values
 from tests.magemin_test_support import close_test_owned_magemin_backend
@@ -49,11 +50,9 @@ def _oxygen_atoms(simulator: PyrolysisSimulator) -> float:
 
 
 def _bookable_ferric_o2(simulator: PyrolysisSimulator) -> float:
-    # Same factor the respeciation reducing arm books:
-    # o2_credit = 0.5 * n(Fe2O3) (fe_redox_respeciation.py).
     melt_mol = simulator.atom_ledger.project_account_mol("process.cleaned_melt")
     _feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
-    return 0.5 * fe2o3_mol
+    return ferric_couple_o2_mol(fe2o3_mol)
 
 
 def _pin_tangent(
