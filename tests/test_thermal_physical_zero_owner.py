@@ -30,17 +30,20 @@ from tests.chemistry.test_authoritative_vapor_pressure_liquid_gate import (
 def test_species_rates_follow_the_vapor_owner_limit(monkeypatch):
     import simulator.thermal_budget as thermal_budget
 
-    seen: list[float] = []
+    seen: list[tuple[float, float | None]] = []
 
-    def rates(temperature_K: float) -> dict[str, float]:
-        seen.append(temperature_K)
+    def rates(
+        temperature_K: float,
+        melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        seen.append((temperature_K, melt_surface_area_m2))
         return {}
 
     floor = thermal_budget.BUILTIN_VAPOR_BELOW_400K_LIMIT_K
     assert thermal_budget._species_rates_kg_hr(floor - 1.0, rates) == {}
     assert seen == []
     thermal_budget._species_rates_kg_hr(floor, rates)
-    assert seen == [floor]
+    assert seen == [(floor, None)]
 
     monkeypatch.setattr(
         thermal_budget,
@@ -48,7 +51,7 @@ def test_species_rates_follow_the_vapor_owner_limit(monkeypatch):
         floor + 50.0,
     )
     assert thermal_budget._species_rates_kg_hr(floor, rates) == {}
-    assert seen == [floor]
+    assert seen == [(floor, None)]
 
 
 def test_internal_analytical_cold_gate_follows_the_vapor_limit(monkeypatch):

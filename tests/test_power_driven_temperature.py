@@ -18,7 +18,12 @@ from simulator.campaigns import CampaignManager
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_schedule import lab_schedule_digests
 from simulator.runner import _load_preset_run_spec
-from simulator.state import CampaignPhase, MeltState
+from simulator.state import (
+    BatchRecord,
+    CampaignPhase,
+    CondensationTrain,
+    MeltState,
+)
 from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
     SOLAR_ABSORPTANCE_DEFAULT,
@@ -135,7 +140,6 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     # hot-upper area. A full wall on node 2 sits near the top-face-only
     # root; the booked root stays closer to the lumped area.
     areas = pellet_face_areas_m2(0.013, 0.010)
-    half_wall = math.pi * 0.013 * 0.010 / 2.0
     late_target, _late_ramp, late, late_previous = rows[29]
     shared = dict(
         power_W=late["focal_power_W"],
@@ -162,8 +166,10 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert lumped_late["nodes"] == "one_node"
     assert top_only_late["nodes"] == "one_node"
     assert math.isfinite(late["temperature_C"])
-    assert late["node_1_area_m2"] == pytest.approx(areas["top"] + half_wall)
-    assert late["node_2_area_m2"] == pytest.approx(half_wall)
+    assert late["node_1_area_m2"] == pytest.approx(areas["hot_upper"])
+    assert late["node_2_area_m2"] == pytest.approx(
+        areas["hot_upper"] - areas["top"]
+    )
     assert abs(late["temperature_C"] - lumped_late["temperature_C"]) < abs(
         late["temperature_C"] - top_only_late["temperature_C"]
     )
@@ -188,13 +194,13 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert record["mass_kg"] == pytest.approx(0.00338)
     # Investigation areas for the 13 mm by 10 mm cylinder: top
     # 1.327e-4 m², lumped hot upper 3.369e-4 m², full side 5.411e-4 m².
-    # area_m2 stays the top face. Node 1 radiates the top plus the
-    # upper half-wall. side_area_m2 stays the full cylinder wall.
+    # area_m2 and node_1_area_m2 are the hot upper surface used for both
+    # radiation and evaporation. side_area_m2 stays the full cylinder wall.
     assert areas["hot_upper"] == pytest.approx(3.369e-4, abs=5.0e-8)
     assert areas["full_side"] == pytest.approx(5.411e-4, abs=5.0e-8)
     assert record["face_set"] == "hot_upper"
     assert record["nodes"] == "two_node"
-    assert record["area_m2"] == pytest.approx(areas["top"])
+    assert record["area_m2"] == pytest.approx(areas["hot_upper"])
     assert record["top_area_m2"] == pytest.approx(areas["top"])
     assert record["side_area_m2"] == pytest.approx(areas["side"])
     assert record["sensitivity"]["face_set"] == "full_side"
@@ -342,7 +348,10 @@ def test_a_later_call_in_the_same_step_reuses_the_coupled_record():
     melt = _melt()
     calls = {"n": 0}
 
-    def rates(temperature_K: float) -> dict[str, float]:
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         calls["n"] += 1
         if float(temperature_K) < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             return {}
@@ -402,6 +411,47 @@ def test_a_later_call_in_the_same_step_reuses_the_coupled_record():
     assert fresh_record["evaporative_sink_W"] == pytest.approx(0.0)
     assert fresh_record["campaign_hour"] == pytest.approx(_DT_H)
     assert fresh != pytest.approx(target)
+
+
+def test_c0_exit_reuses_the_coupled_record_at_minute_thirty():
+    schedule = _robinot_schedule()
+    manager = CampaignManager({"furnace_max_T_C": 1800.0})
+    manager.overrides["C0"] = {"lab_schedule": schedule}
+    manager._process_dt_h = _DT_H
+    manager.c0_first_melt_backstop = True
+    melt = MeltState(campaign=CampaignPhase.C0, temperature_C=25.0)
+    melt.campaign_hour = 30.0 * _DT_H
+
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            return {}
+        return {"SiO": 0.01}
+
+    manager._species_rate_kg_hr_at_K = rates
+
+    target, _ramp = manager.get_temp_target(
+        CampaignPhase.C0,
+        melt.campaign_hour,
+        melt,
+    )
+    coupled_record = manager._power_temperature_for_step
+    assert coupled_record["campaign_hour"] == pytest.approx(0.5)
+    assert coupled_record["evaporative_sink_W"] > 0.0
+    manager.__dict__.pop("_species_rate_kg_hr_at_K", None)
+    coupled_record["ramp_C_per_hr"] = 1234.5
+    melt.temperature_C = float(target)
+
+    assert manager.check_endpoint(
+        melt,
+        None,
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["ramp_C_per_hr"] == pytest.approx(1234.5)
+    assert manager.last_c0_exit["backstop"] == "first_melt"
 
 
 def test_a_printed_area_and_emissivity_emit_no_knob_defaulted_notice():
@@ -709,10 +759,11 @@ def test_printed_face_areas_match_the_investigation_with_holder_and_argon():
         assert lumped["area_m2"] == pytest.approx(areas["hot_upper"])
         assert lumped["temperature_C"] == pytest.approx(hot_C, abs=2.0)
         assert booked["nodes"] == "two_node"
-        assert booked["area_m2"] == pytest.approx(areas["top"])
-        half_wall = math.pi * 0.013 * 0.010 / 2.0
-        assert booked["node_1_area_m2"] == pytest.approx(areas["top"] + half_wall)
-        assert booked["node_2_area_m2"] == pytest.approx(half_wall)
+        assert booked["area_m2"] == pytest.approx(areas["hot_upper"])
+        assert booked["node_1_area_m2"] == pytest.approx(booked["area_m2"])
+        assert booked["node_2_area_m2"] == pytest.approx(
+            areas["hot_upper"] - areas["top"]
+        )
         assert abs(booked["temperature_C"] - lumped["temperature_C"]) < abs(
             booked["temperature_C"] - top_only["temperature_C"]
         )
@@ -829,7 +880,10 @@ def test_campaign_thread_puts_the_evaporative_sink_in_the_root():
     dt_h = peak_min / 60.0
     kg_hr = 401.0 * 1.0e-6 * 60.0
 
-    def rates(temperature_K: float) -> dict[str, float]:
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             return {}
         return {"SiO": kg_hr}

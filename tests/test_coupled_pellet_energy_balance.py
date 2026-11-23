@@ -102,15 +102,20 @@ def _sio_mole_budget(temperature_K: float) -> tuple[float, dict]:
     return float(budget["evaporation_thermal_kWh"]) * 3600.0, budget
 
 
-def _sio_reaction_J_per_mol() -> float:
+def _sio_reaction_J_per_mol(temperature_K: float | None = None) -> float:
     """Joules per mole from the production budget at one mole per hour.
 
     kWh per hour at 1 mol/h is kJ/mol divided by 3600. Multiplying the
-    budget's kWh by 3.6e6 J/kWh recovers J/mol.
+    budget's kWh by 3.6e6 J/kWh recovers J/mol. Omitting temperature
+    keeps the separate 298 K coefficient pin; supplying it selects the
+    production temperature-dependent reaction enthalpy.
     """
 
     kg_per_h = _sio_molar_mass_kg()
-    budget = evaporation_enthalpy_budget({"SiO": kg_per_h})
+    budget = evaporation_enthalpy_budget(
+        {"SiO": kg_per_h},
+        temperature_K=temperature_K,
+    )
     return float(budget["evaporation_thermal_kWh"]) * 3.6e6
 
 
@@ -160,8 +165,12 @@ def _alpha_spec():
     return _load_evaporation_alpha_by_species(document)["SiO"]
 
 
-def _kinetic_sio_kg_hr(temperature_K: float, alpha_spec) -> dict[str, float]:
-    """Booked SiO kg/h on the top face, from the series-resistance owner.
+def _kinetic_sio_kg_hr(
+    temperature_K: float,
+    alpha_spec,
+    melt_surface_area_m2: float | None = None,
+) -> dict[str, float]:
+    """Booked SiO kg/h from the series-resistance owner.
 
     P_eq is the audit anchor run through van't Hoff at the budget's dH.
     Gas resistance is off, so this probe is the owner's interface law.
@@ -173,7 +182,7 @@ def _kinetic_sio_kg_hr(temperature_K: float, alpha_spec) -> dict[str, float]:
 
     if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
         return {}
-    enthalpy_J = _sio_reaction_J_per_mol()
+    enthalpy_J = _sio_reaction_J_per_mol(temperature_K)
     exponent = (
         -enthalpy_J
         / GAS_CONSTANT_6SIG
@@ -200,7 +209,12 @@ def _kinetic_sio_kg_hr(temperature_K: float, alpha_spec) -> dict[str, float]:
         gas_resistance_enabled=False,
         melt_resistance_enabled=False,
     )
-    kg_per_h = float(flux.flux_kg_s_m2) * _areas()["top"] * 3600.0
+    area_m2 = (
+        _areas()["top"]
+        if melt_surface_area_m2 is None
+        else float(melt_surface_area_m2)
+    )
+    kg_per_h = float(flux.flux_kg_s_m2) * area_m2 * 3600.0
     if not math.isfinite(kg_per_h) or kg_per_h <= 0.0:
         return {}
     return {"SiO": kg_per_h}
@@ -244,7 +258,10 @@ def _two_node_sinks_W(record, rates_at) -> float:
             diameter_m=_DIAMETER_M,
             boundary_K=boundary_K,
         )
-        + evaporative_enthalpy_sink_W(top_K, rates_at(top_K))
+        + evaporative_enthalpy_sink_W(
+            top_K,
+            rates_at(top_K, record["node_1_area_m2"]),
+        )
         + _radiation_exchange_W(
             side_K,
             area_m2=half_wall_m2,
@@ -277,7 +294,10 @@ def _one_node_sinks_W(record, rates_at) -> float:
             diameter_m=_DIAMETER_M,
             boundary_K=boundary_K,
         )
-        + evaporative_enthalpy_sink_W(temperature_K, rates_at(temperature_K))
+        + evaporative_enthalpy_sink_W(
+            temperature_K,
+            rates_at(temperature_K, None),
+        )
     )
 
 
@@ -365,9 +385,18 @@ def test_sio_enthalpy_flags_an_unprinted_node_and_the_end_of_the_liquid_table():
 
 def test_coupled_root_closes_and_a_dropped_sink_does_not():
     alpha_spec = _alpha_spec()
+    evaporating_areas: list[float | None] = []
 
-    def rates(temperature_K: float) -> dict[str, float]:
-        return _kinetic_sio_kg_hr(temperature_K, alpha_spec)
+    def rates(
+        temperature_K: float,
+        melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        evaporating_areas.append(melt_surface_area_m2)
+        return _kinetic_sio_kg_hr(
+            temperature_K,
+            alpha_spec,
+            melt_surface_area_m2,
+        )
 
     coupled = _solve(species_rate_kg_hr_at_K=rates)
     dropped = _solve()
@@ -375,6 +404,12 @@ def test_coupled_root_closes_and_a_dropped_sink_does_not():
     opened = _two_node_sinks_W(dropped, rates)
 
     assert coupled["nodes"] == "two_node"
+    assert coupled["area_m2"] == pytest.approx(coupled["node_1_area_m2"])
+    assert evaporating_areas
+    assert all(
+        area == pytest.approx(coupled["node_1_area_m2"])
+        for area in evaporating_areas
+    )
     assert _relative_gap(coupled["power_W"], closed) < _RELATIVE_CLOSURE
     # Mutation: the no-evaporation root is what the solver returns when
     # the sink is left out of the residual. The independent sum still
@@ -382,6 +417,15 @@ def test_coupled_root_closes_and_a_dropped_sink_does_not():
     assert _relative_gap(dropped["power_W"], opened) > _RELATIVE_CLOSURE
     assert 0.0 < dropped["temperature_C"] - coupled["temperature_C"] < 2000.0
     assert coupled["evaporative_sink_W"] > 0.0
+    assert coupled["temperature_C"] == pytest.approx(
+        1956.81553705,
+        abs=0.1,
+    )
+    assert coupled["evaporative_sink_W"] == pytest.approx(47.5704215, abs=0.1)
+    assert rates(
+        coupled["temperature_K"],
+        coupled["node_1_area_m2"],
+    )["SiO"] == pytest.approx(9.88271449225e-3, rel=0.01)
     assert dropped["evaporative_sink_W"] == pytest.approx(0.0)
 
 
@@ -396,10 +440,20 @@ def test_lumped_sio_dump_is_not_a_closed_state():
     # its own, so the kinetic rate at the root can exceed the old dump.
     alpha_spec = _alpha_spec()
 
-    def kinetic(temperature_K: float) -> dict[str, float]:
-        return _kinetic_sio_kg_hr(temperature_K, alpha_spec)
+    def kinetic(
+        temperature_K: float,
+        melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        return _kinetic_sio_kg_hr(
+            temperature_K,
+            alpha_spec,
+            melt_surface_area_m2,
+        )
 
-    def dump(temperature_K: float) -> dict[str, float]:
+    def dump(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             return {}
         return {"SiO": 401.0 * 1.0e-6 * 60.0}
@@ -407,7 +461,10 @@ def test_lumped_sio_dump_is_not_a_closed_state():
     lumped = _lumped_hot_upper()
     bare_two = _solve()
     coupled = _solve(species_rate_kg_hr_at_K=kinetic)
-    lumped_closed = _one_node_sinks_W(lumped, lambda _temperature: {})
+    lumped_closed = _one_node_sinks_W(
+        lumped,
+        lambda _temperature, _area: {},
+    )
     lumped_dump = _one_node_sinks_W(lumped, dump)
     coupled_closed = _two_node_sinks_W(coupled, kinetic)
 
@@ -415,7 +472,10 @@ def test_lumped_sio_dump_is_not_a_closed_state():
     assert _relative_gap(lumped["power_W"], lumped_dump) > _RELATIVE_CLOSURE
     assert _relative_gap(coupled["power_W"], coupled_closed) < _RELATIVE_CLOSURE
     assert coupled["temperature_C"] < bare_two["temperature_C"]
-    booked = kinetic(coupled["temperature_K"])
+    booked = kinetic(
+        coupled["temperature_K"],
+        coupled["node_1_area_m2"],
+    )
     assert booked["SiO"] > 0.0
     assert coupled["evaporative_sink_W"] == pytest.approx(
         evaporative_enthalpy_sink_W(coupled["temperature_K"], booked)
@@ -429,10 +489,13 @@ def test_high_conductivity_merges_the_two_nodes_with_the_one_node_bound():
     # the holder. The half-slab series is the one-node holder term, so
     # the temperatures meet. k = 1e8 W m-1 K-1 is that limit for this
     # pellet: the drop P/G is well under 0.05 °C.
-    alpha_spec = _alpha_spec()
-
-    def rates(temperature_K: float) -> dict[str, float]:
-        return _kinetic_sio_kg_hr(temperature_K, alpha_spec)
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            return {}
+        return {"SiO": 0.006}
 
     for callback in (None, rates):
         two = _solve(
@@ -530,7 +593,10 @@ def test_booked_two_node_root_is_closer_to_lumped_than_to_the_top_face():
 
 
 def test_the_flux_callback_is_not_called_below_the_evaporation_floor():
-    def rates(temperature_K: float) -> dict[str, float]:
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             raise AssertionError(temperature_K)
         return {"SiO": 0.006}
@@ -543,12 +609,18 @@ def test_the_flux_callback_is_not_called_below_the_evaporation_floor():
 def test_a_flux_refusal_inside_the_bracket_stays_a_flagged_temperature():
     from simulator.evaporation import EvaporationFluxRefusal
 
-    def refuse_evaporation(temperature_K: float) -> dict[str, float]:
+    def refuse_evaporation(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         if temperature_K >= 3500.0:
             raise EvaporationFluxRefusal("probe_refused", {"temperature_K": temperature_K})
         return {}
 
-    def refuse_power(temperature_K: float) -> dict[str, float]:
+    def refuse_power(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         if temperature_K >= 3500.0:
             raise PowerTemperatureRefusal("evaporative_flux_refused", "probe")
         return {}
@@ -604,12 +676,17 @@ def test_a_side_node_without_a_bracket_predicts_and_flags(monkeypatch):
 
 def test_a_malformed_rate_callback_refuses():
     with pytest.raises(PowerTemperatureRefusal) as refused:
-        _solve(species_rate_kg_hr_at_K=lambda _temperature: [0.1])
+        _solve(
+            species_rate_kg_hr_at_K=lambda _temperature, _area: [0.1]
+        )
     assert refused.value.reason == "evaporative_rate_callback_malformed"
 
 
 def test_the_tonne_sky_does_not_spend_the_pellet_sink():
-    def rates(_temperature_K: float) -> dict[str, float]:
+    def rates(
+        _temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         raise AssertionError("the sky balance called the pellet flux")
 
     record = solve_power_driven_melt_temperature_C(
@@ -684,8 +761,9 @@ def _bind_power_balance_host(
         calls["trial_lf"].append(value)
         return value
 
-    def calculate(trial):
+    def calculate(trial, *, melt_surface_area_m2=None):
         calls["calc"] += 1
+        calls["melt_surface_area_m2"] = melt_surface_area_m2
         trial_fraction = float(trial.liquid_fraction)
         if trial_fraction <= 0.0:
             return EvaporationFlux()
@@ -729,16 +807,56 @@ def _bind_power_balance_host(
     host._cap_c0_joint_release_to_pipe_capacity = pipe_cap
     cache = {"host": {}, "step_start_C": 25.0}
 
-    def rates(temperature_K: float) -> dict[str, float]:
+    def rates(
+        temperature_K: float,
+        melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
         return PyrolysisSimulator._power_balance_species_rates_kg_hr(
             host,
             temperature_K,
             floor_K=BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
             ceiling_K=EVAPORATIVE_BRACKET_CEILING_K,
             cache=cache,
+            melt_surface_area_m2=melt_surface_area_m2,
         )
 
     return host, equilibrium, calls, rates
+
+
+def test_power_balance_rate_cache_includes_evaporating_area():
+    host, _equilibrium, calls, rates = _bind_power_balance_host(
+        liquid_fraction_at=lambda _temperature_K: 1.0,
+        raw_sio_kg_hr=0.01,
+        depletion=1.0,
+        pump_scale=None,
+        pipe_scale=1.0,
+    )
+    temperature_K = 1700.0
+
+    rates(temperature_K, 1.0e-4)
+    rates(temperature_K, 1.0e-4)
+    assert calls["calc"] == 1
+
+    rates(temperature_K, 2.0e-4)
+    assert calls["calc"] == 2
+    assert (temperature_K, 1.0e-4) in host._power_balance_root_booking
+    assert (temperature_K, 2.0e-4) in host._power_balance_root_booking
+
+
+def test_power_balance_passes_hot_node_area_to_evaporation_owner():
+    host, _equilibrium, calls, rates = _bind_power_balance_host(
+        liquid_fraction_at=lambda _temperature_K: 1.0,
+        raw_sio_kg_hr=0.01,
+        depletion=1.0,
+        pump_scale=None,
+        pipe_scale=1.0,
+    )
+
+    coupled = _solve(species_rate_kg_hr_at_K=rates)
+
+    assert calls["melt_surface_area_m2"] == pytest.approx(
+        coupled["node_1_area_m2"]
+    )
 
 
 def test_a_solid_start_minute_root_includes_the_sink():
@@ -765,7 +883,9 @@ def test_a_solid_start_minute_root_includes_the_sink():
     assert 1.0 in calls["trial_lf"]
     assert calls["gate"] == 1
     assert coupled["temperature_C"] < bare["temperature_C"] - 1.0
-    booked = host._power_balance_root_booking[float(coupled["temperature_K"])]
+    booked = host._power_balance_root_booking[
+        (float(coupled["temperature_K"]), coupled["node_1_area_m2"])
+    ]
     assert booked["rates"]["SiO"] == pytest.approx(0.02)
     assert booked["liquid_fraction"] == pytest.approx(1.0)
 
@@ -786,7 +906,9 @@ def test_a_molten_minute_books_the_root_rate_times_dt():
         pipe_scale=pipe,
     )
     coupled = _solve(species_rate_kg_hr_at_K=rates)
-    root = host._power_balance_root_booking[float(coupled["temperature_K"])]
+    root = host._power_balance_root_booking[
+        (float(coupled["temperature_K"]), coupled["node_1_area_m2"])
+    ]
     assert root["rates"]["SiO"] == pytest.approx(expected)
     dt_hr = 60.0 / 3600.0
     assert root["rates"]["SiO"] * dt_hr == pytest.approx(expected * dt_hr)
@@ -845,7 +967,7 @@ def test_a_second_evaluation_after_the_root_turns_red():
     )
     coupled = _solve(species_rate_kg_hr_at_K=rates)
     host._power_balance_applied_booking = host._power_balance_root_booking[
-        float(coupled["temperature_K"])
+        (float(coupled["temperature_K"]), coupled["node_1_area_m2"])
     ]
     before = calls["calc"]
     assert before > 0

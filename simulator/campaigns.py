@@ -2391,7 +2391,7 @@ class CampaignManager:
     # ------------------------------------------------------------------
 
     def get_temp_target(self, campaign: CampaignPhase,
-                        campaign_hour: int,
+                        campaign_hour: float,
                         melt: MeltState) -> Tuple[Optional[float], float]:
         """
         Get the target temperature and ramp rate for a campaign.
@@ -2469,7 +2469,7 @@ class CampaignManager:
     def _stored_power_step(
         self,
         campaign: CampaignPhase,
-        campaign_hour: int,
+        campaign_hour: float,
     ) -> Optional[Mapping]:
         """Coupled balance already solved for this campaign and hour.
 
@@ -2490,7 +2490,7 @@ class CampaignManager:
         return record
 
     def _get_base_temp_target(self, campaign: CampaignPhase,
-                               campaign_hour: int,
+                               campaign_hour: float,
                                melt: MeltState) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
         coupled = self._stored_power_step(campaign, campaign_hour)
@@ -3092,7 +3092,7 @@ class CampaignManager:
             # First melt has priority over the computed exit and maximum hold.
             if self.c0_first_melt_backstop:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+                    campaign, melt.campaign_hour, melt)
                 self.last_c0_exit = c0_exit_record(
                     STAGE0_RELEASE_KINETICS,
                     backstop="first_melt",
@@ -3107,7 +3107,7 @@ class CampaignManager:
 
             if self.c0_remaining_budget_exit is not None:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+                    campaign, melt.campaign_hour, melt)
                 self.last_c0_exit = c0_exit_record(
                     STAGE0_RELEASE_KINETICS,
                     backstop="remaining_budget",
@@ -3135,7 +3135,7 @@ class CampaignManager:
                     and completed_campaign_hour >= float(exit_campaign_hour)
                 ):
                     _target_T, ramp_C_per_hr = self.get_temp_target(
-                        campaign, int(melt.campaign_hour), melt)
+                        campaign, melt.campaign_hour, melt)
                     self.last_c0_exit = c0_exit_record(
                         STAGE0_RELEASE_KINETICS,
                         backstop="computed_exit",
@@ -3151,7 +3151,7 @@ class CampaignManager:
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+                    campaign, melt.campaign_hour, melt)
                 self.last_c0_exit = c0_exit_record(
                     STAGE0_RELEASE_KINETICS,
                     backstop="maximum_hold",

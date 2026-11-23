@@ -17828,6 +17828,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         floor_K: float,
         ceiling_K: float,
         cache: dict[str, Any],
+        melt_surface_area_m2: float | None = None,
     ) -> dict[str, float]:
         """Booked kg/h at ``temperature_K`` for the quasi-steady root.
 
@@ -17839,9 +17840,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         liquid-fraction curve. It does not reach a new equilibrium.
         The same evaluation applies the bakeout pump scale and the C0
         pipe cap, and that flux is what the step books. A repeat call
-        at the same temperature returns the stored rates: the closing
-        residual, the enthalpy report, and a sensitivity probe must
-        not replace J(T_root). The ledger is not debited. Below
+        at the same temperature and surface area returns the stored
+        rates: the closing residual, the enthalpy report, and a
+        sensitivity probe must not replace J(T_root). The ledger is
+        not debited. Below
         ``floor_K`` the evaporation owner returns a physical zero, and
         the balance does not call it: the bisection bracket starts at 0 K.
 
@@ -17857,13 +17859,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.thermal_budget import PowerTemperatureRefusal
 
         key = float(temperature_K)
+        booking_key = (
+            key,
+            (
+                None
+                if melt_surface_area_m2 is None
+                else float(melt_surface_area_m2)
+            ),
+        )
         if key < floor_K or cache.get("empty"):
             return {}
         bookings = getattr(self, "_power_balance_root_booking", None)
         if not isinstance(bookings, dict):
             bookings = {}
             self._power_balance_root_booking = bookings
-        cached = bookings.get(key)
+        cached = bookings.get(booking_key)
         if isinstance(cached, Mapping):
             return dict(cached["rates"])
         if "equilibrium" not in cache:
@@ -17912,7 +17922,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquid_fraction,
             )
             try:
-                flux = self._calculate_evaporation(trial)
+                flux = self._calculate_evaporation(
+                    trial,
+                    melt_surface_area_m2=melt_surface_area_m2,
+                )
             except EvaporationFluxRefusal as exc:
                 # A flux refusal is the hot side of this probe. The
                 # balance keeps the best finite temperature and flags
@@ -17946,7 +17959,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 for species, rate in stored.species_kg_hr.items()
                 if float(rate) > 0.0
             }
-            bookings[key] = {
+            bookings[booking_key] = {
                 "rates": dict(rates),
                 "flux": stored,
                 "temperature_K": key,
@@ -18047,7 +18060,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         bookings = getattr(self, "_power_balance_root_booking", None)
         if not isinstance(bookings, dict):
             return
-        entry = bookings.get(float(solved_K))
+        evaporation_area_m2 = (
+            record.get("node_1_area_m2")
+            if record.get("nodes") == "two_node"
+            else None
+        )
+        entry = bookings.get((float(solved_K), evaporation_area_m2))
         if isinstance(entry, Mapping):
             self._power_balance_applied_booking = entry
 
@@ -18185,12 +18203,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 "step_start_C": float(self.melt.temperature_C),
             }
 
-            def _rates(temperature_K: float) -> dict[str, float]:
+            def _rates(
+                temperature_K: float,
+                melt_surface_area_m2: float | None,
+            ) -> dict[str, float]:
                 return self._power_balance_species_rates_kg_hr(
                     temperature_K,
                     floor_K=BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
                     ceiling_K=EVAPORATIVE_BRACKET_CEILING_K,
                     cache=cache,
+                    melt_surface_area_m2=melt_surface_area_m2,
                 )
 
             self.campaign_mgr._species_rate_kg_hr_at_K = _rates
