@@ -26992,8 +26992,7 @@ class Migrator:
                 return
             phase_role_token = _phase_role_token(values.get("phase_label"))
             counter_phase_role_token = _phase_role_token(values.get("counter_phase_label"))
-            if phase_raw is None or phase_raw == "":
-                assert phase_role_token is not None
+            if phase_role_token is not None:
                 phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])
                 unmapped_phase = None
         if (

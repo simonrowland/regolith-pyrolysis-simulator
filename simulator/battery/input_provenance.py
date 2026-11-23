@@ -360,7 +360,6 @@ def unprinted_analysed_phase_echo_detail(
         "pdf_page_index",
         "published_page",
         "table",
-        "row",
     )
     if any(
         getattr(row_locator, name) in (None, "")
@@ -368,12 +367,25 @@ def unprinted_analysed_phase_echo_detail(
         for name in locator_fields
     ):
         return None
+    row_key = locator_row_identity(row_locator)
+    if row_key is None or row_key != locator_row_identity(map_locator):
+        return None
     return {
         "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
         "input": "run_composition",
         "default_policy_id": "DP-017",
         "rule": "analysed phase rows cannot use their own analysis as input",
     }
+
+
+def locator_row_identity(locator: Locator) -> str | None:
+    """Return the source row key retained in a typed locator's extra note."""
+
+    note = locator.note
+    if not isinstance(note, str):
+        return None
+    match = re.search(r"(?:^|;\s*)row=([^;]+)", note)
+    return match.group(1).strip() if match is not None else None
 
 
 def _clip(text: str) -> str:

@@ -12320,6 +12320,36 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "phase_role"},
             execution=ExecutionState.NOT_PROBED,
         )
+    composition_state = identity.composition
+    composition = (
+        composition_state.value
+        if composition_state is not None
+        and composition_state.is_value
+        and isinstance(composition_state.value, Composition)
+        else None
+    )
+    preserve_input_diagnostic = composition is not None and (
+        composition.basis == SLAG_METAL_CHARGE_BASIS
+        or (
+            composition.amount_basis is AmountBasis.MASS_PERCENT
+            and sum((amount for _name, amount in composition.components), Decimal(0))
+            != Decimal("100")
+        )
+    )
+    if role is PhaseRole.METAL and not preserve_input_diagnostic:
+        from simulator.melt_backend.base import battery_adapter_class
+
+        adapter = battery_adapter_class(engine.value)
+        if adapter is None or not adapter().capabilities().get("metal_alloy", False):
+            return refused(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+                {
+                    "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                    "engine": engine.value,
+                    "phase_role": role.value,
+                    "detail": "adapter does not declare metal-alloy phase support",
+                },
+            )
     counter = _phase_role_value(identity, "counter_phase_role")
     if quantity is Quantity.DISTRIBUTION_RATIO and counter is None:
         return refused(
@@ -12425,16 +12455,6 @@ def _predict_phase_row(
                 "identity_amount_basis": AmountBasis.MASS_PERCENT.value,
                 "engine_basis": "mole_fraction or mol_inventory",
                 "detail": "printed mass-percent phase identity cannot be read as moles",
-            },
-        )
-    if role is PhaseRole.METAL:
-        return refused(
-            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
-            {
-                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
-                "engine": engine.value,
-                "phase_role": role.value,
-                "detail": "the melt adapters do not model metal-alloy phases",
             },
         )
     wt = composition_wt_pct(composition_state.value)

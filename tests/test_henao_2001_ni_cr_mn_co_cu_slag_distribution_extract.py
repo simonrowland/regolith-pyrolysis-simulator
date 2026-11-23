@@ -16,10 +16,12 @@ from simulator.battery.enums import (
     AmountBasis,
     Engine,
     NoticeKind,
+    Phase,
     PhaseRole,
     RefusalReason,
 )
 from simulator.battery.migrate import Migrator
+from simulator.battery.input_provenance import locator_row_identity
 from simulator.state_types import State
 from simulator.battery.score import _predict_with_engine
 
@@ -342,9 +344,21 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     observations = [row for row in result.observations.values() if row.source_id == EXTRACT.stem]
     assert len(observations) == 431
     assert all(row.admission.status.value == "admitted" for row in observations)
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.L
+        for row in observations
+    )
     assert not [entry for entry in result.queue if entry.source.endswith(EXTRACT.name)]
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     _assert_henao_pressure_pins(result.experiments, observations)
+    henao_experiments = [
+        row
+        for row in result.experiments.values()
+        if row.experiment_id.startswith(
+            "10.2320/matertrans.42.1959::experiment::henao:"
+        )
+    ]
     mutated_experiments = dict(result.experiments)
     pressure_experiment = next(
         row
@@ -409,13 +423,6 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     )
     with pytest.raises(AssertionError):
         _assert_henao_pressure_pins(mutated_sweep_experiments, observations)
-    henao_experiments = [
-        row
-        for row in result.experiments.values()
-        if row.experiment_id.startswith(
-            "10.2320/matertrans.42.1959::experiment::henao:"
-        )
-    ]
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
     # The unprinted slag iron valence leaves slag compositions unknown; alloy
@@ -446,9 +453,12 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     ).refusal_detail == {"reason": "missing_input", "input": "composition"}
     unrelated_map_conditions = dict(a1_slag.point_conditions)
     printed_map = unrelated_map_conditions["printed_composition"]
+    assert a1_slag.locator.page == printed_map.locator.page
+    assert a1_slag.locator.table == printed_map.locator.table
+    assert locator_row_identity(a1_slag.locator) == locator_row_identity(printed_map.locator) == "4"
     unrelated_map_conditions["printed_composition"] = replace(
         printed_map,
-        locator=replace(printed_map.locator, row="unrelated-row"),
+        locator=replace(printed_map.locator, note="row=unrelated-row"),
     )
     unrelated_map = replace(
         a1_slag, point_conditions=unrelated_map_conditions
