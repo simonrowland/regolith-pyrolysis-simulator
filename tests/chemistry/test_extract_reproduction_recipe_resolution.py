@@ -9,6 +9,7 @@ from dataclasses import replace
 import pytest
 
 from simulator.battery import migrate as battery_migrate
+import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 from simulator.diagnostic_helpers.extract_reproduction import (
     _literature_pressure_points,
     _melt_recipe_mol,
@@ -17,7 +18,6 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     observation_admission_reason,
     _pressure_standard_state_kind,
 )
-import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 
 
 def _adopted_observation(source_id: str, species: str, observation_id: str):

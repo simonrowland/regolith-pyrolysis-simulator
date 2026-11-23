@@ -3181,6 +3181,27 @@ def _evaluate_psat(
                 runtime["refusal"] = last_refusal
                 continue
             if pO2 is None:
+                if (
+                    standard_state_kind == "melt"
+                    and obs.source_id == "kems-022-demaria-1971"
+                    and obs.species_id == "K"
+                    and obs.observation_id
+                    == "demaria_1971_k_psat_figure2_digitized"
+                ):
+                    # This extract adapter accepts numeric pO2 only. The
+                    # existing Knudsen oxygen closure belongs to the battery
+                    # scorer's migrated Observation/Experiment path.
+                    last_refusal = (
+                        "diagnostic_effusion_closure_via_scorer_only; "
+                        "owner=simulator/battery/score.py::_borrow_internal_analytical_effusion"
+                    )
+                    typed_gap = f"{_TYPED_SKIP_PREFIX}{last_refusal}"
+                    runtime["refusal"] = last_refusal
+                    runtime["skip_reason"] = typed_gap
+                    unsupported = True
+                    if typed_gap not in evaluation.skip_reasons:
+                        evaluation.skip_reasons.append(typed_gap)
+                    continue
                 last_refusal = "missing_condition:pO2_boundary"
                 runtime["refusal"] = last_refusal
                 continue
