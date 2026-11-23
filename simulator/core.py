@@ -6044,6 +6044,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._sync_oxygen_reservoir_mirror()
         return reservoir
 
+    def _melt_redox_tangent_fO2_step(
+        self,
+        *,
+        signed_o2_equiv_mol: float,
+        base_fO2_log: float,
+        capacity_mol_per_ln: float,
+        apply_pressure_ceiling: bool,
+    ) -> tuple[float, float]:
+        """Advance melt fO2 by one tangent step.
+
+        signed_o2_equiv_mol is mol O2 equivalent added to the melt couple
+        (positive raises fO2). capacity_mol_per_ln is mol per ln fO2, so
+        Δln fO2 = signed_o2_equiv_mol / capacity_mol_per_ln is
+        dimensionless and log10 fO2 = ln fO2 / ln(10).
+
+        When apply_pressure_ceiling is set, compare the oxygen moles with
+        C_m * Δln(to the ideal-gas ceiling) before dividing. A finite
+        source divided by a collapsing C_m can overflow; the ceiling
+        stops the prediction and the caller does not discard the leftover
+        oxygen. The exchange site passes false: its transport target was
+        already limited, and this update must stay x_m - dn_ledger / C_m.
+        """
+        ln10 = math.log(10.0)
+        x_m = base_fO2_log * ln10
+        if apply_pressure_ceiling:
+            upper_bound = self._melt_redox_fO2_upper_bound_log()
+            delta_to_bound = (upper_bound - base_fO2_log) * ln10
+            if signed_o2_equiv_mol >= capacity_mol_per_ln * delta_to_bound:
+                applied_delta_ln = delta_to_bound
+                candidate_fO2_log = upper_bound
+            else:
+                applied_delta_ln = signed_o2_equiv_mol / capacity_mol_per_ln
+                candidate_fO2_log = (x_m + applied_delta_ln) / ln10
+        else:
+            applied_delta_ln = signed_o2_equiv_mol / capacity_mol_per_ln
+            candidate_fO2_log = (x_m + applied_delta_ln) / ln10
+        return applied_delta_ln, candidate_fO2_log
+
     def _apply_oxygen_reservoir_redox_source_terms(
         self,
         source_terms_mol_o2_equiv: Mapping[str, float],
@@ -6137,20 +6175,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'
         else:
-            x_m = base_fO2_log * math.log(10.0)
-            upper_bound = self._melt_redox_fO2_upper_bound_log()
-            delta_to_bound = (upper_bound - base_fO2_log) * math.log(10.0)
-            # Compare in mol BEFORE division: even a finite oxygen source
-            # divided by a collapsing C_m can overflow. The finite Kress
-            # ledger split below owns the actual uptake, not this tangent.
-            if net_o2_equiv_mol >= C_m * delta_to_bound:
-                applied_delta_ln = delta_to_bound
-                candidate_fO2_log = upper_bound
-            else:
-                applied_delta_ln = net_o2_equiv_mol / C_m
-                candidate_fO2_log = (
-                    x_m + applied_delta_ln
-                ) / math.log(10.0)
+            applied_delta_ln, candidate_fO2_log = (
+                self._melt_redox_tangent_fO2_step(
+                    signed_o2_equiv_mol=net_o2_equiv_mol,
+                    base_fO2_log=base_fO2_log,
+                    capacity_mol_per_ln=C_m,
+                    apply_pressure_ceiling=True,
+                )
+            )
             if (
                 not math.isfinite(applied_delta_ln)
                 or not math.isfinite(candidate_fO2_log)
@@ -7298,13 +7330,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # fO₂ advances only with ledger-committed O₂ (dn_ledger), never with the
         # managed-floor / clamp remainder that has no atom backing.
-        x_m_after = x_m - dn_ledger_to_headspace / C_m
-        candidate_fO2_log = x_m_after / math.log(10.0)
+        # No pressure ceiling here: the transport target was already limited
+        # when dn was solved.
+        applied_delta_ln, candidate_fO2_log = self._melt_redox_tangent_fO2_step(
+            signed_o2_equiv_mol=-dn_ledger_to_headspace,
+            base_fO2_log=base_fO2_log,
+            capacity_mol_per_ln=C_m,
+            apply_pressure_ceiling=False,
+        )
         reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
             candidate_fO2_log,
             context='oxygen_reservoir_exchange',
             melt_redox_capacity_mol_per_ln_fO2=C_m,
-            delta_ln_fO2=(-dn_ledger_to_headspace / C_m),
+            delta_ln_fO2=applied_delta_ln,
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
