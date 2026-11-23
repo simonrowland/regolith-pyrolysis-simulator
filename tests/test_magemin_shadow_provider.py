@@ -394,6 +394,26 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     )
 
 
+def test_provider_nominal_oxygen_transport_matches_green_bits():
+    class Backend:
+        def equilibrate(self, **kwargs):
+            return kwargs["fO2_log"]
+
+        find_liquidus_solidus = equilibrate
+
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_LIQUIDUS,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+    )
+    backend = Backend()
+    provider = MAGEMinShadowProvider(backend=backend)
+    for run in (provider._run_backend, provider._run_liquidus_finder):
+        log_fo2 = run(backend, request, composition_mol_by_account={})
+        assert log_fo2.hex() == "-0x1.2000000000000p+3"
+
+
 def test_liquidus_finder_keyerror_propagates():
     request = IntentRequest(
         intent=ChemistryIntent.SILICATE_LIQUIDUS,
