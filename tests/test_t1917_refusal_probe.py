@@ -1,18 +1,29 @@
-"""Contract tests for the t-1917 refusal probes. They do not call an engine."""
+"""Contract tests for the t-1917 refusal probe. They do not call an engine."""
 
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 
+import pytest
+
 from simulator.accounting.ledger_api import wt_pct_from_kg
-from simulator.engine_cache import _not_stored_exception_label
+from simulator.engine_cache import (
+    EngineCacheValue,
+    engine_cache_counters,
+    live_hot,
+    not_stored_refusal_label,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+import simulator.engine_cache as engine_cache
 
 
 def _probe():
-    path = Path(__file__).resolve().parents[1] / "scripts" / "t1917_refusal_probe.py"
-    spec = importlib.util.spec_from_file_location("t1917_refusal_probe_under_test", path)
+    path = Path(__file__).resolve().parent / "t1917_refusal_probe.py"
+    spec = importlib.util.spec_from_file_location(
+        "t1917_refusal_probe_under_test", path,
+    )
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load {path}")
     module = importlib.util.module_from_spec(spec)
@@ -20,55 +31,109 @@ def _probe():
     return module
 
 
-def test_measured_classes_match_the_pass2_counters():
-    probe = _probe()
-    root = Path(__file__).resolve().parents[1]
-    assert set(probe.SCRIPT_CLASSES) == {
-        "probe_t1917_alphamelts_engine_crash.py",
-        "probe_t1917_magemin_engine_worker_timeout.py",
-        "probe_t1917_magemin_engine_not_converged.py",
-        "probe_t1917_magemin_not_converged.py",
-        "probe_t1917_thermoengine_nonfinite.py",
-        "probe_t1917_thermoengine_out_of_domain.py",
-        "probe_t1917_internal_analytical_oxygen_balance.py",
-    }
-    assert set(probe.SCRIPT_CLASSES.values()) == {
-        ("alphamelts", "refusal", "engine_crash"),
-        ("magemin", "exception", "EngineWorkerTimeout"),
-        ("magemin", "refusal", "engine_not_converged"),
-        ("magemin", "refusal", "not_converged"),
-        ("thermoengine", "exception", "ThermoEngineNonFiniteField"),
-        ("thermoengine", "exception", "ThermoEngineOutOfDomainError"),
-        (
-            "internal-analytical",
-            "exception",
-            "internal_analytical_oxygen_balance_unavailable",
-        ),
-    }
-    for name in probe.SCRIPT_CLASSES:
-        assert (root / "scripts" / name).is_file()
+def test_refusal_label_matches_the_live_counter(tmp_path, monkeypatch):
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    crash = {"status": "refusal", "refusal_reason": "engine_crash"}
+    engine_cache.cached_engine_call(
+        "alphamelts", {"case": "crash"}, lambda: crash,
+    )
+    untyped = {"status": "refusal"}
+    engine_cache.cached_engine_call(
+        "alphamelts", {"case": "untyped"}, lambda: untyped,
+    )
+
+    counts = engine_cache_counters()["alphamelts"]
+    assert counts["not_stored:refusal:engine_crash"] == 1
+    assert counts["not_stored:refusal:untyped"] == 1
+    assert not_stored_refusal_label(crash, crash) == "engine_crash"
+    assert not_stored_refusal_label(untyped, untyped) == "untyped"
 
 
-def test_exception_label_delegates_to_the_cache_counter():
+def test_readonly_miss_records_the_request_and_the_writable_label(tmp_path, monkeypatch):
     probe = _probe()
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    found: dict = {}
+    seen: dict = {}
+    details: dict = {}
+    dropped: dict = {}
+    request = {"kwargs": {"temperature_C": 1400.0}}
+    probe.observe_cached_call(
+        "alphamelts",
+        request,
+        lambda: {"status": "refusal", "refusal_reason": "engine_crash"},
+        found,
+        seen,
+        details,
+        dropped,
+    )
+    assert seen["alphamelts"]["not_stored:readonly"] == 1
+    assert seen["alphamelts"].get("not_stored:refusal:engine_crash", 0) == 0
+    assert len(found["alphamelts"]["refusal:engine_crash"]) == 1
+    assert probe.coverage_error(
+        {"alphamelts": {"not_stored:readonly": 1}}, seen,
+    ) is None
+    assert "no request was recorded" in probe.coverage_error(
+        {"alphamelts": {"not_stored:refusal:engine_crash": 2}}, {},
+    )
+
+
+def test_exception_miss_uses_the_counter_label(tmp_path, monkeypatch):
+    probe = _probe()
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
 
     class Boom(Exception):
         code = "internal_analytical_oxygen_balance_unavailable"
 
-    exc = Boom("oxygen balance failed")
-    assert probe.cache_classification("internal-analytical", None, exc) == (
-        "exception",
-        _not_stored_exception_label(exc),
-    )
+    found: dict = {}
+    seen: dict = {}
+    with pytest.raises(Boom):
+        probe.observe_cached_call(
+            "alphamelts",
+            {"kwargs": {"temperature_C": 1200.0}},
+            lambda: (_ for _ in ()).throw(Boom("oxygen balance failed")),
+            found,
+            seen,
+            {},
+            {},
+        )
+    assert seen["alphamelts"][
+        "not_stored:exception:internal_analytical_oxygen_balance_unavailable"
+    ] == 1
+    assert len(found["alphamelts"][
+        "exception:internal_analytical_oxygen_balance_unavailable"
+    ]) == 1
 
 
-def test_mapping_refusal_uses_the_cache_reason_token():
+def test_cacheable_false_is_not_labeled_as_a_refusal():
     probe = _probe()
-    assert probe.cache_classification(
-        "alphamelts",
+    value = EngineCacheValue(
         {"status": "refusal", "refusal_reason": "engine_crash"},
-        None,
-    ) == ("refusal", "engine_crash")
+        cacheable=False,
+        refusal_reason="engine_crash",
+    )
+    assert probe.detail_for(value, live_hot(value), None) == "cacheable_false"
+    assert not_stored_refusal_label(value, live_hot(value)) is None
+
+
+def test_missing_cache_is_a_loud_error(monkeypatch):
+    probe = _probe()
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    with pytest.raises(SystemExit, match="T1917_PROBE_NO_CACHE"):
+        probe.configured_cache_path()
 
 
 def test_kilogram_features_use_the_ledger_weight_percent():
@@ -120,5 +185,11 @@ def test_outcome_identity_ignores_wall_time():
     left = {"cache_kind": "refusal", "cache_token": "engine_crash", "wall_s": 1.0}
     right = {"cache_kind": "refusal", "cache_token": "engine_crash", "wall_s": 30.0}
     assert probe.outcome_identity(left) == probe.outcome_identity(right)
-    right["cache_token"] = "subprocess_died"
+    right["cache_token"] = "unavailable"
     assert probe.outcome_identity(left) != probe.outcome_identity(right)
+
+
+def test_scripts_are_not_the_probe_entry():
+    root = Path(__file__).resolve().parents[1]
+    assert not (root / "scripts" / "t1917_refusal_probe.py").exists()
+    assert list((root / "scripts").glob("probe_t1917_*.py")) == []

@@ -1697,6 +1697,36 @@ def _store_cold(
         connection.execute("DELETE FROM cold.engine_values WHERE row_seq=?", (row_seq,))
 
 
+def not_stored_refusal_label(solved: Any, hot: Any) -> str | None:
+    """Token for ``not_stored:refusal:<token>`` on a returned miss.
+
+    None when the value is not an uncacheable refusal. Readonly mode does
+    not consult this: it counts ``not_stored:readonly`` and returns. A caller
+    that has the solved value can still ask what the writable branch would
+    have counted. ``cacheable=False`` is a different counter and is not
+    labeled here.
+    """
+
+    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+        return None
+    wrapped_refusal = (
+        isinstance(solved, EngineCacheValue) and solved.refusal_reason is not None
+    )
+    refusal_not_cacheable = (
+        wrapped_refusal and not cacheable_refusal(solved)
+    ) or (
+        _is_refusal(hot) and not cacheable_refusal(hot)
+    )
+    if not refusal_not_cacheable:
+        return None
+    refusal_reason = (
+        solved.refusal_reason if wrapped_refusal
+        else hot.get("refusal_reason") if isinstance(hot, Mapping)
+        else getattr(hot, "refusal_reason", None)
+    )
+    return str(refusal_reason) if refusal_reason is not None else "untyped"
+
+
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     if _CACHE_BYPASSED.get():
         return live_hot(solve())
@@ -1782,27 +1812,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 "not_stored:cacheable_false", 0
             ) + 1
         return hot
-    wrapped_refusal = (
-        isinstance(solved, EngineCacheValue)
-        and solved.refusal_reason is not None
-    )
-    refusal_not_cacheable = (
-        wrapped_refusal and not cacheable_refusal(solved)
-    ) or (
-        _is_refusal(hot) and not cacheable_refusal(hot)
-    )
-    if refusal_not_cacheable:
-        refusal_reason = (
-            solved.refusal_reason if wrapped_refusal
-            else hot.get("refusal_reason") if isinstance(hot, Mapping)
-            else getattr(hot, "refusal_reason", None)
-        )
-        reason_label = str(refusal_reason) if refusal_reason is not None else "untyped"
+    reason_label = not_stored_refusal_label(solved, hot)
+    if reason_label is not None:
         with _LOCK:
             counter = f"not_stored:refusal:{reason_label}"
             counts = _counter_bucket(engine_id)
             counts[counter] = counts.get(counter, 0) + 1
-    if refusal_not_cacheable:
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (
