@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.default_policy import load_policy_table
+from simulator.battery.default_policy import resolve
 from simulator.battery.enums import MethodToken, NoticeKind, Phase, Quantity
 from simulator.battery.migrate import (
     map_method,
@@ -76,14 +76,8 @@ def test_unstated_method_is_a_flagged_unspecified_token_not_a_queue_entry(
     assert "default=unspecified" in method_notice.reason
     assert "original_reason=source does not state method" in method_notice.reason
     assert method_notice.policy is not None
-    method_entry = load_policy_table()["DP-100"]
-    assert method_notice.policy == NoticePolicy(
-        id=method_entry["id"],
-        version=method_entry["version"],
-        status=method_entry["status"],
-        value=MethodToken.UNSPECIFIED.value,
-        units=method_entry["units"],
-    )
+    method_policy = resolve("DP-100")
+    assert method_notice.policy == NoticePolicy(**method_policy.payload["policy"])
     assert "policy_id" not in method_notice.reason
     assert "policy_version" not in method_notice.reason
     phase_notice = next(
@@ -94,14 +88,8 @@ def test_unstated_method_is_a_flagged_unspecified_token_not_a_queue_entry(
     assert "value=unspecified" in phase_notice.reason
     assert "original_reason=source does not state phase" in phase_notice.reason
     assert phase_notice.policy is not None
-    phase_entry = load_policy_table()["DP-016"]
-    assert phase_notice.policy == NoticePolicy(
-        id=phase_entry["id"],
-        version=phase_entry["version"],
-        status=phase_entry["status"],
-        value=Phase.UNSPECIFIED.value,
-        units=phase_entry["units"],
-    )
+    phase_policy = resolve("DP-016", inferred_phase=Phase.UNSPECIFIED.value)
+    assert phase_notice.policy == NoticePolicy(**phase_policy.payload["policy"])
     assert "policy_id" not in phase_notice.reason
     assert "policy_version" not in phase_notice.reason
     assert flagged_strata(observation.notices) == (

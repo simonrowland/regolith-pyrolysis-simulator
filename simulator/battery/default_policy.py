@@ -13,7 +13,7 @@ from typing import Mapping
 
 import yaml
 
-from simulator.battery.enums import DEFAULT_POLICY_NOTICE_KINDS, NoticeKind
+from simulator.battery.enums import DEFAULT_POLICY_NOTICE_KINDS, NoticeKind, Phase
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -141,17 +141,14 @@ def _resolved_value(
         return Decimal(match.group(1)) * _decimal(
             context["P_total"], context_name="P_total"
         )
-    if policy_id == "DP-004" and "measured_partial_pressures" in context:
-        pressures = context["measured_partial_pressures"]
-        if not isinstance(pressures, (list, tuple)) or not pressures:
-            raise ValueError("measured_partial_pressures must be a non-empty sequence")
-        return sum(
-            (
-                _decimal(pressure, context_name="measured partial pressure")
-                for pressure in pressures
-            ),
-            Decimal(0),
-        )
+    if policy_id == "DP-016":
+        inferred_phase = context.get("inferred_phase")
+        if not isinstance(inferred_phase, str):
+            raise ValueError("DP-016 requires the owning inferred_phase result")
+        try:
+            return Phase(inferred_phase).value
+        except ValueError as exc:
+            raise ValueError("DP-016 inferred_phase is not a phase token") from exc
     if policy_id == "DP-007":
         from simulator.state import MeltState
 
@@ -176,10 +173,9 @@ def _resolved_value(
         )
     if policy_id == "DP-012" and "printed_value" in context:
         return context["printed_value"]
-    if "value" in context:
-        return context["value"]
     raise ValueError(
-        f"{policy_id} requires its owning formula result in the resolve context"
+        f"{policy_id} requires a value from its owning formula result: "
+        f"{entry.get('formula_owner', 'no formula owner recorded')}"
     )
 
 
@@ -231,7 +227,11 @@ def resolve(policy_id: str, **context: object) -> Resolved:
             "id": policy_id,
             "version": entry["version"],
             "status": entry["status"],
-            "value": value,
+            "value": (
+                format(value.normalize(), "f")
+                if isinstance(value, Decimal)
+                else str(value)
+            ),
             "units": units,
         },
     }

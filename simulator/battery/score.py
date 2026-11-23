@@ -45,6 +45,7 @@ from typing import (
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.battery.default_policy import load_policy_table
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
@@ -627,7 +628,6 @@ FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
-FLAGGED_STRATUM_ASSUMED_PRESSURE = NoticeKind.ASSUMED_PRESSURE.value
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -2489,12 +2489,26 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata = _classify_flagged_notice_facts(
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
-    if any(
-        notice.policy is not None and notice.policy.status == "proposed"
-        for notice in notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+    if (
+        _has_proposed_policy(notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
+
+
+def _has_proposed_policy(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> bool:
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is not None and notice.policy.status == "proposed":
+                return True
+        elif isinstance(notice, Mapping):
+            policy = notice.get("policy")
+            if isinstance(policy, Mapping) and policy.get("status") == "proposed":
+                return True
+    return False
 
 
 def _classify_flagged_notice_facts(
@@ -2562,11 +2576,6 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
-    if (
-        NoticeKind.ASSUMED_PRESSURE.value in kinds
-        and FLAGGED_STRATUM_ASSUMED_PRESSURE not in strata
-    ):
-        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -8197,24 +8206,27 @@ def _activity_request_or_contract_refusal(
     )
 
 
-# TODO(t-1924c): replace the rejected proposal with the method-specific policy.
-_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID = "DP-101"
+# TODO(t-1924c): replace the transitional missing-pressure path with the
+# method-specific DP-001/DP-019 policy while retaining its current pressure.
 
 
 def _assumption_notice(
     quantity: Quantity, reason: str, pressure_bar: float
 ) -> Notice:
+    policy_row = load_policy_table()["DP-101"]
+    if Decimal(str(pressure_bar)) != Decimal(str(policy_row["value"])):
+        raise ValueError("transitional pressure does not match rejected DP-101")
     return Notice(
-        kind=NoticeKind.ASSUMED_PRESSURE,
+        kind=NoticeKind(str(policy_row["flag"])),
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
         policy=NoticePolicy(
-            id=_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID,
-            version="v1",
-            status="proposed",
-            value=f"{pressure_bar:g}",
-            units="bar",
+            id=str(policy_row["id"]),
+            version=policy_row["version"],
+            status=str(policy_row["status"]),
+            value=str(policy_row["value"]),
+            units=str(policy_row["units"]),
         ),
     )
 
@@ -10150,10 +10162,10 @@ def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
 ) -> tuple[float, Notice | None, str | None]:
-    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+    """Observation pressure in bar, or the transitional DP-101 value.
 
     A present but non-finite or negative pressure is invalid. It is not
-    replaced by the assumption.
+    replaced by this fallback.
     """
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -10169,8 +10181,8 @@ def total_pressure_bar_for_score(
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
-    # Keep the existing finite low-pressure engine boundary visible as an
-    # assumption, not as a pressure supplied by the source.
+    # Keep the current engine input for t-1924c, while DP-101 marks this
+    # general missing-pressure fallback as rejected in the audit record.
     notice = _assumption_notice(
         quantity,
         detail,
@@ -23102,7 +23114,8 @@ def flagged_stratum_rows(
                 ).append(residual)
     rows: list[dict[str, object]] = []
     for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
-        groups.items()
+        groups.items(),
+        key=lambda item: _flagged_census_sort_key(item[0]),
     ):
         dex_values = [
             residual.numeric.value
@@ -23123,6 +23136,12 @@ def flagged_stratum_rows(
             row["policy_status"] = policy_status
         rows.append(row)
     return rows
+
+
+def _flagged_census_sort_key(
+    key: tuple[str, str, str, str | None, str | None],
+) -> tuple[str, ...]:
+    return tuple("" if value is None else value for value in key)
 
 
 def headline_records(
@@ -24385,12 +24404,10 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         for notice in raw_notices
     )
     strata = _classify_flagged_notice_facts(notices)
-    if any(
-        notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
-        and isinstance(notice.get("policy"), Mapping)
-        and notice["policy"].get("status") == "proposed"
-        for notice in raw_notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+    if (
+        _has_proposed_policy(raw_notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
 
@@ -24896,7 +24913,9 @@ def flagged_stratum_payloads(
                 else {}
             ),
         }
-        for stratum, rail, engine, policy_id, policy_status in sorted(counts)
+        for stratum, rail, engine, policy_id, policy_status in sorted(
+            counts, key=_flagged_census_sort_key
+        )
     ]
 
 

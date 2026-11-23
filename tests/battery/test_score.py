@@ -805,12 +805,12 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assert residual.numeric is not None
     assert residual.refusal is None
     assert assumption_notice in residual.notices
-    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert assumption_notice.kind is NoticeKind.METHOD_IMPLIED
     assert assumption_notice.policy == NoticePolicy(
         id="DP-101",
-        version="v1",
-        status="proposed",
-        value=f"{assumed_bar:g}",
+        version=1,
+        status="rejected",
+        value="1e-6",
         units="bar",
     )
     assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
@@ -828,10 +828,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         headline_rows,
     )
 
-    assert flagged_strata(residual.notices) == (
-        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
-        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
-    )
+    assert flagged_strata(residual.notices) == (NoticeKind.METHOD_IMPLIED.value,)
     assert [
         (
             row["stratum"],
@@ -843,8 +840,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     ] == [
-        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
-        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
     ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
@@ -858,15 +854,14 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         )
         for row in serialized_strata
     ] == [
-        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
-        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
     ]
     clean_residual = replace(
         residual,
         notices=tuple(
             notice
             for notice in residual.notices
-            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
+            if notice.kind is not NoticeKind.METHOD_IMPLIED
         ),
     )
 

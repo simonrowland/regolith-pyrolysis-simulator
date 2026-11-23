@@ -87,6 +87,7 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery import schema_gap as sg
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
@@ -10627,10 +10628,6 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
-DP_016_PHASE_UNSPECIFIED = Phase.UNSPECIFIED
-DP_100_METHOD_UNSPECIFIED = MethodToken.UNSPECIFIED
-
-
 def _phase_policy_resolution(
     inference: tuple[Phase, str] | None,
     *,
@@ -10642,24 +10639,21 @@ def _phase_policy_resolution(
     # transitions to identify a phase; absent that evidence, neither solid nor
     # liquid has a physical basis, so the stored token remains unspecified.
     phase, evidence = inference or (
-        DP_016_PHASE_UNSPECIFIED,
+        Phase.UNSPECIFIED,
         "row physics does not identify one phase",
     )
+    policy_resolution = resolve_default_policy(
+        "DP-016", inferred_phase=phase.value
+    )
     return phase, Notice(
-        kind=NoticeKind.PHASE_INFERRED,
+        kind=policy_resolution.flag,
         affected_quantities=(() if quantity is None else (quantity,)),
         reason=(
             f"phase_inferred: value={phase.value}; evidence={evidence}; "
             f"original_reason={original_reason}"
         ),
         origin=origin,
-        policy=NoticePolicy(
-            id="DP-016",
-            version=1,
-            status="canonical",
-            value=phase.value,
-            units="phase token",
-        ),
+        policy=NoticePolicy(**policy_resolution.payload["policy"]),
     )
 
 
@@ -25821,6 +25815,7 @@ class Migrator:
                 observation_id=observation.observation_id,
             )
         method_default_reason: str | None = None
+        method_default_policy = None
         method_inference_notice: Notice | None = None
         if experiment is not None and experiment.method.is_unknown:
             work = self.result.works.get(experiment.work_id or "")
@@ -25856,9 +25851,11 @@ class Migrator:
                 method_default_reason = (
                     experiment.method.reason or "source does not state method"
                 )
+                method_default_policy = resolve_default_policy("DP-100")
+                method_token = MethodToken(str(method_default_policy.value))
                 experiment = replace(
                     experiment,
-                    method=State.of(DP_100_METHOD_UNSPECIFIED),
+                    method=State.of(method_token),
                 )
                 self.result.experiments[observation.experiment_id] = experiment
         elif experiment is not None and experiment.method.is_value:
@@ -25893,10 +25890,12 @@ class Migrator:
                 if isinstance(identity, Identity) and identity.quantity.is_value
                 else None
             )
-            method_token = DP_100_METHOD_UNSPECIFIED
+            if method_default_policy is None:
+                method_default_policy = resolve_default_policy("DP-100")
+            method_token = MethodToken(str(method_default_policy.value))
             observation_notices.append(
                 Notice(
-                    kind=NoticeKind.METHOD_UNSTATED,
+                    kind=method_default_policy.flag,
                     affected_quantities=(
                         (quantity,) if isinstance(quantity, Quantity) else ()
                     ),
@@ -25905,13 +25904,7 @@ class Migrator:
                         f"original_reason={method_default_reason or 'source does not state method'}"
                     ),
                     origin=observation.observation_id,
-                    policy=NoticePolicy(
-                        id="DP-100",
-                        version=1,
-                        status="proposed",
-                        value=method_token.value,
-                        units="method token",
-                    ),
+                    policy=NoticePolicy(**method_default_policy.payload["policy"]),
                 )
             )
         if method_inference_notice is not None and not any(
@@ -27468,7 +27461,7 @@ class Migrator:
                 )
             if phase_inference is None and phase_resolution_evidence is not None:
                 phase_inference = (
-                    phase.value if phase.is_value else DP_016_PHASE_UNSPECIFIED,
+                    phase.value if phase.is_value else Phase.UNSPECIFIED,
                     phase_resolution_evidence,
                 )
             if phase_inference is None and phase_provenance and phase.is_value:
