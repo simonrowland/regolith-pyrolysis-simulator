@@ -498,6 +498,47 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     }
 
 
+def fe_metal_saturation_log10_fO2_bar(
+    T_K: float,
+    *,
+    a_feo_stoich: float = 1.0,
+) -> float:
+    """Fe-metal saturation on the Holzheid wustite-liquid standard.
+
+    ``feo_iw_log10_fO2_bar`` is Holzheid 1997 eq 9. The coded standard
+    is ``wustite_FeO_l_holzheid1997_eq9``: its a_FeO argument is the
+    wustite-liquid activity, and a_Fe = 1 is already in that function.
+    ``holzheid_stoich_feo_gamma_band`` owns
+    gamma_stoich / gamma_wustite (2.02 at 1300 °C, 1.94 at 1400 °C,
+    1.66 at 1600 °C).
+
+    Premise: log10(fO2/bar) = IW(a_FeO=1) + 2 log10(a_wustite). A
+    stoichiometric activity plugged into ``feo_iw`` is too oxidizing
+    by 2 log10(multiplier).
+
+    Algebra: a_wustite = a_stoich / conversion_multiplier, then
+    ``feo_iw_log10_fO2_bar(T, a_feo=a_wustite)``. The pure-FeO floor
+    passes a_stoich = 1, so a_wustite = 1/multiplier.
+
+    Units: both activities are dimensionless. The result is
+    log10(fO2/bar).
+
+    Known value: at 1400 °C the multiplier is 1.94, and
+    2 log10(1.94) is about 0.58 dex. IW(a_FeO=1) at 2298.92 K remains
+    -5.873; that number is the unconverted wustite-unit activity, not
+    the pure stoichiometric floor.
+    """
+
+    band = holzheid_stoich_feo_gamma_band(float(T_K))
+    multiplier = float(band['conversion_multiplier'])
+    activity = max(float(a_feo_stoich), 1.0e-300)
+    if not math.isfinite(multiplier) or multiplier <= 0.0:
+        a_wustite = activity
+    else:
+        a_wustite = activity / multiplier
+    return feo_iw_log10_fO2_bar(float(T_K), a_feo=a_wustite)
+
+
 REDOX_BUFFER_LINES: Mapping[str, Callable[[float], float]] = MappingProxyType(
     {
         FE_FEO_BUFFER_STANDARD: lambda T_K: feo_iw_log10_fO2_bar(
