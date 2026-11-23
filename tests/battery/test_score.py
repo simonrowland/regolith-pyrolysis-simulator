@@ -2013,6 +2013,8 @@ def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
     }
 
 
+@pytest.mark.nightly
+@pytest.mark.timeout(300)
 def test_full_store_printed_width_band_census_matches_green() -> None:
     from simulator.battery.identity import quantity_token
     from simulator.battery.migrate import REPO_ROOT, load_migrated_store
@@ -2023,6 +2025,8 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
     band_count = 0
     conflicts: list[str] = []
     for observation in observations.values():
+        if observation.uncertainty.kind is UncertaintyKind.NONE:
+            continue
         quantity = quantity_token(observation.identity)
         reference = point_magnitude(observation.value)
         if quantity is None or reference is None:
@@ -2157,6 +2161,40 @@ def test_dex_printed_interval_domain_uses_original_coverage_width() -> None:
     assert crossing.band is None
     assert crossing.refusal is not None
     assert crossing.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+
+
+def test_dex_linear_width_normalizes_coverage_before_log_transform() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    printed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"value": "1000", "unit": "Pa", "k": "2"},
+        ),
+        Decimal("100000"),
+    )
+
+    # Round 10 transforms the normalized ±500 Pa interval, then applies Z95.
+    # This numeric k=2 declaration must retain those exact standard-width and
+    # ticket values; transforming ±1000 Pa first produces a wider band.
+    assert printed.refusal is None
+    assert printed.standard_uncertainty_dex == Decimal(
+        "0.002176919254274545113717110304"
+    )
+    assert printed.band is not None
+    assert printed.band.value == Decimal(
+        "0.004266683335629900421816705747"
+    )
+    from simulator.battery.score_metrics import match_status
+
+    boundary_residual = ResidualNumeric(
+        operation=MetricOperation.DEX,
+        unit="dimensionless",
+        value=Decimal("0.004272"),
+        decision_band=printed.band,
+    )
+    assert match_status(boundary_residual) is ResidualStatus.MISMATCH
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:

@@ -218,7 +218,9 @@ def _review_causes(run: Document, review: Document, scope: Document) -> list[dic
 
 def _rms_text(values: Sequence[Decimal]) -> str | None:
     value = _rms(values)
-    return None if value is None else str(value)
+    if value is None:
+        return None
+    return "0.00" if value.is_zero() else str(value)
 
 
 def evaluate_card(

@@ -257,6 +257,12 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
     assert receipt["rms_band"] is None
 
 
+def test_zero_rms_receipt_uses_fixed_decimal_precision() -> None:
+    from simulator.battery.reproduction_cards import _rms_text
+
+    assert _rms_text([Decimal("0")]) == "0.00"
+
+
 @pytest.mark.parametrize("mutation", ["row", "group", "band", "attestation", "assumption",
                                       "nan", "null", "hidden_flag", "locator", "path"])
 def test_deletions_and_bad_inputs_cannot_improve_denominator(complete_contract, mutation):
