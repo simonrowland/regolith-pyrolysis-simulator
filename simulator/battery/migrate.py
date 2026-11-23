@@ -144,6 +144,8 @@ from simulator.battery.extract_context import iter_extract_context_containers
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
+    KRESS_FE2O3_WT_PCT_FIELD,
+    KRESS_FEO_WT_PCT_FIELD,
 )
 from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
@@ -17195,8 +17197,6 @@ def _interval_selection(
 # Model-specific recastings (e.g. Kress 1991's oxide-mole-fraction ratio)
 # belong on the prediction side, never here.
 # ---------------------------------------------------------------------------
-KRESS_FE2O3_WT_PCT_FIELD = "Fe2O3_wt_pct"
-KRESS_FEO_WT_PCT_FIELD = "FeO_wt_pct"
 FERRIC_FRACTION_RELATION = "Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed"
 
 

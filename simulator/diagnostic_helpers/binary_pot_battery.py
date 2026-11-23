@@ -3267,6 +3267,9 @@ class _OpenImccBatteryBackend:
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
+        gas_result = None
+        solved_notice = None
+        cell_oxide_sources: Mapping[str, Any] = {}
         engine_binding_identity = self._identity.get("engine_binding_identity") or {}
         gas_table_lineage = (
             "openimcc-gas-table:sha256:"
@@ -3370,17 +3373,7 @@ class _OpenImccBatteryBackend:
                 gas_pressures.update(
                     {name: all_gas[name] for name in cell_info["cell_oxide_janaf_sources"] if name != "buffer_phase"}
                 )
-            _channels, omission_notices = (
-                _openimcc_gas_channels_and_omission_notices(
-                    result.parent_oxides, self._gas, gas_result
-                )
-            )
-            notices.extend(omission_notices)
-            gas_diagnostics = {
-                "domain_flags": dict(getattr(gas_result, "domain_flags", {})),
-                "provenance_class": dict(getattr(gas_result, "provenance_class", {})),
-                "oxygen_balance": dict(balance),
-            }
+            gas_diagnostics["oxygen_balance"] = dict(balance)
             solved_notice = {
                     "kind": "fo2_oxygen_balance_effusion_solved",
                     "pO2_bar": float(po2_bar),
@@ -3399,33 +3392,7 @@ class _OpenImccBatteryBackend:
                 solved_notice["cell_oxide_janaf_sources"] = cell_info[
                     "cell_oxide_janaf_sources"
                 ]
-            notices.append(solved_notice)
-            for name, value in gas_pressures.items():
-                number = finite_float(value)
-                if number is None or number <= 0.0:
-                    continue
-                pressures[str(name)] = number * PA_PER_BAR
-                if cell_material is not None and name in cell_info[
-                    "cell_oxide_janaf_sources"
-                ]:
-                    source = cell_info["cell_oxide_janaf_sources"][name]
-                    vapor_sources[str(name)] = (
-                        f"cell_shared_janaf:{source['table_id']}:"
-                        f"{source['source_sha256']}"
-                    )
-                else:
-                    vapor_sources[str(name)] = gas_table_lineage
-            for name, flag in getattr(gas_result, "domain_flags", {}).items():
-                if flag:
-                    notices.append(
-                        {
-                            "kind": "openimcc_gas_flag",
-                            "authority": AUTHORITY_EXTRAPOLATED,
-                            "species": str(name),
-                            "reason": str(flag),
-                        }
-                    )
-                    authority = AUTHORITY_EXTRAPOLATED
+            cell_oxide_sources = cell_info.get("cell_oxide_janaf_sources", {})
         elif fO2_log is not None:
             if self._gas is None:
                 notices.append(
@@ -3447,33 +3414,44 @@ class _OpenImccBatteryBackend:
                     parent_oxides=result.parent_oxides,
                     allow_extrapolation=True,
                 )
-                _channels, omission_notices = (
-                    _openimcc_gas_channels_and_omission_notices(
-                        result.parent_oxides, self._gas, gas_result
+                gas_pressures = dict(gas_result)
+
+        if gas_result is not None:
+            _channels, omission_notices = _openimcc_gas_channels_and_omission_notices(
+                result.parent_oxides, self._gas, gas_result
+            )
+            notices.extend(omission_notices)
+            if solved_notice is not None:
+                notices.append(solved_notice)
+            domain_flags = dict(getattr(gas_result, "domain_flags", {}))
+            gas_diagnostics.update(
+                domain_flags=domain_flags,
+                provenance_class=dict(getattr(gas_result, "provenance_class", {})),
+            )
+            for name, value in gas_pressures.items():
+                number = finite_float(value)
+                if number is None or number <= 0.0:
+                    continue
+                pressures[str(name)] = number * PA_PER_BAR
+                if name in cell_oxide_sources:
+                    source = cell_oxide_sources[name]
+                    vapor_sources[str(name)] = (
+                        f"cell_shared_janaf:{source['table_id']}:"
+                        f"{source['source_sha256']}"
                     )
-                )
-                notices.extend(omission_notices)
-                gas_diagnostics = {
-                    "domain_flags": dict(gas_result.domain_flags),
-                    "provenance_class": dict(gas_result.provenance_class),
-                }
-                for name, value in dict(gas_result).items():
-                    number = finite_float(value)
-                    if number is None or number <= 0.0:
-                        continue
-                    pressures[str(name)] = number * PA_PER_BAR
+                else:
                     vapor_sources[str(name)] = gas_table_lineage
-                for name, flag in gas_result.domain_flags.items():
-                    if flag:
-                        notices.append(
-                            {
-                                "kind": "openimcc_gas_flag",
-                                "authority": AUTHORITY_EXTRAPOLATED,
-                                "species": str(name),
-                                "reason": str(flag),
-                            }
-                        )
-                        authority = AUTHORITY_EXTRAPOLATED
+            for name, flag in domain_flags.items():
+                if flag:
+                    notices.append(
+                        {
+                            "kind": "openimcc_gas_flag",
+                            "authority": AUTHORITY_EXTRAPOLATED,
+                            "species": str(name),
+                            "reason": str(flag),
+                        }
+                    )
+                    authority = AUTHORITY_EXTRAPOLATED
 
         provenance = {
             "package_version": result.openimcc_version,

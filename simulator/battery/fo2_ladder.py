@@ -51,6 +51,8 @@ from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
+    KRESS_FE2O3_WT_PCT_FIELD,
+    KRESS_FEO_WT_PCT_FIELD,
 )
 from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
@@ -901,11 +903,7 @@ def _printed_ferric_fraction(
             fraction = ratio / (1.0 + ratio)
             if 0.0 < fraction < 1.0:
                 return fraction, key
-    from simulator.battery.migrate import (
-        KRESS_FE2O3_WT_PCT_FIELD,
-        KRESS_FEO_WT_PCT_FIELD,
-        fe3_fe2_ratio_from_oxide_wt_pct,
-    )
+    from simulator.battery.migrate import fe3_fe2_ratio_from_oxide_wt_pct
 
     feo = _printed_number(observation, KRESS_FEO_WT_PCT_FIELD)
     fe2o3 = _printed_number(observation, KRESS_FE2O3_WT_PCT_FIELD)
