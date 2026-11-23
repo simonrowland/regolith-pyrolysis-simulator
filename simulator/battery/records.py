@@ -1016,7 +1016,7 @@ class Derivation:
 @dataclass(frozen=True)
 class NoticePolicy:
     id: str
-    version: str
+    version: str | int
     status: str
     value: str
     units: str
@@ -1024,9 +1024,14 @@ class NoticePolicy:
     def __post_init__(self) -> None:
         if not isinstance(self.id, str) or not self.id.startswith("DP-"):
             raise ValueError("notice policy id must be a DP id")
-        if not all(
-            isinstance(value, str) and value
-            for value in (self.version, self.value, self.units)
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not all(
+                isinstance(value, str) and value
+                for value in (self.value, self.units)
+            )
         ):
             raise ValueError("notice policy requires id, version, value, and units")
         if self.status not in {"canonical", "proposed", "rejected"}:
