@@ -19,6 +19,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
 )
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.migrate import _log_fO2_to_pa, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
@@ -272,11 +273,23 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
                 isinstance(initial_composition, dict)
                 and initial_composition["state"]["tag"] == "value"
             ):
-                if observation.identity.composition.is_value:
-                    assert observation.identity.composition.value is not None
+                migrated_initial = migrated_experiments[
+                    raw["experiment"]
+                ].sample.initial_composition
+                if migrated_initial is not None and migrated_initial.state.is_value:
+                    composition = observation.identity.composition
+                    assert composition is not None and composition.is_value
+                    assert composition.value.components == (
+                        migrated_initial.state.value.components
+                    )
+                    assert (
+                        composition.value.input_provenance
+                        == PRINTED_STARTING_BULK
+                    )
                 else:
                     # Preserve the Table 1 total/component mismatch as a
                     # typed refusal instead of filling or renormalizing it.
+                    assert observation.identity.composition is not None
                     assert observation.identity.composition.is_unknown, raw_id
                     reason = observation.identity.composition.reason or ""
                     if "kept sum=94.37 wt% is below 95 wt%" in reason:
@@ -338,6 +351,19 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
     original_row = migrated_by_raw_id["t2-r002-sio2"]
     assert mutated_row.identity.composition.value.components != (
         original_row.identity.composition.value.components
+    )
+    mutated_experiment = next(
+        experiment
+        for experiment in mutated_result.experiments.values()
+        if experiment.experiment_id.endswith("::experiment::t2-r002")
+    )
+    assert mutated_experiment.sample.initial_composition is not None
+    assert mutated_row.identity.composition.value.components == (
+        mutated_experiment.sample.initial_composition.state.value.components
+    )
+    assert (
+        mutated_row.identity.composition.value.input_provenance
+        == PRINTED_STARTING_BULK
     )
 
     for suffix, quantity, expected in RENDER_PINS:
