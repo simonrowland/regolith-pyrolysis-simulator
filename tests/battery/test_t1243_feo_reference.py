@@ -368,6 +368,13 @@ def test_fe_1_minus_x_identity_uses_existing_d420_wustite_conversion() -> None:
         and "original_reason=species_formula=Fe(1-x)O" in notice.reason
         for notice in converted.notices
     )
+    wustite_notice = next(
+        notice
+        for notice in converted.notices
+        if notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+    )
+    assert "mapped=typed Fe(1-x)O reference" in wustite_notice.reason
+    assert "default=" not in wustite_notice.reason
     assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
         converted.notices
     )
@@ -1423,8 +1430,7 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
         assert converted.identity.reference_state.value.endmember.formula == "FeO"
         assert any(
             notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
-            and "original_reason=Ban-ya activity is printed as a_FetO "
-            "on a total-iron basis" in notice.reason
+            and "original_reason=printed species formula Fe_tO" in notice.reason
             for notice in converted.notices
         )
         assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
@@ -1539,6 +1545,67 @@ def test_banya_total_iron_flag_excludes_measured_headline(banya_migration) -> No
         notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
         for notice in residual.notices
     )
+
+
+def test_total_iron_notice_requires_feto_species_formula(
+    banya_migration, monkeypatch
+) -> None:
+    observations = banya_migration.observations.values()
+    takezoe_na2o = next(
+        observation
+        for observation in observations
+        if observation.observation_id.endswith(
+            "banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"
+        )
+    )
+    banya_feto_activity = next(
+        observation
+        for observation in banya_migration.observations.values()
+        if observation.source_id in {
+            _BANYA_1980,
+            _BANYA_1985,
+            _BANYA_YUGE_1985,
+        }
+        and observation.identity.species is not None
+        and observation.identity.species.formula == "Fe_tO"
+        and quantity_token(observation.identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    )
+
+    def assert_formula_scoped_notice() -> None:
+        assert takezoe_na2o.identity.species.formula == "Na2O"
+        assert quantity_token(takezoe_na2o.identity) is Quantity.ACTIVITY_COEFFICIENT
+        assert score_module._total_iron_formula_notice(takezoe_na2o) is None
+        feto_notice = score_module._total_iron_formula_notice(banya_feto_activity)
+        assert feto_notice is not None
+        assert feto_notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+
+    assert_formula_scoped_notice()
+
+    # Mutation proof: restore the former Ban-ya source-wide condition removed
+    # here. The Na2O assertion above must fail under that regression.
+    production_notice = score_module._total_iron_formula_notice
+
+    def source_wide_mutation(reference):
+        quantity = quantity_token(reference.identity)
+        if (
+            reference.source_id in score_module._BANYA_FETO_ACTIVITY_RELATIONS
+            and quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        ):
+            return Notice(
+                kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+                affected_quantities=(quantity,),
+                reason="regression mutation: Ban-ya source-wide total-iron flag",
+                origin=reference.observation_id,
+            )
+        return production_notice(reference)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score_module, "_total_iron_formula_notice", source_wide_mutation
+        )
+        with pytest.raises(AssertionError):
+            assert_formula_scoped_notice()
 
 
 def test_banya_source_relation_pins_reject_the_old_dg_janaf_conversion(
