@@ -19063,8 +19063,8 @@ def _compile_residual_with_lineage(
                 )
                 two_sigma_band = printed.two_sigma_band
                 if two_sigma_band is not None:
-                    two_sigma_measurement_dex = (
-                        two_sigma_band.value / NORMAL_95_TICKET_MULTIPLIER
+                    two_sigma_measurement_dex = standard_uncertainty_width(
+                        two_sigma_band.value, NORMAL_95_TICKET_MULTIPLIER
                     )
                     two_sigma_total_dex = (
                         _combine_independent_standard_uncertainties(
