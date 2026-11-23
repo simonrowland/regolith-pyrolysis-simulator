@@ -604,6 +604,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_KNOB_DEFAULTED = NoticeKind.KNOB_DEFAULTED.value
 FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
@@ -2499,7 +2500,12 @@ def _classify_flagged_notice_facts(
     kinds = {kind for kind, _reason in notices}
     policy_flags = kinds & _DEFAULT_POLICY_FLAG_VALUES
     if policy_flags:
-        strata.extend(sorted(policy_flags))
+        strata.extend(
+            FLAGGED_STRATUM_KNOB_DEFAULTED
+            if flag == NoticeKind.KNOB_DEFAULTED.value
+            else flag
+            for flag in sorted(policy_flags)
+        )
     unverified_apparatus = tuple(
         reason
         for kind, reason in notices
