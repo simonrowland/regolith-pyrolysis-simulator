@@ -17033,27 +17033,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if area_default_reason is not None:
                 # DP-007 follows the design-teststand ruling: with no printed
-                # evaporating face, use the runtime-sized crucible's exposed
-                # face. The physical premise is that the exposed apparatus
-                # face is the evaporating surface; using its runtime value
-                # preserves m^2 without conversion. A positive face is the
-                # sanity check, while a printed area continues to take the
-                # declared-area branch above.
+                # evaporating face, use EquipmentDesigner.size_crucible's
+                # face from the printed lab sample mass. Its area is in m²,
+                # and evaporation rate is proportional to area, so using that
+                # face directly preserves units; as the sized face tends to
+                # zero, its area-scaled rate tends to zero. A printed area
+                # continues to take the declared-area branch above.
                 from simulator.battery import default_policy
 
-                resolved = default_policy.resolve(
-                    "DP-007", runtime_default=crucible_area_m2
-                )
                 entry = default_policy.load_policy_table()["DP-007"]
                 policy = {
                     "id": entry["id"],
                     "version": entry["version"],
                     "status": entry["status"],
-                    "value": str(resolved.value),
-                    "units": resolved.units,
+                    "value": str(crucible_area_m2),
+                    "units": entry["units"],
                 }
                 self._dp007_area_notice = {
-                    'kind': resolved.flag.value,
+                    'kind': entry["flag"],
                     'reason': area_default_reason,
                     'detail': area_default_detail,
                     'policy': policy,

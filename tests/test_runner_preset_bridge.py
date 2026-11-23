@@ -16,12 +16,12 @@ from simulator import runner as runner_module
 from simulator import condensation as condensation_module
 from simulator.battery.default_policy import (
     load_policy_table,
-    resolve as resolve_default_policy,
 )
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
+from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
@@ -311,6 +311,24 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
     )
 
 
+def test_gram_lab_without_sample_mass_refuses_before_area_default(
+    tmp_path: Path,
+) -> None:
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+    )
+    preset = yaml.safe_load(preset_path.read_text(encoding="utf-8"))
+    del preset["lab_geometry"]["sample"]["mass_g"]
+    preset_path.write_text(yaml.safe_dump(preset, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(
+        runner_module.PresetRunnerError,
+        match="lab_geometry.sample.mass_g is required",
+    ):
+        runner_module._load_preset_run_spec(preset_path, "faithful")
+
+
 def test_null_exposed_melt_area_uses_sized_crucible_face_with_flag() -> None:
     for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
         preset = _vacuum_preset(name)
@@ -323,22 +341,24 @@ def test_null_exposed_melt_area_uses_sized_crucible_face_with_flag() -> None:
         session.start(run._session_config())
         sim = session.simulator
         crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
+        sample_mass_kg = preset["lab_geometry"]["sample"]["mass_g"] / 1000.0
+        expected_sized_area_m2 = EquipmentDesigner().size_crucible(
+            sample_mass_kg
+        ).melt_surface_area_m2
         assert crucible_area_m2 > 0.0
+        assert crucible_area_m2 == pytest.approx(expected_sized_area_m2)
         assert sim.melt.melt_surface_area_m2 == pytest.approx(crucible_area_m2)
         notice = sim._dp007_area_notice
         assert notice is not None
         assert notice["kind"] == "knob_defaulted"
         assert notice["reason"] == "exposed_melt_area_not_printed"
-        resolved = resolve_default_policy(
-            "DP-007", runtime_default=crucible_area_m2
-        )
         entry = load_policy_table()["DP-007"]
         expected_policy = {
             "id": entry["id"],
             "version": entry["version"],
             "status": entry["status"],
-            "value": str(resolved.value),
-            "units": resolved.units,
+            "value": str(crucible_area_m2),
+            "units": entry["units"],
         }
         assert notice["policy"] == expected_policy
 

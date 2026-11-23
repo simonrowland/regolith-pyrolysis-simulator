@@ -623,7 +623,6 @@ FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
-FLAGGED_STRATUM_ASSUMED_PRESSURE = NoticeKind.ASSUMED_PRESSURE.value
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -2485,12 +2484,26 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata = _classify_flagged_notice_facts(
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
-    if any(
-        notice.policy is not None and notice.policy.status == "proposed"
-        for notice in notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+    if (
+        _has_proposed_policy(notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
+
+
+def _has_proposed_policy(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> bool:
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is not None and notice.policy.status == "proposed":
+                return True
+        elif isinstance(notice, Mapping):
+            policy = notice.get("policy")
+            if isinstance(policy, Mapping) and policy.get("status") == "proposed":
+                return True
+    return False
 
 
 def _classify_flagged_notice_facts(
@@ -2559,11 +2572,6 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
-    if (
-        NoticeKind.ASSUMED_PRESSURE.value in kinds
-        and FLAGGED_STRATUM_ASSUMED_PRESSURE not in strata
-    ):
-        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -8197,25 +8205,14 @@ def _activity_request_or_contract_refusal(
 def _assumption_notice(
     quantity: Quantity,
     reason: str,
-    policy_id: str,
     resolved_policy: Any,
 ) -> Notice:
-    from simulator.battery import default_policy
-
-    entry = default_policy.load_policy_table()[policy_id]
-    value = Decimal(str(resolved_policy.value))
     return Notice(
         kind=resolved_policy.flag,
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
-        policy=NoticePolicy(
-            id=str(entry["id"]),
-            version=entry["version"],
-            status=str(entry["status"]),
-            value=format(value.normalize(), "f"),
-            units=resolved_policy.units,
-        ),
+        policy=NoticePolicy(**resolved_policy.payload["policy"]),
     )
 
 
@@ -10190,7 +10187,6 @@ def total_pressure_bar_for_score(
     notice = _assumption_notice(
         quantity,
         detail,
-        policy_id,
         resolved,
     )
     return float(pressure_bar), notice, None
@@ -23131,7 +23127,8 @@ def flagged_stratum_rows(
                 ).append(residual)
     rows: list[dict[str, object]] = []
     for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
-        groups.items()
+        groups.items(),
+        key=lambda item: _flagged_census_sort_key(item[0]),
     ):
         dex_values = [
             residual.numeric.value
@@ -23152,6 +23149,12 @@ def flagged_stratum_rows(
             row["policy_status"] = policy_status
         rows.append(row)
     return rows
+
+
+def _flagged_census_sort_key(
+    key: tuple[str, str, str, str | None, str | None],
+) -> tuple[str, ...]:
+    return tuple("" if value is None else value for value in key)
 
 
 def headline_records(
@@ -24414,12 +24417,10 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         for notice in raw_notices
     )
     strata = _classify_flagged_notice_facts(notices)
-    if any(
-        notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
-        and isinstance(notice.get("policy"), Mapping)
-        and notice["policy"].get("status") == "proposed"
-        for notice in raw_notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+    if (
+        _has_proposed_policy(raw_notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
 
@@ -24925,7 +24926,9 @@ def flagged_stratum_payloads(
                 else {}
             ),
         }
-        for stratum, rail, engine, policy_id, policy_status in sorted(counts)
+        for stratum, rail, engine, policy_id, policy_status in sorted(
+            counts, key=_flagged_census_sort_key
+        )
     ]
 
 

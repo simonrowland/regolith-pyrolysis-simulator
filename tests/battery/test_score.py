@@ -792,7 +792,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         source_id="other-source",
     )
     reference = replace(reference, point_conditions=None)
-    from simulator.battery.default_policy import load_policy_table, resolve
+    from simulator.battery.default_policy import resolve
     from simulator.physical_constants import PA_PER_BAR
 
     policy = resolve("DP-001")
@@ -825,14 +825,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assert residual.refusal is None
     assert assumption_notice in residual.notices
     assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
-    entry = load_policy_table()["DP-001"]
-    assert assumption_notice.policy == NoticePolicy(
-        id=str(entry["id"]),
-        version=entry["version"],
-        status=str(entry["status"]),
-        value=format(Decimal(str(policy.value)).normalize(), "f"),
-        units=policy.units,
-    )
+    assert assumption_notice.policy == NoticePolicy(**policy.payload["policy"])
     assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
     assert f"{assumed_bar:g} bar" not in assumption_notice.reason
     assert "not printed" in assumption_notice.reason
@@ -849,8 +842,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     )
 
     assert flagged_strata(residual.notices) == (
-        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
-        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
+        NoticeKind.ASSUMED_PRESSURE.value,
     )
     assert [
         (
@@ -863,7 +855,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     ] == [
-        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-001", "canonical", 1),
+        (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
     ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
@@ -877,7 +869,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         )
         for row in serialized_strata
     ] == [
-        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-001", "canonical", 1),
+        (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
     ]
     clean_residual = replace(
         residual,

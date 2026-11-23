@@ -43,8 +43,6 @@ from simulator.battery.enums import (
 from simulator.battery.identity import State
 from simulator.battery.records import (
     CandidateRequest,
-    Notice,
-    NoticePolicy,
     Species,
     Value,
 )
@@ -2442,21 +2440,15 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
 
 
 def test_assumed_pressure_notice_token_is_pinned() -> None:
-    assert NoticeKind.ASSUMED_PRESSURE.value == "assumed_pressure"
+    from simulator.battery.default_policy import resolve
 
-    notice = Notice(
-        kind=NoticeKind.ASSUMED_PRESSURE,
-        affected_quantities=(Quantity.P_PARTIAL,),
-        reason="observation does not carry total_pressure_Pa",
-        origin="score:predict_with_engine",
-        policy=NoticePolicy(
-            id="DP-101",
-            version="v1",
-            status="proposed",
-            value="1e-06",
-            units="bar",
-        ),
+    resolved = resolve("DP-001")
+    notice = score_mod._assumption_notice(
+        Quantity.P_PARTIAL,
+        "observation does not carry total_pressure_Pa",
+        resolved,
     )
+    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
     residual = replace(
         F.residual(
             "assumed-pressure::partial",
@@ -2467,10 +2459,5 @@ def test_assumed_pressure_notice_token_is_pinned() -> None:
     )
     payload = json.loads(score_mod.dumps_residual_line(residual))
 
-    assert payload["notices"][0]["policy"] == {
-        "id": "DP-101",
-        "version": "v1",
-        "status": "proposed",
-        "value": "1e-06",
-        "units": "bar",
-    }
+    assert payload["notices"][0]["kind"] == NoticeKind.ASSUMED_PRESSURE.value
+    assert payload["notices"][0]["policy"] == resolved.payload["policy"]

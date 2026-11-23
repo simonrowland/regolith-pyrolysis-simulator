@@ -846,9 +846,7 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
     assert pressure_notice.kind is NoticeKind.METHOD_IMPLIED
     assert "observation does not carry total_pressure_Pa" in pressure_notice.reason
     assert pressure_notice.policy is not None
-    assert pressure_notice.policy.value == format(
-        Decimal(str(policy.value)).normalize(), "f"
-    )
+    assert pressure_notice.policy.value == policy.payload["policy"]["value"]
     assert pressure_notice.policy.units == policy.units
     assert flagged_strata((pressure_notice,)) == (
         NoticeKind.METHOD_IMPLIED.value,
@@ -884,9 +882,7 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
         and "does not carry total_pressure_Pa" in notice.reason
         and notice.policy is not None
         and notice.policy.id == "DP-001"
-        and notice.policy.value == format(
-            Decimal(str(policy.value)).normalize(), "f"
-        )
+        and notice.policy.value == policy.payload["policy"]["value"]
         and notice.policy.units == policy.units
         for notice in prediction.notices
     )

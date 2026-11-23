@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from decimal import Decimal
 from typing import Any
 
 import pytest
@@ -9,7 +8,6 @@ import pytest
 import simulator.diagnostic_helpers.hashimoto_1983 as hashimoto
 from simulator.battery.default_policy import (
     load_policy_table,
-    resolve as resolve_default_policy,
 )
 from simulator.battery.enums import NoticeKind
 from simulator.diagnostic_helpers.hashimoto_1983 import (
@@ -21,6 +19,7 @@ from simulator.diagnostic_helpers.hashimoto_1983 import (
     require_runtime_inputs,
     score_hashimoto_1983,
 )
+from simulator.equipment import EquipmentDesigner
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -201,7 +200,9 @@ def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
         "id": "DP-007",
         "version": 1,
         "status": "canonical",
-        "value": "0.000123",
+        "value": str(
+            EquipmentDesigner().size_crucible(0.0001).melt_surface_area_m2
+        ),
         "units": "m²",
     }
 
@@ -286,19 +287,21 @@ def test_invalid_runtime_output_has_no_numeric_prediction_or_residual(
 def _runtime_outputs(
     observations,
     *,
-    area_m2: Decimal = Decimal("0.000123"),
+    area_m2: float | None = None,
 ) -> dict[str, dict[str, Any]]:
-    resolved = resolve_default_policy("DP-007", runtime_default=area_m2)
+    if area_m2 is None:
+        # Hashimoto reports a 100.0 mg starting sample (page 115).
+        area_m2 = EquipmentDesigner().size_crucible(0.0001).melt_surface_area_m2
     entry = load_policy_table()["DP-007"]
     policy = {
         "id": entry["id"],
         "version": entry["version"],
         "status": entry["status"],
-        "value": str(resolved.value),
-        "units": resolved.units,
+        "value": str(area_m2),
+        "units": entry["units"],
     }
     notice = {
-        "kind": resolved.flag.value,
+        "kind": entry["flag"],
         "reason": "exposed_melt_area_not_printed",
         "detail": "runtime used its size_crucible face area",
         "policy": policy,
