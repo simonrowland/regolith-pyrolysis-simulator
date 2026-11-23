@@ -294,7 +294,7 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.identity.composition is not None for row in observations)
     a1_slag = by_id["henao_2001_t1_A-1_slag_Ni"]
     assert a1_slag.identity.composition.is_unknown
-    assert a1_slag.identity.composition.state.reason == IRON_VALENCE_UNKNOWN_REASON
+    assert a1_slag.identity.composition.reason == IRON_VALENCE_UNKNOWN_REASON
     assert a1_slag.point_conditions["composition"].inference is None
     a1_metal = by_id["henao_2001_t1_A-1_alloy_Ni"]
     assert a1_metal.identity.composition.is_value
