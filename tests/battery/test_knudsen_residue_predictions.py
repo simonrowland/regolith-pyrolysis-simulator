@@ -461,6 +461,28 @@ def test_approximate_component_tail_uses_relative_effect_threshold():
     assert notices[0].certification == "material"
 
 
+def test_exact_component_tail_uses_tenth_of_last_printed_digit():
+    from simulator.battery.residue import _knudsen_trace_tail_notices
+
+    trace_tail = {
+        "fraction_of_measured_mass_loss": 0.0,
+        "material_threshold": 1e-6,
+        "bound_wt_pct_by_component": {"FeO": 1e-8},
+        "retained_kg_by_parent": {"FeO": 1e-12},
+        "measured_loss_kg": 1e-3,
+        "residue_oxide_mass_kg": 1e-2,
+    }
+    reference = SimpleNamespace(
+        value=SimpleNamespace(point=Decimal("0.080000"), approximate=False),
+        identity=SimpleNamespace(species=SimpleNamespace(formula="FeO")),
+    )
+
+    _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=True)
+
+    assert trace_tail["component_material_threshold_wt_pct"] == pytest.approx(1e-7)
+    assert not trace_tail["material"]
+
+
 def test_knudsen_tail_uses_the_real_ledger_loader_cutoff(monkeypatch):
     from simulator import core
     from simulator.battery.residue import _formula_terms
