@@ -4602,6 +4602,95 @@ def test_warm_started_open_root_is_the_bracket_root():
     assert local < counted["n"]
 
 
+def test_warm_start_publishes_the_continuous_root_across_a_jump():
+    """A warm root on the far piece is not the commit across a jump.
+
+    The residual changes piece at 20.00005 Pa. Below the jump it is
+    20.00002 − P. At and above the jump it is 20.00015 − P. Newton
+    stays on the piece of the guess, so 20.000051 Pa and 20.000070 Pa
+    reach 20.000150 Pa. G at those guesses is positive, and the
+    continuity rule picks the closer attractor, 20.000020 Pa. The
+    guess 20.000015 Pa is already on that attractor's piece, so the
+    two rules agree and the hour is not flagged.
+
+    Mutation: accepting every warm root publishes 20.000150 Pa.
+    Treating the warm root as the commit whenever it lies inside the
+    1e-4 Pa band does the same. Refusing every piece change flags the
+    agreeing guess, or leaves its warm counter at 0.
+    """
+
+    boundary = 20.00005
+    near = 20.00002
+    far = 20.00015
+    downstream = 20.0
+
+    def value_at(pressure: float) -> float:
+        if pressure < boundary:
+            return near - pressure
+        return far - pressure
+
+    def piece_at(pressure: float) -> tuple:
+        if pressure < boundary:
+            return ("low",)
+        return ("high",)
+
+    law = SimpleNamespace(
+        species=("X",),
+        downstream_pa=downstream,
+        _scalar_g=value_at,
+        piece_at=piece_at,
+        pstar_warm_newton=0,
+        pstar_brent_band=0,
+        pstar_sign_scan=0,
+        _counting_pstar=False,
+        _pstar_scan_seen=False,
+        species_notices={},
+    )
+    law._remember_species_notices = (
+        capacity_coupling._HeadspaceLaw._remember_species_notices.__get__(
+            law, capacity_coupling._HeadspaceLaw,
+        )
+    )
+    notice_key = ("headspace", "headspace_balance_multiple_roots")
+
+    def publish(guess: float):
+        law.pstar_warm_newton = 0
+        law.pstar_brent_band = 0
+        law.pstar_sign_scan = 0
+        law._counting_pstar = False
+        law.species_notices = {}
+        return capacity_coupling._open_or_shut_fixed_point(
+            law, {"X": 1.0}, near_Pa=guess,
+        )
+
+    assert capacity_coupling._warm_started_open_root(
+        value_at, piece_at, 20.000051, downstream,
+    ) == pytest.approx(far, abs=1.0e-9)
+    assert capacity_coupling._warm_started_open_root(
+        value_at, piece_at, 20.000070, downstream,
+    ) == pytest.approx(far, abs=1.0e-9)
+
+    for guess in (20.000051, 20.000070):
+        kind, root = publish(guess)
+        assert kind == "open"
+        assert root == pytest.approx(near, abs=1.0e-9)
+        assert abs(root - far) > 1.0e-6
+        assert law.pstar_warm_newton == 0
+        assert law.pstar_brent_band == 1
+        assert law.pstar_sign_scan == 0
+        notice = law.species_notices[notice_key]
+        assert notice["root_Pa"] == pytest.approx(near, abs=1.0e-9)
+        assert notice["warm_root_Pa"] == pytest.approx(far, abs=1.0e-9)
+
+    kind, root = publish(20.000015)
+    assert kind == "open"
+    assert root == pytest.approx(near, abs=1.0e-9)
+    assert law.pstar_warm_newton == 1
+    assert law.pstar_brent_band == 0
+    assert law.pstar_sign_scan == 0
+    assert law.species_notices == {}
+
+
 def test_continuation_hour_with_nonzero_buffer_stays_under_the_flux_cap():
     """A reduced-manifold hour with buffer S does not re-bracket P*.
 

@@ -1691,8 +1691,16 @@ class _HeadspaceLaw:
         partials: Mapping[str, float],
         *,
         counted: bool = True,
+        evaluate_source: bool = True,
     ) -> tuple[dict[str, float], dict[str, float], str, tuple]:
-        source = self._source_mol_s(partials, counted=counted)
+        # The piece tuple is the pipe binding, the blend bucket, the
+        # cap, and the empty holdup. It does not read q. A piece
+        # sample that also evaluated the source counted as a flux
+        # evaluation on every Newton probe.
+        if evaluate_source:
+            source = self._source_mol_s(partials, counted=counted)
+        else:
+            source = {species: 0.0 for species in self.species}
         pressure = math.fsum(partials[species] for species in self.species)
         moles = {
             species: partials[species]
@@ -1833,7 +1841,8 @@ class _HeadspaceLaw:
 
     def piece_at(self, pressure_pa: float) -> tuple:
         _source, _outflow, _binding, piece = self._flows(
-            self.partials_of(self.moles_at_pressure(max(pressure_pa, 0.0)))
+            self.partials_of(self.moles_at_pressure(max(pressure_pa, 0.0))),
+            evaluate_source=False,
         )
         return piece
 
@@ -3092,6 +3101,156 @@ def _warm_started_open_root(
     return float(root)
 
 
+def _sign_change_root(
+    value_at: Callable[[float], float],
+    lo: float,
+    hi: float,
+) -> float | None:
+    """One root of a smooth piece. No sign change is not a root.
+
+    Brent stays inside [lo, hi]. The caller keeps that interval on
+    one piece, so a jump is not a root. A work cap still propagates.
+    Any other refusal is not a root of this piece.
+    """
+
+    if not hi > lo:
+        return None
+    try:
+        low = value_at(lo)
+        high = value_at(hi)
+    except _BalanceRefused as refused:
+        if refused.reason == "headspace_balance_work_cap":
+            raise
+        return None
+    if not (math.isfinite(low) and math.isfinite(high)):
+        return None
+    if low == 0.0:
+        return float(lo)
+    if high == 0.0:
+        return float(hi)
+    if low * high > 0.0:
+        return None
+    try:
+        root, _iterations = _brent(value_at, lo, hi)
+    except _BalanceRefused as refused:
+        if refused.reason == "headspace_balance_work_cap":
+            raise
+        return None
+    if not math.isfinite(root):
+        return None
+    return float(root)
+
+
+def _piece_jump(
+    piece_at: Callable[[float], tuple],
+    left: float,
+    right: float,
+) -> tuple[float, float] | None:
+    """The pressures that bound one piece change, or None if there is none.
+
+    The left pressure keeps the left piece. The right pressure is the
+    other piece. The gap is at most 1e-12 Pa, under the 1e-9 Pa root
+    dedup. Unit: both pressures are Pa.
+    """
+
+    left_piece = piece_at(left)
+    if left_piece == piece_at(right):
+        return None
+    bound_lo = left
+    bound_hi = right
+    for _step in range(60):
+        if bound_hi - bound_lo <= 1.0e-12:
+            break
+        mid = 0.5 * (bound_lo + bound_hi)
+        if piece_at(mid) == left_piece:
+            bound_lo = mid
+        else:
+            bound_hi = mid
+    return bound_lo, bound_hi
+
+
+def _continuous_warm_root(
+    value_at: Callable[[float], float],
+    piece_at: Callable[[float], tuple],
+    guess: float,
+    downstream: float,
+    warmed: float,
+) -> tuple[str, float | None]:
+    """Accept the warm root only when the continuity rule selects it.
+
+    Newton refuses a step that leaves the piece. A second attractor
+    on the other side of a jump inside the kink band is then
+    invisible, and the same-piece root would be the commit. A window
+    with one piece at both ends and at the warm root has no such
+    jump: the warm root is the commit, and the window is not scanned.
+    A window whose piece changes is split at the jump. Each smooth
+    side is Brent's only when its residual changes sign. The
+    continuity rule then picks among those attractors.
+
+    "accept" keeps the warm root. "replace" is the other attractor
+    the rule selects. "refuse" is attractors with none on the side
+    the residual is moving. "fallthrough" leaves the geometric
+    bracket to publish.
+
+    The closest attractor the rule can select lies inside the kink
+    band of the guess. An attractor outside that band is farther
+    than one inside it, so the window is the whole candidate set.
+    """
+
+    half = _KINK_BAND_PA
+    lo = max(float(guess) - half, float(downstream))
+    hi = float(guess) + half
+    if not hi > lo or not (lo <= warmed <= hi):
+        return "fallthrough", None
+    if piece_at(lo) == piece_at(hi) == piece_at(warmed):
+        return "accept", float(warmed)
+    points = [lo]
+    if lo < warmed < hi:
+        points.append(float(warmed))
+    points.append(hi)
+    intervals: list[tuple[float, float]] = []
+    cursor = lo
+    for left, right in zip(points, points[1:]):
+        if not right > left:
+            continue
+        jump = _piece_jump(piece_at, left, right)
+        if jump is None:
+            continue
+        bound_lo, bound_hi = jump
+        if bound_lo > cursor:
+            intervals.append((cursor, bound_lo))
+        cursor = max(cursor, bound_hi)
+    if hi > cursor:
+        intervals.append((cursor, hi))
+    roots: list[float] = []
+
+    def _keep(root: float | None) -> None:
+        if root is None or not math.isfinite(root) or root <= downstream:
+            return
+        if any(abs(root - earlier) <= 1.0e-9 for earlier in roots):
+            return
+        roots.append(float(root))
+
+    for start, stop in intervals:
+        _keep(_sign_change_root(value_at, start, stop))
+    _keep(float(warmed))
+    attractors = [
+        root
+        for root in roots
+        if _pressure_root_attracts(value_at, root, downstream)
+    ]
+    if not attractors:
+        return "fallthrough", None
+    chosen = _continuous_open_root(
+        attractors, float(guess), value_at(float(guess)),
+    )
+    if chosen is None:
+        return "refuse", None
+    if abs(chosen - float(warmed)) <= 1.0e-9:
+        return "accept", float(warmed)
+    return "replace", float(chosen)
+
+
 def _open_or_shut_fixed_point(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
@@ -3142,8 +3301,9 @@ def _open_or_shut_fixed_point(
         if value_at(downstream) <= 0.0:
             return "shut", None
         # The scan is the publisher when this neighborhood has no root.
-        # A hit is the same Brent root the scan would keep, and it does
-        # not walk the pressure grid.
+        # A warm hit is that root only when the continuity rule selects
+        # it. Newton will not cross a jump, so the other attractor is
+        # checked here, inside the kink band, and not on the grid.
         if near_Pa is not None:
             warmed = _warm_started_open_root(
                 value_at,
@@ -3152,8 +3312,28 @@ def _open_or_shut_fixed_point(
                 downstream,
             )
             if warmed is not None:
-                law.pstar_warm_newton += 1
-                return "open", warmed
+                decision, chosen = _continuous_warm_root(
+                    value_at,
+                    piece_at,
+                    float(near_Pa),
+                    downstream,
+                    float(warmed),
+                )
+                if decision == "accept":
+                    law.pstar_warm_newton += 1
+                    return "open", warmed
+                if decision == "replace" and chosen is not None:
+                    law._remember_species_notices((
+                        {
+                            "species": "headspace",
+                            "reason": "headspace_balance_multiple_roots",
+                            "warm_root_Pa": float(warmed),
+                            "root_Pa": chosen,
+                        },
+                    ))
+                    return _count_brent(chosen)
+                if decision == "refuse":
+                    raise _BalanceRefused("headspace_balance_multiple_roots")
         if len(law.species) == 1:
             samples = law.g_samples(refuse_multiple=False)
         else:
@@ -5555,7 +5735,10 @@ def _solve_slice(
     def piece_at(n_i: float) -> tuple:
         trial = dict(moles)
         trial[species] = max(n_i, 0.0)
-        _source, _outflow, _binding, piece = law._flows(law.partials_of(trial))
+        _source, _outflow, _binding, piece = law._flows(
+            law.partials_of(trial),
+            evaluate_source=False,
+        )
         return piece
 
     root, iterations = _solve_bracket(
@@ -5664,8 +5847,10 @@ def _mixture_piece(
     fractions: Mapping[str, float],
     pressure: float,
 ) -> tuple:
+    # q is not in the piece tuple. The same sample as law.piece_at.
     _source, _outflow, _binding, piece = law._flows(
-        _mixture_partials(law, fractions, max(pressure, 0.0))
+        _mixture_partials(law, fractions, max(pressure, 0.0)),
+        evaluate_source=False,
     )
     return piece
 
