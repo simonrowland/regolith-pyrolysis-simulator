@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from simulator import engine_cache
+from simulator.melt_backend import openimcc_bridge
 from simulator.battery.integrated_bench import (
     POMEROY_PRESET,
     ROBINOT_PRESET,
@@ -95,7 +96,6 @@ def _ok_document(steps: int) -> dict:
             "pump_outlet_by_species_kg": {},
             "expected_value": 0.0105,
         },
-        "trajectory_comparison": {"nope": 1},
         "degraded_path_engagement": {"evaporation": {"engaged": False}},
         "melt_redox_gate_floor_fallback_engagement": {"engaged": False},
         "condensation_refusals_by_species": {"SiO": {"n": 0}},
@@ -228,7 +228,7 @@ def test_simulator_is_engine_number_7_and_not_a_score_engine() -> None:
         "simulator",
     ]
     assert list(engine_cache._ENGINE_NUMBERS.values()) == [1, 2, 3, 4, 5, 6, 7]
-    assert engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"] == 3
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"] == 4
     from simulator.battery.score import SCORE_ENGINE_SET
 
     assert "simulator" not in {engine.value for engine in SCORE_ENGINE_SET}
@@ -1031,15 +1031,24 @@ def test_chemistry_version_bump_misses_on_an_unchanged_deck(
     run_cached_deck(robinot_deck, solve)
     engine_cache._MEMORY_CACHE.clear()
     engine_cache._close_connections()
-    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "simulator", 3)
+    current_version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    previous_version = current_version - 1
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION,
+        "simulator",
+        previous_version,
+    )
     run_cached_deck(robinot_deck, solve)
     assert calls["n"] == 2
     assert engine_cache.engine_cache_key(
-        "simulator", 2, robinot_deck.cache_request
+        "simulator", previous_version, robinot_deck.cache_request
     ) != engine_cache.engine_cache_key(
-        "simulator", 3, robinot_deck.cache_request
+        "simulator", current_version, robinot_deck.cache_request
     )
-    assert {row[1] for row in _stored_rows(path)} == {"2", "3"}
+    assert {row[1] for row in _stored_rows(path)} == {
+        str(previous_version),
+        str(current_version),
+    }
 
 
 def test_bulk_additions_fe_changes_the_cache_key(
@@ -1453,23 +1462,32 @@ def _write_openimcc_declaration(root: Path, commit: str) -> None:
     )
 
 
-def test_deck_key_uses_the_matching_installed_openimcc_identity(
+def test_deck_key_uses_matching_active_openimcc_identity_over_dist_info(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", tmp_path)
-    installed = {"commit": "1" * 40}
+    active = {"commit": "1" * 40}
     monkeypatch.setattr(
         engine_cache,
         "_compute_runtime_identity",
-        lambda _engine: f"commit:{installed['commit']}",
+        lambda _engine: f"commit:{'9' * 40}",
     )
-    _write_openimcc_declaration(tmp_path, installed["commit"])
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "imported_openimcc_commit",
+        lambda: active["commit"],
+    )
+    _write_openimcc_declaration(tmp_path, active["commit"])
     engine_cache.runtime_identity.cache_clear()
+    assert isinstance(
+        engine_cache.active_external_engine_identities("simulator"),
+        engine_cache.RuntimeIdentityUnknown,
+    )
     first = build_deck_request(REPO / ROBINOT_PRESET)
 
-    installed["commit"] = "2" * 40
-    _write_openimcc_declaration(tmp_path, installed["commit"])
+    active["commit"] = "2" * 40
+    _write_openimcc_declaration(tmp_path, active["commit"])
     engine_cache.runtime_identity.cache_clear()
     second = build_deck_request(REPO / ROBINOT_PRESET)
 
@@ -1480,10 +1498,66 @@ def test_deck_key_uses_the_matching_installed_openimcc_identity(
     assert first.cache_bypass is second.cache_bypass is None
     assert _key(first.cache_request) != _key(second.cache_request)
 
-    installed["commit"] = "3" * 40
+    active["commit"] = "3" * 40
     engine_cache.runtime_identity.cache_clear()
     mismatched = build_deck_request(REPO / ROBINOT_PRESET)
     assert mismatched.cache_bypass == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
+
+
+def test_missing_active_openimcc_bypasses_matching_distribution_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", tmp_path)
+    pin = "1" * 40
+    _write_openimcc_declaration(tmp_path, pin)
+    monkeypatch.setattr(
+        engine_cache,
+        "_compute_runtime_identity",
+        lambda _engine: f"commit:{pin}",
+    )
+    monkeypatch.setattr(openimcc_bridge, "_openimcc", None)
+    engine_cache.runtime_identity.cache_clear()
+
+    assert openimcc_bridge.imported_openimcc_commit() is None
+    assert engine_cache.active_external_engine_identities("simulator") == {
+        "openimcc": f"commit:{pin}"
+    }
+    deck = build_deck_request(REPO / ROBINOT_PRESET)
+    assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
+    monkeypatch.setattr(
+        integrated_bench,
+        "cached_engine_call",
+        lambda *_args, **_kwargs: pytest.fail("missing import used the cache"),
+    )
+    hot = run_cached_deck(
+        deck,
+        lambda _request: _ok_document(deck.requested_steps),
+    )
+    assert hot["notice"] == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
+
+
+def test_shadowed_openimcc_module_with_wrong_pin_bypasses_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", tmp_path)
+    declared = "1" * 40
+    imported = "2" * 40
+    _write_openimcc_declaration(tmp_path, declared)
+    monkeypatch.setattr(
+        engine_cache,
+        "_compute_runtime_identity",
+        lambda _engine: f"commit:{declared}",
+    )
+    monkeypatch.setattr(openimcc_bridge, "imported_openimcc_commit", lambda: imported)
+    engine_cache.runtime_identity.cache_clear()
+
+    assert engine_cache.active_external_engine_identities("simulator") == {
+        "openimcc": f"commit:{declared}"
+    }
+    deck = build_deck_request(REPO / ROBINOT_PRESET)
+    assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
 
 
 def test_unavailable_active_engine_identity_bypasses_cache_with_notice(
@@ -1575,6 +1649,101 @@ def test_dirty_tree_runs_uncached_with_notice(
     assert calls["n"] == 1
     assert hot["notice"] == integrated_bench.DECK_UNCACHED_DIRTY_TREE
     assert hot["per_hour_summary"][0]["P_total_bar"] == pytest.approx(0.033)
+    assert _stored_rows(database) == before
+
+
+def test_dirty_build_snapshot_stays_uncached_after_inputs_are_restored(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = _configure(monkeypatch, tmp_path)
+    pin = "66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
+    monkeypatch.setattr(
+        engine_cache,
+        "_compute_runtime_identity",
+        lambda _engine: f"commit:{pin}",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "imported_openimcc_commit",
+        lambda: pin,
+    )
+    engine_cache.runtime_identity.cache_clear()
+
+    feedstocks_path = (REPO / "data" / "feedstocks.yaml").resolve()
+    original_feedstocks = feedstocks_path.read_bytes()
+    edited_feedstocks = original_feedstocks.replace(
+        b'  sum_check: 98.4\n  composition_status: "primary_xrf_loadable"\n',
+        b"  sum_check: 98.4\n  bulk_additions: {Fe: 1.0}\n"
+        b'  composition_status: "primary_xrf_loadable"\n',
+        1,
+    )
+    assert edited_feedstocks != original_feedstocks
+    real_read_bytes = Path.read_bytes
+    edited_snapshot = {"active": True}
+    events: list[str] = []
+
+    def read_feedstocks_during_build(path: Path) -> bytes:
+        if path.resolve() == feedstocks_path:
+            events.append("feedstocks-read")
+            if edited_snapshot["active"]:
+                return edited_feedstocks
+        return real_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", read_feedstocks_during_build)
+    clean_checks = {"count": 0}
+
+    def dirty_first_build(_commit: str) -> bool:
+        clean_checks["count"] += 1
+        events.append("tree-check")
+        return clean_checks["count"] > 1
+
+    monkeypatch.setattr(
+        integrated_bench,
+        "_working_tree_clean_against",
+        dirty_first_build,
+    )
+    dirty_deck = build_deck_request(REPO / ROBINOT_PRESET)
+    edited_snapshot["active"] = False
+    clean_deck = build_deck_request(REPO / ROBINOT_PRESET)
+
+    assert events[:2] == ["tree-check", "feedstocks-read"]
+    assert dirty_deck.cache_bypass == integrated_bench.DECK_UNCACHED_DIRTY_TREE
+    assert clean_deck.cache_bypass is None
+    assert _key(dirty_deck.cache_request) == _key(clean_deck.cache_request)
+    dirty_components = dirty_deck.resolved_configuration["inventory"][
+        "raw_components_kg"
+    ]
+    clean_components = clean_deck.resolved_configuration["inventory"][
+        "raw_components_kg"
+    ]
+    assert dirty_components.get("Fe", 0.0) > clean_components.get("Fe", 0.0)
+
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    assert engine_cache.load_cache_rows(
+        database,
+        [(
+            _key(clean_deck.cache_request),
+            _ok_document(clean_deck.requested_steps),
+            "simulator",
+            version,
+            "s2",
+            first_row,
+        )],
+    ) == 1
+    before = _stored_rows(database)
+    calls = {"count": 0}
+
+    def solve(_request):
+        calls["count"] += 1
+        snapshot = dirty_deck.run._load_config_bundle()
+        assert snapshot.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == 1.0
+        return _ok_document(dirty_deck.requested_steps)
+
+    hot = run_cached_deck(dirty_deck, solve)
+    assert calls["count"] == 1
+    assert hot["notice"] == integrated_bench.DECK_UNCACHED_DIRTY_TREE
     assert _stored_rows(database) == before
 
 
@@ -2243,19 +2412,10 @@ def test_failed_or_refused_keeps_the_incoming_reason(status: str) -> None:
     assert hot["reason"] == "solver_stopped"
 
 
-def test_measurement_slot_on_the_prediction_is_refused() -> None:
-    with pytest.raises(IntegratedBenchContractError) as caught:
-        integrated_bench.assert_measurement_slots_outside_prediction({
-            "status": "ok",
-            "measurement_selectors": {"id": "uncertainty"},
-        })
-    assert caught.value.reason == "measurement_in_prediction"
-    hot, cacheable = project_whole_run(_ok_document(1), requested_steps=1)
-    assert cacheable is True
-    assert "trajectory_comparison" not in hot
-    assert "measurement_selectors" not in hot
+@pytest.mark.parametrize("slot", integrated_bench.MEASUREMENT_SLOT_KEYS)
+def test_prediction_projector_rejects_each_measurement_slot(slot: str) -> None:
     malformed = _ok_document(1)
-    malformed["measurement_selectors"] = {"id": "uncertainty"}
+    malformed[slot] = {"id": "uncertainty"}
     projected, cacheable = project_whole_run(malformed, requested_steps=1)
     assert cacheable is False
     assert projected["status"] == "partial"

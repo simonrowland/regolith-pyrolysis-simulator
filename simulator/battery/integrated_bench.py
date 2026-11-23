@@ -12,7 +12,7 @@ resolved configuration:
 * git tree ids of ``simulator/``, ``engines/``, and ``data/`` at the captured commit
 * sha256 of the deck file bytes, plus the leg selected from that file
 * sha256 of ``engines/engines.local.toml`` (or ``absent``) and the
-  installed external-engine identities checked against their declarations
+  active external-engine identities checked against their declarations
 * the Python version
 
 A dirty tree under those three paths does not read or write the cache.
@@ -42,6 +42,7 @@ from simulator.engine_cache import (
     record_engine_open,
 )
 from simulator.process_timestep import resolve_process_timestep
+from simulator.melt_backend import openimcc_bridge
 from simulator.runner import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     NOT_APPLICABLE_UNTIL_P0,
@@ -592,6 +593,10 @@ def build_deck_request(
         process_dt_s=spec.process_dt_s,
     )
     run.freeze_configuration()
+    build_tree_clean = _working_tree_clean_against(source_commit)
+    bypass: str | None = (
+        None if build_tree_clean else DECK_UNCACHED_DIRTY_TREE
+    )
     try:
         resolved = run.resolved_configuration(
             spec.document,
@@ -613,11 +618,20 @@ def build_deck_request(
             reason="no_usable_composition",
         ) from exc
     schedule_lineage = _schedule_lineage(run.lab_schedule)
-    engine_identities = active_external_engine_identities(SIMULATOR_ENGINE)
-    bypass: str | None = None
-    if isinstance(engine_identities, RuntimeIdentityUnknown):
-        engine_identities = {engine_identities.engine_id: "unavailable"}
-        bypass = DECK_UNCACHED_ENGINE_IDENTITY
+    imported_commit = openimcc_bridge.imported_openimcc_commit()
+    if imported_commit is None:
+        engine_identities = {"openimcc": "unavailable"}
+        if bypass is None:
+            bypass = DECK_UNCACHED_ENGINE_IDENTITY
+    else:
+        engine_identities = active_external_engine_identities(
+            SIMULATOR_ENGINE,
+            active_identities={"openimcc": f"commit:{imported_commit}"},
+        )
+        if isinstance(engine_identities, RuntimeIdentityUnknown):
+            engine_identities = {engine_identities.engine_id: "unavailable"}
+            if bypass is None:
+                bypass = DECK_UNCACHED_ENGINE_IDENTITY
     cache_request = deck_cache_request(
         tree_ids=_tree_ids(source_commit),
         preset_sha256=hashlib.sha256(preset_bytes).hexdigest(),

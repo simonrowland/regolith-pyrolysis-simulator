@@ -361,7 +361,7 @@ ENGINE_CHEMISTRY_VERSION = {
     # SCORE_ENGINE_SET member. Owned by simulator/battery/integrated_bench.py.
     # v2 invalidates v1 keys that omitted feedstock sections and quoted area.
     # v3 binds the active installed external engine to the coarse deck key.
-    "simulator": 3,
+    "simulator": 4,
 }
 
 # Bump when an engine change can alter predictions. Runtime identities are
@@ -387,6 +387,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # simulator v1: 2026-11-22 integrated_bench.py deck cache - bump when the runner projection, schedule interpretation, process timestep, session-config resolution, feedstocks, setpoints, vapor, species, materials, foulant, or nested melt-engine chemistry changes a cached number
 # simulator v2: 2026-11-23 deck key uses the inventory feedstock masses, the area reader, the power-driver curve, and the resolved process timestep - v1 entries are not reused
 # simulator v3: 2026-11-23 deck key binds the installed external engine identity and the preset execution snapshot
+# simulator v4: 2026-11-23 deck key binds the active imported OpenIMCC module; v3 rows may contain fallback output keyed from distribution metadata
 
 
 @dataclass(frozen=True)
@@ -653,7 +654,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-18",
     },
     "simulator": {
-        "identity": "source-sha256:d03f245b03244827018202d9dda79b2de36a5d17e4a1feb9f2af95f50828a638",
+        "identity": "source-sha256:80bc785e18df7d1443c748e92db19b3ce408740f58b08165aba7ae8defe9a267",
         "date": "2026-11-23",
     },
 }
@@ -1151,8 +1152,10 @@ def runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
 
 def active_external_engine_identities(
     engine_id: str,
+    *,
+    active_identities: Mapping[str, str] | None = None,
 ) -> dict[str, str] | RuntimeIdentityUnknown:
-    """Read declared package pins and require the matching installed builds."""
+    """Read declared pins and match active modules or installed builds."""
 
     try:
         inputs = ENGINE_CACHE_INPUTS[engine_id]
@@ -1199,22 +1202,33 @@ def active_external_engine_identities(
                 f"{input_ref.path} does not declare a full commit",
             )
         declared = f"commit:{revision.lower()}"
-        installed = runtime_identity(package_name)
-        if isinstance(installed, RuntimeIdentityUnknown):
-            return installed
-        if installed == "unavailable":
+        active_identity = (
+            active_identities is not None and package_name in active_identities
+        )
+        identity = (
+            active_identities[package_name]
+            if active_identity
+            else runtime_identity(package_name)
+        )
+        if isinstance(identity, RuntimeIdentityUnknown):
+            return identity
+        if identity == "unavailable":
             return RuntimeIdentityUnknown(
                 package_name,
                 "runtime_identity_unavailable",
                 "installed distribution has no readable identity",
             )
-        if installed != declared:
+        if identity != declared:
             return RuntimeIdentityUnknown(
                 package_name,
-                "declared_installed_identity_mismatch",
-                f"declared {declared}, installed {installed}",
+                (
+                    "declared_active_identity_mismatch"
+                    if active_identity
+                    else "declared_installed_identity_mismatch"
+                ),
+                f"declared {declared}, observed {identity}",
             )
-        identities[package_name] = installed
+        identities[package_name] = identity
     return identities
 
 
