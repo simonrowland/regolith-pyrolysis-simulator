@@ -50,8 +50,6 @@ UNCERTAINTY_SCALAR_RE = re.compile(UNCERTAINTY_NUMBER)
 
 
 def uncertainty_scalar_from_text(raw: str) -> str | None:
-    if re.search(r"(?:<=|≤|<)\s*\d", raw):
-        return None
     match = re.search(rf"(?:±|\+/-)\s*({UNCERTAINTY_NUMBER})", raw)
     if match is not None:
         return match.group(1)
