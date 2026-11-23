@@ -248,6 +248,7 @@ from simulator.battery.records import (
     Located,
     Locator,
     Notice,
+    NoticePolicy,
     Observation,
     PressureEnvironment,
     QuotedFrom,
@@ -3550,6 +3551,19 @@ def _notice_from_plain(payload: object) -> Notice:
     assert _is_mapping(payload)
     affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
     dropped = payload.get("dropped")
+    policy_payload = payload.get("policy")
+    if policy_payload is not None:
+        if not _is_mapping(policy_payload):
+            raise TypeError("notice policy must be a mapping")
+        policy = NoticePolicy(
+            id=str(policy_payload["id"]),
+            version=str(policy_payload["version"]),
+            status=str(policy_payload["status"]),
+            value=str(policy_payload["value"]),
+            units=str(policy_payload["units"]),
+        )
+    else:
+        policy = None
     return Notice(
         kind=NoticeKind(str(payload["kind"])),
         affected_quantities=affected,
@@ -3567,6 +3581,7 @@ def _notice_from_plain(payload: object) -> Notice:
         if payload.get("authority") is None
         else Authority(str(payload["authority"])),
         certification=payload.get("certification"),
+        policy=policy,
     )
 
 

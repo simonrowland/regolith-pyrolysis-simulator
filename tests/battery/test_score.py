@@ -844,6 +844,32 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         (row["stratum"], row.get("policy_id"), row["n"])
         for row in serialized_strata
     ] == [(score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", 1)]
+    payload = residual_to_plain(residual)
+    aggregate = score_mod._ScorePayloadAccumulator.from_rows(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert aggregate.flagged_records() == serialized_strata
+    expected_flagged_row = (
+        "| assumed_pressure | DP-101 | vapour | internal-analytical | 1 |"
+    )
+    legacy_report = score_mod._render_score_report_from_payloads_legacy(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        store_stamp={"revision": "unknown"},
+        _aggregate=aggregate,
+    )
+    payload_report = score_mod.render_score_report_from_payloads(
+        (payload,),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        observations=context.observations,
+        origins=context.origins,
+    )
+    assert expected_flagged_row in legacy_report
+    assert expected_flagged_row in payload_report
     clean_residual = replace(
         residual,
         notices=tuple(
@@ -1316,7 +1342,7 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
-    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+    assert "calibration-not-grounded | — | vapour | internal-analytical | 1" in report
 
 
 def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
@@ -19051,7 +19077,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
+        f"— | {residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
     ) in report
 
     source_point_reference = replace(
@@ -20424,7 +20450,7 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.OPENIMCC,)
     )
-    assert strata[0]["stratum"] == "cell-material-inferred"
+    assert any(row["stratum"] == "cell-material-inferred" for row in strata)
 
 
 

@@ -19817,6 +19817,14 @@ def dumps_residual_line(
     residual: Residual, candidate: Observation | None = None
 ) -> str:
     payload = residual_to_plain(residual, candidate)
+    request = residual.candidate_request
+    request_payload = payload.get("candidate_request")
+    if (
+        request is not None
+        and request.quantity is None
+        and isinstance(request_payload, dict)
+    ):
+        request_payload["quantity"] = None
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -24702,75 +24710,12 @@ def flagged_stratum_payloads(
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
     observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
-    groups: dict[tuple[str, str, str, str | None], list[Decimal]] = {}
-    counts: dict[tuple[str, str, str, str | None], int] = {}
-    engine_names = {engine.value for engine in engines}
+    census = _FlaggedStratumAccumulator(
+        engines, hulls=hulls, observations=observations
+    )
     for row in rows:
-        numeric = row.get("numeric")
-        if not isinstance(numeric, Mapping):
-            continue
-        rail = str(row.get("rail") or "")
-        if not rail:
-            continue
-        engine = str(
-            ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or _engine_from_residual_key(row.get("key"))
-        )
-        if engine_names and engine not in engine_names:
-            continue
-        notices = tuple(
-            notice
-            for notice in (row.get("notices") or ())
-            if isinstance(notice, Mapping)
-        )
-        for stratum in _flagged_payload_strata(row):
-            for policy_id in _policy_ids_for_stratum(notices, stratum):
-                key = (stratum, rail, engine, policy_id)
-                counts[key] = counts.get(key, 0) + 1
-                if hulls is not None:
-                    from simulator.battery.compilation_tier import reference_observation
-
-                    reference = str(row.get("reference") or "")
-                    hull_key = (
-                        f"flagged:{stratum}"
-                        if policy_id is None
-                        else f"flagged:{stratum}:policy={policy_id}"
-                    )
-                    hulls.setdefault(
-                        (hull_key, rail, engine), _ConditionHull()
-                    ).add(reference, reference_observation(observations or {}, reference))
-                dex = (
-                    numeric.get("value")
-                    if numeric.get("operation") == MetricOperation.DEX.value
-                    else None
-                )
-                if dex is None:
-                    continue
-                try:
-                    value = as_decimal(dex)
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
-                groups.setdefault(key, []).append(value)
-    return [
-        {
-            "stratum": stratum,
-            "rail": rail,
-            "engine": engine,
-            "n": counts[(stratum, rail, engine, policy_id)],
-            "median_dex": (
-                None
-                if not groups.get((stratum, rail, engine, policy_id))
-                else str(_median(groups[(stratum, rail, engine, policy_id)]))
-            ),
-            "rms_dex": (
-                None
-                if not groups.get((stratum, rail, engine, policy_id))
-                else str(_rms(groups[(stratum, rail, engine, policy_id)]))
-            ),
-            **({"policy_id": policy_id} if policy_id is not None else {}),
-        }
-        for stratum, rail, engine, policy_id in sorted(counts)
-    ]
+        census.add(row)
+    return census.records()
 
 
 def _redox_source_relation_fields(relation: str) -> dict[str, str]:
@@ -24969,6 +24914,86 @@ class _ScorePayloadRowMetadata:
     tier_uncertainty: str
 
 
+class _FlaggedStratumAccumulator:
+    """One owner for flagged residual counts and dex statistics."""
+
+    def __init__(
+        self,
+        engines: Sequence[Engine],
+        *,
+        hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
+        observations: Mapping[str, Observation] | None = None,
+    ) -> None:
+        self.engine_names = {engine.value for engine in engines}
+        self.hulls = hulls
+        self.observations = observations or {}
+        self.counts: dict[tuple[str, str, str, str | None], int] = defaultdict(int)
+        self.dex_values: dict[
+            tuple[str, str, str, str | None], list[Decimal]
+        ] = defaultdict(list)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            return
+        rail = str(row.get("rail") or "")
+        if not rail:
+            return
+        engine = _engine_from_payload(row)
+        if self.engine_names and engine not in self.engine_names:
+            return
+        notices = tuple(
+            notice
+            for notice in (row.get("notices") or ())
+            if isinstance(notice, Mapping)
+        )
+        for stratum in _flagged_payload_strata(row):
+            for policy_id in _policy_ids_for_stratum(notices, stratum):
+                key = (stratum, rail, engine, policy_id)
+                self.counts[key] += 1
+                if self.hulls is not None:
+                    from simulator.battery.compilation_tier import reference_observation
+
+                    reference = str(row.get("reference") or "")
+                    hull_key = (
+                        f"flagged:{stratum}"
+                        if policy_id is None
+                        else f"flagged:{stratum}:policy={policy_id}"
+                    )
+                    self.hulls.setdefault(
+                        (hull_key, rail, engine), _ConditionHull()
+                    ).add(
+                        reference,
+                        reference_observation(self.observations, reference),
+                    )
+                if numeric.get("operation") != MetricOperation.DEX.value:
+                    continue
+                dex = numeric.get("value")
+                if dex is None:
+                    continue
+                try:
+                    self.dex_values[key].append(as_decimal(dex))
+                except (TypeError, ValueError, ArithmeticError):
+                    continue
+
+    def records(self) -> list[dict[str, object]]:
+        rows: list[dict[str, object]] = []
+        for (stratum, rail, engine, policy_id), n in sorted(self.counts.items()):
+            values = self.dex_values.get((stratum, rail, engine, policy_id), ())
+            row: dict[str, object] = {
+                "stratum": stratum,
+                "rail": rail,
+                "engine": engine,
+                "n": n,
+                "median_dex": None if not values else str(_median(values)),
+                "rms_dex": None if not values else str(_rms(values)),
+            }
+            if policy_id is not None:
+                row["policy_id"] = policy_id
+            rows.append(row)
+        return rows
+
+
 class _ScorePayloadAccumulator:
     """Compact report statistics collected in one pass over residual payloads."""
 
@@ -25023,11 +25048,14 @@ class _ScorePayloadAccumulator:
         self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
+        self.flagged_census = _FlaggedStratumAccumulator(
+            self.engines,
+            hulls=self.headline_hulls,
+            observations=context.observations,
+        )
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
-        self.flagged_counts: dict[tuple[str, str, str], int] = defaultdict(int)
-        self.flagged_values: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
@@ -25401,26 +25429,7 @@ class _ScorePayloadAccumulator:
                 flagged=flagged,
                 numeric_value=numeric_value,
             )
-        numeric = row.get("numeric")
-        rail = str(row.get("rail") or "")
-        if (
-            isinstance(numeric, Mapping)
-            and rail
-            and (not self.engine_names or engine in self.engine_names)
-        ):
-            dex = (
-                numeric.get("value")
-                if numeric.get("operation") == MetricOperation.DEX.value
-                else None
-            )
-            for stratum in flags:
-                key = (stratum, rail, engine)
-                self.flagged_counts[key] += 1
-                self.headline_hulls.setdefault(
-                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
-                ).add(reference, metadata.observation)
-                if dex is not None and numeric_value is not None:
-                    self.flagged_values[key].append(numeric_value)
+        self.flagged_census.add(row)
         exclusions_tuple = tuple(exclusions or ())
         if "admission_admitted" in exclusions_tuple:
             self.admission_with += 1
@@ -25559,25 +25568,7 @@ class _ScorePayloadAccumulator:
             record["decision_strata"] = strata
 
     def flagged_records(self) -> list[dict[str, object]]:
-        return [
-            {
-                "stratum": stratum,
-                "rail": rail,
-                "engine": engine,
-                "n": self.flagged_counts[(stratum, rail, engine)],
-                "median_dex": (
-                    None
-                    if not self.flagged_values.get((stratum, rail, engine))
-                    else str(_median(self.flagged_values[(stratum, rail, engine)]))
-                ),
-                "rms_dex": (
-                    None
-                    if not self.flagged_values.get((stratum, rail, engine))
-                    else str(_rms(self.flagged_values[(stratum, rail, engine)]))
-                ),
-            }
-            for stratum, rail, engine in sorted(self.flagged_counts)
-        ]
+        return self.flagged_census.records()
 
     def condition_hull_lines(self) -> list[str]:
         return _condition_hull_lines(
