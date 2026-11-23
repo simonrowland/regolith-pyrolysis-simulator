@@ -14,6 +14,7 @@ from typing import Mapping
 import yaml
 
 from simulator.battery.enums import DEFAULT_POLICY_NOTICE_KINDS, NoticeKind
+from simulator.battery.records import NoticePolicy
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -99,6 +100,27 @@ def load_policy_table() -> Mapping[str, Mapping[str, object]]:
     """Return the process-cached registry keyed by policy id."""
 
     return _load_policy_table(POLICY_PATH)
+
+
+def _notice_policy(policy_id: str, value: object | None = None) -> NoticePolicy:
+    """Build a notice's compact policy metadata from its registry entry."""
+
+    entry = load_policy_table()[policy_id]
+    selected_value = entry.get("value") if value is None else value
+    if selected_value is None:
+        raise ValueError(f"{policy_id} notice metadata requires a resolved value")
+    value_text = (
+        format(selected_value, "f")
+        if isinstance(selected_value, Decimal)
+        else str(selected_value)
+    )
+    return NoticePolicy(
+        id=policy_id,
+        version=entry["version"],
+        status=str(entry["status"]),
+        value=value_text,
+        units=str(entry["units"]),
+    )
 
 
 def _decimal(value: object, *, context_name: str) -> Decimal:

@@ -12,6 +12,7 @@ absolute log still wins. A row with no printed oxygen stays unknown.
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import replace
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 import re
@@ -30,7 +31,18 @@ from simulator.battery.migrate import (
     load_migrated_store,
 )
 from simulator.battery.records import Located, Value, nominal_pressure_pa
+from simulator.battery.oxygen_identity import (
+    _printed_buffer_offset,
+    _resolve_score_time_buffer_identity,
+)
+from simulator.battery.score import (
+    _headline_payload_admits,
+    flagged_strata,
+    load_score_context,
+    rail_for_quantity,
+)
 from simulator.chemistry.fo2_buffers import evaluate_buffer
+from simulator.state_types import State
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -44,6 +56,12 @@ _BUFFER_IDENTITY_PIN_COUNTS = {
     "neuman-2026-levitation-k-isotopes": 6,
     "lu-2026-mercury-sulfur-liquidus": 61,
     "jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation": 117,
+}
+_BUFFER_MARKER_ONLY_COUNTS = {
+    "hanson-jones-1998-am-cr-partitioning-olivine-liquid": 276,
+    "neuman-2026-levitation-k-isotopes": 1457,
+    "zhang-2024-alkali-evaporation-ti-thesis": 111,
+    "leuthold-2023-basalt-partition-fo2": 2,
 }
 
 # 10^-9.56 bar × 1e5 Pa/bar, computed as Decimal arithmetic.
@@ -1415,3 +1433,181 @@ def test_every_numeric_canonical_buffer_identity_matches_the_owner() -> None:
 
     assert dict(counts) == _BUFFER_IDENTITY_PIN_COUNTS
     assert not mismatches, mismatches
+
+
+def test_every_marked_numeric_identity_resolves_with_dp112() -> None:
+    _, _, observations = load_migrated_store(
+        ROOT, sources=tuple(_BUFFER_IDENTITY_PIN_COUNTS)
+    )
+    counts: Counter[str] = Counter()
+    samples = {}
+    for observation in observations.values():
+        resolved = _resolve_score_time_buffer_identity(observation)
+        if resolved is observation:
+            continue
+        source_id = observation.source_id
+        assert source_id in _BUFFER_IDENTITY_PIN_COUNTS
+        counts[source_id] += 1
+        samples.setdefault(source_id, (observation, resolved))
+
+        stored = observation.identity.fO2_Pa
+        actual = resolved.identity.fO2_Pa
+        assert stored is not None and stored.is_value
+        assert actual is not None and actual.is_value
+        assert actual.value == stored.value
+        notice = next(
+            notice
+            for notice in resolved.notices
+            if notice.origin == "score:DP-112"
+        )
+        assert notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        assert notice.policy is not None
+        assert notice.policy.id == "DP-112"
+        assert notice.policy.version == 1
+        assert notice.policy.status == "proposed"
+        assert notice.policy.value == format(actual.value, "f")
+        assert notice.policy.units == (
+            "printed offset and log10(fO2/bar) in dex; P in bar; output in Pa"
+        )
+        strata = flagged_strata(resolved.notices)
+        assert NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED.value in strata
+        assert "proposed-policy" in strata
+        assert notice.band is not None
+
+        quantity = observation.identity.quantity.value
+        species_formula = (
+            observation.identity.species.formula
+            if observation.identity.species is not None
+            else ""
+        )
+        rail = rail_for_quantity(quantity, species_formula=species_formula)
+        assert rail is not None
+        payload = {
+            "rail": rail.value,
+            "notices": [
+                {
+                    "kind": notice.kind.value,
+                    "reason": notice.reason,
+                    "policy": {
+                        "id": notice.policy.id,
+                        "version": notice.policy.version,
+                        "status": notice.policy.status,
+                        "value": notice.policy.value,
+                        "units": notice.policy.units,
+                    },
+                }
+            ],
+        }
+        assert not _headline_payload_admits(payload, tier="measured")
+
+    assert dict(counts) == _BUFFER_IDENTITY_PIN_COUNTS
+    assert set(samples) == set(_BUFFER_IDENTITY_PIN_COUNTS)
+    for observation, resolved in samples.values():
+        marker = next(
+            notice
+            for notice in observation.notices
+            if notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        )
+        printed_buffer = _printed_buffer_offset(marker.reason)
+        assert printed_buffer is not None
+        buffer, _offset = printed_buffer
+        identity = observation.identity
+        temperature = identity.temperature_K.value
+        pressure_pa = (
+            nominal_pressure_pa(identity.total_pressure_Pa)
+            if identity.total_pressure_Pa is not None
+            and identity.total_pressure_Pa.is_value
+            else None
+        )
+        pressure_bar = (
+            None if pressure_pa is None else pressure_pa / Decimal("100000")
+        )
+        evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
+        expected_band = (
+            "unsized"
+            if evaluation.band_dex is None
+            else format(evaluation.band_dex, "f")
+        )
+        resolved_notice = next(
+            notice for notice in resolved.notices if notice.origin == "score:DP-112"
+        )
+        assert resolved_notice.band == expected_band
+
+
+def test_dp112_mutation_ignores_stored_numeric_identity() -> None:
+    source_id = "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas"
+    _, _, observations = load_migrated_store(ROOT, sources=(source_id,))
+    observation = next(
+        item
+        for item in observations.values()
+        if item.source_id == source_id
+        and any(
+            notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in item.notices
+        )
+    )
+    expected = _resolve_score_time_buffer_identity(observation).identity.fO2_Pa
+    assert expected is not None and expected.is_value
+
+    mutated_identity = replace(
+        observation.identity,
+        fO2_Pa=State.of(Decimal("123.456")),
+    )
+    mutated_observation = replace(observation, identity=mutated_identity)
+    mutated = _resolve_score_time_buffer_identity(mutated_observation)
+    assert mutated.identity.fO2_Pa == expected
+    assert mutated.identity.fO2_Pa.value != Decimal("123.456")
+
+
+def test_marker_rows_keep_buffer_labels_without_numeric_identity_fo2() -> None:
+    _, _, observations = load_migrated_store(
+        ROOT, sources=tuple(_BUFFER_MARKER_ONLY_COUNTS)
+    )
+    unchanged_counts: Counter[str] = Counter()
+    neuman_targets = 0
+    for observation in observations.values():
+        marker = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind
+                is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            ),
+            None,
+        )
+        if marker is None:
+            continue
+        resolved = _resolve_score_time_buffer_identity(observation)
+        if resolved is observation:
+            unchanged_counts[observation.source_id] += 1
+            assert (
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED.value
+                not in flagged_strata(observation.notices)
+            )
+            continue
+        assert observation.source_id == "neuman-2026-levitation-k-isotopes"
+        assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-112"
+            for notice in resolved.notices
+        )
+        neuman_targets += 1
+
+    assert dict(unchanged_counts) == _BUFFER_MARKER_ONLY_COUNTS
+    assert neuman_targets == _BUFFER_IDENTITY_PIN_COUNTS[
+        "neuman-2026-levitation-k-isotopes"
+    ]
+
+
+def test_load_score_context_applies_dp112_before_scoring() -> None:
+    context = load_score_context(
+        ROOT,
+        sources=("mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas",),
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-112"
+        for observation in context.observations.values()
+        for notice in observation.notices
+    )

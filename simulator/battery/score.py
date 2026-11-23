@@ -45,9 +45,12 @@ from typing import (
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
-from simulator.battery.default_policy import load_policy_table
+from simulator.battery.default_policy import _notice_policy, load_policy_table
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
-from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.oxygen_identity import (
+    log10_fo2_to_pa,
+    _resolve_score_time_buffer_identity,
+)
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
@@ -218,7 +221,6 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
-    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -2482,7 +2484,11 @@ def _cell_apparatus_inference_notices(
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata = _classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason) for notice in notices)
+        tuple(
+            (notice.kind.value, notice.reason)
+            for notice in notices
+            if not _is_unapplied_buffer_marker(notice.kind, notice.policy)
+        )
     )
     if (
         _has_proposed_policy(notices)
@@ -2490,6 +2496,17 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
+
+
+def _is_unapplied_buffer_marker(kind: object, policy: object) -> bool:
+    # The retained extraction marker is provenance until the score-time policy
+    # notice attaches DP-112 metadata.
+    kind_value = kind.value if isinstance(kind, NoticeKind) else str(kind)
+    return (
+        kind_value
+        == NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED.value
+        and policy is None
+    )
 
 
 def _has_proposed_policy(
@@ -8212,13 +8229,7 @@ def _assumption_notice(
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
-        policy=NoticePolicy(
-            id=str(policy_row["id"]),
-            version=policy_row["version"],
-            status=str(policy_row["status"]),
-            value=str(policy_row["value"]),
-            units=str(policy_row["units"]),
-        ),
+        policy=_notice_policy(str(policy_row["id"])),
     )
 
 
@@ -19165,14 +19176,15 @@ def _compile_residual_with_lineage(
                 source_relation=source_relation,
                 exclusions=("knudsen_total_pressure_sensitivity_within_band",),
             )
-    # figure_only and reactive-cell-not-modelled keep their numeric band: they
-    # are labels on a predicted quantity, not reasons the reading band is void.
+    # These are labels on a predicted input or quantity, not reasons the
+    # measured reading band is void. DP-112's buffer spread stays on its notice.
     # Catalogue-composition on a figure row is the same kind of label: preserve
     # the stored reading band while keeping the row out of the certified subset.
     band_preserving_kinds = {
         NoticeKind.CELL_MATERIAL_INFERRED,
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+        NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
     }
     initial_charge_figure_band = (
         numeric.decision_band is not None
@@ -19375,6 +19387,10 @@ def load_score_context(
         works, experiments, observations = load_migrated_store(root)
     else:
         works, experiments, observations = load_migrated_store(root, sources=sources)
+    observations = {
+        observation_id: _resolve_score_time_buffer_identity(observation)
+        for observation_id, observation in observations.items()
+    }
     benches = load_migrated_benches(root)
     validation_observations = observations
     if sources is not None:
@@ -24425,6 +24441,9 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
         (str(notice.get("kind") or ""), notice.get("reason"))
         for notice in raw_notices
+        if not _is_unapplied_buffer_marker(
+            notice.get("kind"), notice.get("policy")
+        )
     )
     strata = _classify_flagged_notice_facts(notices)
     if (

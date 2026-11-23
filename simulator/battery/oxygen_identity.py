@@ -16,16 +16,62 @@ evidence inputs.
 from __future__ import annotations
 
 import re
-from decimal import Decimal
+from dataclasses import replace
+from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
-from simulator.battery.enums import ValueKind
-from simulator.battery.records import Located, Value
+from simulator.battery.default_policy import _notice_policy
+from simulator.battery.enums import NoticeKind, Quantity, ValueKind
+from simulator.battery.identity import Identity
+from simulator.battery.records import (
+    Located,
+    Notice,
+    Observation,
+    Value,
+    nominal_pressure_pa,
+)
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.physical_constants import BAR_PA_DECIMAL
+from simulator.state_types import State
 
 # 1 bar = 1e5 Pa exactly. An atmosphere frame passes 101325 Pa instead.
 BAR_PA = BAR_PA_DECIMAL
+
+_BUFFER_CALIBRATION_TARGET_QUANTITIES = {
+    "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "jugo-2010-sulfur-xanes": Quantity.VALENCE_RATIO,
+    "gaillard-2003-hydrous-silicic-melt-activity": Quantity.ACTIVITY,
+    "borisov-veksler-2021-k-fe-supplement":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "zagrtdenov-2020-chromite-magnesiochromite-solubility":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "neuman-2026-levitation-k-isotopes": Quantity.MASS_LOSS_FRACTION,
+    "lu-2026-mercury-sulfur-liquidus":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+}
+
+_BUFFER_OFFSET_PATTERN = re.compile(
+    r"(?:^|\s)buffer=([^\s;]+).*?(?:^|\s)offset=([^\s;]+)"
+)
+
+
+def _printed_buffer_offset(reason: str) -> tuple[str, Decimal] | None:
+    match = _BUFFER_OFFSET_PATTERN.search(reason)
+    if match is None:
+        return None
+    buffer, raw_offset = match.groups()
+    try:
+        offset = Decimal(raw_offset.replace("−", "-"))
+    except (InvalidOperation, ValueError):
+        return None
+    if not offset.is_finite():
+        return None
+    return buffer, offset
+
 
 def log10_fo2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = BAR_PA
@@ -39,6 +85,102 @@ def log10_fo2_to_pa(
     """
 
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
+
+
+def _resolve_score_time_buffer_identity(observation: Observation) -> Observation:
+    """Resolve the eight numeric-source buffer markers for score-time use."""
+
+    if not isinstance(observation.identity, Identity):
+        return observation
+    expected_quantity = _BUFFER_CALIBRATION_TARGET_QUANTITIES.get(
+        observation.source_id or ""
+    )
+    quantity = observation.identity.quantity
+    if (
+        expected_quantity is None
+        or not quantity.is_value
+        or quantity.value is not expected_quantity
+    ):
+        return observation
+
+    if any(
+        notice.kind
+        is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        and notice.policy is not None
+        and notice.policy.id == "DP-112"
+        for notice in observation.notices
+    ):
+        return observation
+    marker = next(
+        (
+            notice
+            for notice in observation.notices
+            if notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ),
+        None,
+    )
+    if marker is None:
+        return observation
+
+    printed_buffer = _printed_buffer_offset(marker.reason)
+    temperature_state = observation.identity.temperature_K
+    if (
+        printed_buffer is None
+        or temperature_state is None
+        or not temperature_state.is_value
+    ):
+        raise ValueError(
+            f"DP-112 target {observation.observation_id} lacks a printed buffer, "
+            "numeric offset, or usable temperature"
+        )
+    buffer, offset = printed_buffer
+    temperature = temperature_state.value
+    if not temperature.is_finite() or temperature <= 0:
+        raise ValueError(
+            f"DP-112 target {observation.observation_id} has invalid temperature"
+        )
+
+    pressure_state = observation.identity.total_pressure_Pa
+    pressure_pa = (
+        nominal_pressure_pa(pressure_state)
+        if pressure_state is not None and pressure_state.is_value
+        else None
+    )
+    if pressure_pa is None and pressure_state is not None and pressure_state.is_value:
+        raise ValueError(
+            f"DP-112 target {observation.observation_id} has invalid pressure"
+        )
+    pressure_bar = None if pressure_pa is None else pressure_pa / BAR_PA
+    evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
+    log10_fO2_bar = evaluation.log10_fO2_bar + offset
+    resolved_pa = log10_fo2_to_pa(log10_fO2_bar)
+    band = (
+        "unsized"
+        if evaluation.band_dex is None
+        else format(evaluation.band_dex, "f")
+    )
+    pressure_text = (
+        "not supplied" if pressure_bar is None else format(pressure_bar, "f")
+    )
+    notice = Notice(
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        affected_quantities=(expected_quantity,),
+        reason=(
+            f"DP-112 buffer={buffer} offset={offset} calibration="
+            f"{evaluation.calibration_id} T_K={temperature} P_bar={pressure_text} "
+            f"log10_fO2_bar={log10_fO2_bar} band_dex={band}"
+        ),
+        origin="score:DP-112",
+        band=band,
+        policy=_notice_policy("DP-112", resolved_pa),
+    )
+    identity = replace(observation.identity, fO2_Pa=State.of(resolved_pa))
+    return replace(
+        observation,
+        identity=identity,
+        notices=(*observation.notices, notice),
+    )
 
 
 _ATM_BAR = Decimal("1.01325")

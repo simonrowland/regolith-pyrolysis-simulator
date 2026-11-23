@@ -45,6 +45,7 @@ EXPECTED_POLICY_FLAGS = {
     "phase_inferred",
     "composition_from_run_siblings",
     "composition_from_analysed_phase",
+    "buffer_calibration_not_printed_canonical_used",
 }
 
 
@@ -54,6 +55,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
     assert set(policies) == {
         *(f"DP-{number:03d}" for number in range(1, 20)),
         "DP-101",
+        "DP-112",
     }
 
     required = {
@@ -89,6 +91,11 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "superseded by DP-001/DP-019 by method"
             )
             assert entry["history"]
+        elif policy_id == "DP-112":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1123canon"
+            assert entry["canonized_by"] is None
+            assert entry["canonized_at"] is None
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}

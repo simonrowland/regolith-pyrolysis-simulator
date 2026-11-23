@@ -350,3 +350,21 @@ policies:
         units: bar
         condition: "unprinted total pressure"
         evidence: "1f9d41322; scorer's existing silent 1e-6 bar fallback"
+  - id: DP-112
+    condition: "temperature and printed buffer plus numeric offset are available; calibration is unprinted; pressure is resolved independently from printed evidence or the applicable existing pressure policy"
+    formula: "fO2_Pa = 10^5 × 10^(evaluate_buffer(buffer, T_K, pressure_bar=P_bar).log10_fO2_bar + printed_offset_dex)"
+    formula_owner: "simulator.chemistry.fo2_buffers.evaluate_buffer"
+    units: "printed offset and log10(fO2/bar) in dex; P in bar; output in Pa"
+    physical_basis: "A printed offset is a logarithmic distance from its named buffer; evaluate the buffer at the observation temperature and available pressure."
+    bias: "Two-sided in log fugacity; another published calibration can move the center in either direction."
+    band: "Per row, use evaluate_buffer(...).band_dex; preserve None as unsized."
+    flag: buffer_calibration_not_printed_canonical_used
+    ruling: "d-460 and gap-closing manual; proposed pending owner physics ruling"
+    version: 1
+    status: proposed
+    proposed_by: w1123canon
+    proposed_at: "2026-11-23T07:55:03Z"
+    evidence: "7,119 numeric marker rows in the eight target sources; Borisov-Veksler supplement cells and parent methods text"
+    canonized_by: null
+    canonized_at: null
+    history: []
