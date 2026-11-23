@@ -557,6 +557,49 @@ def test_anhydrous_handoff_bulk_owns_declared_alkali_atoms(oxide, element, dry_a
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
 
 
+def test_loaded_inventory_matches_the_three_representative_builds():
+    """Pin the inventory ``load_batch`` builds for three feedstock cases.
+
+    Anchors are the printed weight percents of a 1000 kg batch: 43.7 wt%
+    SiO2 and 0.6 wt% P2O5 on EAC-1A, 0.32 wt% Na2O on the comet, and the
+    79/20/1 SiO2/H2O/Na2O anhydrous handoff. The assertions go through
+    ``load_batch``, the load path that exists before and after the
+    inventory-owner move.
+    """
+
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    eac = _sim(feedstocks)
+    eac.load_batch("lunar_eac_1a", mass_kg=1000.0)
+    assert eac.inventory.raw_components_kg["SiO2"] == pytest.approx(437.0)
+    assert eac.inventory.raw_components_kg["P2O5"] == pytest.approx(6.0)
+    assert eac.inventory.melt_oxide_kg["SiO2"] == pytest.approx(437.0)
+    assert eac.inventory.melt_oxide_kg["P2O5"] == pytest.approx(6.0)
+    assert eac.melt.composition_kg["SiO2"] == pytest.approx(437.0)
+    assert eac.melt.composition_kg["P2O5"] == pytest.approx(6.0)
+
+    comet = _sim(feedstocks)
+    comet.load_batch("comet_nucleus", mass_kg=1000.0)
+    assert comet.inventory.raw_components_kg["Na2O"] == pytest.approx(3.2)
+    assert comet.inventory.melt_oxide_kg["Na2O"] == pytest.approx(3.2)
+
+    anhydrous = {
+        "composition_wt_pct": {"SiO2": 79.0, "H2O": 20.0, "Na2O": 1.0},
+        "stage0_profile": "carbonaceous_degas_cleanup",
+        "stage0_temp_range_C": [20.0, 1050.0],
+        "anhydrous_silicate_after_degassing": {
+            "composition_wt_pct": {"SiO2": 100.0},
+        },
+    }
+    dry = _sim({"alkali": anhydrous})
+    dry.load_batch("alkali", mass_kg=1000.0)
+    assert dry.inventory.raw_components_kg["SiO2"] == pytest.approx(790.0)
+    assert dry.inventory.raw_components_kg["H2O"] == pytest.approx(200.0)
+    assert dry.inventory.raw_components_kg["Na2O"] == pytest.approx(10.0)
+    assert dry.inventory.melt_oxide_kg["Na2O"] == pytest.approx(10.0)
+    assert dry.inventory.melt_oxide_kg["SiO2"] == pytest.approx(790.0)
+
+
 def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     sim = _sim(
         {
