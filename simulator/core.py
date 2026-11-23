@@ -11555,6 +11555,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             values.pop(species, None)
 
+    @classmethod
+    def resolved_prediction_driving_feedstock_kg(
+        cls,
+        feedstock: Mapping[str, Any],
+        mass_kg: float,
+    ) -> Dict[str, float]:
+        """Component masses the inventory solve consumes before Stage 0.
+
+        Oxides, metallic Fe, non-oxides, bulk additions, and structural
+        water, then the same ledger normalization ``_build_process_inventory``
+        applies. Callers pack this dict. They do not copy the arithmetic.
+        """
+
+        comp = feedstock.get('composition_wt_pct', {}) or {}
+        raw = cls._component_masses_from_wt_pct(comp, mass_kg)
+        metallic_fe_wt_pct = fe_metal(feedstock)
+        if metallic_fe_wt_pct is not None and metallic_fe_wt_pct > 0.0:
+            raw['Fe'] = raw.get('Fe', 0.0) + mass_kg * metallic_fe_wt_pct / 100.0
+        for section_name in ('non_oxide_components', 'bulk_additions'):
+            extra = cls._component_masses_from_named_section(
+                feedstock.get(section_name, {}) or {}, mass_kg)
+            cls._merge_masses(raw, extra)
+        structural = cls._component_masses_from_named_section(
+            feedstock.get('structural_water', {}) or {}, mass_kg)
+        cls._merge_masses(raw, structural)
+        normalize_component_masses_kg(raw, mass_kg)
+        return raw
+
     def _build_process_inventory(
         self,
         feedstock: Mapping[str, Any],
@@ -11563,22 +11591,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock_key: str | None = None,
     ) -> ProcessInventory:
         """Build raw, Stage 0, and cleaned melt inventories for a batch."""
-        comp = feedstock.get('composition_wt_pct', {}) or {}
-        raw = self._component_masses_from_wt_pct(comp, mass_kg)
-        metallic_fe_wt_pct = fe_metal(feedstock)
-        if metallic_fe_wt_pct is not None and metallic_fe_wt_pct > 0.0:
-            raw['Fe'] = raw.get('Fe', 0.0) + mass_kg * metallic_fe_wt_pct / 100.0
+        raw = self.resolved_prediction_driving_feedstock_kg(feedstock, mass_kg)
         declared_stage0_buckets = self._declared_stage0_product_buckets(
             feedstock, mass_kg)
-
-        for section_name in ('non_oxide_components', 'bulk_additions'):
-            extra = self._component_masses_from_named_section(
-                feedstock.get(section_name, {}) or {}, mass_kg)
-            self._merge_masses(raw, extra)
-        structural = self._component_masses_from_named_section(
-            feedstock.get('structural_water', {}) or {}, mass_kg)
-        self._merge_masses(raw, structural)
-        normalize_component_masses_kg(raw, mass_kg)
         inert_melt = self._inert_trace_component_masses(feedstock, raw)
         self._validate_stage0_unmodeled_nitrate_components(
             raw,
