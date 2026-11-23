@@ -1833,6 +1833,7 @@ def pressure_coating_pareto_diagnostic(
                 series.get("melt_surface_renewal_source")
                 or "disabled:missing-species-state-dependent-melt-transfer-inputs"
             ),
+            "gas_film_shape": series.get("gas_film_shape"),
         }
 
         def flux_at(pressure_pa: float) -> Any:

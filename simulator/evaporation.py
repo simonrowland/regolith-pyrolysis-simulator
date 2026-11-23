@@ -1570,6 +1570,11 @@ class EvaporationMixin:
             )
         except (TypeError, ValueError):
             pipe_diameter_m = 0.12
+        lab_film = getattr(self, "lab_gas_film_geometry", None)
+        gas_film_shape = None
+        if lab_film is not None:
+            pipe_diameter_m = lab_film.length_m
+            gas_film_shape = lab_film.shape
         overhead = getattr(self, "overhead", None)
         try:
             gas_temperature_K = float(
@@ -1655,6 +1660,7 @@ class EvaporationMixin:
             hkl_upper_bound_species=hkl,
             extrapolate_continuum=extrapolate,
             campaign_name=campaign,
+            gas_film_shape=gas_film_shape,
         )
 
     def _closed_langmuir_pressures_for_partials(
@@ -1988,6 +1994,9 @@ class EvaporationMixin:
             diagnostic = langmuir_surface.as_diagnostic()
             diagnostic["overhead_partials_Pa"] = dict(partials)
             diagnostic["overhead_pressure_Pa"] = film_pressure
+            lab_film = getattr(self, "lab_gas_film_geometry", None)
+            if lab_film is not None:
+                diagnostic["gas_film_geometry"] = lab_film.as_diagnostic()
             self._last_langmuir_surface_oxygen = diagnostic
         return (
             vapor_pressures,
@@ -5474,6 +5483,14 @@ class EvaporationMixin:
             ),
             'surface_oxygen_bound': surface_oxygen_bound,
         }
+        lab_film = getattr(self, 'lab_gas_film_geometry', None)
+        if lab_film is not None:
+            controls.update({
+                'gas_film_length_m': lab_film.length_m,
+                'gas_film_shape': lab_film.shape,
+                'gas_film_length_method': lab_film.length_method,
+                'gas_film_typed_flags': lab_film.flags,
+            })
         if vapour_batch_report is not None:
             controls[CONTROL_BATCH_REPORT_KEY] = dict(vapour_batch_report)
         if vapour_batch_flux_overlay is not None:

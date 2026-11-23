@@ -156,6 +156,7 @@ from simulator.lab_geometry import (
     parse_lab_geometry,
     require_lab_pipe_diameter,
     read_gram_lab_exposed_melt_area,
+    resolve_lab_gas_film_geometry,
 )
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
@@ -1640,9 +1641,13 @@ def _stirring_enhanced_sherwood(
     sherwood_laminar: float = DEFAULT_SHERWOOD_LAMINAR,
     *,
     radial_stir_factor: float | None = None,
+    gas_film_shape: str | None = None,
 ) -> float:
-    """Enhanced Sherwood number for induction-stirred gas-pipe boundary
-    layer.
+    """Sherwood number for a stirred pipe or a shaped stagnant gas film.
+
+    A sphere or disk shape selects the analytical stagnant-film limit and
+    ignores stirring. Without a shape, the existing pipe correlation below
+    remains the path for furnace transport.
 
     For an unstirred, fully-developed laminar pipe flow with constant
     wall concentration the asymptotic Sherwood number is 3.66 (Bird/
@@ -1681,6 +1686,9 @@ def _stirring_enhanced_sherwood(
     - Both ``None``: caller didn't drive Sh at all → no-stir laminar
       baseline (``Sh = 3.66``).
 
+    - ``gas_film_shape``: the analytical lab-sample limit, when supplied.
+      A free sphere uses Sh = 2; a disk on an inert plane uses Sh = 8/pi.
+
     Constrained: the driving factor is clamped to ``[0.0,
     MAX_STIR_FACTOR]`` at the operator boundary, with a Sh physics
     floor at 1.0 (laminar baseline never collapses to zero). The 10×
@@ -1710,6 +1718,13 @@ def _stirring_enhanced_sherwood(
     - factor = 100: clamped to 10, then Sh ≈ 11.6
     - factor = NaN: sanitised to 0, then Sh = 3.66 (defensive baseline)
     """
+    from simulator.lab_geometry import GAS_FILM_DISK, GAS_FILM_SPHERE
+
+    if gas_film_shape == GAS_FILM_SPHERE:
+        return 2.0
+    if gas_film_shape == GAS_FILM_DISK:
+        return 8.0 / math.pi
+
     # Precedence: explicit ``radial_stir_factor`` wins over the legacy
     # positional ``stir_factor``. Both None → no-stir baseline (1.0).
     if radial_stir_factor is not None:
@@ -1729,20 +1744,14 @@ def _stirring_enhanced_sherwood(
     return float(sherwood_laminar) * math.sqrt(sh_input)
 
 
-
 def gram_lab_exposed_melt_area_bridge(
     lab_geometry: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
-    try:
-        area = read_gram_lab_exposed_melt_area(lab_geometry)
-    except LabGeometryError as exc:
-        if exc.code != 'exposed_melt_area_not_printed':
-            raise
-        return {}
-    if area is None:
+    resolved = resolve_lab_gas_film_geometry(lab_geometry)
+    if resolved is None:
         return {}
     bridge = {
-        'effective_exposed_area_m2': area,
+        'effective_exposed_area_m2': resolved.area_m2,
         'area_basis': LAB_EXPOSED_MELT_AREA_BASIS,
     }
     sample = (
@@ -1763,7 +1772,7 @@ def gram_lab_exposed_melt_area_bridge(
             )
         bridge['notice'] = {
             **dict(notice),
-            'value': area,
+            'value': resolved.area_m2,
             'unit': 'm2',
         }
     return bridge

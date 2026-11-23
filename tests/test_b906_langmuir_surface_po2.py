@@ -5193,3 +5193,58 @@ def test_surface_balance_bracket_follows_melt_dissociation_floor(
     assert patched_high == 0.0
     assert patched_low == math.log10(patched)
     assert patched_low != low
+
+
+def test_lab_sample_geometry_is_shared_by_surface_root_and_flux_publisher():
+    from simulator.lab_geometry import (
+        GAS_FILM_SPHERE,
+        resolve_lab_gas_film_geometry,
+    )
+
+    compiled, legacy = _catalog()
+    answer = _cao_answer(-9.0)
+    diagnostic = answer.diagnostic
+    published, _published_ca, _p_ref_bar = _published_ca(diagnostic)
+    host, equilibrium = _host(
+        compiled,
+        legacy,
+        diagnostic,
+        published,
+        redox_capacity_mol_per_ln_fO2=0.0,
+        p_total_mbar=10.0,
+    )
+    host.lab_gas_film_geometry = resolve_lab_gas_film_geometry({
+        "scale": "gram_lab",
+        "sample": {"pellet_diameter_mm": 13.0},
+    })
+    host._resolve_condensation_carrier_gas = lambda: "Ar"
+    host.overhead.headspace_temperature_K = 2300.0
+    captured: dict = {}
+    _dispatch_real_flux_provider(host, captured)
+
+    EvaporationMixin._calculate_evaporation(host, equilibrium)
+
+    controls = captured["controls"]
+    assert controls["gas_film_length_m"] == pytest.approx(0.013)
+    assert controls["gas_film_shape"] == GAS_FILM_SPHERE
+    assert "gas_film_length_declared" in controls["gas_film_typed_flags"]
+    surface_diagnostic = host._last_langmuir_surface_oxygen["gas_film_geometry"]
+    assert surface_diagnostic["transport_length_m"] == pytest.approx(0.013)
+    assert surface_diagnostic["gas_film_shape"] == GAS_FILM_SPHERE
+    transport = EvaporationMixin._langmuir_transport(
+        host,
+        {},
+        _T_K,
+        float(controls["overhead_pressure_pa"]),
+    )
+    assert transport.pipe_diameter_m == pytest.approx(0.013)
+    assert transport.gas_film_shape == GAS_FILM_SPHERE
+
+    provider = captured["provider"]
+    assert provider is not None and str(provider.status) == "ok"
+    provider_geometry = provider.diagnostic["gas_film_geometry"]
+    assert provider_geometry["transport_length_m"] == pytest.approx(0.013)
+    assert provider_geometry["shape"] == GAS_FILM_SPHERE
+    ca_series = provider.diagnostic["evaporation_series_resistance"]["Ca"]
+    assert ca_series["transport_length_m"] == pytest.approx(0.013)
+    assert ca_series["gas_film_shape"] == GAS_FILM_SPHERE

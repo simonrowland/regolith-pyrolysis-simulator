@@ -4,6 +4,7 @@ import copy
 from dataclasses import replace
 import hashlib
 import json
+import math
 import subprocess
 import sys
 import textwrap
@@ -14,11 +15,18 @@ import yaml
 
 from simulator import runner as runner_module
 from simulator import condensation as condensation_module
+from simulator import lab_geometry as lab_geometry_module
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
-from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
+from simulator.lab_geometry import (
+    GAS_FILM_DISK,
+    GAS_FILM_SPHERE,
+    LAB_GEOMETRY_SCALE,
+    LabGeometryError,
+    resolve_lab_gas_film_geometry,
+)
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
@@ -381,7 +389,7 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
     )
 
 
-def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
+def test_missing_exposed_area_uses_sample_geometry_instead_of_crucible_sizer() -> None:
     for name in ("sesko_2024.yaml",):
         preset = _vacuum_preset(name)
         assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
@@ -390,13 +398,13 @@ def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
         )
         run = _gram_lab_run(preset, campaign="C0")
         session = SimSession()
-        with pytest.raises(LabGeometryError) as caught:
-            session.start(run._session_config())
-        assert caught.value.code == "exposed_melt_area_not_printed"
+        session.start(run._session_config())
         sim = session.simulator
+        resolved = resolve_lab_gas_film_geometry(preset["lab_geometry"])
+        assert resolved is not None
         crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
         assert crucible_area_m2 > 0.0
-        assert sim.melt.melt_surface_area_m2 == pytest.approx(0.2)
+        assert sim.melt.melt_surface_area_m2 == pytest.approx(resolved.area_m2)
         assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
 
     robinot = _vacuum_preset("robinot_2026.yaml")
@@ -459,15 +467,16 @@ def test_c0_start_installs_printed_area_before_the_bridge(
     omitted = copy.deepcopy(printed)
     omitted["lab_geometry"]["sample"]["exposed_melt_area_m2"] = None
     omitted_session = SimSession()
-    with pytest.raises(LabGeometryError) as caught:
-        omitted_session.start(
-            _gram_lab_run(omitted, campaign="C0")._session_config()
-        )
-    assert caught.value.code == "exposed_melt_area_not_printed"
+    omitted_session.start(_gram_lab_run(omitted, campaign="C0")._session_config())
+    omitted_film = resolve_lab_gas_film_geometry(omitted["lab_geometry"])
+    assert omitted_film is not None
     assert omitted_session.simulator.melt.melt_surface_area_m2 == pytest.approx(
-        0.2
+        omitted_film.area_m2
     )
-    assert forecast_areas == [pytest.approx(0.000123)]
+    assert forecast_areas == [
+        pytest.approx(0.000123),
+        pytest.approx(omitted_film.area_m2),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -506,27 +515,165 @@ def test_numeric_string_exposed_area_stays_admitted() -> None:
     )
 
 
-def test_bridge_and_equipment_share_the_exposed_area_reader(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_bridge_and_runtime_share_resolved_lab_film_geometry() -> None:
     robinot = _vacuum_preset("robinot_2026.yaml")
-    monkeypatch.setattr(
-        condensation_module,
-        "read_gram_lab_exposed_melt_area",
-        lambda _geometry: 0.000201,
-    )
+    resolved = resolve_lab_gas_film_geometry(robinot["lab_geometry"])
+    assert resolved is not None
     bridge = condensation_module.gram_lab_exposed_melt_area_bridge(
         robinot["lab_geometry"]
     )
-    assert bridge["effective_exposed_area_m2"] == pytest.approx(0.000201)
+    assert bridge["effective_exposed_area_m2"] == pytest.approx(resolved.area_m2)
     run = _gram_lab_run(robinot, campaign="C2A")
     session = run._start_session()
     session.simulator._get_turbine_spec()
     melt_m2 = session.simulator.melt.melt_surface_area_m2
-    assert melt_m2 == pytest.approx(0.000201)
+    assert melt_m2 == pytest.approx(resolved.area_m2)
     assert melt_m2 != pytest.approx(
         session.simulator._equipment.crucible.melt_surface_area_m2
     )
+
+
+def test_robinot_lab_film_uses_pellet_diameter_and_keeps_declared_area() -> None:
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    resolved = resolve_lab_gas_film_geometry(robinot["lab_geometry"])
+
+    assert resolved is not None
+    assert resolved.length_m == pytest.approx(0.013)
+    assert resolved.length_m != pytest.approx(0.12)
+    assert resolved.shape == GAS_FILM_SPHERE
+    assert resolved.area_m2 == pytest.approx(0.00013273228961416876)
+    assert "gas_film_length_declared" in resolved.flags
+    assert "gas_film_shape:sphere_equivalent" in resolved.flags
+
+
+def test_crucible_inner_diameter_selects_disk_shape_and_length() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {"crucible_inner_diameter_mm": 20.0},
+    }
+
+    resolved = resolve_lab_gas_film_geometry(geometry)
+
+    assert resolved is not None
+    assert resolved.shape == GAS_FILM_DISK
+    assert resolved.length_m == pytest.approx(0.02)
+    assert resolved.length_method == "declared:crucible_inner_diameter_mm"
+    assert resolved.area_m2 == pytest.approx(math.pi * 0.02**2 / 4.0)
+
+
+def test_crucible_mass_uses_hemisphere_length_and_coherent_disk_area() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {"mass_g": 10.0, "crucible_material": "alumina"},
+    }
+    bridge = condensation_module.gram_lab_exposed_melt_area_bridge(geometry)
+    film = resolve_lab_gas_film_geometry(geometry)
+
+    assert film is not None
+    assert film.shape == GAS_FILM_DISK
+    assert film.length_method == "derived:hemispherical_pool_from_mass"
+    assert "gas_film_length_derived" in film.flags
+    from simulator.equipment import EquipmentDesigner
+
+    assert math.pi * film.length_m**3 / 12.0 == pytest.approx(
+        0.010 / EquipmentDesigner.MELT_DENSITY_KG_M3
+    )
+    assert bridge["effective_exposed_area_m2"] == pytest.approx(
+        math.pi * film.length_m**2 / 4.0
+    )
+
+
+def test_free_body_mass_uses_sphere_length_and_coherent_sphere_area() -> None:
+    geometry = {"scale": "gram_lab", "sample": {"mass_g": 3.38}}
+    bridge = condensation_module.gram_lab_exposed_melt_area_bridge(geometry)
+    film = resolve_lab_gas_film_geometry(geometry)
+
+    assert film is not None
+    assert film.shape == GAS_FILM_SPHERE
+    assert film.length_method == "derived:sphere_from_mass"
+    from simulator.equipment import EquipmentDesigner
+
+    assert math.pi * film.length_m**3 / 6.0 == pytest.approx(
+        0.00338 / EquipmentDesigner.MELT_DENSITY_KG_M3
+    )
+    assert bridge["effective_exposed_area_m2"] == pytest.approx(
+        math.pi * film.length_m**2
+    )
+
+
+def test_printed_area_sets_its_shape_equivalent_film_length() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {
+            "exposed_melt_area_m2": 0.000314,
+            "crucible_material": "alumina",
+        },
+    }
+    resolved = resolve_lab_gas_film_geometry(geometry)
+
+    assert resolved is not None
+    assert resolved.length_m == pytest.approx(
+        math.sqrt(4.0 * 0.000314 / math.pi)
+    )
+    assert resolved.area_m2 == pytest.approx(0.000314)
+    assert resolved.length_method == "derived:printed_exposed_area"
+    assert "gas_film_length_derived" in resolved.flags
+    assert resolved.shape == GAS_FILM_DISK
+
+
+def test_free_body_printed_area_uses_sphere_equivalent_diameter() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {"exposed_melt_area_m2": 0.000314},
+    }
+
+    resolved = resolve_lab_gas_film_geometry(geometry)
+
+    assert resolved is not None
+    assert resolved.shape == GAS_FILM_SPHERE
+    assert resolved.length_m == pytest.approx(math.sqrt(0.000314 / math.pi))
+    assert resolved.area_m2 == pytest.approx(0.000314)
+    assert resolved.length_method == "derived:printed_exposed_area"
+
+
+def test_wire_loop_support_uses_free_sphere_limit() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {"mass_g": 3.38, "support_material": "Pt wire loop"},
+    }
+
+    resolved = resolve_lab_gas_film_geometry(geometry)
+
+    assert resolved is not None
+    assert resolved.shape == GAS_FILM_SPHERE
+    assert resolved.length_method == "derived:sphere_from_mass"
+    assert resolved.area_m2 == pytest.approx(math.pi * resolved.length_m**2)
+
+
+def test_missing_lab_dimensions_use_dp113_with_shape_and_area_flags() -> None:
+    geometry = {"scale": "gram_lab", "sample": {"crucible_material": "alumina"}}
+    resolved = resolve_lab_gas_film_geometry(geometry)
+    policy = yaml.safe_load(
+        (REPO_ROOT / "data" / "battery" / "default_policy.yaml").read_text()
+    )["policies"][0]
+
+    assert resolved is not None
+    assert resolved.length_m == pytest.approx(policy["value"])
+    assert resolved.shape == GAS_FILM_DISK
+    assert "gas_film_length_assumed" in resolved.flags
+    assert resolved.area_m2 == pytest.approx(math.pi * resolved.length_m**2 / 4.0)
+    assert policy["id"] == "DP-113"
+    assert policy["status"] == "proposed"
+    silent = resolve_lab_gas_film_geometry({"scale": "gram_lab", "sample": {}})
+    assert silent is not None
+    assert silent.length_m == pytest.approx(policy["value"])
+    assert silent.shape == GAS_FILM_SPHERE
+    assert "gas_film_shape:sphere_equivalent" in silent.flags
+    assert (
+        "gas_film_shape_assumed:sphere_equivalent:apparatus_unspecified"
+        in silent.flags
+    )
+    assert silent.area_m2 == pytest.approx(math.pi * silent.length_m**2)
 
 
 def test_exposed_area_scale_token_is_lab_geometry_scale(
@@ -535,7 +682,7 @@ def test_exposed_area_scale_token_is_lab_geometry_scale(
     assert LAB_GEOMETRY_SCALE == "gram_lab"
     robinot = _vacuum_preset("robinot_2026.yaml")
     monkeypatch.setattr(
-        condensation_module,
+        lab_geometry_module,
         "LAB_GEOMETRY_SCALE",
         "not_the_gram_lab_token",
     )

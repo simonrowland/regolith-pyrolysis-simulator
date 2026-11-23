@@ -20,6 +20,7 @@ from simulator.condensation import (
     _series_resistance_deposition_flux_mol_m2_s,
 )
 from simulator.state import MAX_STIR_FACTOR
+from simulator.lab_geometry import GAS_FILM_DISK, GAS_FILM_SPHERE
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 
@@ -46,6 +47,32 @@ def _evap(**overrides):
     kwargs = dict(_K_BASE)
     kwargs.update(overrides)
     return _series_resistance_evaporation_flux_kg_m2_s(**kwargs)
+
+
+def test_lab_sphere_and_disk_limits_use_their_stated_sherwood_numbers():
+    sphere = _evap(
+        knudsen_number=0.0,
+        pipe_diameter_m=0.013,
+        gas_film_shape=GAS_FILM_SPHERE,
+    )
+    disk = _evap(
+        knudsen_number=0.0,
+        pipe_diameter_m=0.013,
+        gas_film_shape=GAS_FILM_DISK,
+    )
+
+    assert sphere.transport_length_m == pytest.approx(0.013)
+    assert disk.transport_length_m == pytest.approx(0.013)
+    # k_mt is proportional to Sh for identical T, D, pressure, and length.
+    assert disk.k_mt_kg_s_m2_pa / sphere.k_mt_kg_s_m2_pa == pytest.approx(
+        4.0 / math.pi
+    )
+
+
+def test_unshaped_furnace_transport_keeps_its_pipe_length():
+    furnace = _evap(knudsen_number=0.0, pipe_diameter_m=0.12)
+
+    assert furnace.transport_length_m == pytest.approx(0.12)
 
 
 def test_free_molecular_limit_recovers_intrinsic_alpha_hk():

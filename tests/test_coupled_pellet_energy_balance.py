@@ -169,15 +169,20 @@ def _kinetic_sio_kg_hr(
     temperature_K: float,
     alpha_spec,
     melt_surface_area_m2: float | None = None,
+    *,
+    gas_resistance_enabled: bool = False,
+    gas_film_shape: str | None = None,
+    transport_length_m: float = 0.12,
+    carrier_gas: str = "Ar",
 ) -> dict[str, float]:
     """Booked SiO kg/h from the series-resistance owner.
 
     P_eq is the audit anchor run through van't Hoff at the budget's dH.
-    Gas resistance is off, so this probe is the owner's interface law.
-    Production evaporation still includes gas resistance; this fixture
-    does not reimplement that term. Below 400 K the evaporation owner
-    returns a physical zero and this callback is not the place that
-    decides the floor: the balance already skips the callback there.
+    Gas resistance is normally off for the interface-law fixture; the
+    Robinot root enables production series resistance through the same
+    owner. Below 400 K the evaporation owner returns a physical zero and
+    this callback is not the place that decides the floor: the balance
+    already skips the callback there.
     """
 
     if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
@@ -205,9 +210,14 @@ def _kinetic_sio_kg_hr(
         temperature_K,
         _sio_molar_mass_kg(),
         alpha,
-        knudsen_number=math.inf,
-        gas_resistance_enabled=False,
+        knudsen_number=None if gas_resistance_enabled else math.inf,
+        pipe_diameter_m=transport_length_m,
+        overhead_pressure_pa=_CHAMBER_PA,
+        carrier_gas=carrier_gas,
+        T_gas_K=temperature_K,
+        gas_resistance_enabled=gas_resistance_enabled,
         melt_resistance_enabled=False,
+        gas_film_shape=gas_film_shape,
     )
     area_m2 = (
         _areas()["top"]
@@ -427,6 +437,44 @@ def test_coupled_root_closes_and_a_dropped_sink_does_not():
         coupled["node_1_area_m2"],
     )["SiO"] == pytest.approx(9.88271449225e-3, rel=0.01)
     assert dropped["evaporative_sink_W"] == pytest.approx(0.0)
+
+
+def test_robinot_hot_upper_root_uses_sample_scale_argon_film():
+    from simulator.lab_geometry import GAS_FILM_SPHERE
+
+    alpha_spec = _alpha_spec()
+
+    def rates(temperature_K: float, area_m2: float | None) -> dict[str, float]:
+        return _kinetic_sio_kg_hr(
+            temperature_K,
+            alpha_spec,
+            area_m2,
+            gas_resistance_enabled=True,
+            gas_film_shape=GAS_FILM_SPHERE,
+            transport_length_m=_DIAMETER_M,
+            carrier_gas="Ar",
+        )
+
+    coupled = _solve(species_rate_kg_hr_at_K=rates)
+    rate = rates(coupled["temperature_K"], coupled["node_1_area_m2"])["SiO"]
+    pipe_rate = _kinetic_sio_kg_hr(
+        coupled["temperature_K"],
+        alpha_spec,
+        coupled["node_1_area_m2"],
+        gas_resistance_enabled=True,
+        gas_film_shape=GAS_FILM_SPHERE,
+        transport_length_m=0.12,
+        carrier_gas="Ar",
+    )["SiO"]
+
+    assert coupled["nodes"] == "two_node"
+    assert coupled["temperature_C"] == pytest.approx(1969.4736828, abs=0.1)
+    assert coupled["evaporative_sink_W"] == pytest.approx(38.0440733, abs=0.1)
+    assert rate == pytest.approx(7.90744716e-3, rel=0.01)
+    assert rate > pipe_rate * 5.0
+    assert _relative_gap(
+        coupled["power_W"], _two_node_sinks_W(coupled, rates)
+    ) < _RELATIVE_CLOSURE
 
 
 def test_lumped_sio_dump_is_not_a_closed_state():

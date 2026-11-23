@@ -1,0 +1,19 @@
+schema_version: 1
+policies:
+  - id: DP-113
+    condition: gram-lab sample has no declared diameter, exposed area, or mass
+    value: 0.01
+    units: m
+    band: "0.002–0.03 m"
+    physical_basis: "bench samples (beads, pellets, crucible charges) are mm to cm; Sh = 2 film scales with the sample, not the apparatus"
+    bias: stated bench-sample scale assumption
+    flag: gas_film_length_assumed
+    ruling: b-1298 / d-460
+    version: 1
+    status: proposed
+    proposed_by: w1123b1298
+    proposed_at: "2026-11-23"
+    evidence: DP-113 controller ruling for the gram-lab gas-film length
+    canonized_by: null
+    canonized_at: null
+    history: []

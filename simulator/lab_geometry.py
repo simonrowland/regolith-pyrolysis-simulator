@@ -32,6 +32,9 @@ LAB_GEOMETRY_SOURCE_CLASSES = frozenset({
     "assumption_with_sensitivity_marker",
 })
 LAB_MIN_PIPE_DIAMETER_M = 1.0e-9
+GAS_FILM_SPHERE = "sphere_equivalent"
+GAS_FILM_DISK = "disk_on_plane"
+DP_113_GAS_FILM_LENGTH_M = 0.01
 
 
 class LabGeometryError(ValueError):
@@ -181,6 +184,173 @@ class LabGeometry:
                 default_diameter_m=default_diameter_m,
             ))
         return segments
+
+
+@dataclass(frozen=True)
+class LabGasFilmGeometry:
+    """One sample-scale length, evaporating area, shape, and provenance."""
+
+    length_m: float
+    shape: str
+    area_m2: float
+    length_method: str
+    flags: tuple[str, ...]
+
+    def as_diagnostic(self) -> dict[str, Any]:
+        return {
+            "transport_length_m": self.length_m,
+            "gas_film_shape": self.shape,
+            "melt_surface_area_m2": self.area_m2,
+            "gas_film_length_method": self.length_method,
+            "typed_flags": list(self.flags),
+        }
+
+
+def resolve_lab_gas_film_geometry(
+    lab_geometry: Mapping[str, Any] | None,
+) -> LabGasFilmGeometry | None:
+    """Resolve a gram-lab film and area from the same declared sample geometry.
+
+    Order: a printed/deck-declared diameter, printed exposed area, printed
+    sample mass, then the flagged DP-113 bench-scale length. Apparatus selects
+    the shape: a crucible/support is a disk on a plane; a free pellet, bead, or
+    wire is sphere-equivalent; an unmarked apparatus defaults to a sphere. A
+    mass-only supported melt is a hemispherical pool, while a free body is
+    sphere-equivalent. When area is absent, the same resolved length supplies
+    its shape-consistent evaporating area.
+    """
+    if not isinstance(lab_geometry, Mapping):
+        return None
+    if str(lab_geometry.get("scale") or "").strip() != LAB_GEOMETRY_SCALE:
+        return None
+
+    sample_raw = lab_geometry.get("sample")
+    sample = sample_raw if isinstance(sample_raw, Mapping) else {}
+    apparatus_fields = (
+        "crucible_material",
+        "support_material",
+        "support",
+        "crucible_inner_diameter_mm",
+        "exposed_melt_diameter_mm",
+    )
+    apparatus_text = " ".join(
+        str(sample.get(field) or "").casefold()
+        for field in apparatus_fields[:3]
+    )
+    wire_loop_sample = any(
+        marker in apparatus_text
+        for marker in ("wire", "loop", "bead", "free pellet", "free body")
+    )
+    container_declared = any(bool(sample.get(field)) for field in apparatus_fields[:3])
+    disk_diameter_declared = any(
+        sample.get(field) not in (None, "") for field in apparatus_fields[3:]
+    )
+    supported = (
+        not wire_loop_sample
+        and (container_declared or disk_diameter_declared)
+    )
+    shape = GAS_FILM_DISK if supported else GAS_FILM_SPHERE
+    shape_flag = f"gas_film_shape:{shape}"
+    shape_is_stated = (
+        supported
+        or wire_loop_sample
+        or bool(sample.get("pellet_diameter_mm"))
+    )
+
+    declared_diameter_keys = (
+        ("crucible_inner_diameter_mm", "exposed_melt_diameter_mm")
+        if supported
+        else ("pellet_diameter_mm",)
+    )
+    length_m: float | None = None
+    length_method = ""
+    for key in declared_diameter_keys:
+        raw = sample.get(key)
+        if raw in (None, ""):
+            continue
+        value = _lab_positive_scalar(raw, field=f"sample.{key}")
+        length_m = value / 1000.0
+        length_method = f"declared:{key}"
+        break
+
+    area_m2: float | None = None
+    raw_area = sample.get("exposed_melt_area_m2")
+    if raw_area not in (None, ""):
+        area_m2 = read_gram_lab_exposed_melt_area(lab_geometry)
+        if length_m is None:
+            length_m = (
+                math.sqrt(4.0 * area_m2 / math.pi)
+                if supported
+                else math.sqrt(area_m2 / math.pi)
+            )
+            length_method = "derived:printed_exposed_area"
+
+    flags = [shape_flag]
+    if not shape_is_stated:
+        flags.append(
+            "gas_film_shape_assumed:sphere_equivalent:apparatus_unspecified"
+        )
+    if length_m is not None:
+        if length_method.startswith("declared:"):
+            flags.append("gas_film_length_declared")
+        else:
+            flags.append("gas_film_length_derived")
+    else:
+        raw_mass_g = sample.get("mass_g")
+        if raw_mass_g not in (None, ""):
+            mass_g = _lab_positive_scalar(raw_mass_g, field="sample.mass_g")
+            # EquipmentDesigner owns the melt density used by equipment sizing.
+            from simulator.equipment import EquipmentDesigner
+
+            volume_m3 = (mass_g / 1000.0) / EquipmentDesigner.MELT_DENSITY_KG_M3
+            if supported:
+                # V = (2/3) pi r^3 for a hemispherical pool; d = 2r.
+                length_m = (12.0 * volume_m3 / math.pi) ** (1.0 / 3.0)
+                length_method = "derived:hemispherical_pool_from_mass"
+            else:
+                length_m = (6.0 * volume_m3 / math.pi) ** (1.0 / 3.0)
+                length_method = "derived:sphere_from_mass"
+            flags.append("gas_film_length_derived")
+        else:
+            length_m = DP_113_GAS_FILM_LENGTH_M
+            length_method = "assumed:DP-113"
+            flags.append("gas_film_length_assumed")
+
+    if area_m2 is None:
+        area_m2 = (
+            math.pi * length_m**2 / 4.0
+            if supported
+            else math.pi * length_m**2
+        )
+    return LabGasFilmGeometry(
+        length_m=length_m,
+        shape=shape,
+        area_m2=area_m2,
+        length_method=length_method,
+        flags=tuple(flags),
+    )
+
+
+def _lab_positive_scalar(value: Any, *, field: str) -> float:
+    code = "invalid_lab_gas_film_geometry"
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise LabGeometryError(
+            code,
+            f"lab_geometry.{field} must be finite and positive",
+        )
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise LabGeometryError(
+            code,
+            f"lab_geometry.{field} must be finite and positive",
+        ) from exc
+    if not math.isfinite(number) or number <= 0.0:
+        raise LabGeometryError(
+            code,
+            f"lab_geometry.{field} must be finite and positive",
+        )
+    return number
 
 
 def parse_lab_geometry(

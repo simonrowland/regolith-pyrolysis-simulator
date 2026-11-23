@@ -691,6 +691,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
+    gas_film_shape: str | None = None,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -708,13 +709,14 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         _stirring_enhanced_sherwood,
     )
     from simulator.state import MAX_STIR_FACTOR, clamp_stir_factor
+    from simulator.lab_geometry import GAS_FILM_DISK, GAS_FILM_SPHERE
 
     alpha_intrinsic = max(0.0, _finite_float(alpha_i, 0.0))
     P_eq = _finite_float(P_eq_pa, 0.0)
     P_bulk = _finite_float(P_bulk_pa, 0.0)
     T_surface = _finite_float(T_surface_K, 0.0)
     M_kg_mol = _finite_float(molar_mass_kg_mol, 0.0)
-    diameter_m = _finite_float(pipe_diameter_m, 0.12)
+    transport_length_m = _finite_float(pipe_diameter_m, 0.12)
     overhead_pa = _finite_float(overhead_pressure_pa, 0.0)
     effective_T_gas_K = _finite_float(T_gas_K, T_surface)
 
@@ -742,7 +744,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         or T_surface <= 0.0
         or M_kg_mol <= 0.0
         or alpha_intrinsic <= 0.0
-        or diameter_m <= 0.0
+        or transport_length_m <= 0.0
     ):
         return _zero_series_evaporation_flux(
             alpha_intrinsic=alpha_intrinsic,
@@ -757,7 +759,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 melt_surface_renewal_base_kg_s_m2_pa
             ),
             melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
+            transport_length_m=max(0.0, transport_length_m),
         )
 
     delta_p_pa = max(0.0, P_eq - P_bulk)
@@ -783,7 +785,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 melt_surface_renewal_base_kg_s_m2_pa
             ),
             melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
+            transport_length_m=max(0.0, transport_length_m),
         )
 
     base_k_melt = _finite_float(melt_surface_renewal_base_kg_s_m2_pa, 0.0)
@@ -803,11 +805,16 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             "D_i, k_L,i, and dp_eq/dC_i; universal pressure conductance disabled"
         )
 
+    if gas_film_shape not in (None, GAS_FILM_SPHERE, GAS_FILM_DISK):
+        raise EvaporationFluxConfigurationError(
+            f"unsupported gas_film_shape={gas_film_shape!r}"
+        )
+
     if knudsen_number is None:
         knudsen = _knudsen_number(
             overhead_pa,
             max(effective_T_gas_K, 1.0),
-            diameter_m,
+            transport_length_m,
             carrier_gas=str(carrier_gas or DEFAULT_CARRIER_GAS),
         )
     else:
@@ -842,7 +849,8 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     d_ab_m2_s = 0.0
     if gas_weight > 0.0:
         sherwood_eff = _stirring_enhanced_sherwood(
-            radial_stir_factor=radial_stir_applied
+            radial_stir_factor=radial_stir_applied,
+            gas_film_shape=gas_film_shape,
         )
         if overhead_pa <= 0.0:
             raise EvaporationFluxConfigurationError(
@@ -869,10 +877,28 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 "missing Chapman-Enskog transport parameters for "
                 f"species={species!r} carrier_gas={carrier_gas!r}"
             )
+        # Premise: a stagnant lab chamber makes diffusion around the sample
+        # the limiting gas-side transport. For a sphere of radius a,
+        # 4*pi*a*D*DeltaC divided by its 4*pi*a^2 surface gives k=D/a=2D/d,
+        # hence Sh_d=2. For one exposed face of a disk on an inert plane,
+        # 4*a*D*DeltaC divided by pi*a^2 gives k=4D/(pi*a)=8D/(pi*d),
+        # hence Sh_d=8/pi. Both use k=Sh*D/d; D/d has units m/s, and
+        # multiplying by DeltaC gives mol/(m^2*s); using C=p/(R*T) gives
+        # the pressure-basis conductance used below. The natural-convection
+        # Grashof number is Gr=g*beta*DeltaT*d^3/nu^2; ideal-gas density
+        # gives nu proportional to 1/P, so Gr is proportional to P^2. For
+        # Robinot at 10 mbar Ar and about
+        # 2300 K, scaling Cai's 1-atm Ar nu=8e-5 m^2/s at 1600 C by 1/P
+        # and T^0.7 gives nu about 9e-3 m^2/s; with d=13 mm, DeltaT=2000 K,
+        # beta=1/2300 K and Earth g, Gr is about 0.23, so buoyant flow is
+        # negligible. The stated lambda about 5e-5 m gives Kn about 4e-3.
+        # Sanity at Robinot's 1300 Pa Ar condition and 2236 K: d=13 mm,
+        # Sh=2 retains 0.208 of the interface rate; the unchanged 0.12 m
+        # furnace pipe with its stirred Sh retains 0.0495.
         k_mt_mol_s_m2_pa = (
             sherwood_eff
             * d_ab_m2_s
-            / (diameter_m * GAS_CONSTANT_J_MOL_K * max(effective_T_gas_K, 1.0))
+            / (transport_length_m * GAS_CONSTANT_J_MOL_K * max(effective_T_gas_K, 1.0))
         )
         k_mt_kg_s_m2_pa = k_mt_mol_s_m2_pa * M_kg_mol
         if not math.isfinite(k_mt_kg_s_m2_pa) or k_mt_kg_s_m2_pa <= 0.0:
@@ -894,7 +920,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 ),
                 melt_surface_renewal_source=melt_surface_renewal_source,
                 d_ab_m2_s=d_ab_m2_s,
-                transport_length_m=diameter_m,
+                transport_length_m=transport_length_m,
             )
         r_gas = gas_weight / k_mt_kg_s_m2_pa
 
@@ -921,7 +947,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             melt_surface_renewal_source=melt_surface_renewal_source,
             k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
             d_ab_m2_s=d_ab_m2_s,
-            transport_length_m=diameter_m,
+            transport_length_m=transport_length_m,
         )
 
     k_total_kg_s_m2_pa = 1.0 / denominator
@@ -952,7 +978,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         melt_surface_renewal_source=melt_surface_renewal_source,
         k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
         d_ab_m2_s=d_ab_m2_s,
-        transport_length_m=diameter_m,
+        transport_length_m=transport_length_m,
     )
 
 
@@ -1586,6 +1612,30 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         if not isinstance(series_config, Mapping):
             series_config = {}
         pipe_diameter_m = _finite_float(controls.get("pipe_diameter_m"), 0.12)
+        gas_film_shape = controls.get("gas_film_shape")
+        transport_length_m = (
+            _finite_float(controls.get("gas_film_length_m"), math.nan)
+            if gas_film_shape is not None
+            else pipe_diameter_m
+        )
+        gas_film_length_method = controls.get("gas_film_length_method")
+        gas_film_typed_flags = tuple(
+            str(flag) for flag in (controls.get("gas_film_typed_flags") or ())
+        )
+        if gas_film_shape is not None and (
+            not math.isfinite(transport_length_m) or transport_length_m <= 0.0
+        ):
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "invalid_lab_gas_film_length",
+                    "gas_film_length_m": repr(controls.get("gas_film_length_m")),
+                },
+            )
         overhead_pressure_pa = _finite_float(
             controls.get("overhead_pressure_pa"),
             max(0.0, float(request.pressure_bar) * PA_PER_BAR),
@@ -1628,7 +1678,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         if (
             gas_resistance_enabled
             and melt_surface_area_m2 > 0.0
-            and pipe_diameter_m > 0.0
+            and transport_length_m > 0.0
         ):
             for species, pressure in vapor_pressures.items():
                 species = str(species)
@@ -1735,14 +1785,14 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             kn_domain = _kn_eval(
                 overhead_pressure_pa,
                 max(gas_temperature_K, 1.0),
-                max(pipe_diameter_m, 0.0) or 0.12,
+                max(transport_length_m, 0.0) or 0.12,
                 carrier_gas=carrier_gas,
             )
             domain_refusal = viscous_p_bulk_out_of_domain_diagnostic(
                 knudsen_number=kn_domain,
                 overhead_pressure_pa=overhead_pressure_pa,
                 commanded_pressure_pa=commanded_pressure_pa,
-                pipe_diameter_m=pipe_diameter_m,
+                pipe_diameter_m=transport_length_m,
                 gas_temperature_K=gas_temperature_K,
                 carrier_gas=carrier_gas,
                 affected_species=tuple(active_gas_transport_species),
@@ -1922,7 +1972,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     T_surface_K=T_K,
                     molar_mass_kg_mol=M_kg_mol,
                     alpha_i=alpha,
-                    pipe_diameter_m=pipe_diameter_m,
+                    pipe_diameter_m=transport_length_m,
                     overhead_pressure_pa=overhead_pressure_pa,
                     axial_stir_factor=axial_stir_factor,
                     radial_stir_factor=radial_stir_factor,
@@ -1934,6 +1984,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     extrapolate_continuum=continuum_extrapolation is not None,
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
+                    gas_film_shape=gas_film_shape,
                 )
             except EvaporationFluxConfigurationError as exc:
                 missing_transport_parameters[species] = {
@@ -1950,6 +2001,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
+            if gas_film_shape is not None:
+                series_diagnostic.update({
+                    "gas_film_shape": str(gas_film_shape),
+                    "gas_film_length_method": gas_film_length_method,
+                    "gas_film_typed_flags": list(gas_film_typed_flags),
+                })
             series_diagnostic["authority_status"] = alpha_evaluation["authority_status"]
             if continuum_extrapolation is not None and uses_gas_resistance:
                 series_diagnostic["continuum_extrapolation_notice"] = dict(continuum_extrapolation)
@@ -2024,6 +2081,14 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        if gas_film_shape is not None:
+            diagnostic["gas_film_geometry"] = {
+                "transport_length_m": transport_length_m,
+                "shape": str(gas_film_shape),
+                "length_method": gas_film_length_method,
+                "typed_flags": list(gas_film_typed_flags),
+                "melt_surface_area_m2": melt_surface_area_m2,
+            }
         if below_threshold_flux_kg_hr:
             diagnostic["below_threshold_evaporation_flux"] = {
                 "threshold_kg_hr": _NONTRIVIAL_FLUX_KG_HR,

@@ -666,7 +666,11 @@ from simulator.melt_regime import (
 )
 from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_geometry import (
+    LabGeometryError,
+    parse_lab_geometry,
+    resolve_lab_gas_film_geometry,
+)
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
@@ -1411,6 +1415,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.lab_geometry = parse_lab_geometry(
             self.setpoints.get("lab_geometry"),
             allow_temperature_profiles=allow_lab_geometry_temperature_profiles,
+        )
+        self.lab_gas_film_geometry = resolve_lab_gas_film_geometry(
+            self.setpoints.get("lab_geometry")
         )
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
@@ -8467,6 +8474,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
+        gas_film = getattr(self, 'lab_gas_film_geometry', None)
+        transport_length_m = (
+            gas_film.length_m if gas_film is not None else pipe_diameter_m
+        )
         try:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                 species='Fe',
@@ -8475,7 +8486,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 T_surface_K=T_K,
                 molar_mass_kg_mol=molar_mass_kg_mol,
                 alpha_i=alpha,
-                pipe_diameter_m=pipe_diameter_m,
+                pipe_diameter_m=transport_length_m,
                 overhead_pressure_pa=overhead_pressure_pa,
                 axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
                 radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
@@ -8485,6 +8496,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 gas_resistance_enabled=gas_resistance_enabled,
                 melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                 melt_surface_renewal_source=melt_surface_renewal_source,
+                gas_film_shape=(gas_film.shape if gas_film is not None else None),
             )
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
@@ -8498,7 +8510,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
-            pipe_diameter_m=pipe_diameter_m,
+            pipe_diameter_m=transport_length_m,
             gas_temperature_K=gas_temperature_K,
             carrier_gas=str(carrier_gas),
             campaign_name=str(
@@ -17562,16 +17574,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             current_area_m2 <= 0.0
             or math.isclose(current_area_m2, 0.2, rel_tol=0.0, abs_tol=1e-12)
         ):
-            # condensation imports core at module level.
-            from simulator.condensation import read_gram_lab_exposed_melt_area
-
-            declared_area_m2 = read_gram_lab_exposed_melt_area(
-                self.setpoints.get('lab_geometry'),
-            )
+            lab_film = getattr(self, 'lab_gas_film_geometry', None)
             self.melt.melt_surface_area_m2 = (
                 crucible_area_m2
-                if declared_area_m2 is None
-                else declared_area_m2
+                if lab_film is None
+                else lab_film.area_m2
             )
 
         pipe = self._equipment.pipe

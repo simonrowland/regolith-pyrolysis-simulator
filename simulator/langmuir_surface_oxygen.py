@@ -231,6 +231,7 @@ class LangmuirTransport:
     hkl_upper_bound_species: frozenset[str]
     extrapolate_continuum: bool
     campaign_name: str | None = None
+    gas_film_shape: str | None = None
 
 
 @dataclass(frozen=True)
@@ -1150,6 +1151,7 @@ def _publisher_net_law_with_transport(
             gas_resistance_enabled=True,
             extrapolate_continuum=transport.extrapolate_continuum,
             melt_resistance_enabled=False,
+            gas_film_shape=transport.gas_film_shape,
         )
     except EvaporationFluxConfigurationError as exc:
         raise ValueError(
