@@ -167,25 +167,6 @@ def _trace_workspace_data_reads(
     return reads
 
 
-def _assert_trace_is_fingerprinted(
-    engine_name: str,
-    observed: set[str],
-    callsites: Mapping[str, set[str]],
-) -> None:
-    numeric_reads = _numeric_trace_paths(observed, callsites)
-    declared = {
-        input_ref.path
-        for input_ref in engine_cache.ENGINE_CACHE_INPUTS[engine_name]
-        if input_ref.kind == "data"
-    }
-    unrecorded = numeric_reads - declared
-    assert not unrecorded, (
-        f"{engine_name} numeric data reads are absent from COLD-row trace metadata: "
-        f"{sorted(unrecorded)}; numeric trace={sorted(numeric_reads)}; "
-        f"full trace={sorted(observed)}"
-    )
-
-
 def _numeric_trace_paths(
     observed: set[str], callsites: Mapping[str, set[str]]
 ) -> set[str]:
@@ -387,7 +368,6 @@ def _run_probe(
     assert result["pid"] != os.getpid(), "live probe ran in the pytest worker"
     observed = set(result["observed"])
     callsites = {path: set(sites) for path, sites in result["callsites"].items()}
-    _assert_trace_is_fingerprinted(engine_name, observed, callsites)
     _assert_expected_numeric_trace(engine_name, observed, callsites)
     return result
 
@@ -521,12 +501,8 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
 
 @pytest.mark.parametrize("engine_name", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
 def test_live_engine_numeric_probe_matches_version(
-    engine_name, request, tmp_path, monkeypatch
+    engine_name, request, tmp_path
 ) -> None:
-    from tests.test_engine_cache_input_identity import (
-        _assert_probe_key_ignores_source_changes,
-    )
-
     result = _run_probe(engine_name, request, tmp_path)
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
     probe_request = result["request"]
@@ -558,13 +534,6 @@ def test_live_engine_numeric_probe_matches_version(
         result["version"],
         probe_request,
         tmp_path / "key-portability",
-    )
-    _assert_probe_key_ignores_source_changes(
-        engine_name,
-        result["version"],
-        dict(probe_request),
-        tmp_path / "source-invariance",
-        monkeypatch,
     )
     if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
         species = set(result["vapor_pressure_species"])

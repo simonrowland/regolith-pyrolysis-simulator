@@ -531,6 +531,65 @@ def _intern_equilibrium_source_provenance(hot: list[Any]) -> list[Any]:
     return hot
 
 
+# The process faulted itself. SIGKILL is the timeout reaper. SIGPROF is
+# the CPU-budget timer. Any other signal is an external kill. One set:
+# alphamelts uses it to name the reason, and the status gate below uses
+# it so a mislabeled external kill cannot be stored as subprocess_died.
+_BINARY_FAULT_SIGNALS = frozenset({'SIGABRT', 'SIGSEGV', 'SIGBUS'})
+
+
+def signal_is_binary_fault(signal_name: object) -> bool:
+    return isinstance(signal_name, str) and signal_name in _BINARY_FAULT_SIGNALS
+
+
+def _equilibrium_refusal_status(
+    status: Any, diagnostics: Any,
+) -> str:
+    """Keep process death off the allowlist without a new wire field.
+
+    A non-zero returncode, a signal name, or a timeout record is a property
+    of the process, not of the request. ``process_failure`` is not a
+    cacheable status, so the row is not stored even when the reason code
+    is otherwise deterministic.
+
+    The exception is a returned ``subprocess_died`` whose signal is the
+    binary's own fault. The adapter does not use that reason for a
+    timeout, an external kill, a worker death, or a missing runtime.
+    """
+    refusal_status = str(status or '')
+    failure = (
+        diagnostics.get('subprocess_failure')
+        if isinstance(diagnostics, Mapping) else None
+    )
+    if not isinstance(failure, Mapping):
+        return refusal_status
+    returncode = failure.get('returncode')
+    signal_name = failure.get('signal')
+    from simulator.engine_cache import REFUSAL_SUBPROCESS_DIED
+
+    reason = (
+        diagnostics.get('backend_status_reason')
+        or diagnostics.get('backend_failure_reason_code')
+    )
+    binary_fault = (
+        reason == REFUSAL_SUBPROCESS_DIED
+        and signal_is_binary_fault(signal_name)
+        and isinstance(returncode, int)
+        and not isinstance(returncode, bool)
+        and returncode < 0
+        and failure.get('timeout_s') is None
+    )
+    if binary_fault:
+        return refusal_status
+    if (
+        returncode not in (None, 0)
+        or signal_name
+        or failure.get('timeout_s') is not None
+    ):
+        return 'process_failure'
+    return refusal_status
+
+
 def equilibrium_to_hot(
     values: Mapping[str, Any], *, engine_id: str | None = None, live_value: Any = None,
 ) -> Any:
@@ -538,6 +597,9 @@ def equilibrium_to_hot(
 
     diagnostics = values.get('diagnostics')
     if isinstance(diagnostics, Mapping) and diagnostics.get('backend_failure_disposition'):
+        # Solver nonconvergence and backend absence stay uncached. The
+        # disposition is an explicit do-not-cache signal (MAGEMin ctypes,
+        # internal-analytical imcc_nonconvergence). Do not relabel it.
         return EngineCacheValue(values if live_value is None else live_value, cacheable=False)
     hot = _intern_equilibrium_source_provenance(
         equilibrium_cache_value(values, engine_id=engine_id)
@@ -547,7 +609,10 @@ def equilibrium_to_hot(
         if (numeric := _cold_numbers(values.get(name))) is not None
     }
     status = values.get('status')
-    if engine_id == 'vaporock' and status not in {'ok', 'non_authoritative'}:
+    # Omitted status is not a refusal: successes that leave it unset must store.
+    # ``refused`` is not mapped to invalid_input; a subprocess message with
+    # that status is not an input predicate.
+    if status not in {None, 'ok', 'non_authoritative'}:
         refusal_reason = None
         if isinstance(diagnostics, Mapping):
             refusal_reason = (
@@ -565,7 +630,7 @@ def equilibrium_to_hot(
                 hot,
                 cold,
                 refusal_reason=str(refusal_reason),
-                refusal_status=str(status or ''),
+                refusal_status=_equilibrium_refusal_status(status, diagnostics),
             )
         return EngineCacheValue(
             values if live_value is None else live_value,
