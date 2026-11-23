@@ -897,7 +897,9 @@ def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
             "quantity": Quantity.FUGACITY.value,
         }
     residuals, _ = score_store(context, engines=(Engine.MAGEMIN,), include_diagnostics=False)
-    assert residuals and all(not r.score_eligible and r.numeric is None for r in residuals)
+    # Fugacity is not in any engine's declared set, so the score loop emits
+    # no residual. predict_with_engine above still refuses quantity_not_predicted.
+    assert residuals == ()
     numeric, reason, _ = populate_numeric(quantity=Quantity.FUGACITY, candidate=Decimal("33.7"),
                                            reference=Decimal("33.7"), source_relation=SourceRelation.INDEPENDENT)
     assert numeric is None

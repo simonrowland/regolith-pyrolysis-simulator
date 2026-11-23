@@ -79,6 +79,7 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -792,17 +793,116 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         notices=(assumption_notice,),
     )
 
-    residual, _candidate = _compile(reference, experiment, prediction)
+    context = _context(F.work(), experiment, reference)
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
 
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
     assert assumption_notice in residual.notices
+    assert assumption_notice.kind is NoticeKind.METHOD_IMPLIED
+    assert assumption_notice.policy == NoticePolicy(
+        id="DP-101",
+        version=1,
+        status="rejected",
+        value="1e-6",
+        units="bar",
+    )
+    assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
+    assert f"{assumed_bar:g} bar" not in assumption_notice.reason
+    assert "not printed" in assumption_notice.reason
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "total-pressure-independent" in notice.reason
         for notice in residual.notices
     )
+
+    from simulator.battery.score import (
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    assert flagged_strata(residual.notices) == (NoticeKind.METHOD_IMPLIED.value,)
+    assert [
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [
+        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
+    ]
+    serialized_strata = flagged_stratum_payloads(
+        (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert [
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
+        for row in serialized_strata
+    ] == [
+        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
+    ]
+    payload = residual_to_plain(residual)
+    aggregate = score_mod._ScorePayloadAccumulator.from_rows(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert aggregate.flagged_records() == serialized_strata
+    expected_flagged_rows = (
+        "| method_implied | vapour | internal-analytical | DP-101 | rejected | 1 |",
+    )
+    legacy_report = score_mod._render_score_report_from_payloads_legacy(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        store_stamp={"revision": "unknown"},
+        _aggregate=aggregate,
+    )
+    payload_report = score_mod.render_score_report_from_payloads(
+        (payload,),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        observations=context.observations,
+        origins=context.origins,
+    )
+    assert all(row in legacy_report for row in expected_flagged_rows)
+    assert all(row in payload_report for row in expected_flagged_rows)
+    clean_residual = replace(
+        residual,
+        notices=tuple(
+            notice
+            for notice in residual.notices
+            if notice.kind is not NoticeKind.METHOD_IMPLIED
+        ),
+    )
+
+    def measured_headline_count(row: Residual) -> int:
+        return next(
+            item["n"]
+            for item in headline_rows(
+                (row,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+            )
+            if item["rail"] == Rail.VAPOUR.value
+            and item["engine"] == Engine.INTERNAL_ANALYTICAL.value
+        )
+
+    assert measured_headline_count(residual) == 0
+    assert measured_headline_count(clean_residual) == 1
 
 
 def _partial_prediction(engine, observation, **_kwargs):
@@ -1254,7 +1354,10 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
-    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+    assert (
+        "| calibration-not-grounded | vapour | internal-analytical | — | — | 1 |"
+        in report
+    )
 
 
 def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
@@ -10600,6 +10703,40 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
+@pytest.mark.parametrize("engine", SCORE_ENGINE_SET)
+def test_unknown_quantity_refusal_does_not_fabricate_psat_request(
+    engine: Engine,
+) -> None:
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        F.psat_identity("Na"),
+        quantity=State.unknown("source does not identify the quantity"),
+    )
+    reference = F.observation(
+        "unknown-quantity",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unknown-quantity-source",
+    )
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+    )
+
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "quantity_unknown"
+    assert residual.rail is None
+    assert f"::quantity_unknown::none::{engine.value}" in residual.key
+    assert residual.candidate_request is not None
+    assert residual.candidate_request.quantity is None
+    assert residual.candidate_request.engine is engine
+
+
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
 
 
@@ -11982,16 +12119,22 @@ def test_static_lineage_memo_matches_the_prediction_source_relation(
     monkeypatch.setattr(
         score_mod, "_score_predict_with_engine", refusal_with_other_sources
     )
-    compiled_rows = _assert_score_store_matches_compile_jsonl(
+    # Alpha is in no declared set and this row is not an implied-alpha
+    # rewrite, so the score loop does not emit it. The predict path still
+    # records the foreign coefficient source as unknown.
+    scored, _candidates = score_store(
         context,
-        reference,
         engines=(Engine.VAPOROCK,),
+        include_diagnostics=False,
     )
-
-    assert (
-        compiled_rows[Engine.VAPOROCK][0].source_relation
-        is SourceRelation.UNKNOWN
+    assert scored == ()
+    compiled_residual, _compiled_candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        comparison_ids={reference.observation_id},
     )
+    assert compiled_residual.source_relation is SourceRelation.UNKNOWN
 
 
 def _printed_unresolved_observation(
@@ -14748,7 +14891,14 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     )
     default_partial = default_path.with_name(default_path.name + ".partial")
     default_rows = score_mod.load_residuals_jsonl(default_partial)
-    assert default_written == len(fixture_residuals)
+    # Internal-analytical does not declare S. The two relabeled entropy
+    # rows are capability-matrix cells, not residuals.
+    skipped_entropy = {
+        "fixture-scaled-max-first",
+        "fixture-scaled-max-second",
+    }
+    assert default_written == len(fixture_residuals) - len(skipped_entropy)
+    assert not any(row["reference"] in skipped_entropy for row in default_rows)
     assert score_mod.load_residuals_stamp(default_partial).get("static_refusals") is None
     assert any(row["reference"] == static_id for row in default_rows)
 
@@ -18959,7 +19109,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
+        f"{residual.rail.value} | {Engine.OPENIMCC.value} | — | — | 1 |"
     ) in report
 
     source_point_reference = replace(
@@ -20332,7 +20482,7 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.OPENIMCC,)
     )
-    assert strata[0]["stratum"] == "cell-material-inferred"
+    assert any(row["stratum"] == "cell-material-inferred" for row in strata)
 
 
 
@@ -20975,23 +21125,45 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
 
+    context = _context(
+        F.work("fusion-work"),
+        experiment,
+        observation,
+        review="reviewed",
+    )
     residuals, _candidates = score_store(
-        _context(
-            F.work("fusion-work"),
-            experiment,
-            observation,
-            review="reviewed",
-        ),
+        context,
         engines=(Engine.MAGEMIN,),
         rail=Rail.THERMOCHEMISTRY,
         include_diagnostics=False,
     )
-    assert len(residuals) == 1
-    residual = residuals[0]
-    assert residual.rail is Rail.THERMOCHEMISTRY
-    assert residual.execution.state is ExecutionState.UNSUPPORTED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+    # MAGEMin does not compute fusion. The pair is a capability-matrix cell.
+    # predict_with_engine above still returns engine_does_not_report_fusion.
+    assert residuals == ()
+    from simulator.battery.engine_capability import capability_summary
+
+    summary = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=(Engine.MAGEMIN,),
+        scored_observation_ids=(),
+        n_records=0,
+        n_scored_records=0,
+        n_refused_records=0,
+    )
+    matrix = summary["capability_matrix"]
+    assert matrix["uncovered_pair_total"] == 1
+    assert matrix["rows"] == [
+        {
+            "covered": False,
+            "engine": Engine.MAGEMIN.value,
+            "n_observations": 1,
+            "quantity": quantity.value,
+            "rail": Rail.THERMOCHEMISTRY.value,
+        }
+    ]
+    assert matrix["quantities_no_engine_predicts"] == []
 
 
 @pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))
