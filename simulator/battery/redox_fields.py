@@ -72,7 +72,7 @@ class _PrintedCell:
 _PRINTED_CELL_NOTE = "printed_cell="
 
 
-def located_printed_cell(locator: Locator | None, value: str, unit: str | None) -> Locator | None:
+def located_printed_cell(locator: Locator | None, value: str | None, unit: str | None) -> Locator | None:
     """Keep the raw scalar and unit beside the source address in its locator."""
     if locator is None:
         return None
@@ -92,7 +92,7 @@ def _printed_cell(value: Located, *, address_only: bool = False) -> _PrintedCell
                 raw, unit = json.loads(segment.strip().removeprefix(_PRINTED_CELL_NOTE))
             except (ValueError, TypeError):
                 continue
-            if isinstance(raw, str) and (unit is None or isinstance(unit, str)):
+            if (raw is None or isinstance(raw, str)) and (unit is None or isinstance(unit, str)):
                 return _PrintedCell(address, raw, unit)
     if address_only:
         return _PrintedCell(address, None)
@@ -126,7 +126,13 @@ def same_printed_cell(a: _PrintedCell | None, b: _PrintedCell | None) -> str | N
     try:
         first, second = Decimal(a.value), Decimal(b.value)
     except InvalidOperation:
-        units_agree = a.unit is None or b.unit is None or a.unit == b.unit
+        # Migration imports the cell helpers. Resolve the unit rule at call time.
+        from simulator.battery.migrate import _normalize_printed_unit
+
+        units_agree = (
+            a.unit is None or b.unit is None
+            or _normalize_printed_unit(a.unit) == _normalize_printed_unit(b.unit)
+        )
         return "ambiguous" if a.value == b.value and units_agree else None
     return (
         "ambiguous" if first.is_finite() and second.is_finite() and first == second else None

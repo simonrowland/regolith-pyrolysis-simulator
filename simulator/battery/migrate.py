@@ -2780,13 +2780,27 @@ def _with_located_print(condition: Located, payload: object, unit: str | None) -
     return replace(condition, locator=located_printed_cell(condition.locator, *raw))
 
 
-def _retain_condition_print(condition: Located, payload: object, field: str | None) -> Located:
+def _retain_condition_print(
+    condition: Located, payload: object, field: str | None, *, stored: bool = False,
+) -> Located:
     unit = (
         _PRESSURE_CONDITION_UNITS.get(field) or dict(_TEMPERATURE_FIELDS).get(field)
         or ("Pa" if field == "oxygen_partial_pressure_Pa" else None)
     )
     if condition.inference is None:
-        return _with_located_print(condition, payload, unit)
+        if not stored:
+            return _with_located_print(condition, payload, unit)
+        if isinstance(payload, Mapping):
+            printed = payload.get("as_printed", payload.get("as_published"))
+            if isinstance(printed, str):
+                declared_unit = payload.get("units", payload.get("unit"))
+                return _with_located_print(
+                    condition, printed, declared_unit if isinstance(declared_unit, str) else None,
+                )
+        # A canonical state contains no information about what was printed.
+        # Keep a located absence so downstream code cannot fall back to that state.
+        raw = _printed_pressure_phrase(condition) if unit == "Pa" else None
+        return replace(condition, locator=located_printed_cell(condition.locator, *(raw or (None, None))))
     if not isinstance(payload, Mapping):
         return condition
     published = payload.get("as_published")
@@ -4137,7 +4151,7 @@ def _experiment_control_from_plain(payload: object, cast, field: str, *, retain_
     if control.state.is_value and (
         retain_print or isinstance(payload, Mapping) and isinstance(payload.get("as_published"), Mapping)
     ):
-        return _retain_condition_print(control, payload, field)
+        return _retain_condition_print(control, payload, field, stored=True)
     return control
 
 
@@ -10532,6 +10546,36 @@ def _parse_printed_operands(note: str) -> list[tuple[Decimal, str]] | None:
     if not spans:
         return None
     return spans[:2]
+
+
+def _printed_pressure_phrase(condition: Located) -> tuple[str, str] | None:
+    """Recover a verbatim pressure phrase only when it accounts for the stored point."""
+    locator = condition.locator
+    if locator is None or not locator.note or _pressure_locator_is_unprinted(locator):
+        return None
+    note = locator.note
+    if _PRESSURE_NON_POINT_RE.search(note) or _PRESSURE_BOUND_OPERATOR_RE.search(note):
+        return None
+    stored = _stored_magnitudes(to_plain(condition.state.value))
+    if stored is None or stored[0] != "point":
+        return None
+    operands = _parse_printed_operands(note)
+    if operands is None or len(operands) != 1:
+        return None
+    amount, unit = operands[0]
+    pressure_pa, _ = convert_pressure_to_pa(amount, _normalize_printed_unit(unit))
+    if pressure_pa is None or not _agrees_stored(pressure_pa, stored[1][0]):
+        return None
+    words = "|".join(_PRINTED_WORD_NUMBERS)
+    matches = []
+    for match in re.finditer(
+        rf"(?<![\w.])(?:\b(?:{words})\b|{_PRINTED_NUM})\s*-?\s*({_PRINTED_UNIT})\b",
+        note, re.IGNORECASE,
+    ):
+        text = match[0].strip()
+        if _parse_printed_operands(text) == operands:
+            matches.append((text, match[1]))
+    return matches[0] if len(matches) == 1 else None
 
 
 def _stored_magnitudes(raw: object) -> tuple[str, list[Decimal], str | None] | None:
