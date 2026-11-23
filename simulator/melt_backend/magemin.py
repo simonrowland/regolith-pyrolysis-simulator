@@ -133,6 +133,7 @@ from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
     liquid_fraction_from_phase_masses,
+    phase_name_is_liquid_mass,
     projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
@@ -1447,20 +1448,52 @@ def _lambda_stencil_warning(endmember: str, temperature_K: float) -> Optional[st
     return None
 
 
-def _parse_magemin_sys_oxide_row(
-    matlab_text: str,
+def _oxide_weight_fraction_row(
+    header: Sequence[str],
+    tokens: Sequence[str],
 ) -> Optional[Dict[str, float]]:
-    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+    """One matlab oxide row as weight fractions, or None when it will not parse.
 
-    Unparsable or non-finite values make the row unparseable (None) so the
-    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
-    comparison is False and would pass the guard silently).
+    The header is the oxide names. ``tokens[0]`` is the phase label and is
+    not part of the vector. A short row, a non-numeric token, or a NaN is
+    unparsable. NaN must not become a comparison that is always false.
     """
+
+    if len(tokens) != len(header) + 1:
+        return None
+    try:
+        values = [float(token) for token in tokens[1:]]
+    except ValueError:
+        return None
+    if not all(math.isfinite(value) for value in values):
+        return None
+    return dict(zip(header, values))
+
+
+def _parse_magemin_oxide_block(
+    matlab_text: str,
+) -> Tuple[Optional[Dict[str, Dict[str, float]]], Tuple[Dict[str, object], ...]]:
+    """Rows of the matlab 'Oxide compositions [wt fr]' block.
+
+    Values stay weight fractions. The caller that wants wt% multiplies.
+    SYS is included when its first row parses. A bad non-SYS row is omitted
+    and does not drop a good SYS row. A repeated phase token is omitted
+    rather than averaged. The row map is None when the block header is absent.
+    """
+
     in_block = False
+    found = False
     header: List[str] = []
+    rows: Dict[str, Dict[str, float]] = {}
+    notices: List[Dict[str, object]] = []
+    seen: set[str] = set()
+    duplicated: set[str] = set()
+    sys_failed = False
     for line in matlab_text.splitlines():
         if line.startswith('Oxide compositions'):
             in_block = True
+            found = True
+            header = []
             continue
         if not in_block:
             continue
@@ -1470,19 +1503,122 @@ def _parse_magemin_sys_oxide_row(
                 break
             continue
         if not header:
-            header = tokens
+            header = list(tokens)
             continue
-        if tokens[0] == 'SYS':
-            try:
-                values = [float(t) for t in tokens[1:]]
-            except ValueError:
-                return None
-            if len(values) != len(header):
-                return None
-            if not all(math.isfinite(v) for v in values):
-                return None
-            return dict(zip(header, values))
-    return None
+        name = tokens[0]
+        parsed = _oxide_weight_fraction_row(header, tokens)
+        if name == 'SYS':
+            if 'SYS' not in rows and not sys_failed:
+                if parsed is None:
+                    sys_failed = True
+                    notices.append({
+                        'type': 'typed_notice',
+                        'kind': 'phase_composition_unparsable',
+                        'phase': 'SYS',
+                        'reason': (
+                            'SYS oxide row is not a finite weight-fraction vector'
+                        ),
+                    })
+                else:
+                    rows['SYS'] = parsed
+            continue
+        if name in duplicated:
+            continue
+        if name in seen:
+            duplicated.add(name)
+            rows.pop(name, None)
+            notices.append({
+                'type': 'typed_notice',
+                'kind': 'duplicate_phase_composition',
+                'phase': name,
+                'reason': (
+                    'MAGEMin printed more than one oxide row for this phase; '
+                    'composition omitted rather than averaged'
+                ),
+            })
+            continue
+        seen.add(name)
+        if parsed is None:
+            notices.append({
+                'type': 'typed_notice',
+                'kind': 'phase_composition_unparsable',
+                'phase': name,
+                'reason': 'oxide row is not a finite weight-fraction vector',
+            })
+            continue
+        rows[name] = parsed
+    if not found:
+        return None, ()
+    return rows, tuple(notices)
+
+
+def _parse_magemin_sys_oxide_row(
+    matlab_text: str,
+) -> Optional[Dict[str, float]]:
+    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+
+    Unparsable or non-finite values make the row unparseable (None) so the
+    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
+    comparison is False and would pass the guard silently). A bad non-SYS
+    row does not drop a good SYS row. The numbers stay weight fractions.
+    """
+
+    rows, _notices = _parse_magemin_oxide_block(matlab_text)
+    if not rows:
+        return None
+    return rows.get('SYS')
+
+
+def _attach_magemin_oxide_compositions(
+    phases: Dict[str, Dict[str, float]],
+    matlab_text: str,
+) -> Tuple[Dict[str, object], ...]:
+    """Copy matlab oxide rows onto phase dicts as wt%.
+
+    The block parser keeps weight fractions. This is the one conversion
+    to wt%. A missing block or a missing row is a typed notice. The mode
+    vector already on ``phases`` is left in place. Buffer pseudo-phases
+    are not material phases and are not given a composition.
+    """
+
+    rows, notices = _parse_magemin_oxide_block(matlab_text)
+    extra: List[Dict[str, object]] = list(notices)
+    if rows is None:
+        extra.append({
+            'type': 'typed_notice',
+            'kind': 'phase_composition_not_printed',
+            'reason': 'matlab dump has no Oxide compositions block',
+        })
+        return tuple(extra)
+    omitted = {
+        str(notice.get('phase'))
+        for notice in extra
+        if notice.get('kind') in {
+            'duplicate_phase_composition',
+            'phase_composition_unparsable',
+        }
+        and notice.get('phase') not in (None, 'SYS')
+    }
+    buffers = MAGEMinBackend._BUFFER_CHOICES
+    for name, state in phases.items():
+        if name.lower() in buffers:
+            continue
+        if name in omitted:
+            continue
+        row = rows.get(name)
+        if row is None:
+            extra.append({
+                'type': 'typed_notice',
+                'kind': 'phase_composition_not_printed',
+                'phase': name,
+                'reason': 'mode phase has no oxide row in the matlab dump',
+            })
+            continue
+        state['composition_wt_pct'] = {
+            oxide: fraction * 100.0
+            for oxide, fraction in row.items()
+        }
+    return tuple(extra)
 
 
 def _assert_magemin_bulk_echo(
@@ -2068,6 +2204,21 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if typed_notices:
                 result_diagnostics['magemin_mode_token_notices'] = (
                     typed_notices
+                )
+        phase_composition_notices = (
+            raw.get('phase_composition_notices')
+            if isinstance(raw, Mapping)
+            else None
+        )
+        if isinstance(phase_composition_notices, (list, tuple)):
+            typed_phase_notices = [
+                dict(notice)
+                for notice in phase_composition_notices
+                if isinstance(notice, Mapping)
+            ]
+            if typed_phase_notices:
+                result_diagnostics['magemin_phase_composition_notices'] = (
+                    typed_phase_notices
                 )
         converged = (
             raw.get('converged')
@@ -3511,9 +3662,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         Builds the ``--Verb=0`` argument vector, runs the binary, and
         parses the compact ``Phase :`` / ``Mode :`` stdout block into the
         ``{'phases': {name: {'mass_kg': ...}}}`` shape ``_populate_result``
-        already understands.  The buffer pseudo-phase (``qfm`` etc.) the
-        binary echoes back is dropped — it is a control row, not a
-        material phase.
+        already understands.  Oxide rows in the matlab dump are attached
+        as ``composition_wt_pct`` (weight fraction times 100).  A missing
+        row is a typed notice, not a failed solve.  The buffer
+        pseudo-phase (``qfm`` etc.) the binary echoes back is dropped —
+        it is a control row, not a material phase.
 
         ``_resolve_buffer`` supplies an initial QFM offset. Native solved
         oxygen potential determines the honour verdict; one correction of
@@ -3680,6 +3833,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'phases': phases,
             'mode_token_notices': tuple(
                 stdout_metadata.get('mode_token_notices', ())
+            ),
+            'phase_composition_notices': _attach_magemin_oxide_compositions(
+                phases, matlab_text,
             ),
             'buffer_warnings': (
                 *buffer_warnings,
@@ -4426,11 +4582,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if liquid_fraction is None:
             raise MeltCompositionError('zero_total_phase_mass')
 
-        liquid_phase_names = ('liq', 'liquid', 'LIQUID', 'melt', 'Melt')
         phases_present: List[str] = []
         phase_masses_kg: Dict[str, float] = {}
         phase_compositions: Dict[str, Dict[str, float]] = {}
-        liquid_composition: Dict[str, float] = {}
+        liquid_compositions: List[Dict[str, float]] = []
 
         for name, mass_kg, composition_wt_pct in phases:
             mass = float(mass_kg)
@@ -4440,9 +4595,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             phase_masses_kg[name] = mass
             if composition_wt_pct:
                 phase_compositions[name] = composition_wt_pct
-            if name in liquid_phase_names or name.lower().startswith('liq'):
-                if composition_wt_pct:
-                    liquid_composition = composition_wt_pct
+            if composition_wt_pct and phase_name_is_liquid_mass(name):
+                liquid_compositions.append(composition_wt_pct)
+        # Two liquid compositions must not collapse to the last row.
+        # The selector then reports ambiguous_phase from the map.
+        liquid_composition = (
+            liquid_compositions[0] if len(liquid_compositions) == 1 else {}
+        )
 
         return (
             phases_present,

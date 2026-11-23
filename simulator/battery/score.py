@@ -11253,11 +11253,10 @@ def _equilibrate_phase_assemblage(
             _call_cached_backend_equilibrate,
         )
 
-        # The shared equilibrium cache codec omits phase-composition maps,
-        # which this scorer consumes below. Keep this result uncached until
-        # that codec can preserve the full assemblage without changing schema.
+        # Phase compositions are in the HOT consumer metadata. The MELTS
+        # chemistry version includes that projection, so a hit is this request.
         return _call_cached_backend_equilibrate(
-            handle, kwargs, lambda: backend.equilibrate(**kwargs), cache=False
+            handle, kwargs, lambda: backend.equilibrate(**kwargs)
         )
     finally:
         if owns_handle:
@@ -11353,6 +11352,11 @@ def _select_phase_composition(
         liquid = dict(result.liquid_composition_wt_pct or {})
         if liquid:
             return liquid, None
+        from simulator.melt_backend.phase_composition import ambiguous_role_reason
+
+        ambiguous = ambiguous_role_reason(role.value, comps)
+        if ambiguous is not None:
+            return None, ambiguous
         return None, "phase_not_in_assemblage"
     needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
     hits = [name for name in comps if any(needle in name.casefold() for needle in needles)]

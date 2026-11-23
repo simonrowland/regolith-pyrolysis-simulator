@@ -98,6 +98,7 @@ def test_phase_row_preserves_phase_maps_when_engine_cache_is_configured(
     monkeypatch.setenv(
         "REGOLITH_ENGINE_CACHE", str(tmp_path / "engine-cache.sqlite")
     )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
 
     for _ in range(2):
@@ -111,4 +112,4 @@ def test_phase_row_preserves_phase_maps_when_engine_cache_is_configured(
         )
         assert result.phase_compositions == {"liquid": {"SiO2": 100.0}}
 
-    assert calls == 2
+    assert calls == 1

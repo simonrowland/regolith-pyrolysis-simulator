@@ -224,6 +224,28 @@ def _equilibrium_cache_json(value: Any) -> Any:
     return value
 
 
+def _cache_phase_compositions(value: Any) -> dict[str, dict[str, float]]:
+    """Positive oxide wt% by phase label.
+
+    A non-positive or non-finite amount is omitted. The live extractor
+    already drops those; the cache must not resurrect a silent zero.
+    """
+
+    if not isinstance(value, Mapping):
+        return {}
+    phases: dict[str, dict[str, float]] = {}
+    for phase, oxides in sorted(value.items(), key=lambda item: str(item[0])):
+        mapped = _cache_map(oxides, positive=True)
+        kept = {
+            name: float(amount)
+            for name, amount in mapped.items()
+            if amount is not None
+        }
+        if kept:
+            phases[str(phase)] = kept
+    return phases
+
+
 def _cache_map(
     value: Any, *, positive: bool = False, pressure: bool = False
 ) -> dict[str, float | None]:
@@ -386,6 +408,23 @@ def equilibrium_cache_from_value(
             restored['diagnostics'] = diagnostics
         if 'imcc_model_id' in metadata:
             restored['imcc_model_id'] = metadata['imcc_model_id']
+        phases = metadata.get('phase_compositions')
+        if isinstance(phases, Mapping) and phases:
+            restored_phases: dict[str, dict[str, float]] = {}
+            for phase, oxides in phases.items():
+                if not isinstance(oxides, Mapping):
+                    continue
+                restored_oxides: dict[str, float] = {}
+                for oxide, amount in oxides.items():
+                    if isinstance(amount, bool) or not isinstance(amount, (int, float)):
+                        continue
+                    number = float(amount)
+                    if math.isfinite(number) and number > 0.0:
+                        restored_oxides[str(oxide)] = number
+                if restored_oxides:
+                    restored_phases[str(phase)] = restored_oxides
+            if restored_phases:
+                restored['phase_compositions'] = restored_phases
     return restored
 
 
@@ -465,6 +504,12 @@ def _equilibrium_cache_consumer_metadata(
     model_id = values.get('imcc_model_id')
     if model_id is not None:
         metadata['imcc_model_id'] = _equilibrium_cache_json(model_id)
+    # Phase compositions are output fields of the same request. They sit in
+    # this optional metadata object so EquilibrateCell's 11-slot projection
+    # plus its own flags stays length 12. An empty map adds nothing.
+    phase_compositions = _cache_phase_compositions(values.get('phase_compositions'))
+    if phase_compositions:
+        metadata['phase_compositions'] = phase_compositions
     return metadata
 
 
@@ -862,6 +907,22 @@ _LIQUID_PHASE_NAMES = frozenset({
 })
 
 
+def phase_name_is_liquid_mass(phase_name: str) -> bool:
+    """True when this phase's mass counts in the liquid fraction.
+
+    Battery roles (slag, glass) are a different match. They live on the
+    scorer's liquid-name set. MELTS instance names that end with ``_Liq``
+    are liquid mass. Adapters call this instead of keeping a private tuple.
+    """
+
+    name = str(phase_name)
+    return (
+        name in _LIQUID_PHASE_NAMES
+        or name.lower().startswith('liq')
+        or name.endswith('_Liq')
+    )
+
+
 def liquid_fraction_from_phase_masses(
     phase_masses_kg: Mapping[str, float],
 ) -> Optional[float]:
@@ -883,11 +944,7 @@ def liquid_fraction_from_phase_masses(
             continue
         phase_name = str(phase)
         total_mass_kg += mass
-        if (
-            phase_name in _LIQUID_PHASE_NAMES
-            or phase_name.lower().startswith('liq')
-            or phase_name.endswith('_Liq')
-        ):
+        if phase_name_is_liquid_mass(phase_name):
             liquid_mass_kg += mass
     if total_mass_kg <= 0.0:
         return None

@@ -1044,8 +1044,8 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
 
     assert isinstance(cold, EquilibriumResult)
     assert isinstance(warm, EquilibriumResult)
-    assert cold.phase_compositions == {}
-    assert warm.phase_compositions == {}
+    assert cold.phase_compositions == {"melt": {"FeO": 0.5}}
+    assert warm.phase_compositions == {"melt": {"FeO": 0.5}}
     assert warm.activity_coefficients == expected.activity_coefficients
     assert cold.diagnostics == {"backend_status_reason": "fixture-code"}
     assert warm.diagnostics == {"backend_status_reason": "fixture-code"}
@@ -1113,8 +1113,46 @@ def test_mapping_equilibrium_result_uses_compact_projection(
     assert cold.diagnostics == warm.diagnostics == {
         "backend_status_reason": "unused diagnostic prose"
     }
-    assert cold.phase_compositions == warm.phase_compositions == {}
+    assert cold.phase_compositions == warm.phase_compositions == {
+        "melt": {"FeO": 0.5}
+    }
     assert calls == 1
+
+
+def test_phase_compositions_round_trip_in_hot_metadata_without_a_new_slot() -> None:
+    """Phase maps ride in optional metadata. An empty map stays length 11.
+
+    EquilibrateCell appends its own flags at index 11 and reads payload[:11]
+    as the equilibrium projection. A new slot, or metadata on an empty map,
+    would make that cell payload length 13. A non-positive oxide is omitted
+    on the way in and on the way out. An old length-11 blob still decodes.
+    """
+
+    bare = equilibrium_cache_value(
+        {"status": "ok", "liquid_fraction": 1.0, "phase_compositions": {}}
+    )
+    assert len(bare) == 11
+    assert "phase_compositions" not in equilibrium_cache_from_value(bare)
+
+    payload = equilibrium_cache_value(
+        {
+            "status": "ok",
+            "liquid_fraction": 1.0,
+            "phase_compositions": {
+                "melt": {"FeO": 0.5, "MgO": 0.0, "SiO2": float("nan")},
+            },
+            "diagnostics": {
+                "subprocess_failure": {"returncode": 2, "stdout": "noise"},
+            },
+        }
+    )
+    assert len(payload) == 12
+    metadata = payload[11]
+    assert metadata["phase_compositions"] == {"melt": {"FeO": 0.5}}
+    assert metadata["diagnostics"]["subprocess_failure"] == {"returncode": 2}
+    restored = equilibrium_cache_from_value(payload)
+    assert restored["phase_compositions"] == {"melt": {"FeO": 0.5}}
+    assert restored["diagnostics"]["subprocess_failure"] == {"returncode": 2}
 
 
 def test_isolated_cell_cache_stores_only_compact_hot_fields(

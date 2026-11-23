@@ -28,6 +28,9 @@ from simulator import engine_cache
 
 # Each value pins the current cache chemistry version with one live solver
 # result. Update the pair together after a reviewed numeric engine change.
+# magemin, alphamelts, and thermoengine are chemistry version 5 because phase
+# compositions entered the HOT projection. These three pins stay at the last
+# reviewed pair. The live probe fails until that pair is re-measured.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
     "internal-analytical": (3, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
