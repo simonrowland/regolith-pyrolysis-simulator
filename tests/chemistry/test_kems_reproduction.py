@@ -147,12 +147,31 @@ def test_comparison_status_vocabulary_and_precedence() -> None:
     }
 
 
-@pytest.mark.parametrize("status_flags", [{}, {"assumed_input": True}])
+@pytest.mark.parametrize(
+    "status_flags",
+    [
+        {},
+        {"assumed_input": True},
+        {"assumed_input": True, "status_override": "match"},
+    ],
+)
 def test_numeric_comparison_requires_cited_uncertainty(status_flags: dict) -> None:
     with pytest.raises(ValueError, match="cited uncertainty"):
         _comparison(expected_uncertainty=None, **status_flags)
     with pytest.raises(ValueError, match="uncertainty.value"):
         _comparison(expected_uncertainty={}, **status_flags)
+
+
+def test_ungraded_comparison_cannot_override_to_scoring_without_band() -> None:
+    with pytest.raises(
+        ValueError,
+        match="scoring status overrides require cited uncertainty",
+    ):
+        _comparison(
+            expected_uncertainty=None,
+            ungraded=True,
+            status_override="match",
+        )
 
 
 @pytest.mark.parametrize(

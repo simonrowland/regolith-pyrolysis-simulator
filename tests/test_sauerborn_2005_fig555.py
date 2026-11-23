@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 from inspect import signature
 
@@ -7,7 +8,9 @@ import pytest
 
 from simulator.corpus_paths import regolith_corpus_root
 from simulator.diagnostic_helpers.reproduction_compare import (
+    SCORING_STATUSES,
     TimeSeriesComparisonRefusal,
+    records_to_json,
 )
 from simulator.diagnostic_helpers.sauerborn_2005 import (
     SAUERBORN_FIG555_FILES,
@@ -199,6 +202,38 @@ def test_sauerborn_comparison_scales_from_base_before_pointwise_compare() -> Non
         75.879726,
         1.1218782056e-4,
     )
+
+
+def test_sauerborn_comparison_preserves_source_seconds_exactly() -> None:
+    _require_corpus_files()
+    traces = load_sauerborn_fig555_path_series()
+    point = next(
+        row
+        for rows in traces.values()
+        for row in rows
+        if row["time_s"] == 30.401905
+    )
+    records = compare_sauerborn_o2_partial_pressure_time_series(
+        case_id="sauerborn_2005_fig555",
+        source_id="kems-035-sauerborn-2005",
+        observable_id="sauerborn_o2_partial_pressure_time_series",
+        observation_points=(point,),
+        runtime_pressure_samples=(
+            {"time_s": point["time_s"], "value_mbar": point["value_mbar"]},
+        ),
+        pre_high_temperature_base_mbar=1e-7,
+        evidence_scope="Fig. 5.55 digitization bounds only; ungraded residual",
+        source_locator={"figure": "5.55"},
+        recipe={},
+        observation={"point": point},
+        runtime={"origin": "synthetic"},
+    )
+
+    assert records[0].coordinate["time_s"] == 30.401905
+    serialized = json.loads(records_to_json(records))
+    assert serialized[0]["temperature/time/window"]["time_s"] == 30.401905
+    assert records[0].expected_uncertainty is None
+    assert records[0].status not in SCORING_STATUSES
 
 
 def test_sauerborn_comparison_handoff_reads_pinned_cao_path() -> None:

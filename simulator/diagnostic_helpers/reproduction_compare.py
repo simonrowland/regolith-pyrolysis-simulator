@@ -322,22 +322,28 @@ def _compare_pointwise_observations(
     observable_id: str,
     species: str | None,
     coordinate_key: str,
-    coordinate_scale: float,
     units: str,
     evidence_scope: str,
     source_locator: Mapping[str, Any] | str,
     recipe: Mapping[str, Any],
     observation: Mapping[str, Any],
     runtime: Mapping[str, Any],
+    coordinate_unit: str = "min",
     unsupported_speciation: bool = False,
     assumed_input: bool = False,
+    ungraded: bool = False,
     out_of_domain: bool = False,
 ) -> tuple[tuple[ComparisonRecord, ...], list[float]]:
     """Interpolate runtime values and build records for normalized points."""
 
     sample_times = [time for time, _ in samples]
     actual_values = [
-        _interpolate_runtime_sample(time, samples, sample_times)
+        _interpolate_runtime_sample(
+            time,
+            samples,
+            sample_times,
+            coordinate_unit=coordinate_unit,
+        )
         for time, _, _, _ in observations
     ]
 
@@ -351,7 +357,7 @@ def _compare_pointwise_observations(
                 source_id=source_id,
                 observable_id=observable_id,
                 species=species,
-                coordinate={coordinate_key: time * coordinate_scale},
+                coordinate={coordinate_key: time},
                 expected_value=expected,
                 expected_uncertainty=uncertainty,
                 actual_value=actual,
@@ -363,6 +369,7 @@ def _compare_pointwise_observations(
                 runtime=runtime,
                 unsupported_speciation=unsupported_speciation,
                 assumed_input=assumed_input,
+                ungraded=ungraded,
                 out_of_domain=out_of_domain,
             )
         )
@@ -414,7 +421,6 @@ def compare_time_series(
         observable_id=observable_id,
         species=species,
         coordinate_key="time_min",
-        coordinate_scale=1.0,
         units=units,
         evidence_scope=evidence_scope,
         source_locator=source_locator,
@@ -486,20 +492,23 @@ def _series_point_locator(
 def _normalise_observation_points(
     points: Sequence[Mapping[str, Any]],
     *,
-    allow_missing_uncertainty: bool = False,
+    coordinate_key: str = "time_min",
+    ungraded: bool = False,
 ) -> list[tuple[float, float, Mapping[str, Any] | None, Any]]:
     normalised = []
     for index, point in enumerate(points):
         if not isinstance(point, Mapping):
             raise ValueError(f"observation_points[{index}] must be a mapping")
-        time_min = float(point["time_min"])
+        coordinate = float(point[coordinate_key])
         expected_value = float(point["expected_value"])
         uncertainty = point.get("expected_uncertainty")
-        if not math.isfinite(time_min):
-            raise ValueError(f"observation_points[{index}].time_min must be finite")
+        if not math.isfinite(coordinate):
+            raise ValueError(
+                f"observation_points[{index}].{coordinate_key} must be finite"
+            )
         if not math.isfinite(expected_value):
             raise ValueError(f"observation_points[{index}].expected_value must be finite")
-        if uncertainty is None and not allow_missing_uncertainty:
+        if uncertainty is None and not ungraded:
             raise ValueError(
                 f"observation_points[{index}] requires cited expected_uncertainty"
             )
@@ -511,20 +520,23 @@ def _normalise_observation_points(
             _validated_uncertainty(uncertainty)
         normalised.append(
             (
-                time_min,
+                coordinate,
                 expected_value,
                 dict(uncertainty) if uncertainty is not None else None,
                 point.get("source_locator"),
             )
         )
     normalised.sort(key=lambda row: row[0])
-    if len({time_min for time_min, _, _, _ in normalised}) != len(normalised):
+    if len({coordinate for coordinate, _, _, _ in normalised}) != len(normalised):
         raise ValueError("observation times must be unique")
     return normalised
 
 
 def _normalise_runtime_samples(
     samples: Sequence[Mapping[str, Any]],
+    *,
+    coordinate_key: str = "time_min",
+    coordinate_unit: str = "min",
 ) -> list[tuple[float, float]]:
     if not samples:
         raise TimeSeriesComparisonRefusal(
@@ -534,41 +546,45 @@ def _normalise_runtime_samples(
     for index, sample in enumerate(samples):
         if not isinstance(sample, Mapping):
             raise ValueError(f"runtime_samples[{index}] must be a mapping")
-        time_min = float(sample["time_min"])
+        coordinate = float(sample[coordinate_key])
         value = sample.get("value")
-        if not math.isfinite(time_min):
-            raise ValueError(f"runtime_samples[{index}].time_min must be finite")
+        if not math.isfinite(coordinate):
+            raise ValueError(
+                f"runtime_samples[{index}].{coordinate_key} must be finite"
+            )
         if value is None:
             raise TimeSeriesComparisonRefusal(
                 "runtime_sample_missing",
-                f"runtime sample at {time_min:g} min has no value",
+                f"runtime sample at {coordinate:g} {coordinate_unit} has no value",
             )
         actual = float(value)
         if not math.isfinite(actual):
             raise ValueError(f"runtime_samples[{index}].value must be finite")
-        normalised.append((time_min, actual))
+        normalised.append((coordinate, actual))
     normalised.sort(key=lambda row: row[0])
-    if len({time_min for time_min, _ in normalised}) != len(normalised):
+    if len({coordinate for coordinate, _ in normalised}) != len(normalised):
         raise ValueError("runtime sample times must be unique")
     return normalised
 
 
 def _interpolate_runtime_sample(
-    time_min: float,
+    coordinate: float,
     samples: Sequence[tuple[float, float]],
     sample_times: Sequence[float],
+    *,
+    coordinate_unit: str = "min",
 ) -> float:
-    right = bisect_right(sample_times, time_min)
-    if right and sample_times[right - 1] == time_min:
+    right = bisect_right(sample_times, coordinate)
+    if right and sample_times[right - 1] == coordinate:
         return samples[right - 1][1]
     if right == 0 or right == len(samples):
         raise TimeSeriesComparisonRefusal(
             "runtime_time_coverage_missing",
-            f"runtime does not bracket observation time {time_min:g} min",
+            f"runtime does not bracket observation time {coordinate:g} {coordinate_unit}",
         )
     left_time, left_value = samples[right - 1]
     right_time, right_value = samples[right]
-    fraction = (time_min - left_time) / (right_time - left_time)
+    fraction = (coordinate - left_time) / (right_time - left_time)
     return left_value + fraction * (right_value - left_value)
 
 
@@ -635,6 +651,7 @@ def compare_values(
     runtime: Mapping[str, Any],
     unsupported_speciation: bool = False,
     assumed_input: bool = False,
+    ungraded: bool = False,
     out_of_domain: bool = False,
     status_override: str | None = None,
 ) -> ComparisonRecord:
@@ -648,14 +665,20 @@ def compare_values(
     if (
         expected_value is not None
         and expected_uncertainty is None
-        and not assumed_input
+        and not ungraded
     ):
         raise ValueError("numeric observations require cited uncertainty")
+    if ungraded and (expected_value is None or expected_uncertainty is not None):
+        raise ValueError(
+            "ungraded comparisons require a numeric observation without cited uncertainty"
+        )
     if expected_value is not None and expected_uncertainty is not None:
         _validated_uncertainty(expected_uncertainty)
     if status_override is not None:
         if status_override not in COMPARISON_STATUSES:
             raise ValueError(f"unsupported comparison status: {status_override!r}")
+        if status_override in SCORING_STATUSES and expected_uncertainty is None:
+            raise ValueError("scoring status overrides require cited uncertainty")
         status = status_override
     elif out_of_domain:
         status = "out-of-domain"
@@ -663,7 +686,7 @@ def compare_values(
         status = "unsupported-speciation"
     elif expected_value is None or actual_value is None:
         status = "unsupported-observable"
-    elif assumed_input:
+    elif ungraded or assumed_input:
         status = "assumed-input"
     else:
         status = (

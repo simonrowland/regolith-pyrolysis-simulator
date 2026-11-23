@@ -143,7 +143,7 @@ def compare_sauerborn_o2_partial_pressure_time_series(
         pressure_mbar = sample.get("value_mbar")
         normalized_runtime.append(
             {
-                "time_min": float(sample["time_s"]) / 60.0,
+                "time_s": float(sample["time_s"]),
                 "value": (
                     None
                     if pressure_mbar is None
@@ -151,11 +151,15 @@ def compare_sauerborn_o2_partial_pressure_time_series(
                 ),
             }
         )
-    samples = _normalise_runtime_samples(normalized_runtime)
+    samples = _normalise_runtime_samples(
+        normalized_runtime,
+        coordinate_key="time_s",
+        coordinate_unit="s",
+    )
 
     normalized_observations = [
         {
-            "time_min": float(point["time_s"]) / 60.0,
+            "time_s": float(point["time_s"]),
             "expected_value": point["value_mbar"],
             "expected_uncertainty": None,
             "source_locator": {
@@ -171,7 +175,8 @@ def compare_sauerborn_o2_partial_pressure_time_series(
     ]
     observations = _normalise_observation_points(
         normalized_observations,
-        allow_missing_uncertainty=True,
+        coordinate_key="time_s",
+        ungraded=True,
     )
     # p. 62 gives no per-point instrument uncertainty, so report residuals
     # without grading them as matches or mismatches.
@@ -183,13 +188,13 @@ def compare_sauerborn_o2_partial_pressure_time_series(
         observable_id=observable_id,
         species="O2",
         coordinate_key="time_s",
-        coordinate_scale=60.0,
         units="mbar",
         evidence_scope=evidence_scope,
         source_locator=source_locator,
         recipe=recipe,
         observation=observation,
         runtime=runtime,
-        assumed_input=True,
+        coordinate_unit="s",
+        ungraded=True,
     )
     return records
