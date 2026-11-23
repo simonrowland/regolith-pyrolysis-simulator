@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
+    DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -1027,10 +1028,9 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
-    # Policy metadata is compared as part of notice identity, but mappings are
-    # unhashable. Excluding only this field from the generated hash preserves
-    # equality semantics while allowing notices in residual validation sets.
-    policy: Mapping[str, str] | None = field(default=None, hash=False)
+    # Excluding mapping metadata from the generated hash preserves equality
+    # semantics while allowing notices in residual validation sets.
+    policy: Mapping[str, Any] | None = field(default=None, hash=False)
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1061,6 +1061,28 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        if self.policy is not None:
+            required_policy_fields = {"id", "version", "status", "value", "units"}
+            if not isinstance(self.policy, Mapping) or set(self.policy) != required_policy_fields:
+                raise ValueError(
+                    "Notice.policy must contain exactly id, version, status, value, and units"
+                )
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
+            policy_id = self.policy.get("id")
+            policy_status = self.policy.get("status")
+            policy_version = self.policy.get("version")
+            policy_units = self.policy.get("units")
+            if not isinstance(policy_id, str) or not policy_id.startswith("DP-"):
+                raise ValueError("Notice.policy.id must be a DP id")
+            if policy_status not in {"canonical", "proposed", "rejected"}:
+                raise ValueError("Notice.policy.status is invalid")
+            if not isinstance(policy_version, (int, str)) or not str(policy_version):
+                raise ValueError("Notice.policy.version is required")
+            if not isinstance(policy_units, str) or not policy_units:
+                raise ValueError("Notice.policy.units is required")
+            if self.policy.get("value") is None:
+                raise ValueError("Notice.policy.value is required")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
@@ -2000,7 +2022,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
-                None if notice.policy is None else tuple(sorted(notice.policy.items())),
+                None if notice.policy is None else tuple(sorted((key, repr(value)) for key, value in notice.policy.items())),
             )
             if fingerprint in seen:
                 continue

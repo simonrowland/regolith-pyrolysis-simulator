@@ -68,6 +68,7 @@ from simulator.battery.enums import (
     Authority,
     CellMaterial,
     CONDENSED_PHASES,
+    DEFAULT_POLICY_NOTICE_KINDS,
     EQUILIBRIUM_FIT_QUANTITIES,
     ELEMENT_WT_PERCENT_BASIS,
     Engine,
@@ -247,6 +248,7 @@ from simulator.battery.score_report import (
     _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
     format_assumed_band_report,
+    format_default_policy_census_report,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
@@ -254,6 +256,7 @@ from simulator.battery.score_report import (
 )
 from simulator.battery.score_report_data import (
     AssumedBandReport,
+    default_policy_census,
     eligibility_failure_census,
     element_retention_report_data,
 )
@@ -630,6 +633,9 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+_DEFAULT_POLICY_FLAG_VALUES = frozenset(
+    kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS
+)
 
 
 @dataclass(frozen=True)
@@ -2511,6 +2517,11 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
+    if any(
+        notice.policy is not None and notice.policy.get("status") == "proposed"
+        for notice in notices
+    ):
+        return (FLAGGED_STRATUM_PROPOSED_POLICY,)
     return _classify_flagged_notice_facts(
         tuple(
             (notice.kind.value, notice.reason, notice.policy)
@@ -2524,6 +2535,9 @@ def _classify_flagged_notice_facts(
 ) -> tuple[str, ...]:
     strata: list[str] = []
     kinds = {kind for kind, _reason, _policy in notices}
+    policy_flags = kinds & _DEFAULT_POLICY_FLAG_VALUES
+    if policy_flags:
+        strata.extend(sorted(policy_flags))
     unverified_apparatus = tuple(
         reason
         for kind, reason, _policy in notices
@@ -24017,6 +24031,7 @@ def _render_score_report_from_payloads_legacy(
     _aggregate: _ScorePayloadAccumulator | None = None,
     shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> str:
+    policy_census = default_policy_census(rows)
     aggregate = _aggregate or _ScorePayloadAccumulator.from_rows(
         rows, context=context, engines=engines
     )
@@ -24076,7 +24091,8 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return format_assumed_band_report(report, aggregate.assumed_bands.payload())
+    report = format_assumed_band_report(report, aggregate.assumed_bands.payload())
+    return format_default_policy_census_report(report, policy_census)
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -24385,14 +24401,33 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
+    raw_notices = tuple(
+        notice
+        for notice in (row.get("notices") or ())
+        if isinstance(notice, Mapping)
+    )
+    for notice in raw_notices:
+        if (
+            notice.get("policy") is not None
+            and notice.get("kind") not in _DEFAULT_POLICY_FLAG_VALUES
+        ):
+            raise ValueError(
+                "policy-bearing notice kind must name its default-policy flag"
+            )
+    if any(
+        notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
+        and isinstance(notice.get("policy"), Mapping)
+        and notice["policy"].get("status") == "proposed"
+        for notice in raw_notices
+    ):
+        return (FLAGGED_STRATUM_PROPOSED_POLICY,)
     notices = tuple(
         (
             str(notice.get("kind") or ""),
             notice.get("reason"),
             notice.get("policy") if isinstance(notice.get("policy"), Mapping) else None,
         )
-        for notice in (row.get("notices") or ())
-        if isinstance(notice, Mapping)
+        for notice in raw_notices
     )
     return _classify_flagged_notice_facts(notices)
 
@@ -25805,6 +25840,7 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
+    policy_census = default_policy_census(rows)
     eligibility_census = eligibility_failure_census(
         rows,
         conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
@@ -25921,15 +25957,17 @@ def render_score_report_from_payloads(
     report = format_assumed_band_report(
         report, _assumed_band_summary(rows, observations)
     )
+    report = format_default_policy_census_report(report, policy_census)
     if observations is None:
         return report
     pair_context = ScoreContext({}, {}, observations, origins or {})
     report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(pair_context)
     )
-    return format_element_retention_diagnostics(
+    report = format_element_retention_diagnostics(
         report, element_retention_report_data(rows, observations)
     )
+    return report
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:
