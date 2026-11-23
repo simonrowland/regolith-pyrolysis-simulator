@@ -34,13 +34,18 @@ from simulator.battery.enums import (
     AdmissionStatus,
     Engine,
     EvidenceClass,
+    NoticeKind,
     Phase,
     Quantity,
     Rail,
     ResidualStatus,
 )
 from simulator.battery.identity import State
-from simulator.battery.records import CandidateRequest, Species, Value
+from simulator.battery.records import (
+    CandidateRequest,
+    Species,
+    Value,
+)
 import simulator.battery.score as score_mod
 from tests.battery import factories as F
 from tests.battery.test_score import _predict, _streaming_score_fixture
@@ -66,7 +71,13 @@ def _without_certified_counts(text: str) -> str:
     census_heading = "## Eligibility conjunct failure census"
     if census_heading in text:
         before, _separator, after = text.partition(census_heading)
-        next_headings = ("## Measured tier", "## Per rail × engine headline")
+        # Coverage is inserted after the eligibility census. Stop there so
+        # the pin keeps the coverage block and still drops the census.
+        next_headings = (
+            "## Coverage",
+            "## Measured tier",
+            "## Per rail × engine headline",
+        )
         next_heading = min(
             (heading for heading in next_headings if heading in after),
             key=after.index,
@@ -270,6 +281,34 @@ PIN_SUMMARY_JSON = """\
     "label": "assumed band — literature method precision; confidence not stated",
     "records": [],
     "refusal_counts": {}
+  },
+  "capability_matrix": {
+    "cross_product_total": 2,
+    "engines": [
+      "internal-analytical"
+    ],
+    "n_candidate_observations": 2,
+    "n_outside_census_not_emitted": 0,
+    "n_quantity_unknown": 0,
+    "quantities_no_engine_predicts": [],
+    "rows": [
+      {
+        "covered": true,
+        "engine": "internal-analytical",
+        "n_observations": 2,
+        "quantity": "p_sat",
+        "rail": "vapour"
+      }
+    ],
+    "uncovered_pair_total": 0
+  },
+  "coverage": {
+    "callable_observations": 2,
+    "coverage": "0.500",
+    "n_records": 2,
+    "n_refused_records": 1,
+    "n_scored_observations": 1,
+    "n_scored_records": 1
   },
   "kind": "battery_headline_summary",
   "records": [
@@ -952,6 +991,22 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 |---|---|---|---|---:|---:|---:|
 | vapour | internal-analytical | quantity_unknown | dex | 1 | 0.5 | — |
 
+## Coverage
+
+Coverage is observations with a numeric residual from at least one
+scoring engine, divided by callable comparison candidates. Callable
+means the quantity is in at least one scoring engine's declared
+capability set. A quantity no declared engine predicts is a
+capability-matrix cell, not a refusal, and is outside this ratio.
+The candidate population is the live candidate census, not the
+residual ledger.
+
+| scored observations | callable observations | coverage |
+|---|---:|---:|
+| 1 | 2 | 0.500 |
+
+Per-record diagnostic (residual rows, not observations): n_records=2 n_scored=1 n_refused=1.
+
 ## Measured tier
 
 Numeric measured rows stay visible. score_eligible and inside-band counts are reported separately. Compilation rows are not in this table.
@@ -972,9 +1027,9 @@ Numeric measured rows stay visible. score_eligible and inside-band counts are re
 
 These numeric diagnostics carry an explicit source or apparatus flag. Flagged rows do not derive measurement bands or enter unflagged headlines. Cell-material-inferred residuals are still judged against the band; other flag kinds retain their existing scoring rules. A row carrying both flags appears in both strata.
 
-| stratum | rail | engine | n | median dex | RMS dex |
-|---|---|---|---:|---:|---:|
-| (none) | — | — | 0 | — | — |
+| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |
+|---|---|---|---|---|---:|---:|---:|
+| (none) | — | — | — | — | 0 | — | — |
 
 ## Condition hull per rail × engine
 
@@ -1027,6 +1082,29 @@ Measured tier only. Compilation refusals are in the compilation table.
 |---|---:|
 | `unsupported:fixture_unavailable` | 1 |
 
+Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0. Diagnostic and duplicate pairs outside the candidate census that this report does not emit: 0.
+
+## Capability matrix
+
+Engine × quantity × rail for comparison candidates. A cell this
+engine does not cover is not a residual. The uncovered pair total
+is the cross-product records this report's engine list does not
+emit. Quantities no declared engine predicts are listed with their
+observation count. Residue quantities are outside this table; a
+bound residue adapter still emits a residual.
+
+Matrix total (candidate observations × engines): 2. Uncovered pairs: 0. Quantity unknown, not a matrix cell: 0.
+
+| engine | quantity | rail | n observations | covered |
+|---|---|---|---:|---|
+| internal-analytical | p_sat | vapour | 2 | yes |
+
+### Quantities no engine predicts
+
+| quantity | rail | n observations |
+|---|---|---:|
+| (none) | — | 0 |
+
 ## Admission
 
 score_eligible requires canonical admission admitted. Pending rows
@@ -1075,6 +1153,34 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
     "label": "assumed band — literature method precision; confidence not stated",
     "records": [],
     "refusal_counts": {}
+  },
+  "capability_matrix": {
+    "cross_product_total": 2,
+    "engines": [
+      "internal-analytical"
+    ],
+    "n_candidate_observations": 2,
+    "n_outside_census_not_emitted": 0,
+    "n_quantity_unknown": 0,
+    "quantities_no_engine_predicts": [],
+    "rows": [
+      {
+        "covered": true,
+        "engine": "internal-analytical",
+        "n_observations": 2,
+        "quantity": "p_sat",
+        "rail": "vapour"
+      }
+    ],
+    "uncovered_pair_total": 0
+  },
+  "coverage": {
+    "callable_observations": 2,
+    "coverage": "0.500",
+    "n_records": 2,
+    "n_refused_records": 1,
+    "n_scored_observations": 1,
+    "n_scored_records": 1
   },
   "kind": "battery_headline_summary",
   "records": [
@@ -1710,6 +1816,22 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 |---|---|---|---|---:|---:|---:|
 | vapour | internal-analytical | quantity_unknown | dex | 1 | 0.5 | — |
 
+## Coverage
+
+Coverage is observations with a numeric residual from at least one
+scoring engine, divided by callable comparison candidates. Callable
+means the quantity is in at least one scoring engine's declared
+capability set. A quantity no declared engine predicts is a
+capability-matrix cell, not a refusal, and is outside this ratio.
+The candidate population is the live candidate census, not the
+residual ledger.
+
+| scored observations | callable observations | coverage |
+|---|---:|---:|
+| 1 | 2 | 0.500 |
+
+Per-record diagnostic (residual rows, not observations): n_records=2 n_scored=1 n_refused=1.
+
 ## Measured tier
 
 Numeric measured rows stay visible. score_eligible and inside-band counts are reported separately.
@@ -1730,9 +1852,9 @@ Numeric measured rows stay visible. score_eligible and inside-band counts are re
 
 Flagged numeric diagnostics are excluded from the measured headline, bands, and band statistics.
 
-| stratum | rail | engine | n | median dex | RMS dex |
-|---|---|---|---:|---:|---:|
-| (none) | — | — | 0 | — | — |
+| stratum | rail | engine | policy_id | policy status | n | median dex | RMS dex |
+|---|---|---|---|---|---:|---:|---:|
+| (none) | — | — | — | — | 0 | — | — |
 
 ## Condition hull per rail × engine
 
@@ -1775,6 +1897,29 @@ Measured tier only. Compilation refusals are in the compilation table.
 | reason | n |
 |---|---:|
 | `unsupported:fixture_unavailable` | 1 |
+
+Capability-matrix total (candidate observations × engines in this report): 2. Uncovered pairs not emitted as residuals: 0. Diagnostic and duplicate pairs outside the candidate census that this report does not emit: 0.
+
+## Capability matrix
+
+Engine × quantity × rail for comparison candidates. A cell this
+engine does not cover is not a residual. The uncovered pair total
+is the cross-product records this report's engine list does not
+emit. Quantities no declared engine predicts are listed with their
+observation count. Residue quantities are outside this table; a
+bound residue adapter still emits a residual.
+
+Matrix total (candidate observations × engines): 2. Uncovered pairs: 0. Quantity unknown, not a matrix cell: 0.
+
+| engine | quantity | rail | n observations | covered |
+|---|---|---|---:|---|
+| internal-analytical | p_sat | vapour | 2 | yes |
+
+### Quantities no engine predicts
+
+| quantity | rail | n observations |
+|---|---|---:|
+| (none) | — | 0 |
 
 ## Admission
 
@@ -1922,14 +2067,27 @@ def _score_outputs(
     )
     engines = (engine,)
     root = score_mod.REPO_ROOT
-    residuals, candidates = score_mod.score_store(context, engines=engines)
+    # Element retention is outside every declared set, so the production
+    # gate does not emit it. This pin formats a residual the caller asked
+    # to score. An injected predictor is that gate's exception.
+    injected_predict = None
+    if include_retention:
+        def injected_predict(*_args, **_kwargs):
+            raise AssertionError("compile stub owns this score")
+    residuals, candidates = score_mod.score_store(
+        context, engines=engines, predict=injected_predict
+    )
     direct_jsonl_path = tmp_path / "direct-residuals.jsonl"
     score_mod.write_residuals_jsonl(
         residuals, candidates, direct_jsonl_path, root=root
     )
     streamed_path = tmp_path / "residuals.jsonl"
     _written, metadata = score_mod._score_store_to_jsonl(
-        context, streamed_path, root=root, engines=engines
+        context,
+        streamed_path,
+        root=root,
+        engines=engines,
+        predict=injected_predict,
     )
     partial = streamed_path.with_name(streamed_path.name + ".partial")
     direct_summary = tmp_path / "direct-summary.json"
@@ -2409,3 +2567,56 @@ def test_changed_report_heading_misses_the_output_pins(
     assert _without_certified_counts(got["payload_report"]) != _without_certified_counts(
         PIN_PAYLOAD_REPORT
     )
+
+
+def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
+    residual = F.residual(
+        "unknown-quantity::none::nasa-cea-9",
+        "unknown-quantity",
+        quantity=Quantity.P_SAT,
+    )
+    residual = replace(
+        residual,
+        candidate_request=CandidateRequest(
+            "exp-1", None, Engine.NASA_CEA_9, "cea"
+        ),
+    )
+
+    plain = score_mod.residual_to_plain(residual)
+    assert plain["candidate_request"]["quantity"] is None
+    assert "candidate_observation" not in plain
+    payload = json.loads(score_mod.dumps_residual_line(residual))
+
+    assert payload["candidate_request"] == {
+        "channel": "cea",
+        "engine": Engine.NASA_CEA_9.value,
+        "experiment_id": "exp-1",
+        "quantity": None,
+    }
+
+
+def test_assumed_pressure_notice_token_is_pinned() -> None:
+    from simulator.battery.default_policy import resolve
+
+    resolved = resolve("DP-001")
+    notice = score_mod._assumption_notice(
+        Quantity.P_PARTIAL,
+        "observation does not carry total_pressure_Pa",
+        resolved,
+    )
+    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
+    residual = replace(
+        F.residual(
+            "assumed-pressure::partial",
+            "assumed-pressure",
+            quantity=Quantity.P_PARTIAL,
+        ),
+        notices=(notice,),
+    )
+    payload = json.loads(score_mod.dumps_residual_line(residual))
+
+    assert payload["notices"][0]["kind"] == NoticeKind.ASSUMED_PRESSURE.value
+    assert payload["notices"][0]["policy"] == resolved.payload["policy"]
+    from simulator.battery.migrate import _notice_from_plain
+
+    assert _notice_from_plain(payload["notices"][0]) == notice

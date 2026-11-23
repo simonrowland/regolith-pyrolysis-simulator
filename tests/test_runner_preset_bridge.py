@@ -16,6 +16,7 @@ import yaml
 from simulator import runner as runner_module
 from simulator import condensation as condensation_module
 from simulator import lab_geometry as lab_geometry_module
+from simulator.battery.default_policy import resolve
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
@@ -411,6 +412,38 @@ def test_missing_exposed_area_uses_sample_geometry_instead_of_crucible_sizer() -
         assert sim.melt.melt_surface_area_m2 == pytest.approx(resolved.area_m2)
         assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
 
+
+def test_gram_lab_without_sample_mass_refuses_before_area_default(
+    tmp_path: Path,
+) -> None:
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+    )
+    preset = yaml.safe_load(preset_path.read_text(encoding="utf-8"))
+    del preset["lab_geometry"]["sample"]["mass_g"]
+    preset_path.write_text(yaml.safe_dump(preset, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(
+        runner_module.PresetRunnerError,
+        match="lab_geometry.sample.mass_g is required",
+    ):
+        runner_module._load_preset_run_spec(preset_path, "faithful")
+
+
+def test_null_exposed_melt_area_uses_lab_resolver_with_flag() -> None:
+    preset = _vacuum_preset("sesko_2024.yaml")
+    sample = preset["lab_geometry"]["sample"]
+    assert sample.get("exposed_melt_area_m2") in (None, "")
+    run = _gram_lab_run(preset, campaign="C0")
+    assert run._lab_area_bridge() == {}
+    session = run._start_session()
+    sim = session.simulator
+    resolved = resolve_lab_gas_film_geometry(preset["lab_geometry"])
+    assert resolved is not None
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(resolved.area_m2)
+    assert sim._dp007_area_default is not None
+
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
     printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
@@ -481,12 +514,59 @@ def test_c0_start_installs_printed_area_before_the_bridge(
         pytest.approx(0.000123),
         pytest.approx(omitted_film.area_m2),
     ]
+    omitted_sim = omitted_session.simulator
+    assert omitted_sim.melt.melt_surface_area_m2 == pytest.approx(omitted_film.area_m2)
+    assert omitted_sim._dp007_area_default is not None
+    assert len(forecast_areas) == 2
+    assert forecast_areas[0] == pytest.approx(0.000123)
+
+
+def test_dp007_area_notice_is_attached_to_run_metadata() -> None:
+    preset = _vacuum_preset("sesko_2024.yaml")
+    sample_mass_kg = preset["lab_geometry"]["sample"]["mass_g"] / 1000.0
+    expected = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+    film = resolve_lab_gas_film_geometry(preset["lab_geometry"])
+    assert film is not None
+    run = _gram_lab_run(preset, campaign="C0")
+    session = run._start_session()
+    output = run._run_session(session)
+
+    notices = output["run_metadata"]["runtime_notices"]
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "knob_defaulted"
+    assert notices[0]["reason"] == "exposed_melt_area_not_printed"
+    assert notices[0]["policy"] == {
+        "id": "DP-007",
+        "version": 1,
+        "status": "canonical",
+        "value": expected.payload["policy"]["value"],
+        "units": "m²",
+    }
+    assert float(notices[0]["policy"]["value"]) == pytest.approx(film.area_m2)
+    assert float(notices[0]["policy"]["value"]) == pytest.approx(
+        math.pi * film.length_m**2 / 4.0
+    )
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(
+        film.area_m2
+    )
+
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    declared_area_m2 = robinot["lab_geometry"]["sample"]["exposed_melt_area_m2"]
+    run = _gram_lab_run(robinot, campaign="C0")
+    session = run._start_session()
+    output = run._run_session(session)
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(declared_area_m2)
+    assert all(
+        notice.get("policy", {}).get("id") != "DP-007"
+        for notice in output["run_metadata"].get("runtime_notices", ())
+    )
 
 
 @pytest.mark.parametrize(
     "raw_area",
     [
         0,
+        -1,
         False,
         True,
         "nope",

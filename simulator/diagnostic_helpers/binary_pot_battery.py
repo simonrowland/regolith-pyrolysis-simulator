@@ -203,7 +203,13 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
     }
 )
 
-_DEFAULT_PRESSURE_BAR = 1.0e-6
+# DP-019 uses this finite high-vacuum boundary when a vacuum method omits
+# total pressure. Unit check: 1e-6 bar × 1e5 Pa/bar = 0.1 Pa. This is a model
+# boundary, not inferred source pressure.
+# Limiting check: pressure-independent comparisons should be unchanged by this
+# input; lowering pressure moves a pressure-sensitive gas equilibrium toward
+# its vacuum limit. Actual higher pressure may therefore bias the prediction.
+DP_019_VACUUM_BOUNDARY_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
@@ -304,6 +310,64 @@ class EngineHandle:
     engine_settings: Mapping[str, Any] = field(default_factory=dict)
 
 
+def _cacheable_thermoengine_refusal_payload(
+    exc: BaseException,
+) -> dict[str, Any] | None:
+    """Flat refusal for one allowlisted ThermoEngine cause, or None.
+
+    Other causes stay exceptions. The cache stores this dict and the
+    caller raises the same exception, so classify(error=...) is unchanged.
+    A returned EquilibriumResult would become the cell's out_of_basis.
+    """
+
+    from engines.alphamelts.thermoengine import ThermoEngineOutOfDomainError
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+    if not isinstance(exc, ThermoEngineOutOfDomainError):
+        return None
+    cause = getattr(exc.cause, "value", None)
+    if not isinstance(cause, str) or cause not in CACHEABLE_REFUSAL_CODES:
+        return None
+    return {
+        "status": "refusal",
+        "refusal_reason": cause,
+        "engine_status": exc.backend_failure_category,
+        "detail": str(exc),
+        "requested": exc.requested,
+        "solved": exc.solved,
+    }
+
+
+def _reraise_cached_thermoengine_refusal(payload: Any) -> None:
+    """Raise the stored ThermoEngine cause. A hit never calls the engine."""
+
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("status") == "refusal"
+    ):
+        return
+    reason = payload.get("refusal_reason")
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+    if not isinstance(reason, str) or reason not in CACHEABLE_REFUSAL_CODES:
+        return
+    try:
+        cause = ThermoEngineRefusalCause(reason)
+    except ValueError:
+        return
+    requested = payload.get("requested")
+    solved = payload.get("solved")
+    raise ThermoEngineOutOfDomainError(
+        cause,
+        requested=None if requested is None else float(requested),
+        solved=None if solved is None else float(solved),
+    )
+
+
 def _call_cached_backend_equilibrate(
     handle: EngineHandle,
     kwargs: Mapping[str, Any],
@@ -345,21 +409,30 @@ def _call_cached_backend_equilibrate(
         equilibrium_to_hot,
     )
 
+    caught_thermoengine: list[BaseException] = []
+
     def solve_cache_value() -> Any:
         from simulator.engine_cache import _without_engine_cache
 
         with _without_engine_cache():
-            result = solve()
+            try:
+                result = solve()
+            except Exception as exc:
+                if handle.name != "thermoengine":
+                    raise
+                payload = _cacheable_thermoengine_refusal_payload(exc)
+                if payload is None:
+                    raise
+                caught_thermoengine.append(exc)
+                return payload
         if isinstance(result, EquilibriumResult):
-            if handle.name != "vaporock" and _is_refusal(result):
-                return result
             return result.to_hot(engine_id=handle.name)
-        if _is_refusal(result):
-            return result
         if isinstance(result, SimpleNamespace):
             return equilibrium_to_hot(vars(result), engine_id=handle.name, live_value=result)
         if isinstance(result, Mapping):
             return equilibrium_to_hot(result, engine_id=handle.name)
+        if _is_refusal(result):
+            return result
         return result
 
     adapter_settings = (
@@ -376,6 +449,10 @@ def _call_cached_backend_equilibrate(
         },
         solve_cache_value,
     )
+    if caught_thermoengine:
+        raise caught_thermoengine[0]
+    if handle.name == "thermoengine":
+        _reraise_cached_thermoengine_refusal(payload)
     if isinstance(payload, list):
         payload = equilibrium_cache_from_value(payload, engine_id=handle.name)
     if isinstance(payload, Mapping):
@@ -3831,6 +3908,8 @@ def _internal_analytical_vapor_pressure_adapter(
     }
     high_t_activity = core_diagnostic.get("high_t_melt_activity")
     if isinstance(high_t_activity, Mapping) and high_t_activity.get("backend_failure_disposition"):
+        # imcc_nonconvergence and backend absence are not request-deterministic.
+        # equilibrium_to_hot leaves cacheable=False while this field is set.
         diagnostics["backend_failure_disposition"] = high_t_activity["backend_failure_disposition"]
     activities = dict(core_diagnostic.get("activities") or {})
     from simulator.chemistry.melt_activity import (
@@ -3927,7 +4006,20 @@ def internal_analytical_residue_vapor_pressure(
         return result
 
     def solve():
-        result = solve_live()
+        try:
+            result = solve_live()
+        except _InternalAnalyticalInputRefusal as exc:
+            from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+            if exc.code not in CACHEABLE_REFUSAL_CODES:
+                raise
+            return {
+                "status": "refusal",
+                "refusal_reason": exc.code,
+                "engine_status": "input_refusal",
+                "detail": str(exc),
+                "category": int(exc.category),
+            }
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
             return equilibrium_to_hot(vars(result), engine_id="internal-analytical", live_value=result)
         return result
@@ -3939,10 +4031,22 @@ def internal_analytical_residue_vapor_pressure(
             "call": "residue_pressure", "temperature_C": temperature_C,
             "pressure_bar": pressure_bar, "composition_kg": composition_kg,
             "composition_mol": composition_mol, "fO2_log": fO2_log,
-            "po2": po2_request.as_payload(),
+            # A missing oxygen condition is the request. Building the key
+            # must not crash before the adapter can refuse it.
+            "po2": None if po2_request is None else po2_request.as_payload(),
             "engine_settings": _internal_analytical_cache_settings(core),
         }
         result = cached_engine_call("internal-analytical", _internal_analytical_cache_inputs(request), solve)
+    if (
+        isinstance(result, Mapping)
+        and result.get("status") == "refusal"
+        and result.get("refusal_reason")
+    ):
+        raise _InternalAnalyticalInputRefusal(
+            int(result["category"]),
+            str(result["refusal_reason"]),
+            str(result.get("detail") or ""),
+        )
     if isinstance(result, list):
         return SimpleNamespace(**equilibrium_cache_from_value(result, engine_id="internal-analytical"))
     return result
@@ -5348,7 +5452,7 @@ def _equilibrate_cell_uncached(
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
     if physical_pressure_bar is None:
-        physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+        physical_pressure_bar = DP_019_VACUUM_BOUNDARY_BAR
     else:
         physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
@@ -6097,7 +6201,7 @@ def build_report(
                 "engine_default": grid.engine_default_po2,
                 "commanded": list(grid.commanded_po2_bar),
             },
-            "pressure_bar": _DEFAULT_PRESSURE_BAR,
+            "pressure_bar": DP_019_VACUUM_BOUNDARY_BAR,
         },
         "pots": [
             {

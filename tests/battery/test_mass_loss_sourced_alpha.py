@@ -457,6 +457,8 @@ def prescribed_pressure_engine(monkeypatch, fig3_source, request):
     return state
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sourced_r11_integrates_schedule_and_exposes_bounds(
     r11_inputs, prescribed_pressure_engine,
 ):
@@ -491,6 +493,8 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
                for p in prescribed_pressure_engine["pressures"])
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_full_prediction_refuses_non_negligible_unsourced_channel(
     r11_inputs, prescribed_pressure_engine,
 ):
@@ -505,6 +509,8 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
     assert detail["unsourced_channels"] == ["Ca"]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize("gases", [("Ca",), ("Ca", "Ca2")],
                          ids=["single-gas", "shared-parent-gases"])
 def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
@@ -628,6 +634,8 @@ def test_non_negligible_preheat_is_not_mislabelled_missing_alpha():
     assert failure.value.reason == "preheat_bound_not_negligible"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_stated_bulk_uncertainty_refuses_even_below_one_percent(
     r11_inputs, prescribed_pressure_engine,
 ):
@@ -674,6 +682,8 @@ def test_reproduction_arrhenius_numeric_pin_before_owner_move(form, alpha_hex, s
         assert point["series_name"] == "alpha_form"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_small_unsourced_bound_passes_without_entering_point_loss(
     r11_inputs, prescribed_pressure_engine,
 ):
@@ -698,6 +708,8 @@ def test_small_unsourced_bound_passes_without_entering_point_loss(
     assert 0 < bound["bound_fraction"] <= 0.01
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_preheat_rectangle_changes_only_bound_not_point_loss(
     r11_inputs, prescribed_pressure_engine, monkeypatch,
 ):
@@ -737,6 +749,8 @@ def test_positive_bound_with_zero_point_loss_refuses():
     assert _mass_loss_bound_gate(0, 0, None, channels=(), preheat_bound_kg=0)["bound_fraction"] == 0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_predictions(
     monkeypatch, fig3_source, r11_inputs,
 ):

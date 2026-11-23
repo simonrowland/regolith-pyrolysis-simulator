@@ -155,7 +155,6 @@ from simulator.lab_geometry import (
     LabGeometryError,
     parse_lab_geometry,
     require_lab_pipe_diameter,
-    read_gram_lab_exposed_melt_area,
     resolve_lab_gas_film_geometry,
 )
 from simulator.condensation_routing import (

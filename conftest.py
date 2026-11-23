@@ -242,12 +242,53 @@ def magemin_openmpi_tmpdir(
         shutil.rmtree(tmpdir, ignore_errors=True)
 
 
-@pytest.fixture(autouse=True)
-def _box_for_test_owned_engine_caches(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Only a test's explicit temporary cache may serve or store its doubles."""
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+def apply_test_engine_cache_env(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    cache_off: bool,
+) -> None:
+    """Set the laptop box and, when ``cache_off``, drop the inherited cache.
+
+    The autouse fixture and a test that re-applies the opt-out after seeding
+    an inherited file both call this. ``cache_off`` is ``engine_cache_off``:
+    that test neither reads nor writes the runner file. Every other test
+    keeps it. CI uses that file read-only by default.
+    """
+
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    if cache_off:
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+
+
+@pytest.fixture(autouse=True)
+def _box_for_test_owned_engine_caches(
+    monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
+) -> Iterator[None]:
+    """Leave the runner engine cache in place unless this test opts out.
+
+    The cache exists to speed up CI, gates, the accuracy scorecard, user
+    runs, and the optimizer. CI uses it read-only by default. Engines are
+    stateless: the same engine, chemistry version, and request always give
+    the same prediction, so a cached value is the engine's answer and
+    serving it here is valid. Do not delete the cache to isolate a test.
+    ``engine_cache_off`` is the one opt-out, for a test of the cache itself
+    or a test that must run a real engine solve. The key is engine + version
+    + request.
+    """
+
+    from simulator import engine_cache
+
+    apply_test_engine_cache_env(
+        monkeypatch,
+        cache_off=request.node.get_closest_marker("engine_cache_off") is not None,
+    )
+    with engine_cache.runner_engine_cache_snapshot(
+        os.environ.get("REGOLITH_ENGINE_CACHE") or None,
+        os.environ.get("REGOLITH_ENGINE_CACHE_MODE") or "",
+    ):
+        yield
 
 
 @pytest.fixture(autouse=True)
@@ -315,41 +356,6 @@ def runner_golden_loader(tmp_path_factory):
         return loaded[name]
 
     return load
-
-
-# Golden producers share one dedicated group, serial among themselves and
-# parallel with magemin_fullrun_a..d. They used to join chain a. That chain
-# is already the long one, and the 15s warm-call timeout is not raised.
-# Tests that already have a group (serial, an existing magemin chain, the
-# lunar pin and lunar C0 consumers) stay on it. A held curve still fails
-# as an environment error before the digest compare.
-_GOLDEN_MAGEMIN_GROUP_FILES = frozenset({
-    "test_coating_rate.py",
-    "test_condensation_green_pins.py",
-    "test_condensation_vapour_fog_ledger.py",
-    "test_golden_sections.py",
-    "test_recipe_io.py",
-    "test_run_executor.py",
-    "test_runner_smoke.py",
-    "test_sio_yield_regression.py",
-    "test_web_socket_trace.py",
-})
-
-
-def pytest_itemcollected(item: pytest.Item) -> None:
-    # Mark at collection time, not in pytest_collection_modifyitems. On an
-    # xdist worker, xdist's own modifyitems hook (xdist/remote.py) is
-    # registered after this conftest, so pluggy calls it first: it reads
-    # xdist_group, suffixes the node id with @group, and never sees a mark
-    # added later. tests/_plugins/loadgroup_order.py (tryfirst) also needs
-    # the mark. A remote -n 6 run of 2398a3dba0 showed the old hook's
-    # producers ungrouped (no @magemin_golden on any hook-marked item).
-    filename = _Path(item.nodeid.split("::", 1)[0]).name
-    if filename not in _GOLDEN_MAGEMIN_GROUP_FILES:
-        return
-    if any(mark.name == "xdist_group" for mark in item.iter_markers()):
-        return
-    item.add_marker(pytest.mark.xdist_group("magemin_golden"))
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

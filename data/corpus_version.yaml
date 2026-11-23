@@ -5,6 +5,11 @@
 # and the coupled hot-upper root move, so optimizer rows must be re-ground.
 # 2026-11-23 b-1298 d-467: replace the dilute gas film with the Stefan
 # stagnant-inert film; non-dilute lab and furnace fluxes, O2, and coupled roots move.
+# 2026-11-23 ferric exhaustion publishes the ledger fO2 (Kress inverse of
+# Fe3+/sumFe, floored at Fe-metal saturation on the Holzheid wustite basis)
+# instead of the constant-C_m tangent. The gas ceiling is the effervescence
+# bound and bounds oxidizing terms only. Rows that walked to the uncapped
+# -19.74 landing, and Robinot hours pinned at log10(P_total), are not reusable.
 # 2026-11-23 b-1288: the power-driven and furnace-power temperature is the quasi-steady
 # root of the coupled balance (radiation + conduction + argon + the evaporative
 # enthalpy sink at the same T; two-node pellet). Booked T and evaporation move on
@@ -14,9 +19,11 @@
 # code/data/provider fingerprints. This changes identity shape, not physics.
 # Prior corpus rows are intentionally non-interoperable so old and new key
 # shapes cannot collide after fingerprints become provenance-only.
-corpus_version: "analytical-corpus-2026-11-23-lab-gas-film-stefan-v1"
+corpus_version: "analytical-corpus-2026-11-23-lab-gas-film-stefan-v2"
 interoperable_versions:
-  - "analytical-corpus-2026-11-23-lab-gas-film-stefan-v1"
+  - "analytical-corpus-2026-11-23-lab-gas-film-stefan-v2"
   - "analytical-corpus-2026-11-23-coupled-evaporative-balance-v1"
+  - "analytical-corpus-2026-11-23-coupled-evaporative-balance-v2"
+  - "analytical-corpus-2026-11-23-ferric-ledger-fo2-v1"
   - "analytical-corpus-2026-11-19-c2a-staged-pressure-v1"
   - "analytical-corpus-2026-07-31-vapour-rail-key-v2"

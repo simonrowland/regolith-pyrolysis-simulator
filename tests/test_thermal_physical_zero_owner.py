@@ -7,6 +7,9 @@ constant moves that function's gate. A pasted ``400`` does not.
 
 from __future__ import annotations
 
+import subprocess
+import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -25,6 +28,16 @@ from simulator.thermal_train import FiniteCapacity
 from tests.chemistry.test_authoritative_vapor_pressure_liquid_gate import (
     _sim_with_vapor_dispatch,
 )
+
+
+def test_condensation_provider_imports_in_a_fresh_process():
+    completed = subprocess.run(
+        [sys.executable, "-c", "import engines.builtin.condensation_route"],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_species_rates_follow_the_vapor_owner_limit(monkeypatch):
@@ -114,9 +127,9 @@ def _evaporation_host(*, temperature_C: float, pressures: dict[str, float]):
 
 
 def test_empty_pressure_cold_gate_follows_the_vapor_limit(monkeypatch):
-    import simulator.evaporation as evaporation
+    import engines.builtin.vapor_pressure as vapor_pressure
 
-    monkeypatch.setattr(evaporation, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 500.0)
+    monkeypatch.setattr(vapor_pressure, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 500.0)
     host = _evaporation_host(temperature_C=150.0, pressures={})
     equilibrium = SimpleNamespace(
         liquid_fraction=1.0,
@@ -132,9 +145,9 @@ def test_empty_pressure_cold_gate_follows_the_vapor_limit(monkeypatch):
 
 
 def test_catalog_pressure_gate_follows_the_vapor_limit(monkeypatch):
-    import simulator.evaporation as evaporation
+    import engines.builtin.vapor_pressure as vapor_pressure
 
-    monkeypatch.setattr(evaporation, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 200.0)
+    monkeypatch.setattr(vapor_pressure, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 200.0)
     host = _evaporation_host(temperature_C=25.0, pressures={"SiO": 10.0})
     equilibrium = SimpleNamespace(liquid_fraction=1.0, status="ok", diagnostics={})
     try:

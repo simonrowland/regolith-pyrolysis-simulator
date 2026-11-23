@@ -498,6 +498,48 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     }
 
 
+def fe_metal_saturation_log10_fO2_bar(
+    T_K: float,
+    *,
+    a_feo_stoich: float = 1.0,
+) -> float:
+    """Fe-metal saturation on the Holzheid wustite-liquid standard.
+
+    ``feo_iw_log10_fO2_bar`` is Holzheid 1997 eq 9. The coded standard
+    is ``wustite_FeO_l_holzheid1997_eq9``: its a_FeO argument is the
+    wustite-liquid activity, and a_Fe = 1 is already in that function.
+    ``holzheid_stoich_feo_gamma_band`` owns
+    gamma_stoich / gamma_wustite (2.02 at 1300 °C, 1.94 at 1400 °C,
+    1.66 at 1600 °C).
+
+    Premise: log10(fO2/bar) = IW(a_FeO=1) + 2 log10(a_wustite). A
+    stoichiometric activity plugged into ``feo_iw`` is too oxidizing
+    by 2 log10(multiplier).
+
+    Algebra: a_wustite = a_stoich / conversion_multiplier, then
+    ``feo_iw_log10_fO2_bar(T, a_feo=a_wustite)``. The pure-FeO line
+    passes a_stoich = 1, so a_wustite = 1/multiplier. The melt floor
+    passes the melt's a_FeO, not 1.
+
+    Units: both activities are dimensionless. The result is
+    log10(fO2/bar).
+
+    Known value: at 1400 °C the multiplier is 1.94, and
+    2 log10(1.94) is about 0.58 dex. IW(a_FeO=1) at 2298.92 K remains
+    -5.873; that number is the unconverted wustite-unit activity, not
+    the pure stoichiometric floor.
+    """
+
+    band = holzheid_stoich_feo_gamma_band(float(T_K))
+    multiplier = float(band['conversion_multiplier'])
+    activity = max(float(a_feo_stoich), 1.0e-300)
+    if not math.isfinite(multiplier) or multiplier <= 0.0:
+        a_wustite = activity
+    else:
+        a_wustite = activity / multiplier
+    return feo_iw_log10_fO2_bar(float(T_K), a_feo=a_wustite)
+
+
 REDOX_BUFFER_LINES: Mapping[str, Callable[[float], float]] = MappingProxyType(
     {
         FE_FEO_BUFFER_STANDARD: lambda T_K: feo_iw_log10_fO2_bar(
@@ -1222,6 +1264,18 @@ def _calphad_feo_activity_components(
         regime = 'kress91_ferric_limb_above_iw_pure_feo_plus_1'
     else:
         regime = 'iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend'
+    central_saturation = fe_metal_saturation_log10_fO2_bar(
+        T_K,
+        a_feo_stoich=max(central, 1.0e-300),
+    )
+    current_saturation = fe_metal_saturation_log10_fO2_bar(
+        T_K,
+        a_feo_stoich=max(authoritative, 1.0e-300),
+    )
+    kress91_saturation = fe_metal_saturation_log10_fO2_bar(
+        T_K,
+        a_feo_stoich=max(kress91_activity, 1.0e-300),
+    )
 
     return _with_liquid_model_below_liquidus_notice({
         'status': 'ok',
@@ -1295,28 +1349,27 @@ def _calphad_feo_activity_components(
         },
         'metal_saturation_tie_point': {
             'iw_pure_feo_log10_fO2_bar': pure_feo_iw,
-            'central_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
-            ),
-            'current_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(authoritative, 1.0e-300))
-            ),
-            'kress91_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(kress91_activity, 1.0e-300))
-            ),
+            # Same saturation the published floor and the native onset
+            # use. The offset from IW(a_FeO=1) is that value minus the
+            # pure line, which is 2 log10(a/multiplier), not 2 log10(a).
+            'central_melt_metal_saturation_log10_fO2_bar': central_saturation,
+            'current_melt_metal_saturation_log10_fO2_bar': current_saturation,
+            'kress91_melt_metal_saturation_log10_fO2_bar': kress91_saturation,
             'central_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
-                2.0 * math.log10(max(central, 1.0e-300))
+                central_saturation - pure_feo_iw
             ),
             'current_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
-                2.0 * math.log10(max(authoritative, 1.0e-300))
+                current_saturation - pure_feo_iw
             ),
             'kress91_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
-                2.0 * math.log10(max(kress91_activity, 1.0e-300))
+                kress91_saturation - pure_feo_iw
             ),
             'iw_basis_note': (
-                'IW axis is pure FeO(l), a_FeO=1. A melt with a_FeO<1 reaches '
-                'a_Fe=1 at log10(fO2) lower by 2*log10(a_FeO_melt); the '
-                'self-consistent melt-a_FeO saturation anchor is deferred.'
+                'IW axis is pure FeO(l) on the wustite-liquid standard, '
+                'feo_iw(a_FeO=1). Melt saturation is '
+                'fe_metal_saturation_log10_fO2_bar at that activity: one '
+                'division by holzheid_stoich_feo_gamma_band, then feo_iw. '
+                'The offset is that saturation minus the pure line.'
             ),
             'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
         },
