@@ -47,7 +47,7 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
         loaded_sources.append(sources)
         return production_load_score_context(root, sources=sources)
 
-    def capture_score(context, *, engines=None, work_id=None):
+    def capture_score(context = None, *args, engines = None, work_id = None, **kwargs):
         residuals, candidates = production_score_store(
             context, engines=engines, work_id=work_id, limit=2
         )
@@ -208,7 +208,7 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
 
     production_score_store = score_module.score_store
 
-    def score_with_fixture_prediction(context, *, engines=None, work_id=None):
+    def score_with_fixture_prediction(context = None, *args, engines = None, work_id = None, **kwargs):
         return production_score_store(
             context,
             engines=engines,
@@ -282,7 +282,7 @@ def test_json_cli_uses_full_context_and_keeps_progress_out_of_stdout(
     expected_payload = {"source_id": "fixture-source"}
     builder_calls = []
 
-    def build_report_stub(_source_id, *, engines=None, context_sources=None):
+    def build_report_stub(_source_id = None, *args, engines = None, context_sources = None, **kwargs):
         builder_calls.append((engines, context_sources))
         print("score progress 1/1 residuals")
         return expected_payload

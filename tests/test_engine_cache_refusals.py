@@ -1409,7 +1409,7 @@ def test_internal_analytical_input_refusal_hits_after_disk_round_trip(
     calls = []
     original = binary_pot_battery._internal_analytical_vapor_pressure_adapter
 
-    def wrapped(**adapter_kwargs):
+    def wrapped(*args, **adapter_kwargs):
         calls.append(1)
         return original(**adapter_kwargs)
 
@@ -1457,7 +1457,7 @@ def test_openimcc_canonicalization_refusal_hits_after_disk_round_trip(
     calls = []
     original = openimcc_bridge._evaluate_uncached
 
-    def wrapped(**adapter_kwargs):
+    def wrapped(*args, **adapter_kwargs):
         calls.append(1)
         return original(**adapter_kwargs)
 
@@ -1626,7 +1626,7 @@ def test_openimcc_presolver_refusal_hits_after_disk_round_trip(
     calls = []
     original = openimcc_bridge._evaluate_uncached
 
-    def wrapped(**adapter_kwargs):
+    def wrapped(*args, **adapter_kwargs):
         calls.append(1)
         return original(**adapter_kwargs)
 
@@ -1697,7 +1697,7 @@ def test_openimcc_nonconvergence_is_not_stored(tmp_path, monkeypatch):
 
     _enable_disk_cache(tmp_path, monkeypatch)
 
-    def refuse(**_kwargs):
+    def refuse(*_args, **_kwargs):
         raise ImccNonconvergenceError("did not converge", {"residual": 1.0})
 
     monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", refuse)

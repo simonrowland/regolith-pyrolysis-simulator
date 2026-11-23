@@ -710,7 +710,7 @@ def test_printed_point_oxygen_keeps_unmodelled_reactive_cell_notice(source_conte
     requests = []
     request_type = battery.Po2Request
 
-    def capture_request(**kwargs):
+    def capture_request(*args, **kwargs):
         request = request_type(**kwargs)
         requests.append(request)
         return request

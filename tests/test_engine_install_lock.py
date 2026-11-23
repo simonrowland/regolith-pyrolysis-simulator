@@ -577,7 +577,7 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
     launch_order: list[str] = []
     launch_envs: list[dict[str, str] | None] = []
 
-    def fail_import(command, **kwargs):
+    def fail_import(command = None, *args, **kwargs):
         if "-c" in command:
             import_environments.append(kwargs["env"])
             return SimpleNamespace(returncode=1, stdout="", stderr="import failed")
@@ -848,9 +848,9 @@ def test_check_reports_each_magemin_runtime_binary_candidate(
     observed: list[Path] = []
     original_exists = Path.exists
 
-    def record_candidates(path: Path) -> bool:
+    def record_candidates(path: Path, *, follow_symlinks=True) -> bool:
         observed.append(path)
-        return original_exists(path)
+        return original_exists(path, follow_symlinks=follow_symlinks)
 
     monkeypatch.setattr(Path, "exists", record_candidates)
     assert runtime.MAGEMinBackend._locate_binary(None) is None
@@ -914,10 +914,10 @@ def test_check_reports_each_alphamelts_runtime_binary_candidate(
     observed: list[Path] = []
     original_exists = Path.exists
 
-    def record_candidates(path: Path) -> bool:
+    def record_candidates(path: Path, *, follow_symlinks=True) -> bool:
         if path != order_root:
             observed.append(path)
-        return original_exists(path)
+        return original_exists(path, follow_symlinks=follow_symlinks)
 
     monkeypatch.setattr(Path, "exists", record_candidates)
     assert backend._find_project_binary(order_root) is None

@@ -5484,7 +5484,7 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     monkeypatch.setattr(
         engine_local_config,
         'cache_version_for',
-        lambda _engine: None,
+        lambda engine, *, required=False: None,
     )
     if not producer_backend.initialize(
         {'python_bridge': 'subprocess', 'warm_worker': False}
@@ -5629,7 +5629,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
     monkeypatch.setattr(
         engine_local_config,
         'cache_version_for',
-        lambda _engine: None,
+        lambda engine, *, required=False: None,
     )
     target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
 
@@ -5711,7 +5711,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
     monkeypatch.setattr(
         engine_local_config,
         'cache_version_for',
-        lambda _engine: None,
+        lambda engine, *, required=False: None,
     )
     target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
     curve = {

@@ -522,7 +522,7 @@ def test_compile_residual_keeps_custom_predictor_keyword_contract(
     )
     received: list[str] = []
 
-    def fixed_signature_predictor(engine, point, *, handles, experiment):
+    def fixed_signature_predictor(engine = None, point = None, *args, handles = None, experiment = None, **kwargs):
         received.append(point.observation_id)
         return EnginePrediction(
             engine=engine,
@@ -916,7 +916,7 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
         for item in cp_comparisons
     )
 
-    monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
+    monkeypatch.setattr(fit_generator, "load_sidecar", lambda *args, **kwargs: [record])
     monkeypatch.setattr(score, "SCORE_ENGINE_SET", (Engine.THERMOENGINE,))
     original_iter_cells = compilation_tier._iter_compilation_series_cells
     expanded_observations = []
@@ -1588,7 +1588,7 @@ def test_nasa9_fit_writer_serializes_typed_refusal_fields(tmp_path, monkeypatch)
         )
 
     monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", refuse_fit)
-    monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
+    monkeypatch.setattr(fit_generator, "load_sidecar", lambda *args, **kwargs: [record])
     path = tmp_path / "refused-compilation-comparisons.jsonl"
     assert _write_compilation_comparisons_jsonl(
         context,
@@ -1635,7 +1635,7 @@ def test_nasa9_fit_writer_respects_selected_engines_and_policy(tmp_path, monkeyp
         )
 
     monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", score_selected)
-    monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
+    monkeypatch.setattr(fit_generator, "load_sidecar", lambda *args, **kwargs: [record])
     path = tmp_path / "selected-compilation-comparisons.jsonl"
 
     assert _write_compilation_comparisons_jsonl(

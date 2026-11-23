@@ -231,7 +231,7 @@ def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
     monkeypatch.setattr(
         PyrolysisSimulator,
         "_refresh_vapor_pressures_from_kernel",
-        lambda _self, _result: None,
+        lambda _self, _result, *, include_diagnostic_shadows=True, observation_pO2_bar=None: None,
     )
     monkeypatch.setattr(
         PyrolysisSimulator,

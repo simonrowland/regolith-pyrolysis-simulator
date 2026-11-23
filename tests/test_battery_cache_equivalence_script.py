@@ -31,7 +31,7 @@ def test_scorer_resolves_engine_cache_scope(
 ) -> None:
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", "ambient.sqlite")
 
-    def record_path(_root, _engines, *, workers, engine_cache_path):
+    def record_path(_root, _engines, context=None, *, workers=1, engine_cache_path=None):
         assert engine_cache_path == (Path(expected_path) if expected_path else None)
         return 0
 
@@ -84,7 +84,7 @@ def test_default_slice_uses_all_engines_and_all_rails(
     spec_path = tmp_path / "default-slice.json"
     spec_path.write_text("{}", encoding="utf-8")
     monkeypatch.setenv("TMPDIR", str(tmp_path))
-    monkeypatch.setattr(gate, "load_score_context", lambda _root: object())
+    monkeypatch.setattr(gate, "load_score_context", lambda root=None, *, sources=None: object())
     calls: list[dict[str, Any]] = []
 
     def run_slice(

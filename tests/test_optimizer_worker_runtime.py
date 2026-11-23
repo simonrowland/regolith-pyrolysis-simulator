@@ -135,6 +135,8 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
         session: object,
         *,
         hours: int,
+        stop_at_stage0_exit=None,
+        initial_refusal=None,
     ) -> SimpleNamespace:
         sim = session.simulator
         # Keep strong refs; CPython may recycle id() after the first session is freed.
@@ -172,7 +174,14 @@ def test_cold_env_forces_fresh_backend_resolve(
 
     monkeypatch.setattr(session_module, "resolve_backend", resolve_every_time)
 
-    def no_run(self: RunExecutor, session: object, *, hours: int) -> SimpleNamespace:
+    def no_run(
+        self: RunExecutor,
+        session: object,
+        *,
+        hours: int,
+        stop_at_stage0_exit=None,
+        initial_refusal=None,
+    ) -> SimpleNamespace:
         return SimpleNamespace(session=session, simulator=session.simulator)
 
     monkeypatch.setattr(RunExecutor, "execute_session", no_run)
@@ -351,7 +360,13 @@ def test_pool_worker_initializer_warms_once(
     monkeypatch.delenv(WARM_WORKERS_ENV, raising=False)
     calls: list[str] = []
 
-    def record_warm(backend_name: str) -> object:
+    def record_warm(
+        backend_name: str,
+        *,
+        feedstock_id=None,
+        feedstocks=None,
+        stage0_subprocess_required=None,
+    ) -> object:
         calls.append(backend_name)
         return object()
 

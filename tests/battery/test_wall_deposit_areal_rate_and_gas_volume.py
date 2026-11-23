@@ -488,7 +488,7 @@ def test_areal_rate_calls_the_existing_wall_flux(monkeypatch) -> None:
 
     seen: dict[str, object] = {}
 
-    def _flux(species, p_local, t_surface, alpha, **kwargs):
+    def _flux(species = None, p_local = None, t_surface = None, alpha = None, *args, **kwargs):
         seen["species"] = species
         seen["p_local"] = p_local
         seen["t_surface"] = t_surface

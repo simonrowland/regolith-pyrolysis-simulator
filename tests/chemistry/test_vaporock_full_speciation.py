@@ -21,7 +21,7 @@ _MELT_MODEL_ID = "MELTS-v1.0"
 
 
 def _install_fake_vaporock(monkeypatch, fake_module) -> None:
-    def fake_import_module(name):
+    def fake_import_module(name, package=None):
         if name == "vaporock":
             return fake_module
         raise ImportError(name)

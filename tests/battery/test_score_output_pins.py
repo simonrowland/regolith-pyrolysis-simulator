@@ -2064,7 +2064,7 @@ def test_predictor_sentinel_and_replacement_keyword_contract(
 
     calls.clear()
 
-    def replacement_predictor(engine, observation, *, handles, experiment):
+    def replacement_predictor(engine = None, observation = None, *args, handles = None, experiment = None, **kwargs):
         calls.append((engine, observation, handles, experiment))
         return prediction
 

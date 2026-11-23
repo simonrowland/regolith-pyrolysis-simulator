@@ -7783,7 +7783,7 @@ MAGEMinBackend.equilibrate = _count_magemin_equilibrate
 def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:
     captured: dict[str, Any] = {}
 
-    def fake_run(**kwargs: Any) -> SimpleNamespace:
+    def fake_run(*args, **kwargs: Any) -> SimpleNamespace:
         captured.update(kwargs)
         return SimpleNamespace(
             out_dir=kwargs["out_dir"],
@@ -7826,7 +7826,7 @@ def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> 
 def test_cli_constrained_max_overlay_forwards_hardware_caps(tmp_path, monkeypatch) -> None:
     captured: dict[str, Any] = {}
 
-    def fake_run(**kwargs: Any) -> SimpleNamespace:
+    def fake_run(*args, **kwargs: Any) -> SimpleNamespace:
         captured.update(kwargs)
         return SimpleNamespace(
             out_dir=kwargs["out_dir"],
@@ -8117,7 +8117,7 @@ def test_cli_writes_success_job_status_marker_for_completed_no_feasible_winner(
 ) -> None:
     out_dir = tmp_path / "cli-no-winner"
 
-    def complete_without_winner(**kwargs):
+    def complete_without_winner(*args, **kwargs):
         out = Path(kwargs["out_dir"])
         out.mkdir(parents=True, exist_ok=True)
         store_path = out / "cache.sqlite"
@@ -8168,7 +8168,7 @@ def test_cli_writes_failure_job_status_marker_for_no_feasible_config_error(
 ) -> None:
     out_dir = tmp_path / "cli-failed"
 
-    def fail_after_partial_artifacts(**kwargs):
+    def fail_after_partial_artifacts(*args, **kwargs):
         Path(kwargs["out_dir"]).mkdir(parents=True, exist_ok=True)
         (Path(kwargs["out_dir"]) / "cache.sqlite").write_text("partial", encoding="utf-8")
         raise study.StudyNoFeasibleError(

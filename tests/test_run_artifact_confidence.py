@@ -54,7 +54,7 @@ def _runner_payload(
 def _stable_cache_version(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
-        lambda backend: "cache-v1",
+        lambda backend, *, required=False: "cache-v1",
     )
 
 
@@ -78,7 +78,7 @@ def test_confidence_high_lists_every_passing_signal() -> None:
 def test_confidence_medium_names_incomplete_backend_identity(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
-        lambda backend: None,
+        lambda backend, *, required=False: None,
     )
 
     artifact = build_run_artifact(_runner_payload(), run_id="run-medium")

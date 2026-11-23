@@ -71,7 +71,7 @@ def _patch_deterministic_web_run(monkeypatch):
     monkeypatch.setattr(
         PyrolysisSimulator,
         "_freeze_gate_curve_record",
-        lambda self: write_gate_curve_memo_record(
+        lambda self, *, redox_state=None: write_gate_curve_memo_record(
             self,
             curve,
             provider_outcome="produced",
@@ -1062,7 +1062,7 @@ def test_completion_payload_degrades_when_product_classifier_raises(monkeypatch)
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("s_type")
-    def fail_product_classification(_sim):
+    def fail_product_classification(_sim, *, early_tap_mode=False):
         raise ValueError("rump mismatch")
 
     monkeypatch.setattr(

@@ -330,7 +330,7 @@ def test_sulfliq_import_initialization_error_is_unavailable(monkeypatch) -> None
     monkeypatch.setattr(
         sulfliq_matte_module.importlib,
         'import_module',
-        lambda _name: (_ for _ in ()).throw(RuntimeError('broken extension init')),
+        lambda _name, package=None: (_ for _ in ()).throw(RuntimeError('broken extension init')),
     )
     provider = SulfLiqMatteProvider()
     assert provider.initialize() is False
@@ -369,7 +369,7 @@ def test_import_and_constructor_boundaries_propagate_our_errors_and_type_engine_
     monkeypatch.setattr(
         sulfliq_matte_module.importlib,
         'import_module',
-        lambda _name: (_ for _ in ()).throw(KeyError('local import bookkeeping')),
+        lambda _name, package=None: (_ for _ in ()).throw(KeyError('local import bookkeeping')),
     )
     with pytest.raises(KeyError, match='local import bookkeeping'):
         SulfLiqMatteProvider().initialize()
@@ -380,7 +380,7 @@ def test_import_and_constructor_boundaries_propagate_our_errors_and_type_engine_
             raise RuntimeError('native SulfLiq init failed')
 
     monkeypatch.setattr(
-        sulfliq_matte_module.importlib, 'import_module', lambda _name: BrokenModule
+        sulfliq_matte_module.importlib, 'import_module', lambda _name, package=None: BrokenModule
     )
     provider = SulfLiqMatteProvider()
     assert provider.initialize() is False

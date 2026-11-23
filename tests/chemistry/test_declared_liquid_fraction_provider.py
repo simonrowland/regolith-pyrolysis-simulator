@@ -375,7 +375,7 @@ def test_pool_init_timeout_refuses_direct_gate_read_and_retries_next_call(
     )
     monkeypatch.setattr(
         MAGEMinBackend, 'find_liquidus_solidus',
-        lambda _self, **_kwargs: SimpleNamespace(
+        lambda _self, composition_kg=None, fO2_log=-9.0, pressure_bar=1e-6, **_kwargs: SimpleNamespace(
             status='unavailable', diagnostics={}, warnings=(),
         ),
     )

@@ -320,7 +320,7 @@ def test_blockers_rank_source_count_before_experiment_count(tmp_path, monkeypatc
     }
     experiments["b"] = replace(experiment, experiment_id="b", work_id="b",
         sample=replace(experiment.sample, surface_area_m2=None))
-    monkeypatch.setattr(module, "load_migrated_store", lambda root: ({"a": work_a, "b": work_b}, experiments, {}))
+    monkeypatch.setattr(module, "load_migrated_store", lambda root=None, *, sources=None: ({"a": work_a, "b": work_b}, experiments, {}))
     monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
     blockers = module.report(tmp_path)["summary"]["top_blocking_waypoints"]
     assert [(row["waypoint"], row["source_count"], row["experiment_count"]) for row in blockers] == [
@@ -512,7 +512,7 @@ def test_aliased_work_counts_each_experiment_under_one_canonical_source(tmp_path
     monkeypatch.setattr(
         module,
         "load_migrated_store",
-        lambda root: ({"janaf-work": work}, experiments, {}),
+        lambda root=None, *, sources=None: ({"janaf-work": work}, experiments, {}),
     )
     monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
     readiness = module.report(tmp_path)
@@ -551,7 +551,7 @@ def test_work_with_no_experiments_is_listed_as_unscoreable_gap(tmp_path, monkeyp
         monkeypatch.setattr(
             module,
             "load_migrated_store",
-            lambda root: (works, {experiment.experiment_id: experiment}, {}),
+            lambda root=None, *, sources=None: (works, {experiment.experiment_id: experiment}, {}),
         )
         monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
 

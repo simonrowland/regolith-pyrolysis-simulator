@@ -120,7 +120,7 @@ def test_load_score_context_recurses_nested_compilation_shards(
     monkeypatch.setattr(
         score_mod,
         "load_migrated_store",
-        lambda _root=None: ({}, {}, {oid: observation}),
+        lambda root=None, *, sources=None: ({}, {}, {oid: observation}),
     )
 
     ctx = load_score_context(root)

@@ -162,7 +162,7 @@ def test_chi_escape_salt_uses_compiled_fallback_when_antoine_A_is_missing(
     monkeypatch.setattr(
         foulant_module,
         "_load_vapor_pressures",
-        lambda: {"foulant_vapor": {"NaCl": entry}},
+        lambda *args, **kwargs: {"foulant_vapor": {"NaCl": entry}},
     )
     fallback_calls = []
 
@@ -194,7 +194,7 @@ def test_chi_escape_salt_does_not_fallback_for_explicit_null_antoine_B(
     monkeypatch.setattr(
         foulant_module,
         "_load_vapor_pressures",
-        lambda: {"foulant_vapor": {"NaCl": entry}},
+        lambda *args, **kwargs: {"foulant_vapor": {"NaCl": entry}},
     )
     fallback_calls = []
 

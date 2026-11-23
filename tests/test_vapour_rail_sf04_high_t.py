@@ -618,7 +618,7 @@ def test_vaporock_checkout_identity_refuses_commit_during_status_sample(
     current_commit = "a" * 40
     calls: list[str] = []
 
-    def fake_run(command: list[str], **_: object) -> SimpleNamespace:
+    def fake_run(command: list[str] | None = None, *extra_args, **_: object) -> SimpleNamespace:
         nonlocal current_commit
         if "rev-parse" in command:
             calls.append("head")
@@ -665,7 +665,7 @@ def test_vaporock_evaluation_refuses_checkout_identity_change(
     )
     monkeypatch.setitem(sys.modules, "vaporock", fake_vaporock)
 
-    def fake_run(command: list[str], **_: object) -> SimpleNamespace:
+    def fake_run(command: list[str] | None = None, *extra_args, **_: object) -> SimpleNamespace:
         if "rev-parse" in command:
             commit = "b" * 40 if marker.exists() else "a" * 40
             return SimpleNamespace(returncode=0, stdout=f"{commit}\n")
@@ -712,7 +712,7 @@ def test_vaporock_evaluation_refuses_identity_change_during_snapshot_copy(
 
     identity_changed = tmp_path / "identity-changed-during-copy"
 
-    def fake_run(command: list[str], **_: object) -> SimpleNamespace:
+    def fake_run(command: list[str] | None = None, *extra_args, **_: object) -> SimpleNamespace:
         if "rev-parse" in command:
             commit = "b" * 40 if identity_changed.exists() else "a" * 40
             return SimpleNamespace(returncode=0, stdout=f"{commit}\n")
@@ -723,8 +723,12 @@ def test_vaporock_evaluation_refuses_identity_change_during_snapshot_copy(
     def copyfile_then_change_identity(
         source: Path,
         destination: Path,
+        *,
+        follow_symlinks=True,
     ) -> str | Path:
-        copied = original_copyfile(source, destination)
+        copied = original_copyfile(
+            source, destination, follow_symlinks=follow_symlinks
+        )
         if Path(source).name == "equil.py":
             identity_changed.touch()
         return copied
@@ -776,7 +780,7 @@ def test_vaporock_evaluation_allows_unrelated_checkout_dirtiness_at_cut(
 
     commit = "a" * 40
 
-    def fake_run(command: list[str], **_: object) -> SimpleNamespace:
+    def fake_run(command: list[str] | None = None, *extra_args, **_: object) -> SimpleNamespace:
         if "rev-parse" in command:
             return SimpleNamespace(returncode=0, stdout=f"{commit}\n")
         status = "?? unrelated.txt\n" if unrelated_file.exists() else ""
@@ -787,8 +791,12 @@ def test_vaporock_evaluation_allows_unrelated_checkout_dirtiness_at_cut(
     def copyfile_then_add_unrelated_file(
         source: Path,
         destination: Path,
+        *,
+        follow_symlinks=True,
     ) -> str | Path:
-        copied = original_copyfile(source, destination)
+        copied = original_copyfile(
+            source, destination, follow_symlinks=follow_symlinks
+        )
         if Path(source).name == "equil.py":
             unrelated_file.touch()
         return copied
@@ -841,13 +849,22 @@ def test_vaporock_evaluation_refuses_copied_source_vector_mismatch(
 
     original_copyfile = shutil.copyfile
 
-    def copy_transient_bytes(source: Path, destination: Path) -> str | Path:
+    def copy_transient_bytes(
+        source: Path,
+        destination: Path,
+        *,
+        follow_symlinks=True,
+    ) -> str | Path:
         if Path(source) != changing_file:
-            return original_copyfile(source, destination)
+            return original_copyfile(
+                source, destination, follow_symlinks=follow_symlinks
+            )
         original = changing_file.read_bytes()
         changing_file.write_text("transient full data", encoding="utf-8")
         try:
-            return original_copyfile(source, destination)
+            return original_copyfile(
+                source, destination, follow_symlinks=follow_symlinks
+            )
         finally:
             changing_file.write_bytes(original)
 
@@ -896,8 +913,15 @@ def test_vaporock_evaluation_refuses_source_vector_change_at_snapshot_cut(
 
     original_copyfile = shutil.copyfile
 
-    def copy_then_change_source(source: Path, destination: Path) -> str | Path:
-        copied = original_copyfile(source, destination)
+    def copy_then_change_source(
+        source: Path,
+        destination: Path,
+        *,
+        follow_symlinks=True,
+    ) -> str | Path:
+        copied = original_copyfile(
+            source, destination, follow_symlinks=follow_symlinks
+        )
         if Path(source).name == "JANAF0-vapor-data.csv":
             changing_file.write_text("changed at cut", encoding="utf-8")
         return copied

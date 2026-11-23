@@ -120,8 +120,8 @@ def extract_comparator(monkeypatch):
             expected_value=0.1, expected_uncertainty=obs.uncertainty, actual_value=0.2,
             units="alpha", evidence_scope="extract-store-adopted", source_locator="Table 1",
             recipe={}, observation={}, runtime={}, status_override=status) for t in (1500, 1600)]
-        monkeypatch.setattr(e, "load_adopted_observations", lambda: [obs])
-        monkeypatch.setattr(e, "load_vapor_pressure_data", lambda: {"fixture": True})
+        monkeypatch.setattr(e, "load_adopted_observations", lambda *, extracts_dir=None: [obs])
+        monkeypatch.setattr(e, "load_vapor_pressure_data", lambda path=None: {"fixture": True})
         monkeypatch.setattr(e, "evaluate_observation", lambda *a, **k: e.ObservationEvaluation(obs, records=records))
         monkeypatch.setattr(e, "_engine_alpha", lambda *a: (0.2, None, {"alpha_s_extrapolated": extrapolated}))
         return obs
@@ -193,7 +193,7 @@ def test_superseded_extract_is_outside_selected_denominator(extract_comparator, 
     from scripts.calibration_battery import extract_rows
     from simulator.diagnostic_helpers import extract_reproduction as e
     obs = replace(extract_comparator("match"), adoption_basis="superseded")
-    monkeypatch.setattr(e, "load_adopted_observations", lambda: [obs])
+    monkeypatch.setattr(e, "load_adopted_observations", lambda *, extracts_dir=None: [obs])
     rows = extract_rows()
     assert rows and all(not row["selected"] and not row["score_eligible"] for row in rows)
 
@@ -275,7 +275,7 @@ def test_loader_preserves_unknown_evidence_class_for_refusal(monkeypatch, placem
     container["evidence_class"] = "novel_evidence_b481"
     doc = {"source_id": "kems-fixture", "review_status": "reviewed",
            "species": {"Fe": {"observations": [row]}}}
-    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
+    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory=None, *, require_valid=True, artifact_root=None: [doc])
     obs, = e.load_adopted_observations()
     assert e.observation_admission_reason(obs) == "unknown_evidence_marker:evidence_class=novel_evidence_b481"
 
@@ -294,7 +294,7 @@ def test_equal_measurements_without_supersession_remain_independent(extract_comp
                    for r in result.records]
         return e.ObservationEvaluation(obs, records=records)
     monkeypatch.setattr(e, "evaluate_observation", evaluate)
-    monkeypatch.setattr(e, "load_adopted_observations", lambda: [first, second])
+    monkeypatch.setattr(e, "load_adopted_observations", lambda *, extracts_dir=None: [first, second])
     rows = extract_rows()
     assert len(rows) == 4
     assert all(row["selected"] and row["score_eligible"] for row in rows)

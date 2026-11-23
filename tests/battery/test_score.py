@@ -8718,7 +8718,7 @@ def test_studio_dispatch_uses_caller_host(
 
     # Host dispatch is the assertion. The full store load is a separate path
     # and exceeds the default process CPU budget on its own.
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: None)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: None)
     monkeypatch.setattr(battery_score, "_run_studio", record_host)
     with pytest.raises(RuntimeError, match="dispatch host recorded"):
         battery_score.main(
@@ -10392,7 +10392,7 @@ def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
         ],
         check=True,
     )
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     def score_fixture(store_context, *, engines, _stream, **_kwargs):
         _stream.append(residual, reference)
         _stream.finalize(context=store_context, engines=engines)
@@ -15072,7 +15072,7 @@ def test_battery_failed_rerun_preserves_published_output_set(
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
     monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
     monkeypatch.setattr(
@@ -15227,7 +15227,7 @@ def test_battery_report_only_streams_residual_jsonl(
         encoding="utf-8",
     )
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(
         battery_score,
@@ -15311,7 +15311,7 @@ def test_battery_normal_report_includes_fit_comparison_stratum(
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
     monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
 
@@ -19038,7 +19038,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
 
     dispatched_points = []
 
-    def predict_diagnostic_activity(engine, point, *, handles, experiment):
+    def predict_diagnostic_activity(engine = None, point = None, *args, handles = None, experiment = None, **kwargs):
         dispatched_points.append(point)
         assert point.identity.species.phase.value is Phase.L
         assert point.identity.reference_state.value.endmember.phase.value is Phase.L
@@ -20052,7 +20052,7 @@ def test_unlinked_knudsen_row_keeps_closure_with_assumption_notice(monkeypatch) 
     requests = []
     request_type = battery.Po2Request
 
-    def capture_request(**kwargs):
+    def capture_request(*args, **kwargs):
         request = request_type(**kwargs)
         requests.append(request)
         return request

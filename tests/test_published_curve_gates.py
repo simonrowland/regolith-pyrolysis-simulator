@@ -46,7 +46,7 @@ def test_b677_gate_reports_duplicate_phase_binding_failure(monkeypatch):
     liquid = next(item for item in curves if item["phase"] == "l" and item["quantity"] == "heat_capacity")
     liquid["source_cell_rows"][0] = 4
     monkeypatch.setattr(b677, "load_records", lambda root=b677.COMPILATION_ROOT: iter([record]))
-    monkeypatch.setattr(b677.json, "loads", lambda value: curves)
+    monkeypatch.setattr(b677.json, "loads", lambda s, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw: curves)
     result = next(item for item in b677.load_published_curves() if item["phase"] == "l")
     assert result["gate"].get("reason") == "gate_row_phase_mismatch", result["gate"]
 

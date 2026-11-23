@@ -237,7 +237,7 @@ def test_band_capture_integrates_33_centers_with_inclusive_reactive_cutoff(monke
     stage.temp_range_C = (900.0, 1200.0)
     evaluated_C = []
 
-    def constant_flux(_species, _pressure, temperature_K, _alpha, **kwargs):
+    def constant_flux(_species = None, _pressure = None, temperature_K = None, _alpha = None, *args, **kwargs):
         evaluated_C.append(temperature_K - 273.15)
         kwargs["diagnostic_out"]["wall_saturation_pressure_pa"] = 0.0
         kwargs["diagnostic_out"]["wall_saturation_pressure_refused"] = False
@@ -278,7 +278,7 @@ def test_mixed_saturation_band_matches_numerical_ode_below_mean_threshold(monkey
     monkeypatch.setattr(condensation, "HKL_BAND_SAMPLES", 2)
     strip_conductance = 1.0e-4
 
-    def two_strip_flux(_species, pressure, temperature_K, _alpha, **kwargs):
+    def two_strip_flux(_species = None, pressure = None, temperature_K = None, _alpha = None, *args, **kwargs):
         psat = 0.0 if temperature_K < 274.15 else 90.0
         kwargs["diagnostic_out"].update(
             wall_saturation_pressure_pa=psat,
@@ -340,7 +340,7 @@ def test_isothermal_band_matches_midpoint_excess_inventory_capture(monkeypatch):
     stage.temp_range_C = (1000.0, 1000.0)
     evaluated_K = []
 
-    def constant_flux(_species, _pressure, temperature_K, _alpha, **kwargs):
+    def constant_flux(_species = None, _pressure = None, temperature_K = None, _alpha = None, *args, **kwargs):
         evaluated_K.append(temperature_K)
         kwargs["diagnostic_out"]["wall_saturation_pressure_pa"] = 25.0
         kwargs["diagnostic_out"]["wall_saturation_pressure_refused"] = False

@@ -3079,7 +3079,7 @@ def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
     # changing Mg evolution enough to refuse C4 before C6 is offered.
     # Pin the fallback authority for this routing test; optional host engines
     # must not silently choose its reachability premise (b-475).
-    def unavailable_liquidus_curve(self):
+    def unavailable_liquidus_curve(self = None, *args, **kwargs):
         raise ProviderUnavailableError("C6 routing fixture: liquidus unavailable")
 
     monkeypatch.setattr(

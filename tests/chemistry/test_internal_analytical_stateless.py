@@ -48,7 +48,7 @@ def test_refusal_does_not_depend_on_previous_call_on_a_reused_core(monkeypatch):
         "certified_effective_gamma_by_parent"
     ]
 
-    def refuse(**_kwargs):
+    def refuse(*_args, **_kwargs):
         from openimcc import ImccNonconvergenceError
 
         raise ImccNonconvergenceError("stateless refusal fixture", {})

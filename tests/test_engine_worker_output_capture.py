@@ -55,7 +55,7 @@ def _prepare_blocked_sink(monkeypatch):
         'stderr_fd' in inspect.signature(original_reader).parameters
     )
 
-    def reader_target(connection):
+    def reader_target(connection = None, *args, **kwargs):
         try:
             if supports_stderr_fd:
                 return original_reader(connection, stderr_fd=sink_writer)

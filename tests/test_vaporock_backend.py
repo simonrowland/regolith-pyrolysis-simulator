@@ -39,7 +39,7 @@ def _install_fake_import(monkeypatch, fake_module):
     _allow_fake_native_loader(monkeypatch)
     calls = []
 
-    def fake_import_module(name):
+    def fake_import_module(name, package=None):
         calls.append(name)
         if name == "vaporock":
             return fake_module
@@ -111,7 +111,7 @@ def _assert_h2_melt_envelope(diagnostics, *, temperature_K, status):
 def test_missing_vaporock_import_marks_backend_unavailable(monkeypatch):
     _allow_fake_native_loader(monkeypatch)
 
-    def fake_import_module(name):
+    def fake_import_module(name, package=None):
         raise ImportError(name)
 
     monkeypatch.setattr(
@@ -1280,7 +1280,7 @@ def test_vaporock_table_boundary_propagates_local_errors_and_reports_engine_type
 def test_vaporock_import_boundary_handles_library_failures_only(monkeypatch):
     _allow_fake_native_loader(monkeypatch)
 
-    def fail_import(_name):
+    def fail_import(_name, package=None):
         raise KeyError("local import wrapper bug")
 
     monkeypatch.setattr(vaporock_module.importlib, "import_module", fail_import)
@@ -1291,7 +1291,7 @@ def test_vaporock_import_boundary_handles_library_failures_only(monkeypatch):
     with pytest.raises(KeyError, match="local import wrapper bug"):
         backend._import_vaporock()
 
-    def missing_import(name):
+    def missing_import(name, package=None):
         raise ModuleNotFoundError(f"no module named {name}")
 
     monkeypatch.setattr(vaporock_module.importlib, "import_module", missing_import)
@@ -4188,7 +4188,7 @@ def test_provider_selection_falls_back_with_native_init_failure_reason(
         instances.append(backend)
         return backend
 
-    def native_load_failure(_name):
+    def native_load_failure(_name, package=None):
         raise OSError("dlopen failed for libphaseobjc")
 
     monkeypatch.setattr(vaporock_module, "VapoRockBackend", tracked_backend)
@@ -4211,7 +4211,7 @@ def test_provider_selection_falls_back_with_native_init_failure_reason(
 def test_warm_worker_native_import_failure_is_typed(monkeypatch):
     _allow_fake_native_loader(monkeypatch)
 
-    def native_load_failure(_name):
+    def native_load_failure(_name, package=None):
         raise OSError("dlopen failed for libphaseobjc")
 
     monkeypatch.setattr(
@@ -4231,7 +4231,7 @@ def test_warm_worker_missing_phaseobjc_precedes_objc_import(monkeypatch):
     def missing_library():
         raise ImportError("libphaseobjc missing from configured DYLD paths")
 
-    def unreachable_objc_import(name):
+    def unreachable_objc_import(name, package=None):
         imported.append(name)
         raise NameError("ObjC Class b'LiquidMelts' couldn't be found.")
 

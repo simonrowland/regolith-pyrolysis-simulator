@@ -4655,7 +4655,7 @@ def test_audit_mapping_fidelity_samples_match_canonical_extracts():
 def test_costa_jacobson_retained_sio_has_fidelity_sample(monkeypatch):
     """Run the landed-pilot sample-presence guard against this extract alone."""
     path = EXTRACTS / "costa-jacobson-2015.yaml"
-    monkeypatch.setattr(vle, "discover_extracts", lambda: [path])
+    monkeypatch.setattr(vle, "discover_extracts", lambda directory=None: [path])
     test_every_extract_has_fidelity_sample()
 
 

@@ -41,7 +41,7 @@ def _na_boundary_report(monkeypatch, crossing_K: float, inlet_K: float) -> dict:
     monkeypatch.setattr(
         thermal_train,
         "authoritative_condensation_temperature",
-        lambda _species, *, setpoints: {
+        lambda _species, *, setpoints, vapor_pressure_data=None: {
             "temperature_C": crossing_K - 273.15,
             "source": "boundary-test-fixture",
             "authority": "stage_window",

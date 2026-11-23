@@ -71,7 +71,7 @@ def _install_fake_vaporock(monkeypatch):
             "SiO": float(composition.get("SiO2", 0.0)) * 1e-9,
         }
 
-    def fake_import_module(name):
+    def fake_import_module(name, package=None):
         if name == "vaporock":
             return types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
         raise ImportError(name)

@@ -1589,7 +1589,15 @@ def test_process_pool_timeout_records_failure_and_continues(
     direct abort-gate call proves the emitted reference cannot mint absence.
     """
     class FakeExecutor:
-        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+        def __init__(
+            self,
+            max_workers: int | None = None,
+            mp_context=None,
+            initializer: object = None,
+            initargs=(),
+            *,
+            max_tasks_per_child=None,
+        ) -> None:
             self.max_workers = max_workers
             self.initializer = initializer
             self._processes: dict[int, object] = {}
@@ -1606,7 +1614,7 @@ def test_process_pool_timeout_records_failure_and_continues(
             return None
 
     def fake_wait(
-        futures: object, *, return_when: object, timeout: object = None
+        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del return_when
         done = {future for future in futures if future.done()}
@@ -1661,7 +1669,15 @@ def test_process_pool_timeout_records_failure_with_fake_executor(
     tmp_path: Path,
 ) -> None:
     class FakeExecutor:
-        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+        def __init__(
+            self,
+            max_workers: int | None = None,
+            mp_context=None,
+            initializer: object = None,
+            initargs=(),
+            *,
+            max_tasks_per_child=None,
+        ) -> None:
             self.max_workers = max_workers
             self.initializer = initializer
             self._processes: dict[int, object] = {}
@@ -1679,7 +1695,7 @@ def test_process_pool_timeout_records_failure_with_fake_executor(
             self.shutdown_calls.append({"wait": wait, "cancel_futures": cancel_futures})
 
     def fake_wait(
-        futures: object, *, return_when: object, timeout: object = None
+        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del return_when
         done = {future for future in futures if future.done()}
@@ -1728,7 +1744,15 @@ def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
     captured_extra_pids: list[tuple[int, ...]] = []
 
     class FakeExecutor:
-        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+        def __init__(
+            self,
+            max_workers: int | None = None,
+            mp_context=None,
+            initializer: object = None,
+            initargs=(),
+            *,
+            max_tasks_per_child=None,
+        ) -> None:
             self.max_workers = max_workers
             self.initializer = initializer
             self._processes: dict[int, object] = {}
@@ -1752,7 +1776,7 @@ def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
             return None
 
     def fake_wait(
-        futures: object, *, return_when: object, timeout: object = None
+        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del return_when
         if timeout:
@@ -1801,7 +1825,14 @@ def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    def unavailable_executor(*, max_workers: int | None, initializer: object) -> object:
+    def unavailable_executor(
+        max_workers: int | None = None,
+        mp_context=None,
+        initializer: object = None,
+        initargs=(),
+        *,
+        max_tasks_per_child=None,
+    ) -> object:
         raise PermissionError("sandbox denies process pool")
 
     monkeypatch.setattr(pool_module, "ProcessPoolExecutor", unavailable_executor)
@@ -1967,12 +1998,14 @@ def test_pgrep_process_tree_scan_respects_snapshot_deadline(
     observed_timeouts: list[float] = []
 
     def fake_run(
-        args: list[str],
-        *,
-        check: bool,
-        capture_output: bool,
-        text: bool,
-        timeout: float,
+        args: list[str] | None = None,
+        *extra_args,
+        input=None,
+        capture_output: bool = False,
+        timeout=None,
+        check: bool = False,
+        text: bool = False,
+        **kwargs,
     ) -> subprocess.CompletedProcess[str]:
         del check, capture_output, text
         observed_timeouts.append(float(timeout))
@@ -1993,7 +2026,8 @@ def test_pgrep_process_tree_discovers_root_child(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def fake_run(
-        args: list[str],
+        args: list[str] | None = None,
+        *extra_args,
         **kwargs: object,
     ) -> subprocess.CompletedProcess[str]:
         del kwargs
@@ -2011,7 +2045,8 @@ def test_pgrep_process_tree_retries_child_timeout_and_discovers_grandchild(
     child_calls = 0
 
     def fake_run(
-        args: list[str],
+        args: list[str] | None = None,
+        *extra_args,
         **kwargs: object,
     ) -> subprocess.CompletedProcess[str]:
         nonlocal child_calls
@@ -2354,7 +2389,14 @@ def test_pool_unavailable_constructor_falls_back_to_serial(
     caplog: pytest.LogCaptureFixture,
     tmp_path: Path,
 ) -> None:
-    def unavailable_executor(*, max_workers: int | None, initializer: object) -> object:
+    def unavailable_executor(
+        max_workers: int | None = None,
+        mp_context=None,
+        initializer: object = None,
+        initargs=(),
+        *,
+        max_tasks_per_child=None,
+    ) -> object:
         raise PermissionError("sandbox denies process spawn")
 
     monkeypatch.setattr(pool_module, "ProcessPoolExecutor", unavailable_executor)
@@ -2389,7 +2431,15 @@ def test_pool_unavailable_submit_falls_back_to_serial(
     tmp_path: Path,
 ) -> None:
     class SubmitDeniedExecutor:
-        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+        def __init__(
+            self,
+            max_workers: int | None = None,
+            mp_context=None,
+            initializer: object = None,
+            initargs=(),
+            *,
+            max_tasks_per_child=None,
+        ) -> None:
             self.max_workers = max_workers
             self.initializer = initializer
             self.shutdown_calls: list[dict[str, object]] = []
@@ -2402,7 +2452,14 @@ def test_pool_unavailable_submit_falls_back_to_serial(
 
     executor = SubmitDeniedExecutor(max_workers=2, initializer=None)
 
-    def executor_factory(*, max_workers: int | None, initializer: object) -> SubmitDeniedExecutor:
+    def executor_factory(
+        max_workers: int | None = None,
+        mp_context=None,
+        initializer: object = None,
+        initargs=(),
+        *,
+        max_tasks_per_child=None,
+    ) -> SubmitDeniedExecutor:
         assert max_workers == 2
         return executor
 
@@ -2481,7 +2538,15 @@ def test_worker_abort_survives_teardown_error(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     class BrokenShutdownExecutor:
-        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+        def __init__(
+            self,
+            max_workers: int | None = None,
+            mp_context=None,
+            initializer: object = None,
+            initargs=(),
+            *,
+            max_tasks_per_child=None,
+        ) -> None:
             self.max_workers = max_workers
             self.initializer = initializer
             self.future: Future[object] | None = None
@@ -2511,12 +2576,17 @@ def test_worker_abort_survives_teardown_error(
     executor = BrokenShutdownExecutor(max_workers=1, initializer=None)
 
     def executor_factory(
-        *, max_workers: int | None, initializer: object
+        max_workers: int | None = None,
+        mp_context=None,
+        initializer: object = None,
+        initargs=(),
+        *,
+        max_tasks_per_child=None,
     ) -> BrokenShutdownExecutor:
         return executor
 
     def fake_wait(
-        futures: object, *, return_when: object, timeout: object = None
+        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del timeout
         return set(futures), set()
@@ -2742,7 +2812,15 @@ def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_
     assert isinstance(popen_type, type)
 
     class FakeExecutor:
-        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+        def __init__(
+            self,
+            max_workers: int | None = None,
+            mp_context=None,
+            initializer: object = None,
+            initargs=(),
+            *,
+            max_tasks_per_child=None,
+        ) -> None:
             self.max_workers = max_workers
             self.initializer = initializer
             self.active = 0
@@ -2763,12 +2841,19 @@ def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_
 
     fake_executor = FakeExecutor(max_workers=2, initializer=None)
 
-    def executor_factory(*, max_workers: int | None, initializer: object) -> FakeExecutor:
+    def executor_factory(
+        max_workers: int | None = None,
+        mp_context=None,
+        initializer: object = None,
+        initargs=(),
+        *,
+        max_tasks_per_child=None,
+    ) -> FakeExecutor:
         assert max_workers == 2
         return fake_executor
 
     def fake_wait(
-        futures: object, *, return_when: object, timeout: object = None
+        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del timeout
         future = next(iter(futures))

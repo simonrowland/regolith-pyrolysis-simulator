@@ -294,7 +294,7 @@ def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
     monkeypatch.setattr(
         evaporation_flux,
         "_series_resistance_evaporation_flux_kg_m2_s",
-        lambda **kwargs: flux,
+        lambda *args, **kwargs: flux,
     )
     monkeypatch.setattr(
         evaporation,

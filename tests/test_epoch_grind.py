@@ -309,7 +309,7 @@ def test_launch_preflight_rejects_fallback_enabled_global_setpoints(
         (),
         {"setpoints": {"chemistry_kernel": {"allow_fallback_vapor": True}}},
     )()
-    monkeypatch.setattr(epoch_grind, "load_config_bundle", lambda: bundle)
+    monkeypatch.setattr(epoch_grind, "load_config_bundle", lambda *args, **kwargs: bundle)
 
     with pytest.raises(epoch_grind.GrindSourceGateError, match="allow_fallback_vapor"):
         epoch_grind.run_driver(

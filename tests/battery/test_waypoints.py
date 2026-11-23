@@ -1645,7 +1645,7 @@ def _report_with_work(tmp_path, monkeypatch, work, experiment) -> "object":
     monkeypatch.setattr(
         module,
         "load_migrated_store",
-        lambda root: (
+        lambda root=None, *, sources=None: (
             {work.work_id: work},
             {experiment.experiment_id: experiment},
             {},
@@ -1697,7 +1697,7 @@ def test_readiness_report_passes_modelling_inputs_to_consumer_path(
     monkeypatch.setattr(
         module,
         "load_migrated_store",
-        lambda root: (
+        lambda root=None, *, sources=None: (
             {work.work_id: work},
             {experiment.experiment_id: experiment},
             {observation.observation_id: observation},
@@ -1744,7 +1744,7 @@ def test_readiness_report_passes_modelling_inputs_to_consumer_path(
     monkeypatch.setattr(
         module,
         "load_migrated_store",
-        lambda root: (
+        lambda root=None, *, sources=None: (
             {work.work_id: work},
             {printed_experiment.experiment_id: printed_experiment},
             {printed_observation.observation_id: printed_observation},
@@ -1803,7 +1803,7 @@ def test_readiness_report_carries_vacuum_flag_for_real_source(
     monkeypatch.setattr(
         module,
         "load_migrated_store",
-        lambda root: (
+        lambda root=None, *, sources=None: (
             {work.work_id: work},
             {experiment.experiment_id: experiment},
             {observation.observation_id: observation},

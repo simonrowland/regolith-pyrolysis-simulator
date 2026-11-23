@@ -640,6 +640,8 @@ def test_segment_partial_pressure_uses_pressure_residual_for_zero_carrier(
         total_pressure_pa,
         inlet_species_kg_hr,
         species_kg_hr_by_segment,
+        *,
+        inlet_molar_flows=None,
     ):
         inlet_partials = _flowing_species_partial_pressures_pa(
             {},
@@ -666,6 +668,7 @@ def test_segment_partial_pressure_uses_pressure_residual_for_zero_carrier(
             total_pressure_pa,
             inlet_species_kg_hr,
             species_kg_hr_by_segment,
+            inlet_molar_flows=inlet_molar_flows,
         )
 
     monkeypatch.setattr(

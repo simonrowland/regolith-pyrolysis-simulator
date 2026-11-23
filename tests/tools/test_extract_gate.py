@@ -1311,7 +1311,7 @@ def test_cli_audits_changed_extracts(tmp_path: Path, monkeypatch, capsys):
     monkeypatch.setattr(
         extract_gate.subprocess,
         "run",
-        lambda args, **kwargs: Result()
+        lambda args=None, *extra_args, **kwargs: Result()
         if args[:3] == ["git", "diff", "--name-only"]
         else original_run(args, **kwargs),
     )

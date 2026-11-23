@@ -45,7 +45,7 @@ def test_every_launch_uses_headless_env_and_slot(monkeypatch, tmp_path, launch):
     monkeypatch.setenv('MPLBACKEND', 'MacOSX')
     monkeypatch.setenv('OMPI_MCA_btl', 'tcp')
     monkeypatch.setenv('KEEP_MAGEMIN_TEST_VALUE', 'inherited')
-    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda engine, *, required=False: None)
     held = []
     seen = []
 
@@ -57,7 +57,7 @@ def test_every_launch_uses_headless_env_and_slot(monkeypatch, tmp_path, launch):
         finally:
             held.pop()
 
-    def run(args, **kwargs):
+    def run(args=None, *extra_args, **kwargs):
         assert held == [True]
         env = kwargs['env']
         assert env['OMPI_MCA_btl'] == 'self'
@@ -111,7 +111,7 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
 ):
     import simulator.engine_local_config as local_config
 
-    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda engine, *, required=False: None)
     monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
     run_calls = []
     slot_calls = []
@@ -121,7 +121,7 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
         slot_calls.append(timeout_s)
         yield
 
-    def run(args, **kwargs):
+    def run(args=None, *extra_args, **kwargs):
         run_calls.append((args, kwargs))
         return subprocess.CompletedProcess(
             args, 0, stdout='MAGEMin 1.9.6\n', stderr=''
@@ -162,7 +162,7 @@ def test_version_probe_repeats_when_binary_changes_at_same_path(
 ):
     import simulator.engine_local_config as local_config
 
-    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda engine, *, required=False: None)
     monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
     binary = tmp_path / 'MAGEMin'
     first_bytes = b'1.9.6'
@@ -170,7 +170,7 @@ def test_version_probe_repeats_when_binary_changes_at_same_path(
     initial_stat = binary.stat()
     run_calls = []
 
-    def run(args, **kwargs):
+    def run(args=None, *extra_args, **kwargs):
         run_calls.append(args)
         runtime_bytes = Path(args[0]).read_bytes()
         version = runtime_bytes.decode('ascii')

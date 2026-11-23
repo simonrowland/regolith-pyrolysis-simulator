@@ -422,7 +422,7 @@ def test_cli_forwards_reoptimize_lineage_in_both_variants(
 ) -> None:
     captured: dict[str, object] = {}
 
-    def fake_run(**kwargs):
+    def fake_run(*args, **kwargs):
         captured.update(kwargs)
         return SimpleNamespace(
             out_dir=tmp_path / "out",

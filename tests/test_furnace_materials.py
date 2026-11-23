@@ -66,7 +66,7 @@ def _load_yaml(path):
 def test_runtime_envelope_refuses_catalog_load_failure_with_cause(monkeypatch):
     load_error = OSError("catalog read failed")
 
-    def fail_load():
+    def fail_load(path=None):
         raise load_error
 
     monkeypatch.setattr(furnace_materials, "load_furnace_materials", fail_load)
@@ -83,7 +83,7 @@ def test_runtime_envelope_refuses_catalog_without_enabled_service_rating(
     monkeypatch.setattr(
         furnace_materials,
         "load_furnace_materials",
-        lambda: {
+        lambda path=None: {
             "disabled_material": {
                 "enabled": False,
                 "max_service_T_C": 2200,

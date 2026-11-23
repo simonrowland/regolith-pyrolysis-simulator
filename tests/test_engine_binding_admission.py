@@ -243,10 +243,10 @@ def test_install_provenance_distinguishes_selected_digest_from_optional_metadata
     ).resolve()
     original_is_file = Path.is_file
 
-    def missing_optional_catalog(path: Path) -> bool:
+    def missing_optional_catalog(path: Path, *, follow_symlinks=True) -> bool:
         if path.resolve() == species_catalog:
             return False
-        return original_is_file(path)
+        return original_is_file(path, follow_symlinks=follow_symlinks)
 
     monkeypatch.setattr(Path, "is_file", missing_optional_catalog)
     provenance = install_provenance(identity, runtime_backend=backend)
@@ -651,7 +651,7 @@ def test_cached_real_admission_lifecycle_clears_and_publishes_after_init(
         def get_engine_version(self):
             return "synthetic-fake test"
 
-    def authorize(identity, _provenance):
+    def authorize(identity, _provenance, *, receipt_path=None):
         if not authorized:
             raise EngineBindingAdmissionError(identity, "receipt stale")
         return {"status": "admitted"}
@@ -747,7 +747,7 @@ def test_direct_live_constructor_does_not_admit_mismatched_backend(
     monkeypatch.setattr(
         admission,
         "authorize_binding",
-        lambda identity, _provenance: {
+        lambda identity, _provenance, *, receipt_path=None: {
             "status": "admitted",
             "identity": identity.as_dict(),
         },
@@ -793,7 +793,7 @@ def _run_fake_alpha_python_api_probe(
         _mode=actual_mode,
     )
 
-    def resolve_backend(name, _policy, *, backend_config):
+    def resolve_backend(name, _policy, *, backend_config, **_kwargs):
         requested["name"] = name
         requested["backend_config"] = backend_config
         return actual_backend
@@ -815,7 +815,7 @@ def _run_fake_alpha_python_api_probe(
     monkeypatch.setattr(
         config,
         "load_config_bundle",
-        lambda: SimpleNamespace(
+        lambda data_dir=None, **_kwargs: SimpleNamespace(
             setpoints={},
             feedstocks={},
             vapor_pressures={},
@@ -940,7 +940,7 @@ def test_magemin_binding_probe_forwards_redox_state_to_request(
             )
 
     class FakeMAGEMinProvider(RecordingProvider):
-        def __init__(self):
+        def __init__(self = None, *args, **kwargs):
             self._backend = object()
 
     monkeypatch.setattr(backends, 'resolve_backend', lambda *_a, **_k: object())
@@ -948,7 +948,7 @@ def test_magemin_binding_probe_forwards_redox_state_to_request(
     monkeypatch.setattr(
         config,
         'load_config_bundle',
-        lambda: SimpleNamespace(
+        lambda data_dir=None, **_kwargs: SimpleNamespace(
             setpoints={}, feedstocks={}, vapor_pressures={}
         ),
     )
@@ -976,7 +976,7 @@ def test_direct_replay_only_constructor_uses_receipt_authorizer(
 ) -> None:
     calls = []
 
-    def authorize(identity, provenance):
+    def authorize(identity, provenance, *, receipt_path=None):
         calls.append((identity, provenance))
         return {"status": "admitted"}
 
@@ -1018,7 +1018,7 @@ def test_cached_replay_error_is_raised_from_a_fresh_copy(
         lambda _config, _backend: {"binding_provenance_verifiable": True},
     )
 
-    def refuse(identity, _provenance):
+    def refuse(identity, _provenance, *, receipt_path=None):
         raise EngineBindingAdmissionError(identity, "receipt missing")
 
     monkeypatch.setattr(admission, "authorize_binding", refuse)
@@ -1317,7 +1317,7 @@ def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
     monkeypatch.setattr(
         admission,
         "selected_binding_provenance",
-        lambda _identity, _sim: provenance,
+        lambda _identity, _sim, backend=None: provenance,
     )
     sim = SimpleNamespace()
 

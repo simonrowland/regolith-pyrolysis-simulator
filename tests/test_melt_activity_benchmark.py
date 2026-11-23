@@ -2626,14 +2626,7 @@ def test_benchmark_init_ood_smoke_is_not_absence(monkeypatch):
     class FakeThermoEngineTransport:
         engine_version = "thermoengine fake"
 
-        def __init__(
-            self,
-            *,
-            model_name,
-            activity_converter,
-            equilibrate_timeout_s,
-            health_timeout_s=None,
-        ):
+        def __init__(self, *args, model_name=None, activity_converter=None, equilibrate_timeout_s=None, health_timeout_s=None, **kwargs):
             del model_name, activity_converter, equilibrate_timeout_s
             del health_timeout_s
             self.close_calls = 0
@@ -2690,14 +2683,7 @@ def test_benchmark_init_worker_timeout_is_not_absence(monkeypatch):
     class FakeThermoEngineTransport:
         engine_version = "thermoengine fake"
 
-        def __init__(
-            self,
-            *,
-            model_name,
-            activity_converter,
-            equilibrate_timeout_s,
-            health_timeout_s=None,
-        ):
+        def __init__(self, *args, model_name=None, activity_converter=None, equilibrate_timeout_s=None, health_timeout_s=None, **kwargs):
             del model_name, activity_converter, equilibrate_timeout_s
             del health_timeout_s
 

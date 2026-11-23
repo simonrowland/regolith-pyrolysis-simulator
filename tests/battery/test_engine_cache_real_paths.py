@@ -429,7 +429,7 @@ def test_normalized_engine_defaults_match_backend_defaults(
     monkeypatch.setattr(
         environment,
         "vacuum_floor_bar_for_environment",
-        lambda: environment.DEFAULT_VACUUM_FLOOR_BAR,
+        lambda *args, **kwargs: environment.DEFAULT_VACUUM_FLOOR_BAR,
     )
     normalized = {
         engine: normalize_engine_settings(engine, None)
@@ -608,7 +608,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     monkeypatch.setattr(
         environment,
         "vacuum_floor_bar_for_environment",
-        lambda: environment.DEFAULT_VACUUM_FLOOR_BAR,
+        lambda *args, **kwargs: environment.DEFAULT_VACUUM_FLOOR_BAR,
     )
     monkeypatch.setattr(
         "simulator.engine_local_config.find_alphamelts_binary",
@@ -1148,9 +1148,7 @@ def test_engine_opener_and_cache_share_canonical_settings_projection(
     captured_configs: list[dict[str, Any]] = []
     launched_modes: list[str] = []
 
-    def fake_resolve_backend(
-        _name: str, _policy: Any, *, backend_config: dict[str, Any]
-    ) -> Any:
+    def fake_resolve_backend(_name: str = None, _policy: Any = None, *args, backend_config: dict[str, Any] = None, **kwargs) -> Any:
         captured_configs.append(dict(backend_config))
         backend = AlphaMELTSBackend(model_name=backend_config["model"])
         backend._mode = "subprocess"
@@ -1256,12 +1254,7 @@ def test_default_alphamelts_open_uses_resolved_mode_without_parent_environment(
 
     captured: dict[str, Any] = {}
 
-    def fake_resolve_backend(
-        _name: str,
-        _policy: Any,
-        *,
-        backend_config: dict[str, Any] | None = None,
-    ) -> Any:
+    def fake_resolve_backend(_name: str = None, _policy: Any = None, *args, backend_config: dict[str, Any] | None = None, **kwargs) -> Any:
         captured.update(backend_config or {})
         return SimpleNamespace()
 
@@ -1898,7 +1891,7 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             monkeypatch.setattr(
                 openimcc_bridge,
                 "_evaluate_uncached",
-                lambda **_kwargs: recorded_openimcc_result,
+                lambda *args, **_kwargs: recorded_openimcc_result,
             )
             backend = object.__new__(_OpenImccBatteryBackend)
             backend.engine_name = engine.value
@@ -2382,7 +2375,7 @@ def test_openimcc_slow_solve_still_hits_the_hard_timeout(
     solve_finished = threading.Event()
     original_solve = openimcc_bridge._evaluate_uncached
 
-    def slow_solve(**kwargs: Any) -> Any:
+    def slow_solve(*args, **kwargs: Any) -> Any:
         try:
             time.sleep(0.1)
             return original_solve(**kwargs)
@@ -2440,7 +2433,7 @@ def test_isolated_backend_reconstruction_disables_nested_pools(
 
     monkeypatch.setattr(backends, "_try_backend", try_backend)
 
-    def resolve_backend(name: str, _policy: Any, *, backend_config: dict[str, Any]):
+    def resolve_backend(name: str = None, _policy: Any = None, *args, backend_config: dict[str, Any] = None, **kwargs):
         configs[name] = dict(backend_config)
         return SimpleNamespace()
 

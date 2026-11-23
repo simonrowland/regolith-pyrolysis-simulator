@@ -303,7 +303,7 @@ def test_sso2_report_exit_code_matches_evidence_status(
     monkeypatch.setattr(
         sso2_owner_recipe_report,
         "sso2_owner_recipe_evidence",
-        lambda _execution: evidence,
+        lambda _execution, *, constraints=None: evidence,
     )
     monkeypatch.setattr(
         sso2_owner_recipe_report,

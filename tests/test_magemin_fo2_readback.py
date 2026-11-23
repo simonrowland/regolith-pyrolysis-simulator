@@ -106,7 +106,7 @@ def test_fe_free_native_fo2_is_indeterminate_and_successful(monkeypatch):
     )
     native_readback = 12.25
 
-    def run(_args, *, cwd, **kwargs):
+    def run(_args = None, *args, cwd = None, **kwargs):
         output = Path(cwd) / 'output'
         output.mkdir(exist_ok=True)
         (output / '_matlab_output.txt').write_text(
@@ -159,7 +159,7 @@ def test_fe_bearing_native_fo2_control_failure_remains_not_converged(
     )
     native_readback = 12.25
 
-    def run(_args, *, cwd, **kwargs):
+    def run(_args = None, *args, cwd = None, **kwargs):
         output = Path(cwd) / 'output'
         output.mkdir(exist_ok=True)
         (output / '_matlab_output.txt').write_text(
@@ -194,7 +194,7 @@ def test_subprocess_readback_cannot_self_confirm(monkeypatch, native):
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
 
-    def run(_args, *, cwd, **kwargs):
+    def run(_args = None, *args, cwd = None, **kwargs):
         output = Path(cwd) / 'output'
         output.mkdir(exist_ok=True)
         (output / '_matlab_output.txt').write_text(
@@ -291,7 +291,7 @@ def test_corrective_resolve_shares_budget_and_requires_fresh_output(
     clock = [0.0]
     timeouts = []
 
-    def run(_args, *, cwd, timeout, **kwargs):
+    def run(_args = None, *args, cwd = None, timeout = None, **kwargs):
         timeouts.append(timeout)
         clock[0] += 0.4
         output = Path(cwd) / 'output'
@@ -341,7 +341,7 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     register_synthetic_gate_curve_producer(sim)
     if native is not None:
-        def run(_args, *, cwd, **kwargs):
+        def run(_args = None, *args, cwd = None, **kwargs):
             output = Path(cwd) / 'output'
             output.mkdir(exist_ok=True)
             (output / '_matlab_output.txt').write_text(f'log10(fO2) {native}\n')

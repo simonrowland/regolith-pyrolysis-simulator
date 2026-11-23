@@ -1081,7 +1081,7 @@ def _enforce_finite_cold_train(monkeypatch):
     )
     monkeypatch.setattr(
         "simulator.thermal_train.thermal_train_parameters_from_mapping",
-        lambda: enforced,
+        lambda payload=None: enforced,
     )
     return enforced
 

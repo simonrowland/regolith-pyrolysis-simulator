@@ -231,7 +231,7 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
 def test_measure_all_selects_fastest_independent_stage_process(monkeypatch) -> None:
     calls_by_stage = {stage: 0 for stage in STAGE_NAMES}
 
-    def fake_run(command, **_kwargs):
+    def fake_run(command = None, *extra_args, **_kwargs):
         stage = command[-1]
         calls_by_stage[stage] += 1
         return subprocess.CompletedProcess(

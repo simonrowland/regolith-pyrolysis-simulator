@@ -51,7 +51,7 @@ def _hashimoto_prediction_tuple_digest(predictions) -> str:
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
 
 
-def _hanging_openimcc_engine(**_kwargs):
+def _hanging_openimcc_engine(*args, **_kwargs):
     import threading
 
     threading.Event().wait(30)
@@ -382,17 +382,7 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
 
     # Keep the 24-vector provenance/arm mapping test fast; real refined physics
     # for one vector is covered by the activity-refresh test below.
-    def integrate_at_steps(
-        inventory,
-        _channels,
-        _pressure_model,
-        *,
-        temperature_K,
-        duration_s,
-        steps,
-        geometry_policy_id,
-        initial_area_m2,
-    ):
+    def integrate_at_steps(inventory = None, _channels = None, _pressure_model = None, *args, temperature_K = None, duration_s = None, steps = None, geometry_policy_id = None, initial_area_m2 = None, **kwargs):
         values = residue._hashimoto_project_oxide_wt_pct(inventory)
         shift = 0.8 / steps
         values["FeO"] += shift
@@ -747,7 +737,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
     original_evaluate = openimcc_bridge._evaluate_uncached
 
-    def track_activities(*, composition_mol, **kwargs):
+    def track_activities(*args, composition_mol = None, **kwargs):
         activity_compositions.append(tuple(sorted(composition_mol.items())))
         return original_evaluate(composition_mol=composition_mol, **kwargs)
 
@@ -791,17 +781,7 @@ def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
     import copy
     import simulator.battery.residue as residue
 
-    def never_converges(
-        inventory,
-        _channels,
-        _pressure_model,
-        *,
-        temperature_K,
-        duration_s,
-        steps,
-        geometry_policy_id,
-        initial_area_m2,
-    ):
+    def never_converges(inventory = None, _channels = None, _pressure_model = None, *args, temperature_K = None, duration_s = None, steps = None, geometry_policy_id = None, initial_area_m2 = None, **kwargs):
         values = residue._hashimoto_project_oxide_wt_pct(inventory)
         shift = steps / 1000.0
         values["FeO"] += shift
@@ -863,15 +843,7 @@ def test_hashimoto_engine_refusal_flags_one_run_and_keeps_cohort_moving(
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     failures_remaining = 6
 
-    def pressure_step(
-        inventory,
-        _channels,
-        _pressure_model,
-        *,
-        temperature_K,
-        duration_s,
-        area_evolution_m2,
-    ):
+    def pressure_step(inventory = None, _channels = None, _pressure_model = None, *args, temperature_K = None, duration_s = None, area_evolution_m2 = None, **kwargs):
         nonlocal failures_remaining
         if failures_remaining:
             failures_remaining -= 1
@@ -963,17 +935,7 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
         openimcc_bridge, "_evaluate_uncached", _hanging_openimcc_engine
     )
 
-    def integrate_with_engine_call(
-        inventory,
-        _channels,
-        pressure_model,
-        *,
-        temperature_K,
-        duration_s,
-        steps,
-        geometry_policy_id,
-        initial_area_m2,
-    ):
+    def integrate_with_engine_call(inventory = None, _channels = None, pressure_model = None, *args, temperature_K = None, duration_s = None, steps = None, geometry_policy_id = None, initial_area_m2 = None, **kwargs):
         try:
             pressure_model(inventory, -9.0)
         except residue.ResidueEngineNonconvergence as exc:

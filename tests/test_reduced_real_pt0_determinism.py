@@ -159,7 +159,7 @@ def _select_synthetic_gate_curve_binding(
     monkeypatch.setattr(
         admission,
         "selected_binding_provenance",
-        lambda _identity, _sim: provenance,
+        lambda _identity, _sim, backend=None: provenance,
     )
 
 

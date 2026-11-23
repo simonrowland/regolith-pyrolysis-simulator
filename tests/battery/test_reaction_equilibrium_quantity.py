@@ -390,7 +390,7 @@ def test_bench_readiness_report_handles_species_free_reaction(
     monkeypatch.setattr(
         readiness,
         "load_migrated_store",
-        lambda _root: (result.works, result.experiments, result.observations),
+        lambda root=None, *, sources=None: (result.works, result.experiments, result.observations),
     )
     monkeypatch.setattr(readiness, "load_migrated_benches", lambda _root: result.benches)
 

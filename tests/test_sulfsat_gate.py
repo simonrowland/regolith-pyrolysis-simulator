@@ -244,7 +244,7 @@ def test_import_helper_key_error_propagates(monkeypatch):
     monkeypatch.setattr(
         sulfsat_module.importlib,
         'import_module',
-        lambda _name: (_ for _ in ()).throw(KeyError('local import helper')),
+        lambda _name, package=None: (_ for _ in ()).throw(KeyError('local import helper')),
     )
     with pytest.raises(KeyError, match='local import helper'):
         SulfSatGate().initialize()
@@ -254,7 +254,7 @@ def test_pysulfsat_import_initialization_error_is_unavailable(monkeypatch):
     monkeypatch.setattr(
         sulfsat_module.importlib,
         'import_module',
-        lambda _name: (_ for _ in ()).throw(RuntimeError('broken package init')),
+        lambda _name, package=None: (_ for _ in ()).throw(RuntimeError('broken package init')),
     )
     gate = SulfSatGate()
     assert gate.initialize() is False

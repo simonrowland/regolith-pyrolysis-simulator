@@ -4051,7 +4051,7 @@ def test_compile_resolves_default_manifest_once(monkeypatch: pytest.MonkeyPatch)
     emitted_manifests: list[dict] = []
     real_emit_request_rules = request_module.emit_request_rules
 
-    def stateful_loader() -> dict:
+    def stateful_loader(*args, **kwargs) -> dict:
         nonlocal calls
         calls += 1
         return manifest_a if calls == 1 else manifest_b

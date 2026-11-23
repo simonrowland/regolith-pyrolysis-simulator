@@ -154,7 +154,7 @@ def test_openimcc_battery_passes_moles_and_preserves_genuine_wt_input(monkeypatc
     original_evaluate = openimcc_bridge.evaluate
     observed: list[dict[str, object]] = []
 
-    def capture(**kwargs):
+    def capture(*args, **kwargs):
         observed.append(dict(kwargs))
         return original_evaluate(**kwargs)
 
@@ -2352,7 +2352,7 @@ def test_openimcc_pack_domain_flags_even_without_active_complex(
     package_results = []
     evaluate = openimcc_bridge.evaluate
 
-    def capture_result(**kwargs):
+    def capture_result(*args, **kwargs):
         result = evaluate(**kwargs)
         package_results.append(result)
         return result
@@ -2396,7 +2396,7 @@ def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
     bridge_calls = []
     package_bridge_evaluate = openimcc_bridge.evaluate
 
-    def capture_bridge_call(**kwargs):
+    def capture_bridge_call(*args, **kwargs):
         bridge_calls.append(dict(kwargs))
         return package_bridge_evaluate(**kwargs)
 
@@ -2524,7 +2524,7 @@ def test_openimcc_empty_package_notices_keep_score_store_temperature_flag(
     floor, ceiling = _openimcc_pack_temperature_band()
     evaluate = openimcc_bridge.evaluate
 
-    def evaluate_without_notices(**kwargs):
+    def evaluate_without_notices(*args, **kwargs):
         result = evaluate(**kwargs)
         return replace(
             result,
@@ -2563,7 +2563,7 @@ def test_openimcc_temperature_reason_keeps_package_notice_separate(monkeypatch) 
     package_notice = "openimcc:typed-below-domain-notice:preserve-this-text"
     evaluate = openimcc_bridge.evaluate
 
-    def evaluate_with_package_notice(**kwargs):
+    def evaluate_with_package_notice(*args, **kwargs):
         result = evaluate(**kwargs)
         return replace(
             result,
@@ -3108,7 +3108,7 @@ def test_openimcc_battery_fe2o3_fold_conserves_iron_moles(monkeypatch) -> None:
     original_evaluate = openimcc_bridge.evaluate
     observed: list[dict[str, object]] = []
 
-    def capture(**kwargs):
+    def capture(*args, **kwargs):
         observed.append(dict(kwargs))
         return original_evaluate(**kwargs)
 
@@ -3169,7 +3169,7 @@ def test_openimcc_battery_without_fe2o3_is_bit_identical(monkeypatch) -> None:
     original_evaluate = openimcc_bridge.evaluate
     observed: list[dict[str, object]] = []
 
-    def capture(**kwargs):
+    def capture(*args, **kwargs):
         observed.append(dict(kwargs))
         return original_evaluate(**kwargs)
 

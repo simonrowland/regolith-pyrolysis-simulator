@@ -115,7 +115,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     original_melt_evaluate = openimcc_bridge._evaluate_uncached
     original_gas_evaluate = openimcc.evaluate_gas
 
-    def capture_melt_evaluate(**kwargs):
+    def capture_melt_evaluate(*args, **kwargs):
         evaluated_compositions.append(dict(kwargs["composition_mol"]))
         return original_melt_evaluate(**kwargs)
 
@@ -187,7 +187,7 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     original_channels = battery._openimcc_gas_channels_and_omission_notices
     selected: list[str] = []
 
-    def ti_channels(parents, gas_pack):
+    def ti_channels(parents = None, gas_pack = None, *args, **kwargs):
         channels, omissions = original_channels(parents, gas_pack)
         result = [row for row in channels if str(row[1][0]) == "TiO2"]
         assert result

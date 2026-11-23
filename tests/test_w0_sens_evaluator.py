@@ -548,7 +548,7 @@ def test_patched_transport_loads_library_from_build_prefix(tmp_path, monkeypatch
     monkeypatch.setattr(
         engine_local_config.ctypes,
         "CDLL",
-        lambda path: loaded_paths.append(str(path)),
+        lambda name, mode=4, handle=None, use_errno=False, use_last_error=False, winmode=None: loaded_paths.append(str(name)),
     )
     monkeypatch.setattr(
         worker.ctypes.util,

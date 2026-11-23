@@ -399,7 +399,7 @@ def test_cold_single_request_refuses_before_evaluator_or_result_file(
     monkeypatch.setattr(
         pool.tempfile,
         "mkdtemp",
-        lambda **_kwargs: pytest.fail("proprietary profile created an output root"),
+        lambda *args, **_kwargs: pytest.fail("proprietary profile created an output root"),
     )
     with pytest.raises(ProprietaryEngineRefusal):
         pool.evaluate_request_supervised(

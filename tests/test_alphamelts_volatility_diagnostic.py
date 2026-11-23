@@ -208,7 +208,7 @@ def test_default_activity_source_uses_explicit_reference_pressure(monkeypatch):
 
     monkeypatch.setattr(AlphaMELTSBackend, "initialize", fake_initialize)
 
-    def fake_equilibrate(self, **kwargs):
+    def fake_equilibrate(self = None, *args, **kwargs):
         del self
         seen.update(kwargs)
         return SimpleNamespace(diagnostics={})

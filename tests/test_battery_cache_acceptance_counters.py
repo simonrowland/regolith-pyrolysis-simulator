@@ -23,7 +23,7 @@ def _install_fake_slice(
         encoding="utf-8",
     )
     monkeypatch.setenv("TMPDIR", str(tmp_path))
-    monkeypatch.setattr(gate, "load_score_context", lambda _root: object())
+    monkeypatch.setattr(gate, "load_score_context", lambda root=None, *, sources=None: object())
 
     def run_slice(_context: object, output_path: Path, **_kwargs: Any):
         run_name = output_path.stem

@@ -80,17 +80,7 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     integrated_conditions: list[tuple[float, float]] = []
 
-    def integrate_at_steps(
-        inventory,
-        _channels,
-        _pressure_model,
-        *,
-        temperature_K,
-        duration_s,
-        steps,
-        geometry_policy_id,
-        initial_area_m2,
-    ):
+    def integrate_at_steps(inventory = None, _channels = None, _pressure_model = None, *args, temperature_K = None, duration_s = None, steps = None, geometry_policy_id = None, initial_area_m2 = None, **kwargs):
         integrated_conditions.append((temperature_K, duration_s))
         values = residue._hashimoto_project_oxide_wt_pct(inventory)
         shift = 0.8 / steps

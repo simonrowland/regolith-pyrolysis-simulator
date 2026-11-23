@@ -776,7 +776,7 @@ def test_score_cli_publishes_partial_crash_run_with_success_exit(
         ],
         check=True,
     )
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
 
     def write_empty_comparisons(_context, path, **_kwargs):

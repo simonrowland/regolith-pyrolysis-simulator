@@ -100,7 +100,7 @@ TIER_VALIDATIONS = {"T2": "vaporock", "T3": "mass_spec", "T4": "ratio"}
 
 def _yaml(path: Path) -> dict[str, Any]:
     payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    assert isinstance(payload, dict), f"{path}: expected a YAML mapping"
+    assert isinstance(payload, dict), f"{path}: YAML content must be a mapping"
     return payload
 
 
@@ -236,11 +236,11 @@ GAP_BY_KEY = {
 DISCOVERY_GAPS = tuple(
     row for row in GAPS["entries"] if row["carrier"] == UNRESOLVED_CARRIER
 )
-STRUCTURAL_BY_KEY = {
-    key: species_id
-    for key, row in DEMAND_BY_KEY.items()
-    if (species_id := _ready_catalog_species(row)) is not None
-}
+STRUCTURAL_BY_KEY = {}
+for key, row in DEMAND_BY_KEY.items():
+    structural_species_id = _ready_catalog_species(row)
+    if structural_species_id is not None:
+        STRUCTURAL_BY_KEY[key] = structural_species_id
 LIVE_BY_KEY = {
     key: species_id
     for key, species_id in STRUCTURAL_BY_KEY.items()
@@ -251,11 +251,11 @@ LIVE_BY_KEY = {
     ].vaporisation_coefficients.evaporation_alpha.get("status")
     != "diagnostic_upper_bound"
 }
-STATUS_ONLY_BY_KEY = {
-    key: species_id
-    for key, row in DEMAND_BY_KEY.items()
-    if (species_id := _status_only_catalog_species(row)) is not None
-}
+STATUS_ONLY_BY_KEY = {}
+for key, row in DEMAND_BY_KEY.items():
+    status_only_species_id = _status_only_catalog_species(row)
+    if status_only_species_id is not None:
+        STATUS_ONLY_BY_KEY[key] = status_only_species_id
 STRUCTURAL_PAIRS = tuple(sorted(STRUCTURAL_BY_KEY))
 STRUCTURAL_SPECIES = tuple(sorted(set(STRUCTURAL_BY_KEY.values())))
 LIVE_PAIRS = tuple(sorted(LIVE_BY_KEY))
@@ -643,7 +643,7 @@ def test_demand_manifest_freshness_does_not_probe_git(
 ) -> None:
     commands = []
 
-    def run(command, **kwargs):
+    def run(command=None, *extra_args, **kwargs):
         commands.append(command)
         assert Path(command[1]).name == "generate_rail_demand_manifest.py"
         assert command[2:4] == ["--check", "--output"]

@@ -1299,7 +1299,7 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
     params = thermal_train_parameters_from_mapping(payload)
     monkeypatch.setattr(
         "simulator.thermal_train.thermal_train_parameters_from_mapping",
-        lambda: params,
+        lambda payload=None: params,
     )
     enforced = _real_capacity_sim()
     enforced.start_campaign(CampaignPhase.C0)
@@ -1438,7 +1438,7 @@ def test_explicit_runtime_enforcement_uses_configured_finite_capacity(monkeypatc
     params = thermal_train_parameters_from_mapping(payload)
     monkeypatch.setattr(
         "simulator.thermal_train.thermal_train_parameters_from_mapping",
-        lambda: params,
+        lambda payload=None: params,
     )
     sim = _real_capacity_sim()
 

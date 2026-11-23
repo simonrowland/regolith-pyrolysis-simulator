@@ -1858,7 +1858,7 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
     }
     init_calls = []
 
-    def fake_find_spec(name: str) -> object | None:
+    def fake_find_spec(name: str = None, *args, **kwargs) -> object | None:
         if name in {"vaporock", "thermoengine"}:
             return object()
         return None

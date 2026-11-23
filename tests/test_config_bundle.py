@@ -578,7 +578,13 @@ def test_yaml_cache_walk_oserror_does_not_interrupt_parse(
     )
     walk_attempted = False
 
-    def fail_directory_walk(_root: Path, _pattern: str):
+    def fail_directory_walk(
+        _root: Path,
+        _pattern: str,
+        *,
+        case_sensitive=None,
+        recurse_symlinks=False,
+    ):
         nonlocal walk_attempted
         walk_attempted = True
         raise OSError("directory unavailable")

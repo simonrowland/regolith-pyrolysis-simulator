@@ -244,7 +244,7 @@ def test_header_and_terminal_key_contract_omits_unavailable_optional_fields(
 ) -> None:
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
-        lambda backend: None,
+        lambda backend, *, required=False: None,
     )
     payload = _runner_payload()
     artifact = build_run_artifact(payload, run_id="run-minimum", name="Minimum")
@@ -300,7 +300,7 @@ def test_absent_terminal_payload_sections_are_omitted_but_empty_sections_are_kep
 def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
-        lambda backend: f"{backend}-cache-v1",
+        lambda backend, *, required=False: f"{backend}-cache-v1",
     )
     payload = _runner_payload()
     payload["run_metadata"].update(

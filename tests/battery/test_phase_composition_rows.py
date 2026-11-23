@@ -785,15 +785,7 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
 
     calls: list[dict] = []
 
-    def hook(
-        engine,
-        *,
-        temperature_C,
-        composition_kg,
-        fO2_log,
-        pressure_bar,
-        handles=None,
-    ):
+    def hook(engine = None, *args, temperature_C = None, composition_kg = None, fO2_log = None, pressure_bar = None, handles = None, **kwargs):
         calls.append(
             {
                 "engine": engine,
@@ -1285,15 +1277,7 @@ def test_alphamelts_phase_score_surfaces_invalid_oxide_notice(
 ) -> None:
     """Kill mutation: discard_phase_oxide_projection_notices."""
 
-    def hook(
-        engine,
-        *,
-        temperature_C,
-        composition_kg,
-        fO2_log,
-        pressure_bar,
-        handles=None,
-    ):
+    def hook(engine = None, *args, temperature_C = None, composition_kg = None, fO2_log = None, pressure_bar = None, handles = None, **kwargs):
         return EquilibriumResult(
             liquid_fraction=1.0,
             phase_compositions={
@@ -1429,10 +1413,7 @@ def test_closed_phase_residual_keeps_derived_dex_decision_band(
 def test_distribution_ratio_dex_uses_both_phase_amounts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def hook(
-        engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
-        handles=None,
-    ):
+    def hook(engine = None, *args, temperature_C = None, composition_kg = None, fO2_log = None, pressure_bar = None, handles = None, **kwargs):
         return EquilibriumResult(
             liquid_fraction=1.0,
             phase_compositions={
@@ -1670,10 +1651,7 @@ def test_printed_experiment_pressure_reaches_the_scorer(
 ) -> None:
     calls: list[dict] = []
 
-    def hook(
-        engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
-        handles=None,
-    ):
+    def hook(engine = None, *args, temperature_C = None, composition_kg = None, fO2_log = None, pressure_bar = None, handles = None, **kwargs):
         calls.append(
             {
                 "engine": engine,
@@ -1810,17 +1788,7 @@ def test_capacity_scores_only_when_the_adapter_declares_the_solute(
 
     calls: list[dict] = []
 
-    def hook(
-        engine,
-        *,
-        temperature_C,
-        composition_kg,
-        fO2_log,
-        pressure_bar,
-        solute_fugacity_bar=None,
-        solute_fugacity_parameter=None,
-        handles=None,
-    ):
+    def hook(engine = None, *args, temperature_C = None, composition_kg = None, fO2_log = None, pressure_bar = None, solute_fugacity_bar = None, solute_fugacity_parameter = None, handles = None, **kwargs):
         calls.append(
             {
                 "engine": engine,
@@ -2006,16 +1974,7 @@ def test_unknown_capacity_equation_is_refused(
     monkeypatch.setattr(ThermoEngineBackend, "models_dissolved_chloride", True)
     calls: list[Engine] = []
 
-    def hook(
-        engine,
-        *,
-        temperature_C,
-        composition_kg,
-        fO2_log,
-        pressure_bar,
-        solute_fugacity_bar=None,
-        solute_fugacity_parameter=None,
-    ):
+    def hook(engine = None, *args, temperature_C = None, composition_kg = None, fO2_log = None, pressure_bar = None, solute_fugacity_bar = None, solute_fugacity_parameter = None, **kwargs):
         calls.append(engine)
         return EquilibriumResult(
             liquid_fraction=1.0,

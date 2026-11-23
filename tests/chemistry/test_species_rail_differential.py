@@ -103,7 +103,7 @@ def test_species_rail_reads_gibbs_when_formation_enthalpy_is_typed_absent(monkey
         Path(__file__).resolve().parents[2]
         / "data/literature/compilations/janaf/tables/O-038.yaml"
     )
-    monkeypatch.setattr(differential, "iter_table_paths", lambda: [Path("O-038.yaml")])
+    monkeypatch.setattr(differential, "iter_table_paths", lambda *args, **kwargs: [Path("O-038.yaml")])
     monkeypatch.setattr(differential, "load_table_document", lambda _path: document)
     points = list(
         differential.iter_janaf_keyed_points(

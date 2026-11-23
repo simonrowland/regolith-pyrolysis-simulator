@@ -61,7 +61,7 @@ def _janaf_gibbs_nodes(monkeypatch):
     monkeypatch.setattr(
         differential,
         "iter_table_paths",
-        lambda: [tables_dir / f"{table_id}.yaml" for table_id in table_ids],
+        lambda *args, **kwargs: [tables_dir / f"{table_id}.yaml" for table_id in table_ids],
     )
     rail = SimpleNamespace(in_rail=lambda formula: formula in {"Al", "Si"})
     points = differential.iter_janaf_keyed_points(rail)

@@ -195,7 +195,7 @@ def test_build_run_artifact_canonicalises_a_legacy_analytical_backend(monkeypatc
     """
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
-        lambda backend: f"{backend}-cache-v1",
+        lambda backend, *, required=False: f"{backend}-cache-v1",
     )
     payload = _runner_payload()
     payload["run_metadata"]["backend"] = "stub"
@@ -212,7 +212,7 @@ def test_build_run_artifact_canonicalises_a_legacy_analytical_backend(monkeypatc
 def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.accounting.run_artifact.cache_version_for",
-        lambda backend: f"{backend}-cache-v1",
+        lambda backend, *, required=False: f"{backend}-cache-v1",
     )
     payload = _runner_payload()
     artifact = build_run_artifact(payload, run_id="run-1", name="Lunar run")

@@ -37,7 +37,7 @@ def test_openimcc_is_retried_after_a_single_hour_refusal(monkeypatch) -> None:
     real_evaluate_cleaned_melt = openimcc_bridge_module.evaluate_cleaned_melt
     target_temperatures: list[float] = []
 
-    def refuse_first_hour(**kwargs):
+    def refuse_first_hour(*args, **kwargs):
         temperature_K = float(kwargs["temperature_K"])
         if temperature_K in (2073.15, 2080.65):
             target_temperatures.append(temperature_K)

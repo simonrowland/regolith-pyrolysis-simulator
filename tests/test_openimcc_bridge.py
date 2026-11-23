@@ -206,7 +206,7 @@ def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
     original_evaluate = bridge.evaluate
     observed = []
 
-    def capture(**kwargs):
+    def capture(*args, **kwargs):
         observed.append(kwargs)
         return original_evaluate(**kwargs)
 
@@ -244,7 +244,7 @@ def test_cleaned_melt_wt_pct_describes_the_openimcc_mole_input(
     original_evaluate = bridge.evaluate
     observed = []
 
-    def capture(**kwargs):
+    def capture(*args, **kwargs):
         observed.append(kwargs["composition_mol"])
         return original_evaluate(**kwargs)
 
@@ -299,7 +299,7 @@ def test_cleaned_melt_preserves_feo_equivalent_moles(
     original_evaluate = bridge.evaluate
     observed = []
 
-    def capture(**kwargs):
+    def capture(*args, **kwargs):
         observed.append(kwargs)
         return original_evaluate(**kwargs)
 
@@ -319,7 +319,7 @@ def test_cleaned_melt_refuses_missing_present_parent_activity(
     monkeypatch.setattr(
         bridge,
         "evaluate",
-        lambda **kwargs: OpenImccBridgeResult(
+        lambda *args, **kwargs: OpenImccBridgeResult(
             parent_oxide_activities={"SiO2": 1.0},
             parent_oxides=("SiO2",),
             flags=(),
@@ -358,7 +358,7 @@ def test_cleaned_melt_refuses_invalid_present_parent_activity(
     monkeypatch.setattr(
         bridge,
         "evaluate",
-        lambda **kwargs: OpenImccBridgeResult(
+        lambda *args, **kwargs: OpenImccBridgeResult(
             parent_oxide_activities=activities,
             parent_oxides=OPENIMCC_PARENT_OXIDES,
             flags=(),
@@ -650,7 +650,7 @@ def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
     monkeypatch.setattr(
         openimcc_bridge,
         'resolve_species_formula',
-        lambda _name: (_ for _ in ()).throw(KeyError('formula registry bug')),
+        lambda _name, registry=None: (_ for _ in ()).throw(KeyError('formula registry bug')),
     )
     with pytest.raises(KeyError, match='formula registry bug'):
         _cleaned_melt_projection({'SiO2': 1.0})
@@ -663,7 +663,7 @@ def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypa
     monkeypatch.setattr(
         openimcc_bridge,
         'resolve_species_formula',
-        lambda _name: (_ for _ in ()).throw(UnknownSpeciesError('unknown test oxide')),
+        lambda _name, registry=None: (_ for _ in ()).throw(UnknownSpeciesError('unknown test oxide')),
     )
     with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
         _cleaned_melt_projection({'BadOxide': 1.0})
@@ -1235,7 +1235,7 @@ def test_imported_openimcc_commit_requires_tracked_source_in_enclosing_repo(
     def no_distribution(_name):
         raise PackageNotFoundError("openimcc")
 
-    def git(args, **_kwargs):
+    def git(args=None, *extra_args, **_kwargs):
         if args[3] == "ls-files":
             raise CalledProcessError(1, args)
         return SimpleNamespace(stdout="f" * 40 + "\n")
@@ -1266,7 +1266,7 @@ def test_imported_openimcc_commit_rejects_untracked_wheel_in_project_venv(
     def no_distribution(_name):
         raise PackageNotFoundError("openimcc")
 
-    def git(args, **_kwargs):
+    def git(args=None, *extra_args, **_kwargs):
         return SimpleNamespace(stdout="f" * 40 + "\n")
 
     monkeypatch.setattr(
@@ -1311,7 +1311,7 @@ def test_imported_openimcc_commit_ignores_shadowed_distribution(monkeypatch, tmp
     monkeypatch.setattr(
         openimcc_bridge.subprocess,
         "run",
-        lambda args, **_kwargs: SimpleNamespace(stdout=f"{checkout_commit}\n"),
+        lambda args=None, *extra_args, **_kwargs: SimpleNamespace(stdout=f"{checkout_commit}\n"),
     )
 
     assert imported_openimcc_commit() == checkout_commit
@@ -1402,7 +1402,7 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     monkeypatch.setattr(
         openimcc_bridge,
         "_evaluate_uncached",
-        lambda **_kwargs: SimpleNamespace(to_hot=lambda: {"ok": True}),
+        lambda *args, **_kwargs: SimpleNamespace(to_hot=lambda: {"ok": True}),
     )
     monkeypatch.setattr(
         OpenImccBridgeResult,

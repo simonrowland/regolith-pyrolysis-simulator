@@ -266,7 +266,7 @@ def test_filtered_cli_keeps_published_artifacts_and_labels_subset(
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     monkeypatch.setattr(
         battery_score, "emit_store_stamp_mismatch_warning", lambda *_args: None
     )
@@ -372,7 +372,7 @@ def test_unfiltered_cli_preserves_summary_bytes_and_completion_line(
     ).encode("utf-8")
     monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
-    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda root=None, *, sources=None: context)
     monkeypatch.setattr(
         battery_score, "emit_store_stamp_mismatch_warning", lambda *_args: None
     )
@@ -454,14 +454,7 @@ def test_compilation_comparison_writer_filters_observations(
         visited.append(observation.observation_id)
         return ()
 
-    def nasa9_comparisons(
-        _context,
-        *,
-        engines,
-        invoke_pure_phase,
-        observation_filter=None,
-        _source_cells=None,
-    ):
+    def nasa9_comparisons(_context = None, *args, engines = None, invoke_pure_phase = None, observation_filter = None, _source_cells = None, **kwargs):
         assert engines == ()
         assert invoke_pure_phase is False
         assert _source_cells == {}

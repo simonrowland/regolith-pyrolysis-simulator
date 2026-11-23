@@ -171,7 +171,9 @@ def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeyp
     monkeypatch.setattr(
         extract_merge,
         "load_extracts",
-        lambda _directory: [{"source_id": "legacy-table", "species": "K"}],
+        lambda _directory, *, require_valid=True, artifact_root=None: [
+            {"source_id": "legacy-table", "species": "K"}
+        ],
     )
     assert load_adopted_observations() == []
 
@@ -436,7 +438,11 @@ def test_refused_markers_never_score(monkeypatch, markers, nested) -> None:
     (values if nested else row).update(markers)
     doc = {"source_id": "kems-fixture", "review_status": "reviewed",
            "species": {"Fe": {"observations": [row]}}}
-    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
+    monkeypatch.setattr(
+        extract_merge,
+        "load_extracts",
+        lambda directory, *, require_valid=True, artifact_root=None: [doc],
+    )
     obs, = load_adopted_observations()
     ev = evaluate_observation(obs)
     assert ev.skip_reason.startswith("typed-refusal:")
@@ -469,7 +475,11 @@ def test_supersession_adopts_only_terminal_identity(monkeypatch, length, split, 
     if cross_species:
         doc["species"]["Mg"] = {"observations": [r for r in rows if r["observation_id"] in terminal_ids]}
         doc["species"]["Fe"]["observations"] = [r for r in rows if r["observation_id"] not in terminal_ids]
-    monkeypatch.setattr(extract_merge, "load_extracts", lambda directory: [doc])
+    monkeypatch.setattr(
+        extract_merge,
+        "load_extracts",
+        lambda directory, *, require_valid=True, artifact_root=None: [doc],
+    )
     observations = load_adopted_observations()
     assert [o.observation_id for o in observations if o.adoption_basis != "superseded"] == terminal_ids
     assert next(o for o in observations if o.observation_id == "row-1").admission_metadata["supersedes"] == "row-0"
@@ -2403,7 +2413,11 @@ def test_pilot_rows_remain_context_and_are_not_scored(
     extract_reproduction._ensure_tools_path()
     import extract_merge
 
-    monkeypatch.setattr(extract_merge, "load_extracts", lambda _directory: [document])
+    monkeypatch.setattr(
+        extract_merge,
+        "load_extracts",
+        lambda _directory, *, require_valid=True, artifact_root=None: [document],
+    )
     adopted_observations = load_adopted_observations()
     battery_evaluations = evaluate_all(
         observations=adopted_observations,

@@ -547,7 +547,7 @@ def test_vapour_channel_switch_move_does_not_move_vaporock_band(monkeypatch) -> 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) -> None:
-    def refuse(**_kwargs):
+    def refuse(*_args, **_kwargs):
         raise openimcc_bridge_module.OpenImccUnavailableError()
 
     monkeypatch.setattr(openimcc_bridge_module, "evaluate_cleaned_melt", refuse)
@@ -622,7 +622,7 @@ def test_h133_nonconvergence_uses_temperature_neighbors_without_activity_seam(
     refused_targets = []
     solved_anchor_calls = []
 
-    def refuse_h133_targets(**kwargs):
+    def refuse_h133_targets(*args, **kwargs):
         temperature_K = float(kwargs["temperature_K"])
         if math.isclose(temperature_K, _H133_T_K, abs_tol=1e-9):
             refused_targets.append(temperature_K)
@@ -688,7 +688,7 @@ def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
     evaluate = openimcc_bridge_module.evaluate
     refused_temperatures = []
 
-    def refuse_targets(**kwargs):
+    def refuse_targets(*args, **kwargs):
         temperature_K = kwargs["temperature_K"]
         if temperature_K in target_temperatures:
             refused_temperatures.append(temperature_K)
@@ -824,7 +824,7 @@ def test_one_sided_25k_hold_stays_within_measured_call62_bound(monkeypatch) -> N
     allowed_anchor_T = target_T + 25.0
     evaluate = openimcc_bridge_module.evaluate
 
-    def solve_only_one_side(**kwargs):
+    def solve_only_one_side(*args, **kwargs):
         temperature_K = float(kwargs["temperature_K"])
         if math.isclose(temperature_K, target_T, abs_tol=1e-9):
             raise ImccNonconvergenceError("forced call-62 target refusal", {})
@@ -893,7 +893,7 @@ def test_temperature_neighbor_probe_selection_and_notice_follow_schedule(
     solver_temperatures_K = []
     successful_temperatures_K = []
 
-    def solve_only_available_temperature(**kwargs):
+    def solve_only_available_temperature(*args, **kwargs):
         temperature_K = float(kwargs["temperature_K"])
         solver_temperatures_K.append(temperature_K)
         if math.isclose(
@@ -1684,7 +1684,7 @@ def test_k2o_unknown_pack_notice_has_no_other_pack_evaluation() -> None:
 def test_missing_present_parent_refuses_and_labels_provider_fallback(
     monkeypatch,
 ) -> None:
-    def omit_na(**kwargs):
+    def omit_na(*args, **kwargs):
         return OpenImccBridgeResult(
             parent_oxide_activities={"SiO2": 1.0},
             parent_oxides=("SiO2",),
@@ -1731,7 +1731,7 @@ def test_missing_present_parent_refuses_and_labels_provider_fallback(
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_unexpected_openimcc_activity_error_propagates(monkeypatch) -> None:
-    def fail(**kwargs):
+    def fail(*args, **kwargs):
         raise RuntimeError("unexpected evaluator bug")
 
     monkeypatch.setattr(openimcc_bridge_module, "evaluate", fail)
@@ -1847,7 +1847,7 @@ def test_openimcc_parent_fallback_propagates_to_diagnostics_and_run_notice(
 ) -> None:
     real_evaluate_cleaned_melt = evaluate_cleaned_melt
 
-    def successful_but_incomplete(**kwargs):
+    def successful_but_incomplete(*args, **kwargs):
         cleaned = real_evaluate_cleaned_melt(**kwargs)
         activities = dict(cleaned.single_cation_activities)
         if returned_activity is None:
@@ -1949,7 +1949,7 @@ def test_openimcc_parent_fallback_warning_reaches_residual_activity_row() -> Non
 def test_fallback_status_remains_on_warning_without_authority_status_fields(
     monkeypatch,
 ) -> None:
-    def nonconverge(**kwargs):
+    def nonconverge(*args, **kwargs):
         raise ImccNonconvergenceError(
             "IMCC-SF04 parent-balance solve did not converge",
             {"residual_inf": 0.25},
@@ -1986,7 +1986,7 @@ def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> No
     diagnostics = {"iterations": 8, "residual_inf": 0.25}
     real_evaluate = openimcc_bridge_module.evaluate
 
-    def nonconverge(**kwargs):
+    def nonconverge(*args, **kwargs):
         raise ImccNonconvergenceError(
             "IMCC-SF04 parent-balance solve did not converge",
             diagnostics,

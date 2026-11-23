@@ -186,7 +186,7 @@ def _make_available_magemin(monkeypatch, fake_module):
 def _make_fake_magemin_cli_liquidus(monkeypatch):
     calls = []
 
-    def fake_subprocess_run(args, **_kwargs):
+    def fake_subprocess_run(args=None, *extra_args, **_kwargs):
         args = list(args)
         temperature_arg = next(
             (arg for arg in args if arg.startswith("--Temp=")),
@@ -1697,7 +1697,7 @@ _VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
 
 def _install_fake_magemin_subprocess_with_qfm_readback(monkeypatch, stdout):
     """Give Mode-parser tests valid native redox control evidence."""
-    def fake_subprocess_run(args, **kwargs):
+    def fake_subprocess_run(args=None, *extra_args, **kwargs):
         output = Path(kwargs['cwd']) / 'output'
         output.mkdir()
         (output / '_matlab_output.txt').write_text(
@@ -2250,7 +2250,7 @@ def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
 def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
     calls = []
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         calls.append((args, kwargs))
         output = Path(kwargs['cwd']) / 'output'
         output.mkdir(exist_ok=True)
@@ -3213,7 +3213,7 @@ def test_magemin_pure_phase_probe_argument_vector_is_preserved(
     )
     captured: dict[str, object] = {}
 
-    def run(args, **kwargs):
+    def run(args=None, *extra_args, **kwargs):
         captured['args'] = args
         output = Path(kwargs['cwd']) / 'output' / '_matlab_output.txt'
         output.parent.mkdir(parents=True)
@@ -3671,7 +3671,7 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
 ):
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
-        lambda args, **_kwargs: subprocess.CompletedProcess(
+        lambda args=None, *extra_args, **_kwargs: subprocess.CompletedProcess(
             args, 0, stdout=stdout, stderr='',
         ),
     )
@@ -3702,7 +3702,7 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
 ):
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
-        lambda args, **_kwargs: subprocess.CompletedProcess(
+        lambda args=None, *extra_args, **_kwargs: subprocess.CompletedProcess(
             args, 0, stdout='Phase: liq\nMode: 1.0\n', stderr='',
         ),
     )
@@ -3733,7 +3733,7 @@ def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
     monkeypatch.setattr(
         magemin_module.subprocess,
         'run',
-        lambda args, **_kwargs: subprocess.CompletedProcess(
+        lambda args=None, *extra_args, **_kwargs: subprocess.CompletedProcess(
             args, 0, stdout='MAGEMin output', stderr=''
         ),
     )
@@ -4226,7 +4226,7 @@ def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
     backend._config = {"database": "ig", "timeout_s": 1.0}
     backend._magemin_module = None
 
-    def fake_run(_args, *, cwd, **_kwargs):
+    def fake_run(_args = None, *extra_args, cwd = None, **_kwargs):
         output = Path(cwd) / "output"
         output.mkdir()
         (output / "_matlab_output.txt").write_text(
@@ -4597,7 +4597,7 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(
         stderr = ""
         stdout = "Phase : liq qfm\nMode  : 1.000 0.000\n"
 
-    def fake_subprocess_run(args, **kwargs):
+    def fake_subprocess_run(args=None, *extra_args, **kwargs):
         captured["args"] = list(args)
         captured["cwd"] = kwargs.get("cwd")
         child_env = kwargs.get("env")
@@ -4690,7 +4690,7 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
         stderr = ''
         stdout = 'Phase : liq\nMode  : 1.000\n'
 
-    def fake_subprocess_run(_args, **_kwargs):
+    def fake_subprocess_run(_args=None, *extra_args, **_kwargs):
         with state_lock:
             state['active'] += 1
             state['calls'] += 1
@@ -4851,7 +4851,7 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
             "Mode  : 1.000 0.000\n"
         )
 
-    def fake_subprocess_run(args, **kwargs):
+    def fake_subprocess_run(args=None, *extra_args, **kwargs):
         captured["args"] = list(args)
         return FakeCompleted()
 
@@ -4931,7 +4931,7 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
         stderr = ""
         stdout = "Phase : liq\nMode  : 1.000\n"
 
-    def fake_subprocess_run(args, **kwargs):
+    def fake_subprocess_run(args=None, *extra_args, **kwargs):
         captured["args"] = list(args)
         return FakeCompleted()
 
@@ -4980,7 +4980,7 @@ def test_magemin_configured_named_buffer_is_indeterminate_without_redox_carrier(
         stderr = ""
         stdout = "Phase : liq mw\nMode  : 1.000 0.000\n"
 
-    def fake_subprocess_run(args, **kwargs):
+    def fake_subprocess_run(args=None, *extra_args, **kwargs):
         captured["args"] = list(args)
         output = Path(kwargs['cwd']) / 'output'
         output.mkdir(exist_ok=True)

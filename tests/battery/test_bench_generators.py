@@ -793,7 +793,7 @@ def test_cli_generates_schema_inputs_with_numeric_json(tmp_path, monkeypatch, co
 
     experiment, bench, observation = complete_kems() if consumer == "kems" else case()
     experiment = replace(experiment, bench_id=bench.id)
-    monkeypatch.setattr(cli, "load_migrated_store", lambda root: ({"work-1": f.work()},
+    monkeypatch.setattr(cli, "load_migrated_store", lambda root=None, *, sources=None: ({"work-1": f.work()},
         {experiment.experiment_id: experiment}, {observation.observation_id: observation}))
     monkeypatch.setattr(cli, "load_migrated_benches", lambda root: {bench.id: bench})
     monkeypatch.setattr(cli, "_apparatus_references", lambda root, works: {})

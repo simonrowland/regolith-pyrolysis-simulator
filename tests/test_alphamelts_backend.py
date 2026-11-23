@@ -654,7 +654,7 @@ def test_warm_petthermotools_bootstrap_preserves_model_code(
     )
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts.importlib.import_module',
-        lambda _module_name: module,
+        lambda _module_name, package=None: module,
     )
     backend = AlphaMELTSBackend(model_name=model_name)
     _select_python_api_for_test(backend)
@@ -676,7 +676,7 @@ def test_warm_petthermotools_bootstrap_preserves_model_code(
 def test_petthermotools_warm_bootstrap_import_failure_is_typed(monkeypatch):
     from simulator.engine_pool import EngineWorkerRemoteError
 
-    def fail_library_import(module_name):
+    def fail_library_import(module_name, package=None):
         if module_name in {'petthermotools', 'PetThermoTools'}:
             raise ModuleNotFoundError('external dependency absent')
         raise AssertionError(f'unexpected import: {module_name}')
@@ -731,7 +731,7 @@ def test_petthermotools_initial_start_decodes_bootstrap_origin(
     from simulator.engine_pool import EngineWorkerRemoteError
     from unittest.mock import patch
 
-    def failed_import(_name):
+    def failed_import(_name, package=None):
         raise failure('external-init')
 
     class InitWorker:
@@ -1799,7 +1799,7 @@ def test_alphamelts_subprocess_liquidus_pins_single_absolute_melts_request(
     seen = {}
     runs = []
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         runs.append(list(args))
         seen['args'] = list(args)
         seen['input_melts'] = (
@@ -4560,7 +4560,7 @@ def test_alphamelts_subprocess_below_certified_t_notices_and_still_launches(
     launches = []
     temperature_C = 75.0
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         argv = list(args[0] if args and isinstance(args[0], (list, tuple)) else args)
         if argv and argv[-1] == '--version':
             return types.SimpleNamespace(
@@ -5167,7 +5167,7 @@ def test_alphamelts_initialize_requires_petthermotools_payload(monkeypatch):
     backend = AlphaMELTSBackend()
     fake_ptt = types.SimpleNamespace(__version__='0.test')
 
-    def fake_import(name):
+    def fake_import(name, package=None):
         if name in {'petthermotools', 'PetThermoTools'}:
             return fake_ptt
         if name == 'meltsdynamic':
@@ -5210,7 +5210,7 @@ def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
         lambda _engine_root: Path('/tmp/fake-alphamelts'),
     )
 
-    def fake_import(name):
+    def fake_import(name, package=None):
         if name in {'petthermotools', 'PetThermoTools'}:
             return types.SimpleNamespace(__version__='0.test')
         if name == 'meltsdynamic':
@@ -5345,7 +5345,7 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
         engine_version = 'thermoengine fake'
 
         def __init__(self, *, model_name, activity_converter,
-                     equilibrate_timeout_s, health_timeout_s=None):
+                     equilibrate_timeout_s, health_timeout_s=None, diagnostic_log_dir=None, watchdog_grace_s=0.25, diagnostic_signal=None):
             self.model_name = model_name
             self.activity_converter = activity_converter
             self.equilibrate_timeout_s = equilibrate_timeout_s
@@ -5394,6 +5394,9 @@ def test_thermoengine_backend_pins_blank_model_resolution_before_transport(
             activity_converter,
             equilibrate_timeout_s,
             health_timeout_s=None,
+            diagnostic_log_dir=None,
+            watchdog_grace_s=0.25,
+            diagnostic_signal=None,
         ):
             self.forwarded_model_name = model_name
             self.model_name = str(model_name or "MELTSv1.0.2")
@@ -5669,7 +5672,7 @@ def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
 ):
     calls = []
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         calls.append(args)
         if len(calls) == 1:
             raise subprocess.TimeoutExpired(args, kwargs['timeout'])
@@ -5716,7 +5719,7 @@ def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
 def test_smoke_timeout_reason_is_derived_from_token_not_absence(monkeypatch):
     """DEFECT 1: a TimeoutExpired smoke wall is unfinished, not missing."""
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         raise subprocess.TimeoutExpired(args, kwargs['timeout'])
 
     monkeypatch.setattr(
@@ -5748,7 +5751,7 @@ def test_initialize_smoke_timeout_raises_typed_timeout_not_import_error(
 ):
     """DEFECT 1: initialize must not wrap a timeout as transport-unavailable."""
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         raise subprocess.TimeoutExpired(args, kwargs['timeout'])
 
     monkeypatch.setattr(ThermoEngineTransport, 'initialize', lambda self: True)
@@ -5811,7 +5814,7 @@ def test_health_timeout_default_is_contention_robust_and_overridable(
     assert transport.health_timeout_s == THERMOENGINE_HEALTH_TIMEOUT_S
     seen: list[float] = []
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         seen.append(float(kwargs['timeout']))
         raise subprocess.TimeoutExpired(args, kwargs['timeout'])
 
@@ -5845,7 +5848,7 @@ def test_backend_health_timeout_config_reaches_transport(monkeypatch):
         engine_version = 'thermoengine fake'
 
         def __init__(self, *, model_name, activity_converter,
-                     equilibrate_timeout_s, health_timeout_s=None):
+                     equilibrate_timeout_s, health_timeout_s=None, diagnostic_log_dir=None, watchdog_grace_s=0.25, diagnostic_signal=None):
             self.equilibrate_timeout_s = equilibrate_timeout_s
             self.health_timeout_s = health_timeout_s
 
@@ -6329,7 +6332,7 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
 
     executed_scripts = []
 
-    def fake_run(args, **kwargs):
+    def fake_run(args=None, *extra_args, **kwargs):
         executed_scripts.append(args[-1])
         stdout = io.StringIO()
         try:
@@ -7844,6 +7847,9 @@ def test_initialize_ood_smoke_closes_and_raises_typed_refusal(monkeypatch):
             activity_converter,
             equilibrate_timeout_s,
             health_timeout_s=None,
+            diagnostic_log_dir=None,
+            watchdog_grace_s=0.25,
+            diagnostic_signal=None,
         ):
             self.close_calls = 0
             created.append(self)
@@ -7903,6 +7909,9 @@ def test_initialize_worker_timeout_raises_typed_timeout_not_import_error(
             activity_converter,
             equilibrate_timeout_s,
             health_timeout_s=None,
+            diagnostic_log_dir=None,
+            watchdog_grace_s=0.25,
+            diagnostic_signal=None,
         ):
             del model_name, activity_converter, equilibrate_timeout_s
             del health_timeout_s
@@ -9324,7 +9333,7 @@ def test_thermoengine_parity_skip_requires_missing_dependency(
     def fail_initialize(_backend, _config):
         raise ImportError('ThermoEngine initialization failed') from cause
 
-    def raise_expected_skip(reason):
+    def raise_expected_skip(reason, allow_module_level=False):
         raise ExpectedParitySkip(reason)
 
     monkeypatch.setattr(ThermoEngineBackend, 'initialize', fail_initialize)
@@ -12103,7 +12112,7 @@ def test_cold_worker_missing_loader_is_typed_absence(monkeypatch):
     monkeypatch.setattr(
         alphamelts_module.importlib,
         'import_module',
-        lambda _name: types.SimpleNamespace(),
+        lambda _name, package=None: types.SimpleNamespace(),
     )
     sent = []
 
