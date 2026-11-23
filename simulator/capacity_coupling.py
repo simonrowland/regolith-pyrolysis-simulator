@@ -3831,6 +3831,7 @@ def _reduced_manifold(
 ] | None:
     """Integrate dn_i/dt = s_i(P*(y)) − y_i Q(P*(y)). One solve_ivp."""
 
+    import numpy as np
     from scipy.integrate import solve_ivp
 
     species = list(law.species)
@@ -3842,19 +3843,17 @@ def _reduced_manifold(
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
 
-    def rhs(_time: float, state) -> list[float]:
-        law._note_rhs_flux()
+    def evaluate(state, root_hint: float) -> tuple[list[float], float]:
         raw = [max(float(state[index]), 0.0) for index in range(count)]
         total = math.fsum(raw)
         if total <= 0.0:
-            return [0.0] * (blocks * count)
+            return [0.0] * (blocks * count), float(root_hint)
         evolved = {name: raw[index] / total for index, name in enumerate(species)}
         kind, found = _reduced_open_fixed_point(
-            law, evolved, hint_Pa=hint[0],
+            law, evolved, hint_Pa=root_hint,
         )
         if kind != "open" or found is None:
             raise _ManifoldLost()
-        hint[0] = float(found)
         inflow, redox, gross = _manifold_rates(law, evolved, float(found))
         q_sum = math.fsum(inflow.values())
         if not math.isfinite(q_sum):
@@ -3876,8 +3875,43 @@ def _reduced_manifold(
                 dg.append(gross[name])
                 dr.append(redox[name])
         if track_extent:
-            return dn + da + db + dg + dr
-        return dn + da + db
+            return dn + da + db + dg + dr, float(found)
+        return dn + da + db, float(found)
+
+    def rhs(_time: float, state) -> list[float]:
+        law._note_rhs_flux()
+        rates, found = evaluate(state, hint[0])
+        hint[0] = found
+        return rates
+
+    def jacobian(time: float, state):
+        # A, B, G and R do not enter the rates, so their Jacobian columns
+        # are zero. Each species column differences the reduced RHS once;
+        # that RHS uses one IFT correction, not the bracketed warm solve.
+        base = np.asarray(rhs(time, state), dtype=float)
+        base_hint = hint[0]
+        matrix = np.zeros((len(y0), len(y0)), dtype=float)
+        fd_scale = math.sqrt(np.finfo(float).eps)
+        scale = max(
+            math.fsum(max(float(state[i]), 0.0) for i in range(count)),
+            1.0e-12,
+        )
+        for column in range(count):
+            value = float(state[column])
+            step = max(
+                fd_scale * max(abs(value), scale * 1.0e-8),
+                10.0 * atol_mol,
+            )
+            if value < 0.0:
+                step = max(step, -value + 10.0 * atol_mol)
+            sample = np.asarray(state, dtype=float).copy()
+            sample[column] += step
+            law._note_rhs_flux()
+            perturbed, _sample_root = evaluate(sample, base_hint)
+            matrix[:, column] = (
+                np.asarray(perturbed, dtype=float) - base
+            ) / step
+        return matrix
 
     if track_extent:
         atol = (
@@ -3886,15 +3920,16 @@ def _reduced_manifold(
             + [atol_mol] * count
         )
     else:
-        atol = atol_mol
+        atol = [atol_mol] * (3 * count)
     try:
         solution = solve_ivp(
             rhs,
             (0.0, float(t_rem)),
             y0,
-            method="RK45",
+            method="Radau",
             rtol=_SLOW_RTOL,
             atol=atol,
+            jac=jacobian,
         )
     except _ManifoldLost:
         return None
@@ -3931,6 +3966,23 @@ def _reduced_manifold(
     composition_time = n_tot / q_sum
     n_end_tot = math.fsum(n_end.values())
     if n_end_tot <= 0.0 or not math.isfinite(composition_time):
+        return None
+    end_fractions = _fractions_of(law, n_end)
+    if end_fractions is None:
+        return None
+    end_kind, end_root = _open_or_shut_fixed_point(
+        law, end_fractions, near_Pa=hint[0],
+    )
+    inventory_pressure = law.pressure_of(n_end)
+    if (
+        end_kind != "open"
+        or end_root is None
+        or not math.isfinite(inventory_pressure)
+        or abs(float(end_root) - inventory_pressure) > DEFAULT_ABS_TOL_PA
+    ):
+        # The caller declines the reduced result and keeps the full-system
+        # Radau solve alive from its stall state. Its existing B = ∫Q dt
+        # continues the bleed booking; no reduced extent is booked twice.
         return None
     dy = max(
         abs(n_start[name] / n_tot - n_end[name] / n_end_tot) for name in species
@@ -3976,10 +4028,10 @@ def _slow_manifold(
     n_end = n0 + A − B by that algebra.
 
     Where s_i depends on the partials, the same reduced ODE is
-    integrated with one solve_ivp. Each evaluation re-solves P*
-    from the previous root: Newton, then Brent, on that neighborhood.
-    The bracket runs only when that step fails. The state never sits
-    on the pipe kink. There is not a second solver beside that reduction.
+    integrated with one solve_ivp. Each evaluation advances P* from
+    the previous root with one IFT correction on the open side of the
+    pipe kink. The existing bracket publishes a root only when that
+    correction leaves its continuity band or cannot select one.
 
     Unit check: (mol/s)·s = mol, and n_tot / (mol/s) = s.
     Limit: s_i / Σ s = y_i0 leaves the composition fixed, so
