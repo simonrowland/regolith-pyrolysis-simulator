@@ -504,10 +504,9 @@ _EVIDENCE_VOCABULARY = {
     "alpha_role": dict(_MARKER_REFUSALS),
     # Per-point role tokens are interpreted by migrate.py's typed role reader;
     # unknown point tokens remain eligible for its flagged default path.
-    "composition_role": {
-        "datum_state": None,
-        "initial_charge_only": None,
-    },
+    "composition_role": dict.fromkeys(
+        battery_migrate._COMPOSITION_ROLE_TOKENS
+    ),
     "review_status": {
         "draft": None,  # ames-walsh-white-1967: source review pending.
         "reviewed": None,  # ivtan-mno-coo-thermo: source reviewed.
