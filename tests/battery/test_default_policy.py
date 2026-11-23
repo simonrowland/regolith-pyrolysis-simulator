@@ -86,6 +86,11 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "superseded by DP-001/DP-019 by method"
             )
             assert entry["history"]
+        elif policy_id == "DP-100":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1122cvmq"
+            assert entry["value"] == "unspecified"
+            assert entry["flag"] == "method_unstated"
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
