@@ -1027,6 +1027,7 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
+    policy: Mapping[str, str] | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1056,6 +1057,19 @@ class Notice:
             object.__setattr__(
                 self, "dropped_mass_fraction", as_decimal(self.dropped_mass_fraction)
             )
+        if self.policy is not None:
+            policy_keys = ("id", "version", "status", "value", "units")
+            if not isinstance(self.policy, Mapping) or set(self.policy) != set(policy_keys):
+                raise ValueError(
+                    "Notice.policy must contain id, version, status, value, and units"
+                )
+            policy = {key: self.policy[key] for key in policy_keys}
+            if any(
+                not isinstance(value, str) or not value.strip()
+                for value in policy.values()
+            ):
+                raise ValueError("Notice.policy values must be nonempty strings")
+            object.__setattr__(self, "policy", policy)
 
 
 SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"

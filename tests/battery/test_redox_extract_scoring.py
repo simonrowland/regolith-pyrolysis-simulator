@@ -315,7 +315,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     assert not any(residual.score_eligible for residual in residuals)
 
 
-def test_openimcc_redox_without_printed_fo2_still_refuses():
+def test_openimcc_redox_without_printed_fo2_uses_intrinsic_ladder_default():
     pytest.importorskip("openimcc")
     _context, observations = _sossi_aithala_redox_context()
     observation = observations[
@@ -332,12 +332,17 @@ def test_openimcc_redox_without_printed_fo2_still_refuses():
 
     prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    assert prediction.value is not None
+    assert prediction.refusal_reason is None
+    assert prediction.identity is not None
+    assert prediction.identity.fO2_Pa is not None
+    assert prediction.identity.fO2_Pa.is_value
+    assert any(
+        notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.policy is not None
+        and notice.policy["id"] == "DP-010"
+        for notice in prediction.notices
+    )
 
 
 def _openimcc_row_with_mass_composition(components):
@@ -416,8 +421,8 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     )
 
 
-def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
-    """Silica with no fO2 is a printed-oxygen refusal, not a Kress FeOt refusal."""
+def test_openimcc_missing_fo2_without_iron_reaches_iron_refusal_after_ladder():
+    """The fO2 ladder resolves first; OpenIMCC then reports its missing iron."""
 
     row = _openimcc_row_with_mass_composition((("SiO2", Decimal("100")),))
     conditions = dict(row.point_conditions or {})
@@ -435,7 +440,7 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {
         "reason": "missing_input",
-        "input": "printed_fO2",
+        "input": "total_iron",
     }
     assert prediction.coefficient_sources == ()
 
@@ -1033,12 +1038,14 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         identity=replace(row4.identity, fO2_Pa=None),
     )
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing_fo2)
-    assert missing_prediction.value is None
-    assert missing_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    assert missing_prediction.value is not None
+    assert missing_prediction.refusal_reason is None
+    assert any(
+        notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.policy is not None
+        and notice.policy["id"] == "DP-010"
+        for notice in missing_prediction.notices
+    )
 
     unsupported = predict_with_engine(Engine.MAGEMIN, row4)
     assert unsupported.value is None
@@ -1966,7 +1973,7 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
 
 
-def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(monkeypatch):
+def test_melts_fe_redox_uses_shared_intrinsic_fo2_when_unprinted(monkeypatch):
     row4 = _without_printed_fo2(_borisov_row4())
     calls = _patch_melts_cell(
         monkeypatch,
@@ -1975,24 +1982,30 @@ def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(mon
         ),
     )
     alphamelts = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
-    assert alphamelts.value is None
-    assert alphamelts.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert alphamelts.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
-    assert calls == []
+    assert alphamelts.value is not None
+    assert alphamelts.refusal_reason is None
+    assert alphamelts.identity is not None
+    assert alphamelts.identity.fO2_Pa is not None
+    assert alphamelts.identity.fO2_Pa.is_value
+    assert any(
+        notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.policy is not None
+        and notice.policy["id"] == "DP-010"
+        for notice in alphamelts.notices
+    )
+    assert len(calls) == 1
 
     thermoengine = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
     assert thermoengine.value == fe3_fe2_ratio_from_oxide_wt_pct(
         Decimal("1.0"), Decimal("9.0")
     )
     assert thermoengine.identity is not None
-    assert thermoengine.identity.fO2_Pa is None
-    assert len(calls) == 1
-    assert calls[0]["po2"].mode == "engine_default"
-    assert calls[0]["po2"].po2_bar is None
-    assert calls[0]["physical_pressure_bar"] == pytest.approx(1.01325)
+    assert thermoengine.identity.fO2_Pa is not None
+    assert thermoengine.identity.fO2_Pa.is_value
+    assert len(calls) == 2
+    assert calls[1]["po2"].mode == "commanded"
+    assert calls[1]["po2"].po2_bar > 0.0
+    assert calls[1]["physical_pressure_bar"] == pytest.approx(1.01325)
 
 
 def test_melts_fe_redox_commissioning_notice_is_the_only_extrapolated_flag(monkeypatch):

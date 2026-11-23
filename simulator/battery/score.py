@@ -64,6 +64,7 @@ from simulator.source_ids import (
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
+    AmbientPressureEvidenceClass,
     AmountBasis,
     Authority,
     CellMaterial,
@@ -622,8 +623,15 @@ FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
+FLAGGED_STRATUM_ASSUMED_PRESSURE = "assumed_pressure"
+FLAGGED_STRATUM_ASSUMED_FO2 = "assumed_fo2"
+FLAGGED_STRATUM_METHOD_IMPLIED = "method_implied"
+FLAGGED_STRATUM_PROPOSED_POLICY = "PROPOSED-POLICY"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+
+_DP_001_TOTAL_PRESSURE_PA = ATM_PA_DECIMAL
+_DP_002_TOTAL_PRESSURE_PA = _DP_001_TOTAL_PRESSURE_PA
 
 
 @dataclass(frozen=True)
@@ -2472,9 +2480,15 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
-    return _classify_flagged_notice_facts(
+    strata = _classify_flagged_notice_facts(
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
+    if any(
+        notice.policy is not None and notice.policy.get("status") == "proposed"
+        for notice in notices
+    ):
+        strata = (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
 
 
 def _classify_flagged_notice_facts(
@@ -2541,6 +2555,12 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
+    if NoticeKind.ASSUMED_PRESSURE.value in kinds:
+        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
+    if NoticeKind.ASSUMED_FO2.value in kinds:
+        strata.append(FLAGGED_STRATUM_ASSUMED_FO2)
+    if NoticeKind.METHOD_IMPLIED.value in kinds:
+        strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
@@ -8165,12 +8185,17 @@ def _activity_request_or_contract_refusal(
     )
 
 
-def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
+def _assumed_pressure_notice(
+    quantity: Quantity,
+    reason: str,
+    policy: Mapping[str, str],
+) -> Notice:
     return Notice(
-        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        kind=NoticeKind.ASSUMED_PRESSURE,
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
+        policy=policy,
     )
 
 
@@ -8721,11 +8746,23 @@ def _comparison_identity(
     if pressure_independent and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
-        quantity = quantity_token(identity)
-        if quantity is not None:
-            bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
-            if invalid is None:
-                updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * PA_PER_BAR_DEC)
+        predicted_pressure = (
+            prediction.identity.total_pressure_Pa
+            if isinstance(prediction.identity, Identity)
+            else None
+        )
+        if predicted_pressure is not None and predicted_pressure.is_value:
+            updates["total_pressure_Pa"] = predicted_pressure
+        else:
+            quantity = quantity_token(identity)
+            if quantity is not None:
+                bar, _notice, invalid = total_pressure_bar_for_score(
+                    identity, quantity
+                )
+                if invalid is None:
+                    updates["total_pressure_Pa"] = State.of(
+                        Decimal(str(bar)) * PA_PER_BAR_DEC
+                    )
     if not updates:
         return identity
     return replace(identity, **updates)
@@ -9230,17 +9267,20 @@ def _printed_fe_redox_fo2_log(
 def _score_pressure_state(
     identity: Identity,
     observation: Observation | None = None,
+    experiment: Experiment | None = None,
 ) -> State[Any] | None:
-    """Use the identity pressure, falling back to a printed point condition."""
+    """Use the first recorded total pressure, preserving its source state."""
 
     pressure = identity.total_pressure_Pa
-    if (
-        (pressure is None or not pressure.is_value or pressure.value is None)
-        and observation is not None
-    ):
+    missing = pressure is None or pressure.is_unknown or pressure.is_not_applicable
+    if missing and observation is not None:
         point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
         if point_pressure is not None:
             return State.of(point_pressure)
+    if missing and experiment is not None:
+        located_pressure = experiment.pressure_environment.total_pressure_Pa
+        if located_pressure.inference is None:
+            return located_pressure.state
     return pressure
 
 
@@ -9260,29 +9300,139 @@ def _score_pressure_bar(
     return bar, False
 
 
-def _fe_redox_pressure(
-    observation: Observation, identity: Identity
-) -> tuple[float, State[Any]] | _FeRedoxRefusal:
-    pressure_pa = _score_pressure_state(identity, observation)
+def _original_pressure_reason(
+    identity: Identity,
+    observation: Observation | None,
+    experiment: Experiment | None,
+) -> str:
+    pressure = identity.total_pressure_Pa
+    if pressure is not None and pressure.reason:
+        return pressure.reason
+    if observation is not None:
+        located = (observation.point_conditions or {}).get("total_pressure_Pa")
+        if isinstance(located, Located) and located.state.reason:
+            return located.state.reason
+    if experiment is not None:
+        state = experiment.pressure_environment.total_pressure_Pa.state
+        if state.reason:
+            return state.reason
+    return "no printed total_pressure_Pa is available"
+
+
+def _resolve_score_total_pressure(
+    identity: Identity,
+    quantity: Quantity,
+    *,
+    observation: Observation | None = None,
+    experiment: Experiment | None = None,
+) -> tuple[float, State[Any] | None, Notice | None, str | None]:
+    """Return the pressure used by a scorer, its identity state, and its flag."""
+
+    pressure_pa = _score_pressure_state(identity, observation, experiment)
     pressure_bar, pressure_invalid = _score_pressure_bar(pressure_pa)
     if pressure_invalid:
-        return _FeRedoxRefusal(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": "invalid_input", "input": "total_pressure_Pa"},
-        )
+        return 0.0, pressure_pa, None, "total_pressure_invalid"
     if pressure_bar is not None:
-        assert pressure_pa is not None
-    elif observation.source_id == "borisov-2018-compilation":
-        # The cited compilation is explicitly a 1-atm dataset.
-        pressure_bar = 1.01325
-        pressure_pa = State.of(ATM_PA_DECIMAL)
-    else:
-        return _FeRedoxRefusal(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
+        return pressure_bar, pressure_pa, None, None
+
+    original_reason = _original_pressure_reason(identity, observation, experiment)
+    method = (
+        experiment.method.value
+        if experiment is not None and experiment.method.is_value
+        else None
+    )
+    if method in {
+        MethodToken.KNUDSEN_EFFUSION,
+        MethodToken.VACUUM_CHAMBER_PYROLYSIS,
+    }:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _DEFAULT_PRESSURE_BAR as _DP_100_KNUDSEN_PRESSURE_BAR,
         )
-    assert pressure_bar is not None and pressure_pa is not None
-    return pressure_bar, pressure_pa
+
+        pressure_bar = float(_DP_100_KNUDSEN_PRESSURE_BAR)
+        pressure_pa = State.of(
+            Decimal(str(_DP_100_KNUDSEN_PRESSURE_BAR)) * PA_PER_BAR_DEC
+        )
+        notice = _assumed_pressure_notice(
+            quantity,
+            "default_total_pressure_Pa="
+            f"{pressure_pa.value}; "
+            f"original_reason={original_reason}; "
+            "Knudsen total pressure is the sum of partial pressures, not the "
+            "external vacuum; the scoring row has no recorded total-pressure "
+            "state from which to apply that sum; "
+            "the existing d-456 apparatus pressure is used pending policy review",
+            policy={
+                "id": "DP-100",
+                "version": "v1",
+                "status": "proposed",
+                "value": str(_DP_100_KNUDSEN_PRESSURE_BAR),
+                "units": "bar",
+            },
+        )
+        return pressure_bar, pressure_pa, notice, None
+
+    if (
+        experiment is not None
+        and experiment.ambient_pressure_evidence is not None
+        and experiment.ambient_pressure_evidence.evidence_class
+        in {
+            AmbientPressureEvidenceClass.GAS_MIXING,
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        }
+    ):
+        implied_pressure = (
+            "gas-mixing furnace implies 1 atm"
+            if experiment.ambient_pressure_evidence.evidence_class
+            is AmbientPressureEvidenceClass.GAS_MIXING
+            else "atmospheric-pressure statement implies 1 atm"
+        )
+        pressure_pa = State.of(_DP_002_TOTAL_PRESSURE_PA)
+        pressure_bar = float(_DP_002_TOTAL_PRESSURE_PA / PA_PER_BAR_DEC)
+        notice = Notice(
+            kind=NoticeKind.METHOD_IMPLIED,
+            affected_quantities=(quantity,),
+            reason=(
+                "default_total_pressure_Pa="
+                f"{_DP_002_TOTAL_PRESSURE_PA}; "
+                f"original_reason={original_reason}; "
+                f"{implied_pressure}"
+            ),
+            origin="score:total_pressure",
+            authority=Authority.DERIVED_FROM_APPARATUS,
+            policy={
+                "id": "DP-002",
+                "version": "v1",
+                "status": "canonical",
+                "value": str(_DP_002_TOTAL_PRESSURE_PA),
+                "units": "Pa",
+            },
+        )
+        return pressure_bar, pressure_pa, notice, None
+
+    # Premise: condensed-phase activities and Fe redox are nearly pressure
+    # independent between vacuum and 1 atm. For V_m≈2.5e-5 m³/mol at 1500 K,
+    # Δln(a)=V_mΔP/(RT)≈2.0e-4 (Δlog10(a)≈8.8e-5 dex) at 1 atm.
+    # Units: Pa·m³/mol = J/mol, so the ratio to RT is dimensionless. As
+    # ΔP→0 the correction tends to zero. This estimates the stated fallback;
+    # no measured residual is used to select it.
+    pressure_pa = State.of(_DP_001_TOTAL_PRESSURE_PA)
+    pressure_bar = float(_DP_001_TOTAL_PRESSURE_PA / PA_PER_BAR_DEC)
+    notice = _assumed_pressure_notice(
+        quantity,
+        "default_total_pressure_Pa="
+        f"{_DP_001_TOTAL_PRESSURE_PA}; "
+        f"original_reason={original_reason}; "
+        "method does not fix total pressure",
+        policy={
+            "id": "DP-001",
+            "version": "v1",
+            "status": "canonical",
+            "value": str(_DP_001_TOTAL_PRESSURE_PA),
+            "units": "Pa",
+        },
+    )
+    return pressure_bar, pressure_pa, notice, None
 
 
 def _oxide_weight_fe_ratio(
@@ -9602,6 +9752,7 @@ def _predict_redox(
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """Predict Fe redox or a pinned OpenIMCC Cr/Ti valence couple.
 
@@ -9678,6 +9829,23 @@ def _predict_redox(
         return refused(material.reason, material.detail)
     material_notices.extend(material.notices)
 
+    quantity = quantity_token(identity) or Quantity.FE3_FE2_RATIO
+    pressure_bar, pressure_pa, pressure_notice, pressure_invalid = (
+        _resolve_score_total_pressure(
+            identity,
+            quantity,
+            observation=observation,
+            experiment=experiment,
+        )
+    )
+    if pressure_invalid is not None:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_input", "input": "total_pressure_Pa"},
+        )
+    if pressure_notice is not None:
+        material_notices.append(pressure_notice)
+
     # Offer 20 checks printed fO2 and Fe atoms before any Kress projection.
     # Internal-analytical and MELTS keep the stack's FeOt gate here.
     kress_basis: _FeRedoxKressBasis | None = None
@@ -9687,6 +9855,23 @@ def _predict_redox(
             return refused(kress_basis.reason, kress_basis.detail)
 
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    if fo2_log is None:
+        from simulator.battery.fo2_ladder import (
+            fo2_tier_notice,
+            resolve_row_fo2,
+        )
+
+        resolved_fo2 = resolve_row_fo2(
+            experiment,
+            bench,
+            observation,
+            composition_wt=material.composition_wt,
+            temperature_K=float(material.temperature),
+            quantity=quantity,
+        )
+        if resolved_fo2 is not None:
+            fo2_log = Decimal(str(resolved_fo2.log10_fO2_bar))
+            material_notices.append(fo2_tier_notice(quantity, resolved_fo2))
     handle: object | None = None
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.
@@ -9835,6 +10020,7 @@ def _predict_redox(
             identity,
             composition=material.composition_state,
             fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            total_pressure_Pa=pressure_pa,
         )
         return EnginePrediction(
             engine=engine,
@@ -9859,11 +10045,6 @@ def _predict_redox(
                 else "openimcc-redox"
             ),
         )
-
-    pressure = _fe_redox_pressure(observation, identity)
-    if isinstance(pressure, _FeRedoxRefusal):
-        return refused(pressure.reason, pressure.detail)
-    pressure_bar, pressure_pa = pressure
 
     if not melts:
         assert kress_basis is not None
@@ -10122,30 +10303,24 @@ def _predict_redox(
 def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
+    *,
+    observation: Observation | None = None,
+    experiment: Experiment | None = None,
 ) -> tuple[float, Notice | None, str | None]:
-    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+    """Scoring pressure in bar, with a typed notice for every default.
 
     A present but non-finite or negative pressure is invalid. It is not
-    replaced by the assumption.
+    replaced by a default. Knudsen and vacuum-cell rows use the existing d-456
+    apparatus pressure; other unstated pressures use 1 atm.
     """
 
-    from simulator.diagnostic_helpers.binary_pot_battery import _DEFAULT_PRESSURE_BAR
-
-    state = _score_pressure_state(identity)
-    pressure_bar, invalid = _score_pressure_bar(state)
-    if invalid:
-        return 0.0, None, "total_pressure_invalid"
-    if pressure_bar is not None:
-        return pressure_bar, None, None
-    state = identity.total_pressure_Pa
-    detail = "observation does not carry total_pressure_Pa"
-    if state is not None and state.reason:
-        detail = f"{detail} ({state.tag.value}: {state.reason})"
-    notice = _assumption_notice(
+    pressure_bar, _state, notice, invalid = _resolve_score_total_pressure(
+        identity,
         quantity,
-        f"{detail}; residual assumes {_DEFAULT_PRESSURE_BAR:g} bar",
+        observation=observation,
+        experiment=experiment,
     )
-    return float(_DEFAULT_PRESSURE_BAR), notice, None
+    return pressure_bar, notice, invalid
 
 
 _IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
@@ -12786,6 +12961,7 @@ def _predict_named_fe_valence(
     handles: Mapping[str, object] | None,
     isolated: bool | None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """Route a named valence to the engine that models its couple.
 
@@ -12827,6 +13003,7 @@ def _predict_named_fe_valence(
                 handles=handles,
                 isolated=isolated,
                 experiment=experiment,
+                bench=bench,
             )
         if engine is Engine.OPENIMCC:
             basis_state = identity.valence_basis
@@ -12871,6 +13048,7 @@ def _predict_named_fe_valence(
         handles=handles,
         isolated=isolated,
         experiment=experiment,
+        bench=bench,
     )
 
 
@@ -14215,6 +14393,7 @@ def _predict_with_engine(
             handles=handles,
             isolated=isolated,
             experiment=experiment,
+            bench=bench,
         )
     phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
@@ -14248,6 +14427,7 @@ def _predict_with_engine(
             handles=handles,
             isolated=isolated,
             experiment=experiment,
+            bench=bench,
         )
     wall_prediction = _wall_deposition_quantity_prediction(
         engine, observation, identity, quantity, channel, sources
@@ -14798,6 +14978,26 @@ def _predict_with_engine(
                     notices=tuple(input_notices),
                 )
 
+            _, pressure_state, pressure_notice, pressure_invalid = (
+                _resolve_score_total_pressure(
+                    identity,
+                    quantity,
+                    observation=observation,
+                    experiment=experiment,
+                )
+            )
+            if pressure_invalid is not None:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.INVALID_IDENTITY,
+                    detail={"reason": pressure_invalid, "quantity": quantity.value},
+                    notices=tuple(input_notices),
+                )
+
             # melt_oxide_activity returns single-cation a(MO_x) on its
             # Raoultian pure-liquid reference. Battery activity identities
             # name the parent oxide; mu(MO_x)=mu(parent)/c therefore gives
@@ -14808,6 +15008,8 @@ def _predict_with_engine(
             tier_notice = _payload_fo2_notice(quantity, activity_payload)
             if tier_notice is not None:
                 notices.append(tier_notice)
+            if pressure_notice is not None:
+                notices.append(pressure_notice)
             certified_band = None
             if activity.valid_range_K is not None:
                 low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
@@ -14866,10 +15068,13 @@ def _predict_with_engine(
                 coefficient_sources=activity_sources,
                 lineage_complete=activity_lineage_complete,
                 certified_band=certified_band,
-                identity=_prediction_identity_with_fo2(
-                    identity,
-                    activity_fo2_bar,
-                    preserve_existing=_has_printed_fo2(observation, identity),
+                identity=replace(
+                    _prediction_identity_with_fo2(
+                        identity,
+                        activity_fo2_bar,
+                        preserve_existing=_has_printed_fo2(observation, identity),
+                    ),
+                    total_pressure_Pa=pressure_state,
                 ),
                 requested_composition=requested,
                 version=activity.activity_model,
@@ -14999,35 +15204,41 @@ def _predict_with_engine(
     )
     pressure_bar: float | None = None
     knudsen_seed_pressure_bar: float | None = None
-    if activity_payload is None:
-        if derive_knudsen_total_pressure:
-            # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
-            # d ln(a)/dP~V_m/RT. At V_m=2e-5 m3/mol and T=1800 K,
-            # this is 1.34e-9 Pa^-1; over 1e-3 bar (100 Pa),
-            # delta ln(a)<=1.34e-7 or 5.8e-8 dex. Units check:
-            # Pa*m3/mol=J/mol, so V_m*P/(RT) is dimensionless.
-            # As P approaches zero, the pressure contribution approaches zero.
-            # Seed at the top of the ruled interval, then update once from
-            # the equilibrium partial-pressure sum below.
-            pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
-            knudsen_seed_pressure_bar = pressure_bar
-        else:
-            pressure_bar, pressure_notice, pressure_invalid = (
-                total_pressure_bar_for_score(identity, quantity)
+    if derive_knudsen_total_pressure:
+        # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
+        # d ln(a)/dP~V_m/RT. At V_m=2e-5 m3/mol and T=1800 K,
+        # this is 1.34e-9 Pa^-1; over 1e-3 bar (100 Pa),
+        # delta ln(a)<=1.34e-7 or 5.8e-8 dex. Units check:
+        # Pa*m3/mol=J/mol, so V_m*P/(RT) is dimensionless.
+        # As P approaches zero, the pressure contribution approaches zero.
+        # Seed at the top of the ruled interval, then update once from
+        # the equilibrium partial-pressure sum below.
+        pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
+        knudsen_seed_pressure_bar = pressure_bar
+    else:
+        pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
+            _resolve_score_total_pressure(
+                identity,
+                quantity,
+                observation=observation,
+                experiment=experiment,
             )
-            if pressure_invalid is not None:
-                return _input_refusal(
-                    engine=engine,
-                    channel=channel,
-                    sources=sources,
-                    identity=identity,
-                    requested=requested,
-                    reason=RefusalReason.INVALID_IDENTITY,
-                    detail={"reason": pressure_invalid, "quantity": quantity.value},
-                    notices=tuple(input_notices),
-                )
-            if pressure_notice is not None:
-                input_notices.append(pressure_notice)
+        )
+        if pressure_invalid is not None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.INVALID_IDENTITY,
+                detail={"reason": pressure_invalid, "quantity": quantity.value},
+                notices=tuple(input_notices),
+            )
+        if pressure_notice is not None:
+            input_notices.append(pressure_notice)
+        if pressure_state is not None:
+            identity = replace(identity, total_pressure_Pa=pressure_state)
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (
@@ -24268,12 +24479,23 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
-    notices = tuple(
-        (str(notice.get("kind") or ""), notice.get("reason"))
+    payload_notices = tuple(
+        notice
         for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )
-    return _classify_flagged_notice_facts(notices)
+    notices = tuple(
+        (str(notice.get("kind") or ""), notice.get("reason"))
+        for notice in payload_notices
+    )
+    strata = _classify_flagged_notice_facts(notices)
+    if any(
+        isinstance(notice.get("policy"), Mapping)
+        and notice["policy"].get("status") == "proposed"
+        for notice in payload_notices
+    ):
+        strata = (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:

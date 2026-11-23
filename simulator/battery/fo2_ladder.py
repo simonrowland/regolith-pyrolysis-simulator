@@ -113,26 +113,42 @@ _PHYSICS_RUNG_LABELS = {
 
 def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     reason = f"fo2_tier={resolved.tier}"
+    policy = None
+    assumed_intrinsic = (
+        resolved.tier == 4
+        and resolved.route == "intrinsic_melt_fO2"
+        and resolved.borrowed
+    )
     if resolved.physics_rung is not None:
         reason += (
             f"; physics_rung={resolved.physics_rung}:"
             f"{_PHYSICS_RUNG_LABELS[resolved.physics_rung]}"
         )
     reason += f"; route={resolved.route}"
-    if resolved.borrowed:
-        reason += "; borrowed"
-    if resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
+    if assumed_intrinsic:
+        reason = (
+            "default=intrinsic_melt_fO2; original_reason=no printed fO2; "
+            f"{reason}; borrowed"
+        )
+        policy = {
+            "id": "DP-010",
+            "version": "v1",
+            "status": "canonical",
+            "value": str(resolved.log10_fO2_bar),
+            "units": "log10(bar)",
+        }
+    if assumed_intrinsic:
+        kind = NoticeKind.ASSUMED_FO2
+    elif resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
         reason += "; source-calculated pO2 from observed pNa omitted as a circular condition"
         kind = NoticeKind.INPUT_OMITTED
     elif resolved.route.endswith("rys_pO2_provenance_unknown"):
         reason += "; row-level pO2 provenance unknown; treated as non-independent"
         kind = NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+    elif resolved.borrowed:
+        kind = NoticeKind.OUT_OF_CERTIFIED_BAND
     else:
-        kind = (
-            NoticeKind.OUT_OF_CERTIFIED_BAND
-            if resolved.borrowed
-            else NoticeKind.SOURCE_DISAGREEMENT
-        )
+        kind = NoticeKind.SOURCE_DISAGREEMENT
     return Notice(
         kind=kind,
         affected_quantities=(quantity,),
@@ -141,6 +157,7 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
+        policy=policy,
     )
 
 
