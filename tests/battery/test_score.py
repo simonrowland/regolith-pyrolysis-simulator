@@ -4112,6 +4112,21 @@ def test_species_formula_parser_preserves_normalized_decimal_stoichiometry() -> 
     expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
     assert parse_species_formula("MgAl1.5SiO3") == expected
     assert parse_species_formula("MgAl₁.₅SiO₃") == expected
+    assert parse_species_formula("MgAl₁.5SiO₃") == expected
+    assert parse_species_formula("$MgAl_1.5SiO_3$") == expected
+    assert parse_species_formula("$MgAl_{1.5}SiO_3$") == expected
+
+
+def test_species_formula_parser_checks_decimal_formula_annotations() -> None:
+    formula = "MgAl₁.5SiO₃(g)"
+    expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(formula, species=Species("MgAl1.5SiO3", Phase.CR)) is None
+    assert parse_species_formula(formula, species=Species("MgAl1.5SiO3", Phase.G)) == expected
+    assert parse_species_formula("MgAl₁.5SiO₃+") is None
+    assert parse_species_formula(
+        "MgAl₁.5SiO₃+", species=Species("MgAl1.5SiO3", Phase.CR, charge=1)
+    ) == expected
 
 
 def test_species_formula_parser_keeps_adjacent_parenthesized_groups() -> None:

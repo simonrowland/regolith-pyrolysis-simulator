@@ -1201,12 +1201,15 @@ def parse_species_formula(
         return None
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
-    text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
+    text = re.sub(
+        r"_\{(\d+(?:\.\d+)?)\}|_(\d+(?:\.\d+)?)",
+        lambda m: m.group(1) or m.group(2),
+        text,
+    )
     text = fold_subscript_digits(text)
-    if re.search(r"[₀₁₂₃₄₅₆₇₈₉]\.[₀₁₂₃₄₅₆₇₈₉]", formula):
-        normalized_decimal = formula_composition(text)
-        if normalized_decimal is not None:
-            return normalized_decimal
+    has_explicit_decimal_subscript = re.search(
+        r"[₀₁₂₃₄₅₆₇₈₉]\.\d|_\{?\d+\.\d+", formula
+    ) is not None
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1266,11 +1269,13 @@ def parse_species_formula(
             return None
         text = text[: charge_annotation.start()]
 
+    if has_explicit_decimal_subscript and "·" not in text:
+        normalized_decimal = formula_composition(text)
+        if normalized_decimal is not None:
+            return normalized_decimal
+
     if "." in text and "·" not in text:
-        from simulator.accounting.formulas import (
-            _is_integer_compound_adduct,
-            parse_formula,
-        )
+        from simulator.accounting.formulas import _is_integer_compound_adduct
 
         # The raw fast path above preserves existing JANAF decimal parses.
         # For spellings it cannot parse, the accounting owner decides whether
