@@ -107,7 +107,7 @@ def _sossi_aithala_redox_context():
     return context, observations
 
 
-def _printed_fraction_sigma_r(observation):
+def _printed_fraction_width(observation):
     uncertainty = observation.uncertainty
     if uncertainty is None:
         return None
@@ -142,8 +142,16 @@ def _printed_fraction_sigma_r(observation):
         score_module.QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
     }:
         return None
+    return converted
+
+
+def _printed_fraction_sigma_r(observation):
+    width = _printed_fraction_width(observation)
+    if width is None:
+        return None
     confidence_level = (
-        score_module._stated_printed_confidence_level(uncertainty) or "not_stated"
+        score_module._stated_printed_confidence_level(observation.uncertainty)
+        or "not_stated"
     )
     confidence_scale = (
         Decimal(2)
@@ -152,7 +160,7 @@ def _printed_fraction_sigma_r(observation):
         if confidence_level == "ci95"
         else Decimal(1)
     )
-    return converted / confidence_scale
+    return width / confidence_scale
 
 
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
@@ -567,17 +575,15 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
         fraction = dict(observation.derivation.parameters)[
             "original_Fe3_over_FeT"
         ].state.value
-        sigma_r = _printed_fraction_sigma_r(observation)
-        assert sigma_r is not None
-        if Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+        printed_width = _printed_fraction_width(observation)
+        assert printed_width is not None
+        if printed_width >= fraction or printed_width >= (
             Decimal(1) - fraction
         ):
             assert residual.numeric.decision_band is None
             assert residual.status is ResidualStatus.NO_BAND
             assert residual.refusal is not None
-            assert residual.refusal.detail["reason"] == (
-                "ferric_fraction_uncertainty_linearization_invalid"
-            )
+            assert residual.refusal.detail["reason"] == "printed_uncertainty_outside_metric_domain"
             boundary_refusals.append(residual.reference)
         else:
             assert residual.refusal is None
@@ -588,9 +594,7 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
             or "two_sigma_reading_verdict=" in (notice.band or "")
             for notice in residual.notices
         )
-    assert len(boundary_refusals) == 2
-    assert any(reference.endswith("sossi_2020_per_f_o2_11_xanes") for reference in boundary_refusals)
-    assert any(reference.endswith("sossi_2020_per_f_o2_12_xanes") for reference in boundary_refusals)
+    assert boundary_refusals == []
     encoded = json.dumps(
         [residual_to_plain(residual) for residual in residuals],
         sort_keys=True,
@@ -653,17 +657,16 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
 
         # Independent first-order propagation into the scorer's log10 ratio
         # metric, using only each row's recorded printed r and sigma_r.
+        printed_width = _printed_fraction_width(observation)
+        assert printed_width is not None
         crosses_log_domain = (
-            Decimal(2) * printed_sigma >= fraction
-            or Decimal(2) * printed_sigma >= Decimal(1) - fraction
+            printed_width >= fraction or printed_width >= Decimal(1) - fraction
         )
         if crosses_log_domain:
             assert residual.numeric.decision_band is None
             assert residual.status is ResidualStatus.NO_BAND
             assert residual.refusal is not None
-            assert residual.refusal.detail["reason"] == (
-                "ferric_fraction_uncertainty_linearization_invalid"
-            )
+            assert residual.refusal.detail["reason"] == "printed_uncertainty_outside_metric_domain"
             boundary_refusals.append(reference)
         else:
             assert residual.refusal is None
@@ -675,14 +678,14 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
             )
             assert abs(residual.numeric.decision_band.value - expected_band) < Decimal("1e-20")
 
-    assert len(boundary_refusals) == 2
-    assert {reference.rsplit("::", 1)[-1] for reference in boundary_refusals} == {
-        "sossi_2020_per_f_o2_11_xanes",
-        "sossi_2020_per_f_o2_12_xanes",
-    }
-    assert sum(row.status is ResidualStatus.MATCH for row in residuals) == 2
-    assert sum(row.status is ResidualStatus.MISMATCH for row in residuals) == 14
-    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 2
+    assert boundary_refusals == []
+    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 0
+    # The owner hold defers the exact MATCH/MISMATCH split for the two rows
+    # whose bands were restored; Studio must refresh the serialized payload pin.
+    assert sum(
+        row.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
+        for row in residuals
+    ) == 18
     aithala_1800_30 = next(
         observation_id
         for observation_id, observation in observations.items()
@@ -733,21 +736,21 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
             observation.value.point,
             source_observation=observation,
         )
-        sigma_r = _printed_fraction_sigma_r(observation)
+        printed_width = _printed_fraction_width(observation)
         if resolution.band is not None:
-            assert sigma_r is not None
-            assert Decimal(2) * sigma_r < fraction
-            assert Decimal(2) * sigma_r < Decimal(1) - fraction
+            assert printed_width is not None
+            assert printed_width < fraction
+            assert printed_width < Decimal(1) - fraction
             band_counts[observation.source_id] = (
                 band_counts.get(observation.source_id, 0) + 1
             )
         elif (
             resolution.refusal is not None
             and resolution.refusal.get("reason")
-            == "ferric_fraction_uncertainty_linearization_invalid"
+            == "printed_uncertainty_outside_metric_domain"
         ):
-            assert sigma_r is not None
-            assert Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+            assert printed_width is not None
+            assert printed_width >= fraction or printed_width >= (
                 Decimal(1) - fraction
             )
             invalid_rows.append(observation.observation_id)
@@ -755,13 +758,9 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
     assert band_counts == {
         "aithala-2026-magmatic-iron-redox-to-2100c": 16,
         "cottrell-2009-iron-xanes": 18,
-        "sossi-2020-magma-ocean-redox": 10,
+        "sossi-2020-magma-ocean-redox": 12,
     }
-    assert len(invalid_rows) == 2
-    assert {row.rsplit("::", 1)[-1] for row in invalid_rows} == {
-        "sossi_2020_per_f_o2_11_xanes",
-        "sossi_2020_per_f_o2_12_xanes",
-    }
+    assert invalid_rows == []
 
 
 def _assert_kress91_citation_is_unknown(residuals, observations) -> None:

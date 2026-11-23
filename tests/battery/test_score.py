@@ -1727,9 +1727,7 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     )
     assert near_one_band.band is None
     assert near_one_band.refusal is not None
-    assert near_one_band.refusal["reason"] == (
-        "ferric_fraction_uncertainty_linearization_invalid"
-    )
+    assert near_one_band.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
 
     from simulator.battery.score_metrics import populate_numeric
 
@@ -2015,6 +2013,41 @@ def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
     }
 
 
+def test_full_store_printed_width_band_census_matches_green() -> None:
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+    _, _, observations = load_migrated_store(REPO_ROOT)
+    width_count = 0
+    band_count = 0
+    conflicts: list[str] = []
+    for observation in observations.values():
+        quantity = quantity_token(observation.identity)
+        reference = point_magnitude(observation.value)
+        if quantity is None or reference is None:
+            continue
+        resolution = _printed_uncertainty_band(
+            quantity,
+            observation.uncertainty,
+            reference,
+            source_observation=observation,
+        )
+        if resolution.band is not None:
+            width_count += 1
+            band_count += 1
+        elif resolution.refusal is not None:
+            if resolution.refusal.get("reason") == "unparseable_printed_uncertainty":
+                continue
+            width_count += 1
+            if resolution.refusal.get("reason") == "uncertainty_convention_conflict":
+                conflicts.append(observation.observation_id)
+
+    # Round 10 restores the two in-domain Sossi XANES intervals; no printed
+    # widths or convention conflicts are added or removed.
+    assert (width_count, band_count, conflicts) == (21202, 13527, [])
+
+
 def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> None:
     from simulator.battery.score import _printed_uncertainty_band, populate_numeric
 
@@ -2023,25 +2056,25 @@ def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> N
         species=Species("Fe", Phase.CR),
     )
 
-    def resolve(width: str):
+    def resolve(width: str, k: str = "3", r: str = "0.1"):
         observation = F.observation(
             f"ferric-fraction-domain-{width}",
             "ferric-fraction-domain-experiment",
             identity,
-            Decimal("0.1") / Decimal("0.9"),
+            Decimal(r) / (Decimal(1) - Decimal(r)),
             evidence=EvidenceClass.MEASURED_REDUCED,
             derivation=Derivation(
                 relation=score_mod.FERRIC_FRACTION_RELATION,
                 inputs=("ferric-fraction-domain-source",),
                 parameters=(
-                    ("original_Fe3_over_FeT", F.located(Decimal("0.1"))),
+                    ("original_Fe3_over_FeT", F.located(Decimal(r))),
                 ),
                 output_unit="dimensionless",
             ),
         )
         uncertainty = Uncertainty(
             kind=UncertaintyKind.PRINTED,
-            verbatim={"Fe3_over_FeT": width, "units": "fraction", "k": "3"},
+            verbatim={"Fe3_over_FeT": width, "units": "fraction", "k": k},
         )
         return observation, _printed_uncertainty_band(
             Quantity.FE3_FE2_RATIO,
@@ -2070,6 +2103,20 @@ def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> N
     _inside_observation, inside = resolve("0.09")
     assert inside.refusal is None
     assert inside.band is not None
+
+    _k1_observation, k1_inside = resolve("0.09", "1")
+    assert k1_inside.refusal is None
+    assert k1_inside.band is not None
+
+    _endpoint_observation, endpoint = resolve("0.10", "1")
+    assert endpoint.band is None
+    assert endpoint.refusal is not None
+    assert endpoint.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+
+    _upper_endpoint_observation, upper_endpoint = resolve("0.10", "1", "0.9")
+    assert upper_endpoint.band is None
+    assert upper_endpoint.refusal is not None
+    assert upper_endpoint.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:

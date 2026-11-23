@@ -17210,9 +17210,12 @@ def fe3_fe2_ratio_from_ferric_fraction(r: Decimal) -> Decimal | None:
 
 
 def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
-    r: Decimal, sigma_r: Decimal
+    r: Decimal,
+    sigma_r: Decimal,
+    *,
+    printed_half_width: Decimal | None = None,
 ) -> tuple[Decimal | None, str | None]:
-    """Propagate a ferric-fraction standard uncertainty into log10(R)."""
+    """Propagate ferric uncertainty; validate the printed interval when given."""
 
     if (
         not r.is_finite()
@@ -17223,8 +17226,17 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     ):
         return None, "ferric_fraction_uncertainty_input_invalid"
     gap = Decimal(1) - r
-    two_sigma = Decimal(2) * sigma_r
-    if two_sigma >= r or two_sigma >= gap:
+    if printed_half_width is not None:
+        if (
+            not printed_half_width.is_finite()
+            or printed_half_width < 0
+            or printed_half_width >= r
+            or printed_half_width >= gap
+        ):
+            return None, "printed_uncertainty_outside_metric_domain"
+    elif Decimal(2) * sigma_r >= r or Decimal(2) * sigma_r >= gap:
+        # Non-printed callers have no original interval to check. Preserve
+        # their existing two-standard-uncertainty admissibility rule.
         return None, "ferric_fraction_uncertainty_linearization_invalid"
 
     # Premise: the print gives r = Fe3+/sumFe, while the stored value is
@@ -17235,8 +17247,8 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     # Unit check: r, R, sigma_r and sigma_R are dimensionless ratios, so both
     # sides are dimensionless (the final uncertainty is in dex). Sanity:
     # r=0.5 gives R=1 and sigma_R=4*sigma_r; as r->0, sigma_R->sigma_r.
-    # Refuse when a two-sigma span reaches either endpoint: log10(R) diverges
-    # at r=0 and r=1, so linearisation cannot represent that printed interval.
+    # The scorer has already kept a printed interval strictly inside (0, 1);
+    # the non-printed caller fallback above retains its prior sigma check.
     sigma_log10_r = sigma_r / (Decimal(10).ln() * r * gap)
     if not sigma_log10_r.is_finite():
         return None, "ferric_fraction_uncertainty_input_invalid"

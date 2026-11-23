@@ -7006,6 +7006,7 @@ def _printed_uncertainty_band(
                 method=method,
                 band_basis="row_printed",
                 confidence_level_override=confidence_level_override,
+                native_width=native_width,
             )
             if printed.refusal is not None:
                 return printed
@@ -7211,102 +7212,99 @@ def _printed_uncertainty_band(
     fraction_derivation = None
     if quantity is Quantity.FE3_FE2_RATIO and source_observation is not None:
         fraction_derivation = source_observation.derivation
-    if fraction_derivation is not None and (
-        FERRIC_FRACTION_RELATION in fraction_derivation.relation
-        or any(
-            name.removeprefix("original_") in FERRIC_FRACTION_FIELDS
-            for name, _ in fraction_derivation.parameters
-        )
-    ):
-        relation = fraction_derivation.relation or ""
-        fraction_parameters = [
+    relation = (
+        fraction_derivation.relation or ""
+        if fraction_derivation is not None
+        else ""
+    )
+    fraction_parameters = (
+        [
             parameter
             for name, parameter in fraction_derivation.parameters
             if name.removeprefix("original_") in FERRIC_FRACTION_FIELDS
         ]
-        if FERRIC_FRACTION_RELATION in relation or fraction_parameters:
-            if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_provenance_unmapped",
-                        "quantity": quantity.value,
-                        "relation": relation,
-                    }
-                )
-            fraction_state = getattr(fraction_parameters[0], "state", None)
-            fraction_r = (
-                fraction_state.value
-                if isinstance(fraction_state, State) and fraction_state.is_value
-                else None
+        if fraction_derivation is not None
+        else []
+    )
+    has_ferric_fraction = fraction_derivation is not None and (
+        FERRIC_FRACTION_RELATION in relation
+        or bool(fraction_parameters)
+    )
+    if has_ferric_fraction:
+        if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_provenance_unmapped",
+                    "quantity": quantity.value,
+                    "relation": relation,
+                }
             )
-            if not isinstance(fraction_r, Decimal):
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_input_unmapped",
-                        "quantity": quantity.value,
-                        "relation": relation,
-                    }
-                )
-            if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_unit_unmapped",
-                        "quantity": quantity.value,
-                        "source_unit": source_unit,
-                        "converted_unit": converted_unit,
-                    }
-                )
-            if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_value_mismatch",
-                        "quantity": quantity.value,
-                        "fraction": str(fraction_r),
-                        "reference": str(reference),
-                    }
-                )
-            if operation is not MetricOperation.DEX:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_metric_unmapped",
-                        "quantity": quantity.value,
-                        "operation": operation.value,
-                    }
-                )
-            # The printed ferric fraction is constrained to [0, 1]. Test its
-            # original coverage interval before normalizing or propagating.
-            if converted > fraction_r or converted > Decimal(1) - fraction_r:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_outside_metric_domain",
-                        "quantity": quantity.value,
-                        "original": raw_text,
-                    }
-                )
-            standard_width = (
-                converted / k_print if k_print is not None else converted
+        fraction_state = getattr(fraction_parameters[0], "state", None)
+        fraction_r = (
+            fraction_state.value
+            if isinstance(fraction_state, State) and fraction_state.is_value
+            else None
+        )
+        if not isinstance(fraction_r, Decimal):
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_input_unmapped",
+                    "quantity": quantity.value,
+                    "relation": relation,
+                }
             )
-            sigma_r = standard_width
-            # FE3/Fe2 residuals use log10 distance, so propagate directly to
-            # dex at the reduction owner before the scorer applies its band policy.
-            sigma_log10_r, refusal_reason = (
-                _fe3_fe2_log10_uncertainty_from_ferric_fraction(
-                    fraction_r, sigma_r
-                )
+        if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_unit_unmapped",
+                    "quantity": quantity.value,
+                    "source_unit": source_unit,
+                    "converted_unit": converted_unit,
+                }
             )
-            if sigma_log10_r is None:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": refusal_reason
-                        or "ferric_fraction_uncertainty_propagation_unavailable",
-                        "quantity": quantity.value,
-                        "fraction": str(fraction_r),
-                        "sigma_r": str(sigma_r),
-                        "distance_to_r_one": str(Decimal(1) - fraction_r),
-                    }
-                )
-            standard_width = sigma_log10_r
-            converted_unit = "dex"
+        if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_value_mismatch",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "reference": str(reference),
+                }
+            )
+        if operation is not MetricOperation.DEX:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_metric_unmapped",
+                    "quantity": quantity.value,
+                    "operation": operation.value,
+                }
+            )
+        standard_width = (
+            converted / k_print if k_print is not None else converted
+        )
+        sigma_r = standard_width
+        # FE3/Fe2 residuals use log10 distance, so propagate directly to
+        # dex at the reduction owner before the scorer applies its band policy.
+        sigma_log10_r, refusal_reason = (
+            _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                fraction_r,
+                sigma_r,
+                printed_half_width=converted,
+            )
+        )
+        if sigma_log10_r is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": refusal_reason
+                    or "ferric_fraction_uncertainty_propagation_unavailable",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "sigma_r": str(sigma_r),
+                    "distance_to_r_one": str(Decimal(1) - fraction_r),
+                }
+            )
+        standard_width = sigma_log10_r
+        converted_unit = "dex"
     else:
         printed_interval_metric_width = _metric_uncertainty_width(
             operation,
