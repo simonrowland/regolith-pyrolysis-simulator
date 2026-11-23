@@ -804,47 +804,11 @@ def neighbour_use_from_carrier(value: Any) -> tuple[int, str | None]:
     return raw, preset
 
 
-def evaluate(
-    patch: RecipePatch,
-    feedstock_id: str,
-    fidelity: str,
-    *,
-    profile: Mapping[str, Any],
-    candidate_id: str | None = None,
-    executor: RunExecutor | None = None,
-    constraints: PhysicsConstraintSet | None = None,
-    schema: RecipeSchema | None = None,
-    worker_runtime: Any | None = None,
-    cost_parameters: Mapping[str, Any] | None = None,
-    conditional_context: ConditionalExecutionContext | None = None,
-) -> ScoredResult:
-    """Run one candidate and stamp neighbour use onto the result."""
-
-    stamp = _NeighbourStamp()
-    token = _NEIGHBOUR_STAMP.set(stamp)
-    try:
-        return _evaluate_impl(
-            patch,
-            feedstock_id,
-            fidelity,
-            profile=profile,
-            candidate_id=candidate_id,
-            executor=executor,
-            constraints=constraints,
-            schema=schema,
-            worker_runtime=worker_runtime,
-            cost_parameters=cost_parameters,
-            conditional_context=conditional_context,
-        )
-    finally:
-        _NEIGHBOUR_STAMP.reset(token)
-
-
 class _CandidateAdmissionError(EvaluationInputError):
     """Raised when a candidate violates a pre-run admission limit."""
 
 
-def _evaluate_impl(
+def evaluate(
     patch: RecipePatch,
     feedstock_id: str,
     fidelity: str,
@@ -860,211 +824,149 @@ def _evaluate_impl(
 ) -> ScoredResult:
     """Run one candidate and return feasibility plus any available objectives."""
 
-    active_schema = schema or RecipeSchema()
+    stamp = _NeighbourStamp()
+    token = _NEIGHBOUR_STAMP.set(stamp)
     try:
-        validated_patch = patch.validated(active_schema)
-    except RecipeValidationError as exc:
-        return _invalid_patch_result(candidate_id, str(exc))
+        active_schema = schema or RecipeSchema()
+        try:
+            validated_patch = patch.validated(active_schema)
+        except RecipeValidationError as exc:
+            return _invalid_patch_result(candidate_id, str(exc))
 
-    try:
-        active_constraints, spec, run_config = _build_eval_inputs_for_candidate(
-            validated_patch,
-            feedstock_id,
-            fidelity,
-            profile,
-            active_schema,
-            constraints=constraints,
-            cost_parameters=cost_parameters,
-            conditional_context=conditional_context,
-        )
-    except ProfileValidationError as exc:
-        if _is_stale_profile_refusal(exc):
-            return _stale_profile_result(candidate_id, str(exc))
-        raise
-    except _CandidateAdmissionError as exc:
-        return _invalid_patch_result(candidate_id, str(exc))
-    except EvaluationInputError as exc:
-        if _is_zero_input_basis_breach_message(str(exc)):
-            return _zero_input_basis_result(candidate_id, str(exc))
-        raise
-    except VaporPressureNumericalOverflowError as exc:
-        return _numerical_overflow_result(
-            candidate_id,
-            None,
-            None,
-            f"{type(exc).__name__}: {exc}",
-        )
-    except OverflowError as exc:
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-        ) from exc
-    except _TYPED_ABSENCE_EXCEPTION_CLASSES as exc:
-        raise BackendUnavailableAbort(
-            str(exc),
-            patch=validated_patch,
-            candidate_id=candidate_id,
-        ) from exc
-    refuse_proprietary_engine_use(
-        run_config.backend_name,
-        mode="optimizer evaluation",
-    )
-    key = cache_key(spec)
-    objective_profile = _objective_profile_for_spec(profile, spec)
-    domain_reason = real_backend_feedstock_domain_reason(
-        run_config.backend_name,
-        run_config.feedstock_id,
-        run_config.feedstocks,
-    )
-    if domain_reason is not None:
-        return _preflight_out_of_domain_result(
-            candidate_id,
-            spec,
-            key,
-            domain_reason,
-        )
-    active_executor = executor or RunExecutor()
-    runtime = worker_runtime if worker_runtime is not None else get_worker_runtime(
-        feedstock_id=run_config.feedstock_id,
-        stage0_subprocess_required=requires_stage0_subprocess(
-            run_config.feedstock_id,
-            run_config.feedstocks,
-        ),
-    )
-
-    try:
-        # Coarse presets may reuse a nearby engine result. fine stays exact
-        # and does not write cells. Battery scoring does not enter this scope.
-        # The stamp outlives the scope so the result built below still sees it.
-        with optimizer_engine_neighbour(
-            getattr(run_config, "reduced_real_cache", None),
-            counter=_NEIGHBOUR_STAMP.get(),
-        ):
-            run_execution = _execute_run(
-                active_executor,
-                run_config,
-                worker_runtime=runtime,
+        try:
+            active_constraints, spec, run_config = _build_eval_inputs_for_candidate(
+                validated_patch,
+                feedstock_id,
+                fidelity,
+                profile,
+                active_schema,
+                constraints=constraints,
+                cost_parameters=cost_parameters,
+                conditional_context=conditional_context,
             )
-    except PT0NonFinitePayload as exc:
-        return _non_finite_payload_result(
-            candidate_id,
-            spec,
-            key,
-            str(exc),
-        )
-    except VaporPressureNumericalOverflowError as exc:
-        return _numerical_overflow_result(
-            candidate_id,
-            spec,
-            key,
-            f"{type(exc).__name__}: {exc}",
-        )
-    except OverflowError as exc:
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    except _TYPED_ABSENCE_EXCEPTION_CLASSES as exc:
-        raise BackendUnavailableAbort(
-            str(exc),
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    except _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES as exc:
-        return _typed_physics_refusal_result(
-            candidate_id,
-            spec,
-            key,
-            exc,
-        )
-    except PoisonedHourError as exc:
-        if _is_backend_unavailable(exc):
-            raise BackendUnavailableAbort(
-                str(exc),
-                patch=validated_patch,
-                candidate_id=candidate_id,
-                eval_spec=spec,
-                cache_key_value=key,
-            ) from exc
-        if _is_malformed_recipe_error(exc):
-            return _malformed_recipe_result(
-                candidate_id,
-                spec,
-                key,
-                str(exc),
-                profile=profile,
-            )
-        candidate_failure = _candidate_simulator_failure_result(
-            candidate_id,
-            spec,
-            key,
-            exc,
-        )
-        if candidate_failure is not None:
-            return candidate_failure
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    except RunnerError as exc:
-        if _is_backend_unavailable(exc):
-            raise BackendUnavailableAbort(
-                str(exc),
-                patch=validated_patch,
-                candidate_id=candidate_id,
-                eval_spec=spec,
-                cache_key_value=key,
-            ) from exc
-        if _is_numerical_overflow_message(str(exc)):
+        except ProfileValidationError as exc:
+            if _is_stale_profile_refusal(exc):
+                return _stale_profile_result(candidate_id, str(exc))
+            raise
+        except _CandidateAdmissionError as exc:
+            return _invalid_patch_result(candidate_id, str(exc))
+        except EvaluationInputError as exc:
+            if _is_zero_input_basis_breach_message(str(exc)):
+                return _zero_input_basis_result(candidate_id, str(exc))
+            raise
+        except VaporPressureNumericalOverflowError as exc:
             return _numerical_overflow_result(
                 candidate_id,
-                spec,
-                key,
+                None,
+                None,
                 f"{type(exc).__name__}: {exc}",
             )
-        if _is_non_finite_payload_message(str(exc)):
+        except OverflowError as exc:
+            raise EngineBugAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+            ) from exc
+        except _TYPED_ABSENCE_EXCEPTION_CLASSES as exc:
+            raise BackendUnavailableAbort(
+                str(exc),
+                patch=validated_patch,
+                candidate_id=candidate_id,
+            ) from exc
+        refuse_proprietary_engine_use(
+            run_config.backend_name,
+            mode="optimizer evaluation",
+        )
+        key = cache_key(spec)
+        objective_profile = _objective_profile_for_spec(profile, spec)
+        domain_reason = real_backend_feedstock_domain_reason(
+            run_config.backend_name,
+            run_config.feedstock_id,
+            run_config.feedstocks,
+        )
+        if domain_reason is not None:
+            return _preflight_out_of_domain_result(
+                candidate_id,
+                spec,
+                key,
+                domain_reason,
+            )
+        active_executor = executor or RunExecutor()
+        runtime = worker_runtime if worker_runtime is not None else get_worker_runtime(
+            feedstock_id=run_config.feedstock_id,
+            stage0_subprocess_required=requires_stage0_subprocess(
+                run_config.feedstock_id,
+                run_config.feedstocks,
+            ),
+        )
+
+        try:
+            # Coarse presets may reuse a nearby engine result. fine stays exact
+            # and does not write cells. Battery scoring does not enter this scope.
+            # The stamp outlives the scope so the result built below still sees it.
+            with optimizer_engine_neighbour(
+                getattr(run_config, "reduced_real_cache", None),
+                counter=_NEIGHBOUR_STAMP.get(),
+            ):
+                run_execution = _execute_run(
+                    active_executor,
+                    run_config,
+                    worker_runtime=runtime,
+                )
+        except PT0NonFinitePayload as exc:
             return _non_finite_payload_result(
                 candidate_id,
                 spec,
                 key,
                 str(exc),
             )
-        if _is_inventory_overdraw_message(str(exc)):
-            return _invalid_recipe_result(
+        except VaporPressureNumericalOverflowError as exc:
+            return _numerical_overflow_result(
                 candidate_id,
                 spec,
                 key,
-                str(exc),
+                f"{type(exc).__name__}: {exc}",
             )
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    except (ProposalRejected, OverdraftError) as exc:
-        # b-285 keeps broad ProposalRejected wrappers from becoming inventory
-        # overdraws. b-1154 scores mixed-origin overhead-gas withdrawals as candidates.
-        message = f"{type(exc).__name__}: {exc}"
-        if _is_backend_unavailable(exc):
-            raise BackendUnavailableAbort(
-                message,
+        except OverflowError as exc:
+            raise EngineBugAbort(
+                f"{type(exc).__name__}: {exc}",
                 patch=validated_patch,
                 candidate_id=candidate_id,
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
-        if not _is_inventory_overdraw_message(message):
+        except _TYPED_ABSENCE_EXCEPTION_CLASSES as exc:
+            raise BackendUnavailableAbort(
+                str(exc),
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
+        except _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES as exc:
+            return _typed_physics_refusal_result(
+                candidate_id,
+                spec,
+                key,
+                exc,
+            )
+        except PoisonedHourError as exc:
+            if _is_backend_unavailable(exc):
+                raise BackendUnavailableAbort(
+                    str(exc),
+                    patch=validated_patch,
+                    candidate_id=candidate_id,
+                    eval_spec=spec,
+                    cache_key_value=key,
+                ) from exc
+            if _is_malformed_recipe_error(exc):
+                return _malformed_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(exc),
+                    profile=profile,
+                )
             candidate_failure = _candidate_simulator_failure_result(
                 candidate_id,
                 spec,
@@ -1074,400 +976,468 @@ def _evaluate_impl(
             if candidate_failure is not None:
                 return candidate_failure
             raise EngineBugAbort(
-                message,
-                patch=validated_patch,
-                candidate_id=candidate_id,
-                eval_spec=spec,
-                cache_key_value=key,
-            ) from exc
-        return _invalid_recipe_result(
-            candidate_id,
-            spec,
-            key,
-            message,
-        )
-    except Exception as exc:  # noqa: BLE001 -- crashes abort the study
-        if _is_backend_unavailable(exc):
-            raise BackendUnavailableAbort(
                 f"{type(exc).__name__}: {exc}",
                 patch=validated_patch,
                 candidate_id=candidate_id,
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
-        if _is_malformed_recipe_error(exc):
-            return _malformed_recipe_result(
-                candidate_id,
-                spec,
-                key,
+        except RunnerError as exc:
+            if _is_backend_unavailable(exc):
+                raise BackendUnavailableAbort(
+                    str(exc),
+                    patch=validated_patch,
+                    candidate_id=candidate_id,
+                    eval_spec=spec,
+                    cache_key_value=key,
+                ) from exc
+            if _is_numerical_overflow_message(str(exc)):
+                return _numerical_overflow_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    f"{type(exc).__name__}: {exc}",
+                )
+            if _is_non_finite_payload_message(str(exc)):
+                return _non_finite_payload_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(exc),
+                )
+            if _is_inventory_overdraw_message(str(exc)):
+                return _invalid_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(exc),
+                )
+            raise EngineBugAbort(
                 f"{type(exc).__name__}: {exc}",
-                profile=profile,
-            )
-        honest = _result_from_honest_engine_exception(
-            candidate_id,
-            spec,
-            key,
-            exc,
-            profile,
-        )
-        if honest is not None:
-            return honest
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-
-    status = str(getattr(run_execution, "status", "ok"))
-    error_message = str(getattr(run_execution, "error_message", ""))
-    if (
-        status == "refused"
-        and _run_execution_has_environment_failure_disposition(run_execution)
-    ):
-        raise EngineBugAbort(
-            "environment-disposition refusal cannot be scored as candidate "
-            "physics",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        )
-    if status == "failed":
-        failure_exc = getattr(run_execution, "failure_exception", None)
-        if _is_malformed_recipe_error(failure_exc):
-            return _malformed_recipe_result(
-                candidate_id,
-                spec,
-                key,
-                str(failure_exc),
-                run_execution=run_execution,
-                profile=profile,
-            )
-        if _is_backend_unavailable(failure_exc, carrier=run_execution):
-            raise BackendUnavailableAbort(
-                error_message or "backend unavailable",
                 patch=validated_patch,
                 candidate_id=candidate_id,
                 eval_spec=spec,
                 cache_key_value=key,
-            )
-        if _is_numerical_overflow_message(error_message):
-            return _numerical_overflow_result(
-                candidate_id,
-                spec,
-                key,
-                error_message,
-                run_execution=run_execution,
-                profile=profile,
-            )
-        if _is_non_finite_payload_message(error_message):
-            return _non_finite_payload_result(
-                candidate_id,
-                spec,
-                key,
-                error_message,
-                run_execution=run_execution,
-                profile=profile,
-            )
-        if _is_inventory_overdraw_message(error_message):
+            ) from exc
+        except (ProposalRejected, OverdraftError) as exc:
+            # b-285 keeps broad ProposalRejected wrappers from becoming inventory
+            # overdraws. b-1154 scores mixed-origin overhead-gas withdrawals as candidates.
+            message = f"{type(exc).__name__}: {exc}"
+            if _is_backend_unavailable(exc):
+                raise BackendUnavailableAbort(
+                    message,
+                    patch=validated_patch,
+                    candidate_id=candidate_id,
+                    eval_spec=spec,
+                    cache_key_value=key,
+                ) from exc
+            if not _is_inventory_overdraw_message(message):
+                candidate_failure = _candidate_simulator_failure_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    exc,
+                )
+                if candidate_failure is not None:
+                    return candidate_failure
+                raise EngineBugAbort(
+                    message,
+                    patch=validated_patch,
+                    candidate_id=candidate_id,
+                    eval_spec=spec,
+                    cache_key_value=key,
+                ) from exc
             return _invalid_recipe_result(
                 candidate_id,
                 spec,
                 key,
-                error_message,
-                run_execution=run_execution,
-                profile=profile,
+                message,
             )
-        candidate_failure = _candidate_simulator_failure_result(
-            candidate_id,
-            spec,
-            key,
-            failure_exc,
-            run_execution=run_execution,
-            profile=profile,
-            error_message=error_message,
-        )
-        if candidate_failure is not None:
-            return candidate_failure
-        if isinstance(failure_exc, BaseException):
+        except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+            if _is_backend_unavailable(exc):
+                raise BackendUnavailableAbort(
+                    f"{type(exc).__name__}: {exc}",
+                    patch=validated_patch,
+                    candidate_id=candidate_id,
+                    eval_spec=spec,
+                    cache_key_value=key,
+                ) from exc
+            if _is_malformed_recipe_error(exc):
+                return _malformed_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    f"{type(exc).__name__}: {exc}",
+                    profile=profile,
+                )
             honest = _result_from_honest_engine_exception(
                 candidate_id,
                 spec,
                 key,
-                failure_exc,
+                exc,
                 profile,
             )
             if honest is not None:
                 return honest
-        raise EngineBugAbort(
-            error_message or "run executor failed",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        )
+            raise EngineBugAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
 
-    # INVARIANT: a stored C6 refusal is never a numeric score. This is the
-    # only pricing return. It stands after environment-failure aborts and
-    # after failed-status results, and before every score-producing return
-    # (earned out-of-domain rump, infeasible retained vector, feasible vector).
-    stored_c6_refusal = _stored_c6_campaign_refusal_result(
-        candidate_id,
-        spec,
-        key,
-        run_execution,
-        profile,
-    )
-    if stored_c6_refusal is not None:
-        return stored_c6_refusal
+        status = str(getattr(run_execution, "status", "ok"))
+        error_message = str(getattr(run_execution, "error_message", ""))
+        if (
+            status == "refused"
+            and _run_execution_has_environment_failure_disposition(run_execution)
+        ):
+            raise EngineBugAbort(
+                "environment-disposition refusal cannot be scored as candidate "
+                "physics",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            )
+        if status == "failed":
+            failure_exc = getattr(run_execution, "failure_exception", None)
+            if _is_malformed_recipe_error(failure_exc):
+                return _malformed_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(failure_exc),
+                    run_execution=run_execution,
+                    profile=profile,
+                )
+            if _is_backend_unavailable(failure_exc, carrier=run_execution):
+                raise BackendUnavailableAbort(
+                    error_message or "backend unavailable",
+                    patch=validated_patch,
+                    candidate_id=candidate_id,
+                    eval_spec=spec,
+                    cache_key_value=key,
+                )
+            if _is_numerical_overflow_message(error_message):
+                return _numerical_overflow_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    error_message,
+                    run_execution=run_execution,
+                    profile=profile,
+                )
+            if _is_non_finite_payload_message(error_message):
+                return _non_finite_payload_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    error_message,
+                    run_execution=run_execution,
+                    profile=profile,
+                )
+            if _is_inventory_overdraw_message(error_message):
+                return _invalid_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    error_message,
+                    run_execution=run_execution,
+                    profile=profile,
+                )
+            candidate_failure = _candidate_simulator_failure_result(
+                candidate_id,
+                spec,
+                key,
+                failure_exc,
+                run_execution=run_execution,
+                profile=profile,
+                error_message=error_message,
+            )
+            if candidate_failure is not None:
+                return candidate_failure
+            if isinstance(failure_exc, BaseException):
+                honest = _result_from_honest_engine_exception(
+                    candidate_id,
+                    spec,
+                    key,
+                    failure_exc,
+                    profile,
+                )
+                if honest is not None:
+                    return honest
+            raise EngineBugAbort(
+                error_message or "run executor failed",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            )
 
-    backend_status = _latest_backend_status(run_execution)
-    if _has_out_of_domain_backend_signal(
-        run_execution,
-        backend_status=backend_status,
-    ):
-        return _out_of_domain_result(
-            candidate_id,
-            spec,
-            key,
-            run_execution,
-            objective_profile,
-            patch=validated_patch,
-            schema=active_schema,
-            constraints=active_constraints,
-        )
-
-    if backend_status == "not_attempted":
-        # Per-probe sequential-transport token (alphaMELTS mid-run prior
-        # close on the kernel IntentResult rail). It is a legal
-        # INTENT_RESULT_STATUSES member, but it is not a whole-run
-        # optimizer envelope answer. Production never delivers it here:
-        # core._get_equilibrium is pre-gated on is_available(), and
-        # RunExecutor._aggregate_backend_status swallows non-priority
-        # history members. Do not relabel as refused (never-attempted is
-        # not attempted-and-refused-on-physics) and do not score the
-        # candidate.
-        raise EngineBugAbort(
-            "backend_status='not_attempted' reached the whole-run "
-            "optimizer envelope. That token is a per-probe sequential-"
-            "transport close (alphaMELTS mid-run prior close); it is "
-            "not a candidate physics answer. A mid-run transport death "
-            "must abort/drop and recycle the backend, never score the "
-            "candidate as PHYSICS_REFUSED.",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        )
-
-    if backend_status in {"refused", "not_converged"}:
-        return _honest_non_ok_backend_result(
+        # INVARIANT: a stored C6 refusal is never a numeric score. This is the
+        # only pricing return. It stands after environment-failure aborts and
+        # after failed-status results, and before every score-producing return
+        # (earned out-of-domain rump, infeasible retained vector, feasible vector).
+        stored_c6_refusal = _stored_c6_campaign_refusal_result(
             candidate_id,
             spec,
             key,
             run_execution,
             profile,
-            backend_status=backend_status,
         )
+        if stored_c6_refusal is not None:
+            return stored_c6_refusal
 
-    _abort_on_non_authoritative_backend_status(
-        run_execution,
-        spec=spec,
-        patch=validated_patch,
-        candidate_id=candidate_id,
-        key=key,
-    )
-
-    snapshots = getattr(run_execution, "snapshots", None)
-    if status != "refused" or snapshots is None or snapshots:
-        _abort_on_mass_balance_breach(
+        backend_status = _latest_backend_status(run_execution)
+        if _has_out_of_domain_backend_signal(
             run_execution,
+            backend_status=backend_status,
+        ):
+            return _out_of_domain_result(
+                candidate_id,
+                spec,
+                key,
+                run_execution,
+                objective_profile,
+                patch=validated_patch,
+                schema=active_schema,
+                constraints=active_constraints,
+            )
+
+        if backend_status == "not_attempted":
+            # Per-probe sequential-transport token (alphaMELTS mid-run prior
+            # close on the kernel IntentResult rail). It is a legal
+            # INTENT_RESULT_STATUSES member, but it is not a whole-run
+            # optimizer envelope answer. Production never delivers it here:
+            # core._get_equilibrium is pre-gated on is_available(), and
+            # RunExecutor._aggregate_backend_status swallows non-priority
+            # history members. Do not relabel as refused (never-attempted is
+            # not attempted-and-refused-on-physics) and do not score the
+            # candidate.
+            raise EngineBugAbort(
+                "backend_status='not_attempted' reached the whole-run "
+                "optimizer envelope. That token is a per-probe sequential-"
+                "transport close (alphaMELTS mid-run prior close); it is "
+                "not a candidate physics answer. A mid-run transport death "
+                "must abort/drop and recycle the backend, never score the "
+                "candidate as PHYSICS_REFUSED.",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            )
+
+        if backend_status in {"refused", "not_converged"}:
+            return _honest_non_ok_backend_result(
+                candidate_id,
+                spec,
+                key,
+                run_execution,
+                profile,
+                backend_status=backend_status,
+            )
+
+        _abort_on_non_authoritative_backend_status(
+            run_execution,
+            spec=spec,
             patch=validated_patch,
             candidate_id=candidate_id,
-            eval_spec=spec,
             key=key,
         )
 
-    if status == "refused":
-        return _physics_refused_result(
-            candidate_id,
-            spec,
-            key,
-            reason=_run_execution_refusal_reason(run_execution),
-            error_message=error_message,
-            run_execution=run_execution,
-            profile=profile,
-        )
-
-    try:
-        feasibility = _evaluate_physics_constraints(
-            active_constraints,
-            _trace_with_optimizer_coating_report(
+        snapshots = getattr(run_execution, "snapshots", None)
+        if status != "refused" or snapshots is None or snapshots:
+            _abort_on_mass_balance_breach(
                 run_execution,
-                active_constraints,
-                spec=spec,
-            ),
-            spec=spec,
-            profile=profile,
-            run_config=run_config,
-        )
-    except OverflowError as exc:
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    if not feasibility.feasible:
-        # ``profile`` stays the authored profile for the run reference.
-        # The vector and its withhold notice come from ``objective_profile``,
-        # which is stamped with EvalSpec.campaign. They travel as one score
-        # so a fidelity overlay cannot make the notice name a different campaign.
-        campaign_score = None
-        try:
-            pumping_diagnostic = _pumping_diagnostic_for_gate(
-                run_execution,
-                feedstock_id=spec.feedstock_id,
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                key=key,
             )
+
+        if status == "refused":
+            return _physics_refused_result(
+                candidate_id,
+                spec,
+                key,
+                reason=_run_execution_refusal_reason(run_execution),
+                error_message=error_message,
+                run_execution=run_execution,
+                profile=profile,
+            )
+
+        try:
+            feasibility = _evaluate_physics_constraints(
+                active_constraints,
+                _trace_with_optimizer_coating_report(
+                    run_execution,
+                    active_constraints,
+                    spec=spec,
+                ),
+                spec=spec,
+                profile=profile,
+                run_config=run_config,
+            )
+        except OverflowError as exc:
+            raise EngineBugAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
+        if not feasibility.feasible:
+            # ``profile`` stays the authored profile for the run reference.
+            # The vector and its withhold notice come from ``objective_profile``,
+            # which is stamped with EvalSpec.campaign. They travel as one score
+            # so a fidelity overlay cannot make the notice name a different campaign.
+            campaign_score = None
+            try:
+                pumping_diagnostic = _pumping_diagnostic_for_gate(
+                    run_execution,
+                    feedstock_id=spec.feedstock_id,
+                )
+                campaign_score = _compute_objective_vector(
+                    run_execution,
+                    objective_profile,
+                    pumping_diagnostic,
+                    spec,
+                )
+            except (OverflowError, ObjectiveComputationError):
+                # Keep the failed gate result; an unavailable vector remains unscored.
+                campaign_score = None
+            return _infeasible_result(
+                candidate_id,
+                spec,
+                key,
+                feasibility,
+                run_execution,
+                profile,
+                campaign_score=campaign_score,
+            )
+        pumping_diagnostic = _pumping_diagnostic_for_gate(
+            run_execution,
+            feedstock_id=spec.feedstock_id,
+        )
+        pumping_margin = _pumping_feasibility_margin(pumping_diagnostic)
+        if pumping_margin is not None and not pumping_margin.feasible:
+            return _pumping_infeasible_result(
+                candidate_id,
+                spec,
+                key,
+                run_execution,
+                profile,
+                pumping_margin,
+            )
+        # Gates use the resolved execution triple. ``objective_profile`` is
+        # stamped with EvalSpec campaign, track, and c5_enabled, and
+        # ``composition_target_specs`` drops objectives that triple does not
+        # claim. An unclaimed terminal-rump row must not
+        # replace the retained score with rump_terminal_completion_unknown.
+        target_reason = composition_target_infeasible_reason(objective_profile)
+        if target_reason:
+            return _target_infeasible_result(
+                candidate_id,
+                spec,
+                key,
+                run_execution,
+                profile,
+                gate="composition_target_order",
+                detail=target_reason,
+                notes=(target_reason,),
+            )
+        if composition_targets_require_terminal_rump(objective_profile):
+            if _trace_has_unearned_rump_terminal(run_execution):
+                return _target_infeasible_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    run_execution,
+                    profile,
+                    gate="rump_terminal",
+                    detail="rump_terminal_unproven",
+                    notes=("rump_terminal_unproven",),
+                )
+            completion_problem = _terminal_rump_completed_run_problem(run_execution)
+            if completion_problem is not None:
+                return _target_infeasible_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    run_execution,
+                    profile,
+                    gate="rump_terminal",
+                    detail=completion_problem,
+                    notes=(completion_problem,),
+                )
+
+        try:
             campaign_score = _compute_objective_vector(
                 run_execution,
                 objective_profile,
                 pumping_diagnostic,
                 spec,
             )
-        except (OverflowError, ObjectiveComputationError):
-            # Keep the failed gate result; an unavailable vector remains unscored.
-            campaign_score = None
-        return _infeasible_result(
-            candidate_id,
-            spec,
-            key,
-            feasibility,
-            run_execution,
-            profile,
-            campaign_score=campaign_score,
-        )
-    pumping_diagnostic = _pumping_diagnostic_for_gate(
-        run_execution,
-        feedstock_id=spec.feedstock_id,
-    )
-    pumping_margin = _pumping_feasibility_margin(pumping_diagnostic)
-    if pumping_margin is not None and not pumping_margin.feasible:
-        return _pumping_infeasible_result(
-            candidate_id,
-            spec,
-            key,
-            run_execution,
-            profile,
-            pumping_margin,
-        )
-    # Gates use the resolved execution triple. ``objective_profile`` is
-    # stamped with EvalSpec campaign, track, and c5_enabled, and
-    # ``composition_target_specs`` drops objectives that triple does not
-    # claim. An unclaimed terminal-rump row must not
-    # replace the retained score with rump_terminal_completion_unknown.
-    target_reason = composition_target_infeasible_reason(objective_profile)
-    if target_reason:
-        return _target_infeasible_result(
-            candidate_id,
-            spec,
-            key,
-            run_execution,
-            profile,
-            gate="composition_target_order",
-            detail=target_reason,
-            notes=(target_reason,),
-        )
-    if composition_targets_require_terminal_rump(objective_profile):
-        if _trace_has_unearned_rump_terminal(run_execution):
-            return _target_infeasible_result(
-                candidate_id,
-                spec,
-                key,
+            objectives = campaign_score.objectives
+            trace_payload = _composition_target_trace_payload(
+                objective_profile,
+                objectives,
                 run_execution,
-                profile,
-                gate="rump_terminal",
-                detail="rump_terminal_unproven",
-                notes=("rump_terminal_unproven",),
             )
-        completion_problem = _terminal_rump_completed_run_problem(run_execution)
-        if completion_problem is not None:
-            return _target_infeasible_result(
-                candidate_id,
-                spec,
-                key,
-                run_execution,
-                profile,
-                gate="rump_terminal",
-                detail=completion_problem,
-                notes=(completion_problem,),
-            )
-
-    try:
-        campaign_score = _compute_objective_vector(
-            run_execution,
-            objective_profile,
-            pumping_diagnostic,
-            spec,
-        )
-        objectives = campaign_score.objectives
-        trace_payload = _composition_target_trace_payload(
-            objective_profile,
-            objectives,
-            run_execution,
-        )
-        trace_payload = _trace_payload_with_knob_saturation(
-            trace_payload,
-            compute_knob_saturation(
-                validated_patch,
-                active_schema,
-                active_objective_metrics=(
-                    value.metric for value in objectives.values
+            trace_payload = _trace_payload_with_knob_saturation(
+                trace_payload,
+                compute_knob_saturation(
+                    validated_patch,
+                    active_schema,
+                    active_objective_metrics=(
+                        value.metric for value in objectives.values
+                    ),
                 ),
-            ),
-        )
-    except OverflowError as exc:
-        raise EngineBugAbort(
-            f"{type(exc).__name__}: {exc}",
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    except ObjectiveComputationError as exc:
-        raise EngineBugAbort(
-            str(exc),
-            patch=validated_patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key_value=key,
-        ) from exc
-    trace_payload = _trace_payload_with_interpolation_feasibility(
-        trace_payload,
-        run_execution,
-        feasibility.margins,
-    )
-
-    return ScoredResult(
-        candidate_id=candidate_id,
-        eval_spec=spec,
-        cache_key=key,
-        feasible=True,
-        objectives=objectives,
-        feasibility_margins=feasibility.margins,
-        failing_gates=(),
-        run_reference=_run_reference(
+            )
+        except OverflowError as exc:
+            raise EngineBugAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
+        except ObjectiveComputationError as exc:
+            raise EngineBugAbort(
+                str(exc),
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
+        trace_payload = _trace_payload_with_interpolation_feasibility(
+            trace_payload,
             run_execution,
-            objective_profile,
-            trace_payload=trace_payload,
-            cost_parameters=spec.cost_parameters,
-            coating_margin=feasibility.margins.get("coating"),
-        ),
-        notes=_notes_for_executed_campaign_score((), campaign_score),
-    )
+            feasibility.margins,
+        )
+
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=key,
+            feasible=True,
+            objectives=objectives,
+            feasibility_margins=feasibility.margins,
+            failing_gates=(),
+            run_reference=_run_reference(
+                run_execution,
+                objective_profile,
+                trace_payload=trace_payload,
+                cost_parameters=spec.cost_parameters,
+                coating_margin=feasibility.margins.get("coating"),
+            ),
+            notes=_notes_for_executed_campaign_score((), campaign_score),
+        )
+
+    finally:
+        _NEIGHBOUR_STAMP.reset(token)
 
 
 def _trace_payload_with_knob_saturation(
