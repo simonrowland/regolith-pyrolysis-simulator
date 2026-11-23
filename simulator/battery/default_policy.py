@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
@@ -102,15 +102,17 @@ def load_policy_table() -> Mapping[str, Mapping[str, object]]:
     return _load_policy_table(POLICY_PATH)
 
 
-def _notice_policy(policy_id: str, value: object | None = None) -> NoticePolicy:
+def _notice_policy(
+    entry: Mapping[str, object], value: object | None = None
+) -> NoticePolicy:
     """Build a notice's compact policy metadata from its registry entry."""
 
-    entry = load_policy_table()[policy_id]
+    policy_id = str(entry["id"])
     selected_value = entry.get("value") if value is None else value
     if selected_value is None:
         raise ValueError(f"{policy_id} notice metadata requires a resolved value")
     value_text = (
-        format(selected_value, "f")
+        format(selected_value.normalize(), "f")
         if isinstance(selected_value, Decimal)
         else str(selected_value)
     )
@@ -256,17 +258,7 @@ def resolve(policy_id: str, **context: object) -> Resolved:
         "value": value,
         "units": units,
         "flag": flag.value,
-        "policy": {
-            "id": policy_id,
-            "version": entry["version"],
-            "status": entry["status"],
-            "value": (
-                format(value.normalize(), "f")
-                if isinstance(value, Decimal)
-                else str(value)
-            ),
-            "units": units,
-        },
+        "policy": asdict(_notice_policy(entry, value)),
     }
     for key in (
         "condition",

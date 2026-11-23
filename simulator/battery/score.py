@@ -8229,7 +8229,7 @@ def _assumption_notice(
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
-        policy=_notice_policy(str(policy_row["id"])),
+        policy=_notice_policy(policy_row),
     )
 
 
