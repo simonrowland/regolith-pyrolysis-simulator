@@ -335,6 +335,39 @@ def test_retry_recovery_preserves_step_down_notice(
     }
 
 
+def test_engine_worker_timeout_retries_freeze_gate_dispatch_once(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.magemin import MAGEMIN_WARM_CALL_TIMEOUT_S
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    calls = []
+
+    def dispatch_only(*_args, **_kwargs):
+        calls.append(len(calls) + 1)
+        if len(calls) == 1:
+            raise EngineWorkerTimeout(
+                'fake MAGEMin worker',
+                MAGEMIN_WARM_CALL_TIMEOUT_S,
+                phase='job',
+            )
+        return IntentResult(
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            status='ok',
+            diagnostic={'solidus_T_C': 1000, 'liquidus_T_C': 1300},
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch_only)
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    assert calls == [1, 2]
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert curve['environment_retries']['disposition'] == 'environment'
+    assert curve['environment_retries']['reason'] == 'engine_worker_timeout'
+
+
 def test_magemin_success_does_not_call_alpha(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):

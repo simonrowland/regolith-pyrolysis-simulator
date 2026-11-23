@@ -96,7 +96,7 @@ from __future__ import annotations
 import builtins
 import copy
 from concurrent.futures import TimeoutError as FutureTimeoutError
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from decimal import Decimal, InvalidOperation
 import fcntl
 import json
@@ -191,6 +191,9 @@ _MAGEMIN_FO2_TOL_DEX = 2.0e-5
 # (tests/test_engine_worker_live_determinism.py A/B), so this only moves
 # when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99.
 MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
+# A busy host-wide MAGEMin slot is not a stuck engine call. Keep a separate,
+# much longer bound so a wedged slot lock still returns a typed refusal.
+_MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S = 300.0
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
@@ -289,9 +292,10 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
             remaining = deadline - time.monotonic()
             if remaining <= 0.0:
                 raise _MAGEMinEngineLifecycleError(
-                    'MAGEMinSubprocessSlotTimeout',
-                    f'MAGEMin subprocess slot timed out after '
+                    'MAGEMinSubprocessSlotWaitLimitExceeded',
+                    f'MAGEMin subprocess slot wait limit exceeded after '
                     f'{timeout_s:g}s',
+                    failure_disposition='environment',
                 )
             time.sleep(min(0.01, remaining))
         yield
@@ -337,6 +341,8 @@ def _bootstrap_magemin_subprocess_worker(
 
 
 def _handle_magemin_subprocess_request(backend, request, _errlog):
+    # The caller holds the host-wide slot across this request; reacquiring it
+    # here would deadlock the worker against its caller.
     return backend._call_magemin_subprocess(
         bulk_projection=request['bulk_projection'],
         temperature_C=request['temperature_C'],
@@ -344,6 +350,7 @@ def _handle_magemin_subprocess_request(backend, request, _errlog):
         fO2_log=request['fO2_log'],
         call_timeout_s=request.get('call_timeout_s'),
         capture_native_activities=bool(request.get('capture_native_activities')),
+        slot_already_acquired=True,
     )
 
 
@@ -3271,76 +3278,97 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         float(call_timeout_s),
                     )
                 try:
-                    future = self._subprocess_pool.submit({
-                        'bulk_projection': bulk_projection,
-                        'temperature_C': temperature_C,
-                        'pressure_kbar': pressure_kbar,
-                        'fO2_log': fO2_log,
-                        # The pool's job wall starts after worker startup;
-                        # Future.result below also bounds queue/startup waits.
-                        # This subprocess wall is secondary containment for
-                        # platforms without process-group cleanup.
-                        'call_timeout_s': timeout_s + 0.5,
-                        'capture_native_activities': capture_native_activities,
-                    }, timeout_s=timeout_s)
-                    try:
-                        return future.result(timeout=future_timeout_s)
-                    except EngineWorkerTimeout as timeout:
-                        diagnostic_detail = (
-                            self._magemin_timeout_diagnostic_detail_safely(
-                                bulk_projection=bulk_projection,
-                                composition_mol=composition_mol,
-                                temperature_C=temperature_C,
-                                pressure_bar=pressure_bar,
-                                pressure_kbar=pressure_kbar,
-                                fO2_log=fO2_log,
+                    # The 15 s warm-call wall means the engine is stuck, not
+                    # busy. Acquire its host-wide slot before starting that
+                    # wall so normal queueing cannot trigger a retry.
+                    with _magemin_subprocess_slot(
+                        _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
+                    ):
+                        if call_timeout_s is not None:
+                            remaining_aggregate = (
+                                self._residual_call_timeout_s(
+                                    call_timeout_s,
+                                    call_started,
+                                )
                             )
-                        )
-                        self._subprocess_pool._abort_request(
-                            future,
-                            diagnostic_detail=diagnostic_detail,
-                        )
-                        self._attach_magemin_timeout_diagnostic(
-                            timeout,
-                            diagnostic_detail,
-                        )
-                        raise
-                    except FutureTimeoutError as exc:
-                        future.cancel()
-                        diagnostic_detail = (
-                            self._magemin_timeout_diagnostic_detail_safely(
-                                bulk_projection=bulk_projection,
-                                composition_mol=composition_mol,
-                                temperature_C=temperature_C,
-                                pressure_bar=pressure_bar,
-                                pressure_kbar=pressure_kbar,
-                                fO2_log=fO2_log,
+                            timeout_s = min(timeout_s, remaining_aggregate)
+                            future_timeout_s = min(
+                                WarmEngineWorker._caller_future_timeout_s(
+                                    timeout_s,
+                                    startup_timeout_s,
+                                ),
+                                remaining_aggregate,
                             )
-                        )
-                        self._subprocess_pool._abort_request(
-                            future,
-                            diagnostic_detail=diagnostic_detail,
-                        )
-                        timeout = EngineWorkerTimeout(
-                            'MAGEMin subprocess pool',
-                            future_timeout_s,
-                            phase='job',
-                        )
-                        self._attach_magemin_timeout_diagnostic(
-                            timeout,
-                            diagnostic_detail,
-                        )
-                        raise timeout from exc
-                    except (
-                        OSError,
-                        subprocess.SubprocessError,
-                        MemoryError,
-                    ) as exc:
-                        raise _MAGEMinEngineCallError(
-                            type(exc).__name__,
-                            f'MAGEMin warm worker could not be started: {exc}',
-                            failure_disposition='environment',
-                        ) from exc
+                        future = self._subprocess_pool.submit({
+                            'bulk_projection': bulk_projection,
+                            'temperature_C': temperature_C,
+                            'pressure_kbar': pressure_kbar,
+                            'fO2_log': fO2_log,
+                            # The pool's job wall starts after worker startup;
+                            # Future.result below also bounds queue/startup waits.
+                            # This subprocess wall is secondary containment for
+                            # platforms without process-group cleanup.
+                            'call_timeout_s': timeout_s + 0.5,
+                            'capture_native_activities': capture_native_activities,
+                        }, timeout_s=timeout_s)
+                        try:
+                            return future.result(timeout=future_timeout_s)
+                        except EngineWorkerTimeout as timeout:
+                            diagnostic_detail = (
+                                self._magemin_timeout_diagnostic_detail_safely(
+                                    bulk_projection=bulk_projection,
+                                    composition_mol=composition_mol,
+                                    temperature_C=temperature_C,
+                                    pressure_bar=pressure_bar,
+                                    pressure_kbar=pressure_kbar,
+                                    fO2_log=fO2_log,
+                                )
+                            )
+                            self._subprocess_pool._abort_request(
+                                future,
+                                diagnostic_detail=diagnostic_detail,
+                            )
+                            self._attach_magemin_timeout_diagnostic(
+                                timeout,
+                                diagnostic_detail,
+                            )
+                            raise
+                        except FutureTimeoutError as exc:
+                            future.cancel()
+                            diagnostic_detail = (
+                                self._magemin_timeout_diagnostic_detail_safely(
+                                    bulk_projection=bulk_projection,
+                                    composition_mol=composition_mol,
+                                    temperature_C=temperature_C,
+                                    pressure_bar=pressure_bar,
+                                    pressure_kbar=pressure_kbar,
+                                    fO2_log=fO2_log,
+                                )
+                            )
+                            self._subprocess_pool._abort_request(
+                                future,
+                                diagnostic_detail=diagnostic_detail,
+                            )
+                            timeout = EngineWorkerTimeout(
+                                'MAGEMin subprocess pool',
+                                future_timeout_s,
+                                phase='job',
+                            )
+                            self._attach_magemin_timeout_diagnostic(
+                                timeout,
+                                diagnostic_detail,
+                            )
+                            raise timeout from exc
+                        except (
+                            OSError,
+                            subprocess.SubprocessError,
+                            MemoryError,
+                        ) as exc:
+                            raise _MAGEMinEngineCallError(
+                                type(exc).__name__,
+                                f'MAGEMin warm worker could not be started: {exc}',
+                                failure_disposition='environment',
+                            ) from exc
                 except EngineWorkerTimeout:
                     raise
                 except (
@@ -3513,6 +3541,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
         capture_native_activities: bool = False,
+        slot_already_acquired: bool = False,
     ) -> Dict[str, Any]:
         """
         Drive the compiled MAGEMin binary for one single-point call.
@@ -3555,17 +3584,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin call cancelled: aggregate liquidus budget exhausted',
                 )
             timeout_s = min(configured_timeout_s, remaining)
-        call_started = time.monotonic()
-        matlab_text = ''
-        with _magemin_subprocess_slot(timeout_s):
-            remaining_timeout_s = timeout_s - max(
-                0.0, time.monotonic() - call_started
+        slot_wait_started = time.monotonic()
+        slot_context = (
+            nullcontext()
+            if slot_already_acquired
+            else _magemin_subprocess_slot(
+                _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
             )
-            if remaining_timeout_s <= 0.0:
-                raise _MAGEMinEngineLifecycleError(
-                    'MAGEMinSubprocessSlotTimeout',
-                    'MAGEMin call cancelled while waiting for subprocess slot',
+        )
+        with slot_context:
+            if not slot_already_acquired and call_timeout_s is not None:
+                remaining_aggregate = self._residual_call_timeout_s(
+                    call_timeout_s,
+                    slot_wait_started,
                 )
+                timeout_s = min(configured_timeout_s, remaining_aggregate)
+            # The engine wall begins after the busy slot wait. It measures a
+            # stuck run, not ordinary host-wide queue contention.
+            call_started = time.monotonic()
+            matlab_text = ''
+            remaining_timeout_s = timeout_s
             with tempfile.TemporaryDirectory() as tmpdir:
                 for attempt in range(2):
                     remaining_timeout_s = self._residual_call_timeout_s(
@@ -4312,7 +4350,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         timeout_s = float(self._config.get('timeout_s', 60.0))
         try:
-            with _magemin_subprocess_slot(timeout_s):
+            with _magemin_subprocess_slot(
+                _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
+            ):
                 with tempfile.TemporaryDirectory() as tmpdir:
                     completed = subprocess.run(  # noqa: S603 - adapter-built
                         args,
