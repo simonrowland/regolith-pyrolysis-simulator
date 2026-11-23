@@ -16,7 +16,9 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    FO2Channel,
     MetricOperation,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
@@ -43,7 +45,11 @@ from simulator.battery.score import (
     SCORE_ENGINE_SET,
 )
 from simulator.battery.records import (
+    Bench,
+    BenchIdentity,
+    BenchIdentityBasis,
     Composition,
+    FO2Control,
     Located,
     Locator,
     Species,
@@ -51,6 +57,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.score import headline_payload_records, residual_to_plain
+from tests.battery import factories as F
 from tests.battery.factories import migrate_one_extract
 
 
@@ -1770,62 +1777,179 @@ def _without_printed_fo2(observation):
     )
 
 
-def test_unprinted_redox_oxygen_passes_recorded_bench_to_ladder(monkeypatch):
-    from simulator.battery.fo2_ladder import ResolvedFo2
-
-    row = _without_printed_fo2(_borisov_row4())
-    bench = object()
-    calls = []
-
-    def resolve(experiment, recorded_bench, observation, **kwargs):
-        calls.append((experiment, recorded_bench, observation, kwargs))
-        return ResolvedFo2(-8.0, 3, "buffer_relation", False)
-
-    monkeypatch.setattr("simulator.battery.fo2_ladder.resolve_row_fo2", resolve)
-    experiment = object()
-    selected = score_module._unprinted_redox_oxygen(
-        experiment,
-        bench,
-        row,
-        SimpleNamespace(
-            composition_wt={"FeO": 9.94}, temperature=Decimal("1673.15")
-        ),
+def _borisov_score_context(*, vacuum=False, named_valence=False, buffered=False):
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = Migrator(root)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    result = migrator.result
+    row = next(
+        item
+        for item in result.observations.values()
+        if item.observation_id.endswith("borisov_2018_table1_row_4")
     )
+    row = _without_printed_fo2(row)
+    if vacuum:
+        row = replace(
+            row,
+            point_conditions={
+                key: value
+                for key, value in (row.point_conditions or {}).items()
+                if key != "total_pressure_Pa"
+            },
+            identity=replace(row.identity, total_pressure_Pa=None),
+        )
+    if named_valence:
+        row = replace(
+            row,
+            identity=replace(
+                row.identity,
+                quantity=Quantity.VALENCE_RATIO,
+                species=Species("Fe", Phase.L),
+                valence_basis=State.of(
+                    parse_valence_basis(
+                        "Fe3plus_over_Fe2plus", species_formula="Fe"
+                    )
+                ),
+            ),
+        )
 
-    assert selected is not None
-    assert calls[0][:3] == (experiment, bench, row)
-    assert calls[0][3]["quantity"] is Quantity.FE3_FE2_RATIO
-
-
-def test_unprinted_named_valence_notice_names_scored_quantity(monkeypatch):
-    from simulator.battery.fo2_ladder import ResolvedFo2
-
-    row = _without_printed_fo2(_borisov_row4())
-    identity = replace(
-        row.identity,
-        quantity=Quantity.VALENCE_RATIO,
-        species=Species("Cr", Phase.L),
-        valence_basis=State.of(
-            parse_valence_basis("Cr3plus_over_Cr2plus", species_formula="Cr")
-        ),
+    experiment = result.experiments[row.experiment_id]
+    bench = Bench(
+        id="borisov-test-bench",
+        work_id=experiment.work_id,
+        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
     )
-    row = replace(row, identity=identity)
-    monkeypatch.setattr(
-        "simulator.battery.fo2_ladder.resolve_row_fo2",
-        lambda *_args, **_kwargs: ResolvedFo2(-8.0, 3, "buffer_relation", False),
+    changes = {
+        "bench_id": bench.id,
+        "method": State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+    }
+    if buffered:
+        changes["fO2_control"] = FO2Control(
+            channel=State.of(FO2Channel.BUFFER),
+            buffer=F.located("IW"),
+        )
+    if vacuum:
+        changes["pressure_environment"] = replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=F.located(
+                Value.point_of(Decimal("1e-4")),
+                note="printed vacuum during run",
+            ),
+        )
+    experiment = replace(experiment, **changes)
+    observations = {row.observation_id: row}
+    context = ScoreContext(
+        result.works,
+        {experiment.experiment_id: experiment},
+        observations,
+        origins={row.observation_id: extract.name},
+        benches={bench.id: bench},
     )
+    return context, row, experiment, bench
 
-    selected = score_module._unprinted_redox_oxygen(
-        None,
-        None,
-        row,
-        SimpleNamespace(
-            composition_wt={"FeO": 9.94}, temperature=Decimal("1673.15")
-        ),
+
+def test_redox_dispatcher_forwards_recorded_buffer_and_preserves_control():
+    context, row, experiment, bench = _borisov_score_context(buffered=True)
+    residuals, _ = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
+    residual = next(item for item in residuals if item.reference == row.observation_id)
+    oxygen = [notice for notice in residual.notices if notice.origin == "fo2_ladder"]
+    assert len(oxygen) == 1
+    assert "route=buffer_relation" in oxygen[0].reason
+    assert "selected_fO2_Pa=" in oxygen[0].reason
+    assert oxygen[0].kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert context.benches[experiment.bench_id] is bench
 
-    assert selected is not None
-    assert selected[2].affected_quantities == (Quantity.VALENCE_RATIO,)
+    without_bench = replace(context, benches={})
+    fallback, _ = score_store(
+        without_bench, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
+    )
+    fallback_row = next(item for item in fallback if item.reference == row.observation_id)
+    fallback_notice = next(
+        notice for notice in fallback_row.notices if notice.origin == "fo2_ladder"
+    )
+    assert "route=intrinsic_melt_fO2" in fallback_notice.reason
+    assert fallback_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+
+
+def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
+    context, row, _experiment, _bench = _borisov_score_context(
+        named_valence=True, buffered=True
+    )
+    residuals, _ = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
+    )
+    residual = next(item for item in residuals if item.reference == row.observation_id)
+    notice = next(item for item in residual.notices if item.origin == "fo2_ladder")
+    assert notice.affected_quantities == (Quantity.VALENCE_RATIO,)
+    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert "route=buffer_relation" in notice.reason
+    assert "selected_fO2_Pa=" in notice.reason
+
+    borrowed_context = replace(context, benches={})
+    borrowed_residuals, _ = score_store(
+        borrowed_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    borrowed_residual = next(
+        item for item in borrowed_residuals if item.reference == row.observation_id
+    )
+    borrowed_notice = next(
+        item for item in borrowed_residual.notices if item.origin == "fo2_ladder"
+    )
+    assert borrowed_notice.affected_quantities == (Quantity.VALENCE_RATIO,)
+    assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert "route=intrinsic_melt_fO2" in borrowed_notice.reason
+    borrowed_headline = headline_payload_records(
+        [residual_to_plain(borrowed_residual)],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        observations=borrowed_context.observations,
+        origins=borrowed_context.origins,
+    )
+    measured_redox = next(
+        item
+        for item in borrowed_headline
+        if item["tier"] == "measured" and item["rail"] == Rail.REDOX.value
+    )
+    assert measured_redox["n_scored"] == 0
+
+    vacuum_context, vacuum_row, _experiment, _bench = _borisov_score_context(
+        vacuum=True
+    )
+    vacuum_residuals, _ = score_store(
+        vacuum_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    vacuum_residual = next(
+        item
+        for item in vacuum_residuals
+        if item.reference == vacuum_row.observation_id
+    )
+    vacuum_notice = next(
+        item for item in vacuum_residual.notices if item.origin == "fo2_ladder"
+    )
+    assert vacuum_notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+    assert vacuum_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert vacuum_notice.authority is Authority.EXTRAPOLATED
+    assert "Dalton pO2 <= Ptotal" in vacuum_notice.reason
+    assert "selected_fO2_Pa=" in vacuum_notice.reason
+    measured_headline = headline_payload_records(
+        [residual_to_plain(vacuum_residual)],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        observations=vacuum_context.observations,
+        origins=vacuum_context.origins,
+    )
+    measured_redox = next(
+        item
+        for item in measured_headline
+        if item["tier"] == "measured" and item["rail"] == Rail.REDOX.value
+    )
+    assert measured_redox["n_scored"] == 0
 
 
 def _patch_melts_cell(monkeypatch, cell_for):

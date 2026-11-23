@@ -9618,7 +9618,11 @@ def _unprinted_redox_oxygen(
     this point. None means no independent oxygen condition can be called.
     """
 
-    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+    from simulator.battery.fo2_ladder import (
+        _VACUUM_ROUTE,
+        fo2_tier_notice,
+        resolve_row_fo2,
+    )
 
     quantity = quantity_token(observation.identity)
     if quantity is None:
@@ -9645,6 +9649,11 @@ def _unprinted_redox_oxygen(
         reason=(
             f"{notice.reason}; selected_fO2_Pa={commanded.value}; "
             "original_reason=source does not print fO2 for this run"
+            + (
+                "; Dalton pO2 <= Ptotal; the upper bound was substituted as a point"
+                if resolved.route == _VACUUM_ROUTE
+                else ""
+            )
         ),
     )
     return fo2_log, commanded, qualified

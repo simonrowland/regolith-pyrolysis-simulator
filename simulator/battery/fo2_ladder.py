@@ -136,7 +136,7 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             if resolved.borrowed
             else NoticeKind.SOURCE_DISAGREEMENT
         )
-    return Notice(
+    notice = Notice(
         kind=kind,
         affected_quantities=(quantity,),
         reason=reason,
@@ -145,6 +145,14 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
     )
+    if resolved.route == _VACUUM_ROUTE:
+        notice = replace(
+            notice,
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            band="vacuum pO2 upper bound substituted at Ptotal",
+            authority=Authority.EXTRAPOLATED,
+        )
+    return notice
 
 
 def fo2_refusal_notice(quantity: Quantity) -> Notice:
