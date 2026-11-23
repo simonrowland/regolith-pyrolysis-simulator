@@ -224,10 +224,6 @@ def test_default_flag_mutation_fails_the_clean_headline_invariant() -> None:
     assert records[0].policy_notice is not None
     mutant = replace(
         records[0],
-        policy_notice=replace(
-            records[0].policy_notice,
-            kind=NoticeKind.SOURCE_DISAGREEMENT,
-        ),
         notice_set=records[0].notice_set - {NoticeKind.KNOB_DEFAULTED.value},
         flagged_strata=(
             records[0].flagged_strata - {NoticeKind.KNOB_DEFAULTED.value}
