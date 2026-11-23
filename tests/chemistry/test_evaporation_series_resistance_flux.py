@@ -9,7 +9,8 @@ import pytest
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
     EvaporationFluxConfigurationError,
-    _stefan_film_enhancement,
+    _oxygen_coproduct_moles_per_carrier_mole,
+    _solve_equal_d_stefan_maxwell,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
@@ -19,6 +20,7 @@ from simulator.condensation import (
     GAS_CONSTANT_J_MOL_K,
     _chapman_enskog_d_ab_m2_s,
     _series_resistance_deposition_flux_mol_m2_s,
+    common_film_diffusivity,
 )
 from simulator.state import MAX_STIR_FACTOR
 from simulator.lab_geometry import GAS_FILM_DISK, GAS_FILM_SPHERE
@@ -82,7 +84,7 @@ def test_dilute_furnace_hour_recovers_the_round_one_linear_flux():
         P_bulk_pa=0.0,
         overhead_pressure_pa=1000.0,
         stefan_total_pressure_pa=1000.0,
-        _stefan_phi_override=1.0,
+        _defer_shared_stefan=True,
     )
     stefan = _evap(
         P_eq_pa=1.0e-9,
@@ -92,13 +94,13 @@ def test_dilute_furnace_hour_recovers_the_round_one_linear_flux():
     )
 
     assert stefan.transport_length_m == pytest.approx(0.12)
-    assert stefan.stefan_phi == pytest.approx(1.0, abs=1.0e-12)
+    assert stefan.stefan_log_E == pytest.approx(0.0, abs=1.0e-12)
     assert stefan.flux_kg_s_m2 == pytest.approx(linear.flux_kg_s_m2, rel=1.0e-11)
 
 
 def test_surface_pressure_limit_recovers_interface_plus_melt_series_flux():
     total_pressure = 1300.0
-    p_eq = 1350.0
+    p_eq = 1.0e6
     result = _evap(
         species="SiO",
         P_eq_pa=p_eq,
@@ -142,46 +144,242 @@ def test_robinot_outflow_pressure_is_finite_flagged_and_below_hk_bound():
         gas_film_shape=GAS_FILM_SPHERE,
     )
     result = _evap(**inputs)
-    linear_film = _evap(**inputs, _stefan_phi_override=1.0)
+    linear_film = _evap(**inputs, _defer_shared_stefan=True)
     diagnostic = result.as_diagnostic()
     hertz_knudsen_bound = (
         result.alpha_intrinsic
         * result.k_hk_kg_s_m2_pa
         * (p_eq - result.P_bulk_Pa)
     )
+    molar_flux = result.flux_kg_s_m2 / result.molar_mass_kg_mol
+    interface_molar_conductance = 1.0 / (
+        (result.r_interface + result.r_melt) * result.molar_mass_kg_mol
+    )
 
     assert math.isfinite(result.flux_kg_s_m2)
     assert result.surface_partial_pressure_Pa < total_pressure
     assert 0.0 < result.flux_kg_s_m2 < hertz_knudsen_bound
     assert result.flux_kg_s_m2 > 1.5 * linear_film.flux_kg_s_m2
+    assert molar_flux == pytest.approx(
+        interface_molar_conductance
+        * (p_eq - result.surface_partial_pressure_Pa),
+        rel=1.0e-12,
+    )
+    assert result.flux_kg_s_m2 * (
+        result.r_interface + result.r_gas + result.r_melt
+    ) == pytest.approx(p_eq - result.P_bulk_Pa, rel=1.0e-12)
     assert diagnostic["P_eq_over_P_total"] == pytest.approx(1.2)
     assert "bulk_outflow_regime" in diagnostic["typed_flags"]
-    assert "gas_film_stefan_effective_binary" in diagnostic["typed_flags"]
+    assert "gas_film_equal_d_stefan_maxwell" in diagnostic["typed_flags"]
     assert "internal bubble boiling" in diagnostic["typed_flag_details"][
         "bulk_outflow_regime"
     ]
 
 
-def test_stefan_film_and_interface_bracket_are_monotone():
-    total_pressure = 1300.0
-    p_bulk = 0.0
-    p_eq = 1560.0
-    interface_resistance = 20000.0
-    gas_conductance = 1.0e-5
-    surface_pressures = (0.0, 100.0, 500.0, 1000.0, 1290.0)
-    film_fluxes = []
-    interface_fluxes = []
-    for p_surface in surface_pressures:
-        phi = _stefan_film_enhancement(total_pressure, p_bulk, p_surface)
-        film_fluxes.append(
-            gas_conductance * phi * (p_surface - p_bulk)
-        )
-        interface_fluxes.append(
-            max(0.0, p_eq - p_surface) / interface_resistance
-        )
+def test_stefan_total_includes_stoichiometric_oxygen_coproduct():
+    from simulator.state import MOLAR_MASS
 
-    assert film_fluxes == sorted(film_fluxes)
-    assert interface_fluxes == sorted(interface_fluxes, reverse=True)
+    sio_molar_mass = 0.044084
+    o2_per_product_kg = (
+        0.5 * (float(MOLAR_MASS["O2"]) / 1000.0) / sio_molar_mass
+    )
+    assert _oxygen_coproduct_moles_per_carrier_mole(
+        {"O2_per_product_kg": o2_per_product_kg},
+        sio_molar_mass,
+    ) == pytest.approx(0.5)
+
+    result = _evap(
+        species="SiO",
+        P_eq_pa=900.0,
+        P_bulk_pa=0.0,
+        T_surface_K=2200.0,
+        T_gas_K=2200.0,
+        molar_mass_kg_mol=sio_molar_mass,
+        alpha_i=0.1,
+        knudsen_number=4.0e-4,
+        pipe_diameter_m=0.013,
+        overhead_pressure_pa=1300.0,
+        stefan_total_pressure_pa=1300.0,
+        carrier_gas="Ar",
+        gas_film_shape=GAS_FILM_SPHERE,
+        oxygen_coproduct_moles_per_mole=0.5,
+        oxygen_bulk_partial_pressure_pa=0.0,
+    )
+
+    assert result.surface_o2_partial_pressure_Pa == pytest.approx(
+        0.5 * result.surface_partial_pressure_Pa,
+        rel=1.0e-12,
+    )
+    assert result.shared_surface_evolved_pressure_Pa == pytest.approx(
+        result.surface_partial_pressure_Pa
+        + result.surface_o2_partial_pressure_Pa
+    )
+
+
+def test_equal_d_closure_is_invariant_to_bulk_oxygen_composition():
+    common = dict(
+        species="SiO",
+        P_eq_pa=900.0,
+        P_bulk_pa=0.0,
+        T_surface_K=2200.0,
+        T_gas_K=2200.0,
+        molar_mass_kg_mol=0.044084,
+        alpha_i=0.1,
+        knudsen_number=4.0e-4,
+        pipe_diameter_m=0.013,
+        overhead_pressure_pa=1300.0,
+        stefan_total_pressure_pa=1300.0,
+        carrier_gas="Ar",
+        gas_film_shape=GAS_FILM_SPHERE,
+        oxygen_coproduct_moles_per_mole=0.5,
+    )
+    dilute_o2 = _evap(**common, oxygen_bulk_partial_pressure_pa=0.01)
+    oxygen_rich = _evap(**common, oxygen_bulk_partial_pressure_pa=1200.0)
+
+    assert oxygen_rich.flux_kg_s_m2 == pytest.approx(
+        dilute_o2.flux_kg_s_m2, rel=1.0e-12
+    )
+    assert oxygen_rich.surface_partial_pressure_Pa == pytest.approx(
+        dilute_o2.surface_partial_pressure_Pa, rel=1.0e-12
+    )
+    assert oxygen_rich.surface_partial_pressure_Pa < 1300.0
+    assert math.isfinite(oxygen_rich.stefan_log_E)
+    assert oxygen_rich.surface_o2_partial_pressure_Pa > dilute_o2.surface_o2_partial_pressure_Pa
+
+
+def test_oxygen_consumers_and_melt_buffer_oxidants_add_no_film_o2():
+    oxygen_consuming = _oxygen_coproduct_moles_per_carrier_mole(
+        {"O2_per_product_kg": -0.13563178355490185},
+        0.0589795385,
+    )
+    melt_buffer = _oxygen_coproduct_moles_per_carrier_mole(
+        {
+            "O2_per_product_kg": 0.25,
+            "oxygen_destination": "reservoir.fo2_buffer",
+        },
+        0.0839941,
+    )
+
+    assert oxygen_consuming == 0.0
+    assert melt_buffer == 0.0
+
+
+def test_bulk_carrier_without_evaporation_still_enters_surface_composition():
+    active = _evap(
+        species="SiO",
+        P_eq_pa=900.0,
+        P_bulk_pa=0.0,
+        T_surface_K=2200.0,
+        T_gas_K=2200.0,
+        molar_mass_kg_mol=0.044084,
+        alpha_i=0.1,
+        knudsen_number=4.0e-4,
+        pipe_diameter_m=0.013,
+        overhead_pressure_pa=1300.0,
+        stefan_total_pressure_pa=1300.0,
+        carrier_gas="Ar",
+        gas_film_shape=GAS_FILM_SPHERE,
+        oxygen_coproduct_moles_per_mole=0.5,
+        _defer_shared_stefan=True,
+    )
+    inactive = _evap(
+        species="Na",
+        P_eq_pa=50.0,
+        P_bulk_pa=100.0,
+        T_surface_K=2200.0,
+        T_gas_K=2200.0,
+        molar_mass_kg_mol=0.02298976928,
+        alpha_i=0.1,
+        knudsen_number=4.0e-4,
+        pipe_diameter_m=0.013,
+        overhead_pressure_pa=1300.0,
+        stefan_total_pressure_pa=1300.0,
+        carrier_gas="Ar",
+        gas_film_shape=GAS_FILM_SPHERE,
+        _defer_shared_stefan=True,
+    )
+
+    solved, surface_evolved, surface_o2, _log_E = (
+        _solve_equal_d_stefan_maxwell(
+            {"SiO": active, "Na": inactive},
+            total_pressure_Pa=1300.0,
+            temperature_K=2200.0,
+            diffusion_m2_s=active.d_ab_m2_s,
+            total_bulk_partial_pressure_Pa=100.0,
+            bulk_o2_partial_pressure_Pa=0.0,
+        )
+    )
+
+    inverse_E = math.exp(-solved["SiO"].stefan_log_E)
+    assert solved["Na"].flux_kg_s_m2 == 0.0
+    assert solved["Na"].surface_partial_pressure_Pa == pytest.approx(
+        100.0 * inverse_E
+    )
+    assert surface_evolved == pytest.approx(
+        solved["SiO"].surface_partial_pressure_Pa
+        + solved["Na"].surface_partial_pressure_Pa
+        + surface_o2
+    )
+
+
+def test_common_film_diffusivity_is_exact_for_one_carrier_and_reports_spread():
+    diffusion, top_species, spread, species_diffusions = common_film_diffusivity(
+        {"SiO": 1.0}, 2200.0, 1300.0, "Ar"
+    )
+    expected = _chapman_enskog_d_ab_m2_s("SiO", 2200.0, 1300.0, carrier="Ar")
+
+    assert diffusion == pytest.approx(expected, rel=1.0e-14)
+    assert top_species == "SiO"
+    assert spread == pytest.approx(1.0)
+    assert species_diffusions == {"SiO": pytest.approx(expected)}
+
+
+def test_common_film_diffusivity_is_continuous_through_na_sio_weight_crossover():
+    from simulator.chemistry.langmuir_knudsen import (
+        hertz_knudsen_k_kg_s_m2_pa,
+    )
+
+    midpoint_K = 1800.0
+    alpha = 0.5
+    na_mass = 0.02298976928
+    sio_mass = 0.044084
+    na_k = alpha * hertz_knudsen_k_kg_s_m2_pa(midpoint_K, na_mass) / na_mass
+    sio_k = alpha * hertz_knudsen_k_kg_s_m2_pa(midpoint_K, sio_mass) / sio_mass
+    sio_eq_at_crossing = na_k / sio_k
+    diffusivities = []
+    top_species = set()
+    for temperature_K in range(1780, 1821):
+        offset = temperature_K - midpoint_K
+        na_eq = math.exp(0.01 * offset)
+        sio_eq = sio_eq_at_crossing * math.exp(-0.01 * offset)
+        na_flux_weight = (
+            alpha
+            * hertz_knudsen_k_kg_s_m2_pa(temperature_K, na_mass)
+            / na_mass
+            * na_eq
+        )
+        sio_flux_weight = (
+            alpha
+            * hertz_knudsen_k_kg_s_m2_pa(temperature_K, sio_mass)
+            / sio_mass
+            * sio_eq
+        )
+        diffusion, top, spread, _species_diffusions = common_film_diffusivity(
+            {"Na": na_flux_weight, "SiO": sio_flux_weight},
+            float(temperature_K),
+            1300.0,
+            "Ar",
+        )
+        assert spread >= 1.0
+        top_species.add(top)
+        diffusivities.append(diffusion)
+
+    largest_adjacent_relative_change = max(
+        abs(right - left) / min(right, left)
+        for left, right in zip(diffusivities, diffusivities[1:])
+    )
+    assert top_species == {"Na", "SiO"}
+    assert largest_adjacent_relative_change < 0.01
 
 
 def test_free_molecular_limit_recovers_intrinsic_alpha_hk():

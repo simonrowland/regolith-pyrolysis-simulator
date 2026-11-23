@@ -1365,7 +1365,7 @@ def _w3_dispatch_with_stir(stir_control) -> dict:
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_uses_one_shared_stefan_factor_and_flags_bulk_outflow():
+def test_provider_uses_equal_d_stefan_maxwell_and_flags_bulk_outflow():
     result = _w3_result_with_controls(
         0.0,
         vapour_batch_flux_pressures_Pa={"Na": 900.0, "K": 700.0},
@@ -1398,19 +1398,51 @@ def test_provider_uses_one_shared_stefan_factor_and_flags_bulk_outflow():
     diagnostics = result.diagnostic["evaporation_series_resistance"]
     sodium = diagnostics["Na"]
     potassium = diagnostics["K"]
-    assert sodium["stefan_phi"] > 1.0
-    assert sodium["stefan_phi"] == pytest.approx(potassium["stefan_phi"])
-    assert sodium["surface_partial_pressure_Pa"] + potassium[
-        "surface_partial_pressure_Pa"
-    ] == pytest.approx(result.diagnostic["shared_surface_evolved_P_Pa"])
-    assert result.diagnostic["total_evolved_P_eq_over_P_total"] == pytest.approx(
-        1600.0 / 1300.0
+    assert sodium["stefan_log_E"] > 0.0
+    assert sodium["stefan_log_E"] == pytest.approx(potassium["stefan_log_E"])
+    assert sodium["shared_film_diffusion_m2_s"] == pytest.approx(
+        potassium["shared_film_diffusion_m2_s"]
     )
+    assert result.diagnostic["shared_film_diffusion_m2_s"] > 0.0
+    na_weight = 900.0 / (sodium["r_interface"] * 0.023)
+    k_weight = 700.0 / (potassium["r_interface"] * 0.0390983)
+    expected_top_weighted = "Na" if na_weight >= k_weight else "K"
+    assert result.diagnostic["shared_film_diffusion_reference_species"] == (
+        expected_top_weighted
+    )
+    assert result.diagnostic["shared_film_diffusion_spread_ratio"] == pytest.approx(
+        max(sodium["d_ab_m2_s"], potassium["d_ab_m2_s"])
+        / min(sodium["d_ab_m2_s"], potassium["d_ab_m2_s"])
+    )
+    assert result.diagnostic["equal_d_approximation_material"] is (
+        result.diagnostic["shared_film_diffusion_spread_ratio"] > 2.0
+    )
+    assert (
+        sodium["surface_partial_pressure_Pa"]
+        + potassium["surface_partial_pressure_Pa"]
+        + result.diagnostic["surface_O2_partial_pressure_Pa"]
+    ) == pytest.approx(result.diagnostic["shared_surface_evolved_P_Pa"])
+    na_molar_flux = sodium["flux_kg_s_m2"] / 0.023
+    k_molar_flux = potassium["flux_kg_s_m2"] / 0.0390983
+    o2_molar_flux = (
+        sodium["oxygen_coproduct_moles_per_mole"] * na_molar_flux
+        + potassium["oxygen_coproduct_moles_per_mole"] * k_molar_flux
+    )
+    total_molar_flux = na_molar_flux + k_molar_flux + o2_molar_flux
+    inverse_E = math.exp(-sodium["stefan_log_E"])
+    expected_surface_o2 = 1300.0 * (
+        o2_molar_flux / total_molar_flux * (1.0 - inverse_E)
+        + result.diagnostic["bulk_O2_partial_pressure_Pa"] / 1300.0 * inverse_E
+    )
+    assert result.diagnostic["surface_O2_partial_pressure_Pa"] == pytest.approx(
+        expected_surface_o2
+    )
+    assert result.diagnostic["total_evolved_P_eq_over_P_total"] > 1600.0 / 1300.0
     assert "bulk_outflow_regime" in result.diagnostic["typed_flags"]
     assert "internal bubble boiling" in result.diagnostic[
         "typed_flag_details"
     ]["bulk_outflow_regime"]
-    assert "gas_film_stefan_effective_binary" in sodium["typed_flags"]
+    assert "gas_film_equal_d_stefan_maxwell" in sodium["typed_flags"]
 
 
 @pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf")])

@@ -1908,6 +1908,64 @@ def _chapman_enskog_d_ab_m2_s(
     return D_AB_cm2_s * 1.0e-4
 
 
+def common_film_diffusivity(
+    carriers: Mapping[str, float],
+    T_K: float,
+    pressure_pa: float,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
+    *,
+    species_params_by_carrier: Mapping[
+        str, tuple[float, float, float] | None
+    ] | None = None,
+) -> tuple[float, str, float, dict[str, float]]:
+    """Return the interface-weighted common D for a multispecies film.
+
+    ``carriers`` maps evaporating species to ``k_i * p_eq,i``. O2
+    coproducts are absent because they have no interface law. The common
+    coefficient is the weighted harmonic mean of the Chapman-Enskog
+    species/inert coefficients: film resistance scales as ``1/D``, so
+    harmonic rather than arithmetic averaging preserves the weighted film
+    resistance. A single carrier therefore returns its exact binary D.
+
+    The result also reports the largest-weight species and the max/min D
+    spread so callers can expose when the equal-D approximation matters.
+    """
+    active_weights = {
+        str(species): float(weight)
+        for species, weight in carriers.items()
+        if math.isfinite(float(weight)) and float(weight) > 0.0
+    }
+    if not active_weights:
+        return 0.0, "", 0.0, {}
+    params_by_carrier = species_params_by_carrier or {}
+    diffusivities = {
+        species: _chapman_enskog_d_ab_m2_s(
+            species,
+            T_K,
+            pressure_pa,
+            carrier=carrier_gas,
+            species_params=params_by_carrier.get(species),
+        )
+        for species in active_weights
+    }
+    if any(
+        not math.isfinite(diffusion) or diffusion <= 0.0
+        for diffusion in diffusivities.values()
+    ):
+        raise ValueError("common film diffusivity requires positive binary D values")
+    total_weight = math.fsum(active_weights.values())
+    effective_diffusivity = total_weight / math.fsum(
+        active_weights[species] / diffusivities[species]
+        for species in active_weights
+    )
+    top_weighted_species = max(
+        active_weights,
+        key=lambda species: (active_weights[species], species),
+    )
+    spread_ratio = max(diffusivities.values()) / min(diffusivities.values())
+    return effective_diffusivity, top_weighted_species, spread_ratio, diffusivities
+
+
 # Chapman–Enskog viscosity. μ [Pa·s] = 2.6693e-6 * sqrt(M[g/mol] * T[K])
 # / (σ[Å]^2 * Ω^(2,2)*). 26.693 micropoise times 1e-7 Pa·s per micropoise
 # is 2.6693e-6. Neufeld, Janzen & Aziz, J. Chem. Phys. 57, 1100 (1972),

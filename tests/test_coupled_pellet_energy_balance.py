@@ -175,9 +175,21 @@ def _runtime_robinot_pressure_pair(*, gas_resistance_enabled: bool):
     """Use the runtime chamber floor and SiO partial-pressure policy."""
     runtime = object.__new__(PyrolysisSimulator)
     runtime.melt = SimpleNamespace(p_total_mbar=13.0)
+    preset = yaml.safe_load(
+        (_REPO / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml")
+        .read_text()
+    )
+    p_o2_bulk_pa = (
+        float(
+            preset["pair"]["remediation"]["mitigation"]["pO2_cover"][
+                "effective_pO2_achieved_mbar"
+            ]
+        )
+        * 100.0
+    )
     partials, total_pressure_pa = EvaporationMixin._langmuir_film(
         runtime,
-        {"SiO": 0.0},
+        {"SiO": 0.0, "O2": p_o2_bulk_pa},
     )
     bulk_pressure_pa = species_drive_bulk_Pa(
         "SiO",
@@ -248,6 +260,8 @@ def _kinetic_sio_kg_hr(
         gas_resistance_enabled=gas_resistance_enabled,
         melt_resistance_enabled=False,
         gas_film_shape=gas_film_shape,
+        oxygen_coproduct_moles_per_mole=0.5,
+        oxygen_bulk_partial_pressure_pa=_partials.get("O2", 0.0),
     )
     area_m2 = (
         _areas()["top"]
@@ -476,7 +490,7 @@ def test_robinot_hot_upper_root_uses_sample_scale_argon_film():
     runtime_partials, runtime_bulk_pa, runtime_total_pa = (
         _runtime_robinot_pressure_pair(gas_resistance_enabled=True)
     )
-    assert runtime_partials == {}
+    assert runtime_partials == {"O2": pytest.approx(0.01)}
     assert runtime_bulk_pa == pytest.approx(0.0)
     assert runtime_total_pa == pytest.approx(1300.0)
     alpha_spec = _alpha_spec()
@@ -507,9 +521,9 @@ def test_robinot_hot_upper_root_uses_sample_scale_argon_film():
     assert coupled["nodes"] == "two_node"
     assert film.length_m == pytest.approx(0.013)
     assert film.length_m != pytest.approx(0.12)
-    assert coupled["temperature_C"] == pytest.approx(1924.46504692, abs=0.1)
-    assert coupled["evaporative_sink_W"] == pytest.approx(71.21204765, abs=0.1)
-    assert rate == pytest.approx(0.01477597481, rel=0.01)
+    assert coupled["temperature_C"] == pytest.approx(1920.92907849, abs=0.1)
+    assert coupled["evaporative_sink_W"] == pytest.approx(73.73557378, abs=0.1)
+    assert rate == pytest.approx(0.01529751151, rel=0.01)
     assert rate > pipe_rate * 5.0
     assert _relative_gap(
         coupled["power_W"], _two_node_sinks_W(coupled, rates)
