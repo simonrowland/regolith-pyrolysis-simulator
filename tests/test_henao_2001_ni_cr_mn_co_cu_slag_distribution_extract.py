@@ -287,6 +287,12 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.admission.status.value == "admitted" for row in observations)
     assert not [entry for entry in result.queue if entry.source.endswith(EXTRACT.name)]
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
+    assert all(
+        row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("101300")
+        for row in observations
+    )
     henao_experiments = [
         row
         for row in result.experiments.values()
@@ -297,10 +303,17 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert len(henao_experiments) == 55
     assert all(
         row.pressure_environment.total_pressure_Pa.state.is_value
-        and row.pressure_environment.total_pressure_Pa.state.value == Decimal("101300")
+        and row.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101300")
         and row.pressure_environment.total_pressure_Pa.locator is not None
         and row.pressure_environment.total_pressure_Pa.locator.pdf_page_index == 0
         and row.pressure_environment.total_pressure_Pa.locator.published_page == "1959"
+        for row in henao_experiments
+    )
+    assert all(
+        row.pressure_environment.sweep_gas.state.is_value
+        and row.pressure_environment.sweep_gas.state.value.species == "CO-CO2"
+        and row.pressure_environment.sweep_gas.state.value.flow_sccm.is_unknown
+        and row.pressure_environment.sweep_gas.state.value.partial_pressure_Pa.is_unknown
         for row in henao_experiments
     )
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
