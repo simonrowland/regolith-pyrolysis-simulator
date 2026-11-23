@@ -153,7 +153,13 @@ def test_digitized_12022_entry_point_emits_flagged_record_for_every_point(
         obs, vapor_pressure_data=load_vapor_pressure_data()
     )
 
-    assert evaluation.skip_reason is None
+    assert evaluation.skip_reason is not None
+    assert evaluation.skip_reason.startswith("typed-refusal:")
+    assert evaluation.skip_reason in evaluation.skip_reasons
+    assert battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG in evaluation.skip_reason
+    assert battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE in evaluation.skip_reason
+    assert "pO2_bar" in evaluation.skip_reason
+    assert "contextual" in evaluation.skip_reason.lower()
     assert len(engine_calls) == 6
     assert {call[2] for call in engine_calls} == {5.613405e-9}
     assert len(engine_calls[0][3]) == 9
@@ -170,9 +176,48 @@ def test_digitized_12022_entry_point_emits_flagged_record_for_every_point(
     assert len(comparisons) == 6
     assert all(assumed_input for assumed_input, _runtime in comparisons)
     assert all(
-        runtime["input_assumption"] == expected_assumption
+        runtime["input_assumption"]["flag"] == expected_assumption["flag"]
+        and runtime["input_assumption"]["reason"] == expected_assumption["reason"]
+        and runtime["input_assumption"]["pO2_bar"] == 5.613405e-9
+        and "contextual" in runtime["input_assumption"]["pO2_reason"].lower()
         for _assumed_input, runtime in comparisons
     )
+
+
+def test_initial_charge_role_reader_normalizes_extract_whitespace(monkeypatch) -> None:
+    import simulator.diagnostic_helpers.extract_reproduction as er
+
+    obs = _observation(
+        "Na", "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
+    values = deepcopy(obs.values)
+    values["composition_role"] = {
+        **values["composition_role"],
+        "value": " initial_charge_only ",
+    }
+    values["points"] = [
+        {
+            **point,
+            "composition_role": {
+                **point["composition_role"],
+                "value": " initial_charge_only ",
+            },
+        }
+        for point in values["points"]
+    ]
+    obs = replace(obs, values=values)
+    monkeypatch.setattr(
+        er,
+        "_engine_melt_psat_pa",
+        lambda *_args, **_kwargs: (1.0, None, {"provider_status": "ok"}),
+    )
+
+    evaluation = evaluate_observation(
+        obs, vapor_pressure_data=load_vapor_pressure_data()
+    )
+
+    assert len(evaluation.records) == 6
+    assert {record.status for record in evaluation.records} == {"assumed-input"}
 
 
 def test_figure_only_psat_without_numeric_points_still_refuses() -> None:
