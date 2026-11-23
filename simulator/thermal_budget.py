@@ -1958,7 +1958,11 @@ def evaporative_enthalpy_sink_W(
 
 def _species_rates_kg_hr(
     temperature_K: float,
-    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None,
+    species_rate_kg_hr_at_K: Callable[
+        [float, float | None], Mapping[str, float]
+    ] | None,
+    *,
+    melt_surface_area_m2: float | None = None,
 ) -> Mapping[str, float]:
     """Booked kg/h at this trial temperature, or an empty map.
 
@@ -1971,7 +1975,9 @@ def _species_rates_kg_hr(
         or temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K
     ):
         return {}
-    rates = species_rate_kg_hr_at_K(float(temperature_K))
+    rates = species_rate_kg_hr_at_K(
+        float(temperature_K), melt_surface_area_m2
+    )
     if not isinstance(rates, Mapping):
         raise PowerTemperatureRefusal(
             "evaporative_rate_callback_malformed",
@@ -2066,8 +2072,11 @@ def pellet_energy_loss_W(
     top_area_m2: float,
     height_m: float,
     diameter_m: float,
-    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
+    species_rate_kg_hr_at_K: Callable[
+        [float, float | None], Mapping[str, float]
+    ] | None = None,
     vapor_pressures: Mapping[str, Any] | None = None,
+    melt_surface_area_m2: float | None = None,
 ) -> float:
     """Watts leaving one isothermal pellet temperature.
 
@@ -2138,7 +2147,11 @@ def pellet_energy_loss_W(
         diameter_m=diameter_m,
         boundary_K=boundary_K,
     )
-    rates = _species_rates_kg_hr(temperature_K, species_rate_kg_hr_at_K)
+    rates = _species_rates_kg_hr(
+        temperature_K,
+        species_rate_kg_hr_at_K,
+        melt_surface_area_m2=melt_surface_area_m2,
+    )
     evaporative = evaporative_enthalpy_sink_W(
         temperature_K,
         rates,
@@ -2156,7 +2169,9 @@ def two_node_pellet_loss_W(
     conductivity_W_m_K: float,
     height_m: float,
     diameter_m: float,
-    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
+    species_rate_kg_hr_at_K: Callable[
+        [float, float | None], Mapping[str, float]
+    ] | None = None,
     vapor_pressures: Mapping[str, Any] | None = None,
     notices: list[dict[str, Any]] | None = None,
 ) -> tuple[float, float, float, float]:
@@ -2166,8 +2181,11 @@ def two_node_pellet_loss_W(
     That is a stated geometry, not a moving melt front. Node 1 is the
     top face plus the upper half-wall. It absorbs the beam, radiates
     that area at T_top, loses continuum argon, carries the evaporative
-    sink, and conducts into node 2. Node 2 is the lower half-wall plus
-    the holder. It radiates ``pi * d * H / 2`` at T_side and conducts
+    sink, and conducts into node 2. Radiation and evaporation share
+    ``A_node_1``: the rate callback receives that area, and its surface
+    flux is multiplied by it before the enthalpy sink is charged. Node
+    2 is the lower half-wall plus the holder. It radiates
+    ``pi * d * H / 2`` at T_side and conducts
     with the same half-slab conductance.
 
     Gas is on node 1. A hot free surface keeps that sink. At high
@@ -2180,9 +2198,11 @@ def two_node_pellet_loss_W(
         A_node_2 = A_side / 2
         Q = eps * sigma * A_node_1 * (T_top**4 - T_b**4)
             + Q_gas(T_top)
-            + sum_i J_i(T_top) * dH_i(T_top)
+            + Q_evap(T_top, A_node_1)
             + eps * sigma * A_node_2 * (T_side**4 - T_b**4)
             + G_half * (T_side - T_b)
+
+        Q_evap(T, A) = evaporative_enthalpy_sink_W(T, rates(T, A))
 
         G_half = 2 * k * A_top / H
         T_side from _side_node_temperature_K
@@ -2195,13 +2215,14 @@ def two_node_pellet_loss_W(
     """
 
     boundary_K = COLD_BOUNDARY_K
+    faces = pellet_face_areas_m2(diameter_m, height_m)
+    node_1_area_m2 = faces[FACE_HOT_UPPER]
+    node_2_area_m2 = 0.5 * side_area_m2
     half = 2.0 * _slab_conductance_W_per_K(
         conductivity_W_m_K,
         top_area_m2,
         height_m,
     )
-    node_2_area_m2 = 0.5 * side_area_m2
-    node_1_area_m2 = top_area_m2 + node_2_area_m2
     side_K = _side_node_temperature_K(
         temperature_top_K,
         side_area_m2=node_2_area_m2,
@@ -2213,6 +2234,7 @@ def two_node_pellet_loss_W(
     rates = _species_rates_kg_hr(
         temperature_top_K,
         species_rate_kg_hr_at_K,
+        melt_surface_area_m2=node_1_area_m2,
     )
     evaporative = evaporative_enthalpy_sink_W(
         temperature_top_K,
@@ -2384,7 +2406,9 @@ def solve_power_driven_melt_temperature_C(
     solar_absorptance: float | None = None,
     window_transmittance: float | None = None,
     conductivity_W_m_K: float | None = None,
-    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
+    species_rate_kg_hr_at_K: Callable[
+        [float, float | None], Mapping[str, float]
+    ] | None = None,
 ) -> dict[str, Any]:
     """Solve one end-of-step melt temperature from furnace power.
 
@@ -2423,10 +2447,12 @@ def solve_power_driven_melt_temperature_C(
     printed peak.
 
     ``species_rate_kg_hr_at_K`` is the evaporation step's booked kg/h
-    at the trial kelvin, closed over the step-start composition. The
-    root evaluates that sink at the same temperature as the other
-    losses. None is a zero sink. The tonne sky has no pellet surface;
-    a callback there is noticed and not applied.
+    at the trial kelvin, closed over the step-start composition. For
+    ``hot_upper``, the two-node geometry supplies ``A_node_1`` to the
+    flux owner, so the same area radiates and evaporates. The root
+    evaluates that sink at the same temperature as the other losses.
+    None is a zero sink. The tonne sky has no pellet surface; a callback
+    there is noticed and not applied.
 
     Algebra, both sides watts, losses at the unknown end temperature.
     One node (full side, explicit area, or the high-k limit)::
@@ -2434,7 +2460,8 @@ def solve_power_driven_melt_temperature_C(
         m * cp * (T - T_prev) / dt = P_abs - pellet_energy_loss_W(T)
 
     Two nodes, hot upper, sensible heat on the top node only.
-    Node 1 radiates ``A_top + pi * d * H / 2``::
+    Node 1 radiates and evaporates from
+    ``A_node_1 = A_top + pi * d * H / 2``::
 
         m * cp * (T_top - T_prev) / dt = P_abs
             - two_node_pellet_loss_W(T_top)
@@ -2606,6 +2633,11 @@ def solve_power_driven_melt_temperature_C(
         faces = pellet_face_areas_m2(pellet_d, height_m)
         top_area_m2 = faces["top"]
         side_area_m2 = faces["side"]
+        evaporating_area_m2 = (
+            faces[FACE_HOT_UPPER]
+            if face_set == FACE_HOT_UPPER
+            else None
+        )
 
         def loss_for(radiating_area_m2: float) -> Callable[[float], float]:
             def loss(temperature_K: float) -> float:
@@ -2618,6 +2650,7 @@ def solve_power_driven_melt_temperature_C(
                     height_m=height_m,
                     diameter_m=pellet_d,
                     species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
+                    melt_surface_area_m2=evaporating_area_m2,
                 )
             return loss
 
@@ -2639,7 +2672,6 @@ def solve_power_driven_melt_temperature_C(
         # other solution and does not replace the booked temperature.
         if face_set == FACE_HOT_UPPER:
             nodes = "two_node"
-            area = top_area_m2
             root_loss = two_node_loss
             other_loss = (
                 loss_for(faces[FACE_FULL_SIDE])
@@ -2728,7 +2760,13 @@ def solve_power_driven_melt_temperature_C(
     else:
         evaporative_sink_W = evaporative_enthalpy_sink_W(
             root_K,
-            _species_rates_kg_hr(root_K, species_rate_kg_hr_at_K),
+            _species_rates_kg_hr(
+                root_K,
+                species_rate_kg_hr_at_K,
+                melt_surface_area_m2=(
+                    node_1_area_m2 if nodes == "two_node" else None
+                ),
+            ),
             notices=notices,
         )
     sensitivity = None
@@ -2792,7 +2830,9 @@ def melt_temperature_from_furnace_power(
     previous_temperature_C: float,
     dt_s: float,
     live_mass_kg: float | None = None,
-    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
+    species_rate_kg_hr_at_K: Callable[
+        [float, float | None], Mapping[str, float]
+    ] | None = None,
 ) -> dict[str, Any]:
     """Prediction for one step. The live melt mass wins when it is set.
 

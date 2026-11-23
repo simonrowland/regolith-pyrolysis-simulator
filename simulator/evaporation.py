@@ -2063,6 +2063,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        melt_surface_area_m2: float | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -2083,6 +2084,9 @@ class EvaporationMixin:
             M_i         = molar mass (kg/mol)
             R           = gas constant (J/mol·K)
             T           = temperature (K)
+
+        The coupled hot-upper balance supplies its node-1 area here so
+        the trial rate and radiation term use the same surface.
 
         The SiO suppression under pO₂ control is handled automatically:
         when pO₂ is elevated, the equilibrium vapor pressure of SiO
@@ -2590,6 +2594,7 @@ class EvaporationMixin:
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
                 vapour_batch_flux_overlay=flux_overlay_report,
+                melt_surface_area_m2=melt_surface_area_m2,
             )
         )
         kernel_result = self._dispatch_only(
@@ -5345,6 +5350,7 @@ class EvaporationMixin:
         vapour_batch_flux_pressures_Pa: Mapping[str, float] | None = None,
         vapour_batch_report: Mapping[str, Any] | None = None,
         vapour_batch_flux_overlay: Mapping[str, Any] | None = None,
+        melt_surface_area_m2: float | None = None,
     ) -> tuple[dict[str, Any], dict[str, float]]:
         # VR-11: this already-gated map comes from the typed effective-pressure
         # seam. The kernel never reads equilibrium.vapor_pressures_Pa for flux.
@@ -5418,7 +5424,11 @@ class EvaporationMixin:
             'molar_mass_kg_mol': molar_masses_kg_mol,
             'stoich_by_species': stoich_by_species,
             'available_oxide_kg': available_oxide_kg,
-            'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
+            'melt_surface_area_m2': float(
+                self.melt.melt_surface_area_m2
+                if melt_surface_area_m2 is None
+                else melt_surface_area_m2
+            ),
             'stir_factor': {
                 'axial': clamp_stir_factor(self.melt.stir_state.axial),
                 'radial': clamp_stir_factor(self.melt.stir_state.radial),
