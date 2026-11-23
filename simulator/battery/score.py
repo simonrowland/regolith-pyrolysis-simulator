@@ -142,6 +142,7 @@ from simulator.battery.source_oxygen import (
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.input_provenance import (
     ANALYSED_MELT_MINUS_SCORED,
+    NAMED_MATERIAL_MIXTURE,
     PRINTED_STARTING_BULK,
     SINGLE_LIQUID_MASS_FRACTION,
     InputDecision,
@@ -192,6 +193,7 @@ from simulator.battery.migrate import (
     _hold_reason_notice,
     _STANDARD_PRESSURE_UNPRINTED_REASON,
     _standard_pressure_ambiguity_uncertainty,
+    _starting_bulk_notices,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -18367,7 +18369,7 @@ def _compile_residual_with_lineage(
             predictor_kwargs["phase_siblings"] = phase_siblings
             predictor_kwargs["phase_sibling_refusal"] = phase_sibling_refusal
         prediction_reference = implied_alpha_reference or reference
-        phase_input_notice: Notice | None = None
+        phase_input_notices: tuple[Notice, ...] = ()
         if (
             builtin_predictor
             and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -18386,12 +18388,17 @@ def _compile_residual_with_lineage(
                     or {"reason": phase_input.refusal_reason.value},
                     execution=Execution(state=ExecutionState.NOT_PROBED),
                 )
-            phase_input_notice = phase_input.notice
+            if phase_input.notice is not None:
+                phase_input_notices = (phase_input.notice,)
             phase_composition = phase_input.composition
             if phase_composition is not None and isinstance(
                 prediction_reference.identity, Identity
             ):
                 if phase_composition.amount_basis is AmountBasis.MASS_PERCENT:
+                    is_starting_bulk = phase_composition.input_provenance in {
+                        PRINTED_STARTING_BULK,
+                        NAMED_MATERIAL_MIXTURE,
+                    }
                     try:
                         phase_composition = composition_with_provenance(
                             wt_pct_to_mole_fraction(
@@ -18409,6 +18416,17 @@ def _compile_residual_with_lineage(
                             },
                             execution=Execution(
                                 state=ExecutionState.NOT_PROBED
+                            ),
+                        )
+                    if is_starting_bulk and experiment is not None:
+                        initial = experiment.sample.initial_composition
+                        phase_input_notices = union_notices(
+                            phase_input_notices,
+                            _starting_bulk_notices(
+                                experiment,
+                                quantity,
+                                reference.observation_id,
+                                initial.locator if initial is not None else None,
                             ),
                         )
                 elif phase_composition.amount_basis not in {
@@ -18431,17 +18449,17 @@ def _compile_residual_with_lineage(
                         composition=State.of(phase_composition),
                     ),
                 )
-                if phase_input_notice is not None:
-                    notices = union_notices(notices, (phase_input_notice,))
+                if phase_input_notices:
+                    notices = union_notices(notices, phase_input_notices)
         prediction = predictor(
             engine,
             _melt_prediction_reference(prediction_reference),
             **predictor_kwargs,
         )
-        if phase_input_notice is not None:
+        if phase_input_notices:
             prediction = replace(
                 prediction,
-                notices=union_notices(prediction.notices, (phase_input_notice,)),
+                notices=union_notices(prediction.notices, phase_input_notices),
             )
 
     notices = union_notices(notices, prediction.notices)

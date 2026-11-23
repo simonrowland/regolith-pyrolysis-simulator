@@ -337,7 +337,12 @@ def _phase_row_composition_input(
     if (
         not isinstance(identity, Identity)
         or quantity_token(identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        or (identity.composition is not None and identity.composition.is_value)
+    ):
+        return _PhaseCompositionInput()
+    if _row_printed_composition_unknown(observation.point_conditions):
+        return _PhaseCompositionInput()
+    if identity.composition is not None and (
+        identity.composition.is_unknown or identity.composition.is_value
     ):
         return _PhaseCompositionInput()
 
