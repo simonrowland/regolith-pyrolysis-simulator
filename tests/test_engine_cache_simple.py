@@ -1088,7 +1088,17 @@ def test_mapping_equilibrium_result_uses_compact_projection(
         "vapor_pressures_Pa": {"CO": 42.0},
         "vapor_pressures_source": {"CO": "thermoengine"},
         "phase_compositions": {"melt": {"FeO": 0.5}},
-        "diagnostics": {"backend_status_reason": "unused diagnostic prose"},
+        "diagnostics": {
+            "backend_status_reason": "unused diagnostic prose",
+            "magemin_phase_composition_notices": [
+                {
+                    "type": "typed_notice",
+                    "kind": "duplicate_phase_composition",
+                    "phase": "liq",
+                    "reason": "duplicate liq row omitted",
+                }
+            ],
+        },
     }
 
     def solve() -> dict[str, object]:
@@ -1111,7 +1121,15 @@ def test_mapping_equilibrium_result_uses_compact_projection(
     assert isinstance(stored, bytes)
     assert cold.activity_coefficients == warm.activity_coefficients == {"FeO": 0.75}
     assert cold.diagnostics == warm.diagnostics == {
-        "backend_status_reason": "unused diagnostic prose"
+        "backend_status_reason": "unused diagnostic prose",
+        "magemin_phase_composition_notices": [
+            {
+                "type": "typed_notice",
+                "kind": "duplicate_phase_composition",
+                "phase": "liq",
+                "reason": "duplicate liq row omitted",
+            }
+        ],
     }
     assert cold.phase_compositions == warm.phase_compositions == {
         "melt": {"FeO": 0.5}

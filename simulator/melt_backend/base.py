@@ -60,6 +60,7 @@ _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'reported_activity_coefficients',
     'subprocess_failure',
     'vapor_pressure_diagnostic',
+    'magemin_phase_composition_notices',
 })
 
 # Append-only wire table for consumer-visible engine notices and warnings.
