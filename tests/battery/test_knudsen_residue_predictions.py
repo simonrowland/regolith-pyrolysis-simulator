@@ -517,7 +517,10 @@ def _predict_and_classify_mass_loss_tail(extent_point, monkeypatch, *, approxima
     ))
     experiment = replace(experiment, sample=replace(
         experiment.sample,
-        mass_kg=Located(State.of(Value.point_of("1e-9")), reference.locator),
+        # At the exact 0.05 boundary, a 1e-3 kg charge retains
+        # 1e-3 * 0.2 * 0.05 = 1e-5 kg FeO (ratio 0.05), above the
+        # 1e-12 kg loader cutoff; the production threshold is 0.05000000000000001.
+        mass_kg=Located(State.of(Value.point_of("1e-3")), reference.locator),
         initial_composition=Located(State.of(composition), reference.locator),
     ))
     rows = (*rows[:1], replace(rows[-1], value=replace(
@@ -578,6 +581,7 @@ def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic(extent_point, m
         extent_point, monkeypatch, approximate=False, loss_fraction=0.05,
     )
 
+    assert tail["fraction_of_measured_mass_loss"] == pytest.approx(0.05, abs=1e-12)
     assert tail["material_threshold"] == 0.05000000000000001
     assert not tail["material"]
     assert notices[0].certification == "immaterial"
