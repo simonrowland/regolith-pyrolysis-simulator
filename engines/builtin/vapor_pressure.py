@@ -3945,6 +3945,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         }
                     )
                 if parent_oxide == "FeO":
+                    provenance["activity_used_for_pressure"] = a_oxide
                     if fe_degraded_activity_basis is not None:
                         provenance["activity_basis"] = fe_degraded_activity_basis
                         provenance["degraded_activity_basis"] = (

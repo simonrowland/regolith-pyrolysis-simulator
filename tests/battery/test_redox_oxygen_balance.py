@@ -89,6 +89,9 @@ def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch
     response = SimpleNamespace(
         diagnostics={
             "vapor_pressure_diagnostic": {
+                "vapor_pressure_numerator_provenance": {
+                    "Fe": {"activity_used_for_pressure": 0.29},
+                },
                 "a_FeO_calphad": {
                     "a_FeO_calphad": 0.37,
                     "a_FeO_authoritative": 0.41,
@@ -116,11 +119,30 @@ def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch
         engine_flags=flags,
         engine_response=response,
     )
-    assert _engine_fe_speciation(response) == (0.5, 0.37)
+    assert _engine_fe_speciation(response) == (0.5, 0.29)
     assert evaluated.fe3_over_sum_fe == 0.5
-    assert evaluated.fe_activity == 0.37
+    assert evaluated.fe_activity == 0.29
     assert evaluated.speciation_source == "engine"
     assert flags == set()
+
+    high_temperature_response = SimpleNamespace(
+        diagnostics={
+            "vapor_pressure_diagnostic": {
+                "vapor_pressure_numerator_provenance": {
+                    "Fe": {"activity_used_for_pressure": 0.41},
+                },
+                "a_FeO_calphad": {
+                    "a_FeO_calphad": 0.37,
+                    "a_FeO_authoritative": 0.41,
+                    "kress91_split": {
+                        "fe3_over_sigma_fe": 0.5,
+                        "x_feo": 0.29,
+                    },
+                },
+            },
+        }
+    )
+    assert _engine_fe_speciation(high_temperature_response) == (0.5, 0.41)
 
 
 def test_reporting_limit_omission_is_honoured_by_the_exponent_probe() -> None:
@@ -136,7 +158,7 @@ def test_reporting_limit_omission_is_honoured_by_the_exponent_probe() -> None:
         "provenance": "BuiltinVaporPressureProvider.below_reporting_threshold_omissions",
     }
 
-    def pressure(logp: float) -> PressureEvaluation:
+    def pressure(logp: float, *, unexplained_lower_zero: bool = False) -> PressureEvaluation:
         pO2_bar = 10.0**logp
         pressures = {
             "Fe": 2.114e-7 * pO2_bar**-0.5,
@@ -147,6 +169,8 @@ def test_reporting_limit_omission_is_honoured_by_the_exponent_probe() -> None:
         if logp > -8.02:
             pressures["MgO"] = 0.0
             omissions["MgO"] = omission
+        if unexplained_lower_zero and logp < -8.10:
+            pressures["MgO"] = 0.0
         return PressureEvaluation(
             pressures,
             below_threshold_omissions=omissions,
@@ -158,6 +182,13 @@ def test_reporting_limit_omission_is_honoured_by_the_exponent_probe() -> None:
     )
     assert balance.pO2_bar > 0.0
     assert balance.pressures_Pa["MgO"] == 1.0e-8
+    with pytest.raises(ValueError, match="not positive around the root"):
+        _residue_oxygen_balance(
+            _channel_terms(channels),
+            {"FeO": 1.0, "MgO": 1.0},
+            lambda logp: pressure(logp, unexplained_lower_zero=True),
+            1800.0,
+        )
 
 
 def test_generic_balance_failure_reaches_finite_step_no_flux_check() -> None:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -360,7 +361,9 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
     assert bounds["Fe"] >= minimum_fe_bound
 
 
-def test_sourced_fe_mixed_alpha_corner_current_output_pin() -> None:
+def test_sourced_fe_mixed_alpha_corner_is_in_mass_loss_envelope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import simulator.battery.residue as residue
     from simulator.battery.residue import ResidueChannel
 
@@ -384,6 +387,19 @@ def test_sourced_fe_mixed_alpha_corner_current_output_pin() -> None:
         )
 
     pressure.declares_fixed_activities = True
+    roots = {}
+    production_solver = residue._solve_vacuum_oxygen_balance
+
+    def capture_root(model, selected, *, temperature_K):
+        key = tuple(
+            (channel.species, channel.alpha)
+            for channel in selected if channel.species in {"FeO", "Mg"}
+        )
+        result = production_solver(model, selected, temperature_K=temperature_K)
+        roots[key] = result.pO2_bar
+        return result
+
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", capture_root)
     bounds, corners = residue._mass_loss_corner_bounds(
         {"FeO": 1.0, "MgO": 1.0},
         channels,
@@ -393,8 +409,23 @@ def test_sourced_fe_mixed_alpha_corner_current_output_pin() -> None:
         area_m2=1.0e-4,
         duration_s=1.0,
     )
-    assert corners["pO2_low_bar"] == pytest.approx(1.2562992493087133e-6)
-    assert bounds["Mg"] == pytest.approx(7.521604749150495e-9)
+    target_root = roots[(("FeO", 0.0), ("Mg", 1.0))]
+    assert target_root == pytest.approx(1.0309578725830958e-6, rel=1e-9)
+    mg_term = residue._channel_terms(
+        (channels[2],), require_oxygen_channels=False,
+    )
+    target_flux = residue._finite_step_fluxes(
+        mg_term,
+        {"MgO": 1.0},
+        temperature_K=1800.0,
+        area_m2=1.0e-4,
+        pressures_Pa={"Mg": pressure({}, math.log10(target_root))["Mg"]},
+        include_below_threshold=True,
+    )["Mg"]
+    target_loss = target_flux * mg_term[0].oxide_per_product_kg
+    assert target_loss == pytest.approx(8.30302983621701e-9, rel=1e-9)
+    assert corners["pO2_low_bar"] <= target_root
+    assert bounds["Mg"] >= target_loss
 
 
 @pytest.fixture

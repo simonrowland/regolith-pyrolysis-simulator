@@ -2572,6 +2572,7 @@ def _residue_redox_flag_notices(
     """Translate the residue engine's redox flags into scored evidence."""
 
     from simulator.vacuum_oxygen_balance import (
+        PressureLawChannelDiagnostic,
         RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
         RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
         RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
@@ -2594,14 +2595,22 @@ def _residue_redox_flag_notices(
         ):
             continue
         detailed_reasons.add(str(reason))
+        channel_diagnostic = PressureLawChannelDiagnostic(
+            species=species,
+            declared=float(declared),
+            observed=float(observed),
+            expected=float(expected),
+            reason=str(reason),
+        )
+        arm = diagnostic.get("arm")
+        arm_label = f"arm={arm}; " if isinstance(arm, str) else ""
         notices.append(
             Notice(
                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                 affected_quantities=(quantity,),
                 reason=str(reason),
                 origin=(
-                    f"{origin}; species={species}; declared={declared!r}; "
-                    f"observed={observed!r}; expected={expected!r}"
+                    f"{origin}; {arm_label}{channel_diagnostic.evidence_text()}"
                 ),
             )
         )

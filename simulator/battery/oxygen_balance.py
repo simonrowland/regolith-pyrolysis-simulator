@@ -362,12 +362,17 @@ def _solve_vacuum_oxygen_balance(
                 upper_omissions = getattr(
                     upper_model_pressures, "below_threshold_omissions", {}
                 )
-                if (
+                lower_omission_proven = (
                     isinstance(lower_omissions, Mapping)
                     and channel.species in lower_omissions
-                ) or (
+                )
+                upper_omission_proven = (
                     isinstance(upper_omissions, Mapping)
                     and channel.species in upper_omissions
+                )
+                if (
+                    (lower_pressure > 0.0 or lower_omission_proven)
+                    and (upper_pressure > 0.0 or upper_omission_proven)
                 ):
                     continue
                 raise ValueError(
