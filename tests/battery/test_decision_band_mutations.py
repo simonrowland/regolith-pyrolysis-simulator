@@ -245,6 +245,7 @@ def test_coverage_normalization_callers_use_the_shared_owner() -> None:
     root = Path(__file__).resolve().parents[2]
     for relative_path, target in (
         ("simulator/battery/score.py", "metric_standard_width"),
+        ("simulator/battery/score.py", "two_sigma_measurement_dex"),
         ("simulator/battery/migrate.py", "numeric_extra_unc"),
     ):
         tree = ast.parse((root / relative_path).read_text(encoding="utf-8"))
