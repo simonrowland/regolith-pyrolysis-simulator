@@ -18413,6 +18413,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     raise
                 from simulator.battery.default_policy import resolve
 
+                # When b-1298 lands, DP-007 defers to its lab-geometry
+                # resolver for both evaporating area and film length.
                 resolved = resolve('DP-007', sample_mass_kg=sample_mass_g / 1000.0)
                 declared_area_m2 = float(resolved.value)
                 self._dp007_area_default = {
