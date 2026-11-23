@@ -802,6 +802,9 @@ _VALID_DECISION_CHOICES = {
     DecisionType.C7_PROCEED: ('yes', 'no'),
 }
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
+_MELT_REDOX_GATE_PIN_DISPOSITIONS = frozenset(
+    {'live', 'memo-hit', 'replay'}
+)
 # Distinct from a resolved curve of None (gate read in progress). The FeO
 # domain reads a curve the hour already resolved. It must not start a
 # liquidus solve, and it must not treat a missing read as below.
@@ -947,6 +950,22 @@ def _liquidus_status_from_freeze_gate_exception(
 _MeltRedoxGateAuthority = (
     Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None
 )
+
+
+def _melt_redox_gate_authority_is_pin_candidate(
+    authority: Any,
+) -> bool:
+    if not (
+        isinstance(authority, Mapping)
+        and authority.get('disposition')
+        in _MELT_REDOX_GATE_PIN_DISPOSITIONS
+        and isinstance(authority.get('curve'), Mapping)
+    ):
+        return False
+    return (
+        authority.get('disposition') != 'replay'
+        or isinstance(authority.get('law_disclosures'), list)
+    )
 
 
 STAGE0_GAS_COMPONENTS = {
@@ -5246,7 +5265,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return self._establish_melt_redox_gate_authority_for_current_hour(
                     **redox_state_kwargs,
                 )
-            if gate_authority.get('disposition') in {'live', 'memo-hit', 'replay'}:
+            if (
+                gate_authority.get('disposition')
+                in _MELT_REDOX_GATE_PIN_DISPOSITIONS
+            ):
                 if self._melt_redox_gate_record_is_admitted(
                     gate_authority,
                     **redox_state_kwargs,
@@ -5262,12 +5284,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> bool:
-        if not (
-            isinstance(value, Mapping)
-            and value.get('disposition') in {'live', 'memo-hit'}
-            and isinstance(value.get('curve'), Mapping)
-        ):
+        if not _melt_redox_gate_authority_is_pin_candidate(value):
             return False
+        if value.get('disposition') == 'replay':
+            return True
         from simulator.engine_binding_admission import (
             gate_curve_memo_reuse_eligible,
         )
@@ -5323,10 +5343,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             '_melt_redox_gate_authority_this_tick',
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
         )
-        if (
-            pinned_hour != int(self.melt.hour)
-            or pinned_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-        ):
+        if pinned_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
+            return False, None
+        if pinned_hour != int(self.melt.hour):
+            self._melt_redox_gate_authority_this_tick = (
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+            )
+            self._melt_redox_gate_authority_tick_hour = None
+            self._melt_redox_gate_authority_tick_verdict_identity = None
             return False, None
 
         current_verdict, _ = self._melt_redox_gate_current_pin_verdict()
@@ -5341,8 +5365,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if isinstance(pinned_authority, Mapping):
             authority_is_reusable = (
-                pinned_authority.get('disposition') in {'live', 'memo-hit'}
-                and isinstance(pinned_authority.get('curve'), Mapping)
+                _melt_redox_gate_authority_is_pin_candidate(
+                    pinned_authority
+                )
             )
         else:
             authority_is_reusable = True
@@ -5374,11 +5399,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         authority = self._melt_redox_liquidus_gate_record(
             **redox_state_kwargs,
         )
-        if (
-            isinstance(authority, Mapping)
-            and authority.get('disposition') in {'live', 'memo-hit'}
-            and isinstance(authority.get('curve'), Mapping)
-        ):
+        if _melt_redox_gate_authority_is_pin_candidate(authority):
             verdict_identity, _ = (
                 self._melt_redox_gate_current_pin_verdict()
             )
@@ -5411,11 +5432,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             isinstance(authority, Mapping)
             and isinstance(authority.get('curve'), Mapping)
         ):
-            # Replay, and a live record admission rejects, already have a
-            # liquidus. The redox pin cannot hold them: the resolver
-            # collapses that record to None, and None means no curve, which
-            # would mark a hot hour below the liquidus. Keep the curve for
-            # the FeO domain only.
+            # A curve that cannot be stored as a reusable hour pin still
+            # supplies the domain for FeO reads during this hour.
             curve = authority['curve']
             self._liquid_feo_resolved_curve_hour = current_hour
             self._liquid_feo_resolved_curve = curve
@@ -5478,9 +5496,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
-        return self._resolved_melt_redox_gate_authority(
-            redox_state=redox_state,
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+        authority = self._melt_redox_liquidus_gate_record(
+            **redox_state_kwargs,
         )
+        if (
+            isinstance(authority, Mapping)
+            and isinstance(authority.get('curve'), Mapping)
+        ):
+            return authority['curve']
+        return authority
 
     def _melt_redox_liquidus_gate_record(
         self,

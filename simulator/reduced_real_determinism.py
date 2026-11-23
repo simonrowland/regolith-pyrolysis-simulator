@@ -151,6 +151,41 @@ _SOURCE_MODULE_PATTERNS = (
     # is ever cached.
     "engines/vaporock/*.py",
 )
+
+
+def _payload_codec_version(artifact: str) -> int | None:
+    if artifact == "freeze_gate_curve":
+        return PT0_GATE_CURVE_CODEC_VERSION
+    if artifact == "equilibrium_post_record":
+        return PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
+    return None
+
+
+def _payload_codec_is_current(
+    artifact: str,
+    payload: Any,
+) -> bool:
+    version = _payload_codec_version(artifact)
+    return (
+        version is None
+        or (
+            isinstance(payload, Mapping)
+            and payload.get("payload_codec_version") == version
+        )
+    )
+
+
+def _versioned_replay_payload(
+    artifact: str,
+    payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    version = _payload_codec_version(artifact)
+    result = dict(payload)
+    if version is not None:
+        result["payload_codec_version"] = version
+    return result
+
+
 _ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"
 _ALPHAMELTS_BACKEND_NAME = "AlphaMELTSBackend"
 _ALPHAMELTS_BACKEND_CLASS = (
@@ -937,7 +972,10 @@ class PT0DeterminismStore:
         self._store(
             "freeze_gate_curve",
             key,
-            {"curve": _curve_payload(curve)},
+            _versioned_replay_payload(
+                "freeze_gate_curve",
+                {"curve": _curve_payload(curve)},
+            ),
             engine_version_provenance=_engine_version_provenance(
                 sim,
                 ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -1146,6 +1184,8 @@ class PT0DeterminismStore:
         repair_notices: Sequence[Mapping[str, Any]] = (),
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
+        if _payload_codec_version(artifact) is not None:
+            payload = _versioned_replay_payload(artifact, payload)
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
@@ -1165,8 +1205,15 @@ class PT0DeterminismStore:
             }
         )
         existing = self._entries.get(key_hash)
+        stale_payload = (
+            existing is not None
+            and not _payload_codec_is_current(
+                artifact,
+                existing.get("payload"),
+            )
+        )
         if existing is not None:
-            if existing["payload_hash"] != payload_hash:
+            if not stale_payload and existing["payload_hash"] != payload_hash:
                 raise PT0CacheCollision(
                     f"PT-0 {artifact} key collision with different payload: "
                     f"{key_hash}"
@@ -1209,7 +1256,7 @@ class PT0DeterminismStore:
                 persisted.get("law_disclosures"),
                 incoming_disclosures,
             )
-        if existing is not None:
+        if existing is not None and not stale_payload:
             existing["repair_notices_json"] = effective_notices_json
             existing["law_disclosures"] = _prefer_law_disclosures(
                 existing.get("law_disclosures"),
@@ -1268,6 +1315,11 @@ class PT0DeterminismStore:
             if entry is None or not replay_dependency_vectors_match(
                 key,
                 entry.get("key", {}),
+            ):
+                continue
+            if not _payload_codec_is_current(
+                artifact,
+                entry.get("payload"),
             ):
                 continue
             if artifact == "freeze_gate_curve":
@@ -1448,6 +1500,11 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 entry = None
+            if entry is not None and not _payload_codec_is_current(
+                artifact,
+                entry.get("payload"),
+            ):
+                entry = None
             if entry is not None and not _disclosures_known(entry):
                 entry = None
             if entry is not None:
@@ -1619,6 +1676,14 @@ class PT0DeterminismStore:
             replay_scope_sha256=replay_scope_for_interpolation(key),
             exclude_key_hash=key_hash,
         )
+        candidates = [
+            candidate
+            for candidate in candidates
+            if _payload_codec_is_current(
+                artifact,
+                candidate.get("payload"),
+            )
+        ]
         for candidate in candidates:
             self._entries[str(candidate["key_hash"])] = copy.deepcopy(candidate)
         attempt = attempt_cached_interpolation(key, candidates)
@@ -1824,7 +1889,11 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
-                if (
+                stale_payload = not _payload_codec_is_current(
+                    artifact,
+                    entry.get("payload"),
+                )
+                if not stale_payload and (
                     entry["payload_hash"] != payload_hash
                     or canonical_json_bytes(entry["payload"]) != payload_bytes
                 ):
@@ -1841,6 +1910,18 @@ class PT1PersistentEquilibriumStore:
                     (key_hash,),
                 ).fetchone()
                 if local_row is not None:
+                    if stale_payload:
+                        conn.execute(
+                            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                            "SET payload_sha256 = ?, payload_bytes = ?, "
+                            "repair_notices_json = ? WHERE key_hash = ?",
+                            (
+                                payload_hash,
+                                sqlite3.Binary(payload_bytes),
+                                effective_notices_json,
+                                key_hash,
+                            ),
+                        )
                     if effective_notices_json != existing_notices_json:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
@@ -1868,7 +1949,9 @@ class PT1PersistentEquilibriumStore:
                         ),
                     )
                     return
-                if effective_notices_json == existing_notices_json:
+                if stale_payload:
+                    insert_source = None
+                elif effective_notices_json == existing_notices_json:
                     # A read-only row with no disclosure field is not a usable
                     # hit. Copy it locally once this computation measured one.
                     base_disclosures = _law_disclosures_from_json(
@@ -3596,12 +3679,6 @@ def canonical_replay_key(
             total_amount_kg,
             quantization.composition_sig_figs,
         )
-    if artifact == "freeze_gate_curve":
-        key["gate_curve_codec_version"] = PT0_GATE_CURVE_CODEC_VERSION
-    elif artifact == "equilibrium_post_record":
-        key["equilibrium_payload_codec_version"] = (
-            PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
-        )
     return key
 
 
@@ -3688,12 +3765,6 @@ def canonical_physics_bucket_key_from_replay_key(
         "controls": bucket_controls,
         "sulfur": bucket_sulfur,
     }
-    equilibrium_codec = key.get("equilibrium_payload_codec_version")
-    if equilibrium_codec is not None:
-        physics_bucket["equilibrium_payload_codec_version"] = (
-            equilibrium_codec
-        )
-
     return {
         "physics_bucket": physics_bucket,
         "replay_scope": replay_scope,
@@ -4005,9 +4076,10 @@ def canonical_replay_output_projection(
         )
         for domain_key in GATE_CURVE_DOMAIN_KEYS:
             curve_payload.pop(domain_key, None)
-        return {
-            "curve": curve_payload,
-        }
+        return _versioned_replay_payload(
+            artifact,
+            {"curve": curve_payload},
+        )
     if artifact != "equilibrium_post_record":
         raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
     transition = getattr(result, "ledger_transition", None)
@@ -4066,7 +4138,7 @@ def canonical_replay_output_projection(
             if isinstance(alphamelts_diagnostics, Mapping)
             else _json_ready(alphamelts_diagnostics)
         )
-    return payload
+    return _versioned_replay_payload(artifact, payload)
 
 
 def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:

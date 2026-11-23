@@ -4472,6 +4472,28 @@ def test_pt1_domain_gate_prediction_replays_with_qualification(
     )
 
 
+def _store_raw_replay_payload(
+    store: PT0DeterminismStore,
+    artifact: str,
+    key: dict,
+    payload: dict,
+    *,
+    law_disclosures=(),
+) -> None:
+    key_bytes = rrd.canonical_json_bytes(key)
+    payload_bytes = rrd.canonical_json_bytes(payload)
+    store.persistent_store.put(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=rrd._sha256(key_bytes),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=rrd._sha256(payload_bytes),
+        law_disclosures=law_disclosures,
+    )
+
+
 def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     tmp_path: Path,
 ) -> None:
@@ -4487,7 +4509,6 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         'path': (),
     })['is_liquidus_floor'] is False
     markerless_payload = {
-        'payload_codec_version': 2,
         'curve': {
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',
             'solidus_T_C': 1200.0,
@@ -4510,7 +4531,8 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         'certification_route': [],
         'evaluation_count': 1,
     }
-    store._store(
+    _store_raw_replay_payload(
+        store,
         'freeze_gate_curve',
         key,
         markerless_payload,
@@ -4607,7 +4629,12 @@ def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(
     old_payload['equilibrium_result']['diagnostics'][
         'a_FeO_calphad'
     ]['notices'] = notices
-    capture._store('equilibrium_post_record', new_key, old_payload)
+    _store_raw_replay_payload(
+        capture,
+        'equilibrium_post_record',
+        new_key,
+        old_payload,
+    )
 
     replay = PT0DeterminismStore('replay', db_path=db_path)
     with pytest.raises(PT0CacheMiss):

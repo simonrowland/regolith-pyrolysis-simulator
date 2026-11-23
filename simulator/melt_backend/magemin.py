@@ -2292,6 +2292,28 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
         )
 
+        domain_valid, domain_warnings, domain_reason = domain_verdict
+        domain_identity, evaluated_silica_diagnostic = (
+            magemin_domain_identity_from_evaluated_bulk(
+                None if domain_projection is None
+                else domain_projection.oxide_wt_pct,
+                projection_threshold_verdict=(
+                    'refused' if projection_threshold_reason else 'clear'
+                ),
+                refusal_reason=projection_threshold_reason or domain_reason,
+                domain_verdict=(domain_valid, domain_reason),
+            )
+        )
+        domain_diagnostics = dict(evaluated_silica_diagnostic or {})
+        domain_diagnostics['projection_threshold_verdict'] = (
+            domain_identity.projection_threshold_verdict
+        )
+        if projection_threshold_reason is not None:
+            domain_diagnostics['projection_threshold_reason'] = (
+                projection_threshold_reason
+            )
+        projection_diagnostics.update(domain_diagnostics)
+
         if (
             projection.dropped_mass_kg_by_species
             or dropped_accounts
@@ -2373,27 +2395,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
-        domain_valid, _domain_warnings, domain_reason = domain_verdict
-        domain_identity, evaluated_silica_diagnostic = (
-            magemin_domain_identity_from_evaluated_bulk(
-                None if domain_projection is None
-                else domain_projection.oxide_wt_pct,
-                projection_threshold_verdict=(
-                    'refused' if projection_threshold_reason else 'clear'
-                ),
-                refusal_reason=projection_threshold_reason or domain_reason,
-                domain_verdict=(domain_valid, domain_reason),
-            )
-        )
-        if evaluated_silica_diagnostic is not None:
-            result_diagnostics.update(evaluated_silica_diagnostic)
-        result_diagnostics['projection_threshold_verdict'] = (
-            domain_identity.projection_threshold_verdict
-        )
-        if projection_threshold_reason is not None:
-            result_diagnostics['projection_threshold_reason'] = (
-                projection_threshold_reason
-            )
+        result_diagnostics.update(domain_diagnostics)
         if bulk_projection.dropped_components:
             # A result for a different (projected) bulk is not a result for
             # this one. Do not call MAGEMin on the truncated vector.

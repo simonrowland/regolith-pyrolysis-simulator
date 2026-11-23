@@ -820,6 +820,7 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
     backend = MAGEMinBackend()
     backend._available = False
     backend._bridge = None
+    monkeypatch.setattr(backend, 'initialize', lambda _config: True)
     provider = MAGEMinShadowProvider(backend=backend)
     formula_registry = {}
     composition_wt_pct = {'SiO2': 85., 'Al2O3': 10., 'CaO': 5.}
@@ -1029,6 +1030,7 @@ def test_equilibrium_provider_qualifies_exact_evaluated_bulk(
     backend = MAGEMinBackend()
     backend._available = False
     backend._bridge = None
+    monkeypatch.setattr(backend, 'initialize', lambda _config: True)
     provider = MAGEMinShadowProvider(backend=backend)
 
     result = provider.dispatch(request)

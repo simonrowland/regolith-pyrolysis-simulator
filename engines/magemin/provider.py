@@ -292,32 +292,21 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         from simulator.melt_backend.magemin import (
             DEFAULT_MAGEMIN_DATABASE,
             evaluated_magemin_domain_identity,
-            magemin_domain_identity_from_evaluated_bulk,
         )
 
         request_domain_identity, domain_diagnostic = (
-            magemin_domain_identity_from_evaluated_bulk(composition_wt_pct)
+            evaluated_magemin_domain_identity(
+                composition_mol_by_account,
+                str(_SHADOW_BACKEND_CONFIG.get(
+                    'database', DEFAULT_MAGEMIN_DATABASE,
+                )),
+                species_formula_registry=(
+                    request.account_view.species_formula_registry
+                ),
+                composition_mol_by_account=True,
+            )
         )
         domain_diagnostic = domain_diagnostic or {}
-        if request.intent is not ChemistryIntent.SILICATE_EQUILIBRIUM:
-            evaluated_domain_identity, evaluated_domain_diagnostic = (
-                evaluated_magemin_domain_identity(
-                    composition_mol_by_account,
-                    str(_SHADOW_BACKEND_CONFIG.get(
-                        'database', DEFAULT_MAGEMIN_DATABASE,
-                    )),
-                    species_formula_registry=(
-                        request.account_view.species_formula_registry
-                    ),
-                    composition_mol_by_account=True,
-                )
-            )
-            if evaluated_domain_identity.silica_verdict == 'in_band':
-                request_domain_identity = evaluated_domain_identity
-                domain_diagnostic = {}
-            elif evaluated_domain_identity.silica_verdict == 'extrapolated':
-                request_domain_identity = evaluated_domain_identity
-                domain_diagnostic = evaluated_domain_diagnostic or domain_diagnostic
         if request_domain_identity.silica_verdict == 'in_band':
             gate_warnings = [
                 warning
@@ -375,7 +364,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         equilibrium_diagnostics = dict(
             getattr(equilibrium, 'diagnostics', {}) or {}
         )
-        if request.intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+        if request.intent in {
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+        }:
             backend_domain_diagnostic = {
                 field: equilibrium_diagnostics[field]
                 for field in ('authority', 'certified_band')
@@ -387,18 +379,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     for field in ('authority', 'certified_band')
                 }
             elif backend_domain_diagnostic:
-                evaluated_domain_diagnostic = backend_domain_diagnostic
-        elif request.intent is ChemistryIntent.SILICATE_EQUILIBRIUM:
-            # A non-empty backend verdict describes the same direct bulk and
-            # is more specific than preflight. An empty in-band diagnostic is
-            # not evidence that an extrapolated request-level verdict should
-            # be discarded.
-            backend_domain_diagnostic = {
-                field: equilibrium_diagnostics[field]
-                for field in ('authority', 'certified_band')
-                if equilibrium_diagnostics.get(field) is not None
-            }
-            if backend_domain_diagnostic:
                 evaluated_domain_diagnostic = backend_domain_diagnostic
         projected_diagnostics = equilibrium_diagnostics.get(
             'projected_liquidus_diagnostics'
@@ -667,7 +647,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         return backend
 
     def _initialize_backend(self, backend: Any) -> bool:
-        """Treat the backend's explicit unavailable result as a failed init."""
+        """Return false for normal unavailability; retain raised init errors."""
         self._backend_initialization_error = None
         try:
             initialized = backend.initialize(
@@ -677,9 +657,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             self._backend_initialization_error = exc
             return False
         if initialized is False:
-            self._backend_initialization_error = RuntimeError(
-                'MAGEMin backend initialization returned unavailable'
-            )
             return False
         return True
 
