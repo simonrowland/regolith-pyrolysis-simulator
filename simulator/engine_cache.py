@@ -7,13 +7,15 @@ are manual tools in scripts/engine_cache_sync.py.
 Refusal masks are a separate table, not a key dimension. A request whose
 coarse cell was learned from a deterministic refusal returns that typed
 refusal, flagged ``mask_hit``, without calling the engine. One live key in
-32 is solved again; a different outcome deletes that cell. The teaching
-request is one ``landed`` audit row per cell, replaced when that cell is
-taught again. ``false_mask`` audit rows stay until ``clear-mask``. That
-command drops one engine's cells and audit rows for one class. Merge copies
-output rows only, not mask tables. An in-process replay dies with the
-process. A readonly cache can serve a mask and can count a contradiction,
-but it cannot learn, delete, or write the audit row.
+32 is solved again. A different outcome deletes that cell and records a
+``false_mask`` witness. That cell stays mixed until ``clear-mask``: a later
+refusal does not teach it again. The teaching request is one ``landed``
+audit row per cell, replaced when that cell is taught again. ``clear-mask``
+drops one engine's cells and audit rows for one class, and this process's
+memory of that file. Merge copies output rows only, not mask tables. A
+readonly cache cannot write the witness, but a contradiction seen in this
+process is not served again. The in-process counter is the one the score
+reads.
 """
 
 from __future__ import annotations
@@ -740,6 +742,10 @@ _COUNTER_NAMES = (
 _MEMORY_CACHE_MAXSIZE = 65536
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
+# Cells a live sample contradicted in this process. The file may still
+# hold the row when it is readonly. Lookup and the in-process replay
+# both treat a denied cell as absent until clear-mask forgets the file.
+_MASK_DENY: set[tuple[str, str, str, bytes]] = set()
 _RUNTIME_BACKENDS: dict[str, Any] = {}
 
 
@@ -1742,8 +1748,10 @@ def not_stored_refusal_label(solved: Any, hot: Any) -> str | None:
 
 # Coarse preset of ControlQuantization (simulator/reduced_real_determinism.py):
 # t_k 1 K, pressure 0.001 bar, log fO2 0.01, composition 3 significant figures.
-# This leaf cannot import that module. tests/test_engine_cache_refusal_mask.py
-# pins these quanta and the bucket functions to that preset.
+# This leaf cannot import that module. No module already imports both, and
+# a caller that forgot to register a quantizer would skip the mask. The
+# copy stays. The property test sweeps these functions against the owner's
+# _quantize and _sigfig. _sigfig_snap is a different rule and stays there.
 _MASK_T_QUANTUM = 1.0
 _MASK_T_DECIMALS = 0
 _MASK_PRESSURE_QUANTUM = 0.001
@@ -1757,20 +1765,22 @@ _MASK_COMPOSITION_FIELDS = frozenset({
 _MASK_TEMPERATURE_FIELDS = frozenset({"temperature_K", "temperature_C"})
 _MASK_PRESSURE_FIELDS = frozenset({"pressure_bar", "physical_pressure_bar"})
 _MASK_LOG_FO2_FIELDS = frozenset({"fO2_log"})
-_MASK_PO2_FIELDS = frozenset({"po2_bar"})
+# po2_bar is the nested number. po2 and vapor_transport_pO2_bar are the
+# names the battery puts on the request. Same significant-figure bucket.
+_MASK_PO2_FIELDS = frozenset({
+    "po2_bar", "po2", "vapor_transport_pO2_bar",
+})
 _MASK_EXACT_SUBTREES = frozenset({"engine_settings"})
 # One live solve out of this many exact keys, chosen from the key bytes.
 # The same key always verifies or never verifies.
 MASK_VERIFY_EVERY = 32
-# Classes the phase-A probe replayed identically. alphaMELTS ValueError was
-# 19 µs. The cell lookup (coarsen, pack, primary-key read) on a 5000-row
-# table was under that, so the class is included. tests/t1917_mask_probe.py
-# remeasures the lookup and fails if that comparison flips. Timeouts and
-# untyped refusals are not in this set: a load-dependent miss must not
-# become a permanent cell.
+# Classes the phase-A probe replayed identically. alphaMELTS ValueError
+# costs 19 µs. A battery-shaped coarsen plus lookup was not under that,
+# so the class is left unmasked. tests/t1917_mask_probe.py exits 2 if
+# this set disagrees with a fresh measurement. Timeouts and untyped
+# refusals stay out: a load-dependent miss must not become a cell.
 MASKABLE_REFUSAL_CLASSES = frozenset({
     ("alphamelts", "refusal:engine_crash"),
-    ("alphamelts", "exception:ValueError"),
     ("internal-analytical", "refusal:unavailable"),
     ("thermoengine", "refusal:unavailable"),
     ("thermoengine", "exception:ThermoEngineFO2OmittedError"),
@@ -1899,13 +1909,37 @@ def mask_verify_selected(cache_key: bytes) -> bool:
     return int.from_bytes(digest, "little") % MASK_VERIFY_EVERY == 0
 
 
+class _MaskedList(list):
+    """Production list hot plus the mask class.
+
+    ``equilibrium_cache_from_value`` accepts a list of length 11 or 12.
+    A subclass is still a list, so that decoder keeps working. Callers
+    read ``mask_hit`` off the object. The stored recipe stays a plain list.
+    """
+
+    mask_hit: str
+
+
 def _replayable(recipe: Mapping[str, Any]) -> bool:
     kind = recipe.get("kind")
     if kind == "refusal":
-        return isinstance(recipe.get("hot"), Mapping)
+        hot = recipe.get("hot")
+        return isinstance(hot, (Mapping, list))
     if kind == "exception":
         return str(recipe.get("type")) in _MASK_EXCEPTION_BUILDERS
     return False
+
+
+def _flag_refusal_hot(hot: Any, refusal_class: str) -> Any:
+    if isinstance(hot, Mapping):
+        flagged = dict(hot)
+        flagged["mask_hit"] = refusal_class
+        return flagged
+    if isinstance(hot, list):
+        flagged = _MaskedList(hot)
+        flagged.mask_hit = refusal_class
+        return flagged
+    raise TypeError("refusal mask recipe has no mapping or list")
 
 
 def _emit_mask(recipe: Mapping[str, Any], refusal_class: str) -> Any:
@@ -1919,12 +1953,7 @@ def _emit_mask(recipe: Mapping[str, Any], refusal_class: str) -> Any:
         except AttributeError:
             pass
         raise exc
-    hot = recipe.get("hot")
-    if not isinstance(hot, Mapping):
-        raise TypeError("refusal mask recipe has no mapping")
-    flagged = dict(hot)
-    flagged["mask_hit"] = refusal_class
-    return flagged
+    return _flag_refusal_hot(recipe.get("hot"), refusal_class)
 
 
 def _observed_mask_class(solved: Any, hot: Any, exc: BaseException | None) -> str | None:
@@ -1989,24 +2018,16 @@ def _mask_recipe(
             if not isinstance(token, str):
                 return None
             recipe["cause"] = token
-        for attr in ("requested", "solved"):
-            if not hasattr(exc, attr):
-                continue
-            value = getattr(exc, attr)
-            if value is None:
-                recipe[attr] = None
-                continue
-            if isinstance(value, bool) or not isinstance(value, (int, float)):
-                return None
-            number = float(value)
-            if not math.isfinite(number):
-                return None
-            recipe[attr] = number
         return recipe
-    if not isinstance(hot, Mapping):
+    if isinstance(hot, Mapping):
+        payload: Any = dict(hot)
+        payload.pop("mask_hit", None)
+    elif isinstance(hot, list):
+        # The compact scorer list from equilibrium_to_hot. A subclass's
+        # mask_hit attribute is not an element and is not stored.
+        payload = list(hot)
+    else:
         return None
-    payload = dict(hot)
-    payload.pop("mask_hit", None)
     try:
         frozen = unpack(pack({"kind": "refusal", "hot": payload}))
     except (TypeError, ValueError):
@@ -2021,7 +2042,6 @@ def _ensure_mask_tables(connection: sqlite3.Connection) -> None:
         f"CREATE TABLE IF NOT EXISTS {_MASK_TABLE} ("
         "engine TEXT NOT NULL, chem_version TEXT NOT NULL, cell BLOB NOT NULL, "
         "refusal_class TEXT NOT NULL, outcome BLOB NOT NULL, "
-        "hits INTEGER NOT NULL DEFAULT 0, verifies INTEGER NOT NULL DEFAULT 0, "
         "PRIMARY KEY (engine, chem_version, cell)) WITHOUT ROWID"
     )
     connection.execute(
@@ -2062,6 +2082,30 @@ def _add_counter(engine_id: str, name: str) -> None:
     bucket[name] = bucket.get(name, 0) + 1
 
 
+def _mask_deny_key(
+    path_value: str, engine: str, version: str, cell: bytes,
+) -> tuple[str, str, str, bytes]:
+    try:
+        resolved = str(Path(path_value).expanduser().resolve())
+    except OSError:
+        resolved = str(path_value)
+    return (resolved, engine, version, cell)
+
+
+def _deny_mask_cell(
+    path_value: str, engine: str, version: str, cell: bytes,
+) -> None:
+    with _LOCK:
+        _MASK_DENY.add(_mask_deny_key(path_value, engine, version, cell))
+
+
+def _mask_cell_denied(
+    path_value: str, engine: str, version: str, cell: bytes,
+) -> bool:
+    with _LOCK:
+        return _mask_deny_key(path_value, engine, version, cell) in _MASK_DENY
+
+
 def _drop_mask_memory(path_value: str) -> None:
     with _LOCK:
         for memory_key in tuple(_MEMORY_CACHE):
@@ -2083,9 +2127,12 @@ def _learn_mask_cell(
 ) -> None:
     """Learn one cell and keep the teaching request as the landed audit row.
 
-    Older landed rows for this cell are the alerts that the cell was missing.
-    They expire here. The new teaching row stays: it is the exact record the
-    battery's finite set leaves behind. False-mask rows are not deleted.
+    A ``false_mask`` witness for this engine, chemistry version, and cell
+    means the cell is mixed. Learn commits and returns without writing:
+    the keys that were not sampled must not be refused again. ``clear-mask``
+    deletes that witness. Older landed rows for a cell that is still being
+    taught expire here. The new teaching row stays. False-mask rows are
+    not deleted.
     """
 
     outcome = pack(dict(recipe))
@@ -2093,6 +2140,15 @@ def _learn_mask_cell(
         connection.execute("BEGIN IMMEDIATE")
         try:
             _ensure_mask_tables(connection)
+            mixed = connection.execute(
+                f"SELECT 1 FROM {_MASK_AUDIT_TABLE} "
+                "WHERE engine=? AND chem_version=? AND cell=? "
+                "AND disposition='false_mask' LIMIT 1",
+                (engine, version, cell),
+            ).fetchone()
+            if mixed is not None:
+                connection.commit()
+                return
             connection.execute(
                 f"DELETE FROM {_MASK_AUDIT_TABLE} "
                 "WHERE engine=? AND refusal_class=? AND chem_version=? "
@@ -2101,16 +2157,9 @@ def _learn_mask_cell(
             )
             connection.execute(
                 f"INSERT OR REPLACE INTO {_MASK_TABLE} "
-                "(engine, chem_version, cell, refusal_class, outcome, hits, verifies) "
-                "VALUES (?, ?, ?, ?, ?, COALESCE(("
-                f"SELECT hits FROM {_MASK_TABLE} "
-                "WHERE engine=? AND chem_version=? AND cell=?), 0), COALESCE(("
-                f"SELECT verifies FROM {_MASK_TABLE} "
-                "WHERE engine=? AND chem_version=? AND cell=?), 0))",
-                (
-                    engine, version, cell, refusal_class, outcome,
-                    engine, version, cell, engine, version, cell,
-                ),
+                "(engine, chem_version, cell, refusal_class, outcome) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (engine, version, cell, refusal_class, outcome),
             )
             connection.execute(
                 f"INSERT OR REPLACE INTO {_MASK_AUDIT_TABLE} "
@@ -2118,38 +2167,6 @@ def _learn_mask_cell(
                 "VALUES (?, 'landed', ?, ?, ?, ?, ?)",
                 (cache_key, engine, refusal_class, version, cell, refusal_class),
             )
-            connection.commit()
-        except BaseException:
-            try:
-                connection.rollback()
-            except sqlite3.Error:
-                pass
-            raise
-
-
-def _bump_mask_use(
-    connection: sqlite3.Connection,
-    *,
-    engine: str,
-    version: str,
-    cell: bytes,
-    verify: bool,
-) -> None:
-    with _LOCK:
-        connection.execute("BEGIN IMMEDIATE")
-        try:
-            if verify:
-                connection.execute(
-                    f"UPDATE {_MASK_TABLE} SET hits=hits+1, verifies=verifies+1 "
-                    "WHERE engine=? AND chem_version=? AND cell=?",
-                    (engine, version, cell),
-                )
-            else:
-                connection.execute(
-                    f"UPDATE {_MASK_TABLE} SET hits=hits+1 "
-                    "WHERE engine=? AND chem_version=? AND cell=?",
-                    (engine, version, cell),
-                )
             connection.commit()
         except BaseException:
             try:
@@ -2266,10 +2283,8 @@ def _flag_live(hot: Any, exc: BaseException | None, refusal_class: str) -> Any:
         except AttributeError:
             pass
         raise exc
-    if isinstance(hot, Mapping):
-        flagged = dict(hot)
-        flagged["mask_hit"] = refusal_class
-        return flagged
+    if isinstance(hot, (Mapping, list)):
+        return _flag_refusal_hot(hot, refusal_class)
     return hot
 
 
@@ -2286,11 +2301,16 @@ def _lookup_refusal_mask(
     engine_id: str,
     version: str,
     request: Any,
+    path_value: str,
 ) -> tuple[str, Mapping[str, Any], bytes] | None:
     if connection is None:
         return None
     cell = refusal_mask_cell(request)
     if cell is None:
+        return None
+    # A contradiction already seen in this process wins over the file.
+    # Readonly cannot delete the row, and a failed delete must not either.
+    if _mask_cell_denied(path_value, engine_id, version, cell):
         return None
     try:
         selected = _select_mask(connection, engine_id, version, cell)
@@ -2305,21 +2325,11 @@ def _lookup_refusal_mask(
 
 
 def _serve_mask_without_engine(
-    connection: sqlite3.Connection,
-    readonly: bool,
     engine_id: str,
-    version: str,
-    cell: bytes,
     refusal_class: str,
     recipe: Mapping[str, Any],
     memory_key: tuple[str, bytes, bool],
 ) -> Any:
-    if not readonly:
-        def write() -> None:
-            _bump_mask_use(
-                connection, engine=engine_id, version=version, cell=cell, verify=False,
-            )
-        _try_mask_write(engine_id, write)
     _remember_mask(memory_key, refusal_class, recipe)
     with _LOCK:
         _add_counter(engine_id, f"mask_hit:{refusal_class}")
@@ -2327,11 +2337,7 @@ def _serve_mask_without_engine(
 
 
 def _serve_verified_mask(
-    connection: sqlite3.Connection,
-    readonly: bool,
     engine_id: str,
-    version: str,
-    cell: bytes,
     refusal_class: str,
     recipe: Mapping[str, Any],
     memory_key: tuple[str, bytes, bool],
@@ -2343,12 +2349,6 @@ def _serve_verified_mask(
     remembered = recipe
     if live_recipe is not None and _replayable(live_recipe):
         remembered = live_recipe
-    if not readonly:
-        def write() -> None:
-            _bump_mask_use(
-                connection, engine=engine_id, version=version, cell=cell, verify=True,
-            )
-        _try_mask_write(engine_id, write)
     _remember_mask(memory_key, refusal_class, remembered)
     with _LOCK:
         _add_counter(engine_id, f"mask_hit:{refusal_class}")
@@ -2370,6 +2370,9 @@ def _reject_false_mask(
     exc: BaseException | None,
 ) -> None:
     observed = _observed_mask_class(solved, hot, exc) or "accepted"
+    # Deny before the write. A readonly file cannot record the witness,
+    # and a failed delete must not keep serving the cell in this process.
+    _deny_mask_cell(path_value, engine_id, version, cell)
     if not readonly:
         def write() -> None:
             _unmask_cell(
@@ -2603,12 +2606,24 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             result = _MEMORY_CACHE[memory_key]
             _MEMORY_CACHE.move_to_end(memory_key)
             if isinstance(result, _MaskReplay):
-                # A repeated key in this process does not re-verify or bump
-                # the sqlite hit count. The counter is the one the score reads.
-                _add_counter(engine_id, f"mask_hit:{result.refusal_class}")
-                return _emit_mask(result.recipe, result.refusal_class)
-            counts["hits"] += 1
-            return result
+                # A repeated key in this process does not re-verify.
+                # The counter is the one the score reads. A cell this
+                # process already contradicted is not served from memory.
+                cell = refusal_mask_cell(request)
+                denied = (
+                    cell is not None
+                    and _mask_cell_denied(
+                        path_value, engine_id, str(chem_version), cell,
+                    )
+                )
+                if denied:
+                    del _MEMORY_CACHE[memory_key]
+                else:
+                    _add_counter(engine_id, f"mask_hit:{result.refusal_class}")
+                    return _emit_mask(result.recipe, result.refusal_class)
+            else:
+                counts["hits"] += 1
+                return result
 
     path = Path(path_value).expanduser()
     try:
@@ -2640,7 +2655,9 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 return result
 
     version = str(chem_version)
-    masked = _lookup_refusal_mask(connection, engine_id, version, request)
+    masked = _lookup_refusal_mask(
+        connection, engine_id, version, request, path_value,
+    )
     finish = {
         "engine_id": engine_id,
         "request": request,
@@ -2658,14 +2675,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     refusal_class, recipe, cell = masked
     if not mask_verify_selected(cache_key):
         return _serve_mask_without_engine(
-            connection, readonly, engine_id, version, cell,
-            refusal_class, recipe, memory_key,
+            engine_id, refusal_class, recipe, memory_key,
         )
     solved, hot, exc = _capture_solve(solve)
     if _mask_matches(recipe, refusal_class, solved, hot, exc):
         return _serve_verified_mask(
-            connection, readonly, engine_id, version, cell,
-            refusal_class, recipe, memory_key, solved, hot, exc,
+            engine_id, refusal_class, recipe, memory_key, solved, hot, exc,
         )
     _reject_false_mask(
         connection, readonly, engine_id, version, cell,
@@ -3000,6 +3015,12 @@ def _forget_process_cache(path: Path) -> None:
                 same = False
             if same:
                 del _MEMORY_CACHE[memory_key]
+        # Same path comparison as the memory drop. Deny keys already store
+        # the resolved path, so a symlink does not leave a cell servable.
+        resolved = str(expanded)
+        for deny_key in tuple(_MASK_DENY):
+            if deny_key[0] == resolved:
+                _MASK_DENY.discard(deny_key)
     if _CONNECTION_PATH is not None and _CONNECTION_PATH.expanduser().resolve() == expanded:
         _close_connections()
 

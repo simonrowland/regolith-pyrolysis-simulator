@@ -607,13 +607,13 @@ class ThermoEngineOutOfDomainError(ValueError):
 
 
 def _mask_out_of_domain(recipe: Mapping[str, Any]) -> ThermoEngineOutOfDomainError:
-    """Rebuild a masked out-of-domain refusal from the stored cause token."""
+    """Rebuild a masked out-of-domain refusal from the stored cause token.
 
-    return ThermoEngineOutOfDomainError(
-        str(recipe["cause"]),
-        requested=recipe.get("requested"),
-        solved=recipe.get("solved"),
-    )
+    Requested and solved belong to the key that raised. A neighbor in the
+    same coarse cell does not inherit them.
+    """
+
+    return ThermoEngineOutOfDomainError(str(recipe["cause"]))
 
 
 def _mask_non_finite(recipe: Mapping[str, Any]) -> ThermoEngineNonFiniteField:

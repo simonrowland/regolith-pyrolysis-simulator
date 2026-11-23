@@ -447,8 +447,17 @@ def _call_cached_backend_equilibrate(
         raise caught_thermoengine[0]
     if handle.name == "thermoengine":
         _reraise_cached_thermoengine_refusal(payload)
+    if isinstance(payload, Mapping):
+        mask_hit = payload.get("mask_hit")
+    else:
+        mask_hit = getattr(payload, "mask_hit", None)
+    if not isinstance(mask_hit, str):
+        mask_hit = None
     if isinstance(payload, list):
         payload = equilibrium_cache_from_value(payload, engine_id=handle.name)
+        if mask_hit is not None and isinstance(payload, Mapping):
+            payload = dict(payload)
+            payload["mask_hit"] = mask_hit
     if isinstance(payload, Mapping):
         if handle.name == "internal-analytical":
             return SimpleNamespace(**payload)
@@ -624,6 +633,9 @@ class EquilibrateCell:
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
     backend_failure_disposition: str | None = None
+    # Class string when the refusal mask returned this cell. None on a
+    # live engine call. A default keeps payloads written before the field.
+    mask_hit: str | None = None
 
     def to_cache_payload(self) -> str:
         """Serialize the cell without losing its Python value types."""
@@ -688,6 +700,7 @@ class EquilibrateCell:
             "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
             "fe_redox_split": dict(self.fe_redox_split),
             "backend_failure_disposition": self.backend_failure_disposition,
+            "mask_hit": self.mask_hit,
         }
 
     @classmethod
@@ -802,6 +815,11 @@ class EquilibrateCell:
                 if payload.get("backend_failure_disposition") is None
                 else str(payload.get("backend_failure_disposition"))
             ),
+            mask_hit=(
+                None
+                if payload.get("mask_hit") is None
+                else str(payload.get("mask_hit"))
+            ),
         )
 
     def to_engine_cache_value(self) -> Any:
@@ -876,19 +894,25 @@ class EquilibrateCell:
 
     @classmethod
     def from_hot(cls, payload: Any) -> "EquilibrateCell":
+        if isinstance(payload, Mapping):
+            mask_hit = payload.get("mask_hit")
+        else:
+            mask_hit = getattr(payload, "mask_hit", None)
         if isinstance(payload, Mapping) and "cell" in payload:
             cell = cls.from_engine_cache_value(payload["cell"])
             cell.activities_standard_state = payload["activities_standard_state"]
-            return cell
-        if isinstance(payload, Mapping) and "refusal_cell" in payload:
+        elif isinstance(payload, Mapping) and "refusal_cell" in payload:
             cell = cls.from_engine_cache_value(payload["refusal_cell"])
             cell.refusal_reason = payload["refusal_reason"]
             cell.engine_reason = payload["reason"]
             cell.exit_signal = payload["exit_signal"]
             cell.exit_code = payload["exit_code"]
             cell.engine_annotation = payload["engine_annotation"]
-            return cell
-        return cls.from_engine_cache_value(payload)
+        else:
+            cell = cls.from_engine_cache_value(payload)
+        if isinstance(mask_hit, str):
+            cell.mask_hit = mask_hit
+        return cell
 
     @classmethod
     def from_engine_cache_value(cls, payload: Any) -> "EquilibrateCell":
@@ -4734,9 +4758,15 @@ class _IsolatedCellWorker:
             self.engine, normalize_engine_settings(self.engine, self.engine_settings),
         )
         result = cached_engine_call(self.engine, request, solve)
-        # EquilibrateCell.from_hot/as_payload keeps only cell fields. A mask
-        # flag set on the cached refusal has to be copied back after that.
-        mask_hit = result.get("mask_hit") if isinstance(result, Mapping) else None
+        # EquilibrateCell.from_hot/as_payload keeps cell fields. A mask
+        # flag on a mapping or on a list subclass has to be copied back
+        # after that projection.
+        if isinstance(result, Mapping):
+            mask_hit = result.get("mask_hit")
+        else:
+            mask_hit = getattr(result, "mask_hit", None)
+        if not isinstance(mask_hit, str):
+            mask_hit = None
         if isinstance(result, list) or (isinstance(result, Mapping) and ("refusal_cell" in result or "cell" in result)):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
@@ -5581,6 +5611,11 @@ def _equilibrate_cell_uncached(
                 if diagnostics.get("backend_failure_disposition") is None
                 else str(diagnostics.get("backend_failure_disposition"))
             ),
+            mask_hit=(
+                getattr(result, "mask_hit", None)
+                if isinstance(getattr(result, "mask_hit", None), str)
+                else None
+            ),
         )
         return cell
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
@@ -5608,6 +5643,11 @@ def _equilibrate_cell_uncached(
                 None
                 if getattr(exc, "failure_disposition", None) is None
                 else str(getattr(exc, "failure_disposition"))
+            ),
+            mask_hit=(
+                getattr(exc, "mask_hit", None)
+                if isinstance(getattr(exc, "mask_hit", None), str)
+                else None
             ),
         )
         return cell

@@ -4,8 +4,9 @@ No arguments. Run from the repository root:
 
     python3 tests/t1917_mask_probe.py
 
-Does not call an engine. Builds a temporary sqlite mask table, times the
-cell lookup, and checks one learn / short-circuit / clear cycle. Exits 2
+Does not call an engine. Builds a temporary sqlite mask table, times
+coarsen plus lookup on a battery-shaped request, and checks one learn /
+short-circuit / clear cycle. Exits 2
 when that lookup is not cheaper than the phase-A alphaMELTS ValueError
 median (19 µs) by a different answer than MASKABLE_REFUSAL_CLASSES, or
 when the coarse quanta disagree with ControlQuantization.
@@ -38,6 +39,24 @@ def _percentile(samples: list[float], fraction: float) -> float:
     return ordered[index]
 
 
+def _battery_request(index: int) -> dict:
+    """Controls the battery sends, plus one exact setting so cells differ."""
+
+    return {
+        "temperature_C": 1200.0 + (index % 40) * 0.02,
+        "composition_kg": {
+            "SiO2": 0.55 + (index % 9) * 1.0e-5,
+            "MgO": 0.2,
+            "Al2O3": 0.15,
+            "FeO": 0.1,
+        },
+        "pressure_bar": 1.0 + (index % 6) * 1.0e-5,
+        "fO2_log": -8.0 + (index % 4) * 1.0e-4,
+        "vapor_transport_pO2_bar": 1.0e-10 * (1.0 + (index % 5) * 1.0e-4),
+        "engine_settings": {"probe": index},
+    }
+
+
 def _measure_lookup() -> tuple[float, float, float]:
     from simulator.engine_cache import (
         _ensure_mask_tables,
@@ -58,7 +77,7 @@ def _measure_lookup() -> tuple[float, float, float]:
             rows = []
             requests = []
             for index in range(LOOKUP_ROWS):
-                request = {"probe": index}
+                request = _battery_request(index)
                 cell = refusal_mask_cell(request)
                 if cell is None:
                     raise RuntimeError("probe request has no mask cell")
@@ -66,8 +85,8 @@ def _measure_lookup() -> tuple[float, float, float]:
                 rows.append(("alphamelts", "4", cell, "refusal:engine_crash", outcome))
             connection.executemany(
                 "INSERT INTO engine_refusal_mask "
-                "(engine, chem_version, cell, refusal_class, outcome, hits, verifies) "
-                "VALUES (?, ?, ?, ?, ?, 0, 0)",
+                "(engine, chem_version, cell, refusal_class, outcome) "
+                "VALUES (?, ?, ?, ?, ?)",
                 rows,
             )
             connection.commit()
@@ -141,7 +160,7 @@ def _functional() -> tuple[int, int, int, int]:
         version = engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"]
         request = None
         for index in range(64):
-            candidate = {"temperature_K": 1000.0, "probe": index}
+            candidate = _battery_request(10_000 + index)
             key = engine_cache.engine_cache_key("alphamelts", version, candidate)
             if not engine_cache.mask_verify_selected(key):
                 request = candidate
