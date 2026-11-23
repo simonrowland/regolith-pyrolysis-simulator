@@ -8,7 +8,10 @@ from simulator import engine_binding_admission as admission_module
 from simulator import fe_redox as fe_redox_module
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.ledger import AtomLedger
-from simulator.physical_constants import MBAR_PER_BAR
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    MBAR_PER_BAR,
+)
 from tests.chemistry.test_evaporation_freeze_gate import (
     _CLEANED_MELT_ACCOUNT,
     _build_freeze_gate_sim,
@@ -145,7 +148,9 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         composition = _liquid_feo_bulk(sim, 50.0)
         sim._establish_melt_redox_gate_authority_for_current_hour()
         temperature_C = 1300.0
-        domain = sim.liquid_feo_domain_at(temperature_C + 273.15)
+        domain = sim.liquid_feo_domain_at(
+            temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        )
         assert (
             domain.domain_identity.projection_threshold_verdict
             == 'not_applicable'
@@ -193,7 +198,7 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         composition = _liquid_feo_bulk(sim, 85.0)
         temperature_C = 1800.0
 
-    temperature_K = temperature_C + 273.15
+    temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
     pressure_bar = float(sim.melt.p_total_mbar) / MBAR_PER_BAR
     fO2_log = float(sim._current_melt_redox_fO2_log())
     plain_activity = fe_redox_module.calphad_ferrous_feo_activity_diagnostic(
@@ -361,7 +366,7 @@ def test_timeout_then_magemin_retry_keeps_extrapolated_feo_qualification(
     )
     assert curve['gate_provider_step_down']['magemin_sourced'] is True
     temperature_C = 1800.0
-    temperature_K = temperature_C + 273.15
+    temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
     domain = sim.liquid_feo_domain_at(temperature_K)
     assert domain.domain_identity.silica_verdict == 'extrapolated'
     assert domain.domain_identity.certified_band == (30.0, 80.0)

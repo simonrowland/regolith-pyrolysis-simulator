@@ -815,12 +815,12 @@ def test_magemin_missing_silicate_still_refuses(composition):
 
 def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
     from simulator.accounting.formulas import resolve_species_formula
-    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
 
-    provider = MAGEMinShadowProvider(backend=object())
-    monkeypatch.setattr(provider, '_run_backend', lambda *a, **kw: EquilibriumResult(
-        temperature_C=1500., pressure_bar=0.001, liquid_fraction=1., status='ok',
-    ))
+    backend = MAGEMinBackend()
+    backend._available = False
+    backend._bridge = None
+    provider = MAGEMinShadowProvider(backend=backend)
     formula_registry = {}
     composition_wt_pct = {'SiO2': 85., 'Al2O3': 10., 'CaO': 5.}
     composition_mol = {
@@ -839,8 +839,11 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
         temperature_C=1500., pressure_bar=0.001,
     )
     result = provider.dispatch(request)
-    assert result.status == 'ok'
-    assert result.diagnostic['liquid_fraction'] == 1.
+    assert result.status == 'unavailable'
+    assert result.diagnostic['authority'] == 'extrapolated'
+    assert result.diagnostic['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
     assert result.transition is None
     assert any('authority=extrapolated' in w for w in result.warnings)
 
@@ -1003,7 +1006,7 @@ def test_equilibrium_provider_qualifies_exact_evaluated_bulk(
     expected_band,
 ):
     from simulator.accounting.formulas import resolve_species_formula
-    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
 
     formula_registry = {}
     composition_mol = {
@@ -1023,20 +1026,13 @@ def test_equilibrium_provider_qualifies_exact_evaluated_bulk(
         pressure_bar=1.0,
         fO2_log=-9.0,
     )
-    provider = MAGEMinShadowProvider(backend=object())
-    monkeypatch.setattr(
-        provider,
-        '_run_backend',
-        lambda *_args, **_kwargs: EquilibriumResult(
-            temperature_C=1400.0,
-            pressure_bar=1.0,
-            liquid_fraction=1.0,
-            status='ok',
-        ),
-    )
+    backend = MAGEMinBackend()
+    backend._available = False
+    backend._bridge = None
+    provider = MAGEMinShadowProvider(backend=backend)
 
     result = provider.dispatch(request)
 
-    assert result.status == 'ok'
+    assert result.status == 'unavailable'
     assert result.diagnostic.get('authority') == expected_authority
     assert result.diagnostic.get('certified_band') == expected_band

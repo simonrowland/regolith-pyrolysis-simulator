@@ -318,18 +318,11 @@ def test_pt0_supplied_finite_fo2_quantization_is_golden_neutral() -> None:
 
 def test_control_quantization_default_production_key_is_byte_identical() -> None:
     key = _freeze_gate_key()
-    codec_version = key['gate_curve_codec_version']
-    assert codec_version == 2
-    request_key = {
-        name: value for name, value in key.items()
-        if name != 'gate_curve_codec_version'
-    }
+    assert 'gate_curve_codec_version' not in key
+    request_key = key
     key_hash = _key_hash(request_key)
     fine_key = _freeze_gate_key(control_quantization=ControlQuantization.PRODUCTION)
-    fine_request_key = {
-        name: value for name, value in fine_key.items()
-        if name != 'gate_curve_codec_version'
-    }
+    fine_request_key = fine_key
 
     # 2026-07-04: rebaselined for #89 — the reduced-real production key now hashes
     # the FUNCTIONAL parsed content of setpoints/vapor_pressures (canonical JSON),
@@ -1607,12 +1600,8 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fO2_log=sim._compute_intrinsic_melt_fO2(),
         fe_redox_policy="intrinsic",
     )
-    assert magemin_key['gate_curve_codec_version'] == 3
-    magemin_request_key = {
-        name: value for name, value in magemin_key.items()
-        if name != 'gate_curve_codec_version'
-    }
-    magemin_bytes = canonical_json_bytes(magemin_request_key)
+    assert 'gate_curve_codec_version' not in magemin_key
+    magemin_bytes = canonical_json_bytes(magemin_key)
     assert len(magemin_bytes) == 1319
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
         "00f40658d0a344757029e661d4574a75c72b13521066689f205e6194a5dcea0a"
@@ -4489,7 +4478,8 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     db_path = tmp_path / 'markerless-gate-curve.db'
     store = PT0DeterminismStore('capture', db_path=db_path)
     key = _freeze_gate_key()
-    assert key['gate_curve_codec_version'] == 3
+    assert 'gate_curve_codec_version' not in key
+    assert rrd.PT0_GATE_CURVE_CODEC_VERSION == 3
     assert rrd._curve_payload({
         'source': 'gate_liquid_fraction',
         'solidus_T_C': 950.0,
@@ -4497,6 +4487,7 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         'path': (),
     })['is_liquidus_floor'] is False
     markerless_payload = {
+        'payload_codec_version': 2,
         'curve': {
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',
             'solidus_T_C': 1200.0,
@@ -4519,14 +4510,16 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         'certification_route': [],
         'evaluation_count': 1,
     }
-    old_key = dict(key)
-    old_key['gate_curve_codec_version'] = 2
     store._store(
         'freeze_gate_curve',
-        old_key,
+        key,
         markerless_payload,
         law_disclosures=[markerless_disclosure],
     )
+    old_replay = PT0DeterminismStore('replay', db_path=db_path)
+    with pytest.raises(PT0CacheMiss):
+        old_replay._lookup('freeze_gate_curve', key)
+    assert old_replay.hits == 0
     alternate_key = dict(key)
     alternate_pressure = float(key['controls']['pressure_bar']) + 0.01
     alternate_controls = dict(key['controls'])
@@ -4537,6 +4530,7 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     )
     alternate_key['freeze_gate_cache_key'] = cache_key
     valid_payload = {
+        'payload_codec_version': 3,
         'curve': {
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',
             'solidus_T_C': 1200.0,
@@ -4580,6 +4574,11 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         rrd.canonical_json_bytes(alternate_key)
     )
 
+    store._store('freeze_gate_curve', key, valid_payload)
+    recapture = PT0DeterminismStore('replay', db_path=db_path)
+    assert recapture._lookup('freeze_gate_curve', key) == valid_payload
+    assert recapture.hits == 1
+
 
 def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(
     tmp_path: Path,
@@ -4599,16 +4598,16 @@ def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(
         },
     }
     new_key = capture._equilibrium_key(sim)
-    assert new_key['equilibrium_payload_codec_version'] == 2
-    old_key = copy.deepcopy(new_key)
-    old_key.pop('equilibrium_payload_codec_version')
+    assert 'equilibrium_payload_codec_version' not in new_key
+    assert rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION == 2
     old_payload = rrd.canonical_replay_output_projection(
         'equilibrium_post_record', sim, result,
     )
+    old_payload.pop('payload_codec_version')
     old_payload['equilibrium_result']['diagnostics'][
         'a_FeO_calphad'
     ]['notices'] = notices
-    capture._store('equilibrium_post_record', old_key, old_payload)
+    capture._store('equilibrium_post_record', new_key, old_payload)
 
     replay = PT0DeterminismStore('replay', db_path=db_path)
     with pytest.raises(PT0CacheMiss):
@@ -4626,7 +4625,7 @@ def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(
         'source': 'none:second-read-state',
     }]
     capture.capture_equilibrium(sim, result)
-    assert len(capture._entries) == 2
+    assert len(capture._entries) == 1
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(
