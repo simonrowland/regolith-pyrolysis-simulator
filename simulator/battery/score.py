@@ -20012,6 +20012,16 @@ def residual_to_plain(
 ) -> dict[str, object]:
     payload = to_plain(residual)
     assert isinstance(payload, dict)
+    request = residual.candidate_request
+    request_payload = payload.get("candidate_request")
+    if (
+        request is not None
+        and request.quantity is None
+        and isinstance(request_payload, dict)
+    ):
+        # Null records that the engine request had an unidentified quantity;
+        # omitting the field would make it look like legacy absence.
+        request_payload["quantity"] = None
     if candidate is not None:
         payload["candidate_observation"] = to_plain(candidate)
     return payload

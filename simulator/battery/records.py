@@ -1016,14 +1016,26 @@ class Derivation:
 @dataclass(frozen=True)
 class NoticePolicy:
     id: str
-    version: str
+    version: str | int
     status: str
     value: str | int | Decimal
     units: str
 
     def __post_init__(self) -> None:
-        if not self.id or not self.version or not self.status or not self.units:
-            raise ValueError("NoticePolicy id, version, status, and units are required")
+        if not isinstance(self.id, str) or not self.id.startswith("DP-"):
+            raise ValueError("NoticePolicy.id must be a DP id")
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not self.status
+            or not isinstance(self.units, str)
+            or not self.units
+            or isinstance(self.value, bool)
+            or not isinstance(self.value, (str, int, Decimal))
+            or not str(self.value)
+        ):
+            raise ValueError("NoticePolicy id, version, status, value, and units are required")
         if self.status not in {"canonical", "proposed", "rejected"}:
             raise ValueError("NoticePolicy.status must be canonical, proposed, or rejected")
         if isinstance(self.value, bool) or not isinstance(self.value, (str, int, Decimal)):
