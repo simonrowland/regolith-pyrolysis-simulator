@@ -52,6 +52,7 @@ from simulator.reduced_real_determinism import (
     canonical_json_bytes,
     gate_curve_memo_record,
     gate_curve_memo_producer_configuration,
+    record_dependency_vector,
     uncacheable_replay_disposition,
 )
 from simulator.runner import _attach_composition_projected_liquidus_notice
@@ -5291,7 +5292,7 @@ def test_gate_curve_memo_ignores_sulfur_input_drift_same_key(
     assert len(provider_calls) == 1
 
 
-def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
+def test_gate_curve_memo_origin_ignores_sulfsat_but_replay_vector_keeps_it(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -5321,6 +5322,20 @@ def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
     state_changed.inventory.salt_phase_kg['SO3'] = 1.0
     state_changed.inventory.sulfide_matte_kg['FeS'] = 1.0
 
+    first_vector = record_dependency_vector(
+        sims[0],
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        resolve_magemin_database_default=True,
+    )
+    second_vector = record_dependency_vector(
+        state_changed,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        resolve_magemin_database_default=True,
+    )
+    assert first_vector["sulfur_side"] != second_vector["sulfur_side"]
+
     first = gate_curve_memo_producer_configuration(sims[0], curve)
     second = gate_curve_memo_producer_configuration(state_changed, curve)
 
@@ -5331,7 +5346,14 @@ def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
             return False
 
     state_changed._sulfsat_gate = _OtherSulfSatGate()
-    assert gate_curve_memo_producer_configuration(state_changed, curve) != first
+    third_vector = record_dependency_vector(
+        state_changed,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        resolve_magemin_database_default=True,
+    )
+    assert third_vector["sulfur_side"] != second_vector["sulfur_side"]
+    assert gate_curve_memo_producer_configuration(state_changed, curve) == first
 
 
 def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
@@ -7186,6 +7208,9 @@ def test_core_gate_curve_memo_predicts_and_flags_after_stable_out_of_domain(
     assert curves[0]['gate_provider_refusal']['reason'] == stable_reason
     assert curves[0]['gate_provider_refusal']['qualification'] == 'out_of_domain_kress91_floor_prediction'
     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+    key = _freeze_gate_key_for_current_state(sim)
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    assert shared_cache == {}
     snapshot = sim._make_snapshot()
     assert snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']['status'] == 'out_of_domain'
     assert len(provider_calls) == 1
