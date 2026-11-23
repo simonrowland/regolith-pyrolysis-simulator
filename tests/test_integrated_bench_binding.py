@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
-import copy
+import hashlib
 import json
+import os
+import platform
 import sqlite3
+import subprocess
 import zlib
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -19,9 +23,9 @@ from simulator.battery.integrated_bench import (
     IntegratedBenchContractError,
     bound_observation_ids,
     build_deck_request,
-    cache_key_document,
     classify_observation,
     consumed_chamber_pressure_dt_s,
+    deck_cache_request,
     project_whole_run,
     run_cached_deck,
     score_bound_decks,
@@ -161,49 +165,21 @@ def _rewrite(
     return path
 
 
-def _without_loaded_files(request: dict) -> dict:
-    copied = copy.deepcopy(request)
-    copied.pop("loaded_files", None)
-    return copied
+def _plain(value):
+    if isinstance(value, Mapping):
+        return {str(key): _plain(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_plain(item) for item in value]
+    return value
 
 
-def _key(request: dict) -> bytes:
+def _blob(value) -> str:
+    return json.dumps(_plain(value))
+
+
+def _key(request) -> bytes:
     version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
     return engine_cache.engine_cache_key("simulator", version, request)
-
-
-def _echo(request: dict) -> dict:
-    """Project the printed inputs the differential is allowed to see."""
-
-    schedule = request["schedule"]
-    driver = schedule["furnace_power_driver"]
-    return {
-        "status": "ok",
-        "per_hour_summary": [{
-            "hour": 1.0,
-            "O2_source_side_potential_kg_cumulative": float(
-                request["session"]["mass_kg"]
-            ),
-            "P_total_bar": 0.013,
-            "pO2_bar": 1.0e-6,
-            "vapor_species_kg_hr": {
-                "O2": float(driver["pellet_diameter_m"]),
-                "SiO": float(schedule["chamber_pressure_mbar"][0]["value"]),
-                "Ar": float(schedule["gas_boundary"]["imposed_flow"]["value"]),
-                "Fe": float(
-                    request["inventory"]["raw_components_kg"]["SiO2"]
-                ),
-            },
-        }],
-        "final_state": {"process.cleaned_melt": {"SiO2": 1.0}},
-        "final": {"pump_outlet_by_species_kg": {}},
-    }
-
-
-def _observable(request: dict) -> dict:
-    hot, cacheable = project_whole_run(_echo(request), requested_steps=1)
-    assert cacheable is True
-    return hot
 
 
 def test_simulator_is_engine_number_7_and_not_a_score_engine() -> None:
@@ -356,8 +332,27 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
     robinot_deck: DeckRequest,
 ) -> None:
     request = robinot_deck.cache_request
-    integrated_bench.assert_cache_request_has_no_measurement(request)
-    blob = json.dumps(request)
+    resolved = robinot_deck.resolved_configuration
+    assert robinot_deck.cache_bypass is None
+    assert set(request) == {
+        "trees",
+        "preset_sha256",
+        "leg",
+        "external_engines",
+        "python_version",
+    }
+    assert request["trees"] == integrated_bench._tree_ids()
+    raw = (REPO / ROBINOT_PRESET).read_bytes()
+    assert request["preset_sha256"] == hashlib.sha256(raw).hexdigest()
+    assert request["leg"] == "faithful"
+    assert request["python_version"] == platform.python_version()
+    external = request["external_engines"]
+    assert set(external) == {"engines_local_toml_sha256", "declared_pins"}
+    local_hash = external["engines_local_toml_sha256"]
+    assert local_hash == "absent" or len(local_hash) == 64
+    assert external["declared_pins"] == integrated_bench.declared_engine_pins()
+    assert external["declared_pins"]["openimcc"].startswith("commit:66ec4a3")
+    blob = _blob(request)
     for token in _MEASURED_YIELDS:
         assert token not in blob
     for banned in (
@@ -369,30 +364,17 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
         "robinot_2026_main",
         "expected_value",
         "uncertainty",
+        "paper_id",
+        "trajectory_comparison",
+        "comparison_contract",
     ):
         assert banned not in blob
-    assert "paper_id" not in request["preset"]
-    assert "trajectory_comparison" not in request["preset"]
-    assert "comparison_contract" not in request["preset"]
-    holder_curve = request["schedule"]["surface_temperature_C"]["holder"]
+    holder_curve = resolved["schedule"]["surface_temperature_C"]["holder"]
     assert holder_curve[-1]["value"] == pytest.approx(1500.0)
     assert robinot_deck.preset_digest.startswith("sha256:")
     assert robinot_deck.preset_digest not in blob
-    loaded = request["loaded_files"]
-    for role in (
-        "preset",
-        "setpoints",
-        "feedstocks",
-        "vapor_pressures",
-        "foulant_thermo",
-        "materials",
-        "species_catalog",
-    ):
-        assert len(loaded[role]) == 64
-        assert "/" not in role
-    assert all("/" not in name for name in loaded)
 
-    session = request["session"]
+    session = resolved["session"]
     assert session["backend_name"] == "internal-analytical"
     assert session["backend_policy"] == "runner-strict"
     assert session["leg"] == "faithful"
@@ -405,12 +387,12 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
     assert session["effective_dt_s"] == consumed_chamber_pressure_dt_s(
         robinot_deck.run
     )
-    assert request["schedule"]["duration_h"] == pytest.approx(1.0)
-    assert "pO2_cover" not in request["schedule"]
-    assert "furnace_power_driver" in request["schedule"]
-    assert "expected_value" not in request["schedule"]["furnace_power_driver"]
+    assert resolved["schedule"]["duration_h"] == pytest.approx(1.0)
+    assert "pO2_cover" not in resolved["schedule"]
+    assert "furnace_power_driver" in resolved["schedule"]
+    assert "expected_value" not in resolved["schedule"]["furnace_power_driver"]
 
-    power = request["schedule"]["furnace_power_driver"]
+    power = resolved["schedule"]["furnace_power_driver"]
     assert power["pellet_diameter_m"] == pytest.approx(0.013)
     assert power["pellet_height_m"] == pytest.approx(0.010)
     assert power["mass_kg"] == pytest.approx(3.38 / 1000.0)
@@ -420,29 +402,28 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
         robinot_deck.run.setpoints_patch["lab_geometry"]
     )
     assert area is not None
-    assert request["exposed_area_m2"] == pytest.approx(area)
+    assert resolved["exposed_area_m2"] == pytest.approx(area)
     holder = next(
         surface
-        for surface in request["preset"]["lab_geometry"]["surfaces"]
+        for surface in resolved["preset"]["lab_geometry"]["surfaces"]
         if surface["id"] == "holder"
     )
     assert holder["equivalent_diameter_m"] == pytest.approx(0.02)
     assert holder["area_m2"] == pytest.approx(0.000314)
     assert holder["temperature_profile"] == "holder"
-    assert request["preset"]["lab_geometry"]["sample"]["pressed_at_tons"] == (
+    assert resolved["preset"]["lab_geometry"]["sample"]["pressed_at_tons"] == (
         pytest.approx(2.5)
     )
-    assert request["preset"]["lab_geometry"]["pump"]["vacuum_limit_mbar"] == (
+    assert resolved["preset"]["lab_geometry"]["pump"]["vacuum_limit_mbar"] == (
         pytest.approx(7.0e-3)
     )
     assert "Edwards" not in blob
-    assert request["feedstock"]["id"] == "lunar_eac_1a"
-    assert "SiO2" in request["inventory"]["raw_components_kg"]
-    assert "SiO2" in request["feedstock"]["entry"]["composition_wt_pct"]
-    assert "elemental_composition_wt_pct" not in request["feedstock"]["entry"]
-    pressures = request["schedule"]["chamber_pressure_mbar"]
+    assert resolved["feedstock"]["id"] == "lunar_eac_1a"
+    assert "SiO2" in resolved["inventory"]["raw_components_kg"]
+    assert "SiO2" in resolved["feedstock"]["entry"]["composition_wt_pct"]
+    pressures = resolved["schedule"]["chamber_pressure_mbar"]
     assert [point["value"] for point in pressures] == pytest.approx([13.0, 13.0])
-    assert request["schedule"]["gas_boundary"]["imposed_flow"]["value"] == pytest.approx(0.3)
+    assert resolved["schedule"]["gas_boundary"]["imposed_flow"]["value"] == pytest.approx(0.3)
 
     lineage = robinot_deck.lineage
     assert all(
@@ -509,12 +490,12 @@ def test_robinot_lineage_is_on_the_returned_request(
     assert notice["ruling_ref"] == "t-1892_2026-11-22"
     assert "derivation" in notice
     assert notice["unit"] == "m2"
-    blob = json.dumps(robinot_deck.cache_request)
+    blob = _blob(robinot_deck.cache_request)
     assert "outcome_conditioned" not in blob
     assert "eac_1a_proxy_for_robinot_charge" not in blob
     assert "assumed_constant_between_knots" not in blob
-    assert robinot_deck.cache_request["session"]["hours"] == 59
-    assert robinot_deck.cache_request["session"]["effective_dt_s"] == 60.0
+    assert robinot_deck.resolved_configuration["session"]["hours"] == 59
+    assert robinot_deck.resolved_configuration["session"]["effective_dt_s"] == 60.0
 
 
 def test_effective_timestep_is_the_chamber_pressure_step(
@@ -527,10 +508,7 @@ def test_effective_timestep_is_the_chamber_pressure_step(
 
     step = consumed_chamber_pressure_dt_s(robinot_deck.run)
     assert step == 60.0
-    assert robinot_deck.cache_request["session"]["effective_dt_s"] == step
-    edited = copy.deepcopy(robinot_deck.cache_request)
-    edited["session"]["effective_dt_s"] = step + 1.0
-    assert _key(edited) != _key(robinot_deck.cache_request)
+    assert robinot_deck.resolved_configuration["session"]["effective_dt_s"] == step
 
     received: list[float] = []
     original = teststand.apply_process_chamber_pressure
@@ -547,7 +525,7 @@ def test_effective_timestep_is_the_chamber_pressure_step(
     )
     session.advance()
     assert received
-    assert set(received) == {robinot_deck.cache_request["session"]["effective_dt_s"]}
+    assert set(received) == {robinot_deck.resolved_configuration["session"]["effective_dt_s"]}
     assert set(received) == {60.0}
 
 
@@ -586,22 +564,23 @@ def test_effective_timestep_is_the_chamber_pressure_step(
         ),
     ],
 )
-def test_comparison_metadata_leaves_the_request_and_observable_unchanged(
+def test_comparison_metadata_changes_the_preset_bytes_and_keeps_the_trees(
     robinot_deck: DeckRequest,
     tmp_path: Path,
     old: bytes,
     new: bytes,
     count: int,
 ) -> None:
+    """A preset byte edit changes the preset digest. The git trees stay."""
+
     mutant = build_deck_request(_rewrite(tmp_path, old, new, count=count))
-    assert mutant.cache_request["loaded_files"]["preset"] != (
-        robinot_deck.cache_request["loaded_files"]["preset"]
+    assert mutant.cache_request["trees"] == robinot_deck.cache_request["trees"]
+    assert mutant.cache_request["preset_sha256"] != (
+        robinot_deck.cache_request["preset_sha256"]
     )
-    assert _without_loaded_files(mutant.cache_request) == _without_loaded_files(
-        robinot_deck.cache_request
-    )
-    assert _observable(mutant.cache_request) == _observable(robinot_deck.cache_request)
-    blob = json.dumps(mutant.cache_request)
+    assert mutant.cache_request["leg"] == robinot_deck.cache_request["leg"]
+    assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
+    blob = _blob(mutant.cache_request)
     for token in _MEASURED_YIELDS:
         assert token not in blob
 
@@ -610,11 +589,9 @@ def test_sticking_provenance_coefficient_is_over_keyed(
     robinot_deck: DeckRequest,
     tmp_path: Path,
 ) -> None:
-    """Provenance over-keying, not the runtime sticking selector.
+    """A sticking-coefficient byte changes the preset digest and the key.
 
-    The runner copies ``sticking_provenance`` into provenance. The liner
-    material selects ``alpha_s``. The coefficient stays in the key
-    because a name-based drop would also drop a live curve.
+    The resolved pairs still show the coefficient the runner copied.
     """
 
     mutant = build_deck_request(_rewrite(
@@ -623,10 +600,10 @@ def test_sticking_provenance_coefficient_is_over_keyed(
         b"sticking_coefficient: 0.5\n",
         count=2,
     ))
-    base_pairs = robinot_deck.cache_request["preset"]["sticking_provenance"][
+    base_pairs = robinot_deck.resolved_configuration["preset"]["sticking_provenance"][
         "species_surface_pairs"
     ]
-    mutant_pairs = mutant.cache_request["preset"]["sticking_provenance"][
+    mutant_pairs = mutant.resolved_configuration["preset"]["sticking_provenance"][
         "species_surface_pairs"
     ]
     assert [pair["sticking_coefficient"] for pair in base_pairs] == [1.0, 1.0]
@@ -661,9 +638,12 @@ def test_a_printed_input_changes_the_request_and_the_observable(
     count: int,
 ) -> None:
     mutant = build_deck_request(_rewrite(tmp_path, old, new, count=count))
-    assert mutant.cache_request != robinot_deck.cache_request
+    assert mutant.resolved_configuration != robinot_deck.resolved_configuration
+    assert mutant.cache_request["trees"] == robinot_deck.cache_request["trees"]
+    assert mutant.cache_request["preset_sha256"] != (
+        robinot_deck.cache_request["preset_sha256"]
+    )
     assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
-    assert _observable(mutant.cache_request) != _observable(robinot_deck.cache_request)
 
 
 def test_feedstock_oxide_edit_changes_the_request(
@@ -679,17 +659,17 @@ def test_feedstock_oxide_edit_changes_the_request(
         name="feedstocks.yaml",
     )
     mutant = build_deck_request(REPO / ROBINOT_PRESET, feedstocks_path=feedstocks)
-    assert mutant.cache_request["feedstock"]["id"] == "lunar_eac_1a"
-    base_sio2 = robinot_deck.cache_request["inventory"]["raw_components_kg"]["SiO2"]
-    mutant_sio2 = mutant.cache_request["inventory"]["raw_components_kg"]["SiO2"]
+    assert mutant.resolved_configuration["feedstock"]["id"] == "lunar_eac_1a"
+    base_sio2 = robinot_deck.resolved_configuration["inventory"]["raw_components_kg"]["SiO2"]
+    mutant_sio2 = mutant.resolved_configuration["inventory"]["raw_components_kg"]["SiO2"]
     assert mutant_sio2 != pytest.approx(base_sio2)
-    assert mutant.cache_request != robinot_deck.cache_request
-    assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
-    assert "elemental_composition_wt_pct" not in json.dumps(mutant.cache_request)
-    assert "SiO2" in mutant.cache_request["feedstock"]["entry"]["composition_wt_pct"]
+    assert mutant.cache_bypass == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert _key(mutant.cache_request) == _key(robinot_deck.cache_request)
+    assert "elemental_composition_wt_pct" not in _blob(mutant.cache_request)
+    assert "SiO2" in mutant.resolved_configuration["feedstock"]["entry"]["composition_wt_pct"]
 
 
-def test_point_source_class_changes_lineage_only(
+def test_point_source_class_changes_lineage_and_the_preset_digest(
     robinot_deck: DeckRequest,
     tmp_path: Path,
 ) -> None:
@@ -703,12 +683,11 @@ def test_point_source_class_changes_lineage_only(
         1,
     )
     mutant = build_deck_request(_rewrite(tmp_path, old, new, count=1))
-    assert mutant.cache_request["loaded_files"]["preset"] != (
-        robinot_deck.cache_request["loaded_files"]["preset"]
+    assert mutant.cache_request["trees"] == robinot_deck.cache_request["trees"]
+    assert mutant.cache_request["preset_sha256"] != (
+        robinot_deck.cache_request["preset_sha256"]
     )
-    assert _without_loaded_files(mutant.cache_request) == _without_loaded_files(
-        robinot_deck.cache_request
-    )
+    assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
     assert mutant.lineage != robinot_deck.lineage
     point = mutant.lineage["schedule"]["melt_temperature_C"][0]
     assert point["source_class"] == "literature_sidecar"
@@ -736,14 +715,19 @@ def test_remediation_setpoint_is_in_the_resolved_key(
         count=1,
     )
     faithful = build_deck_request(path)
-    assert faithful.cache_request["session"]["mitigation"] == "none"
+    assert faithful.resolved_configuration["session"]["mitigation"] == "none"
     assert faithful.cache_request != robinot_deck.cache_request
     assert _key(faithful.cache_request) != _key(robinot_deck.cache_request)
     remediated = build_deck_request(path, leg="remediation")
-    assert remediated.cache_request["session"]["mitigation"] == "pO2_cover"
-    assert remediated.cache_request["schedule"]["pO2_cover"]["setpoint_mbar"] == pytest.approx(2.0e-4)
+    assert remediated.resolved_configuration["session"]["mitigation"] == "pO2_cover"
+    assert remediated.resolved_configuration["schedule"]["pO2_cover"]["setpoint_mbar"] == pytest.approx(2.0e-4)
+    assert faithful.cache_request["preset_sha256"] == (
+        remediated.cache_request["preset_sha256"]
+    )
+    assert faithful.cache_request["leg"] == "faithful"
+    assert remediated.cache_request["leg"] == "remediation"
     assert _key(remediated.cache_request) != _key(faithful.cache_request)
-    assert "source_class" not in json.dumps(remediated.cache_request)
+    assert "source_class" not in _blob(remediated.cache_request)
 
 
 def test_one_scoring_call_per_deck_then_a_warm_hit(
@@ -1033,16 +1017,17 @@ def test_bulk_additions_fe_changes_the_cache_key(
         name="feedstocks.yaml",
     )
     mutant = build_deck_request(REPO / ROBINOT_PRESET, feedstocks_path=feedstocks)
-    assert mutant.cache_request["feedstock"]["id"] == (
-        robinot_deck.cache_request["feedstock"]["id"]
+    assert mutant.resolved_configuration["feedstock"]["id"] == (
+        robinot_deck.resolved_configuration["feedstock"]["id"]
     )
     assert b"SiO2:  43.7" in feedstocks.read_bytes()
-    base = robinot_deck.cache_request["inventory"]["raw_components_kg"]
-    changed = mutant.cache_request["inventory"]["raw_components_kg"]
+    base = robinot_deck.resolved_configuration["inventory"]["raw_components_kg"]
+    changed = mutant.resolved_configuration["inventory"]["raw_components_kg"]
     assert "Fe" not in base
     assert changed["Fe"] > 0.0
-    assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
-    assert "elemental_composition_wt_pct" not in json.dumps(mutant.cache_request)
+    assert mutant.cache_bypass == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert _key(mutant.cache_request) == _key(robinot_deck.cache_request)
+    assert "elemental_composition_wt_pct" not in _blob(mutant.cache_request)
 
 
 def test_quoted_exposed_area_changes_the_cache_key(
@@ -1065,17 +1050,17 @@ def test_quoted_exposed_area_changes_the_cache_key(
         count=1,
         name="area-high.yaml",
     ))
-    assert low.cache_request["feedstock"] == high.cache_request["feedstock"]
-    assert low.cache_request["feedstock"]["id"] == (
-        robinot_deck.cache_request["feedstock"]["id"]
+    assert low.resolved_configuration["feedstock"] == high.resolved_configuration["feedstock"]
+    assert low.resolved_configuration["feedstock"]["id"] == (
+        robinot_deck.resolved_configuration["feedstock"]["id"]
     )
-    assert low.cache_request["exposed_area_m2"] == pytest.approx(0.000123)
-    assert high.cache_request["exposed_area_m2"] == pytest.approx(0.000234)
+    assert low.resolved_configuration["exposed_area_m2"] == pytest.approx(0.000123)
+    assert high.resolved_configuration["exposed_area_m2"] == pytest.approx(0.000234)
     assert low.lineage["exposed_area_notice"]["reason"] == (
         "liquid_footprint_not_printed"
     )
     assert low.lineage["exposed_area_notice"]["value"] == pytest.approx(0.000123)
-    assert "liquid_footprint_not_printed" not in json.dumps(low.cache_request)
+    assert "liquid_footprint_not_printed" not in _blob(low.cache_request)
     assert _key(low.cache_request) != _key(high.cache_request)
 
 
@@ -1083,10 +1068,9 @@ def test_unreviewed_fields_are_keyed_deny_by_default(
     robinot_deck: DeckRequest,
     tmp_path: Path,
 ) -> None:
-    """A name is not metadata. An unlisted field stays in the key.
+    """A dynamic id is legal. ``uncertainty`` and ``target`` are not slots.
 
-    ``uncertainty`` is a measurement token, so it is rejected rather
-    than dropped. ``target`` and an ``observed_`` field are keyed.
+    The preset bytes change, so the key changes. The deck still builds.
     """
 
     target = build_deck_request(_rewrite(
@@ -1100,13 +1084,13 @@ def test_unreviewed_fields_are_keyed_deny_by_default(
         count=1,
         name="target.yaml",
     ))
-    assert target.cache_request["preset"]["target"] == pytest.approx(0.0105)
-    assert target.cache_request["preset"]["observed_o2_mass_fraction"] == (
+    assert target.resolved_configuration["preset"]["target"] == pytest.approx(0.0105)
+    assert target.resolved_configuration["preset"]["observed_o2_mass_fraction"] == (
         pytest.approx(0.0105)
     )
     assert _key(target.cache_request) != _key(robinot_deck.cache_request)
 
-    uncertain = _rewrite(
+    uncertain = build_deck_request(_rewrite(
         tmp_path,
         b"schema_version: vacuum_pyrolysis_preset.v1\n",
         (
@@ -1115,10 +1099,13 @@ def test_unreviewed_fields_are_keyed_deny_by_default(
         ),
         count=1,
         name="uncertainty.yaml",
+    ))
+    assert uncertain.resolved_configuration["preset"]["uncertainty"] == (
+        pytest.approx(0.001)
     )
-    with pytest.raises(IntegratedBenchContractError) as caught:
-        build_deck_request(uncertain)
-    assert caught.value.reason == "measurement_in_request"
+    assert uncertain.cache_bypass is None
+    assert _key(uncertain.cache_request) != _key(robinot_deck.cache_request)
+    assert _key(uncertain.cache_request) != _key(target.cache_request)
 
 
 def test_checked_in_robinot_deck_starts_the_real_runner() -> None:
@@ -1143,7 +1130,7 @@ def test_checked_in_robinot_deck_starts_the_real_runner() -> None:
     area = read_gram_lab_exposed_melt_area(geometry)
     assert area is not None
     assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(area)
-    assert deck.cache_request["exposed_area_m2"] == pytest.approx(area)
+    assert deck.resolved_configuration["exposed_area_m2"] == pytest.approx(area)
     assert consumed_chamber_pressure_dt_s(deck.run) == 60.0
 
 
@@ -1263,13 +1250,24 @@ def test_quoted_holder_diameters_change_the_resolved_surface_key(
     ))
     quoted_same = build_deck_request(same)
     checked_in = build_deck_request(REPO / ROBINOT_PRESET)
-    assert _without_loaded_files(quoted_same.cache_request) == _without_loaded_files(
-        checked_in.cache_request
-    )
-    assert quoted_same.cache_request["loaded_files"]["preset"] != (
-        checked_in.cache_request["loaded_files"]["preset"]
+    assert quoted_same.cache_request["trees"] == checked_in.cache_request["trees"]
+    assert quoted_same.cache_request["preset_sha256"] != (
+        checked_in.cache_request["preset_sha256"]
     )
     assert _key(quoted_same.cache_request) != _key(checked_in.cache_request)
+    quoted_holder = next(
+        surface
+        for surface in quoted_same.resolved_configuration["preset"]["lab_geometry"]["surfaces"]
+        if surface["id"] == "holder"
+    )
+    checked_holder = next(
+        surface
+        for surface in checked_in.resolved_configuration["preset"]["lab_geometry"]["surfaces"]
+        if surface["id"] == "holder"
+    )
+    assert quoted_holder["equivalent_diameter_m"] == pytest.approx(
+        checked_holder["equivalent_diameter_m"]
+    )
     decks = []
     diameters = []
     packed = []
@@ -1291,7 +1289,7 @@ def test_quoted_holder_diameters_change_the_resolved_surface_key(
         diameters.append(holder.equivalent_diameter_m)
         packed_holder = next(
             surface
-            for surface in deck.cache_request["preset"]["lab_geometry"]["surfaces"]
+            for surface in deck.resolved_configuration["preset"]["lab_geometry"]["surfaces"]
             if surface["id"] == "holder"
         )
         packed.append(packed_holder["equivalent_diameter_m"])
@@ -1321,7 +1319,7 @@ def test_feedstock_override_is_loaded_once_for_the_key_and_the_solve(
         name="feedstocks.yaml",
     )
     deck = build_deck_request(REPO / ROBINOT_PRESET, feedstocks_path=feedstocks)
-    packed_fe = deck.cache_request["inventory"]["raw_components_kg"]["Fe"]
+    packed_fe = deck.resolved_configuration["inventory"]["raw_components_kg"]["Fe"]
     assert packed_fe > 0.0
     rewritten = feedstocks.read_bytes().replace(
         b"bulk_additions: {Fe: 1.0}",
@@ -1345,7 +1343,7 @@ def test_feedstock_override_is_loaded_once_for_the_key_and_the_solve(
     )
     assert consumed["Fe"] == pytest.approx(packed_fe)
     fresh = build_deck_request(REPO / ROBINOT_PRESET, feedstocks_path=feedstocks)
-    assert fresh.cache_request["inventory"]["raw_components_kg"]["Fe"] != (
+    assert fresh.resolved_configuration["inventory"]["raw_components_kg"]["Fe"] != (
         pytest.approx(packed_fe)
     )
 
@@ -1381,156 +1379,170 @@ def test_loaded_hit_of_any_status_must_be_a_complete_ok(
     assert caught.value.reason == "cache_hit_not_ok"
 
 
-# Own copy of the reviewed path list. This test does not call the
-# production walker or a name matcher.
-_REVIEWED_METADATA_PATHS = {
-    "/area_notice": "area-bridge display notice, not a melt input",
-    "/preset/paper_id": "paper label",
-    "/preset/paper_citation_id": "citation id",
-    "/preset/measurement_id": "measurement label",
-    "/preset/extraction_status": "extraction status label; the refusal gate reads it before the key",
-    "/preset/source_notes": "source notes",
-    "/preset/measurement_selectors": "observation selectors, not the solve",
-    "/preset/comparison_contract": "comparison policy, sidecar path, and fast-tier policy",
-    "/preset/digests": "provenance digests, including schedule_digest",
-    "/preset/trajectory_comparison": "comparison grid and figure targets",
-    "/preset/lab_geometry/sample/exposed_melt_area_notice": "geometry display notice",
-    "/preset/lab_geometry/pump/model": "pump model name, not a solve input",
-    "/preset/lab_geometry/pump/model_source_class": "pump model citation class",
-    "/preset/lab_geometry/pump/model_citation_id": "pump model citation id",
-    "/preset/lab_geometry/pump/model_digest": "pump model citation text",
-    "/preset/lab_schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot",
-    "/preset/lab_schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot",
-    "/preset/lab_schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot",
-    "/schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot on the resolved schedule",
-    "/schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot on the resolved schedule",
-    "/schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot on the resolved schedule",
-    "/feedstock/entry/name": "feedstock display name",
-    "/feedstock/entry/label": "feedstock display label",
-    "/feedstock/entry/source": "feedstock citation source",
-    "/feedstock/entry/confidence": "feedstock confidence label",
-    "/feedstock/entry/note": "feedstock display note",
-    "/feedstock/entry/paper_aliases": "feedstock paper aliases",
-    "/feedstock/entry/provenance": "feedstock citation provenance",
-    "/feedstock/entry/simulant_vs_real_caveat": "feedstock display caveat",
-    "/feedstock/entry/process_notes": "feedstock process notes",
-    "/feedstock/entry/composition_basis": "composition citation basis",
-    "/feedstock/entry/composition_status": "composition status label",
-    "/feedstock/entry/sum_check": "oxide sum cross-check, not an input mass",
-    "/feedstock/entry/elemental_composition_wt_pct": "elemental cross-check, not the loadable oxide table",
-    "/feedstock/entry/elemental_sum_check": "elemental sum cross-check",
-    "/feedstock/entry/elemental_composition_status": "elemental cross-check status",
-    "/feedstock/entry/elemental_cross_check_note": "elemental cross-check note",
-}
+def _identity(**overrides):
+    """One coarse key. Each override changes a single identity part."""
+
+    trees = {"simulator": "a" * 40, "engines": "b" * 40, "data": "c" * 40}
+    pins = {"openimcc": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"}
+    document = {
+        "tree_ids": trees,
+        "preset_sha256": "d" * 64,
+        "leg": "faithful",
+        "engines_local_toml_sha256": "e" * 64,
+        "declared_pins": pins,
+        "python_version": "3.12.0",
+    }
+    document.update(overrides)
+    return deck_cache_request(**document)
 
 
-def _pointer(path: tuple) -> str:
-    chunks = []
-    for step in path:
-        text = str(step).replace("~", "~0").replace("/", "~1")
-        chunks.append("/" + text)
-    return "".join(chunks)
+def test_cache_key_includes_trees_preset_engines_and_python() -> None:
+    """Each of the four identity parts, and the selected leg, changes the key."""
+
+    base = _identity()
+    trees = _plain(base)["trees"]
+    assert _key(base) != _key(_identity(tree_ids={**trees, "simulator": "1" * 40}))
+    assert _key(base) != _key(_identity(tree_ids={**trees, "engines": "2" * 40}))
+    assert _key(base) != _key(_identity(tree_ids={**trees, "data": "3" * 40}))
+    assert _key(base) != _key(_identity(preset_sha256="4" * 64))
+    assert _key(base) != _key(_identity(leg="remediation"))
+    assert _key(base) != _key(_identity(engines_local_toml_sha256="absent"))
+    assert _key(base) != _key(_identity(
+        declared_pins={"openimcc": "commit:0000000000000000000000000000000000000000"},
+    ))
+    assert _key(base) != _key(_identity(python_version="3.11.9"))
 
 
-def _pointer_steps(pointer: str) -> list[str]:
-    assert pointer.startswith("/") and pointer != "/"
-    return [
-        step.replace("~1", "/").replace("~0", "~")
-        for step in pointer[1:].split("/")
-    ]
+def test_cache_request_cannot_be_mutated(robinot_deck: DeckRequest) -> None:
+    request = robinot_deck.cache_request
+    with pytest.raises(TypeError):
+        request["leg"] = "remediation"
+    with pytest.raises(TypeError):
+        request["trees"]["data"] = "0" * 40
+    with pytest.raises(TypeError):
+        request["external_engines"]["declared_pins"]["openimcc"] = "commit:0"
 
 
-def _walk_resolved(value, path: tuple = ()):
-    """Independent walk. An exclusion path is yielded whole and not descended."""
-
-    pointer = _pointer(path)
-    excluded = bool(path) and pointer in _REVIEWED_METADATA_PATHS
-    if excluded:
-        yield path, value, True
-        return
-    if isinstance(value, dict):
-        if not value:
-            yield path, value, False
-            return
-        for key in sorted(value, key=str):
-            yield from _walk_resolved(value[key], path + (str(key),))
-        return
-    if isinstance(value, list):
-        if not value:
-            yield path, value, False
-            return
-        for index, item in enumerate(value):
-            yield from _walk_resolved(item, path + (index,))
-        return
-    yield path, value, False
-
-
-def _set_pointer(root: dict, pointer: str, value) -> None:
-    cursor = root
-    steps = _pointer_steps(pointer)
-    for step in steps[:-1]:
-        if isinstance(cursor, list):
-            cursor = cursor[int(step)]
-            continue
-        child = cursor.get(step)
-        if not isinstance(child, (dict, list)):
-            child = {}
-            cursor[step] = child
-        cursor = child
-    last = steps[-1]
-    if isinstance(cursor, list):
-        cursor[int(last)] = value
-    else:
-        cursor[last] = value
-
-
-def test_reviewed_metadata_paths_stay_out_of_the_key(
-    robinot_deck: DeckRequest,
+def test_dirty_tree_runs_uncached_with_notice(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Every reviewed path is excluded. The walk is not the production walker."""
+    database = _configure(monkeypatch, tmp_path)
+    monkeypatch.setattr(integrated_bench, "_working_tree_dirty", lambda: True)
+    deck = build_deck_request(REPO / ROBINOT_PRESET)
+    assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_DIRTY_TREE
+    seeded = _ok_document(deck.requested_steps)
+    seeded["per_hour_summary"][0]["P_total_bar"] = 0.021
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    assert engine_cache.load_cache_rows(
+        database,
+        [(
+            _key(deck.cache_request),
+            seeded,
+            "simulator",
+            version,
+            "s2",
+            first_row,
+        )],
+    ) == 1
+    before = _stored_rows(database)
+    calls = {"n": 0}
 
-    assert integrated_bench.METADATA_EXCLUSION_PATHS == _REVIEWED_METADATA_PATHS
-    resolved = robinot_deck.resolved_configuration
-    base = cache_key_document(resolved)
-    assert base == robinot_deck.cache_request
-    found = set()
-    holder_terminal = False
-    for path, value, excluded in _walk_resolved(resolved):
-        if excluded:
-            found.add(_pointer(path))
-            continue
-        if (
-            len(path) >= 4
-            and path[-4] == "surface_temperature_C"
-            and path[-3] == "holder"
-            and path[-2] == 1
-            and path[-1] == "value"
-            and value in (1500, 1500.0)
-        ):
-            holder_terminal = True
-    assert holder_terminal
-    assert found, "the deck should contain reviewed metadata"
-    assert found <= set(_REVIEWED_METADATA_PATHS)
-    for pointer in _REVIEWED_METADATA_PATHS:
-        mutant = copy.deepcopy(resolved)
-        _set_pointer(mutant, pointer, {"sentinel": pointer})
-        assert cache_key_document(mutant) == base, pointer
-    holder = resolved["schedule"]["surface_temperature_C"]["holder"]
-    assert holder[-1]["value"] == pytest.approx(1500.0)
-    shifted = copy.deepcopy(resolved)
-    shifted["schedule"]["surface_temperature_C"]["holder"][-1]["value"] = 1400.0
-    assert _key(cache_key_document(shifted)) != _key(base)
-    for name in ("observed_holder", "holder_reason", "note"):
-        left = copy.deepcopy(resolved)
-        right = copy.deepcopy(resolved)
-        for tree, terminal in ((left, 1500.0), (right, 1400.0)):
-            curve = [
-                {"t_h": 0.0, "value": 25, "unit": "C"},
-                {"t_h": 1.0, "value": terminal, "unit": "C"},
-            ]
-            tree["schedule"]["surface_temperature_C"][name] = curve
-        assert _key(cache_key_document(left)) != _key(cache_key_document(right)), name
-        assert _key(cache_key_document(left)) != _key(base), name
+    def solve(_request):
+        calls["n"] += 1
+        document = _ok_document(deck.requested_steps)
+        document["per_hour_summary"][0]["P_total_bar"] = 0.033
+        return document
+
+    hot = run_cached_deck(deck, solve)
+    assert calls["n"] == 1
+    assert hot["notice"] == integrated_bench.DECK_UNCACHED_DIRTY_TREE
+    assert hot["per_hour_summary"][0]["P_total_bar"] == pytest.approx(0.033)
+    assert _stored_rows(database) == before
+
+
+def _git(args: list[str], *, env: dict[str, str] | None = None, data: bytes | None = None) -> str:
+    completed = subprocess.run(
+        ["git", *args],
+        cwd=REPO,
+        input=data,
+        capture_output=True,
+        env=env,
+        check=False,
+    )
+    if completed.returncode != 0:
+        detail = completed.stderr.decode() or completed.stdout.decode()
+        raise AssertionError(detail)
+    return completed.stdout.decode().strip()
+
+
+def test_a_vapour_table_byte_changes_the_data_tree_id(tmp_path: Path) -> None:
+    """One tracked data byte changes the data tree id, and therefore the key.
+
+    The swapped tree is written only under ``tmp_path``. The repository
+    object store does not receive the new blob or the new tree.
+    """
+
+    source = REPO / "data" / "vapor_pressures.yaml"
+    original = source.read_bytes()
+    committed = _git(["rev-parse", "HEAD:data/vapor_pressures.yaml"])
+    assert _git(["hash-object", "--stdin"], data=original) == committed
+    mutated = _git(["hash-object", "--stdin"], data=original + b"\n# byte\n")
+    assert mutated != committed
+    objects = tmp_path / "objects"
+    objects.mkdir()
+    private = os.environ.copy()
+    private["GIT_OBJECT_DIRECTORY"] = str(objects)
+    git_objects = _git(["rev-parse", "--git-path", "objects"])
+    private["GIT_ALTERNATE_OBJECT_DIRECTORIES"] = (
+        git_objects if os.path.isabs(git_objects) else str((REPO / git_objects).resolve())
+    )
+    written = _git(["hash-object", "-w", "--stdin"], env=private, data=original + b"\n# byte\n")
+    assert written == mutated
+    lines = []
+    replaced = False
+    for line in _git(["ls-tree", "HEAD:data"]).splitlines():
+        meta, name = line.split("\t", 1)
+        if name == "vapor_pressures.yaml":
+            mode, kind, _old = meta.split()
+            assert kind == "blob"
+            line = f"{mode} blob {mutated}\t{name}"
+            replaced = True
+        lines.append(line)
+    assert replaced
+    new_tree = _git(["mktree"], env=private, data=("\n".join(lines) + "\n").encode())
+    old_tree = _git(["rev-parse", "HEAD:data"])
+    assert new_tree != old_tree
+    for oid in (mutated, new_tree):
+        missing = subprocess.run(
+            ["git", "cat-file", "-t", oid],
+            cwd=REPO,
+            capture_output=True,
+            check=False,
+        )
+        assert missing.returncode != 0
+    base_ids = integrated_bench._tree_ids()
+    changed = dict(base_ids)
+    changed["data"] = new_tree
+    pins = integrated_bench.declared_engine_pins()
+    left = deck_cache_request(
+        tree_ids=base_ids,
+        preset_sha256="ab" * 32,
+        leg="faithful",
+        engines_local_toml_sha256="absent",
+        declared_pins=pins,
+        python_version=platform.python_version(),
+    )
+    right = deck_cache_request(
+        tree_ids=changed,
+        preset_sha256="ab" * 32,
+        leg="faithful",
+        engines_local_toml_sha256="absent",
+        declared_pins=pins,
+        python_version=platform.python_version(),
+    )
+    assert _key(left) != _key(right)
 
 
 def test_holder_profile_binding_changes_the_cache_key(
@@ -1573,7 +1585,10 @@ def test_holder_profile_binding_changes_the_cache_key(
     assert _key(decks[0].cache_request) != _key(decks[1].cache_request)
 
 
-@pytest.mark.parametrize("profile", ["observed_holder", "holder_reason", "note"])
+@pytest.mark.parametrize(
+    "profile",
+    ["observed_holder", "holder_reason", "note", "uncertainty", "target"],
+)
 def test_renamed_holder_curve_changes_the_cache_key(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1654,7 +1669,7 @@ def test_gas_reported_status_changes_the_cache_key(tmp_path: Path) -> None:
         for deck in decks
     ]
     assert carrier == ["Ar", None]
-    assert decks[1].cache_request["schedule"]["gas_boundary"]["background_gas"][
+    assert decks[1].resolved_configuration["schedule"]["gas_boundary"]["background_gas"][
         "reported_status"
     ] == "not_reported"
     assert _key(decks[0].cache_request) != _key(decks[1].cache_request)
@@ -1690,23 +1705,38 @@ def test_dry_surrogate_anhydrous_composition_changes_the_cache_key(
         sim = _sim(feed)
         sim.load_batch(
             "lunar_eac_1a",
-            mass_kg=deck.cache_request["session"]["mass_kg"],
+            mass_kg=deck.resolved_configuration["session"]["mass_kg"],
         )
         dry_alumina.append(sim.inventory.melt_oxide_kg["Al2O3"])
     assert dry_alumina[0] < dry_alumina[1]
     packed = [
-        deck.cache_request["inventory"]["melt_oxide_kg"]["Al2O3"]
+        deck.resolved_configuration["inventory"]["melt_oxide_kg"]["Al2O3"]
         for deck in decks
     ]
     assert packed[0] < packed[1]
-    assert decks[0].cache_request["feedstock"]["id"] == decks[1].cache_request[
-        "feedstock"
-    ]["id"]
     assert (
-        decks[0].cache_request["inventory"]["raw_components_kg"]
-        == decks[1].cache_request["inventory"]["raw_components_kg"]
+        decks[0].resolved_configuration["feedstock"]["id"]
+        == decks[1].resolved_configuration["feedstock"]["id"]
     )
-    assert _key(decks[0].cache_request) != _key(decks[1].cache_request)
+    assert (
+        decks[0].resolved_configuration["inventory"]["raw_components_kg"]
+        == decks[1].resolved_configuration["inventory"]["raw_components_kg"]
+    )
+    assert decks[0].cache_bypass == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert decks[1].cache_bypass == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert _key(decks[0].cache_request) == _key(decks[1].cache_request)
+    solved = []
+
+    def solve_at(alumina):
+        def solve(_request):
+            solved.append(alumina)
+            return _ok_document(decks[0].requested_steps)
+        return solve
+
+    for deck, alumina in zip(decks, (12.5, 25.0)):
+        hot = run_cached_deck(deck, solve_at(alumina))
+        assert hot["notice"] == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert solved == [12.5, 25.0]
 
 
 def test_liner_material_changes_the_cache_key(tmp_path: Path) -> None:
@@ -1718,7 +1748,7 @@ def test_liner_material_changes_the_cache_key(tmp_path: Path) -> None:
     ))
     holder = next(
         surface
-        for surface in mutant.cache_request["preset"]["lab_geometry"]["surfaces"]
+        for surface in mutant.resolved_configuration["preset"]["lab_geometry"]["surfaces"]
         if surface["id"] == "holder"
     )
     assert holder["liner_material"] == "steel"
@@ -1736,18 +1766,24 @@ def test_pump_speed_changes_the_cache_key(
         b"pumping_speed_m3_s: 0.003\n",
         count=1,
     ))
-    assert mutant.cache_request["apparatus"]["pump"]["nominal_speed_m3_s"] == (
+    assert mutant.resolved_configuration["apparatus"]["pump"]["nominal_speed_m3_s"] == (
         pytest.approx(0.003)
     )
     assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
 
 
-def test_edited_vapor_table_bytes_change_the_cache_key(
+def test_edited_vapor_override_does_not_share_a_hit(
     robinot_deck: DeckRequest,
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A vapor-file edit is in the key even when the parsed tree is unchanged."""
+    """An override file is outside the committed tree, so the deck is not cached.
 
+    The lookup identity can match the checked-in deck. The bypass is what
+    stops that identity from returning or storing a row.
+    """
+
+    database = _configure(monkeypatch, tmp_path)
     source = REPO / "data" / "vapor_pressures.yaml"
     edited = tmp_path / "vapor_pressures.yaml"
     edited.write_bytes(source.read_bytes() + b"\n# byte-identity probe\n")
@@ -1755,13 +1791,37 @@ def test_edited_vapor_table_bytes_change_the_cache_key(
         REPO / ROBINOT_PRESET,
         vapor_pressures_path=edited,
     )
-    assert mutant.cache_request["loaded_files"]["vapor_pressures"] != (
-        robinot_deck.cache_request["loaded_files"]["vapor_pressures"]
-    )
-    assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
-    assert _without_loaded_files(mutant.cache_request) == _without_loaded_files(
-        robinot_deck.cache_request
-    )
+    assert mutant.cache_bypass == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert _key(mutant.cache_request) == _key(robinot_deck.cache_request)
+    seeded = _ok_document(mutant.requested_steps)
+    seeded["per_hour_summary"][0]["P_total_bar"] = 0.021
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    assert engine_cache.load_cache_rows(
+        database,
+        [(
+            _key(mutant.cache_request),
+            seeded,
+            "simulator",
+            version,
+            "s2",
+            first_row,
+        )],
+    ) == 1
+    before = _stored_rows(database)
+    calls = {"n": 0}
+
+    def solve(_request):
+        calls["n"] += 1
+        document = _ok_document(mutant.requested_steps)
+        document["per_hour_summary"][0]["P_total_bar"] = 0.033
+        return document
+
+    hot = run_cached_deck(mutant, solve)
+    assert calls["n"] == 1
+    assert hot["notice"] == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+    assert hot["per_hour_summary"][0]["P_total_bar"] == pytest.approx(0.033)
+    assert _stored_rows(database) == before
 
 
 def test_deck_configuration_is_frozen_at_key_time(
@@ -1779,6 +1839,12 @@ def test_deck_configuration_is_frozen_at_key_time(
         robinot_deck.run.lab_schedule["melt_temperature_C"][0]["value"] = 30
     with pytest.raises(TypeError):
         robinot_deck.run.lab_schedule["melt_temperature_C"].append({})
+    with pytest.raises(TypeError):
+        robinot_deck.run.feedstocks_path = Path("other-feedstocks.yaml")
+    with pytest.raises(TypeError):
+        robinot_deck.run.setpoints_path = Path("other-setpoints.yaml")
+    with pytest.raises(TypeError):
+        robinot_deck.run.vapor_pressures_path = Path("other-vapor.yaml")
 
 
 def test_species_poison_is_partial_and_keeps_the_bad_rate(
@@ -1879,6 +1945,15 @@ def _apply_shape_defect(payload: dict, defect: str) -> bool:
     if defect == "pump_token":
         payload["final"]["pump_outlet_by_species_kg"] = token
         return True
+    if defect == "surface_number":
+        payload["final"]["deposit_by_surface_species_kg"] = {"holder": 1.0}
+        return False
+    if defect == "surface_species":
+        payload["final"]["deposit_by_surface_species_kg"] = {"holder": {"Fe": 0.25}}
+        return True
+    if defect == "surface_empty":
+        payload["final"]["deposit_by_surface_species_kg"] = {"holder": {}}
+        return True
     raise AssertionError(defect)
 
 
@@ -1892,6 +1967,9 @@ def _apply_shape_defect(payload: dict, defect: str) -> bool:
         "wall_token",
         "empty_map",
         "pump_token",
+        "surface_number",
+        "surface_species",
+        "surface_empty",
     ],
 )
 def test_cold_and_validated_shape_agree(defect: str) -> None:
@@ -1912,6 +1990,16 @@ def test_cold_and_validated_shape_agree(defect: str) -> None:
         assert hot["per_hour_summary"][0]["vapor_species_kg_hr"]["O2"] == {
             "unexpected": 1.0,
         }
+    elif defect == "surface_number":
+        assert hot["final"]["deposit_by_surface_species_kg"]["holder"] == (
+            pytest.approx(1.0)
+        )
+    elif defect == "surface_species":
+        assert hot["final"]["deposit_by_surface_species_kg"]["holder"]["Fe"] == (
+            pytest.approx(0.25)
+        )
+    elif defect == "surface_empty":
+        assert hot["final"]["deposit_by_surface_species_kg"]["holder"] == {}
     if not expect:
         assert hot["status"] == "partial"
         assert hot["reason"]
@@ -1919,7 +2007,7 @@ def test_cold_and_validated_shape_agree(defect: str) -> None:
 
 @pytest.mark.parametrize(
     "defect",
-    ["null", "invalid_name", "nested", "reason", "wall_token"],
+    ["null", "invalid_name", "nested", "reason", "wall_token", "surface_number"],
 )
 def test_loaded_shape_defect_is_rejected_like_the_cold_row(
     robinot_deck: DeckRequest,
@@ -1946,7 +2034,10 @@ def test_loaded_shape_defect_is_rejected_like_the_cold_row(
     assert error.value.reason == "cache_hit_not_ok"
 
 
-@pytest.mark.parametrize("defect", ["empty_map", "pump_token"])
+@pytest.mark.parametrize(
+    "defect",
+    ["empty_map", "pump_token", "surface_species", "surface_empty"],
+)
 def test_loaded_clean_shape_is_a_hit(
     robinot_deck: DeckRequest,
     tmp_path: Path,
@@ -1974,3 +2065,89 @@ def test_loaded_clean_shape_is_a_hit(
     hit = run_cached_deck(robinot_deck, unexpected)
     assert hit["status"] == "ok"
     assert "reason" not in hit
+
+
+@pytest.mark.parametrize("status", ["failed", "refused"])
+def test_failed_or_refused_keeps_the_incoming_reason(status: str) -> None:
+    payload = _ok_document(1)
+    payload["status"] = status
+    payload["reason"] = "solver_stopped"
+    hot, cacheable = project_whole_run(payload, requested_steps=1)
+    assert cacheable is False
+    assert hot["status"] == status
+    assert hot["reason"] == "solver_stopped"
+
+
+def test_measurement_slot_on_the_prediction_is_refused() -> None:
+    with pytest.raises(IntegratedBenchContractError) as caught:
+        integrated_bench.assert_measurement_slots_outside_prediction({
+            "status": "ok",
+            "measurement_selectors": {"id": "uncertainty"},
+        })
+    assert caught.value.reason == "measurement_in_prediction"
+    hot, cacheable = project_whole_run(_ok_document(1), requested_steps=1)
+    assert cacheable is True
+    assert "trajectory_comparison" not in hot
+    assert "measurement_selectors" not in hot
+
+
+def test_dynamic_species_id_named_uncertainty_is_legal() -> None:
+    payload = _ok_document(1)
+    payload["per_hour_summary"][0]["vapor_species_kg_hr"]["uncertainty"] = 1.0
+    payload["per_hour_summary"][0]["vapor_species_kg_hr"]["target"] = 2.0
+    hot, cacheable = project_whole_run(payload, requested_steps=1)
+    assert cacheable is True
+    rates = hot["per_hour_summary"][0]["vapor_species_kg_hr"]
+    assert rates["uncertainty"] == pytest.approx(1.0)
+    assert rates["target"] == pytest.approx(2.0)
+
+
+def test_setpoints_path_override_is_not_cached(tmp_path: Path) -> None:
+    edited = tmp_path / "setpoints.yaml"
+    edited.write_bytes((REPO / "data" / "setpoints.yaml").read_bytes())
+    deck = build_deck_request(REPO / ROBINOT_PRESET, setpoints_path=edited)
+    assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_PATH_OVERRIDE
+
+
+def test_config_bundle_reloads_when_any_path_changes(tmp_path: Path) -> None:
+    """An unfrozen run reloads when a path changes and ignores an in-place edit."""
+
+    from simulator.runner import PyrolysisRun
+
+    low = _rewrite(
+        tmp_path,
+        b'  sum_check: 98.4\n  composition_status: "primary_xrf_loadable"\n',
+        (
+            b"  sum_check: 98.4\n"
+            b"  bulk_additions: {Fe: 1.0}\n"
+            b'  composition_status: "primary_xrf_loadable"\n'
+        ),
+        count=1,
+        source=REPO / "data" / "feedstocks.yaml",
+        name="feed-low.yaml",
+    )
+    high = tmp_path / "feed-high.yaml"
+    high.write_bytes(low.read_bytes().replace(b"{Fe: 1.0}", b"{Fe: 2.0}"))
+    setpoints = tmp_path / "setpoints.yaml"
+    setpoints.write_bytes((REPO / "data" / "setpoints.yaml").read_bytes())
+    vapor = tmp_path / "vapor_pressures.yaml"
+    vapor.write_bytes((REPO / "data" / "vapor_pressures.yaml").read_bytes())
+    run = PyrolysisRun(
+        feedstock_id="lunar_eac_1a",
+        campaign="C0",
+        hours=1,
+        mass_kg=0.00338,
+        feedstocks_path=low,
+    )
+    first = run._load_config_bundle()
+    assert first.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == pytest.approx(1.0)
+    run.feedstocks_path = high
+    second = run._load_config_bundle()
+    assert second.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == pytest.approx(2.0)
+    high.write_bytes(high.read_bytes().replace(b"{Fe: 2.0}", b"{Fe: 3.0}"))
+    held = run._load_config_bundle()
+    assert held.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == pytest.approx(2.0)
+    run.setpoints_path = setpoints
+    assert run._load_config_bundle().source_paths["setpoints"] == setpoints
+    run.vapor_pressures_path = vapor
+    assert run._load_config_bundle().source_paths["vapor_pressures"] == vapor

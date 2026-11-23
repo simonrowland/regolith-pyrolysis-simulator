@@ -57,7 +57,6 @@ from simulator.config import (
     ConfigBundle,
     _load_setpoints_file,
     load_config_bundle,
-    note_loaded_file_bytes,
 )
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
@@ -473,7 +472,6 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             provenance=base_provenance,
         ) from exc
 
-    note_loaded_file_bytes("preset", raw_bytes)
     digest = hashlib.sha256(raw_bytes).hexdigest()
     provenance = {
         **base_provenance,
@@ -1295,6 +1293,9 @@ class PyrolysisRun:
     _config_bundle: ConfigBundle | None = field(
         default=None, init=False, repr=False
     )
+    _config_bundle_paths: tuple[Optional[Path], Optional[Path], Optional[Path]] | None = field(
+        default=None, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical
@@ -1619,15 +1620,22 @@ class PyrolysisRun:
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
-        """Load recipe files once. Later calls reuse that snapshot.
+        """Load recipe files for the current path triple.
 
-        ``run`` and the deck key share this object. A feedstock file
-        edited after the first load is not read again.
+        The same paths reuse the first snapshot, so a file edited in
+        place after that load is not read again. A reused run that
+        switches ``feedstocks_path``, ``setpoints_path``, or
+        ``vapor_pressures_path`` loads the new files.
         """
 
-        if self._config_bundle is None:
+        paths = (
+            self.feedstocks_path,
+            self.setpoints_path,
+            self.vapor_pressures_path,
+        )
+        if self._config_bundle is None or self._config_bundle_paths != paths:
             try:
-                self._config_bundle = load_config_bundle(
+                bundle = load_config_bundle(
                     DATA_DIR,
                     feedstocks_path=self.feedstocks_path,
                     setpoints_path=self.setpoints_path,
@@ -1635,6 +1643,8 @@ class PyrolysisRun:
                 )
             except FileNotFoundError as exc:
                 raise RunnerError(str(exc)) from exc
+            self._config_bundle = bundle
+            self._config_bundle_paths = paths
         return copy.deepcopy(self._config_bundle)
 
     def resolved_configuration(
@@ -1646,11 +1656,9 @@ class PyrolysisRun:
     ) -> dict[str, Any]:
         """The whole resolved run, after this object's one config load.
 
-        The tree still contains metadata. The cache key omits that list.
-        Every other leaf, including a field added later, stays in the tree.
-        Geometry, gas, the schedule, the pump, and the Stage 0 inventory
-        are the objects the runner resolved, not a field allowlist.
-        ``area_notice`` is metadata for the caller to keep off the key.
+        This snapshot is provenance for the caller. The deck cache key
+        does not hash it. Geometry, gas, the schedule, the pump, and the
+        Stage 0 inventory are the objects the runner resolved.
         """
 
         if not isinstance(preset_document, Mapping):

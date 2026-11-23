@@ -6,31 +6,36 @@ disposition. A cached value is a whole-run projection or it is not stored.
 
 The chemistry version for engine ``simulator`` lives in
 ``simulator.engine_cache``. Bump that version when a cached number
-changes. The cache key is the runner's resolved configuration after the
-one load, minus the exact metadata paths below. A new prediction field,
-including a user-named curve, is in the key without a version bump.
-Paths are matched exactly: not by name, prefix, or suffix. ``loaded_files``
-is the sha256 of every file byte that load read. The runner file hash
-and the preset digest field are provenance and stay out of the cache key.
+changes. The cache key is the execution identity, not a walk of the
+resolved configuration:
+
+* git tree ids of ``simulator/``, ``engines/``, and ``data/`` at HEAD
+* sha256 of the deck file bytes, plus the leg selected from that file
+* sha256 of ``engines/engines.local.toml`` (or ``absent``) and the
+  declared engine pins
+* the Python version
+
+A dirty tree under those three paths does not read or write the cache.
+An explicit feedstock, setpoints, or vapor path is not that tree, so it
+does not read or write the cache either. A small resolved summary is
+stored as provenance and is not key material.
 """
 
 from __future__ import annotations
 
 import hashlib
 import math
+import platform
+import subprocess
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 
 from simulator.condensation import LabGeometryError
-from simulator.config import (
-    begin_file_byte_record,
-    finish_file_byte_record,
-    note_loaded_file_bytes,
-)
-from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.engine_cache import (
+    ENGINE_CHEMISTRY_VERSION_IDENTITY_AT,
     EngineCacheValue,
     cached_engine_call,
     record_engine_open,
@@ -79,128 +84,73 @@ _SESKO_IDS = (
     "kems-036-sesko-2024::sesko_2024_table2_factsage_and_literature_o2_yield",
 )
 
-# Measurement tokens. A request that contains one has copied a result
-# into the solve input. Provenance names are not matched: a dynamic
-# curve may carry a citation, and that citation stays in the key.
-FORBIDDEN_REQUEST_KEYS = frozenset({
+# Measurement slots on a prediction document. They are schema locations,
+# not names matched anywhere in a curve, profile, surface, or species id.
+MEASUREMENT_SLOT_KEYS = (
+    "measurement_id",
+    "measurement_selectors",
+    "comparison_contract",
+    "trajectory_comparison",
     "comparison_points",
-    "expected_value",
-    "expected_values",
-    "observation_id",
-    "trial_id",
-    "uncertainty",
-})
+)
 
-# Exact schema paths omitted from the cache key, with the node and its
-# subtree. A path not listed here is key material, whatever it is named.
-# Over-keying misses; a wrong hit does not. Dynamic curve, profile, and
-# surface ids are not listed.
-METADATA_EXCLUSION_PATHS: dict[str, str] = {
-    "/area_notice": "area-bridge display notice, not a melt input",
-    "/preset/paper_id": "paper label",
-    "/preset/paper_citation_id": "citation id",
-    "/preset/measurement_id": "measurement label",
-    "/preset/extraction_status": "extraction status label; the refusal gate reads it before the key",
-    "/preset/source_notes": "source notes",
-    "/preset/measurement_selectors": "observation selectors, not the solve",
-    "/preset/comparison_contract": "comparison policy, sidecar path, and fast-tier policy",
-    "/preset/digests": "provenance digests, including schedule_digest",
-    "/preset/trajectory_comparison": "comparison grid and figure targets",
-    "/preset/lab_geometry/sample/exposed_melt_area_notice": "geometry display notice",
-    "/preset/lab_geometry/pump/model": "pump model name, not a solve input",
-    "/preset/lab_geometry/pump/model_source_class": "pump model citation class",
-    "/preset/lab_geometry/pump/model_citation_id": "pump model citation id",
-    "/preset/lab_geometry/pump/model_digest": "pump model citation text",
-    "/preset/lab_schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot",
-    "/preset/lab_schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot",
-    "/preset/lab_schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot",
-    "/schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot on the resolved schedule",
-    "/schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot on the resolved schedule",
-    "/schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot on the resolved schedule",
-    "/feedstock/entry/name": "feedstock display name",
-    "/feedstock/entry/label": "feedstock display label",
-    "/feedstock/entry/source": "feedstock citation source",
-    "/feedstock/entry/confidence": "feedstock confidence label",
-    "/feedstock/entry/note": "feedstock display note",
-    "/feedstock/entry/paper_aliases": "feedstock paper aliases",
-    "/feedstock/entry/provenance": "feedstock citation provenance",
-    "/feedstock/entry/simulant_vs_real_caveat": "feedstock display caveat",
-    "/feedstock/entry/process_notes": "feedstock process notes",
-    "/feedstock/entry/composition_basis": "composition citation basis",
-    "/feedstock/entry/composition_status": "composition status label",
-    "/feedstock/entry/sum_check": "oxide sum cross-check, not an input mass",
-    "/feedstock/entry/elemental_composition_wt_pct": "elemental cross-check, not the loadable oxide table",
-    "/feedstock/entry/elemental_sum_check": "elemental sum cross-check",
-    "/feedstock/entry/elemental_composition_status": "elemental cross-check status",
-    "/feedstock/entry/elemental_cross_check_note": "elemental cross-check note",
-}
+_TREE_PREFIXES = ("simulator", "engines", "data")
+DECK_UNCACHED_DIRTY_TREE = "deck_uncached_dirty_tree"
+DECK_UNCACHED_PATH_OVERRIDE = "deck_uncached_path_override"
 
 
-def _json_pointer(path: tuple[Any, ...]) -> str:
-    """JSON pointer for a resolved path. ``~`` and ``/`` in a key are escaped."""
-
-    chunks: list[str] = []
-    for step in path:
-        text = str(step).replace("~", "~0").replace("/", "~1")
-        chunks.append("/")
-        chunks.append(text)
-    return "".join(chunks)
-
-
-def _canonicalize(value: Any, path: tuple[Any, ...] = ()) -> Any:
-    """Sorted keys and the runner's numeric-string parse.
-
-    A listed metadata path is omitted with its subtree. Every other
-    field is kept, including a curve whose name looks like a note.
-    """
+def _readonly(value: Any) -> Any:
+    """A mapping the caller cannot mutate, including nested maps."""
 
     if isinstance(value, Mapping):
-        packed: dict[str, Any] = {}
-        for key, item in sorted(value.items(), key=lambda pair: str(pair[0])):
-            name = str(key)
-            child = path + (name,)
-            if _json_pointer(child) in METADATA_EXCLUSION_PATHS:
-                continue
-            packed[name] = _canonicalize(item, child)
-        return packed
+        return MappingProxyType({
+            str(key): _readonly(item) for key, item in value.items()
+        })
     if isinstance(value, (list, tuple)):
-        return [
-            _canonicalize(item, path + (index,))
-            for index, item in enumerate(value)
-        ]
-    if isinstance(value, bool) or value is None:
-        return value
-    if is_declared_real_scalar(value, allow_numeric_str=True):
-        number = float(value)
-        if not math.isfinite(number):
-            raise IntegratedBenchContractError(
-                "resolved configuration contains a non-finite number",
-                kind="no_deck",
-                reason="non_numeric",
-            )
-        if number == 0.0:
-            return 0.0
-        return number
-    if isinstance(value, str):
-        return value
-    raise IntegratedBenchContractError(
-        f"resolved configuration cannot pack {type(value).__name__}",
-        kind="no_deck",
-        reason="non_numeric",
-    )
+        return tuple(_readonly(item) for item in value)
+    return value
 
 
-def cache_key_document(resolved: Mapping[str, Any]) -> dict[str, Any]:
-    """Canonical key material for one resolved configuration."""
+def declared_engine_pins() -> dict[str, str]:
+    """Identity strings declared for each engine, including OpenIMCC."""
 
-    document = _canonicalize(resolved)
-    if not isinstance(document, dict):
+    return {
+        str(name): str(record["identity"])
+        for name, record in sorted(ENGINE_CHEMISTRY_VERSION_IDENTITY_AT.items())
+    }
+
+
+def deck_cache_request(
+    *,
+    tree_ids: Mapping[str, str],
+    preset_sha256: str,
+    leg: str,
+    engines_local_toml_sha256: str,
+    declared_pins: Mapping[str, str],
+    python_version: str,
+) -> Mapping[str, Any]:
+    """The lookup identity. Each argument is one part of the key."""
+
+    missing = [name for name in _TREE_PREFIXES if name not in tree_ids]
+    if missing:
         raise IntegratedBenchContractError(
-            "resolved configuration is not a mapping",
+            "deck cache identity is missing tree ids: " + ", ".join(missing),
             kind="no_deck",
             reason="non_numeric",
         )
-    return document
+    return _readonly({
+        "trees": {name: str(tree_ids[name]) for name in _TREE_PREFIXES},
+        "preset_sha256": str(preset_sha256),
+        "leg": str(leg),
+        "external_engines": {
+            "engines_local_toml_sha256": str(engines_local_toml_sha256),
+            "declared_pins": {
+                str(name): str(declared_pins[name])
+                for name in sorted(declared_pins)
+            },
+        },
+        "python_version": str(python_version),
+    })
 
 
 _SUCCESS_STATUS = "ok"
@@ -250,20 +200,22 @@ class ObservationDisposition:
 
 @dataclass(frozen=True)
 class DeckRequest:
-    """Numeric solve inputs, plus lineage that does not enter the cache key.
+    """Frozen deck identity, plus lineage that does not enter the cache key.
 
-    ``cache_request`` is what ``cached_engine_call`` packs. ``lineage`` names
-    the role of each boundary so a later score can flag it after lookup.
-    ``run`` is the runner object the solve calls. It is not packed.
+    ``cache_request`` is the read-only lookup identity ``cached_engine_call``
+    packs. ``lineage`` names the role of each boundary so a later score can
+    flag it after lookup. ``run`` is the runner object the solve calls.
     ``requested_steps`` is the step count ``drive_session`` executes.
+    ``cache_bypass`` is a typed notice when this deck must not touch the cache.
     """
 
-    cache_request: dict[str, Any]
+    cache_request: Mapping[str, Any]
     resolved_configuration: dict[str, Any]
     lineage: dict[str, Any]
     preset_digest: str
     run: PyrolysisRun
     requested_steps: int
+    cache_bypass: str | None = None
 
 
 @dataclass(frozen=True)
@@ -513,36 +465,74 @@ def _refuse_uncacheable_preset(document: Mapping[str, Any]) -> None:
         )
 
 
-def _forbidden_paths(value: Any, path: str = "") -> list[str]:
-    found: list[str] = []
-    if isinstance(value, Mapping):
-        for key, item in value.items():
-            name = str(key)
-            child = f"{path}.{name}" if path else name
-            if name in FORBIDDEN_REQUEST_KEYS:
-                found.append(child)
-            found.extend(_forbidden_paths(item, child))
-    elif isinstance(value, (list, tuple)):
-        for index, item in enumerate(value):
-            found.extend(_forbidden_paths(item, f"{path}[{index}]"))
-    return found
+def assert_measurement_slots_outside_prediction(document: Mapping[str, Any]) -> None:
+    """Refuse a prediction that carries a measurement slot at its root.
 
+    Slots are the fixed schema locations below. A dynamic id named
+    ``uncertainty`` or ``target`` is not one of them.
+    """
 
-def assert_cache_request_has_no_measurement(request: Mapping[str, Any]) -> None:
-    found = _forbidden_paths(request)
+    found = [name for name in MEASUREMENT_SLOT_KEYS if name in document]
     if found:
         raise IntegratedBenchContractError(
-            "cache request contains measurement or lineage fields: "
-            + ", ".join(found),
+            "prediction document contains measurement slots: " + ", ".join(found),
             kind="not_a_measurement",
-            reason="measurement_in_request",
+            reason="measurement_in_prediction",
         )
+
+
+def _git_text(args: list[str]) -> str:
+    completed = subprocess.run(
+        ["git", *args],
+        cwd=_repo_root(),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        detail = completed.stderr.strip() or completed.stdout.strip() or "git failed"
+        raise IntegratedBenchContractError(
+            detail,
+            kind="no_deck",
+            reason=DECK_UNCACHED_DIRTY_TREE,
+        )
+    return completed.stdout.strip()
+
+
+def _working_tree_dirty() -> bool:
+    """True when ``simulator/``, ``engines/``, or ``data/`` is not a clean commit."""
+
+    return bool(_git_text(["status", "--porcelain", "--", *_TREE_PREFIXES]))
+
+
+def _tree_ids() -> dict[str, str]:
+    return {
+        name: _git_text(["rev-parse", f"HEAD:{name}"])
+        for name in _TREE_PREFIXES
+    }
+
+
+def _engines_local_toml_sha256() -> str:
+    path = _repo_root() / "engines" / "engines.local.toml"
+    if not path.is_file():
+        return "absent"
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _read_preset_bytes(path: Path) -> bytes:
+    try:
+        return path.read_bytes()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise IntegratedBenchContractError(
+            f"preset {path} is unreadable",
+            kind="no_deck",
+            reason="preset_unreadable",
+        ) from exc
 
 
 def _read_preset_document(path: Path) -> Mapping[str, Any]:
     try:
-        raw = path.read_bytes()
-        note_loaded_file_bytes("preset", raw)
+        raw = _read_preset_bytes(path)
         document = load_cached_safe_yaml(raw) or {}
     except (OSError, UnicodeDecodeError) as exc:
         raise IntegratedBenchContractError(
@@ -564,60 +554,77 @@ def build_deck_request(
     *,
     leg: str = "faithful",
     feedstocks_path: Path | None = None,
+    setpoints_path: Path | None = None,
     vapor_pressures_path: Path | None = None,
 ) -> DeckRequest:
-    """Build the request from the inputs the runner resolves.
+    """Build the frozen run and the read-only cache identity.
 
     Comparison provenance is not attached, so the fast-tier comparison
     contract is not a numeric input and does not ban the analytical backend.
-    The run is frozen before the load, and the key is that same object.
+    The run is frozen before the load. The lookup key is the tree, deck,
+    engine, and Python identity captured with that freeze.
     """
 
-    token = begin_file_byte_record()
+    document = _read_preset_document(preset_path)
+    _refuse_uncacheable_preset(document)
+    preset_bytes = _read_preset_bytes(preset_path)
+    spec = _load_vacuum_preset_run_spec(preset_path, leg)
+    run = PyrolysisRun(
+        feedstock_id=spec.feedstock_id,
+        campaign="C0",
+        hours=spec.hours,
+        mass_kg=spec.mass_kg,
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        setpoints_patch={"lab_geometry": spec.lab_geometry},
+        lab_schedule=spec.lab_schedule,
+        track="pyrolysis",
+        feedstocks_path=feedstocks_path,
+        setpoints_path=setpoints_path,
+        vapor_pressures_path=vapor_pressures_path,
+        process_dt_s=spec.process_dt_s,
+    )
+    run.freeze_configuration()
     try:
-        document = _read_preset_document(preset_path)
-        _refuse_uncacheable_preset(document)
-        spec = _load_vacuum_preset_run_spec(preset_path, leg)
-        run = PyrolysisRun(
-            feedstock_id=spec.feedstock_id,
-            campaign="C0",
-            hours=spec.hours,
-            mass_kg=spec.mass_kg,
-            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-            setpoints_patch={"lab_geometry": spec.lab_geometry},
-            lab_schedule=spec.lab_schedule,
-            track="pyrolysis",
-            feedstocks_path=feedstocks_path,
-            vapor_pressures_path=vapor_pressures_path,
-            process_dt_s=spec.process_dt_s,
+        resolved = run.resolved_configuration(
+            spec.document,
+            leg=str(leg),
+            mitigation=_mitigation_token(spec, leg),
         )
-        run.freeze_configuration()
-        try:
-            resolved = run.resolved_configuration(
-                spec.document,
-                leg=str(leg),
-                mitigation=_mitigation_token(spec, leg),
-            )
-        except LabGeometryError as exc:
-            raise IntegratedBenchContractError(
-                str(exc),
-                kind="missing_capability",
-                reason=str(exc.code),
-            ) from exc
-        except RunnerError as exc:
-            if not str(exc).startswith("feedstock "):
-                raise
-            raise IntegratedBenchContractError(
-                str(exc),
-                kind="no_deck",
-                reason="no_usable_composition",
-            ) from exc
-        schedule_lineage = _schedule_lineage(run.lab_schedule)
-    finally:
-        loaded_files = finish_file_byte_record(token)
-    resolved["loaded_files"] = loaded_files
-    cache_request = cache_key_document(resolved)
-    assert_cache_request_has_no_measurement(cache_request)
+    except LabGeometryError as exc:
+        raise IntegratedBenchContractError(
+            str(exc),
+            kind="missing_capability",
+            reason=str(exc.code),
+        ) from exc
+    except RunnerError as exc:
+        if not str(exc).startswith("feedstock "):
+            raise
+        raise IntegratedBenchContractError(
+            str(exc),
+            kind="no_deck",
+            reason="no_usable_composition",
+        ) from exc
+    schedule_lineage = _schedule_lineage(run.lab_schedule)
+    cache_request = deck_cache_request(
+        tree_ids=_tree_ids(),
+        preset_sha256=hashlib.sha256(preset_bytes).hexdigest(),
+        leg=str(leg),
+        engines_local_toml_sha256=_engines_local_toml_sha256(),
+        declared_pins=declared_engine_pins(),
+        python_version=platform.python_version(),
+    )
+    bypass: str | None = None
+    if _working_tree_dirty():
+        bypass = DECK_UNCACHED_DIRTY_TREE
+    elif any(
+        path is not None
+        for path in (
+            run.feedstocks_path,
+            run.setpoints_path,
+            run.vapor_pressures_path,
+        )
+    ):
+        bypass = DECK_UNCACHED_PATH_OVERRIDE
     if spec.feedstock_id == "lunar_eac_1a":
         feedstock_lineage: dict[str, Any] = {
             "input_role": "proxy",
@@ -635,7 +642,7 @@ def build_deck_request(
     }
     if resolved["area_notice"] is not None:
         lineage["exposed_area_notice"] = resolved["area_notice"]
-    digest = "sha256:" + hashlib.sha256(preset_path.read_bytes()).hexdigest()
+    digest = "sha256:" + hashlib.sha256(preset_bytes).hexdigest()
     return DeckRequest(
         cache_request=cache_request,
         resolved_configuration=resolved,
@@ -643,17 +650,17 @@ def build_deck_request(
         preset_digest=digest,
         run=run,
         requested_steps=int(run.hours),
+        cache_bypass=bypass,
     )
 
 
 def _copy_diagnostic(value: Any) -> Any:
-    """Keep a runner diagnostic. Measurement-target keys stay out."""
+    """Keep a runner diagnostic. Names are not measurement tests."""
 
     if isinstance(value, Mapping):
         return {
             str(key): _copy_diagnostic(item)
             for key, item in value.items()
-            if str(key) not in FORBIDDEN_REQUEST_KEYS
         }
     if isinstance(value, list):
         return [_copy_diagnostic(item) for item in value]
@@ -750,7 +757,6 @@ def _species_key_ok(name: Any) -> bool:
         and bool(name)
         and name.strip() == name
         and " " not in name
-        and name not in FORBIDDEN_REQUEST_KEYS
     )
 
 
@@ -775,9 +781,9 @@ def _copy_species_tree(
 ) -> tuple[dict[str, Any], bool]:
     """Copy a species map. An empty map is valid. A bad leaf is kept.
 
-    A flat rate field rejects a nested map. ``deposit_by_surface`` is the
-    one map of surface to species map, and only that caller sets
-    ``nested_ok``. ``depth`` is accepted so a caller can pass it through.
+    A flat rate field rejects a nested map. ``deposit_by_surface`` is a
+    map of surface to species map: a number at the surface is malformed
+    and is kept. ``depth`` is accepted so a caller can pass it through.
     """
 
     del depth
@@ -787,12 +793,17 @@ def _copy_species_tree(
         key = name if isinstance(name, str) else str(name)
         if not _species_key_ok(name):
             clean = False
+        if nested_ok:
+            if isinstance(item, Mapping):
+                child, child_clean = _copy_species_tree(item, nested_ok=False)
+                projected[key] = child
+                clean = clean and child_clean
+            else:
+                projected[key] = float(item) if _finite(item) else item
+                clean = False
+            continue
         if _finite(item):
             projected[key] = float(item)
-        elif isinstance(item, Mapping) and nested_ok:
-            child, child_clean = _copy_species_tree(item, nested_ok=False)
-            projected[key] = child
-            clean = clean and child_clean
         elif isinstance(item, Mapping):
             projected[key] = _keep_evidence(item)
             clean = False
@@ -816,7 +827,7 @@ def _project_final_state(state: Any) -> tuple[dict[str, Any], str | None]:
     saw_finite = False
     for account, species in state.items():
         key = account if isinstance(account, str) else str(account)
-        if not isinstance(account, str) or account in FORBIDDEN_REQUEST_KEYS:
+        if not isinstance(account, str):
             projected[key] = _keep_evidence(species)
             clean = False
             continue
@@ -948,6 +959,12 @@ def project_whole_run(
     status = document.get("status")
     status_text = str(status) if isinstance(status, str) else "missing"
     reason: str | None = None
+    incoming = document.get("reason")
+    incoming_text = (
+        None
+        if incoming in (None, "")
+        else incoming if isinstance(incoming, str) else str(incoming)
+    )
     if status_text == _SUCCESS_STATUS:
         if "malformed_row" in issues:
             status_text = "partial"
@@ -966,10 +983,11 @@ def project_whole_run(
             elif report_issue is not None:
                 status_text = "partial"
                 reason = report_issue
-        incoming = document.get("reason")
-        if status_text == _SUCCESS_STATUS and incoming not in (None, ""):
+        if status_text == _SUCCESS_STATUS and incoming_text is not None:
             status_text = "partial"
-            reason = incoming if isinstance(incoming, str) else str(incoming)
+            reason = incoming_text
+    elif incoming_text is not None:
+        reason = incoming_text
 
     hot: dict[str, Any] = {
         "status": status_text,
@@ -982,6 +1000,7 @@ def project_whole_run(
     for key in _RUN_DIAGNOSTICS:
         if key in document:
             hot[key] = _copy_diagnostic(document.get(key))
+    assert_measurement_slots_outside_prediction(hot)
     cacheable = reason is None and status_text == _SUCCESS_STATUS
     return hot, cacheable
 
@@ -1017,8 +1036,24 @@ def run_cached_deck(
         return deck.run.run()
 
     solver = solve if solve is not None else _execute
+    if deck.cache_bypass:
+        document = solver(deck.cache_request)
+        hot, _cacheable = project_whole_run(
+            document,
+            requested_steps=deck.requested_steps,
+        )
+        hot["notice"] = deck.cache_bypass
+        return hot
+    session = deck.resolved_configuration.get("session")
+    mitigation = session.get("mitigation") if isinstance(session, Mapping) else None
     cold = {
         "preset_digest": deck.preset_digest,
+        "provenance": {
+            "feedstock_id": deck.run.feedstock_id,
+            "leg": deck.cache_request["leg"],
+            "requested_steps": deck.requested_steps,
+            "mitigation": mitigation,
+        },
     }
     solved = False
 
