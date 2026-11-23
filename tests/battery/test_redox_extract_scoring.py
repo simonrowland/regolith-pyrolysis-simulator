@@ -2459,12 +2459,18 @@ def test_redox_excludes_its_analytes_and_keeps_independent_emf():
         assert all(not n.reason.startswith("fO2_log:") for n in prediction.notices)
 
 
-def test_redox_excludes_condition_derived_from_named_target_observation():
+@pytest.mark.parametrize("reference_form", ("bare", "qualified"))
+def test_redox_excludes_condition_derived_from_named_target_observation(reference_form):
     target = _without_printed_fo2(_borisov_row4())
+    reference = (
+        target.observation_id
+        if reference_form == "bare"
+        else f"observation[{target.observation_id}].value"
+    )
     source = Located(
         State.of(Decimal("-0.68")),
         Locator(page=7, table="1", record="same result, separate locator"),
-        Derivation("reported from result", (target.observation_id,), (), "1"),
+        Derivation("reported from result", (reference,), (), "1"),
     )
     target = replace(target, point_conditions={"fO2_log": source})
 

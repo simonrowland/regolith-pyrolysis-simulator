@@ -103,7 +103,13 @@ def _target_dependency(
     if inference is not None:
         # A bare observation ID is a supported derivation reference, and
         # identifies the scored value even when no parameter is expanded.
-        if observation_id in inference.inputs:
+        target_reference = f"observation[{observation_id}]"
+        if any(
+            reference == observation_id
+            or reference == target_reference
+            or reference.startswith(f"{target_reference}.")
+            for reference in inference.inputs
+        ):
             return "derived_from_target"
         for _, operand in inference.parameters:
             match = _target_dependency(target, operand, observation_id)
