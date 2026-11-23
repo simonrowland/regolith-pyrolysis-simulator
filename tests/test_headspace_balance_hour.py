@@ -243,7 +243,7 @@ def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
     )
     assert len(result[0]) == 14
     assert holder is not None
-    assert law.flux_evaluations < capacity_coupling._MAX_FLUX_EVALUATIONS
+    assert law.flux_evaluations == 2811
     assert law._rhs_flux_counts
     assert max(law._rhs_flux_counts) <= 5
 
@@ -407,6 +407,95 @@ def test_reduced_rhs_reuses_one_root_anchor_across_trial_states(monkeypatch):
     assert rates["first"] == rates["repeat"]
     assert len(root_hints) == 3
     assert root_hints == [root, root, root]
+
+
+def test_reduced_pstar_finite_difference_is_smooth_below_outer_atol():
+    law, _holder, fractions, _start, anchor = _reduced_manifold_case(stiff=True)
+    species = tuple(law.species)
+    species_a, species_b = species[:2]
+    initial_a = fractions[species_a]
+    curvature_Pa2 = 5.0e8
+    composition_sensitivity_Pa = 0.1
+
+    def total_outflow(pressure_Pa, mix):
+        result = capacity_coupling.pipe_species_outflow_mol_s(
+            pressure_Pa,
+            _IFT_DOWNSTREAM_PA,
+            _IFT_T_K,
+            mix,
+            _IFT_D_M,
+            _IFT_L_M,
+            molar_mass_kg_mol=law.masses,
+        )
+        return math.fsum(
+            float(result.species_mol_s.get(name, 0.0)) for name in species
+        )
+
+    derivative_step_Pa = 1.0e-5
+    outflow_slope_mol_s_Pa = (
+        total_outflow(anchor + derivative_step_Pa, fractions)
+        - total_outflow(anchor - derivative_step_Pa, fractions)
+    ) / (2.0 * derivative_step_Pa)
+
+    def smooth_flux(partials):
+        pressure_Pa = math.fsum(
+            float(partials.get(name, 0.0)) for name in species
+        )
+        if pressure_Pa <= 0.0:
+            return {species_a: 0.0}
+        mix = {
+            name: float(partials.get(name, 0.0)) / pressure_Pa
+            for name in species
+        }
+        outflow = total_outflow(pressure_Pa, mix)
+        root_Pa = anchor + composition_sensitivity_Pa * (
+            mix[species_a] - initial_a
+        )
+        offset_Pa = pressure_Pa - root_Pa
+        residual_mol_s = -outflow_slope_mol_s_Pa * (
+            offset_Pa + curvature_Pa2 * offset_Pa**3
+        )
+        return {
+            species_a: (outflow + residual_mol_s)
+            * law.masses[species_a]
+            * 3600.0
+        }
+
+    # Premise: the single-root smooth law is G = -m(δP + c·δP³), with
+    # δP = P - P*(x) and P*(x) = anchor + 0.1·(x - x₀). The IFT pressure
+    # stencil is about 2e-5 Pa, so c·h² = 0.2; for Δx = 1e-7 the old
+    # one-chord miss is about 1.7e-9 Pa: above 1e-10 Pa (10⁻³ outer atol)
+    # but below the former 1e-6 Pa gate. Unit check: m [mol/(s·Pa)] times
+    # [δP + c·δP³] [Pa] gives G [mol/s]. As c → 0, one chord is exact.
+    law.flux = smooth_flux
+    center_kind, center_root = capacity_coupling._open_or_shut_fixed_point(
+        law, fractions, near_Pa=anchor,
+    )
+    assert center_kind == "open"
+    assert center_root is not None
+
+    reduced_roots = {}
+    resolved_roots = {}
+    for sign in (-1.0, 1.0):
+        sample = dict(fractions)
+        sample[species_a] += sign * 1.0e-7
+        sample[species_b] -= sign * 1.0e-7
+        reduced_kind, reduced_root = capacity_coupling._reduced_open_fixed_point(
+            law, sample, float(center_root),
+        )
+        resolved_kind, resolved_root = capacity_coupling._open_or_shut_fixed_point(
+            law, sample, near_Pa=float(center_root),
+        )
+        assert reduced_kind == resolved_kind == "open"
+        assert reduced_root is not None and resolved_root is not None
+        reduced_roots[sign] = float(reduced_root)
+        resolved_roots[sign] = float(resolved_root)
+
+    reduced_difference_Pa = reduced_roots[1.0] - reduced_roots[-1.0]
+    resolved_difference_Pa = resolved_roots[1.0] - resolved_roots[-1.0]
+    assert abs(reduced_difference_Pa - resolved_difference_Pa) <= (
+        1.0e-3 * capacity_coupling._SLOW_ATOL_PA
+    )
 
 
 def _geometry_o2(source_kg_hr: float, rating_Pa: float):
