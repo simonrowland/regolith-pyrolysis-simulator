@@ -55,7 +55,7 @@ def paper_point(store):
         Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
         "MISMATCH",
     ),
-    ({"confidence_level": "ci95"}, Decimal(1), "MATCH"),
+    ({"confidence_level": "ci95"}, Decimal(1), "MISMATCH"),
     ({"confidence_level": "not_stated"}, Decimal(1), "MATCH"),
     (
         {"kind": "two_sigma"},
@@ -63,6 +63,11 @@ def paper_point(store):
         "MISMATCH",
     ),
     ({"k": 2}, Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER, "MISMATCH"),
+    (
+        {"k": 2, "note": "standard deviation"},
+        Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
+        "MISMATCH",
+    ),
 ])
 def test_shared_scalar_policy(paper_point, declaration, factor, status):
     # Widths are comparator fixtures, never assertions about Hashimoto's errors.
@@ -70,11 +75,13 @@ def test_shared_scalar_policy(paper_point, declaration, factor, status):
         kind=UncertaintyKind.PRINTED,
         verbatim={"value": "1", "unit": "wt%", **declaration},
     ))
-    row = compare_point(obs, Decimal("23.74"))
+    # The residual is just outside the native 1 wt% width but inside the
+    # erroneous normal-95 rescaling of prose left behind after metadata clears.
+    row = compare_point(obs, Decimal("23.740001"))
     assert row["band_refusal"] is None
     assert row["status"] == status
     assert Decimal(row["band"]["value"]) == factor
-    assert row["native_inside"] is True
+    assert row["native_inside"] is False
     assert Decimal(row["native_band"]["value"]) == Decimal(1)
     if declaration.get("confidence_level") == "not_stated":
         assert row["band"]["rule"].startswith("printed_unstated:")

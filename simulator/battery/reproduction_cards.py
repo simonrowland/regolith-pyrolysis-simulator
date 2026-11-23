@@ -54,8 +54,6 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
     Candidates are comparison data only. No prediction or engine route is added.
     Native membership is the same owner's policy with confidence unstated.
     """
-    from dataclasses import replace
-
     identity = observation.identity
     result: dict[str, Any] = {
         "observation_id": observation.observation_id,
@@ -88,16 +86,12 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
     result["band_refusal"] = to_plain(resolution.refusal)
     result["band_notice"] = to_plain(resolution.notice)
     native = observation.uncertainty
-    if isinstance(native.verbatim, Mapping):
-        native_declaration = {
-            key: value
-            for key, value in native.verbatim.items()
-            if key not in {"kind", "k"}
-        }
-        native_declaration["confidence_level"] = "not_stated"
-        native = replace(native, verbatim=native_declaration)
     native_resolution = _printed_uncertainty_band(
-        quantity, native, reference, source_observation=observation,
+        quantity,
+        native,
+        reference,
+        source_observation=observation,
+        native_width=True,
     )
     result["native_band"] = to_plain(native_resolution.band)
     if candidate is None or not isinstance(candidate, Decimal) or not candidate.is_finite():

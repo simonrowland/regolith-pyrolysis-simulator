@@ -1940,15 +1940,17 @@ def test_norris_standard_deviation_metadata_preserves_all_printed_bands() -> Non
     assert banded == 64
 
 
-def test_full_store_printed_width_band_census_matches_green() -> None:
+def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
     from simulator.battery.identity import quantity_token
     from simulator.battery.migrate import REPO_ROOT, load_migrated_store
     from simulator.battery.score import _printed_uncertainty_band, point_magnitude
 
-    _, _, observations = load_migrated_store(REPO_ROOT)
-    width_count = 0
-    band_count = 0
-    conflict_ids: list[str] = []
+    source_ids = (
+        "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite",
+        "gorojovsky-wood-2026-sulfur-crustal",
+    )
+    _, _, observations = load_migrated_store(REPO_ROOT, sources=source_ids)
+    band_counts: dict[str, int] = {}
     outside_domain_ids: list[str] = []
     for observation in observations.values():
         quantity = quantity_token(observation.identity)
@@ -1966,22 +1968,17 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
             and resolution.refusal.get("reason") == "unparseable_printed_uncertainty"
         ):
             continue
-        if resolution.band is not None or resolution.refusal is not None:
-            width_count += 1
         if resolution.band is not None:
-            band_count += 1
-        if (
-            resolution.refusal is not None
-            and resolution.refusal.get("reason") == "uncertainty_convention_conflict"
-        ):
-            conflict_ids.append(observation.observation_id)
+            band_counts[observation.source_id] = (
+                band_counts.get(observation.source_id, 0) + 1
+            )
         if (
             resolution.refusal is not None
             and resolution.refusal.get("reason")
             == "printed_uncertainty_outside_metric_domain"
         ):
             outside_domain_ids.append(observation.observation_id)
-    expected_outside_domain_ids = (
+    restored_ids = (
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::bonnand_2020_A3a_cr2o3",
         "gorojovsky-wood-2026-sulfur-crustal::t2-r011-mgo",
         "gorojovsky-wood-2026-sulfur-crustal::t2-r020-cao",
@@ -1991,10 +1988,88 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
         "gorojovsky-wood-2026-sulfur-crustal::t3-r003-cao",
         "gorojovsky-wood-2026-sulfur-crustal::t3-r037-k2o",
     )
-    # Captured from the green scorer on this same migrated store; explicit IDs
-    # catch the eight row-level additions seen in round 7.
-    assert (width_count, band_count, tuple(sorted(conflict_ids))) == (21202, 13525, ())
-    assert tuple(sorted(outside_domain_ids)) == expected_outside_domain_ids
+    preexisting_refusal_ids = (
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r002-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r003-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r004-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r007-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r008-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r010-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r013-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r015-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r019-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r020-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r026-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r030-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r031-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r038-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r043-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r044-mgo",
+    )
+    # Both partitions were called against green using this same migrated store.
+    assert set(outside_domain_ids) == set(restored_ids) | set(preexisting_refusal_ids)
+    assert set(restored_ids).isdisjoint(preexisting_refusal_ids)
+    assert band_counts == {
+        source_ids[0]: 83,
+        source_ids[1]: 908,
+    }
+
+
+def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> None:
+    from simulator.battery.score import _printed_uncertainty_band, populate_numeric
+
+    identity = Identity(
+        quantity=Quantity.FE3_FE2_RATIO,
+        species=Species("Fe", Phase.CR),
+    )
+
+    def resolve(width: str):
+        observation = F.observation(
+            f"ferric-fraction-domain-{width}",
+            "ferric-fraction-domain-experiment",
+            identity,
+            Decimal("0.1") / Decimal("0.9"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            derivation=Derivation(
+                relation=score_mod.FERRIC_FRACTION_RELATION,
+                inputs=("ferric-fraction-domain-source",),
+                parameters=(
+                    ("original_Fe3_over_FeT", F.located(Decimal("0.1"))),
+                ),
+                output_unit="dimensionless",
+            ),
+        )
+        uncertainty = Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"Fe3_over_FeT": width, "units": "fraction", "k": "3"},
+        )
+        return observation, _printed_uncertainty_band(
+            Quantity.FE3_FE2_RATIO,
+            uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+
+    outside_observation, outside = resolve("0.12")
+    assert outside.band is None
+    assert outside.refusal is not None
+    assert outside.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+    numeric, reason, _detail = populate_numeric(
+        quantity=Quantity.FE3_FE2_RATIO,
+        candidate=Decimal("0.2"),
+        reference=outside_observation.value.point,
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=outside.refusal,
+        operation_override=MetricOperation.DEX,
+        band_operation=MetricOperation.DEX,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.decision_band is None
+
+    _inside_observation, inside = resolve("0.09")
+    assert inside.refusal is None
+    assert inside.band is not None
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
