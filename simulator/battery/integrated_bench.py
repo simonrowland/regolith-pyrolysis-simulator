@@ -20,10 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from simulator.condensation import (
-    LabGeometryError,
-    read_gram_lab_exposed_melt_area,
-)
+from simulator.condensation import LabGeometryError
 from simulator.engine_cache import (
     EngineCacheValue,
     cached_engine_call,
@@ -34,7 +31,9 @@ from simulator.lab_schedule import normalize_lab_schedule
 from simulator.process_timestep import resolve_process_timestep
 from simulator.runner import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    NOT_APPLICABLE_UNTIL_P0,
     PyrolysisRun,
+    RunnerError,
     _load_vacuum_preset_run_spec,
 )
 from simulator.thermal_budget import (
@@ -535,140 +534,6 @@ def _project_schedule(
     return schedule, lineage
 
 
-def _project_geometry(
-    raw_geometry: Mapping[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    sample = raw_geometry.get("sample") if isinstance(raw_geometry.get("sample"), Mapping) else {}
-    projected_sample: dict[str, Any] = {}
-    sample_lineage: dict[str, str] = {}
-    for key in (
-        "mass_g",
-        "pellet_diameter_mm",
-        "pellet_height_mm",
-        "pressed_at_tons",
-    ):
-        if _finite(sample.get(key)):
-            projected_sample[key] = _num(sample[key], f"sample.{key}")
-            sample_lineage[key] = "printed_input"
-    # The runner's area reader. Quoted numerics stay admitted. A null
-    # gram-lab face is a refusal, not a filled default.
-    try:
-        area = read_gram_lab_exposed_melt_area(raw_geometry)
-    except LabGeometryError as exc:
-        raise IntegratedBenchContractError(
-            str(exc),
-            kind="missing_capability",
-            reason=str(exc.code),
-        ) from exc
-    if area is not None:
-        projected_sample["exposed_melt_area_m2"] = float(area)
-        source = str(sample.get("exposed_melt_area_source_class") or "")
-        sample_lineage["exposed_melt_area_m2"] = (
-            "deck_declared_assumption" if "assumption" in source else "printed_input"
-        )
-    surfaces = []
-    surface_lineage = []
-    for surface in raw_geometry.get("surfaces") or ():
-        if not isinstance(surface, Mapping):
-            continue
-        item: dict[str, Any] = {
-            "id": str(surface.get("id") or ""),
-            "apparatus_role": str(surface.get("role") or ""),
-            "area_m2": _num(surface["area_m2"], "surface.area_m2"),
-            "view_factor_from_melt": _num(
-                surface["view_factor_from_melt"], "surface.view_factor_from_melt"
-            ),
-            "line_of_sight_to_melt": bool(surface["line_of_sight_to_melt"]),
-        }
-        if _finite(surface.get("equivalent_diameter_m")):
-            item["equivalent_diameter_m"] = _num(
-                surface["equivalent_diameter_m"], "surface.equivalent_diameter_m"
-            )
-        profile = str(surface.get("temperature_profile") or "").strip()
-        if profile and " " not in profile:
-            item["temperature_profile"] = profile
-        surfaces.append(item)
-        surface_lineage.append({
-            "id": item["id"],
-            "input_role": "assumption",
-            "source_class": str(surface.get("source_class") or ""),
-        })
-    pump = raw_geometry.get("pump") if isinstance(raw_geometry.get("pump"), Mapping) else {}
-    projected_pump: dict[str, Any] = {}
-    pump_lineage: dict[str, str] = {}
-    model = str(pump.get("model") or "").strip()
-    if model:
-        projected_pump["model"] = model
-        pump_lineage["model"] = "printed_input"
-    if _finite(pump.get("vacuum_limit_mbar")):
-        projected_pump["vacuum_limit_mbar"] = _num(
-            pump["vacuum_limit_mbar"], "pump.vacuum_limit_mbar"
-        )
-        pump_lineage["vacuum_limit_mbar"] = "printed_input"
-    geometry = {
-        "scale": str(raw_geometry.get("scale") or ""),
-        "equipment_sizing": str(raw_geometry.get("equipment_sizing") or ""),
-        "sample": projected_sample,
-        "surfaces": surfaces,
-        "pump": projected_pump,
-    }
-    lineage = {
-        "sample": sample_lineage,
-        "surfaces": surface_lineage,
-        "pump": pump_lineage,
-    }
-    return geometry, lineage
-
-
-def _resolved_feedstock_kg(
-    feedstocks: Mapping[str, Any],
-    feedstock_id: str,
-    mass_kg: float,
-) -> dict[str, float]:
-    """The inventory's prediction-driving masses, not a second formula."""
-
-    try:
-        entry = feedstocks[feedstock_id]
-    except KeyError as exc:
-        raise IntegratedBenchContractError(
-            f"feedstock {feedstock_id!r} is not in the session bundle",
-            kind="no_deck",
-            reason="no_usable_composition",
-        ) from exc
-    if not isinstance(entry, Mapping):
-        raise IntegratedBenchContractError(
-            f"feedstock {feedstock_id!r} has no usable composition",
-            kind="no_deck",
-            reason="no_usable_composition",
-        )
-    raw = entry.get("composition_wt_pct")
-    if not isinstance(raw, Mapping) or not raw:
-        raise IntegratedBenchContractError(
-            f"feedstock {feedstock_id!r} has no usable oxide vector",
-            kind="no_deck",
-            reason="no_usable_composition",
-        )
-    from simulator.core import PyrolysisSimulator
-
-    try:
-        masses = PyrolysisSimulator.resolved_prediction_driving_feedstock_kg(
-            entry, mass_kg
-        )
-    except (TypeError, ValueError) as exc:
-        raise IntegratedBenchContractError(
-            f"feedstock {feedstock_id!r} is not a usable composition: {exc}",
-            kind="no_deck",
-            reason="no_usable_composition",
-        ) from exc
-    if not masses:
-        raise IntegratedBenchContractError(
-            f"feedstock {feedstock_id!r} resolved to no component mass",
-            kind="no_deck",
-            reason="no_usable_composition",
-        )
-    return {str(name): float(kg) for name, kg in sorted(masses.items())}
-
-
 def _mitigation_token(spec: Any, leg: str) -> str:
     pair = spec.document.get("pair")
     block = pair.get(leg) if isinstance(pair, Mapping) else None
@@ -763,8 +628,6 @@ def build_deck_request(
     document = _read_preset_document(preset_path)
     _refuse_uncacheable_preset(document)
     spec = _load_vacuum_preset_run_spec(preset_path, leg)
-    from simulator.runner import PyrolysisRun
-
     run = PyrolysisRun(
         feedstock_id=spec.feedstock_id,
         campaign="C0",
@@ -777,14 +640,32 @@ def build_deck_request(
         feedstocks_path=feedstocks_path,
         process_dt_s=spec.process_dt_s,
     )
-    config = run._session_config()
+    # One load. ``run`` freezes the bundle here; ``run()`` reuses it.
+    try:
+        resolved = run.resolved_prediction_inputs()
+    except LabGeometryError as exc:
+        raise IntegratedBenchContractError(
+            str(exc),
+            kind="missing_capability",
+            reason=str(exc.code),
+        ) from exc
+    except RunnerError as exc:
+        if not str(exc).startswith("feedstock "):
+            raise
+        raise IntegratedBenchContractError(
+            str(exc),
+            kind="no_deck",
+            reason="no_usable_composition",
+        ) from exc
+    config = resolved["config"]
     schedule, schedule_lineage = _project_schedule(
-        spec.lab_schedule, spec.lab_geometry
+        run.lab_schedule,
+        run.setpoints_patch["lab_geometry"],
     )
-    geometry, geometry_lineage = _project_geometry(spec.lab_geometry)
-    component_kg = _resolved_feedstock_kg(
-        config.feedstocks, spec.feedstock_id, float(config.mass_kg)
-    )
+    geometry: dict[str, Any] = {"segments": resolved["segments"]}
+    if resolved["exposed_area_m2"] is not None:
+        geometry["exposed_area_m2"] = float(resolved["exposed_area_m2"])
+    component_kg = resolved["feedstock_component_kg"]
     additives = {
         str(name): _num(amount, f"additives_kg.{name}")
         for name, amount in sorted(dict(config.additives_kg).items())
@@ -811,7 +692,7 @@ def build_deck_request(
             "high_t_melt_activity": str(config.high_t_melt_activity),
             "until_campaign_complete": bool(config.until_campaign_complete),
             "imcc_activity_shadow": bool(config.imcc_activity_shadow),
-            "effective_dt_s": consumed_chamber_pressure_dt_s(run),
+            "effective_dt_s": float(resolved["dt_s"]),
             "leg": str(leg),
             "mitigation": _mitigation_token(spec, leg),
             "mre_target_species": str(run.mre_target_species),
@@ -833,11 +714,12 @@ def build_deck_request(
             "input_role": "printed_input",
             "registered_id": spec.feedstock_id,
         }
-    lineage = {
+    lineage: dict[str, Any] = {
         "feedstock": feedstock_lineage,
         "schedule": schedule_lineage,
-        "geometry": geometry_lineage,
     }
+    if resolved["area_notice"] is not None:
+        lineage["exposed_area_notice"] = resolved["area_notice"]
     digest = "sha256:" + hashlib.sha256(preset_path.read_bytes()).hexdigest()
     return DeckRequest(
         cache_request=cache_request,
@@ -871,7 +753,7 @@ def _copy_diagnostic(value: Any) -> Any:
 def _project_hour_row(row: Mapping[str, Any]) -> dict[str, Any]:
     projected: dict[str, Any] = {"hour": float(row["hour"])}
     for key in _HOUR_NUMERIC:
-        if _finite(row.get(key)):
+        if key in row and _finite(row.get(key)):
             projected[key] = float(row[key])
     species = row.get("vapor_species_kg_hr")
     if isinstance(species, Mapping):
@@ -907,6 +789,112 @@ def _project_numeric_tree(value: Mapping[str, Any], depth: int = 0) -> dict[str,
     return dict(sorted(projected.items()))
 
 
+def _project_step(row: Any) -> tuple[dict[str, Any], str | None]:
+    """Project one step. A bad numeric payload stays a malformed row.
+
+    An index-only row keeps its hour. It is not dropped and it is not
+    promoted by discarding the missing payload.
+    """
+
+    if (
+        isinstance(row, Mapping)
+        and row.get("status") == "malformed_row"
+        and set(row).issubset({"status", "hour"})
+    ):
+        kept = {"status": "malformed_row"}
+        if "hour" in row:
+            kept["hour"] = row["hour"]
+        return kept, "malformed_row"
+    if not isinstance(row, Mapping) or not _finite(row.get("hour")):
+        if isinstance(row, Mapping):
+            return (
+                {"status": "malformed_row", "hour": row.get("hour")},
+                "malformed_row",
+            )
+        return {"status": "malformed_row"}, "malformed_row"
+    for key in _HOUR_NUMERIC:
+        if key in row and not _finite(row.get(key)):
+            return (
+                {"status": "malformed_row", "hour": float(row["hour"])},
+                "malformed_row",
+            )
+    projected = _project_hour_row(row)
+    if not any(_finite(projected.get(key)) for key in _HOUR_NUMERIC):
+        return projected, "index_only_row"
+    return projected, None
+
+
+def _copy_species_tree(
+    value: Mapping[str, Any],
+    depth: int = 0,
+) -> tuple[dict[str, Any], bool]:
+    """Copy a species map. An empty map is valid. A bad leaf is kept."""
+
+    projected: dict[str, Any] = {}
+    clean = True
+    for name, item in value.items():
+        if not isinstance(name, str) or " " in name or name in FORBIDDEN_REQUEST_KEYS:
+            continue
+        if _finite(item):
+            projected[name] = float(item)
+        elif depth < 2 and isinstance(item, Mapping):
+            child, child_clean = _copy_species_tree(item, depth + 1)
+            projected[name] = child
+            clean = clean and child_clean
+        else:
+            projected[name] = item
+            clean = False
+    return dict(sorted(projected.items())), clean
+
+
+def _project_final_state(state: Any) -> tuple[dict[str, Any], bool]:
+    """Ledger accounts. Valid when one account holds a finite mol."""
+
+    if not isinstance(state, Mapping) or not state:
+        return {}, False
+    projected: dict[str, Any] = {}
+    clean = True
+    saw_finite = False
+    for account, species in state.items():
+        if not isinstance(account, str) or account in FORBIDDEN_REQUEST_KEYS:
+            clean = False
+            continue
+        if not isinstance(species, Mapping):
+            projected[account] = species
+            clean = False
+            continue
+        mols, mols_clean = _copy_species_tree(species)
+        projected[account] = mols
+        clean = clean and mols_clean
+        if mols_clean and any(_finite(mol) for mol in mols.values()):
+            saw_finite = True
+    return dict(sorted(projected.items())), clean and saw_finite
+
+
+def _project_final_report(final: Any) -> tuple[dict[str, Any], bool]:
+    """The runner's final report. Empty maps and the pump token count."""
+
+    if not isinstance(final, Mapping):
+        return {}, False
+    projected: dict[str, Any] = {}
+    clean = True
+    for key in _FINAL_FIELDS:
+        if key not in final:
+            continue
+        value = final[key]
+        if value == NOT_APPLICABLE_UNTIL_P0:
+            projected[key] = NOT_APPLICABLE_UNTIL_P0
+            continue
+        if isinstance(value, Mapping):
+            child, child_clean = _copy_species_tree(value)
+            projected[key] = child
+            clean = clean and child_clean
+            continue
+        projected[key] = value
+        clean = False
+    return projected, clean and bool(projected)
+
+
 def _expected_hours(requested_steps: int) -> list[float]:
     return [float(step) for step in range(1, requested_steps + 1)]
 
@@ -929,10 +917,11 @@ def project_whole_run(
 ) -> tuple[dict[str, Any], bool]:
     """Project one finished run against the step count the deck executed.
 
-    ``ok`` is cacheable only when that count is present in order, a final
-    state is present, and no row was malformed. A document that claimed
-    success and failed one of those checks is persisted as ``partial``
-    with a typed reason. Runner diagnostics are copied on that path too.
+    ``ok`` is cacheable only when every requested step is present with a
+    finite numeric payload, the runner's ``final_state`` holds a finite
+    mol, and the final report is present. An index-only row, a bad
+    numeric payload, an empty final, or a missing ledger is ``partial``
+    with a typed reason. The same projection certifies a stored hit.
     Omitting ``requested_steps`` cannot certify success.
     """
 
@@ -947,49 +936,56 @@ def project_whole_run(
             reason="incomplete_steps",
         )
     if not isinstance(document, Mapping):
-        return {"status": "missing", "per_hour_summary": [], "final": {}}, False
+        return {
+            "status": "missing",
+            "per_hour_summary": [],
+            "final_state": {},
+            "final": {},
+        }, False
 
     rows = document.get("per_hour_summary")
     projected_rows: list[dict[str, Any]] = []
-    malformed = False
+    issues: list[str] = []
     if isinstance(rows, list):
         for row in rows:
-            if not isinstance(row, Mapping) or not _finite(row.get("hour")):
-                projected_rows.append({"status": "malformed_row"})
-                malformed = True
-                continue
-            projected_rows.append(_project_hour_row(row))
+            projected, issue = _project_step(row)
+            projected_rows.append(projected)
+            if issue is not None:
+                issues.append(issue)
     elif rows is not None:
         projected_rows.append({"status": "malformed_row"})
-        malformed = True
+        issues.append("malformed_row")
 
-    final = document.get("final")
-    projected_final: dict[str, Any] = {}
-    if isinstance(final, Mapping):
-        for key in _FINAL_FIELDS:
-            value = final.get(key)
-            if isinstance(value, Mapping):
-                projected_final[key] = _project_numeric_tree(value)
+    final_state, final_state_ok = _project_final_state(document.get("final_state"))
+    final, final_ok = _project_final_report(document.get("final"))
 
     status = document.get("status")
     status_text = str(status) if isinstance(status, str) else "missing"
     reason: str | None = None
     if status_text == _SUCCESS_STATUS:
-        actual = _row_hours(projected_rows)
-        if malformed or actual is None:
+        if "malformed_row" in issues:
             status_text = "partial"
             reason = "malformed_row"
-        elif not isinstance(final, Mapping):
+        elif "index_only_row" in issues:
             status_text = "partial"
-            reason = "missing_final_state"
-        elif actual != _expected_hours(requested_steps):
-            status_text = "partial"
-            reason = "incomplete_steps"
+            reason = "index_only_row"
+        else:
+            actual = _row_hours(projected_rows)
+            if actual != _expected_hours(requested_steps):
+                status_text = "partial"
+                reason = "incomplete_steps"
+            elif not final_state_ok:
+                status_text = "partial"
+                reason = "missing_final_state"
+            elif not final_ok:
+                status_text = "partial"
+                reason = "missing_final_report"
 
     hot: dict[str, Any] = {
         "status": status_text,
         "per_hour_summary": projected_rows,
-        "final": projected_final,
+        "final_state": final_state,
+        "final": final,
     }
     if reason is not None:
         hot["reason"] = reason
@@ -1001,22 +997,18 @@ def project_whole_run(
 
 
 def _validated_ok_document(result: Any, requested_steps: int) -> bool:
-    """True when a returned ``ok`` document is the complete executed run."""
+    """True when a returned document is a complete ``ok`` run.
+
+    Hits of every status use this check. It is the store projection:
+    an index-only row or an empty final is not success.
+    """
 
     if not isinstance(result, Mapping) or result.get("status") != _SUCCESS_STATUS:
         return False
     if result.get("reason"):
         return False
-    rows = result.get("per_hour_summary")
-    if not isinstance(rows, list):
-        return False
-    actual = _row_hours([row for row in rows if isinstance(row, Mapping)])
-    if actual is None or len(rows) != len(actual):
-        return False
-    return (
-        actual == _expected_hours(requested_steps)
-        and isinstance(result.get("final"), Mapping)
-    )
+    _hot, cacheable = project_whole_run(result, requested_steps=requested_steps)
+    return cacheable
 
 
 def run_cached_deck(
@@ -1026,8 +1018,10 @@ def run_cached_deck(
     """Solve once per packed request. Only a complete ``ok`` run is stored.
 
     The default solve is the deck's own ``PyrolysisRun.run``. A test may
-    pass a stub. A cache hit is returned only when it is still that
-    complete ``ok`` document.
+    pass a stub. A hit of any status, including a row loaded from
+    outside this process, is returned only when the store projection
+    still calls it a complete ``ok``. A cold partial is returned and
+    not stored.
     """
 
     def _execute(_request: Mapping[str, Any]) -> Any:
@@ -1037,8 +1031,11 @@ def run_cached_deck(
     cold = {
         "preset_digest": deck.preset_digest,
     }
+    solved = False
 
     def _solve() -> EngineCacheValue:
+        nonlocal solved
+        solved = True
         document = solver(deck.cache_request)
         hot, cacheable = project_whole_run(
             document,
@@ -1051,13 +1048,12 @@ def run_cached_deck(
 
     record_engine_open(SIMULATOR_ENGINE)
     result = cached_engine_call(SIMULATOR_ENGINE, deck.cache_request, _solve)
-    if isinstance(result, Mapping) and result.get("status") == _SUCCESS_STATUS:
-        if not _validated_ok_document(result, deck.requested_steps):
-            raise IntegratedBenchContractError(
-                "a cache hit returned a document that is not a complete ok run",
-                kind="no_deck",
-                reason="cache_hit_not_ok",
-            )
+    if not solved and not _validated_ok_document(result, deck.requested_steps):
+        raise IntegratedBenchContractError(
+            "a cache hit returned a document that is not a complete ok run",
+            kind="no_deck",
+            reason="cache_hit_not_ok",
+        )
     return result
 
 

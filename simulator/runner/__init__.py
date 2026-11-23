@@ -162,6 +162,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
+    _has_runtime_surface_temperature_schedule,
 )
 from simulator.state import (
     Atmosphere,
@@ -1152,6 +1153,9 @@ class PyrolysisRun:
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
     )
+    _config_bundle: ConfigBundle | None = field(
+        default=None, init=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical
@@ -1435,15 +1439,121 @@ class PyrolysisRun:
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
+        """Load recipe files once. Later calls reuse that snapshot.
+
+        ``run`` and the deck key share this object. A feedstock file
+        edited after the first load is not read again.
+        """
+
+        if self._config_bundle is None:
+            try:
+                self._config_bundle = load_config_bundle(
+                    DATA_DIR,
+                    feedstocks_path=self.feedstocks_path,
+                    setpoints_path=self.setpoints_path,
+                    vapor_pressures_path=self.vapor_pressures_path,
+                )
+            except FileNotFoundError as exc:
+                raise RunnerError(str(exc)) from exc
+        return copy.deepcopy(self._config_bundle)
+
+    def _resolved_geometry_segments(
+        self,
+        *,
+        allow_temperature_profiles: bool,
+    ) -> list[dict[str, Any]]:
+        """Pipe segments ``to_pipe_segment`` builds for this run's geometry."""
+
+        raw = (
+            self.setpoints_patch.get("lab_geometry")
+            if isinstance(self.setpoints_patch, Mapping)
+            else None
+        )
+        if not isinstance(raw, Mapping):
+            return []
+        geometry = parse_lab_geometry(
+            raw,
+            allow_temperature_profiles=allow_temperature_profiles,
+        )
+        if geometry is None:
+            return []
+        segments: list[dict[str, Any]] = []
+        for segment in geometry.to_pipe_segments():
+            segments.append({
+                "name": segment.name,
+                "role": segment.role,
+                "inner_diameter_m": float(segment.inner_diameter_m),
+                "length_m": float(segment.length_m),
+                "declared_area_m2": float(segment.declared_area_m2 or 0.0),
+                "wall_temperature_C": float(segment.wall_temperature_C),
+                "view_factor_from_melt": float(
+                    segment.view_factor_from_melt or 0.0
+                ),
+                "line_of_sight_to_melt": bool(segment.line_of_sight_to_melt),
+            })
+        return segments
+
+    def resolved_prediction_inputs(self) -> dict[str, Any]:
+        """Prediction-driving state after this object's one config load.
+
+        Geometry is the session's pipe segments, including a quoted
+        holder diameter. Feedstock masses are the inventory owner.
+        Area and its typed notice come from the exposed-area bridge.
+        ``dt_s`` is the process step ``run`` will pass. The notice is
+        for the caller to keep outside the packed key.
+        """
+
+        config = self._session_config()
         try:
-            return load_config_bundle(
-                DATA_DIR,
-                feedstocks_path=self.feedstocks_path,
-                setpoints_path=self.setpoints_path,
-                vapor_pressures_path=self.vapor_pressures_path,
+            entry = config.feedstocks[self.feedstock_id]
+        except KeyError as exc:
+            raise RunnerError(
+                f"feedstock {self.feedstock_id!r} is not in the session bundle"
+            ) from exc
+        if not isinstance(entry, Mapping):
+            raise RunnerError(
+                f"feedstock {self.feedstock_id!r} has no usable composition"
             )
-        except FileNotFoundError as exc:
-            raise RunnerError(str(exc)) from exc
+        try:
+            masses = PyrolysisSimulator.resolved_prediction_driving_feedstock_kg(
+                entry, float(config.mass_kg)
+            )
+        except (TypeError, ValueError) as exc:
+            raise RunnerError(
+                f"feedstock {self.feedstock_id!r} is not a usable composition: {exc}"
+            ) from exc
+        if not masses:
+            raise RunnerError(
+                f"feedstock {self.feedstock_id!r} resolved to no component mass"
+            )
+        raw_geometry = (
+            self.setpoints_patch.get("lab_geometry")
+            if isinstance(self.setpoints_patch, Mapping)
+            else None
+        )
+        bridge = gram_lab_exposed_melt_area_bridge(
+            raw_geometry if isinstance(raw_geometry, Mapping) else None
+        )
+        area = bridge.get("effective_exposed_area_m2")
+        notice = bridge.get("notice")
+        return {
+            "config": config,
+            "segments": self._resolved_geometry_segments(
+                allow_temperature_profiles=(
+                    _has_runtime_surface_temperature_schedule(
+                        config.runtime_campaign_overrides
+                    )
+                ),
+            ),
+            "feedstock_component_kg": {
+                str(name): float(kg) for name, kg in sorted(masses.items())
+            },
+            "exposed_area_m2": None if area is None else float(area),
+            "area_notice": (
+                copy.deepcopy(notice) if isinstance(notice, Mapping) else None
+            ),
+            "dt_s": float(self.process_dt_s),
+        }
 
     def _load_feedstocks(self) -> dict:
         path = self.feedstocks_path or (DATA_DIR / "feedstocks.yaml")

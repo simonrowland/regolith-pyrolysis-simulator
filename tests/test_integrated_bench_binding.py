@@ -85,6 +85,7 @@ def _ok_document(steps: int) -> dict:
     return {
         "status": "ok",
         "per_hour_summary": rows,
+        "final_state": {"process.cleaned_melt": {"SiO2": 1.0}},
         "final": {
             "pump_outlet_by_species_kg": {},
             "expected_value": 0.0105,
@@ -167,8 +168,8 @@ def _key(request: dict) -> bytes:
 def _echo(request: dict) -> dict:
     """Project the printed inputs the differential is allowed to see."""
 
-    sample = request["geometry"]["sample"]
     schedule = request["schedule"]
+    driver = schedule["furnace_power_driver"]
     return {
         "status": "ok",
         "per_hour_summary": [{
@@ -176,8 +177,10 @@ def _echo(request: dict) -> dict:
             "O2_source_side_potential_kg_cumulative": float(
                 request["session"]["mass_kg"]
             ),
+            "P_total_bar": 0.013,
+            "pO2_bar": 1.0e-6,
             "vapor_species_kg_hr": {
-                "O2": float(sample["pellet_diameter_mm"]),
+                "O2": float(driver["pellet_diameter_m"]),
                 "SiO": float(schedule["chamber_pressure_mbar"][0]["value"]),
                 "Ar": float(schedule["gas_boundary"]["imposed_flow"]["value"]),
                 "Fe": float(
@@ -185,6 +188,7 @@ def _echo(request: dict) -> dict:
                 ),
             },
         }],
+        "final_state": {"process.cleaned_melt": {"SiO2": 1.0}},
         "final": {"pump_outlet_by_species_kg": {}},
     }
 
@@ -383,21 +387,26 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
     assert "furnace_power_driver" in request["schedule"]
     assert "expected_value" not in request["schedule"]["furnace_power_driver"]
 
-    sample = request["geometry"]["sample"]
-    assert sample["mass_g"] == pytest.approx(3.38)
-    assert sample["pellet_diameter_mm"] == pytest.approx(13.0)
-    assert sample["pellet_height_mm"] == pytest.approx(10.0)
-    assert sample["pressed_at_tons"] == pytest.approx(2.5)
+    power = request["schedule"]["furnace_power_driver"]
+    assert power["pellet_diameter_m"] == pytest.approx(0.013)
+    assert power["pellet_height_m"] == pytest.approx(0.010)
+    assert power["mass_kg"] == pytest.approx(3.38 / 1000.0)
     from simulator.condensation import read_gram_lab_exposed_melt_area
 
     area = read_gram_lab_exposed_melt_area(
         robinot_deck.run.setpoints_patch["lab_geometry"]
     )
     assert area is not None
-    assert sample["exposed_melt_area_m2"] == pytest.approx(area)
-    pump = request["geometry"]["pump"]
-    assert pump["model"] == "Edwards NDX15"
-    assert pump["vacuum_limit_mbar"] == pytest.approx(7.0e-3)
+    geometry = request["geometry"]
+    assert geometry["exposed_area_m2"] == pytest.approx(area)
+    holder = next(
+        segment for segment in geometry["segments"] if segment["name"] == "holder"
+    )
+    assert holder["inner_diameter_m"] == pytest.approx(0.02)
+    assert holder["declared_area_m2"] == pytest.approx(0.000314)
+    assert "pressed_at_tons" not in blob
+    assert "Edwards" not in blob
+    assert "vacuum_limit_mbar" not in blob
     assert request["feedstock"]["id"] == "lunar_eac_1a"
     assert "SiO2" in request["feedstock"]["resolved_component_kg"]
     assert "composition_wt_pct" not in request["feedstock"]
@@ -427,13 +436,16 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
     assert lineage["schedule"]["gas_boundary"]["imposed_flow"] == "conditional_covariate"
     assert lineage["schedule"]["gas_boundary"]["pressure_control"] == "assumption"
     assert lineage["schedule"]["furnace_power_driver"] == "measured_driver"
-    assert lineage["geometry"]["sample"]["mass_g"] == "printed_input"
-    assert lineage["geometry"]["sample"]["pellet_diameter_mm"] == "printed_input"
-    assert (
-        lineage["geometry"]["sample"]["exposed_melt_area_m2"]
-        == "deck_declared_assumption"
-    )
-    assert lineage["geometry"]["pump"]["model"] == "printed_input"
+    notice = lineage["exposed_area_notice"]
+    assert notice["reason"] == "liquid_footprint_not_printed"
+    assert notice["ruling_ref"] == "t-1892_2026-11-22"
+    assert notice["derivation"] == "pi*(D/2)^2 from the reported D=13 mm"
+    assert notice["value"] == pytest.approx(area)
+    assert notice["unit"] == "m2"
+    assert notice["kind"] == "deck_declared_assumption"
+    assert "liquid_footprint_not_printed" not in blob
+    assert "deck_declared_assumption" not in blob
+    assert "t-1892_2026-11-22" not in blob
     assert lineage["feedstock"] == {
         "input_role": "proxy",
         "reason": "eac_1a_proxy_for_robinot_charge",
@@ -462,6 +474,11 @@ def test_robinot_lineage_is_on_the_returned_request(
     assert lineage["feedstock"]["input_role"] == "proxy"
     assert lineage["feedstock"]["reason"] == "eac_1a_proxy_for_robinot_charge"
     assert lineage["feedstock"]["registered_id"] == "lunar_eac_1a"
+    notice = lineage["exposed_area_notice"]
+    assert notice["reason"] == "liquid_footprint_not_printed"
+    assert notice["ruling_ref"] == "t-1892_2026-11-22"
+    assert "derivation" in notice
+    assert notice["unit"] == "m2"
     blob = json.dumps(robinot_deck.cache_request)
     assert "outcome_conditioned" not in blob
     assert "eac_1a_proxy_for_robinot_charge" not in blob
@@ -472,13 +489,36 @@ def test_robinot_lineage_is_on_the_returned_request(
 
 def test_effective_timestep_is_the_chamber_pressure_step(
     robinot_deck: DeckRequest,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """The packed step is the dt the real chamber-pressure call receives."""
+
+    from simulator import teststand
+
     step = consumed_chamber_pressure_dt_s(robinot_deck.run)
     assert step == 60.0
     assert robinot_deck.cache_request["session"]["effective_dt_s"] == step
     edited = copy.deepcopy(robinot_deck.cache_request)
     edited["session"]["effective_dt_s"] = step + 1.0
     assert _key(edited) != _key(robinot_deck.cache_request)
+
+    received: list[float] = []
+    original = teststand.apply_process_chamber_pressure
+
+    def capture(sim, *, dt_s):
+        received.append(dt_s)
+        return original(sim, dt_s=dt_s)
+
+    monkeypatch.setattr(teststand, "apply_process_chamber_pressure", capture)
+    session = robinot_deck.run._start_session()
+    robinot_deck.run._apply_lab_area_bridge(
+        session.simulator,
+        robinot_deck.run._lab_area_bridge(),
+    )
+    session.advance()
+    assert received
+    assert set(received) == {robinot_deck.cache_request["session"]["effective_dt_s"]}
+    assert set(received) == {60.0}
 
 
 @pytest.mark.parametrize(
@@ -816,17 +856,55 @@ def test_partial_or_failed_runs_are_not_cached_numbers(
 
 
 def test_a_successful_run_without_a_pump_outlet_is_still_a_projection() -> None:
+    """An empty species map and the unavailable pump token stay cacheable.
+
+    ``final: {}`` is not a report. An index-only hour is not a step.
+    """
+
     hot, cacheable = project_whole_run({
         "status": "ok",
         "per_hour_summary": [{
             "hour": 1,
             "O2_source_side_potential_kg_cumulative": 0.001,
+            "P_total_bar": 0.013,
+            "pO2_bar": 1.0e-6,
         }],
-        "final": {},
+        "final_state": {"process.cleaned_melt": {"SiO2": 1.0}},
+        "final": {
+            "pump_outlet_by_species_kg": "not_applicable_until_p0",
+            "wall_deposit_by_species_kg": {},
+            "deposit_by_surface_species_kg": {},
+        },
     }, requested_steps=1)
     assert cacheable is True
-    assert hot["final"] == {}
-    assert hot["per_hour_summary"][0]["hour"] == 1.0
+    assert hot["final"]["pump_outlet_by_species_kg"] == "not_applicable_until_p0"
+    assert hot["final"]["wall_deposit_by_species_kg"] == {}
+    assert hot["final_state"]["process.cleaned_melt"]["SiO2"] == pytest.approx(1.0)
+    again, again_cacheable = project_whole_run(hot, requested_steps=1)
+    assert again_cacheable is True
+    assert again["status"] == "ok"
+
+    empty_final, empty_cacheable = project_whole_run({
+        "status": "ok",
+        "per_hour_summary": [{
+            "hour": 1,
+            "P_total_bar": 0.013,
+        }],
+        "final_state": {"process.cleaned_melt": {"SiO2": 1.0}},
+        "final": {},
+    }, requested_steps=1)
+    assert empty_cacheable is False
+    assert empty_final["status"] == "partial"
+    assert empty_final["reason"] == "missing_final_report"
+
+    index_only, index_cacheable = project_whole_run(
+        {"status": "ok", "per_hour_summary": [{"hour": 1}], "final": {}},
+        requested_steps=1,
+    )
+    assert index_cacheable is False
+    assert index_only["status"] == "partial"
+    assert index_only["reason"] == "index_only_row"
+    assert index_only["per_hour_summary"][0]["hour"] == 1.0
 
 
 def test_chemistry_version_bump_misses_on_an_unchanged_deck(
@@ -910,12 +988,13 @@ def test_quoted_exposed_area_changes_the_cache_key(
     assert low.cache_request["feedstock"]["id"] == (
         robinot_deck.cache_request["feedstock"]["id"]
     )
-    assert low.cache_request["geometry"]["sample"]["exposed_melt_area_m2"] == (
-        pytest.approx(0.000123)
+    assert low.cache_request["geometry"]["exposed_area_m2"] == pytest.approx(0.000123)
+    assert high.cache_request["geometry"]["exposed_area_m2"] == pytest.approx(0.000234)
+    assert low.lineage["exposed_area_notice"]["reason"] == (
+        "liquid_footprint_not_printed"
     )
-    assert high.cache_request["geometry"]["sample"]["exposed_melt_area_m2"] == (
-        pytest.approx(0.000234)
-    )
+    assert low.lineage["exposed_area_notice"]["value"] == pytest.approx(0.000123)
+    assert "liquid_footprint_not_printed" not in json.dumps(low.cache_request)
     assert _key(low.cache_request) != _key(high.cache_request)
 
 
@@ -963,9 +1042,7 @@ def test_checked_in_robinot_deck_starts_the_real_runner() -> None:
     area = read_gram_lab_exposed_melt_area(geometry)
     assert area is not None
     assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(area)
-    assert deck.cache_request["geometry"]["sample"]["exposed_melt_area_m2"] == (
-        pytest.approx(area)
-    )
+    assert deck.cache_request["geometry"]["exposed_area_m2"] == pytest.approx(area)
     assert consumed_chamber_pressure_dt_s(deck.run) == 60.0
 
 
@@ -1026,7 +1103,21 @@ def test_incomplete_or_malformed_ok_is_partial_and_not_cached(
     missing, missing_cacheable = project_whole_run(no_final, requested_steps=1)
     assert missing_cacheable is False
     assert missing["status"] == "partial"
-    assert missing["reason"] == "missing_final_state"
+    assert missing["reason"] == "missing_final_report"
+
+    no_state = _ok_document(1)
+    del no_state["final_state"]
+    missing_state, state_cacheable = project_whole_run(no_state, requested_steps=1)
+    assert state_cacheable is False
+    assert missing_state["status"] == "partial"
+    assert missing_state["reason"] == "missing_final_state"
+
+    poisoned = _ok_document(1)
+    poisoned["per_hour_summary"][0]["P_total_bar"] = float("nan")
+    bad_number, bad_cacheable = project_whole_run(poisoned, requested_steps=1)
+    assert bad_cacheable is False
+    assert bad_number["reason"] == "malformed_row"
+    assert bad_number["per_hour_summary"][0]["status"] == "malformed_row"
 
 
 def test_cache_hit_must_be_a_complete_ok(
@@ -1046,4 +1137,128 @@ def test_cache_hit_must_be_a_complete_ok(
             robinot_deck,
             lambda _request: _ok_document(robinot_deck.requested_steps),
         )
+    assert caught.value.reason == "cache_hit_not_ok"
+
+
+def test_quoted_holder_diameters_change_the_resolved_segment_key(
+    tmp_path: Path,
+) -> None:
+    """Quoted holder diameters the runner admits must not share a key."""
+
+    from simulator.lab_geometry import parse_lab_geometry
+
+    source = (REPO / ROBINOT_PRESET).read_bytes()
+    original = b"equivalent_diameter_m: 0.02\n"
+    assert source.count(original) == 1
+    decks = []
+    diameters = []
+    packed = []
+    lengths = []
+    for diameter in (0.02, 0.03):
+        path = tmp_path / f"deck-{diameter}.yaml"
+        path.write_bytes(source.replace(
+            original,
+            f'equivalent_diameter_m: "{diameter}"\n'.encode(),
+        ))
+        deck = build_deck_request(path)
+        decks.append(deck)
+        geometry = parse_lab_geometry(
+            deck.run.setpoints_patch["lab_geometry"],
+            allow_temperature_profiles=True,
+        )
+        holder = next(
+            surface for surface in geometry.surfaces if surface.surface_id == "holder"
+        )
+        diameters.append(holder.equivalent_diameter_m)
+        segment = next(
+            item
+            for item in deck.cache_request["geometry"]["segments"]
+            if item["name"] == "holder"
+        )
+        packed.append(segment["inner_diameter_m"])
+        lengths.append(segment["length_m"])
+    assert diameters == [0.02, 0.03]
+    assert packed == pytest.approx([0.02, 0.03])
+    assert lengths[0] != pytest.approx(lengths[1])
+    assert _key(decks[0].cache_request) != _key(decks[1].cache_request)
+
+
+def test_feedstock_override_is_loaded_once_for_the_key_and_the_solve(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A feedstock edit after the key is built cannot change the solve."""
+
+    from simulator.core import PyrolysisSimulator
+
+    feedstocks = _rewrite(
+        tmp_path,
+        b'  sum_check: 98.4\n  composition_status: "primary_xrf_loadable"\n',
+        (
+            b"  sum_check: 98.4\n"
+            b"  bulk_additions: {Fe: 1.0}\n"
+            b'  composition_status: "primary_xrf_loadable"\n'
+        ),
+        count=1,
+        source=REPO / "data" / "feedstocks.yaml",
+        name="feedstocks.yaml",
+    )
+    deck = build_deck_request(REPO / ROBINOT_PRESET, feedstocks_path=feedstocks)
+    packed_fe = deck.cache_request["feedstock"]["resolved_component_kg"]["Fe"]
+    assert packed_fe > 0.0
+    rewritten = feedstocks.read_bytes().replace(
+        b"bulk_additions: {Fe: 1.0}",
+        b"bulk_additions: {Fe: 2.0}",
+    )
+    assert rewritten != feedstocks.read_bytes()
+    feedstocks.write_bytes(rewritten)
+    captured: dict = {}
+
+    def spy_start(self, config, *, backend=None):
+        captured["entry"] = config.feedstocks[deck.run.feedstock_id]
+        captured["mass_kg"] = config.mass_kg
+        raise RuntimeError("stop before physics")
+
+    monkeypatch.setattr("simulator.session.SimSession.start", spy_start)
+    with pytest.raises(RuntimeError, match="stop before physics"):
+        run_cached_deck(deck)
+    consumed = PyrolysisSimulator.resolved_prediction_driving_feedstock_kg(
+        captured["entry"],
+        float(captured["mass_kg"]),
+    )
+    assert consumed["Fe"] == pytest.approx(packed_fe)
+    fresh = build_deck_request(REPO / ROBINOT_PRESET, feedstocks_path=feedstocks)
+    assert fresh.cache_request["feedstock"]["resolved_component_kg"]["Fe"] != (
+        pytest.approx(packed_fe)
+    )
+
+
+@pytest.mark.parametrize("status", ["partial", "ok"])
+def test_loaded_hit_of_any_status_must_be_a_complete_ok(
+    robinot_deck: DeckRequest,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    status: str,
+) -> None:
+    """Rows inserted by ``load_cache_rows`` use the same completeness rule."""
+
+    db = _configure(monkeypatch, tmp_path)
+    key = _key(robinot_deck.cache_request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_s2_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    document = {
+        "status": status,
+        "per_hour_summary": [{"hour": step} for step in range(1, 60)],
+        "final": {},
+    }
+    assert engine_cache.load_cache_rows(
+        db,
+        [(key, document, "simulator", version, "s2", first_s2_row)],
+    ) == 1
+
+    def unexpected_solve(*_args, **_kwargs):
+        pytest.fail("invalid-hit validation did not reach the stored row")
+
+    with pytest.raises(IntegratedBenchContractError) as caught:
+        run_cached_deck(robinot_deck, unexpected_solve)
     assert caught.value.reason == "cache_hit_not_ok"
