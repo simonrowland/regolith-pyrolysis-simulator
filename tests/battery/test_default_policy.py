@@ -40,6 +40,7 @@ EXPECTED_POLICY_FLAGS = {
     "phase_inferred",
     "composition_from_run_siblings",
     "composition_from_analysed_phase",
+    "method_unstated",
 }
 
 
