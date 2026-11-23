@@ -114,8 +114,8 @@ _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
 _PHASE_SUFFIX_RE = re.compile(
-    r"(?:\((?:c|s|l|g|aq|cr|liq|liquid|solid|gas|vapor|glass)\)|"
-    r"\[(?:c|s|l|g|aq|cr|liq|liquid|solid|gas|vapor|glass)\])$",
+    r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
+    r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
     re.IGNORECASE,
 )
 

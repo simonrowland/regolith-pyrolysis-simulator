@@ -2802,14 +2802,19 @@ def _openimcc_species_input(
         )
 
     phase = phase_token(species)
+    phase_from_source = False
     if formula_phase_text is not None:
         from simulator.battery.migrate import map_phase
 
-        formula_phase_state, _formula_phase_error = map_phase(formula_phase_text)
-        if not formula_phase_state.is_value:
-            formula_phase_state, _formula_phase_error = map_phase(
-                f"({formula_phase_text})"
-            )
+        if formula_phase_text in {"s", "solid"}:
+            mapped_formula_phase = "cr"
+        elif formula_phase_text in {"liq", "liquid"}:
+            mapped_formula_phase = "l"
+        elif formula_phase_text == "vapor":
+            mapped_formula_phase = "g"
+        else:
+            mapped_formula_phase = formula_phase_text
+        formula_phase_state, _formula_phase_error = map_phase(mapped_formula_phase)
         if not formula_phase_state.is_value:
             return None, None, _OpenIMCCBridgeRefusal(
                 RefusalReason.UNSUPPORTED,
@@ -2855,10 +2860,15 @@ def _openimcc_species_input(
                 phase_resolution,
                 {"formula": source_formula},
             )
+        phase_from_source = True
     if phase not in {Phase.G, Phase.L, Phase.CR}:
         return None, None, _OpenIMCCBridgeRefusal(
             RefusalReason.UNSUPPORTED,
-            "openimcc-phase-unsupported",
+            (
+                "openimcc-phase-unsupported"
+                if phase_from_source
+                else "pure-phase-phase-unsupported"
+            ),
             {
                 "engine": Engine.OPENIMCC.value,
                 "formula": source_formula,
@@ -2872,7 +2882,6 @@ def _openimcc_species_input(
             {"engine": Engine.OPENIMCC.value, "formula": formula},
         )
     return formula, phase, None
-
 
 
 def _fraction_decimal(value: Fraction) -> Decimal:

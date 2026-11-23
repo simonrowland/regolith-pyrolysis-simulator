@@ -515,15 +515,9 @@ PHASE_MAP: dict[str, Phase] = {
     "gas": Phase.G,
     "condensed_solid": Phase.CR,
     "condensed_liquid": Phase.L,
-    "c": Phase.CR,
     "g": Phase.G,
     "cr": Phase.CR,
-    "s": Phase.CR,
-    "solid": Phase.CR,
     "l": Phase.L,
-    "liq": Phase.L,
-    "liquid": Phase.L,
-    "vapor": Phase.G,
     "liquid_sodium": Phase.L,
     "liquid sodium": Phase.L,
     "liquid iron oxide": Phase.L,
@@ -541,10 +535,6 @@ PHASE_MAP: dict[str, Phase] = {
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
-    "(l)": Phase.L,
-    "(cr)": Phase.CR,
-    "(aq)": Phase.AQ,
-    "(glass)": Phase.GLASS,
     "(g)": Phase.G,
     "(c)": Phase.CR,
 }
@@ -562,21 +552,17 @@ _SAMPLE_SOURCE_PHASE_LABELS = frozenset(
 
 
 def phase_for_sample_form(form: str | None) -> Phase | None:
-    """Resolve a sample-form token without treating ``solid`` as a suffix.
+    """Closed phase for a sample form token. Untyped prose is None.
 
-    The bare ``solid`` alias belongs to formula phase parsing; reviewed row
-    descriptions classify it through their exact description map. A miss is
-    not a phase. ``map_phase`` keeps the formula/source-phase lookup.
+    Same lookup the p_sat reservoir fill uses: strip, casefold, then
+    PHASE_MAP. A miss is not a phase. ``map_phase`` stays separate: it
+    records the original species-phase spelling on an unknown.
     """
 
     if form is None:
         return None
     token = form.strip().casefold()
     if not token:
-        return None
-    # ``solid`` is a formula suffix alias in PHASE_MAP, not a typed sample
-    # form. Reviewed row descriptions classify it through the description map.
-    if token == "solid":
         return None
     return PHASE_MAP.get(token)
 
@@ -4337,7 +4323,6 @@ def observation_from_plain(payload: object) -> Observation:
         annotations=annotations,
         authority=payload.get("authority"),
     )
-
 
 
 def source_filter_tokens(sources: Sequence[str] | None) -> tuple[str, ...] | None:

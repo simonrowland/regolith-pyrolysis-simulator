@@ -743,23 +743,41 @@ def test_openimcc_grouped_carbon_formula_uses_janaf_hill_key() -> None:
         assert canonicalize_formula(source_formula) == (manifest_key, None, None)
 
 
-def test_openimcc_formula_suffix_phases_use_the_existing_phase_map() -> None:
-    from simulator.accounting.formulas import canonicalize_formula
-    from simulator.battery.migrate import map_phase
+def test_openimcc_formula_suffix_phases_resolve_inside_species_input() -> None:
+    from simulator.battery.compilation_tier import _openimcc_species_input
+    from simulator.battery.enums import Polymorph
 
-    for suffix, expected_phase in (
-        ("s", Phase.CR),
-        ("solid", Phase.CR),
-        ("liq", Phase.L),
-        ("liquid", Phase.L),
-        ("vapor", Phase.G),
+    for source_formula, expected_formula, expected_phase in (
+        ("SiO2(s)", "SiO2", Phase.CR),
+        ("SiO2(solid)", "SiO2", Phase.CR),
+        ("FeO(liq)", "FeO", Phase.L),
+        ("FeO(liquid)", "FeO", Phase.L),
+        ("FeO(vapor)", "FeO", Phase.G),
+        ("FeO(g)", "FeO", Phase.G),
+        ("FeO(l)", "FeO", Phase.L),
+        ("SiO2(cr)", "SiO2", Phase.CR),
     ):
-        formula, parsed_suffix, refusal = canonicalize_formula(f"FeO({suffix})")
-        mapped, _unmapped = map_phase(parsed_suffix)
-        assert formula == "FeO"
-        assert parsed_suffix == suffix
-        assert refusal is None
-        assert mapped.is_value and mapped.value is expected_phase
+        polymorph = State.of(Polymorph.QUARTZ) if expected_phase is Phase.CR else None
+        identity = Identity(
+            quantity=Quantity.CP,
+            species=Species(
+                source_formula,
+                State.unknown("source does not state phase"),
+                polymorph=polymorph,
+            ),
+            per=State.of(PerBasis.MOL_SPECIES),
+            temperature_K=State.of(Decimal("500")),
+        )
+        item = observation(
+            f"openimcc-formula-phase-{source_formula}",
+            "exp",
+            identity,
+            Decimal("1"),
+        )
+        formula, phase, refusal = _openimcc_species_input(item)
+        assert refusal is None, (source_formula, refusal)
+        assert formula == expected_formula
+        assert phase is expected_phase
 
 
 def test_openimcc_group_formula_matches_independent_janaf_source(monkeypatch) -> None:
@@ -899,7 +917,7 @@ def test_openimcc_symbolic_hydrate_and_unstated_phase_stay_typed(
             ),
         )
         assert attempt.value is None
-        assert attempt.refusal_detail["reason"] == "openimcc-phase-unsupported"
+        assert attempt.refusal_detail["reason"] == "pure-phase-phase-unsupported"
 
     title_path = tmp_path / "title-only.json"
     title_path.write_text('{"title":"ideal gas"}', encoding="utf-8")
