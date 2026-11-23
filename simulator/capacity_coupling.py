@@ -270,6 +270,22 @@ class CapacityShadowRefusal:
     pstar_warm_newton: int | None = None
     pstar_brent_band: int | None = None
     pstar_sign_scan: int | None = None
+    reduced_rhs_calls: int | None = None
+    reduced_jacobian_builds: int | None = None
+    reduced_ift_residual_check_rejections: int | None = None
+    reduced_second_corrections: int | None = None
+    reduced_resolver_warm_root_fallbacks: int | None = None
+    reduced_resolver_bracket_fallbacks: int | None = None
+    reduced_shut_branch_hits: int | None = None
+    reduced_accepted_steps: int | None = None
+    # Error-test rejections plus failed Newton collocation attempts.
+    reduced_rejected_steps: int | None = None
+    reduced_step_size_min_s: float | None = None
+    reduced_step_size_median_s: float | None = None
+    reduced_step_size_max_s: float | None = None
+    reduced_time_covered_s: float | None = None
+    full_system_radau_time_covered_s: float | None = None
+    handoff_time_s: float | None = None
     # Post-settle buffer-release record. Set on the inventory refusal
     # only. The hour notice carries the same dict. The comparison does
     # not read it. excess_integrated is inside the dict, by that name.
@@ -1286,6 +1302,21 @@ def _hour_cost_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
     """
 
     low, median, high = _rhs_flux_span(law._rhs_flux_counts)
+    reduced_steps = sorted(law.reduced_step_sizes_s)
+    if reduced_steps:
+        middle = len(reduced_steps) // 2
+        if len(reduced_steps) % 2:
+            reduced_step_median = reduced_steps[middle]
+        else:
+            reduced_step_median = 0.5 * (
+                reduced_steps[middle - 1] + reduced_steps[middle]
+            )
+        reduced_step_min = reduced_steps[0]
+        reduced_step_max = reduced_steps[-1]
+    else:
+        reduced_step_min = None
+        reduced_step_median = None
+        reduced_step_max = None
     return {
         "tau_s": law.opening_tau_s,
         "dt_over_tau": law.opening_dt_over_tau,
@@ -1297,6 +1328,29 @@ def _hour_cost_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
         "pstar_warm_newton": int(law.pstar_warm_newton),
         "pstar_brent_band": int(law.pstar_brent_band),
         "pstar_sign_scan": int(law.pstar_sign_scan),
+        "reduced_rhs_calls": int(law.reduced_rhs_calls),
+        "reduced_jacobian_builds": int(law.reduced_jacobian_builds),
+        "reduced_ift_residual_check_rejections": int(
+            law.reduced_ift_residual_check_rejections
+        ),
+        "reduced_second_corrections": int(law.reduced_second_corrections),
+        "reduced_resolver_warm_root_fallbacks": int(
+            law.reduced_resolver_warm_root_fallbacks
+        ),
+        "reduced_resolver_bracket_fallbacks": int(
+            law.reduced_resolver_bracket_fallbacks
+        ),
+        "reduced_shut_branch_hits": int(law.reduced_shut_branch_hits),
+        "reduced_accepted_steps": int(law.reduced_accepted_steps),
+        "reduced_rejected_steps": int(law.reduced_rejected_steps),
+        "reduced_step_size_min_s": reduced_step_min,
+        "reduced_step_size_median_s": reduced_step_median,
+        "reduced_step_size_max_s": reduced_step_max,
+        "reduced_time_covered_s": law.reduced_time_covered_s,
+        "full_system_radau_time_covered_s": (
+            law.full_system_radau_time_covered_s
+        ),
+        "handoff_time_s": law.handoff_time_s,
     }
 
 
@@ -1508,6 +1562,19 @@ class _HeadspaceLaw:
         self.pstar_sign_scan = 0
         self._counting_pstar = False
         self._pstar_scan_seen = False
+        self.reduced_rhs_calls = 0
+        self.reduced_jacobian_builds = 0
+        self.reduced_ift_residual_check_rejections = 0
+        self.reduced_second_corrections = 0
+        self.reduced_resolver_warm_root_fallbacks = 0
+        self.reduced_resolver_bracket_fallbacks = 0
+        self.reduced_shut_branch_hits = 0
+        self.reduced_accepted_steps = 0
+        self.reduced_rejected_steps = 0
+        self.reduced_step_sizes_s: list[float] = []
+        self.reduced_time_covered_s: float | None = None
+        self.full_system_radau_time_covered_s: float | None = None
+        self.handoff_time_s: float | None = None
 
     def _remember_species_notices(
         self,
@@ -3483,13 +3550,35 @@ def _reduced_open_fixed_point(
     """Advance P* once on the continuous open branch; bracket on a miss."""
 
     downstream = law.downstream_pa
+
+    def resolve_fallback() -> tuple[str | None, float | None]:
+        warm_before = law.pstar_warm_newton
+        brent_before = law.pstar_brent_band
+        scan_before = law.pstar_sign_scan
+        resolved = None
+        try:
+            resolved = _open_or_shut_fixed_point(
+                law, fractions, near_Pa=hint_Pa,
+            )
+            return resolved
+        finally:
+            law.reduced_resolver_warm_root_fallbacks += (
+                law.pstar_warm_newton - warm_before
+            )
+            law.reduced_resolver_bracket_fallbacks += (
+                law.pstar_brent_band - brent_before
+                + law.pstar_sign_scan - scan_before
+            )
+            if resolved is not None and resolved[0] == "shut":
+                law.reduced_shut_branch_hits += 1
+
     if not (math.isfinite(hint_Pa) and hint_Pa > downstream):
-        return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+        return resolve_fallback()
 
     residual_down = _mixture_g(law, fractions, downstream)
     if residual_down <= 0.0:
         # The existing resolver owns the shut return and its diagnostics.
-        return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+        return resolve_fallback()
 
     residual = _mixture_g(law, fractions, hint_Pa)
     if residual == 0.0:
@@ -3516,16 +3605,12 @@ def _reduced_open_fixed_point(
         )
         lower = float(hint_Pa) - step
         if not (step > 0.0 and lower > downstream):
-            return _open_or_shut_fixed_point(
-                law, fractions, near_Pa=hint_Pa,
-            )
+            return resolve_fallback()
         residual_lower = _mixture_g(law, fractions, lower)
         pressure_span = float(hint_Pa) - lower
         derivative = (residual - residual_lower) / pressure_span
         if not (math.isfinite(derivative) and derivative < 0.0):
-            return _open_or_shut_fixed_point(
-                law, fractions, near_Pa=hint_Pa,
-            )
+            return resolve_fallback()
         corrected = float(hint_Pa) - residual / derivative
 
     if (
@@ -3535,7 +3620,7 @@ def _reduced_open_fixed_point(
     ):
         # The established bracket remains the publisher outside the
         # local IFT neighborhood, including multiple-root handling.
-        return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+        return resolve_fallback()
 
     if derivative is not None:
         # G is mol/s and dG/dP is mol/(s·Pa), so |G|/|dG/dP| is a
@@ -3550,24 +3635,23 @@ def _reduced_open_fixed_point(
             not math.isfinite(corrected_residual)
             or abs(corrected_residual) / abs(derivative) > DEFAULT_ABS_TOL_PA
         ):
+            law.reduced_ift_residual_check_rejections += 1
+            law.reduced_second_corrections += 1
             second = corrected - corrected_residual / derivative
             if (
                 not math.isfinite(second)
                 or second <= downstream
                 or abs(second - float(hint_Pa)) > _KINK_BAND_PA
             ):
-                return _open_or_shut_fixed_point(
-                    law, fractions, near_Pa=hint_Pa,
-                )
+                return resolve_fallback()
             second_residual = _mixture_g(law, fractions, second)
             if (
                 not math.isfinite(second_residual)
                 or abs(second_residual) / abs(derivative)
                 > DEFAULT_ABS_TOL_PA
             ):
-                return _open_or_shut_fixed_point(
-                    law, fractions, near_Pa=hint_Pa,
-                )
+                law.reduced_ift_residual_check_rejections += 1
+                return resolve_fallback()
             corrected = second
 
     decision, continuous = _continuous_warm_root(
@@ -3581,7 +3665,7 @@ def _reduced_open_fixed_point(
         return "open", float(continuous)
     # Reuse the bracket publisher for a replacement attractor, a
     # multiple-root refusal, or a window with no continuous warm root.
-    return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+    return resolve_fallback()
 
 
 def _quasi_steady_tau(jacobian, state) -> float | None:
@@ -3871,6 +3955,7 @@ def _reduced_manifold(
     species = list(law.species)
     count = len(species)
     blocks = 5 if track_extent else 3
+    law.reduced_time_covered_s = 0.0
     y0 = [float(n_start[name]) for name in species]
     y0.extend(0.0 for _unused in range(count * (blocks - 1)))
     accepted_root = [float(root)]
@@ -3913,11 +3998,13 @@ def _reduced_manifold(
         return dn + da + db, float(found)
 
     def rhs(_time: float, state) -> list[float]:
+        law.reduced_rhs_calls += 1
         law._note_rhs_flux()
         rates, _found = evaluate(state, accepted_root[0])
         return rates
 
     def jacobian(time: float, state):
+        law.reduced_jacobian_builds += 1
         # A, B, G and R do not enter the rates, so their Jacobian columns
         # are zero. Each species column differences the reduced RHS once;
         # that RHS uses one IFT correction, not the bracketed warm solve.
@@ -3951,6 +4038,10 @@ def _reduced_manifold(
     def accepted_step(solver, accepted, _fails_before, _message) -> None:
         if not accepted:
             return
+        step_s = float(solver.t - solver.t_old)
+        law.reduced_accepted_steps += 1
+        law.reduced_step_sizes_s.append(step_s)
+        law.reduced_time_covered_s = float(solver.t)
         raw = [max(float(solver.y[index]), 0.0) for index in range(count)]
         total = math.fsum(raw)
         if total <= 0.0:
@@ -3966,6 +4057,10 @@ def _reduced_manifold(
             raise _ManifoldLost()
         accepted_root[0] = float(found)
 
+    recorder = _StiffnessRecord(
+        species,
+        ("n", "A", "B", "G", "R") if track_extent else ("n", "A", "B"),
+    )
     if track_extent:
         atol = (
             [atol_mol] * (3 * count)
@@ -3975,17 +4070,24 @@ def _reduced_manifold(
     else:
         atol = [atol_mol] * (3 * count)
     try:
-        solution = solve_ivp(
-            rhs,
-            (0.0, float(t_rem)),
-            y0,
-            method=_recording_radau(on_step=accepted_step),
-            rtol=_SLOW_RTOL,
-            atol=atol,
-            jac=jacobian,
-        )
+        with _RadauNormTape(recorder):
+            solution = solve_ivp(
+                rhs,
+                (0.0, float(t_rem)),
+                y0,
+                method=_recording_radau(recorder, accepted_step),
+                rtol=_SLOW_RTOL,
+                atol=atol,
+                jac=jacobian,
+            )
     except _ManifoldLost:
         return None
+    finally:
+        # Include both local error-test rejections and failed Newton
+        # collocation attempts; accepted step sizes are recorded above.
+        law.reduced_rejected_steps = (
+            recorder.rejected + recorder.newton_failures
+        )
     if not solution.success:
         return None
     end = solution.y[:, -1]
@@ -4169,6 +4271,7 @@ def _hold_open_fixed_point(
         state,
         track_extent=track_extent,
     )
+    law.handoff_time_s = float(t_stall)
     continued = _slow_manifold(
         law,
         fractions,
@@ -4336,6 +4439,7 @@ def _slow_converge(
     from scipy.integrate import solve_ivp
 
     _mark_balance_path(law, "radau_fallback")
+    law.full_system_radau_time_covered_s = 0.0
     species = law.species
     count = len(species)
     # The holder is the hour. Other callers keep n, A, B only.
@@ -4565,6 +4669,11 @@ def _slow_converge(
     recorder = _StiffnessRecord(species, block_names)
 
     def _on_radau_step(solver, accepted, fails_before, _message) -> None:
+        if accepted:
+            step_s = float(solver.t - solver.t_old)
+            if law.handoff_time_s is None:
+                covered = law.full_system_radau_time_covered_s or 0.0
+                law.full_system_radau_time_covered_s = covered + step_s
         # A collapsed step on the open path is the stall, wherever
         # the root sits. Newton has already missed twice, or the
         # accepted step itself is below 1e-3 s, and the pressure is
