@@ -505,7 +505,7 @@ _EVIDENCE_VOCABULARY = {
     # Per-point role tokens are interpreted by migrate.py's typed role reader;
     # unknown point tokens remain eligible for its flagged default path.
     "composition_role": dict.fromkeys(
-        battery_migrate._COMPOSITION_ROLE_TOKENS
+        sorted(battery_migrate._COMPOSITION_ROLE_TOKENS)
     ),
     "review_status": {
         "draft": None,  # ames-walsh-white-1967: source review pending.
