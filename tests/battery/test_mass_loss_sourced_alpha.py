@@ -262,14 +262,14 @@ def test_r11_supplier_free_corner_has_zero_oxygen_limit(monkeypatch):
 
 
 @pytest.mark.parametrize("kind,expected_low,expected_high,expected_bounds", [
-    ("consumer", 2.018796086752308e-6, 2.018842360013321e-6,
-     {"AlO2": 2.404377673527403e-12}),
-    ("releaser", 2.018842360013321e-6, 2.418878686949343e-6,
-     {"Ca": 1.198086440164288e-8}),
-    ("both", 2.018796086752308e-6, 2.418878686949343e-6,
-     {"Ca": 1.198100170884603e-8, "AlO2": 2.515536402267817e-12}),
-    ("supplier-free", 0.0, 9.276958156134232e-7,
-     {"Ca": 0.056077, "AlO2": 1.979604734527376e-12}),
+    ("consumer", 2.018796086752906e-6, 2.018842360013919e-6,
+     {"AlO2": 2.404363895932157e-12}),
+    ("releaser", 2.018842360013919e-6, 2.418878686943272e-6,
+     {"Ca": 1.0945417031259065e-8}),
+    ("both", 2.018842360013919e-6, 2.41883027431536e-6,
+     {"Ca": 1.0945526566383604e-8, "AlO2": 2.5155238153992054e-12}),
+    ("supplier-free", 0.0, 9.276577176338048e-7,
+     {"Ca": 0.056077, "AlO2": 1.979584409968031e-12}),
     ("supplier-free-consumer", 0.0, 0.0, {"AlO2": 0.0}),
 ], ids=["consumer", "releaser", "both", "supplier-free", "supplier-free-consumer"])
 def test_mass_loss_bounds_use_each_channels_worst_oxygen_corner(
@@ -294,16 +294,210 @@ def test_mass_loss_bounds_use_each_channels_worst_oxygen_corner(
         unsourced=tuple(expected_bounds), temperature_K=2073.15,
         area_m2=0.0001, duration_s=1.0,
     )
-    # Independent 70-digit solution: x=pO2/bar; multiplying the low-corner
-    # equation by sqrt(x) gives a quadratic in x**(3/4). The high corner is
-    # the Mg+Ca cubic in sqrt(x). HKL at the maximizing root gives each
-    # channel's own parent-oxide kg, including its signed O coproduct once.
+    # Independent closed form: with y=x**(3/4), the balance is quadratic,
+    # 2 D/sqrt(M_O2)*y**2 + C*alpha_AlO2/(2*sqrt(M_AlO2))*y =
+    # A*alpha_Mg/sqrt(M_Mg) + B*alpha_Ca/sqrt(M_Ca). Each target uses its
+    # monotone-bound corner; HKL at that root gives parent-oxide kg, including
+    # its signed O coproduct once. Supplier-free Ca also uses its zero-root
+    # inventory cap.
     assert corners["pO2_low_bar"] <= corners["pO2_high_bar"]
     assert corners["pO2_low_bar"] == pytest.approx(expected_low, rel=1e-10, abs=0.0)
     assert corners["pO2_high_bar"] == pytest.approx(expected_high, rel=1e-10, abs=0.0)
     assert bounds == pytest.approx(expected_bounds, rel=1e-10, abs=0.0)
+    assert corners["primary_corner_count"] == 2 * len(expected_bounds)
+    assert corners["corner_root_solves"] == corners["primary_corner_count"] + 1
     if kind == "supplier-free":
         assert corners["inventory_capped_channels"] == ["Ca"]
+
+
+def test_zero_net_oxygen_channel_alpha_does_not_move_other_species_bound():
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        return residue.PressureEvaluation(
+            {
+                "Fe": 1.0e-4 * pO2_bar**-0.5,
+                "FeO": 1.0,
+                "O2": 1.0e5 * pO2_bar,
+            },
+            fe3_over_sum_fe=0.0,
+        )
+
+    pressure.declares_fixed_activities = True
+    results = []
+    for alpha_feo in (0.0, 1.0):
+        channels = (
+            ResidueChannel("Fe", "Fe", "FeO", 0.0, "unsourced Fe"),
+            ResidueChannel("FeO", "FeO", "FeO", alpha_feo, "FeO alpha"),
+            ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+        )
+        results.append(_mass_loss_corner_bounds(
+            {"FeO": 1.0}, channels, pressure, unsourced=("Fe",),
+            temperature_K=1800.0, area_m2=1.0e-4, duration_s=1.0,
+        ))
+
+    assert results[0][0]["Fe"] == pytest.approx(results[1][0]["Fe"], rel=0.0)
+    assert results[0][1]["pO2_high_bar"] == pytest.approx(
+        results[1][1]["pO2_high_bar"], rel=0.0,
+    )
+
+
+def test_single_channel_corner_recovers_congruent_oxygen_root():
+    import simulator.battery.residue as residue
+    from simulator.battery.oxygen_balance import _solve_vacuum_oxygen_balance
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+
+    coefficient_mg = 1.0e-4
+    coefficient_o2 = 1.0e5
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        return {
+            "Mg": coefficient_mg * pO2_bar**-0.5,
+            "O2": coefficient_o2 * pO2_bar,
+        }
+
+    pressure.declares_fixed_activities = True
+    channels = (
+        ResidueChannel("Mg", "Mg", "MgO", 0.0, "unsourced Mg"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+    )
+    _bounds, corners = _mass_loss_corner_bounds(
+        {"MgO": 1.0}, channels, pressure, unsourced=("Mg",),
+        temperature_K=1800.0, area_m2=1.0e-4, duration_s=1.0,
+    )
+    mg_molar_mass = residue._formula_terms("Mg")[1]
+    o2_molar_mass = residue._formula_terms("O2")[1]
+    congruent_root = (
+        coefficient_mg * math.sqrt(o2_molar_mass)
+        / (2.0 * coefficient_o2 * math.sqrt(mg_molar_mass))
+    ) ** (2.0 / 3.0)
+    assert corners["pO2_high_bar"] == pytest.approx(congruent_root, rel=1e-10)
+
+    oxygen_channels = residue._residue_oxygen_channels(
+        residue._channel_terms(channels), {"MgO": 1.0}
+    )
+    quarter_alpha_channels = (replace(oxygen_channels[0], alpha=0.25), oxygen_channels[1])
+    quarter_root = _solve_vacuum_oxygen_balance(
+        pressure, quarter_alpha_channels, temperature_K=1800.0,
+    ).pO2_bar
+    assert quarter_root == pytest.approx(
+        congruent_root * 0.25 ** (2.0 / 3.0), rel=1e-10,
+    )
+
+
+def test_bracket_sign_change_adds_binary_corner_and_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+    from simulator.battery.oxygen_balance import _VacuumOxygenChannel
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+    from simulator.vacuum_oxygen_balance import PressureEvaluation
+
+    # Synthetic demand callback exercises the generic crossing guard; it does
+    # not define or imply a production Cr speciation model.
+    channels = (
+        ResidueChannel("CrO2", "CrO2", "Cr2O3", 0.0, "fixture Cr alpha"),
+        ResidueChannel("Mg", "Mg", "MgO", 0.0, "fixture Mg alpha"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+    )
+    oxygen_channels = (
+        _VacuumOxygenChannel(
+            "CrO2", residue._formula_terms("CrO2")[1], 2.0, 1.5, 0.25,
+            0.0, "fixture Cr alpha",
+            oxygen_per_metal_atom=lambda q: 1.5 + 1.5 * q,
+            redox_metal_atoms=1.0,
+        ),
+        _VacuumOxygenChannel(
+            "Mg", residue._formula_terms("Mg")[1], 0.0, 1.0, -0.5,
+            0.0, "fixture Mg alpha",
+        ),
+        _VacuumOxygenChannel(
+            "O2", residue._formula_terms("O2")[1], 2.0, 0.0, 1.0,
+            1.0, "oxygen escape",
+        ),
+    )
+    monkeypatch.setattr(
+        residue, "_residue_oxygen_channels", lambda _terms, _inventory: oxygen_channels,
+    )
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        q = max(0.0, min(1.0, (logp + 30.0) / 30.0))
+        return PressureEvaluation(
+            {
+                "CrO2": 1.0e-20 * pO2_bar**0.25,
+                "Mg": 1.0e-4 * pO2_bar**-0.5,
+                "O2": 1.0e5 * pO2_bar,
+            },
+            fe3_over_sum_fe=q,
+        )
+
+    pressure.declares_fixed_activities = True
+    _bounds, corners = _mass_loss_corner_bounds(
+        {"Cr2O3": 1.0, "MgO": 1.0}, channels, pressure,
+        unsourced=("CrO2", "Mg"), temperature_K=1800.0,
+        area_m2=1.0e-4, duration_s=1.0,
+    )
+
+    assert corners["corner_sign_ambiguous"] == ["CrO2"]
+    assert corners["primary_corner_count"] == 6
+
+
+def test_thirteen_alpha_corner_count_is_linear_and_endpoint_checks_flips(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+    from simulator.battery.oxygen_balance import _VacuumOxygenChannel
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+
+    species = tuple(f"Mg{index}" for index in range(13))
+    residue_channels = tuple(
+        ResidueChannel(name, "Mg", "MgO", 0.0, "unsourced fixture")
+        for name in species
+    ) + (ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),)
+    oxygen_channels = tuple(
+        _VacuumOxygenChannel(
+            name, 0.024305, 0.0, 1.0, -0.5, 1.0, "alpha corner",
+        )
+        for name in species
+    ) + (
+        _VacuumOxygenChannel(
+            "O2", 0.031998, 2.0, 0.0, 1.0, 1.0, "oxygen escape",
+        ),
+    )
+    monkeypatch.setattr(
+        residue, "_residue_oxygen_channels", lambda _terms, _inventory: oxygen_channels,
+    )
+    monkeypatch.setattr(
+        residue, "_finite_step_fluxes",
+        lambda terms, _inventory, **_kwargs: {
+            term.source.species: term.source.alpha * 1.0e-12
+            for term in terms if term.source.parent_oxide is not None
+        },
+    )
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        return {**{name: 1.0e-4 * pO2_bar**-0.5 for name in species},
+                "O2": 1.0e5 * pO2_bar}
+
+    pressure.declares_fixed_activities = True
+    _bounds, corners = _mass_loss_corner_bounds(
+        {"MgO": 1.0}, residue_channels, pressure,
+        unsourced=species, temperature_K=1800.0,
+        area_m2=1.0e-4, duration_s=1.0, check_neighbours=True,
+    )
+
+    # Thirteen target species need 26 primary corners, then one sign probe.
+    # The endpoint path guard checks 13 single flips for each of 13 extrema.
+    assert corners["primary_corner_count"] == 26
+    assert corners["corner_neighbour_evaluations"] == 169
+    assert corners["corner_count"] == 195
+    assert corners["corner_root_solves"] == 196
+    assert corners["corner_not_extremal_on_path"] == sorted(species)
 
 
 def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
@@ -332,6 +526,7 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
     pressure.declares_fixed_activities = True
     pressures_by_corner = {}
     roots_by_corner = {}
+    current_corner = [None]
     production_solver = residue._solve_vacuum_oxygen_balance
 
     def capture_root(model, selected, *, temperature_K):
@@ -339,6 +534,7 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
             (channel.species, channel.alpha)
             for channel in selected if channel.species in {"Fe", "FeO"}
         )
+        current_corner[0] = corner
         result = production_solver(model, selected, temperature_K=temperature_K)
         roots_by_corner[corner] = result.pO2_bar
         return result
@@ -346,11 +542,7 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
     production_flux = residue._finite_step_fluxes
 
     def capture_flux(terms, inventory, **kwargs):
-        corner = tuple(
-            (term.source.species, term.source.alpha)
-            for term in terms if term.source.species in {"Fe", "FeO"}
-        )
-        pressures_by_corner[corner] = dict(kwargs["pressures_Pa"])
+        pressures_by_corner[current_corner[0]] = dict(kwargs["pressures_Pa"])
         return production_flux(terms, inventory, **kwargs)
 
     monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", capture_root)
@@ -363,15 +555,26 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
     )
     positive_corner = (("Fe", 1.0), ("FeO", 0.0))
     zero_corner = (("Fe", 0.0), ("FeO", 0.0))
+    zero_alpha_by_species = dict(zero_corner)
+    zero_corner_channels = tuple(
+        replace(channel, alpha=zero_alpha_by_species.get(channel.species, channel.alpha))
+        for channel in channels
+    )
+    zero_corner_balance = residue._residue_oxygen_balance(
+        residue._channel_terms(zero_corner_channels),
+        {"FeO": 1.0},
+        lambda logp: pressure({"FeO": 1.0}, logp),
+        1800.0,
+    )
+    assert zero_corner_balance.pO2_bar == 0.0
     assert roots_by_corner[zero_corner] == 0.0
     assert roots_by_corner[positive_corner] == pytest.approx(
         6.071549282154776e-7, rel=1e-9,
     )
-    assert corners["pO2_low_bar"] == 0.0
+    assert corners["pO2_low_bar"] == pytest.approx(6.071549282154776e-7, rel=1e-9)
     assert pressures_by_corner[positive_corner]["Fe"] == pytest.approx(
         0.12833651381197933, rel=1e-9,
     )
-    assert pressures_by_corner[zero_corner]["Fe"] == 0.0
     fe_term = residue._channel_terms(
         (channels[0],), require_oxygen_channels=False,
     )
@@ -451,7 +654,7 @@ def test_sourced_fe_mixed_alpha_corner_is_in_mass_loss_envelope(
     target_loss = target_flux * mg_term[0].oxide_per_product_kg
     assert target_loss == pytest.approx(8.30302983621701e-9, rel=1e-9)
     assert corners["pO2_low_bar"] <= target_root
-    assert bounds["Mg"] >= target_loss
+    assert bounds["Mg"] == pytest.approx(target_loss, rel=1e-9)
 
 
 @pytest.fixture

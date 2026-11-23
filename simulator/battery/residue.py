@@ -20,6 +20,7 @@ from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     OxygenBalanceBracketBoundary,
     _VacuumOxygenChannel,
+    _channel_parent_oxygen_demand,
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
@@ -2238,54 +2239,134 @@ def _mass_loss_corner_bounds(
     pressure_model: Callable[[Mapping[str, float], float], Mapping[str, float]],
     *, unsourced: Sequence[str], temperature_K: float, area_m2: float, duration_s: float,
     include_sourced: bool = False,
+    check_neighbours: bool = False,
 ) -> tuple[dict[str, float], dict[str, Any]]:
     terms = _channel_terms(channels)
     oxygen_channels = _residue_oxygen_channels(terms, inventory)
-    # Maximize each unsourced channel's own parent-oxide loss over the alpha
-    # corners, using each corner's actual alphas. Sourced channels stay at
-    # their documented alpha; this envelope is not a joint trajectory.
-    # Ferric FeO(g) contributes -q*J_FeO/2 to the residual even with a declared
-    # zero pressure exponent, so exponent-sign shortcuts miss mixed corners.
-    # Hold sourced alphas fixed and enumerate every 0/1 assignment for the n
-    # unsourced active channels: 2**n solves, with n bounded by this call's
-    # finite active-channel list. If n grows, cost grows exponentially; capping
-    # corners would make the reported envelope non-conservative.
-    roots: list[float] = []
     variable_alpha_channels = tuple(
         channel for channel in oxygen_channels
         if channel.active and channel.species in unsourced
     )
+    variable_species = {channel.species for channel in variable_alpha_channels}
+    pressure_roots: list[float] = []
     bounds: dict[str, float] = {}
     inventory_caps: dict[str, float] = {}
-    for corner_mask in range(1 << len(variable_alpha_channels)):
-        alpha_by_species = {
-            channel.species: float(bool(corner_mask & (1 << index)))
-            for index, channel in enumerate(variable_alpha_channels)
-        }
+    pressure_exponents = {
+        channel.species: channel.pO2_exponent for channel in oxygen_channels
+    }
+
+    def pressure_at(logp: float) -> Mapping[str, float]:
+        pressures = pressure_model(inventory, logp)
+        _inherit_residue_pressure_contract(pressure_at, pressure_model)
+        return pressures
+
+    # Binding oxygen balance for an alpha vector is
+    # F(pO2; alpha) = sum_j alpha_j J_j(pO2) c_j(pO2) + O2 terms,
+    # where c_j = o_vap,j - o_bar,j(pO2), the net O carried per molecule;
+    # the sign check guarantees dF/dpO2 > 0.
+    # Implicitly, d pO2*/d alpha_j = -c_j J_j / (dF/dpO2), so
+    # sign(d pO2*/d alpha_j) = -sign(c_j), evaluated at the root.
+    # For target s, rate_s = alpha_s p_s(pO2*), so
+    # d ln rate_s / d alpha_j = n_s * d ln pO2*/d alpha_j,
+    # with n_s the pressure-law exponent (A).
+    # The extreme corner for s has alpha_s in {0, 1}, since its rate is
+    # monotone increasing despite its own feedback (Fe(g) with O2 scales as
+    # alpha^(2/3) in the single-channel limit). Each other unsourced j is 1
+    # when n_s*(-c_j) raises the requested maximum or lowers the minimum, and
+    # 0 otherwise. c_j=0 (FeO(g) at q=0) is immaterial. This is 2 per target,
+    # O(n), with a further 2x per bracket-sign-ambiguous channel.
+    # The all-on solve supplies c at a positive root for the stable signs;
+    # bracket-end evaluations below route sign-changing channels to binaries.
+    # Apply the existing parent-inventory ceiling to each root-zero, negative-
+    # exponent corner, including alpha_s=0. A sign change is physically possible
+    # only when o_vap,j lies strictly within the melt valence range (CrO2 with
+    # Cr6+ is the live example); differing bracket-end signs add a binary and
+    # corner_sign_ambiguous. Composition and q move along an extent, so its
+    # endpoint checks the selected extreme's single-flip neighbours; a larger
+    # neighbour replaces it and sets corner_not_extremal_on_path. For 13
+    # variable alphas an ordinary step is 26 primary corners and one sign
+    # probe; the endpoint check is 26 primary corners, 169 flips and one sign
+    # probe (196 total root solves there).
+    try:
+        all_on = tuple(
+            replace(
+                channel, alpha=1.0,
+                alpha_source="alpha<=1 oxygen-corner sign probe",
+            ) if channel.species in variable_species else channel
+            for channel in oxygen_channels
+        )
+        sign_probe = _solve_vacuum_oxygen_balance(
+            pressure_at, all_on, temperature_K=temperature_K,
+        )
+    except ValueError as exc:
+        raise _residue_oxygen_balance_failure(exc) from exc
+    pressure_roots.append(sign_probe.pO2_bar)
+
+    low_pressures = pressure_at(-30.0)
+    high_pressures = pressure_at(0.0)
+    transfer_sign: dict[str, int] = {}
+    ambiguous_channels: set[str] = set()
+    for channel in variable_alpha_channels:
+        c_low = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+            channel, low_pressures,
+        )
+        c_high = channel.oxygen_atoms - _channel_parent_oxygen_demand(
+            channel, high_pressures,
+        )
+        root_demand = sign_probe.parent_oxygen_demand_at_root.get(
+            channel.species, channel.parent_oxygen_demand,
+        )
+        c_root = channel.oxygen_atoms - root_demand
+        if c_low * c_high < 0.0:
+            ambiguous_channels.add(channel.species)
+            transfer_sign[channel.species] = 0
+        elif c_root != 0.0:
+            transfer_sign[channel.species] = 1 if c_root > 0.0 else -1
+        elif c_low != 0.0:
+            transfer_sign[channel.species] = 1 if c_low > 0.0 else -1
+        elif c_high != 0.0:
+            transfer_sign[channel.species] = 1 if c_high > 0.0 else -1
+        else:
+            transfer_sign[channel.species] = 0
+
+    term_by_species = {term.source.species: term for term in terms}
+    target_channels = list(variable_alpha_channels)
+    if include_sourced:
+        target_channels.extend(
+            channel for channel in oxygen_channels
+            if channel.active and channel.species not in variable_species
+            and term_by_species[channel.species].source.parent_oxide is not None
+        )
+
+    corner_count = 0
+    primary_corner_count = 0
+    neighbour_evaluations = 0
+    best_corner_by_species: dict[str, dict[str, float]] = {}
+    path_non_extremal_species: set[str] = set()
+
+    def evaluate_corner(
+        alpha_by_species: Mapping[str, float],
+    ) -> tuple[float, Mapping[str, float]]:
+        nonlocal corner_count
         selected = tuple(
             replace(
                 channel,
                 alpha=alpha_by_species[channel.species],
                 alpha_source="alpha<=1 oxygen-corner bound",
-            )
-            if channel.species in alpha_by_species else channel
+            ) if channel.species in alpha_by_species else channel
             for channel in oxygen_channels
         )
-        def pressure_at(logp: float) -> Mapping[str, float]:
-            pressures = pressure_model(inventory, logp)
-            _inherit_residue_pressure_contract(pressure_at, pressure_model)
-            return pressures
-
         try:
-            root = _solve_vacuum_oxygen_balance(
+            balance = _solve_vacuum_oxygen_balance(
                 pressure_at, selected, temperature_K=temperature_K,
-            ).pO2_bar
+            )
         except ValueError as exc:
             raise _residue_oxygen_balance_failure(exc) from exc
-        roots.append(root)
-        corner_pressures = dict(
-            pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
-        )
+        root = balance.pO2_bar
+        corner_count += 1
+        pressure_roots.append(root)
+        root_logp = math.log10(root) if root > 0.0 else -30.0
+        corner_pressures = dict(pressure_at(root_logp if root > 0.0 else 0.0))
         if root == 0.0:
             for channel in selected:
                 if channel.pO2_exponent != 0.0:
@@ -2309,35 +2390,117 @@ def _mass_loss_corner_bounds(
             pressures_Pa=corner_pressures,
             include_below_threshold=True,
         )
-        for term, channel in zip(terms, selected):
-            if (
-                term.source.parent_oxide is None
-                or not channel.active
-                or (channel.species not in unsourced and not include_sourced)
-                or channel.alpha == 0.0
-            ):
-                continue
-            if root == 0.0 and channel.pO2_exponent < 0.0:
-                cap = (
-                    float(inventory.get(term.source.parent_oxide, 0.0))
-                    * _formula_terms(term.source.parent_oxide)[1]
-                )
-                inventory_caps[channel.species] = max(
-                    inventory_caps.get(channel.species, 0.0), cap,
-                )
-                continue
-            amount = (
-                rates.get(channel.species, 0.0)
-                * duration_s * term.oxide_per_product_kg
-            )
-            bounds[channel.species] = max(
-                bounds.get(channel.species, 0.0), amount,
-            )
+        return root, rates
 
-    low, high = min(roots), max(roots)
+    for target in target_channels:
+        bounds.setdefault(target.species, 0.0)
+        variable_target = target.species in variable_species
+        alpha_options = (0.0, 1.0) if variable_target else (target.alpha,)
+        ambiguous_others = tuple(
+            channel for channel in variable_alpha_channels
+            if channel.species != target.species
+            and channel.species in ambiguous_channels
+        )
+        stable_others = tuple(
+            channel for channel in variable_alpha_channels
+            if channel.species != target.species
+            and channel.species not in ambiguous_channels
+        )
+        exponent = pressure_exponents[target.species]
+        for target_alpha in alpha_options:
+            maximize = target_alpha == 1.0 or not variable_target
+            fixed_alpha = {
+                target.species: target_alpha,
+                **{
+                    channel.species: float(
+                        (exponent * -transfer_sign[channel.species] > 0.0)
+                        == maximize
+                    ) if transfer_sign[channel.species] else 0.0
+                    for channel in stable_others
+                },
+            }
+            ambiguous_assignments = 1 << len(ambiguous_others)
+            for mask in range(ambiguous_assignments):
+                alpha_by_species = dict(fixed_alpha)
+                alpha_by_species.update({
+                    channel.species: float(bool(mask & (1 << index)))
+                    for index, channel in enumerate(ambiguous_others)
+                })
+                root, rates = evaluate_corner(alpha_by_species)
+                primary_corner_count += 1
+                term = term_by_species[target.species]
+                amount = 0.0
+                if (
+                    root == 0.0
+                    and target.pO2_exponent < 0.0
+                    and (variable_target or target_alpha > 0.0)
+                ):
+                    amount = (
+                        float(inventory.get(term.source.parent_oxide or "", 0.0))
+                        * _formula_terms(term.source.parent_oxide)[1]
+                    )
+                    inventory_caps[target.species] = max(
+                        inventory_caps.get(target.species, 0.0), amount,
+                    )
+                elif target_alpha > 0.0:
+                    amount = (
+                        rates.get(target.species, 0.0)
+                        * duration_s * term.oxide_per_product_kg
+                    )
+                if amount > bounds.get(target.species, 0.0):
+                    bounds[target.species] = amount
+                    best_corner_by_species[target.species] = dict(alpha_by_species)
+
+    if check_neighbours:
+        for target in target_channels:
+            species = target.species
+            selected_corner = best_corner_by_species.get(species)
+            if selected_corner is None:
+                continue
+            term = term_by_species[species]
+            for flipped in variable_alpha_channels:
+                neighbour = dict(selected_corner)
+                neighbour[flipped.species] = 1.0 - neighbour[flipped.species]
+                root, rates = evaluate_corner(neighbour)
+                neighbour_evaluations += 1
+                if (
+                    root == 0.0
+                    and target.pO2_exponent < 0.0
+                    and (species in variable_species or target.alpha > 0.0)
+                ):
+                    amount = (
+                        float(inventory.get(term.source.parent_oxide or "", 0.0))
+                        * _formula_terms(term.source.parent_oxide)[1]
+                    )
+                    inventory_caps[species] = max(
+                        inventory_caps.get(species, 0.0), amount,
+                    )
+                elif neighbour.get(species, target.alpha) > 0.0:
+                    amount = (
+                        rates.get(species, 0.0)
+                        * duration_s * term.oxide_per_product_kg
+                    )
+                else:
+                    amount = 0.0
+                if amount > bounds.get(species, 0.0):
+                    bounds[species] = amount
+                    best_corner_by_species[species] = neighbour
+                    path_non_extremal_species.add(species)
+
+    low, high = min(pressure_roots), max(pressure_roots)
     bounds.update(inventory_caps)
     return bounds, {"pO2_low_bar": low, "pO2_high_bar": high,
-                    "inventory_capped_channels": sorted(inventory_caps)}
+                    "inventory_capped_channels": sorted(inventory_caps),
+                    "corner_count": corner_count,
+                    "corner_root_solves": corner_count + 1,
+                    "primary_corner_count": primary_corner_count,
+                    "corner_neighbour_evaluations": neighbour_evaluations,
+                    "corner_sign_ambiguous": sorted(
+                        ambiguous_channels
+                    ),
+                    "corner_not_extremal_on_path": sorted(
+                        path_non_extremal_species
+                    )}
 
 def predict_knudsen_residue_composition(
     engine: str, reference, experiment, observations, bench=None,
@@ -2681,6 +2844,12 @@ def predict_mass_loss_fraction(
     bounds_by_channel = {species: 0.0 for species in unsourced}
     preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
     corner_records = []
+    corner_evaluations = 0
+    corner_root_solves = 0
+    corner_neighbour_evaluations = 0
+    corner_evaluations_by_arm: defaultdict[str, int] = defaultdict(int)
+    corner_sign_ambiguities: set[str] = set()
+    corner_path_non_extremal: set[str] = set()
     inventory_capped_channels = set()
     # The shared callback names residue composition for Knudsen and Hashimoto.
     # This path keeps those notices and retargets only the mass-loss quantity.
@@ -2758,12 +2927,25 @@ def predict_mass_loss_fraction(
             caller="Mass-loss residue prediction",
         )
         arm = "PREHEAT" if rectangle else "JOINT" if unsourced_unity else "POINT"
+        last_step_bounds: dict[str, float] = {}
+        last_step_duration = 0.0
         def measure(incoming, active_channels, area, duration):
+            nonlocal corner_evaluations, corner_root_solves
+            nonlocal corner_neighbour_evaluations, last_step_duration
             bounds, corners = _mass_loss_corner_bounds(
                 incoming, active_channels, pressure_model, unsourced=unsourced,
                 temperature_K=at_K, area_m2=area, duration_s=duration,
                 include_sourced=rectangle,
             )
+            if corners["corner_sign_ambiguous"]:
+                flags.add("corner_sign_ambiguous")
+                corner_sign_ambiguities.update(corners["corner_sign_ambiguous"])
+            corner_evaluations += corners["corner_count"]
+            corner_root_solves += corners["corner_root_solves"]
+            corner_evaluations_by_arm[arm] += corners["corner_count"]
+            last_step_bounds.clear()
+            last_step_bounds.update(bounds)
+            last_step_duration = duration
             inventory_capped_channels.update(corners["inventory_capped_channels"])
             target = preheat_bounds_by_channel if rectangle else bounds_by_channel
             for species, amount in bounds.items():
@@ -2782,6 +2964,56 @@ def predict_mass_loss_fraction(
             )
             if result.refusal is not None:
                 raise result.refusal
+            if rectangle or (not unsourced_unity and unsourced):
+                final_inventory = result.inventory_mol
+                final_mass_kg = math.fsum(
+                    amount * _formula_terms(oxide)[1]
+                    for oxide, amount in final_inventory.items()
+                )
+                endpoint_area = (
+                    area_m2 if rectangle else _self_similar_area_m2(
+                        area_m2, final_mass_kg, sample_mass_kg,
+                    )
+                )
+                endpoint_channels = tuple(
+                    channel for channel in channels
+                    if channel.parent_oxide is None
+                    or float(final_inventory.get(channel.parent_oxide, 0.0)) > 0.0
+                )
+                endpoint_bounds, endpoint_corners = _mass_loss_corner_bounds(
+                    final_inventory, endpoint_channels, pressure_model,
+                    unsourced=unsourced, temperature_K=at_K,
+                    area_m2=endpoint_area,
+                    duration_s=last_step_duration or seconds,
+                    include_sourced=rectangle,
+                    check_neighbours=True,
+                )
+                corner_evaluations += endpoint_corners["corner_count"]
+                corner_root_solves += endpoint_corners["corner_root_solves"]
+                corner_neighbour_evaluations += endpoint_corners[
+                    "corner_neighbour_evaluations"
+                ]
+                corner_evaluations_by_arm[arm] += endpoint_corners["corner_count"]
+                inventory_capped_channels.update(
+                    endpoint_corners["inventory_capped_channels"]
+                )
+                if endpoint_corners["corner_sign_ambiguous"]:
+                    flags.add("corner_sign_ambiguous")
+                    corner_sign_ambiguities.update(
+                        endpoint_corners["corner_sign_ambiguous"]
+                    )
+                if endpoint_corners["corner_not_extremal_on_path"]:
+                    flags.add("corner_not_extremal_on_path")
+                    corner_path_non_extremal.update(
+                        endpoint_corners["corner_not_extremal_on_path"]
+                    )
+                destination = (
+                    preheat_bounds_by_channel if rectangle else bounds_by_channel
+                )
+                for species, amount in endpoint_bounds.items():
+                    destination[species] += max(
+                        0.0, amount - last_step_bounds.get(species, 0.0),
+                    )
             arm_diagnostics = pressure_law_diagnostics_by_arm.setdefault(arm, {})
             for diagnostic in result.pressure_law_diagnostics:
                 arm_diagnostics[diagnostic.species] = replace(
@@ -2869,6 +3101,12 @@ def predict_mass_loss_fraction(
             "joint_arm_refusal_non_gating": joint_refusal,
             "joint_arm_background_pressure_Pa": 0.0,
             "corner_steps": len(corner_records),
+            "corner_evaluations": corner_evaluations,
+            "corner_root_solves": corner_root_solves,
+            "corner_neighbour_evaluations": corner_neighbour_evaluations,
+            "corner_evaluations_by_arm": dict(corner_evaluations_by_arm),
+            "corner_sign_ambiguous": sorted(corner_sign_ambiguities),
+            "corner_not_extremal_on_path": sorted(corner_path_non_extremal),
             "corner_ordering_verified": all(c["pO2_low_bar"] <= c["pO2_high_bar"] for c in corner_records),
             "pO2_corner_ranges_bar": {
                 name: [min(c[name] for c in corner_records), max(c[name] for c in corner_records)]
