@@ -61,7 +61,10 @@ from simulator.battery.enums import (
     StateTag,
     ValueKind,
 )
-from simulator.battery.default_policy import resolve as resolve_default_policy
+from simulator.battery.default_policy import (
+    load_policy_table,
+    resolve as resolve_default_policy,
+)
 from simulator.battery.identity import (
     Identity,
     log10K_from_delta_fG_kJ_mol,
@@ -215,7 +218,10 @@ def apparatus_prediction_notices(
         # in-cell total pressure convention separately from the DP-004 regime.
         implied_conditions = str(resolve_default_policy("DP-004").value)
         implied_policy = _notice_policy_from_registry(
-            "DP-018", method_condition=implied_conditions
+            "DP-018",
+            method_condition=(
+                "molecular effusion regime inside the cell; vacuum outside"
+            ),
         )
         notices.append(
             Notice(
@@ -252,9 +258,9 @@ def _apparatus_policy(
     if flag == NoticeKind.EFFUSION_REGIME_ASSUMED.value:
         return _notice_policy_from_registry("DP-004")
     if flag == NoticeKind.EFFUSION_REGIME_VIOLATED.value:
-        # DP-100 is proposed because the v1 table has no entry for contrary
+        # DP-109 is proposed because the v1 table has no entry for contrary
         # regime evidence; these rows stay in their own proposed-policy tier.
-        return _notice_policy_from_registry("DP-100")
+        return _notice_policy_from_registry("DP-109")
     return None
 
 
@@ -999,7 +1005,7 @@ def _method_assumption_detail(
     observation: Observation,
     quantity: Quantity,
 ) -> dict[str, Any]:
-    """Describe the quantity-based comparison used when source method is absent."""
+    """Describe an allowed comparison assumption when the method token is absent."""
 
     method_class = observation.evidence.original_method_class
     method_reason = experiment.method.reason or "source method is not stated"
@@ -1022,11 +1028,12 @@ def _method_assumption_detail(
                 "original_reason": method_reason,
             }
         if alpha_value is None:
-            alpha = str(resolve_default_policy("DP-005").value)
+            alpha_policy = resolve_default_policy("DP-005")
+            alpha = str(alpha_policy.value)
             alpha_assumption = {
                 "alpha": alpha,
-                "physical_basis": "Hertz-Knudsen-Langmuir maximum flux",
-                "bias": "upper_bound_on_flux",
+                "physical_basis": alpha_policy.payload["physical_basis"],
+                "bias": alpha_policy.payload["bias"],
             }
         else:
             alpha = str(alpha_value)
@@ -1040,21 +1047,22 @@ def _method_assumption_detail(
         # reduction. The absent experimental method remains visible in the flag.
         assumed_method = "equilibrium_partial_pressure"
         alpha = None
+    elif (
+        "hkl" in source_text
+        or "langmuir" in source_text
+        or "free evaporation" in source_text
+    ):
+        assumed_method = "hertz_knudsen_langmuir"
+        alpha = None
     elif "knudsen" in source_text or "kems" in source_text:
         assumed_method = MethodToken.KNUDSEN_EFFUSION.value
         alpha = None
-    elif "langmuir" in source_text or "free evaporation" in source_text:
-        assumed_method = "hertz_knudsen_langmuir"
-        alpha = None
-    elif quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
-        # Activity and its coefficient are thermodynamic quantities; the engine
-        # computes the same quantity on the typed reference state directly.
-        assumed_method = "quantity_defined_equilibrium_activity"
-        alpha = None
     else:
-        # Other recognized quantities keep their quantity-defined engine path;
-        # no measurement-apparatus conversion is inferred for them here.
-        assumed_method = "quantity_defined_engine_comparison"
+        # DP-011 does not name a method for this quantity, so retain its
+        # registry-owned comparison statement rather than inventing a token.
+        assumed_method = str(
+            load_policy_table()["DP-011"]["physical_basis"]
+        )
         alpha = None
     return {
         "flag": NoticeKind.METHOD_ASSUMED.value,

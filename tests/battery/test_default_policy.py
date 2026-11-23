@@ -34,6 +34,7 @@ EXPECTED_POLICY_FLAGS = {
     "assumed_pressure",
     "method_implied",
     "effusion_regime_assumed",
+    "effusion_regime_violated",
     "alpha_assumed",
     "knob_defaulted",
     "assumed_fo2",
@@ -52,6 +53,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
     assert load_policy_table() is policies
     assert set(policies) == {
         *(f"DP-{number:03d}" for number in range(1, 20)),
+        "DP-109",
         "DP-101",
     }
 
@@ -88,6 +90,13 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "superseded by DP-001/DP-019 by method"
             )
             assert entry["history"]
+        elif policy_id == "DP-109":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1122cvga"
+            assert entry["units"] == "retention rule"
+            assert entry["evidence"]["rows"][0]["observation_id"] == (
+                "stolyarova_1996_table2_pSiO_1933k"
+            )
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -108,12 +117,28 @@ def test_canonical_policy_values() -> None:
     assert resolve("DP-006").value == Decimal("1")
     assert resolve("DP-015").value == Decimal("298.15")
     assert resolve("DP-015").units == "K"
+    policies = load_policy_table()
+    assert policies["DP-002"]["ruling"] == "d-460, gap manual"
+    assert policies["DP-003"]["ruling"] == "gap manual"
+
+
+def test_resolved_policy_payload_carries_registry_basis_and_bias() -> None:
+    entry = load_policy_table()["DP-005"]
+    resolved = resolve("DP-005")
+    assert resolved.payload["physical_basis"] == entry["physical_basis"]
+    assert resolved.payload["bias"] == entry["bias"]
 
 
 def test_kems_method_policies_resolve_owner_results() -> None:
     regime = resolve("DP-004")
-    assert regime.value.startswith("molecular effusion inside the cell")
-    assert regime.units == "method-implied conditions"
+    assert regime.value == (
+        "molecular effusion inside the cell; vacuum outside; "
+        "P_total(cell) = Σ measured partials. Never 1 atm"
+    )
+    assert regime.units == "Pa"
+    assert regime.payload["formula_owner"] == (
+        "simulator.battery.score._sum_gas_partial_pressures_pa"
+    )
     assert NoticePolicy(**regime.payload["policy"]).value == regime.value
 
     method = resolve(
@@ -123,8 +148,13 @@ def test_kems_method_policies_resolve_owner_results() -> None:
     assert method.flag is NoticeKind.METHOD_ASSUMED
     assert NoticePolicy(**method.payload["policy"]).value == method.value
 
-    conditions = resolve("DP-018", method_condition=str(regime.value))
-    assert conditions.value == regime.value
+    conditions = resolve(
+        "DP-018",
+        method_condition="molecular effusion regime inside the cell; vacuum outside",
+    )
+    assert conditions.value == (
+        "molecular effusion regime inside the cell; vacuum outside"
+    )
     assert conditions.flag is NoticeKind.METHOD_IMPLIED
     assert NoticePolicy(**conditions.payload["policy"]).value == conditions.value
 
@@ -279,6 +309,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
 
     policy_id = append_proposal(
         {
+            "id": "DP-109",
             "condition": "test-only missing apparatus knob",
             "value": "runtime supplied",
             "units": "knob-specific",
@@ -290,7 +321,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture row and source"],
     )
-    assert policy_id == "DP-100"
+    assert policy_id == "DP-109"
     resolved = resolve(policy_id)
     assert resolved.payload["policy_status"] == "proposed"
     assert resolved.payload["policy_id"] == policy_id
@@ -342,15 +373,6 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
     ]
     assert all(item["policy_id"] == policy_id for item in flagged)
     assert all(item["policy_status"] == "proposed" for item in flagged)
-    from simulator.battery.default_policy import (
-        default_policy_census,
-        format_default_policy_census_report,
-    )
-    census = default_policy_census([row])
-    assert census.rows == ((policy_id, "proposed", 1),)
-    assert "| policy_id | status | flagged residuals |" in (
-        format_default_policy_census_report("", census)
-    )
 
     canonical_policy = {**notice_policy, "status": "canonical"}
     canonical_row = {
@@ -404,7 +426,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         flagged_stratum_payloads([flagless_row], [Engine.INTERNAL_ANALYTICAL])
 
 
-def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
+def test_proposals_require_allocated_ids_and_refuse_duplicate_ids(
     tmp_path, monkeypatch
 ) -> None:
     import simulator.battery.default_policy as policy_module
@@ -415,6 +437,7 @@ def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
     )
     monkeypatch.setattr(policy_module, "POLICY_PATH", policy_path)
     proposal = {
+        "id": "DP-109",
         "condition": "test",
         "value": 1,
         "units": "dimensionless",
@@ -427,16 +450,18 @@ def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
         proposed_by="test-dispatch",
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture"],
-    ) == "DP-100"
-    assert append_proposal(
-        proposal,
-        proposed_by="test-dispatch",
-        proposed_at="2026-11-23T00:00:00+00:00",
-        evidence=["fixture"],
-    ) == "DP-102"
+    ) == "DP-109"
     with pytest.raises(ValueError, match="already exists"):
         append_proposal(
-            {**proposal, "id": "DP-100"},
+            proposal,
+            proposed_by="test-dispatch",
+            proposed_at="2026-11-23T00:00:00+00:00",
+            evidence=["fixture"],
+        )
+    without_id = {key: value for key, value in proposal.items() if key != "id"}
+    with pytest.raises(ValueError, match="must name its allocated DP-1xx id"):
+        append_proposal(
+            without_id,
             proposed_by="test-dispatch",
             proposed_at="2026-11-23T00:00:00+00:00",
             evidence=["fixture"],

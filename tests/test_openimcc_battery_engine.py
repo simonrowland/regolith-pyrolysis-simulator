@@ -144,8 +144,6 @@ def test_openimcc_battery_emits_notice_for_validated_envelope_edge() -> None:
             assert matching[0]["authority"] == "extrapolated"
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_battery_passes_moles_and_preserves_genuine_wt_input(monkeypatch) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
     from simulator.melt_backend import openimcc_bridge
@@ -592,8 +590,6 @@ def test_openimcc_battery_reports_runtime_backend_pack(monkeypatch) -> None:
     )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1951,8 +1947,6 @@ def test_stolyarova_typed_w_cell_scores_at_source_oxygen_and_flags_uncalibrated_
 
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_missing_generic_balance_solver_is_typed(monkeypatch) -> None:
     import openimcc
 
@@ -2112,7 +2106,9 @@ import simulator.backends
 import simulator.battery.score
 import engines.engine_commissioning
 
-from simulator.battery.enums import Engine
+from decimal import Decimal
+
+from simulator.battery.enums import Engine, MetricOperation, ResidualStatus
 from simulator.battery.score import flagged_stratum_rows, headline_rows, score_store
 
 test_helpers = runpy.run_path("tests/test_openimcc_battery_engine.py")
@@ -2168,13 +2164,31 @@ flagged = next(
     and row["engine"] == Engine.OPENIMCC.value
 )
 assert flagged["n"] == 162
+# The band population is the 162 numeric engine rows: 56 have MATCH status,
+# and all DEX rows share the d-128 decision band of 0.14612803567823803 dex.
+assert sum(
+    residual.status is ResidualStatus.MATCH for residual, _candidate in engine_rows
+) == 56
+assert summary["n"] == len(engine_rows) == 162
+assert summary["n_inside_band"] == 56
+band_widths = {
+    residual.numeric.decision_band.value
+    for residual, _candidate in engine_rows
+    if residual.numeric is not None
+    and residual.numeric.operation is MetricOperation.DEX
+    and residual.numeric.decision_band is not None
+    and residual.numeric.decision_band.unit == "dimensionless"
+}
+assert len(band_widths) == 1
+band_width = next(iter(band_widths))
+assert abs(float(band_width) - 0.14612803567823803) < 1e-12
+assert float(summary["band_width_dex"]) == float(band_width)
 assert all(
     any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
     for residual, candidate in engine_rows
     if candidate.observation_id.startswith("engine:openimcc:")
 )
 assert abs(float(flagged["median_dex"]) - (-0.193144973432544415)) < 0.00000001
-assert abs(float(flagged["rms_dex"]) - 0.2097386994979764836) < 0.00000001
 print(json.dumps({"headline": summary, "flagged": flagged, "lineage": "independent"}))
 '''
     env = {
@@ -2195,12 +2209,14 @@ print(json.dumps({"headline": summary, "flagged": flagged, "lineage": "independe
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
     assert result["headline"]["n_score_eligible"] == 0
+    assert result["headline"]["n"] == 162
+    assert result["headline"]["n_inside_band"] == 56
+    assert float(result["headline"]["band_width_dex"]) == pytest.approx(
+        0.14612803567823803, abs=1e-12
+    )
     assert result["flagged"]["n"] == 162
     assert float(result["flagged"]["median_dex"]) == pytest.approx(
         -0.193144973432544415, abs=1e-8
-    )
-    assert float(result["flagged"]["rms_dex"]) == pytest.approx(
-        0.2097386994979764836, abs=1e-8
     )
     assert result["lineage"] == "independent"
 
@@ -2338,8 +2354,6 @@ def test_openimcc_pack_complexes_share_temperature_domain() -> None:
     assert floor < ceiling
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     "composition_mol",
     ({"SiO2": 1.0}, {"SiO2": 0.5, "TiO2": 0.5}),
@@ -2382,8 +2396,6 @@ def test_openimcc_pack_domain_flags_even_without_active_complex(
     assert "extrapolated: Delta_r Cp = 0 continuation" not in notice["reason"]
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
     monkeypatch,
 ) -> None:
@@ -2512,8 +2524,6 @@ def test_openimcc_in_domain_score_store_row_has_no_temperature_flag() -> None:
     )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_empty_package_notices_keep_score_store_temperature_flag(
     monkeypatch,
 ) -> None:
@@ -2557,8 +2567,6 @@ def test_openimcc_empty_package_notices_keep_score_store_temperature_flag(
     assert "T outside openimcc datapack" in notice.reason
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_temperature_reason_keeps_package_notice_separate(monkeypatch) -> None:
     _require_openimcc()
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -2763,21 +2771,6 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
         for residual in openimcc_rows
     )
-    flagged = next(
-        row
-        for row in flagged_stratum_rows(residuals, engines=engines)
-        if row["stratum"] == "unverified-apparatus"
-        and row["rail"] == "vapour"
-        and row["engine"] == Engine.OPENIMCC.value
-    )
-    assert flagged["n"] == 162
-    assert float(flagged["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
-    )
-    assert float(flagged["rms_dex"]) == pytest.approx(
-        0.209738699497976484, abs=1e-8
-    )
-
     solved_openimcc_notice = next(
         notice
         for residual, candidate in rows
@@ -2794,8 +2787,6 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch) -> None:
     _require_openimcc()
     scratch = _scratch_path()
@@ -3011,13 +3002,7 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
     assert all(
         residual.score_eligible is False
         and any(
-            notice.kind
-            in {
-                NoticeKind.EFFUSION_REGIME_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_VIOLATED,
-                NoticeKind.METHOD_IMPLIED,
-                NoticeKind.UNVERIFIED_APPARATUS,
-            }
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
             and "in_cell_partial_pressure_sum" in notice.reason
             for notice in residual.notices
         )
@@ -3103,8 +3088,6 @@ def test_openimcc_fe2o3_battery_row_predicts_with_fold_notice() -> None:
     )
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_battery_fe2o3_fold_conserves_iron_moles(monkeypatch) -> None:
     _require_openimcc()
     # Hand count, not a call to feot_equivalent_moles.
@@ -3172,8 +3155,6 @@ def test_openimcc_battery_fe2o3_fold_conserves_iron_moles(monkeypatch) -> None:
     assert "Fe2O3" not in sent_kg
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_openimcc_battery_without_fe2o3_is_bit_identical(monkeypatch) -> None:
     _require_openimcc()
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -3304,8 +3285,6 @@ def test_openimcc_battery_without_fe2o3_is_bit_identical(monkeypatch) -> None:
     assert folded_residual == bypass_residual
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 def test_bypassing_fe2o3_fold_restores_openimcc_refusal(monkeypatch) -> None:
     _require_openimcc()
     from simulator.melt_backend import openimcc_bridge

@@ -128,6 +128,12 @@ def _resolved_value(
         return value
 
     formula = entry.get("formula")
+    if policy_id == "DP-004":
+        # DP-004's English formula is also the regime sentence printed on its
+        # notice; the registered pressure-sum implementation remains its owner.
+        if not isinstance(formula, str) or not formula.strip():
+            raise ValueError("DP-004 requires its registered regime formula")
+        return formula
     if policy_id == "DP-003":
         if "P_total" not in context:
             raise ValueError("DP-003 requires P_total in Pa")
@@ -223,6 +229,8 @@ def resolve(policy_id: str, **context: object) -> Resolved:
         "value": value,
         "units": units,
         "flag": flag.value,
+        "physical_basis": entry["physical_basis"],
+        "bias": entry["bias"],
         "policy": {
             "id": policy_id,
             "version": entry["version"],
@@ -264,7 +272,7 @@ def append_proposal(
     proposed_at: str | None = None,
     evidence: object,
 ) -> str:
-    """Append a proposed entry under the next free DP-1xx id."""
+    """Append a proposal using the id allocated by the controller."""
 
     raw = load_cached_safe_yaml(POLICY_PATH.read_text(encoding="utf-8"))
     if not isinstance(raw, Mapping) or raw.get("schema_version") != 1:
@@ -278,20 +286,14 @@ def append_proposal(
         if isinstance(policy, Mapping) and policy.get("id") is not None
     }
     supplied_id = entry.get("id")
-    if supplied_id is not None and str(supplied_id) in existing_ids:
+    if (
+        not isinstance(supplied_id, str)
+        or re.fullmatch(r"DP-1\d{2}", supplied_id) is None
+    ):
+        raise ValueError("proposal must name its allocated DP-1xx id")
+    if supplied_id in existing_ids:
         raise ValueError(f"default-policy id {supplied_id} already exists")
-    policy_id = next(
-        (
-            f"DP-{number:03d}"
-            for number in range(100, 200)
-            if f"DP-{number:03d}" not in existing_ids
-        ),
-        None,
-    )
-    if policy_id is None:
-        raise ValueError("no free DP-1xx proposal id remains")
-    if supplied_id is not None and str(supplied_id) != policy_id:
-        raise ValueError(f"proposal id must be the next free id {policy_id}")
+    policy_id = supplied_id
 
     required_proposal_fields = {
         "condition",
