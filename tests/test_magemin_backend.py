@@ -4491,10 +4491,14 @@ def test_magemin_live_iron_free_phase_output_is_oxygen_insensitive(request):
     for result in results:
         assert result.status == "ok", result.diagnostics
         assert result.phases_present and result.phase_masses_kg
+        assert any(
+            result.phase_compositions.get(phase) for phase in result.phases_present
+        )
         assert result.fO2_log is None
     reduced, oxidized = results
     assert reduced.phases_present == oxidized.phases_present
     assert reduced.phase_masses_kg == oxidized.phase_masses_kg
+    assert reduced.phase_compositions == oxidized.phase_compositions
     assert reduced.liquid_fraction == oxidized.liquid_fraction
 
 
