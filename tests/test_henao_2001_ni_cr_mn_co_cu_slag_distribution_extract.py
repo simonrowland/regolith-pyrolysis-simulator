@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
@@ -336,7 +337,25 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
         "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
         "input": "run_composition",
         "default_policy_id": "DP-017",
-        "rule": "analysed liquid composition predicts other phases only",
+        "rule": "analysed phase rows cannot use their own analysis as input",
+    }
+    unrelated_map_conditions = dict(a1_slag.point_conditions)
+    printed_map = unrelated_map_conditions["printed_composition"]
+    unrelated_map_conditions["printed_composition"] = replace(
+        printed_map,
+        locator=replace(printed_map.locator, row="unrelated-row"),
+    )
+    unrelated_map = replace(
+        a1_slag, point_conditions=unrelated_map_conditions
+    )
+    unrelated_prediction = _predict_with_engine(
+        Engine.THERMOENGINE,
+        unrelated_map,
+        experiment=result.experiments[unrelated_map.experiment_id],
+    )
+    assert unrelated_prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "composition",
     }
     a1_metal = by_id["henao_2001_t1_A-1_alloy_Ni"]
     assert a1_metal.identity.composition.is_value
@@ -379,7 +398,7 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
             "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
             "input": "run_composition",
             "default_policy_id": "DP-017",
-            "rule": "analysed liquid composition predicts other phases only",
+            "rule": "analysed phase rows cannot use their own analysis as input",
         }
         for prediction in slag_predictions
     )

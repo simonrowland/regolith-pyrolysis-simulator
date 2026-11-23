@@ -313,6 +313,69 @@ def input_composition_echo_detail(identity: Identity) -> dict[str, object] | Non
     return refused("input_composition_is_scored_phase_analysis")
 
 
+def unprinted_analysed_phase_echo_detail(
+    identity: Identity, observation: Observation
+) -> dict[str, object] | None:
+    """Refuse a missing input only when the printed map is this row's phase.
+
+    A point-condition map alone does not establish either its phase or its
+    relation to this observation. The printed phase label and matching full
+    row locator together bind it to this phase row.
+    """
+
+    quantity = quantity_token(identity)
+    if quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return None
+    role = _phase_role_of(identity)
+    phase = (observation.provenance or {}).get("printed_phase")
+    if not isinstance(phase, str):
+        return None
+    phase_role = {
+        "liquid": PhaseRole.MELT,
+        "melt": PhaseRole.MELT,
+        "slag": PhaseRole.SLAG,
+        "glass": PhaseRole.GLASS,
+    }.get(phase.strip().casefold())
+    if role not in _MELT_ROLES or role is not phase_role:
+        return None
+    conditions = observation.point_conditions or {}
+    composition = conditions.get("composition")
+    printed = conditions.get("printed_composition")
+    composition_state = getattr(composition, "state", None)
+    printed_state = getattr(printed, "state", None)
+    if (
+        composition_state is None
+        or not composition_state.is_unknown
+        or printed_state is None
+        or not printed_state.is_value
+        or not isinstance(printed_state.value, Mapping)
+    ):
+        return None
+    row_locator = observation.locator
+    map_locator = getattr(printed, "locator", None)
+    if row_locator is None or map_locator is None:
+        return None
+    locator_fields = (
+        "page",
+        "pdf_page_index",
+        "published_page",
+        "table",
+        "row",
+    )
+    if any(
+        getattr(row_locator, name) in (None, "")
+        or getattr(row_locator, name) != getattr(map_locator, name)
+        for name in locator_fields
+    ):
+        return None
+    return {
+        "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
+        "input": "run_composition",
+        "default_policy_id": "DP-017",
+        "rule": "analysed phase rows cannot use their own analysis as input",
+    }
+
+
 def _clip(text: str) -> str:
     collapsed = " ".join(text.split())
     if len(collapsed) > 180:
