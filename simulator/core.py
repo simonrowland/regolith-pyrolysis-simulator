@@ -1108,6 +1108,24 @@ OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 
 
+def _nonzero_o2_lot_mol_for_accounts(
+    lot,
+    *,
+    registry,
+    accounts: set[str],
+) -> tuple[str, float] | None:
+    account = str(lot.account)
+    if account not in accounts:
+        return None
+    moles = lot.species_moles_for(registry)
+    if OXYGEN_SPECIES not in moles:
+        return None
+    amount = float(moles[OXYGEN_SPECIES])
+    if amount == 0.0:
+        return None
+    return account, amount
+
+
 def _headspace_buffer_release_roundoff_slack_mol(
     buffer_release: Mapping[str, Any],
 ) -> float:
@@ -4671,15 +4689,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buffer_postings = 0
         registry = self.atom_ledger.registry
         start = max(0, int(transition_at))
+        buffer_accounts = {FO2_BUFFER_ACCOUNT}
         for transition in self.atom_ledger.transitions[start:]:
             name = str(getattr(transition, "name", "") or "")
             for lot in (*transition.debits, *transition.credits):
-                if str(lot.account) != FO2_BUFFER_ACCOUNT:
-                    continue
-                buffer_mol = lot.species_moles_for(registry).get(
-                    OXYGEN_SPECIES, 0.0,
-                )
-                if float(buffer_mol or 0.0) != 0.0:
+                if _nonzero_o2_lot_mol_for_accounts(
+                    lot,
+                    registry=registry,
+                    accounts=buffer_accounts,
+                ) is not None:
                     buffer_postings += 1
             if not name.startswith("condense_"):
                 continue
@@ -4760,16 +4778,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         watched = {"process.overhead_gas", FO2_BUFFER_ACCOUNT}
 
         def o2_mol(item) -> tuple[str, float] | None:
-            account = str(item.account)
-            if account not in watched:
-                return None
-            moles = item.species_moles_for(registry)
-            if OXYGEN_SPECIES not in moles:
-                return None
-            amount = float(moles[OXYGEN_SPECIES])
-            if amount == 0.0:
-                return None
-            return account, amount
+            return _nonzero_o2_lot_mol_for_accounts(
+                item,
+                registry=registry,
+                accounts=watched,
+            )
 
         rows: list[tuple[str, str, float]] = []
         if transition is not None:
