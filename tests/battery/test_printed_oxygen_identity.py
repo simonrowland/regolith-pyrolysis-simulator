@@ -21,6 +21,7 @@ import pytest
 
 from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.enums import (
+    AmountBasis,
     AmbientPressureEvidenceClass,
     Authority,
     Engine,
@@ -41,6 +42,7 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import (
     AmbientPressureEvidence,
+    Composition,
     Located,
     Locator,
     Value,
@@ -1950,22 +1952,232 @@ def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> 
     assert "proposed-policy" in flagged_strata(residual.notices)
 
 
-def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal() -> None:
-    from simulator.battery.score import _is_bulk_not_liquid_composition
+def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import ExecutionState, RefusalReason
+    from simulator.melt_backend import base as melt_base
+    from simulator.battery.score import (
+        _liquid_pair_target,
+        _printed_fo2_log10_bar,
+        predict_with_engine,
+    )
+
+    import simulator.battery.score as score
 
     source_id = "borisov-veksler-2021-k-fe-supplement"
     context = load_score_context(ROOT, sources=(source_id,))
-    observation = next(
+    rows = tuple(
         row
         for row in context.observations.values()
-        if row.source_id == source_id and _is_bulk_not_liquid_composition(row)
+        if row.source_id == source_id
     )
-    residual, _candidate = compile_residual(
-        observation,
+    lfe_oxide_rows = tuple(
+        row
+        for row in rows
+        if _liquid_pair_target(row) == ("Lfe", "Lsi")
+        and row.identity.species is not None
+        and row.identity.species.formula == "Al2O3"
+    )
+    lsi_oxide_rows = tuple(
+        row
+        for row in rows
+        if _liquid_pair_target(row) == ("Lsi", "Lfe")
+        and row.identity.species is not None
+        and row.identity.species.formula == "SiO2"
+    )
+    assert lfe_oxide_rows, "expected a real Borisov–Veksler Lfe Al2O3 row"
+    assert lsi_oxide_rows, "expected a real Borisov–Veksler Lsi SiO2 row"
+    lfe = next(iter(lfe_oxide_rows))
+    lsi = next(iter(lsi_oxide_rows))
+    recorded: dict[str, float] = {}
+    # BV's persisted excluded-data rows do not carry a starting composition.
+    # Supply a test-only engine input so this case reaches the post-engine
+    # capability decision; the mocked engine below supplies the single liquid.
+    test_bulk = Composition(
+        "test-only engine composition",
+        (
+            ("FeO", Decimal("0.50")),
+            ("Al2O3", Decimal("0.25")),
+            ("SiO2", Decimal("0.25")),
+        ),
+        AmountBasis.MOLE_FRACTION,
+    )
+
+    def predict_single_liquid(observation):
+        observation = replace(
+            observation,
+            identity=replace(
+                observation.identity, composition=State.of(test_bulk)
+            ),
+        )
+        formula = observation.identity.species.formula
+        result = melt_base.EquilibriumResult(
+            status="ok",
+            phases_present=["liquid"],
+            liquid_fraction=1.0,
+            phase_compositions={"melt": {formula: 50.0}},
+            liquid_composition_wt_pct={formula: 50.0},
+        )
+
+        def equilibrate(*_args, **kwargs):
+            recorded["fO2_log"] = kwargs["fO2_log"]
+            return result
+
+        monkeypatch.setattr(score, "_equilibrate_phase_assemblage", equilibrate)
+        return predict_with_engine(
+            Engine.ALPHAMELTS,
+            observation,
+            experiment=context.experiments[observation.experiment_id],
+        )
+
+    lfe_prediction = predict_single_liquid(lfe)
+    assert (
+        lfe_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert lfe_prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert lfe_prediction.refusal_detail["target_phase"] == "Lfe"
+    assert lfe_prediction.refusal_detail["conjugate_phase"] == "Lsi"
+
+    lsi_prediction = predict_single_liquid(lsi)
+    assert (
+        lsi_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert lsi_prediction.refusal_detail["target_phase"] == "Lsi"
+    assert lsi_prediction.refusal_detail["conjugate_phase"] == "Lfe"
+
+    # Mutating the source predicate to False must turn the exact same one-liquid
+    # result into a prediction; the capability-gap assertion above catches it.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(score, "_liquid_pair_target", lambda _observation: None)
+        mutated = predict_single_liquid(lfe)
+    assert mutated.refusal_reason is None
+    assert mutated.value is not None
+
+    printed_fo2_rows = tuple(
+        row
+        for row in rows
+        if row.identity.species is not None
+        and row.identity.species.formula in {"SiO2", "Al2O3", "CaO"}
+        and _printed_fo2_log10_bar(row.identity) is not None
+        and not any(
+            notice.policy is not None and notice.policy.id == "DP-112"
+            for notice in row.notices
+        )
+    )
+    assert printed_fo2_rows, "expected printed-fO2 BV controls"
+    printed = next(iter(printed_fo2_rows))
+    expected_log = _printed_fo2_log10_bar(printed.identity)
+    printed_prediction = predict_single_liquid(printed)
+    assert recorded["fO2_log"] == expected_log
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in printed_prediction.notices
+    )
+
+
+def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import ExecutionState, NoticeKind, RefusalReason
+    from simulator.melt_backend import base as melt_base
+    from simulator.battery.score import predict_with_engine
+
+    import simulator.battery.score as score
+
+    source_id = "xu-2026-excess-oxygen-magma"
+    context = load_score_context(ROOT, sources=(source_id,))
+    candidates = tuple(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.experiment_id == "xu_2026_lvp_1"
+        and row.identity.species is not None
+        and row.identity.species.formula == "SiO2"
+        and row.value.point == Decimal("23.40")
+    )
+    assert candidates, "expected the real Xu LVP-1 SiO2 23.40 wt% phase row"
+    observation = next(iter(candidates))
+    assert score._liquid_pair_target(observation) is None
+    recorded: dict[str, float] = {}
+
+    def one_liquid(*_args, **kwargs):
+        recorded["fO2_log"] = kwargs["fO2_log"]
+        formula = observation.identity.species.formula
+        return melt_base.EquilibriumResult(
+            status="ok",
+            phases_present=["liquid"],
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {formula: 50.0}},
+            liquid_composition_wt_pct={formula: 50.0},
+        )
+
+    monkeypatch.setattr(score, "_equilibrate_phase_assemblage", one_liquid)
+    prediction = predict_with_engine(
         Engine.ALPHAMELTS,
-        context=context,
+        observation,
+        experiment=context.experiments[observation.experiment_id],
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason.value == "bulk_not_liquid_composition"
-    assert residual.numeric is None
+    # This real single-liquid phase row with a printed starting bulk remains
+    # eligible and reaches the mocked engine boundary with DP-010.
+    assert recorded
+    assert prediction.refusal_reason is None
+    assert prediction.value is not None
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    dp010 = next(
+        notice
+        for notice in prediction.notices
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    )
+    assert dp010.kind is NoticeKind.ASSUMED_FO2
+    assert "physics_rung=4" in dp010.reason
+    assert "fo2_tier=4" in dp010.reason
+    assert recorded["fO2_log"] == float(dp010.policy.value)
+
+    air_evidence = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        "in air",
+        Locator(note="test-only in-air evidence"),
+    )
+    air_identity = replace(
+        observation.identity,
+        fO2_Pa=State.unknown("test-only unprinted fO2"),
+    )
+    air_observation = replace(observation, identity=air_identity)
+    air_experiment = replace(
+        context.experiments[observation.experiment_id],
+        ambient_pressure_evidence=air_evidence,
+    )
+    _air_identity, air_log, air_notice = score._phase_row_fo2(
+        air_identity,
+        air_observation,
+        air_experiment,
+        {},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert air_log is not None
+    assert air_notice is not None and air_notice.policy is not None
+    assert air_notice.policy.id == "DP-003"
+    assert "physics_rung=3" in air_notice.reason
+
+    # Mutation restoring the previous hard refusal is rejected by the same
+    # engine-boundary prediction assertion above.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score,
+            "_phase_row_fo2",
+            lambda identity, *_args: (identity, None, None),
+        )
+        recorded.clear()
+        refused = predict_with_engine(
+            Engine.ALPHAMELTS,
+            observation,
+            experiment=context.experiments[observation.experiment_id],
+        )
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refused.execution.state is ExecutionState.NOT_PROBED
+    assert not recorded

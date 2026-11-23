@@ -45,7 +45,11 @@ from typing import (
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
-from simulator.battery.default_policy import _notice_policy, load_policy_table
+from simulator.battery.default_policy import (
+    _notice_policy,
+    load_policy_table,
+    resolve as resolve_default_policy,
+)
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import (
     log10_fo2_to_pa,
@@ -69,6 +73,7 @@ from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
     AmountBasis,
+    AmbientPressureEvidenceClass,
     Authority,
     CellMaterial,
     CONDENSED_PHASES,
@@ -221,6 +226,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -522,7 +528,22 @@ _NOT_VAPOUR_QUANTITIES: frozenset[Quantity] = frozenset(
     }
 )
 _REDOX_DISTRIBUTION_ELEMENTS = frozenset({"Fe", "Cr", "Mn", "Ti", "P"})
-_LIQUID_PHASE_NAMES = frozenset({"liq", "liquid", "melt", "slag", "glass"})
+_UNSPECIFIED_LIQUID_CONJUGATE = (
+    "other coexisting liquid (source does not identify a unique pair)"
+)
+_LIQUID_PAIR_CONJUGATES = {
+    "lfe": "Lsi",
+    "lsi": "Lfe",
+    "lfe-tem": _UNSPECIFIED_LIQUID_CONJUGATE,
+    "lsi-tem": _UNSPECIFIED_LIQUID_CONJUGATE,
+    "liql": _UNSPECIFIED_LIQUID_CONJUGATE,
+}
+_LIQUID_PHASE_NAMES = frozenset(
+    {"liq", "liquid", "melt", "slag", "glass"}
+) | frozenset(_LIQUID_PAIR_CONJUGATES)
+_SOURCE_PHASE_LABEL_PATTERN = re.compile(
+    r"\bphase\s+([A-Za-z0-9-]+)\b", re.IGNORECASE
+)
 
 ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.VAPOROCK: "vaporock",
@@ -860,6 +881,7 @@ _STATIC_REFUSAL_DETAILS = frozenset(
         "quantity_not_predicted",
         "engine-thermo-does-not-emit",
         "engine_does_not_report_phase_composition",
+        "engine_does_not_model_liquid_immiscibility",
         "engine_does_not_report_fe_redox",
         "engine_does_not_report_melt_activity",
         "engine_missing_observable",
@@ -11399,6 +11421,164 @@ def _printed_fo2_log10_bar(identity: Identity) -> float | None:
     return float(pa.log10() - PA_PER_BAR_DEC.log10())
 
 
+def _liquid_pair_target(observation: Observation) -> tuple[str, str] | None:
+    """Return the source-labelled phase and conjugate for a liquid-pair target."""
+
+    identity = observation.identity
+    role = _phase_role_value(identity, "phase_role")
+    if (
+        not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        or role not in {PhaseRole.MELT, PhaseRole.SLAG}
+    ):
+        return None
+    provenance = observation.provenance or {}
+    locator_note = (
+        observation.locator.note
+        if observation.locator is not None
+        and isinstance(observation.locator.note, str)
+        else ""
+    )
+    raw_label = provenance.get("liquid_label_as_published")
+    if raw_label is None:
+        match = _SOURCE_PHASE_LABEL_PATTERN.search(locator_note)
+        raw_label = None if match is None else match.group(1)
+    label = " ".join(str(raw_label).split()) if raw_label is not None else ""
+    assemblage = provenance.get("phase_assemblage_as_printed")
+    source_text = " ".join(
+        value.casefold().replace("-", " ")
+        for value in (assemblage, locator_note)
+        if isinstance(value, str)
+    )
+    marker_present = any(
+        marker in source_text
+        for marker in ("immiscib", "coexisting liquid", "two liquid", "liquid pair")
+    )
+    # These labels are the source's explicit names for coexisting liquids;
+    # their vocabulary carries the pair relation even when a migrated locator
+    # retains the phase label but not the full assemblage field. The TEM and
+    # Liql source rows explicitly say no unique Lfe/Lsi pair was inferred.
+    if label.casefold() not in _LIQUID_PAIR_CONJUGATES and not marker_present:
+        return None
+    if not label:
+        label = role.value
+    conjugate = _LIQUID_PAIR_CONJUGATES.get(
+        label.casefold(), "the other coexisting liquid"
+    )
+    return label, conjugate
+
+
+def _is_liquid_phase_name(name: object) -> bool:
+    return str(name).strip().casefold() in _LIQUID_PHASE_NAMES
+
+
+def _reported_liquid_phase_count(result: EquilibriumResult) -> int:
+    """Count liquid phases in the most authoritative available result view."""
+
+    for values in (
+        result.phases_present,
+        (result.phase_compositions or {}).keys(),
+        (result.phase_masses_kg or {}).keys(),
+    ):
+        phases = {
+            str(name).strip().casefold()
+            for name in values
+            if _is_liquid_phase_name(name)
+        }
+        if phases:
+            return len(phases)
+    return int(bool(result.liquid_composition_wt_pct))
+
+
+def _phase_row_fo2(
+    identity: Identity,
+    observation: Observation,
+    experiment: Experiment | None,
+    composition_wt: Mapping[str, float],
+    temperature_K: Decimal,
+    quantity: Quantity | None,
+) -> tuple[Identity, float | None, Notice | None]:
+    """Resolve the phase-row fO2 through printed evidence and registered rungs."""
+
+    fo2_log = _printed_fo2_log10_bar(identity)
+    if fo2_log is not None:
+        return identity, fo2_log, None
+
+    resolved_observation = _resolve_score_time_buffer_identity(
+        observation,
+        ambient_pressure_evidence=(
+            None if experiment is None else experiment.ambient_pressure_evidence
+        ),
+    )
+    resolved_identity = resolved_observation.identity
+    fo2_log = _printed_fo2_log10_bar(resolved_identity)
+    if fo2_log is not None:
+        policy_notice = next(
+            (
+                notice
+                for notice in resolved_observation.notices
+                if notice.policy is not None and notice.policy.id == "DP-112"
+            ),
+            None,
+        )
+        return resolved_identity, fo2_log, policy_notice
+
+    atmospheric_evidence = (
+        None if experiment is None else experiment.ambient_pressure_evidence
+    )
+    if (
+        atmospheric_evidence is not None
+        and atmospheric_evidence.evidence_class
+        is AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT
+    ):
+        pressure_bar = _printed_total_pressure_bar(identity, observation)
+        if pressure_bar is not None:
+            total_pressure_pa = pressure_bar * PA_PER_BAR_DEC
+            policy = resolve_default_policy("DP-003", P_total=total_pressure_pa)
+            oxygen_pa = as_decimal(policy.value)
+            fo2_log = _printed_fo2_log10_bar(
+                replace(identity, fO2_Pa=State.of(oxygen_pa))
+            )
+            if fo2_log is not None and quantity is not None:
+                resolved_identity = replace(identity, fO2_Pa=State.of(oxygen_pa))
+                return (
+                    resolved_identity,
+                    fo2_log,
+                    Notice(
+                        kind=policy.flag,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "DP-003 physics_rung=3: source says the experiment was "
+                            f"in air; P_total={total_pressure_pa} Pa"
+                        ),
+                        origin="score:DP-003",
+                        policy=NoticePolicy(**policy.payload["policy"]),
+                    ),
+                )
+
+    if quantity is None:
+        return identity, None, None
+    from simulator.battery.fo2_ladder import _tier4, fo2_tier_notice
+
+    intrinsic = _tier4(dict(composition_wt), float(temperature_K))
+    if intrinsic is None:
+        return identity, None, None
+    policy = resolve_default_policy("DP-010", formula_result=intrinsic.log10_fO2_bar)
+    ladder_notice = fo2_tier_notice(quantity, intrinsic)
+    notice = replace(
+        ladder_notice,
+        kind=policy.flag,
+        reason=f"DP-010 physics_rung=4: {ladder_notice.reason}",
+        origin="score:DP-010",
+        policy=NoticePolicy(**policy.payload["policy"]),
+    )
+    resolved_identity = replace(
+        identity,
+        fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(intrinsic.log10_fO2_bar)))),
+    )
+    return resolved_identity, intrinsic.log10_fO2_bar, notice
+
+
 def _select_phase_composition(
     result: EquilibriumResult, role: PhaseRole
 ) -> tuple[Mapping[str, float] | None, str | None]:
@@ -11409,7 +11589,7 @@ def _select_phase_composition(
     if len(exact) == 1:
         return comps[exact[0]], None
     if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
-        liquids = [name for name in comps if name.casefold() in _LIQUID_PHASE_NAMES]
+        liquids = [name for name in comps if _is_liquid_phase_name(name)]
         if len(liquids) > 1:
             return None, "ambiguous_phase"
         if len(liquids) == 1:
@@ -12317,7 +12497,16 @@ def _predict_phase_row(
             name: float(Decimal(100) * amount / kept_total)
             for name, amount in kept
         }
-    fo2_log = _printed_fo2_log10_bar(identity)
+    identity, fo2_log, fo2_notice = _phase_row_fo2(
+        identity,
+        observation,
+        experiment,
+        wt,
+        temperature,
+        quantity,
+    )
+    if fo2_notice is not None:
+        exclusion_notices = exclusion_notices + (fo2_notice,)
     if fo2_log is None:
         return refused(
             RefusalReason.IDENTITY_INCOMPLETE,
@@ -12397,6 +12586,28 @@ def _predict_phase_row(
                 "reason": f"engine_transport_error:{engine.value}",
                 "engine": engine.value,
                 "backend_failure_exception": worker_failure,
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            notices=exclusion_notices,
+        )
+
+    liquid_pair = _liquid_pair_target(observation)
+    if liquid_pair is not None and _reported_liquid_phase_count(result) <= 1:
+        target_phase, conjugate_phase = liquid_pair
+        return refused(
+            RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY,
+            {
+                "reason": (
+                    RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY.value
+                ),
+                "engine": engine.value,
+                "quantity": quantity.value if quantity is not None else "",
+                "target_phase": target_phase,
+                "conjugate_phase": conjugate_phase,
+                "detail": (
+                    "single-liquid engine result cannot predict one member of "
+                    "the source-reported coexisting liquid pair"
+                ),
             },
             execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
             notices=exclusion_notices,
@@ -23837,10 +24048,12 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
     # counted, including when this engine is outside the melt-activity list.
     if reason in {
         RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY.value,
         RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
         RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
     } or detail_reason in {
         RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY.value,
         RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
         RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
     }:

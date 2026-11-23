@@ -220,6 +220,14 @@ def test_dp112_resolves_the_buffer_owner_formula_result() -> None:
         resolve("DP-112")
 
 
+def test_dp010_resolves_the_intrinsic_fo2_ladder_result() -> None:
+    result = Decimal("-8.25")
+    resolved = resolve("DP-010", formula_result=result)
+    assert resolved.value == result
+    assert resolved.flag is NoticeKind.ASSUMED_FO2
+    assert resolved.payload["policy"]["value"] == "-8.25"
+
+
 def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
     assert load_policy_table()["DP-004"]["formula_owner"] == (
         "simulator.battery.score._sum_gas_partial_pressures_pa"
