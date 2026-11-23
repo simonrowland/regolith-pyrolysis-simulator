@@ -2249,6 +2249,7 @@ def _mass_loss_corner_bounds(
     # sourced-flux suppression cannot cancel B. This envelope is not a joint
     # trajectory. The point arm and its original area/inventory remain L.
     roots: list[float] = []
+    corner_channels: list[tuple[_VacuumOxygenChannel, ...]] = []
     low_corner_channels: tuple[_VacuumOxygenChannel, ...] | None = None
     for low_corner in (True, False):
         selected = tuple(
@@ -2261,17 +2262,7 @@ def _mass_loss_corner_bounds(
         )
         if low_corner:
             low_corner_channels = selected
-        def pressure_at(logp: float) -> Mapping[str, float]:
-            pressures = pressure_model(inventory, logp)
-            _inherit_residue_pressure_contract(pressure_at, pressure_model)
-            return pressures
-        try:
-            roots.append(_solve_vacuum_oxygen_balance(
-                pressure_at, selected,
-                temperature_K=temperature_K,
-            ).pO2_bar)
-        except ValueError as exc:
-            raise _residue_oxygen_balance_failure(exc) from exc
+        corner_channels.append(selected)
 
     # With ferric FeO(g), its residual contribution is -q*J_FeO/2 even
     # though its declared pressure exponent is zero. For the Fe flux envelope,
@@ -2305,18 +2296,20 @@ def _mass_loss_corner_bounds(
                 else channel
                 for channel in oxygen_channels
             )
+            corner_channels.append(selected)
 
-            def pressure_at(logp: float) -> Mapping[str, float]:
-                pressures = pressure_model(inventory, logp)
-                _inherit_residue_pressure_contract(pressure_at, pressure_model)
-                return pressures
+    for selected in corner_channels:
+        def pressure_at(logp: float) -> Mapping[str, float]:
+            pressures = pressure_model(inventory, logp)
+            _inherit_residue_pressure_contract(pressure_at, pressure_model)
+            return pressures
 
-            try:
-                roots.append(_solve_vacuum_oxygen_balance(
-                    pressure_at, selected, temperature_K=temperature_K,
-                ).pO2_bar)
-            except ValueError as exc:
-                raise _residue_oxygen_balance_failure(exc) from exc
+        try:
+            roots.append(_solve_vacuum_oxygen_balance(
+                pressure_at, selected, temperature_K=temperature_K,
+            ).pO2_bar)
+        except ValueError as exc:
+            raise _residue_oxygen_balance_failure(exc) from exc
 
     low, high = min(roots), max(roots)
     pressures = [pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
