@@ -127,6 +127,7 @@ from simulator.battery.input_provenance import (
     label_marks_final,
     label_marks_initial,
     phase_map_provenance,
+    _row_printed_composition_unknown,
 )
 from simulator.battery.composition import (
     ELEMENT_WT_PERCENT_FEO_T_BASIS,
@@ -8970,6 +8971,43 @@ def _printed_anhydrous_normalization(locator: Locator | None) -> bool:
     )
 
 
+def _starting_bulk_notices(
+    experiment: Experiment,
+    quantity: Quantity,
+    origin: str,
+    locator: Locator | None,
+) -> tuple[Notice, ...]:
+    notices: list[Notice] = []
+    causes = _open_system_starting_bulk_causes(experiment)
+    if causes:
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason="open_system_starting_bulk: " + "; ".join(causes),
+                origin=origin,
+                band=_OPEN_SYSTEM_STARTING_BULK_BAND,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    if _printed_anhydrous_normalization(locator):
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=(
+                    "anhydrous_starting_bulk_omits_h2o: "
+                    "identity.composition omits H2O; the printed starting "
+                    "vector is normalized to 100% anhydrous"
+                ),
+                origin=origin,
+                band=_ANHYDROUS_STARTING_BULK_BAND,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    return tuple(notices)
+
+
 def _is_printed_phase_mass_stamp(state: object) -> bool:
     """The mass-percent copy of a printed map. Engines do not read it as moles."""
 
@@ -8996,29 +9034,6 @@ def _keeps_existing_composition(state: object) -> bool:
     if _is_printed_phase_mass_stamp(state):
         return False
     return True
-
-
-def _row_printed_composition_unknown(
-    point_conditions: Mapping[str, Located[Any]] | None,
-) -> bool:
-    """The row prints its composition cell as unknown.
-
-    That is a printed blank, with a reason. It is this row's statement.
-    An experiment-level, group-level, or neighbouring starting bulk must
-    not fill it. A missing key is not this refusal: the starting bulk may
-    still be this row's printed start.
-    """
-
-    conditions = point_conditions or {}
-    for key in ("composition", "initial_composition_as_published"):
-        located = conditions.get(key)
-        if (
-            isinstance(located, Located)
-            and isinstance(located.state, State)
-            and located.state.is_unknown
-        ):
-            return True
-    return False
 
 
 _INPUT_PROVENANCE_QUANTITIES = PHASE_ROW_QUANTITIES | {
@@ -9441,7 +9456,9 @@ def _apply_equilibrium_starting_bulk(
             **(point_conditions or {}),
             "composition": initial,
         }
-    notices: list[Notice] = []
+    notices = list(
+        _starting_bulk_notices(experiment, quantity, origin, initial.locator)
+    )
     printed = experiment.sample.printed_composition
     printed_values = (
         printed.state.value
@@ -9450,35 +9467,6 @@ def _apply_equilibrium_starting_bulk(
         and isinstance(printed.state.value, Mapping)
         else None
     )
-    causes = _open_system_starting_bulk_causes(experiment)
-    if causes:
-        notices.append(
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(quantity,),
-                reason=(
-                    "open_system_starting_bulk: " + "; ".join(causes)
-                ),
-                origin=origin,
-                band=_OPEN_SYSTEM_STARTING_BULK_BAND,
-                authority=Authority.EXTRAPOLATED,
-            )
-        )
-    if _printed_anhydrous_normalization(initial.locator):
-        notices.append(
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(quantity,),
-                reason=(
-                    "anhydrous_starting_bulk_omits_h2o: "
-                    "identity.composition omits H2O; the printed starting "
-                    "vector is normalized to 100% anhydrous"
-                ),
-                origin=origin,
-                band=_ANHYDROUS_STARTING_BULK_BAND,
-                authority=Authority.EXTRAPOLATED,
-            )
-        )
     if (
         printed_values is not None
         and any(

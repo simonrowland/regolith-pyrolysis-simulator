@@ -1,8 +1,9 @@
 """Provenance of an engine-input composition, and the SC-458 / d-323 / d-325 rules.
 
 migrate.py writes the token from locators, notes, and table identity. It does
-not compare a component amount to the scored point. score.py refuses from the
-token. Both call this module. This module does not import score or migrate.
+not compare a component amount to the scored point. This module also owns the
+printed-unknown row predicate used by migration and scoring. score.py refuses
+from the token. This module imports neither score nor migrate.
 
 Copies left elsewhere, on purpose:
 - feedstock_composition.FEOT_FROM_FE2O3 is 2*71.844/159.687. The d-323 input
@@ -39,6 +40,7 @@ from simulator.battery.records import (
     Locator,
     Notice,
     Observation,
+    State,
     phase_token,
 )
 from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
@@ -282,6 +284,31 @@ def _phase_role_of(identity: Identity) -> PhaseRole | None:
     return None
 
 
+def _is_other_phase(identity: Identity) -> bool:
+    role = _phase_role_of(identity)
+    if role in {PhaseRole.METAL, PhaseRole.MATTE}:
+        return True
+    phase = phase_token(identity.species) if identity.species is not None else None
+    return role is None and phase in {Phase.CR, Phase.G}
+
+
+def _row_printed_composition_unknown(
+    point_conditions: Mapping[str, Located[object]] | None,
+) -> bool:
+    """Whether this row prints its composition cell as unknown."""
+
+    conditions = point_conditions or {}
+    for key in ("composition", "initial_composition_as_published"):
+        located = conditions.get(key)
+        if (
+            isinstance(located, Located)
+            and isinstance(located.state, State)
+            and located.state.is_unknown
+        ):
+            return True
+    return False
+
+
 def _component_names(composition: Composition) -> set[str]:
     return {name for name, _amount in composition.components}
 
@@ -329,12 +356,6 @@ def _phase_row_composition_input(
         role = _phase_role_of(row_identity)
         return role in _MELT_ROLES or (
             role is None and phase(row_identity) in {Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
-        )
-
-    def other_phase(row_identity: Identity) -> bool:
-        role = _phase_role_of(row_identity)
-        return role in {PhaseRole.METAL, PhaseRole.MATTE} or (
-            role is None and phase(row_identity) in {Phase.CR, Phase.G}
         )
 
     def composition_sources(row: Observation) -> tuple[tuple[Composition, str], ...]:
@@ -431,7 +452,7 @@ def _phase_row_composition_input(
     target_role = _phase_role_of(identity)
     target_phase = phase(identity)
     target_is_liquid = liquid(identity)
-    target_is_other_phase = other_phase(identity)
+    target_is_other_phase = _is_other_phase(identity)
     liquid_rows = tuple(
         row
         for row in rows.values()
@@ -649,19 +670,10 @@ def input_composition_echo_detail(identity: Identity) -> dict[str, object] | Non
         }
 
     if provenance == SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE:
-        role = _phase_role_of(identity)
-        phase_state = identity.species.phase if identity.species is not None else None
-        phase = (
-            phase_state.value
-            if phase_state is not None
-            and getattr(phase_state, "is_value", False)
-            else phase_state
-        )
-        other_phase = (
-            role in {PhaseRole.METAL, PhaseRole.MATTE}
-            or (role is None and phase in {Phase.CR, Phase.G})
-        )
-        if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION and other_phase:
+        if (
+            quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and _is_other_phase(identity)
+        ):
             return None
         return refused("analysed_liquid_input_is_not_a_different_phase")
     if provenance == SAME_RUN_INITIAL_ANALYSED_MELT:
