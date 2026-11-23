@@ -429,12 +429,13 @@ def _validate_kress91_controls(
     *,
     fO2_log: float,
     T_K: float,
-    pressure_bar: float | None,
+    pressure_bar: float,
 ) -> None:
+    """Finite controls for the forward fold. Pressure is required."""
+
     _kress91_require_control('fO2_log', fO2_log, positive=False)
     _kress91_require_control('T_K', T_K, positive=True)
-    if pressure_bar is not None:
-        _kress91_require_control('pressure_bar', pressure_bar, positive=True)
+    _kress91_require_control('pressure_bar', pressure_bar, positive=True)
 
 
 def floor_vacuum_pressure_bar(
@@ -902,19 +903,24 @@ def _kress91_ln_ratio(
     inverse-temperature term; the other terms keep ``T_K`` as given.
     """
 
-    _validate_kress91_controls(fO2_log=fO2_log, T_K=T_K, pressure_bar=pressure_bar)
+    if pressure_bar is None:
+        # The ruled inverse omits pressure. Do not validate it and do not
+        # add a zero stand-in: absence and a zero term are different folds.
+        _kress91_require_control('fO2_log', fO2_log, positive=False)
+        _kress91_require_control('T_K', T_K, positive=True)
+    else:
+        _validate_kress91_controls(
+            fO2_log=fO2_log,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
     if fo2_term is None:
         # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10).
         # 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and then
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    pressure_term = 0.0
-    if pressure_bar is not None:
-        p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
-        inv_t, d_t, squared = _kress91_pressure_terms(T_K, p_pa)
-        pressure_term = inv_t + d_t + squared
-    return (
+    fold = (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
         - 6.675
@@ -928,8 +934,12 @@ def _kress91_ln_ratio(
             - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
             - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
         )
-        + pressure_term
     )
+    if pressure_bar is None:
+        return fold
+    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
+    inv_t, d_t, squared = _kress91_pressure_terms(T_K, p_pa)
+    return fold + inv_t + d_t + squared
 
 
 def _kress91_fe2o3_over_feo_molar(
@@ -960,8 +970,10 @@ def kress91_log10_fO2_from_fe3_over_sigma_fe(
     q = 2*ratio/(2*ratio+1), so ratio = q/(2*(1-q)). q of 0 or 1 has no
     finite oxygen fugacity. This inverts the unclamped ln(ratio) equation;
     the forward exp() clamp is a numerical guard, not part of the relation.
+    Pressure stays required here. Only the private inverse may omit it.
     """
 
+    _kress91_require_control('pressure_bar', pressure_bar, positive=True)
     return _kress91_log10_fO2_from_fe3_over_sigma_fe(
         fe3_over_sigma_fe=fe3_over_sigma_fe,
         mol_fractions=mol_fractions,
