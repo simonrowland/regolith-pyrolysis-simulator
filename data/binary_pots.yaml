@@ -2,8 +2,8 @@
 #
 # Oxide-pair pots plus one ternary, in wt%. Each pot is a Kato 1993 Table 4
 # oxide-melt system (kems-049, published p. 308) or a recipe-relevant
-# endmember pair the melt engines will actually accept. Single-oxide pots
-# are not used: the melt engines cannot take a single species.
+# endmember pair. A stated one-oxide pot is loadable; silicate engines
+# still apply their own domain gates. This catalog has no one-oxide pot.
 #
 # Temperature and pO2 grids live here, not in code. Residuals are the
 # result; this file does not encode a pass/fail gate.

@@ -38,6 +38,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _FLOOR_INVERSION_REASON,
     _internal_analytical_vapor_pressure_adapter,
     BinaryPot,
+    BinaryPotBatteryError,
     BatteryGrid,
     EngineHandle,
     EquilibrateCell,
@@ -3242,3 +3243,39 @@ def test_plain_subprocess_death_has_no_engine_annotation() -> None:
     assert cell.engine_reason == "subprocess_died"
     assert cell.engine_annotation is None
     assert cell.as_payload().get("engine_annotation") is None
+
+
+def _one_oxide_catalog(composition: dict[str, float]) -> str:
+    lines = [
+        "temperature_grid_K:",
+        "  start: 1500",
+        "  stop: 1500",
+        "  step: 100",
+        "po2_bar:",
+        "  engine_default: true",
+        "  commanded: []",
+        "pots:",
+        "  pure_sio2:",
+        "    why: stated one-oxide pot",
+        "    composition_wt_pct:",
+    ]
+    for oxide, weight in composition.items():
+        lines.append(f"      {oxide}: {weight}")
+    return "\n".join(lines) + "\n"
+
+
+def test_one_oxide_pot_loads_and_sums_to_100(tmp_path: Path) -> None:
+    path = tmp_path / "pots.yaml"
+    path.write_text(_one_oxide_catalog({"SiO2": 100.0}), encoding="utf-8")
+    pots, grid = load_binary_pots(path)
+    assert len(pots) == 1
+    assert pots[0].composition_wt_pct == {"SiO2": 100.0}
+    assert sum(pots[0].composition_wt_pct.values()) == pytest.approx(100.0)
+    assert grid.temperatures_K == (1500.0,)
+
+
+def test_zero_mass_pot_still_needs_an_oxide(tmp_path: Path) -> None:
+    path = tmp_path / "pots.yaml"
+    path.write_text(_one_oxide_catalog({"SiO2": 0.0}), encoding="utf-8")
+    with pytest.raises(BinaryPotBatteryError, match="at least one oxide"):
+        load_binary_pots(path)

@@ -25,6 +25,7 @@ from simulator.diagnostic_helpers.binary_pot_scoring import (
     DEFAULT_POTS_PATH,
     SCORING_EXTRACTS,
     build_scoring_pots_from_extracts,
+    BinaryPotScoringError,
     convert_printed_composition_to_wt_pct,
     feto_fe2_fe3_to_feo_fe2o3_moles,
     iter_activity_comparators,
@@ -676,3 +677,68 @@ def test_superseded_parent_observation_is_not_scored(tmp_path: Path) -> None:
     assert rows
     assert all(not r["score_eligible"] for r in rows)
     assert any("superseded" in (r.get("notices") or []) for r in rows)
+
+
+def test_one_oxide_printed_wt_and_mol_rows_convert() -> None:
+    wt, _printed, basis, _conversion = convert_printed_composition_to_wt_pct(
+        {"SiO2_wt_percent": 50.0}
+    )
+    assert basis == "oxide_wt_percent"
+    assert wt == {"SiO2": pytest.approx(100.0)}
+    mol, _printed, mol_basis, _conversion = convert_printed_composition_to_wt_pct(
+        {"SiO2_mol_percent": 1.0}
+    )
+    assert mol_basis == "oxide_mol_percent"
+    assert mol == {"SiO2": pytest.approx(100.0)}
+
+
+def test_empty_printed_row_still_has_no_composition() -> None:
+    with pytest.raises(BinaryPotScoringError, match="no convertible melt composition"):
+        convert_printed_composition_to_wt_pct({})
+
+
+def test_one_oxide_scoring_pot_loads(tmp_path: Path) -> None:
+    path = tmp_path / "scoring.yaml"
+    path.write_text(
+        "\n".join(
+            (
+                "scoring_pots:",
+                "  pure_sio2:",
+                "    source_id: fixture",
+                "    observation_id: obs-1",
+                "    sample_no: 1",
+                "    temperatures_K: [1500]",
+                "    composition_basis: oxide_wt_percent",
+                "    composition_conversion: printed_oxide_wt_pct_renormalized",
+                "    composition_as_printed:",
+                "      SiO2_wt_percent: 100",
+                "    composition_wt_pct:",
+                "      SiO2: 100",
+                "    why: stated one-oxide scoring pot",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    pots = load_scoring_pots(path)
+    assert len(pots) == 1
+    assert pots[0].composition_wt_pct == {"SiO2": pytest.approx(100.0)}
+
+
+def test_zero_mass_scoring_pot_still_needs_an_oxide(tmp_path: Path) -> None:
+    path = tmp_path / "scoring.yaml"
+    path.write_text(
+        "\n".join(
+            (
+                "scoring_pots:",
+                "  empty:",
+                "    temperatures_K: [1500]",
+                "    composition_wt_pct:",
+                "      SiO2: 0",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(BinaryPotScoringError, match="at least one oxide"):
+        load_scoring_pots(path)

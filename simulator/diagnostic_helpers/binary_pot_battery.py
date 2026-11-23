@@ -1145,10 +1145,9 @@ def load_binary_pots(
             if weight == 0.0:
                 continue
             wt[str(oxide)] = weight
-        if len(wt) < 2:
+        if not wt:
             raise BinaryPotBatteryError(
-                f"pot {pot_id!r} must contain at least two oxides "
-                "(melt engines cannot take a single species)"
+                f"pot {pot_id!r} must contain at least one oxide"
             )
         total = sum(wt.values())
         if not math.isclose(total, 100.0, rel_tol=0.0, abs_tol=_WT_PCT_SUM_TOLERANCE):

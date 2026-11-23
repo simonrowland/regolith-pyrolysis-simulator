@@ -158,8 +158,8 @@ def _renormalize_wt_pct(masses: Mapping[str, float]) -> dict[str, float]:
     if total <= 0.0 or not math.isfinite(total):
         raise BinaryPotScoringError("composition masses must sum to a positive finite total")
     wt = {str(k): 100.0 * float(v) / total for k, v in masses.items() if float(v) > 0.0}
-    if len(wt) < 2:
-        raise BinaryPotScoringError("scoring pot must contain at least two oxides")
+    if not wt:
+        raise BinaryPotScoringError("scoring pot must contain at least one oxide")
     return wt
 
 
@@ -240,7 +240,7 @@ def convert_printed_composition_to_wt_pct(
             continue
         as_printed[key] = value
         oxide_wt[oxide] = oxide_wt.get(oxide, 0.0) + value
-    if len(oxide_wt) >= 2:
+    if oxide_wt:
         return (
             _renormalize_wt_pct(oxide_wt),
             as_printed,
@@ -264,7 +264,7 @@ def convert_printed_composition_to_wt_pct(
         )
         oxide_mol["FeO"] = oxide_mol.get("FeO", 0.0) + n_feo
         oxide_mol["Fe2O3"] = oxide_mol.get("Fe2O3", 0.0) + n_fe2o3
-    if len(oxide_mol) >= 2:
+    if oxide_mol:
         # mol% → mass, then wt%. Premise: printed N_i are mole percent.
         # Algebra: m_i = N_i * M_i; w_i = 100 m_i / sum m.
         # Unit check: mol% * g/mol = relative grams; ratio is wt%.
@@ -489,8 +489,10 @@ def load_scoring_pots(path: Path | None = None) -> tuple[ScoringPot, ...]:
         if not isinstance(composition, Mapping) or not composition:
             raise BinaryPotScoringError(f"scoring pot {pot_id!r} has no composition_wt_pct")
         wt = {str(k): float(v) for k, v in composition.items() if float(v) > 0.0}
-        if len(wt) < 2:
-            raise BinaryPotScoringError(f"scoring pot {pot_id!r} needs two oxides")
+        if not wt:
+            raise BinaryPotScoringError(
+                f"scoring pot {pot_id!r} needs at least one oxide"
+            )
         total = sum(wt.values())
         # YAML dumps round to 10 significant figures; re-close onto 100 wt%.
         if not math.isclose(total, 100.0, rel_tol=0.0, abs_tol=1.0e-6):
