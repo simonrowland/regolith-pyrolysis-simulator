@@ -270,6 +270,7 @@ def _install_magemin_subprocess_gate(sim, monkeypatch):
     provider._backend = backend
     provider._backend_initialised = True
     provider._backend_initialization_error = None
+    monkeypatch.setattr(provider, '_ensure_backend', lambda: backend)
     return trace
 
 
