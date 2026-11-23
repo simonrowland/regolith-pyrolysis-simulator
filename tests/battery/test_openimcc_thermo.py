@@ -727,12 +727,20 @@ def test_openimcc_grouped_carbon_formula_uses_janaf_hill_key() -> None:
     from simulator.yaml_cache import load_cached_safe_yaml
 
     root = Path(__file__).resolve().parents[2]
-    janaf = load_cached_safe_yaml(
-        (root / "data/literature/compilations/janaf/tables/C-065.yaml").read_bytes()
-    )
-    expected_formula = janaf["table"]["index_entry"]["formula_normalised"]
-    assert expected_formula == "CH3F"
-    assert canonicalize_formula("C(F)(H3)") == (expected_formula, None, None)
+    for source_formula, table_id, expected_key in (
+        ("C(F)(H3)", "C-065", "CH3F"),
+        ("C(BrF3)", "C-015", "CBrF3"),
+    ):
+        janaf = load_cached_safe_yaml(
+            (
+                root
+                / "data/literature/compilations/janaf/tables"
+                / f"{table_id}.yaml"
+            ).read_bytes()
+        )
+        manifest_key = janaf["table"]["index_entry"]["formula_normalised"]
+        assert manifest_key == expected_key
+        assert canonicalize_formula(source_formula) == (manifest_key, None, None)
 
 
 def test_openimcc_formula_suffix_phases_use_the_existing_phase_map() -> None:
