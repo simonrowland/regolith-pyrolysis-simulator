@@ -5,13 +5,18 @@
 # instead of the constant-C_m tangent. The gas ceiling is the effervescence
 # bound and bounds oxidizing terms only. Rows that walked to the uncapped
 # -19.74 landing, and Robinot hours pinned at log10(P_total), are not reusable.
+# 2026-11-23 b-1288: the power-driven and furnace-power temperature is the quasi-steady
+# root of the coupled balance (radiation + conduction + argon + the evaporative
+# enthalpy sink at the same T; two-node pellet). Booked T and evaporation move on
+# those paths, so their optimizer rows are not reusable (physics, d-463 rule).
 # 2026-11-19 C2A staged-pressure runtime results changed; expire optimizer rows.
 # 2026-07-31 VR-3 compatibility-only bump: retire optimizer keys containing
 # code/data/provider fingerprints. This changes identity shape, not physics.
 # Prior corpus rows are intentionally non-interoperable so old and new key
 # shapes cannot collide after fingerprints become provenance-only.
-corpus_version: "analytical-corpus-2026-11-23-ferric-ledger-fo2-v1"
+corpus_version: "analytical-corpus-2026-11-23-coupled-evaporative-balance-v2"
 interoperable_versions:
+  - "analytical-corpus-2026-11-23-coupled-evaporative-balance-v2"
   - "analytical-corpus-2026-11-23-ferric-ledger-fo2-v1"
   - "analytical-corpus-2026-11-19-c2a-staged-pressure-v1"
   - "analytical-corpus-2026-07-31-vapour-rail-key-v2"
