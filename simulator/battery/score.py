@@ -8761,11 +8761,15 @@ def _comparison_identity(
         prediction.notices
     )
     quantity = quantity_token(identity)
+    pressure_axis_applies = (
+        "total_pressure_Pa" in profile_for(identity).required
+    )
     pressure_notice: Notice | None = None
     pressure_state: State[Any] | None = None
     if (
         "total_pressure_Pa" not in excluded_axes
         and quantity is not None
+        and pressure_axis_applies
         and not pressure_independent
         and (
             identity.total_pressure_Pa is None

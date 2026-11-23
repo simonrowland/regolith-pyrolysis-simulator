@@ -668,6 +668,31 @@ def test_mathieu_partial_pressure_prediction_is_independent_of_total_pressure(
     assert predictions[0] == predictions[1]
 
 
+def test_internal_analytical_scorer_admits_commanded_oxygen_without_total_pressure():
+    context, admitted = _mathieu_pressure_context()
+    reference = admitted[0]
+    experiment = context.experiments[reference.experiment_id]
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            total_pressure_Pa=State.unknown("total pressure not printed"),
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        reference,
+        experiment=experiment,
+        bench=context.benches.get(experiment.bench_id or ""),
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value is not None
+    assert prediction.refusal_reason is None
+
+
 def test_known_total_pressure_mismatch_still_refuses() -> None:
     experiment = F.kems_experiment()
     identity = replace(
@@ -3960,6 +3985,11 @@ def test_green_thermo_residual_is_score_eligible() -> None:
         [residual],
     )
     assert report.ok, [i.detail for i in report.issues]
+    assert candidate.identity.total_pressure_Pa == ident.total_pressure_Pa
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in residual.notices
+    )
 
 
 def test_refused_never_numeric() -> None:

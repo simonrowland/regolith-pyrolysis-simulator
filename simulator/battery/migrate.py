@@ -4953,7 +4953,7 @@ def convert_pressure_to_pa(
     if units is None or not str(units).strip():
         return None, "missing pressure unit"
     unit = str(units).strip()
-    lowered = unit.lower().replace(" ", "")
+    lowered = _normalize_printed_unit(unit).lower().replace(" ", "")
     if lowered in {"pa", "pascal", "pascals"}:
         return amount, "identity:Pa"
     if lowered in {"kpa"}:
@@ -10347,6 +10347,16 @@ def _prefer_printed_temperature(
             if k_item[0] in _TWIN_KELVIN_KEYS and k_item[2] == c_item[2]:
                 return c_item
     return found[0]
+
+
+def _select_temperature_field(
+    found: list[tuple[str, object, Decimal, str]],
+    available_fallbacks: Iterable[str],
+) -> str | None:
+    """Choose one source using the migration's shared temperature precedence."""
+    if found:
+        return _prefer_printed_temperature(found)[0]
+    return next(iter(available_fallbacks), None)
 
 
 # Printed-unit recovery for a Located whose note (or as_published block)
@@ -18442,8 +18452,14 @@ def select_declared_source(
                 found_temperatures.append(
                     (f"point_conditions.{key}", raw, amount, trail or "identity:K")
                 )
-        if found_temperatures:
-            key, _raw, amount, trail = _prefer_printed_temperature(found_temperatures)
+        selected_field = _select_temperature_field(
+            found_temperatures,
+            (key for key in ("temperature", "T") if key in payload),
+        )
+        if found_temperatures and selected_field is not None:
+            key, _raw, amount, trail = next(
+                item for item in found_temperatures if item[0] == selected_field
+            )
             return _point_selection(amount, key, trail, payload, condition_ranges)
         if nested_temperature_unknown is not None:
             key, reason = nested_temperature_unknown
@@ -18453,7 +18469,7 @@ def select_declared_source(
                 field_name=key,
                 unit_trail="identity",
             )
-        if "temperature" in payload:
+        if selected_field == "temperature":
             raw = payload.get("temperature")
             unit = "K"
             if isinstance(raw, Mapping):
@@ -18464,7 +18480,10 @@ def select_declared_source(
                 return _point_selection(
                     amount, "temperature", trail or "identity:K", payload, condition_ranges
                 )
-        if "T" in payload:
+            selected_field = _select_temperature_field(
+                [], ("T",) if "T" in payload else ()
+            )
+        if selected_field == "T":
             t_unit = payload.get("T_units") or payload.get("temperature_units") or units
             amount, trail = convert_temperature_to_k(payload.get("T"), t_unit)
             if amount is not None:
@@ -21317,13 +21336,17 @@ def condition_identity_axis(name: str) -> str | None:
     return None
 
 
-def condition_identity_value(name: str, value: object) -> object:
+def condition_identity_value(
+    name: str, value: object, temperature_unit: str | None = None,
+) -> object:
     """Compare a control operand in the same units as its identity axis."""
     axis = condition_identity_axis(name)
     if axis == "temperature_K":
         if name == "temperature":
             return convert_temperature_to_k(_temperature_number(value), "K")[0]
         unit = dict(_TEMPERATURE_FIELDS).get(name)
+        if name == "T":
+            unit = temperature_unit
         return convert_temperature_to_k(_temperature_number(value), unit)[0] if unit else None
     if axis == "total_pressure_Pa":
         unit = _PRESSURE_CONDITION_UNITS[name]
@@ -21375,8 +21398,14 @@ def _located_temperature_selection(
         if amount is None:
             return None
         found.append((field, raw, amount, trail or "identity:K"))
-    if found:
-        field, _raw, amount, _trail = _prefer_printed_temperature(found)
+    selected_field = _select_temperature_field(
+        found,
+        (key for key in ("temperature", "T") if key in conditions),
+    )
+    if found and selected_field is not None:
+        field, _raw, amount, _trail = next(
+            item for item in found if item[0] == selected_field
+        )
         return field, amount
     temperature = conditions.get("temperature")
     if temperature is not None and temperature.state.is_value:

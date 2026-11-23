@@ -30,6 +30,7 @@ def normalize_printed_unit(unit: str) -> str:
         "torr": "Torr", "mmhg": "Torr", "atm": "atm",
         "atmosphere": "atm", "atmospheres": "atm", "bar": "bar",
         "bars": "bar", "mbar": "mbar", "millibar": "mbar",
+        "pa": "Pa", "pascal": "Pa", "pascals": "Pa",
         "mpa": "MPa", "mm": "mm", "cm": "cm", "cm3": "cm3",
         "mg": "mg", "g": "g", "gram": "g", "grams": "g",
         "kg": "kg", "s": "s", "sec": "s", "second": "s",
@@ -113,8 +114,6 @@ def same_printed_cell(a: PrintedCell | None, b: PrintedCell | None) -> str | Non
         return None
     left, right = a.address, b.address
     if left[4] is None or left[4] != right[4]:
-        return None
-    if not any(locus is not None and locus == other for locus, other in zip(left[1:4], right[1:4])):
         return None
     if any(locus is not None and other is not None and locus != other for locus, other in zip(left, right)):
         return None

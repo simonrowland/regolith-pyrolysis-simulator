@@ -3587,13 +3587,6 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_total_pressure",
             f"pressure_bar must be finite and non-negative; got {pressure_bar!r}",
         )
-    if pressure is None and po2_request is not None and po2_request.mode == PO2_COMMANDED:
-        raise _InternalAnalyticalInputRefusal(
-            2,
-            "internal_analytical_missing_total_pressure",
-            "commanded oxygen requires the scorer's resolved total pressure",
-        )
-
     validated_melt_mass_kg_by_species: dict[str, float] = {}
     if composition_kg:
         for species, raw in composition_kg.items():

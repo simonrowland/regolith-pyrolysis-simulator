@@ -569,15 +569,16 @@ def test_reused_internal_analytical_core_drops_omitted_controls(monkeypatch):
     assert snapshots[0] != snapshots[1]
 
     before = len(snapshots)
-    with pytest.raises(battery._InternalAnalyticalInputRefusal) as caught:
-        reused.equilibrate(
-            1200.0,
-            composition,
-            pressure_bar=None,
-            po2_request=Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0e-8),
-        )
-    assert caught.value.code == "internal_analytical_missing_total_pressure"
-    assert len(snapshots) == before
+    reused.equilibrate(
+        1200.0,
+        composition,
+        pressure_bar=None,
+        po2_request=Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0e-8),
+    )
+    assert len(snapshots) == before + 1
+    assert snapshots[-1][0] == 0.0
+    assert snapshots[-1][2] is Atmosphere.CONTROLLED_O2
+    assert snapshots[-1][3] == 1.0e-5
 
     commanded = Po2Request(mode=battery.PO2_COMMANDED, po2_bar=3.0e-7)
     reused.equilibrate(

@@ -1864,6 +1864,17 @@ def test_scalar_row_only_print_match_respects_units():
                              PrintedCell(address, "400", "bars")) == "ambiguous"
     assert same_printed_cell(PrintedCell(address, "400", "bar"),
                              PrintedCell(address, "400", "MPa")) is None
+    assert same_printed_cell(PrintedCell(address, "400", "Pa"),
+                             PrintedCell(address, "400", "pascals")) == "ambiguous"
+
+
+def test_printed_cell_table_annotation_on_one_locator_does_not_distinguish_row():
+    with_table = ("source", None, "Table 1", None, "4", None)
+    row_only = ("source", None, None, None, "4", None)
+    assert same_printed_cell(
+        PrintedCell(with_table, "400", "Pa"),
+        PrintedCell(row_only, "400", "pascals"),
+    ) == "ambiguous"
 
 
 def _without_printed_fo2(observation):
@@ -2448,6 +2459,70 @@ def test_redox_excludes_its_analytes_and_keeps_independent_emf():
         assert all(not n.reason.startswith("fO2_log:") for n in prediction.notices)
 
 
+def test_redox_excludes_condition_derived_from_named_target_observation():
+    target = _without_printed_fo2(_borisov_row4())
+    source = Located(
+        State.of(Decimal("-0.68")),
+        Locator(page=7, table="1", record="same result, separate locator"),
+        Derivation("reported from result", (target.observation_id,), (), "1"),
+    )
+    target = replace(target, point_conditions={"fO2_log": source})
+
+    view, _, notices = score_module._redox_input_view(
+        target, Quantity.FE3_FE2_RATIO, F.tabulation_experiment()
+    )
+
+    assert "fO2_log" not in view.point_conditions
+    assert any(
+        notice.kind is NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY
+        and notice.reason.startswith("fO2_log: derived_from_target")
+        for notice in notices
+    )
+
+
+def test_generic_temperature_correction_uses_its_printed_unit_and_run_temperature():
+    target = _without_printed_fo2(_borisov_row4())
+    original = Located(
+        State.of(Decimal("1200")), Locator(page=3, record="original T")
+    )
+    target = replace(
+        target,
+        identity=replace(
+            target.identity,
+            temperature_K=None,
+            total_pressure_Pa=State.of(BAR_PA_DECIMAL),
+        ),
+        point_conditions={
+            "T": original,
+            "T_units": Located(State.of("C"), original.locator),
+        },
+        derivation=Derivation(
+            "temperature correction", (), (("original_T", original),), "1"
+        ),
+    )
+    experiment = replace(
+        F.tabulation_experiment(),
+        conditions={
+            "T": Located(State.of(Decimal("1300")), Locator(page=4, record="run T")),
+            "T_units": Located(State.of("C"), Locator(page=4, record="run T unit")),
+        },
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        target,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.identity.temperature_K == State.of(Decimal("1573.15"))
+    assert prediction.value == Decimal("4.239439070820317")
+    assert any(
+        notice.kind is NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH
+        for notice in prediction.notices
+    )
+
+
 @pytest.mark.parametrize("column", ("O2 setpoint", None), ids=("explicit", "omitted"))
 def test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline(column):
     experiment = F.tabulation_experiment()
@@ -2754,7 +2829,8 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
             assert (bar, notice) == (250.0, None)
             expected = NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL
         else:
-            assert bar == (4000.0 if unit == "MPa" else 400.0) and notice.policy.id == "DP-114"
+            assert bar == (4000.0 if unit == "MPa" else 400.0)
+            assert notice is None
             expected = NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH
         assert [n.kind for n in notices] == [expected]
     elif route == "independent-log-oxygen":

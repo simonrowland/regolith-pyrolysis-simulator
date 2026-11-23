@@ -1865,7 +1865,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # transport control and preserve the omission as a per-call flag.
             fO2_log = MAGEMIN_NOMINAL_FO2_LOG
             prior_warnings.append(
-                'MAGEMin used nominal fO2_log=-9.0 because oxygen was omitted'
+                f'MAGEMin used nominal fO2_log={MAGEMIN_NOMINAL_FO2_LOG} '
+                'because oxygen was omitted'
             )
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}

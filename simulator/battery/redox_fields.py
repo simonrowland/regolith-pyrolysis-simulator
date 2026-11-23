@@ -75,18 +75,25 @@ def _match_target_cell(targets: tuple[_PrintedCell, ...], candidate: _PrintedCel
     return "same" if "same" in matches else "ambiguous" if "ambiguous" in matches else None
 
 
-def _is_imposed_oxygen_cell(targets: tuple[_PrintedCell, ...], experiment: Experiment | None) -> bool:
+def _is_imposed_oxygen_cell(
+    targets: tuple[_PrintedCell, ...], experiment: Experiment | None,
+    observation_id: str,
+) -> bool:
     control = experiment.fO2_control if experiment is not None else None
     return (
         control is not None
         and control.channel.is_value
         and control.channel.value is not FO2Channel.INTRINSIC
         and control.oxygen_partial_pressure_Pa is not None
-        and _target_dependency(targets, control.oxygen_partial_pressure_Pa) is not None
+        and _target_dependency(
+            targets, control.oxygen_partial_pressure_Pa, observation_id
+        ) is not None
     )
 
 
-def _target_dependency(target: tuple[_PrintedCell, ...], condition: Located) -> str | None:
+def _target_dependency(
+    target: tuple[_PrintedCell, ...], condition: Located, observation_id: str,
+) -> str | None:
     inference = condition.inference
     match = _match_target_cell(target, _printed_cell(
         condition, address_only=inference is not None,
@@ -94,8 +101,12 @@ def _target_dependency(target: tuple[_PrintedCell, ...], condition: Located) -> 
     if match is not None:
         return match
     if inference is not None:
+        # A bare observation ID is a supported derivation reference, and
+        # identifies the scored value even when no parameter is expanded.
+        if observation_id in inference.inputs:
+            return "derived_from_target"
         for _, operand in inference.parameters:
-            match = _target_dependency(target, operand)
+            match = _target_dependency(target, operand, observation_id)
             if match is not None:
                 return "ambiguous" if match == "ambiguous" else "derived_from_target"
     return None
@@ -121,12 +132,22 @@ def _operand_fields(observation: Observation, conditions: Mapping[str, Located])
     }
 
 
+def _temperature_unit(field: str, conditions: Mapping[str, Located]) -> str | None:
+    if field != "T":
+        return None
+    return next((
+        str(conditions[key].state.value)
+        for key in ("T_units", "temperature_units")
+        if key in conditions and conditions[key].state.is_value
+    ), None)
+
+
 def independent_redox_conditions(
     observation: Observation, *,
     quantity: Quantity,
     ferric_target: bool,
     condition_identity_axis: Callable[[str], str | None],
-    condition_identity_value: Callable[[str, object], object],
+    condition_identity_value: Callable[..., object],
     temperature_selection: Callable[[Mapping[str, Located]], State | None],
     pressure_selection: Callable[[Mapping[str, Located]], Decimal | Value | None],
     identity_sources: Mapping[str, tuple[str, ...]],
@@ -151,7 +172,9 @@ def independent_redox_conditions(
             or any(field in fields for fields in CONTROL_VARIABLE_FIELDS.values())
             or (
                 axis == "fO2_Pa" and condition is not None
-                and _is_imposed_oxygen_cell(_printed_cells(condition), experiment)
+                and _is_imposed_oxygen_cell(
+                    _printed_cells(condition), experiment, observation.observation_id
+                )
             )
         ):
             excluded[field] = "analyte_operand"
@@ -164,15 +187,19 @@ def independent_redox_conditions(
             or axis not in {"temperature_K", "total_pressure_Pa"}
         ):
             continue
-        original_value = condition_identity_value(field, original.state.value)
+        original_value = condition_identity_value(
+            field, original.state.value, _temperature_unit(field, conditions)
+        )
         projected = getattr(identity, axis)
         if original_value is None:
             continue
         axis_conditions = {
-            key: condition_identity_value(key, condition.state.value)
+            key: condition_identity_value(
+                key, condition.state.value, _temperature_unit(key, conditions)
+            )
             for key, condition in conditions.items()
             if condition.state.is_value and condition_identity_axis(key) == axis
-            and _target_dependency(target, condition) is None
+            and _target_dependency(target, condition, observation.observation_id) is None
         }
         projected_value = (
             projected.value if projected is not None and projected.is_value else None
@@ -181,7 +208,7 @@ def independent_redox_conditions(
         if experiment is not None:
             run_conditions = {
                 key: condition for key, condition in experiment.conditions.items()
-                if _target_dependency(target, condition) is None
+                if _target_dependency(target, condition, observation.observation_id) is None
             }
             if axis == "temperature_K":
                 selected = temperature_selection(run_conditions)
@@ -189,7 +216,9 @@ def independent_redox_conditions(
                     run_value = selected.value
             else:
                 pressure = experiment.pressure_environment.total_pressure_Pa
-                if pressure.state.is_value and _target_dependency(target, pressure) is None:
+                if pressure.state.is_value and _target_dependency(
+                    target, pressure, observation.observation_id
+                ) is None:
                     run_conditions[axis] = pressure
                 run_value = pressure_selection(run_conditions)
         if any(
@@ -210,7 +239,7 @@ def independent_redox_conditions(
             continue
         if field in {"sample_id", "quench_state", "quench_direction"}:
             continue
-        relation = _target_dependency(target, condition)
+        relation = _target_dependency(target, condition, observation.observation_id)
         if relation is not None:
             excluded[field] = relation
         elif ferric_target and field in _FERRIC_CONDITION_FIELDS and (
@@ -223,7 +252,9 @@ def independent_redox_conditions(
     excluded_sources = {f"point_conditions.{field}" for field in excluded}
     if experiment is not None:
         def independent_control(field: str, condition: Located | None) -> Located | None:
-            if condition is None or (reason := _target_dependency(target, condition)) is None:
+            if condition is None or (reason := _target_dependency(
+                target, condition, observation.observation_id
+            )) is None:
                 return condition
             excluded[field] = reason
             located_inputs[field] = condition
