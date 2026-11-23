@@ -4753,13 +4753,31 @@ class EvaporationMixin:
                     timeout_reason=timeout_reason,
                 )
                 if held is not None:
-                    if 'gate_provider_step_down' in held:
-                        held['gate_provider_step_down'] = {
-                            **held['gate_provider_step_down'],
+                    current_step_down = diagnostic.get(
+                        'gate_provider_step_down'
+                    )
+                    held_step_down = (
+                        current_step_down
+                        if isinstance(current_step_down, Mapping)
+                        else held.get('gate_provider_step_down')
+                    )
+                    if isinstance(held_step_down, Mapping):
+                        held_step_down = {
+                            **held_step_down,
                             'prediction': 'held_last_good_curve',
                             'realized_provider': (self._freeze_gate_last_good_curve or {}).get('realized_provider')
                             or self._liquid_fraction_provider,
                         }
+                        if isinstance(current_step_down, Mapping):
+                            last_good_curve = (
+                                self._freeze_gate_last_good_curve or {}
+                            ).get('curve') or {}
+                            held_step_down['magemin_sourced'] = (
+                                self._freeze_gate_curve_uses_magemin_domain_identity(
+                                    last_good_curve
+                                )
+                            )
+                        held['gate_provider_step_down'] = held_step_down
                     return self._record_freeze_gate_magemin_timeout_fallback_notice(
                         held,
                         timeout_reason=timeout_reason,

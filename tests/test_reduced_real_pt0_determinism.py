@@ -4552,7 +4552,6 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     )
     alternate_key['freeze_gate_cache_key'] = cache_key
     valid_payload = {
-        'payload_codec_version': 3,
         'curve': {
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',
             'solidus_T_C': 1200.0,
@@ -4625,7 +4624,7 @@ def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(
     old_payload = rrd.canonical_replay_output_projection(
         'equilibrium_post_record', sim, result,
     )
-    old_payload.pop('payload_codec_version')
+    assert 'payload_codec_version' not in old_payload
     old_payload['equilibrium_result']['diagnostics'][
         'a_FeO_calphad'
     ]['notices'] = notices

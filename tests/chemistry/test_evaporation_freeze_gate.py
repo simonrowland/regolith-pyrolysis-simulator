@@ -5160,6 +5160,111 @@ def test_worker_timeout_last_good_matches_current_evaluated_silica_verdict(
     )
 
 
+def test_double_timeout_held_curve_keeps_magemin_flag_for_feo_activity(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.fe_redox import (
+        MAGEMIN_DOMAIN_IDENTITY_KIND,
+        calphad_ferrous_feo_activity_diagnostic,
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    _install_magemin_subprocess_gate(sim, monkeypatch)
+
+    def set_bulk(silica_wt_pct):
+        composition_wt_pct = {
+            'SiO2': silica_wt_pct,
+            'MgO': 10.0,
+            'FeO': 90.0 - silica_wt_pct,
+        }
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source='same-domain MAGEMin timeout provenance test',
+            material_origin='feedstock',
+        )
+        sim.atom_ledger = ledger
+
+    set_bulk(80.001)
+    successful_curve = (
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+    )
+    assert successful_curve['authority'] == 'extrapolated'
+    assert successful_curve['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+    last_good_identity = sim._freeze_gate_last_good_curve[
+        'magemin_domain_identity'
+    ]
+
+    completed_hour = int(sim.melt.hour)
+    sim._clear_melt_redox_gate_authority_for_completed_hour(completed_hour)
+    sim.melt.hour += 1
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    sim._freeze_gate_shared_curve_cache = {}
+    backend = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )._backend
+    timeout_calls = []
+
+    def timeout_worker(**kwargs):
+        timeout_calls.append(kwargs['bulk_projection'].composition_wt_pct)
+        raise EngineWorkerTimeout('MAGEMin worker', 0.01, phase='job')
+
+    monkeypatch.setattr(backend, '_call_magemin', timeout_worker)
+    held_curve = sim._establish_melt_redox_gate_authority_for_current_hour()
+
+    assert len(timeout_calls) == 2
+    assert held_curve['authority'] == 'extrapolated'
+    assert held_curve['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+    assert held_curve['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    assert held_curve['gate_provider_step_down']['magemin_sourced'] is True
+    assert sim._freeze_gate_last_good_curve[
+        'magemin_domain_identity'
+    ].matches(sim._freeze_gate_current_magemin_domain_identity)
+
+    temperature_K = 1800.0 + 273.15
+    activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=sim.melt.composition_wt_pct(),
+        fO2_log=float(sim._compute_intrinsic_melt_fO2()),
+        T_K=temperature_K,
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        liquid_domain=sim.liquid_feo_domain_at(temperature_K),
+    )
+    identity_notice = next(
+        notice
+        for notice in activity['notices']
+        if notice['kind'] == MAGEMIN_DOMAIN_IDENTITY_KIND
+    )
+    assert identity_notice['authority'] == 'extrapolated'
+    assert identity_notice['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+
+
 @pytest.mark.parametrize(
     ('composition_wt_pct', 'expected_reason'),
     [
@@ -8852,7 +8957,6 @@ def test_gate_memo_replay_return_is_not_written_to_core_memo(
     def replay_gate_curve(target, *, fO2_log):
         replay_calls.append(fO2_log)
         target._last_reduced_real_replay_notices = []
-        store._accepted_hit_disclosures = []
         return dict(curve)
 
     monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
@@ -8867,15 +8971,11 @@ def test_gate_memo_replay_return_is_not_written_to_core_memo(
     assert sim._establish_melt_redox_gate_authority_for_current_hour() == curve
 
     assert len(replay_calls) == 2
-    assert sim._resolved_melt_redox_gate_authority() == curve
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
-    assert sim._melt_redox_gate_authority_this_tick is not prior_authority
-    assert (
-        sim._melt_redox_gate_authority_this_tick['disposition'] == 'replay'
-    )
-    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
+    assert sim._melt_redox_gate_authority_this_tick is prior_authority
+    assert sim._melt_redox_gate_authority_tick_hour is None
 
 
 @pytest.mark.parametrize('foreign_member', ['pid', 'configuration'])
@@ -9213,7 +9313,7 @@ def test_replay_gate_curve_is_not_written_to_core_memo(
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
 
 
-def test_accepted_replay_gate_curve_is_pinned_as_tick_authority(
+def test_replay_gate_curve_is_not_pinned_as_tick_authority(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -9237,23 +9337,19 @@ def test_accepted_replay_gate_curve_is_pinned_as_tick_authority(
     def replay_gate_curve(target, *, fO2_log):
         replay_calls.append(fO2_log)
         target._last_reduced_real_replay_notices = []
-        store._accepted_hit_disclosures = []
         return dict(curve)
 
     monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
     sim.configure_pt0_determinism_store(store)
     prior_authority = object()
+    prior_tick_hour = -1
     sim._melt_redox_gate_authority_this_tick = prior_authority
+    sim._melt_redox_gate_authority_tick_hour = prior_tick_hour
 
     assert sim._establish_melt_redox_gate_authority_for_current_hour() == curve
     assert len(replay_calls) == 1
-    assert sim._melt_redox_gate_authority_this_tick is not prior_authority
-    assert (
-        sim._melt_redox_gate_authority_this_tick['disposition'] == 'replay'
-    )
-    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
-    assert sim._resolved_melt_redox_gate_authority() == curve
-    assert len(replay_calls) == 1
+    assert sim._melt_redox_gate_authority_this_tick is prior_authority
+    assert sim._melt_redox_gate_authority_tick_hour == prior_tick_hour
 
 
 @pytest.mark.parametrize(

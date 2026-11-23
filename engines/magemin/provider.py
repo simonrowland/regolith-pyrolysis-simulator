@@ -263,12 +263,32 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         valid, gate_warnings, gate_reason = (
             MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
         )
+        from simulator.melt_backend.magemin import (
+            DEFAULT_MAGEMIN_DATABASE,
+            evaluated_magemin_domain_identity,
+        )
+
+        request_domain_identity, domain_diagnostic = (
+            evaluated_magemin_domain_identity(
+                composition_mol_by_account,
+                str(_SHADOW_BACKEND_CONFIG.get(
+                    'database', DEFAULT_MAGEMIN_DATABASE,
+                )),
+                species_formula_registry=(
+                    request.account_view.species_formula_registry
+                ),
+                composition_mol_by_account=True,
+                fold_ferric_split=(
+                    request.intent is not ChemistryIntent.SILICATE_EQUILIBRIUM
+                ),
+            )
+        )
+        domain_diagnostic = domain_diagnostic or {}
         if not valid:
-            domain_diagnostic = (
+            domain_diagnostic = domain_diagnostic or (
                 MAGEMinDomainGate.silica_extrapolation_diagnostic(
                     composition_wt_pct
-                )
-                or {}
+                ) or {}
             )
             return IntentResult(
                 intent=request.intent,
@@ -288,25 +308,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),
             )
-
-        from simulator.melt_backend.magemin import (
-            DEFAULT_MAGEMIN_DATABASE,
-            evaluated_magemin_domain_identity,
-        )
-
-        request_domain_identity, domain_diagnostic = (
-            evaluated_magemin_domain_identity(
-                composition_mol_by_account,
-                str(_SHADOW_BACKEND_CONFIG.get(
-                    'database', DEFAULT_MAGEMIN_DATABASE,
-                )),
-                species_formula_registry=(
-                    request.account_view.species_formula_registry
-                ),
-                composition_mol_by_account=True,
-            )
-        )
-        domain_diagnostic = domain_diagnostic or {}
         if request_domain_identity.silica_verdict == 'in_band':
             gate_warnings = [
                 warning
@@ -318,7 +319,30 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             ]
 
         backend = self._ensure_backend()
+        if (
+            backend is not None
+            and request.intent in {
+                ChemistryIntent.SILICATE_LIQUIDUS,
+                ChemistryIntent.SILICATE_EQUILIBRIUM,
+            }
+        ):
+            is_available = getattr(backend, 'is_available', None)
+            if callable(is_available) and not is_available():
+                backend = None
         if backend is None:
+            backend_diagnostics = {}
+            if request.intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+                backend_diagnostics = {
+                    'projected_liquidus_status': 'unavailable',
+                    'projected_liquidus_diagnostics': {
+                        'backend_status_reason': (
+                            'missing_binary'
+                            if self._backend_initialization_error is None
+                            else 'magemin_engine_worker_unavailable'
+                        ),
+                        'backend_failure_disposition': 'environment',
+                    },
+                }
             return IntentResult(
                 intent=request.intent,
                 status='unavailable',
@@ -331,6 +355,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     magemin_sourced=(
                         request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
                     ),
+                    backend_diagnostics=backend_diagnostics,
                     **domain_diagnostic,
                 ).as_diagnostic(),
                 warnings=(
@@ -371,15 +396,15 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             backend_domain_diagnostic = {
                 field: equilibrium_diagnostics[field]
                 for field in ('authority', 'certified_band')
-                if field in equilibrium_diagnostics
+                if equilibrium_diagnostics.get(field) is not None
             }
-            if 'projection_threshold_verdict' in equilibrium_diagnostics:
-                evaluated_domain_diagnostic = {
-                    field: equilibrium_diagnostics.get(field)
-                    for field in ('authority', 'certified_band')
-                }
-            elif backend_domain_diagnostic:
-                evaluated_domain_diagnostic = backend_domain_diagnostic
+            # Keep the request's identity when the adapter has no complete
+            # authority fields. Equilibrium preflight and equilibrate use the
+            # same unfolded bulk; liquidus retries can replace it below.
+            evaluated_domain_diagnostic = {
+                **evaluated_domain_diagnostic,
+                **backend_domain_diagnostic,
+            }
         projected_diagnostics = equilibrium_diagnostics.get(
             'projected_liquidus_diagnostics'
         )
@@ -609,8 +634,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         _ensure_close_reaper()
         if self._backend is not None:
             if not self._backend_initialised:
-                self._initialize_backend(self._backend)
+                initialized = self._initialize_backend(self._backend)
                 self._backend_initialised = True
+                if not initialized:
+                    return None
             if self._backend_initialization_error is not None:
                 return None
             return self._backend

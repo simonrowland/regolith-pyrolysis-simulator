@@ -166,24 +166,46 @@ def _payload_codec_is_current(
     payload: Any,
 ) -> bool:
     version = _payload_codec_version(artifact)
-    return (
-        version is None
-        or (
-            isinstance(payload, Mapping)
-            and payload.get("payload_codec_version") == version
+    if version is None:
+        return True
+    if not isinstance(payload, Mapping):
+        return False
+    # Codec markers belong to row admission, not the reviewed output payload.
+    # Rows written by the earlier marker-bearing codec are stale as well.
+    if "payload_codec_version" in payload:
+        return False
+    if artifact == "freeze_gate_curve":
+        if version != PT0_GATE_CURVE_CODEC_VERSION:
+            return False
+        curve = payload.get("curve")
+        if not isinstance(curve, Mapping):
+            return False
+        if curve.get("is_liquidus_floor") is not True:
+            return True
+        step_down = curve.get("gate_provider_step_down")
+        return (
+            isinstance(step_down, Mapping)
+            and type(step_down.get("magemin_sourced")) is bool
         )
-    )
-
-
-def _versioned_replay_payload(
-    artifact: str,
-    payload: Mapping[str, Any],
-) -> dict[str, Any]:
-    version = _payload_codec_version(artifact)
-    result = dict(payload)
-    if version is not None:
-        result["payload_codec_version"] = version
-    return result
+    if artifact == "equilibrium_post_record":
+        if version != PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION:
+            return False
+        equilibrium_result = payload.get("equilibrium_result")
+        diagnostics = (
+            equilibrium_result.get("diagnostics")
+            if isinstance(equilibrium_result, Mapping)
+            else None
+        )
+        feo_activity = (
+            diagnostics.get("a_FeO_calphad")
+            if isinstance(diagnostics, Mapping)
+            else None
+        )
+        return not (
+            isinstance(feo_activity, Mapping)
+            and "notices" in feo_activity
+        )
+    return False
 
 
 _ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"
@@ -972,10 +994,7 @@ class PT0DeterminismStore:
         self._store(
             "freeze_gate_curve",
             key,
-            _versioned_replay_payload(
-                "freeze_gate_curve",
-                {"curve": _curve_payload(curve)},
-            ),
+            {"curve": _curve_payload(curve)},
             engine_version_provenance=_engine_version_provenance(
                 sim,
                 ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -1184,8 +1203,6 @@ class PT0DeterminismStore:
         repair_notices: Sequence[Mapping[str, Any]] = (),
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
-        if _payload_codec_version(artifact) is not None:
-            payload = _versioned_replay_payload(artifact, payload)
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
@@ -1437,6 +1454,11 @@ class PT0DeterminismStore:
             key_bytes = canonical_json_bytes(candidate_key)
             key_hash = _sha256(key_bytes)
             entry = self._entry_for_key(artifact, candidate_key, key_bytes, key_hash)
+            if entry is not None and not _payload_codec_is_current(
+                artifact,
+                entry.get("payload"),
+            ):
+                entry = None
             cache_state = "cached_exact"
             candidate_physics_bucket_key = (
                 physics_bucket_key
@@ -1495,14 +1517,18 @@ class PT0DeterminismStore:
                             )
                             physics_bucket_rung = rung_tag
                             break
+            if (
+                entry is not None
+                and cache_state != "cached_exact"
+                and not _payload_codec_is_current(
+                    artifact,
+                    entry.get("payload"),
+                )
+            ):
+                entry = None
             if entry is not None and not replay_dependency_vectors_match(
                 candidate_key,
                 entry.get("key", {}),
-            ):
-                entry = None
-            if entry is not None and not _payload_codec_is_current(
-                artifact,
-                entry.get("payload"),
             ):
                 entry = None
             if entry is not None and not _disclosures_known(entry):
@@ -4076,10 +4102,7 @@ def canonical_replay_output_projection(
         )
         for domain_key in GATE_CURVE_DOMAIN_KEYS:
             curve_payload.pop(domain_key, None)
-        return _versioned_replay_payload(
-            artifact,
-            {"curve": curve_payload},
-        )
+        return {"curve": curve_payload}
     if artifact != "equilibrium_post_record":
         raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
     transition = getattr(result, "ledger_transition", None)
@@ -4138,7 +4161,7 @@ def canonical_replay_output_projection(
             if isinstance(alphamelts_diagnostics, Mapping)
             else _json_ready(alphamelts_diagnostics)
         )
-    return _versioned_replay_payload(artifact, payload)
+    return payload
 
 
 def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:

@@ -849,6 +849,50 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
     assert any('authority=extrapolated' in w for w in result.warnings)
 
 
+def test_real_magemin_projection_flag_survives_engine_failure(monkeypatch):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _MAGEMinEngineCallError,
+    )
+
+    formula_registry = {}
+    composition_wt_pct = {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 5.0}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = object()
+    monkeypatch.setattr(backend, 'initialize', lambda _config: True)
+
+    def fail_magemin(**_kwargs):
+        raise _MAGEMinEngineCallError('SyntheticEngineFailure', 'injected')
+
+    monkeypatch.setattr(backend, '_call_magemin', fail_magemin)
+    provider = MAGEMinShadowProvider(backend=backend)
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    ))
+
+    assert result.status == 'not_converged'
+    assert result.diagnostic['authority'] == 'extrapolated'
+    assert result.diagnostic['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+
+
 @pytest.mark.parametrize(
     ('intent', 'composition_wt_pct', 'expected_status', 'expected_authority'),
     (
@@ -932,8 +976,8 @@ def test_real_request_domain_verdict_survives_failed_backend_result(
         for species, amount in composition_wt_pct.items()
     }
     backend = MAGEMinBackend()
-    backend._available = False
-    backend._bridge = None
+    backend._available = True
+    backend._bridge = object()
     monkeypatch.setattr(backend, 'initialize', lambda _config: True)
     provider = MAGEMinShadowProvider(backend=backend)
     monkeypatch.setattr(
@@ -946,6 +990,7 @@ def test_real_request_domain_verdict_survives_failed_backend_result(
             diagnostics={
                 'backend_status': 'not_converged',
                 'backend_status_reason': 'engine_crash',
+                'projection_threshold_verdict': 'clear',
             },
         ),
     )
@@ -1038,3 +1083,46 @@ def test_equilibrium_provider_qualifies_exact_evaluated_bulk(
     assert result.status == 'unavailable'
     assert result.diagnostic.get('authority') == expected_authority
     assert result.diagnostic.get('certified_band') == expected_band
+
+
+def test_equilibrium_domain_flag_survives_backend_initialization_failure(
+    monkeypatch,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    formula_registry = {}
+    composition_wt_pct = {
+        'SiO2': 29.999,
+        'MgO': 60.001,
+        'Fe2O3': 10.0,
+    }
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        'initialize',
+        lambda _self, _config: False,
+    )
+    provider = MAGEMinShadowProvider()
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    ))
+
+    assert result.status == 'unavailable'
+    assert result.diagnostic['authority'] == 'extrapolated'
+    assert result.diagnostic['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }

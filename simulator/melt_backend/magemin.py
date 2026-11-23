@@ -1771,15 +1771,19 @@ def _evaluated_magemin_oxide_bulk(
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
+    fold_ferric_split: bool = True,
 ) -> Dict[str, float] | None:
     """Return the exact oxide bulk evaluated by MAGEMin without the engine."""
 
     if composition_mol_by_account:
-        _kg, _mol, accounts = _liquidus_inputs_on_feo_total_iron_basis(
-            composition_kg=None,
-            composition_mol=None,
-            composition_mol_by_account=bulk,
-        )
+        if fold_ferric_split:
+            _kg, _mol, accounts = _liquidus_inputs_on_feo_total_iron_basis(
+                composition_kg=None,
+                composition_mol=None,
+                composition_mol_by_account=bulk,
+            )
+        else:
+            accounts = bulk
         if accounts is None:
             return None
         melt_moles = accounts.get(CLEANED_MELT_ACCOUNT)
@@ -1842,6 +1846,7 @@ def evaluated_magemin_domain_identity(
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
+    fold_ferric_split: bool = True,
     projection_threshold_verdict: str = 'clear',
     refusal_reason: str | None = None,
     domain_verdict: tuple[bool, str | None] | None = None,
@@ -1854,6 +1859,7 @@ def evaluated_magemin_domain_identity(
             database,
             species_formula_registry=species_formula_registry,
             composition_mol_by_account=composition_mol_by_account,
+            fold_ferric_split=fold_ferric_split,
         )
     except MeltCompositionError as exc:
         return magemin_domain_identity_from_evaluated_bulk(

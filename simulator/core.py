@@ -803,7 +803,7 @@ _VALID_DECISION_CHOICES = {
 }
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
 _MELT_REDOX_GATE_PIN_DISPOSITIONS = frozenset(
-    {'live', 'memo-hit', 'replay'}
+    {'live', 'memo-hit'}
 )
 # Distinct from a resolved curve of None (gate read in progress). The FeO
 # domain reads a curve the hour already resolved. It must not start a
@@ -962,10 +962,7 @@ def _melt_redox_gate_authority_is_pin_candidate(
         and isinstance(authority.get('curve'), Mapping)
     ):
         return False
-    return (
-        authority.get('disposition') != 'replay'
-        or isinstance(authority.get('law_disclosures'), list)
-    )
+    return True
 
 
 STAGE0_GAS_COMPONENTS = {
@@ -5265,6 +5262,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return self._establish_melt_redox_gate_authority_for_current_hour(
                     **redox_state_kwargs,
                 )
+            if gate_authority.get('disposition') == 'replay':
+                return gate_authority['curve']
             if (
                 gate_authority.get('disposition')
                 in _MELT_REDOX_GATE_PIN_DISPOSITIONS
@@ -5286,8 +5285,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> bool:
         if not _melt_redox_gate_authority_is_pin_candidate(value):
             return False
-        if value.get('disposition') == 'replay':
-            return True
         from simulator.engine_binding_admission import (
             gate_curve_memo_reuse_eligible,
         )

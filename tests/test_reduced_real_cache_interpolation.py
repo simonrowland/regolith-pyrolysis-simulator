@@ -410,6 +410,54 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert "printed_fO2_echo_log" not in payload["equilibrium_result"]
 
 
+def test_obsolete_exact_row_does_not_hide_current_physics_bucket_row(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    bucket = _interpolation_key(
+        "bucket", feo_fraction=0.20, temperature_K=1500.01,
+    )
+    db_path = tmp_path / "obsolete-exact-with-current-bucket.sqlite"
+    old_payload = _interpolation_payload(liquid_fraction=0.4, sio_pa=5.0)
+    old_payload["equilibrium_result"]["diagnostics"] = {
+        "a_FeO_calphad": {
+            "notices": [{
+                "kind": "liquidus_unknown",
+                "authority": "unknown",
+                "source": "none:liquidus_gate_not_established",
+            }],
+        },
+    }
+    key_bytes = canonical_json_bytes(query)
+    rrd.PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=query,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=old_payload,
+        payload_bytes=canonical_json_bytes(old_payload),
+        payload_hash=hashlib.sha256(
+            canonical_json_bytes(old_payload)
+        ).hexdigest(),
+    )
+    _put_interpolation_row(
+        db_path,
+        bucket,
+        liquid_fraction=0.7,
+        sio_pa=7.0,
+    )
+
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    payload = store._lookup_optional(
+        "equilibrium_post_record",
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+    )
+
+    assert payload is not None
+    assert store.replay_sequence[-1]["cache_state"] == "cached_physics_bucket"
+
+
 def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
     tmp_path: Path,
 ) -> None:
