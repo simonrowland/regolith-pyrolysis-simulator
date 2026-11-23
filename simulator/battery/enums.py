@@ -418,6 +418,7 @@ DEFAULT_POLICY_NOTICE_KINDS = frozenset(
         NoticeKind.ASSUMED_PRESSURE,
         NoticeKind.METHOD_IMPLIED,
         NoticeKind.EFFUSION_REGIME_ASSUMED,
+        NoticeKind.EFFUSION_REGIME_VIOLATED,
         NoticeKind.ALPHA_ASSUMED,
         NoticeKind.KNOB_DEFAULTED,
         NoticeKind.ASSUMED_FO2,
