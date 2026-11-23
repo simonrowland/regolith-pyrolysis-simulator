@@ -8307,6 +8307,10 @@ def _activity_request_or_contract_refusal(
     )
 
 
+# TODO(t-1924c): replace the rejected proposal with the method-specific policy.
+_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID = "DP-101"
+
+
 def _assumption_notice(
     quantity: Quantity, reason: str, pressure_bar: float
 ) -> Notice:
@@ -8316,7 +8320,7 @@ def _assumption_notice(
         reason=reason,
         origin="score:predict_with_engine",
         policy=NoticePolicy(
-            id="DP-101",
+            id=_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID,
             version="v1",
             status="proposed",
             value=f"{pressure_bar:g}",
