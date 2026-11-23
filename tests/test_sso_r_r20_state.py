@@ -1379,12 +1379,23 @@ def test_redox_source_treats_denormal_capacity_as_no_melt_redox_capacity(
         exchange_direction="redox_source:evaporative_loss",
     )
 
-    # Reservoir untouched (the term cannot be absorbed) and diagnosed as the honest root
-    # cause, not a downstream candidate-fO2 artifact.
+    # The term is not integrated. Re-reference still publishes the metal
+    # floor of the sentinel: a lunar melt cannot keep log10(fO2) = -1614.
+    # The skip reason, the empty refusal, and a zero applied delta stay.
+    unfloored = -1614.1695751928787
+    notices = [
+        notice
+        for notice in sim._melt_metal_saturation_floor_notices
+        if notice.get("unfloored_log10_fO2_bar") == pytest.approx(unfloored)
+    ]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert str(notice["kind"]).startswith("melt_fO2_metal_saturation_floor:")
     assert math.isfinite(reservoir.melt_intrinsic_fO2_log)
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
-        -1614.1695751928787
+        float(notice["floor_log10_fO2_bar"])
     )
+    assert reservoir.melt_intrinsic_fO2_log > -30.0
     assert reservoir.redox_source_terms_applied is False
     assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
     assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
