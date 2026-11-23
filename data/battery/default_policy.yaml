@@ -350,3 +350,41 @@ policies:
         units: bar
         condition: "unprinted total pressure"
         evidence: "1f9d41322; scorer's existing silent 1e-6 bar fallback"
+  - id: DP-106
+    condition: "source does not state method"
+    value: "unspecified"
+    units: "method token"
+    physical_basis: "No reported technique means an unspecified token makes no apparatus-specific claim and adds no method-dependent premise."
+    bias: "The true method-specific condition may remain unknown; the proposed flag keeps the residual outside the clean tier."
+    flag: method_unstated
+    ruling: null
+    version: 1
+    status: proposed
+    proposed_by: w1122cvmq
+    proposed_at: "2026-11-23T01:39:34.631829+00:00"
+    evidence:
+      - source_id: ohta-suito-1995-mno-activity-slags
+        observation_id: ohta_suito_1995_table2_ac_alumina_activity
+      - source_id: ohta-suito-1995-mno-activity-slags
+        observation_id: ohta_suito_1995_table2_ca_alumina_activity
+    canonized_by: null
+    canonized_at: null
+    history: []
+  - id: DP-107
+    condition: row or experiment method prose identifies a closed technique
+    formula: method token inferred from the printed method prose
+    formula_owner: simulator.battery.migrate._method_inference_from_evidence
+    units: method token
+    physical_basis: The printed technique fixes the measurement regime.
+    bias: Citation text is not evidence for the row's measurement method.
+    flag: method_inferred
+    ruling: null
+    version: 1
+    status: proposed
+    proposed_by: w1123cvmq2
+    proposed_at: '2026-11-22T00:00:00+00:00'
+    evidence:
+    - row-level printed technique resolves to one closed method token
+    canonized_by: null
+    canonized_at: null
+    history: []

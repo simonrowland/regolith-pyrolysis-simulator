@@ -9,8 +9,17 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import AmountBasis, NoticeKind, Phase, Quantity, ValueKind
+from simulator.battery.default_policy import resolve
+from simulator.battery.enums import (
+    AmountBasis,
+    MethodToken,
+    NoticeKind,
+    Phase,
+    Quantity,
+    ValueKind,
+)
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import NoticePolicy
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -236,11 +245,37 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     records = list(result.observations.values())
     assert len(records) == 62
     assert not result.registry_issues
-    assert len(result.queue) == 6
-    assert all(
-        item.axes == ["method"] and item.why == "source does not state method"
+    assert not any("method" in item.axes for item in result.queue)
+
+    unstated_method_ids = {
+        "borisov_2013_morb_christie_1986_quoted",
+        "borisov_2013_morb_cottrell_kelley_2011_quoted",
+        "borisov_2013_pu3_schuessler_2008_quoted_mean",
+        "borisov_2013_pu3_wet_chemistry_session_1",
+        "borisov_2013_pu3_wet_chemistry_session_2",
+        "borisov_2013_pu3_wet_chemistry_session_3",
+    }
+    method_rows = {
+        record.observation_id.split("::", 1)[1]: record
+        for record in records
+        if record.observation_id.split("::", 1)[1] in unstated_method_ids
+    }
+    assert set(method_rows) == unstated_method_ids
+    method_policy = NoticePolicy(**resolve("DP-106").payload["policy"])
+    for record in method_rows.values():
+        method = result.experiments[record.experiment_id].method
+        assert method.is_value and method.value is MethodToken.UNSPECIFIED
+        method_notice = next(
+            notice for notice in record.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+        )
+        assert method_notice.policy == method_policy
+    remaining_non_method_queue = {
+        (item.observation_id, tuple(item.axes), item.why)
         for item in result.queue
-    )
+        if "method" not in item.axes
+    }
+    assert remaining_non_method_queue == set()
 
     source_formula = {
         item["observation_id"]: formula

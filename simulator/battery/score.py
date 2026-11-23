@@ -124,7 +124,7 @@ from simulator.battery.identity import (
     identity_equal,
     _identity_equal,
     _same_row_redox_identity_equal,
-    _same_row_knudsen_residue_identity_equal,
+    _same_row_residue_extent_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     melt_activity_log10_pressure_bound,
     profile_for,
@@ -615,6 +615,11 @@ FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION = (
 )
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
+FLAGGED_STRATUM_D460_MIGRATION = (
+    NoticeKind.METHOD_UNSTATED.value,
+    NoticeKind.METHOD_INFERRED.value,
+    NoticeKind.PHASE_INFERRED.value,
+)
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
@@ -2595,9 +2600,10 @@ def _classify_flagged_notice_facts(
         or NoticeKind.WUSTITE_REFERENCE_CONVERSION.value in kinds
     ):
         strata.append(FLAGGED_STRATUM_IRON_OXIDE_CONVENTION)
-    policy_flags = kinds & _DEFAULT_POLICY_FLAG_VALUES
-    if policy_flags:
-        strata.extend(sorted(policy_flags))
+    d460_flags = kinds & (
+        _DEFAULT_POLICY_FLAG_VALUES | set(FLAGGED_STRATUM_D460_MIGRATION)
+    )
+    strata.extend(sorted(d460_flags))
     unverified_apparatus = tuple(
         reason
         for kind, reason in notices
@@ -2625,7 +2631,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
+    if any(
+        _is_fusion_conversion_reason(reason)
+        for _kind, reason in notices
+    ):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
@@ -17239,6 +17248,135 @@ def _knudsen_residue_prediction(
         )
 
 
+def _langmuir_residue_prediction(
+    context,
+    reference,
+    engine,
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] | None = None,
+) -> EnginePrediction:
+    """Translate the per-bead Langmuir extent result to one oxide score."""
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence,
+        ResidueInventoryRefusal,
+        predict_langmuir_residue_composition,
+    )
+
+    experiment = context.experiments.get(reference.experiment_id)
+    channel = ENGINE_CHANNELS[engine]
+    sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    cache_source_id = (
+        f"langmuir:{reference.source_id}:{reference.experiment_id}:"
+        f"{getattr(reference.locator, 'table', None)}:"
+        f"{getattr(reference.locator, 'note', None)}"
+    )
+    try:
+        result = (
+            None if cache is None else
+            _residue_prediction_cache_entry(cache, cache_source_id, engine)
+        )
+        if result is None:
+            result = predict_langmuir_residue_composition(
+                engine.value, reference, experiment, context.observations.values()
+            )
+            if cache is not None:
+                _residue_prediction_cache_entry(
+                    cache, cache_source_id, engine, value=result
+                )
+        formula = reference.identity.species.formula
+        value = result["composition_wt_pct"].get(formula)
+        if value is None:
+            raise ResidueInventoryRefusal("channel_missing", formula)
+        provenance = {key: item for key, item in result.items() if key != "notices"}
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"{engine.value}:langmuir_residue_extent",
+            ),
+            value=Decimal(str(value)),
+            unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=sources,
+            lineage_complete=False,
+            notices=result["notices"],
+            identity=reference.identity,
+            refusal_detail=provenance,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if isinstance(exc, ResidueEngineNonconvergence)
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
+            coefficient_sources=sources,
+            notices=getattr(exc, "notices", ()),
+            lineage_complete=False,
+            refusal_reason=(
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if isinstance(exc, ResidueEngineNonconvergence)
+                else RefusalReason.UNSUPPORTED
+            ),
+            refusal_detail={
+                **getattr(exc, "provenance", {}),
+                "reason": exc.reason,
+                "detail": exc.detail,
+            },
+            identity=reference.identity,
+        )
+
+
+def _extent_residue_method(reference, experiment, quantity) -> MethodToken | None:
+    """Select a method-specific extent adapter without widening cohort locks."""
+    if (
+        experiment is None or not experiment.method.is_value
+        or quantity is None
+    ):
+        return None
+    if (
+        experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and quantity in {
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Quantity.ELEMENT_RETENTION_RATIO,
+        }
+    ):
+        return MethodToken.KNUDSEN_EFFUSION
+    if (
+        experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and reference.source_id == "mendybaev-2013-fun-cai-evaporation"
+        and _declared_residue_predictor(reference.source_id) is None
+    ):
+        return MethodToken.LANGMUIR_FREE_EVAPORATION
+    return None
+
+
+def _extent_residue_prediction(
+    context,
+    reference,
+    engine,
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] | None = None,
+) -> EnginePrediction | None:
+    method = _extent_residue_method(
+        reference,
+        context.experiments.get(reference.experiment_id),
+        quantity_token(reference.identity),
+    )
+    if method is MethodToken.KNUDSEN_EFFUSION:
+        return _knudsen_residue_prediction(context, reference, engine, cache)
+    if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
+        return _langmuir_residue_prediction(context, reference, engine, cache)
+    return None
+
+
 def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -18439,18 +18577,8 @@ def _compile_residual_with_lineage(
         reference,
         reference_present=reference.observation_id in context._observation_ids,
     )
-    if (
-        prediction is None and predict in (None, predict_with_engine)
-        and quantity in {
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
-            Quantity.ELEMENT_RETENTION_RATIO,
-        }
-        and experiment is not None and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-    ):
-        prediction = _knudsen_residue_prediction(
-            context, reference, engine
-        )
+    if prediction is None and predict in (None, predict_with_engine):
+        prediction = _extent_residue_prediction(context, reference, engine)
     if prediction is None:
         builtin_predictor = (
             predict is _BUILTIN_SCORE_PREDICTOR
@@ -18851,12 +18979,15 @@ def _compile_residual_with_lineage(
         )
 
     candidate = candidate_observation(reference, prediction)
-    knudsen_extent = (
+    extent_call = prediction.execution.call_evidence or ""
+    residue_extent = (
         quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and experiment is not None and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        and prediction.execution.call_evidence == f"{engine.value}:knudsen_residue_extent"
+        and extent_call in {
+            f"{engine.value}:knudsen_residue_extent",
+            f"{engine.value}:langmuir_residue_extent",
+        }
     )
+    langmuir_extent = residue_extent and extent_call == f"{engine.value}:langmuir_residue_extent"
     compared_reference = reference.identity
     compared_candidate = candidate.identity
     source_identity = source_reference.identity
@@ -18886,9 +19017,11 @@ def _compile_residual_with_lineage(
             source_identity.reference_state.value.endmember.polymorph
         )
     )
-    if knudsen_extent:
-        equal = _same_row_knudsen_residue_identity_equal(
-            compared_reference, compared_candidate
+    if residue_extent:
+        equal = _same_row_residue_extent_identity_equal(
+            compared_reference,
+            compared_candidate,
+            allow_unknown_species_phase=langmuir_extent,
         )
     elif fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity in MELT_ACTIVITY_QUANTITIES:
         equal = _identity_equal(
@@ -19404,7 +19537,7 @@ def _compile_residual_with_lineage(
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
-    if knudsen_extent:
+    if residue_extent:
         # Carry the identity owner's validated comparison into eligibility.
         conjuncts = replace(conjuncts, identity_equal=equal.kind is IdentityEqualKind.EQUAL)
     if is_sf04_workbook(reference):
@@ -23220,6 +23353,10 @@ def _policies_for_stratum(
         if isinstance(notice, Notice):
             policy = notice.policy
             if policy is None:
+                if notice.kind is NoticeKind.METHOD_INFERRED:
+                    raise ValueError(
+                        "method_inferred notice requires policy metadata"
+                    )
                 continue
             if (
                 notice.kind.value == stratum
@@ -24588,6 +24725,11 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         if isinstance(notice, Mapping)
     )
     for notice in raw_notices:
+        if (
+            notice.get("kind") == NoticeKind.METHOD_INFERRED.value
+            and notice.get("policy") is None
+        ):
+            raise ValueError("method_inferred notice requires policy metadata")
         if (
             notice.get("policy") is not None
             and notice.get("kind") not in _DEFAULT_POLICY_FLAG_VALUES

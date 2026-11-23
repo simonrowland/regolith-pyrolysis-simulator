@@ -72,6 +72,7 @@ from simulator.battery.records import (
     State,
     Uncertainty,
     Value,
+    phase_token,
     union_notices,
 )
 from simulator.battery.validate import validate_corpus
@@ -482,6 +483,18 @@ def test_m03_cao_liquid_vs_crystal_is_identity_mismatch() -> None:
     assert "species.phase" in outcome.fields
     control = identity_equal(crystal, F.cao_identity(Phase.CR, T_K=Decimal("1200")))
     assert control.kind is IdentityEqualKind.EQUAL
+
+
+def test_m03_unspecified_phase_remains_identity_unknown() -> None:
+    identity = F.psat_identity("Na")
+    unspecified = replace(
+        identity,
+        species=replace(identity.species, phase=State.of(Phase.UNSPECIFIED)),
+    )
+    assert phase_token(unspecified.species) is None
+    assert identity_equal(unspecified, unspecified).kind is (
+        IdentityEqualKind.IDENTITY_UNKNOWN
+    )
 
 
 def test_m04_residual_notice_union_survives_endpoint_ancestry() -> None:
@@ -3155,6 +3168,70 @@ def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
         NoticeKind.WUSTITE_REFERENCE_CONVERSION.value
         == "wustite_reference_conversion"
     )
+
+
+def test_d460_migration_default_and_inference_enum_tokens_are_pinned() -> None:
+    assert {
+        NoticeKind.METHOD_UNSTATED.value,
+        NoticeKind.METHOD_INFERRED.value,
+        NoticeKind.PHASE_INFERRED.value,
+    } == {
+        "method_unstated",
+        "method_inferred",
+        "phase_inferred",
+    }
+    assert Phase.UNSPECIFIED.value == "unspecified"
+    assert MethodToken.UNSPECIFIED.value == "unspecified"
+    assert MethodToken.CALORIMETRY.value == "calorimetry"
+    assert MethodToken.ELECTRON_MICROPROBE.value == "electron_microprobe"
+
+
+def test_d460_row_flags_can_survive_when_quantity_is_unknown() -> None:
+    for kind in (
+        NoticeKind.METHOD_UNSTATED,
+        NoticeKind.METHOD_INFERRED,
+        NoticeKind.PHASE_INFERRED,
+    ):
+        Notice(kind=kind, affected_quantities=(), reason="evidence", origin="row")
+
+    with pytest.raises(ValueError, match="affected_quantities"):
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(),
+            reason="evidence",
+            origin="row",
+        )
+
+
+def test_policy_metadata_is_part_of_notice_union_identity() -> None:
+    from simulator.battery.default_policy import load_policy_table
+    from simulator.battery.records import NoticePolicy
+
+    entry = load_policy_table()["DP-016"]
+    notice = Notice(
+        kind=NoticeKind.PHASE_INFERRED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="same reason",
+        origin="row",
+        policy=NoticePolicy(
+            id=entry["id"],
+            version=entry["version"],
+            status=entry["status"],
+            value=Phase.UNSPECIFIED.value,
+            units=entry["units"],
+        ),
+    )
+    other = replace(
+        notice,
+        policy=NoticePolicy(
+            id=entry["id"],
+            version=entry["version"],
+            status=entry["status"],
+            value=Phase.L.value,
+            units=entry["units"],
+        ),
+    )
+    assert union_notices((notice, other)) == (notice, other)
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:
