@@ -47,7 +47,9 @@ _ATM_BAR = Decimal("1.01325")
 # doi:10.1351/goldbook.C01214). The U.S. Standard Atmosphere 1976 table gives
 # 20.9476%: 0.0016 percentage points higher, i.e. log10(0.209476/0.20946)
 # = +3.3e-5 dex, below the precision of every four-place pin here. For
-# ideal gases that volume fraction equals the mole fraction: log10(0.20946) is
+# ideal gases that volume fraction equals the mole fraction. For a printed
+# oxygen partial pressure, this owner uses the same ideal-gas convention
+# fO2 = pO2: log10(0.20946) is
 # -0.67890 at 1 bar total, and log10(0.20946 × 1.01325) is -0.67318 at 1 atm
 # total (both to five decimal places). Versus 0.2095, the delta is
 # log10(0.20946 / 0.2095) = -0.00008293 dex (~1e-4), below the precision of

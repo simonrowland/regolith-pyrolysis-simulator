@@ -23223,6 +23223,55 @@ def _walk_printed_oxygen(
         if skip_tables and name in _OXYGEN_TABLE_KEYS:
             continue
         if name == "point_conditions" and isinstance(value, Mapping):
+            control = value.get("fO2_control")
+            control_state = (
+                control.get("state") if isinstance(control, Mapping) else None
+            )
+            control_text = (
+                control_state.get("value")
+                if isinstance(control_state, Mapping)
+                and control_state.get("tag") == "value"
+                else None
+            )
+            if isinstance(control_text, str):
+                fractional_oxygen = re.fullmatch(
+                    r"\s*(?P<numerator>\d+)\s*/\s*(?P<denominator>\d+)\s+"
+                    r"atmospheres?\s+of\s+(?:oxygen|O2)\s*\.?\s*",
+                    control_text,
+                    re.IGNORECASE,
+                )
+                if fractional_oxygen is not None:
+                    numerator = Decimal(fractional_oxygen.group("numerator"))
+                    denominator = Decimal(fractional_oxygen.group("denominator"))
+                    if denominator > 0:
+                        control_locator = (
+                            locator_from_mapping(control.get("locator"))
+                            or local
+                        )
+                        pressure = _pressure_located(
+                            numerator / denominator,
+                            "atm",
+                            control_locator,
+                            printed_key="point_conditions.fO2_control",
+                            published=control_text,
+                            quote=control_text,
+                            source_derivation=(
+                                "printed; "
+                                f"({numerator}/{denominator} atm)*"
+                                "(101325 Pa/atm); atm_to_Pa; "
+                                "fO2=pO2 under the ideal-gas convention"
+                            ),
+                        )
+                        if pressure is not None and pressure.state.is_value:
+                            raw_pressure = pressure.state.value
+                            if (
+                                isinstance(raw_pressure, Value)
+                                and raw_pressure.kind is ValueKind.POINT
+                                and raw_pressure.point is not None
+                            ):
+                                pressures.append(
+                                    (raw_pressure.point, pressure, "atm")
+                                )
             condition = value.get("fO2_log")
             if condition is not None:
                 try:

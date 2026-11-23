@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -50,6 +51,21 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
         and o.point_conditions["fO2_control"].locator.pdf_page_index == 3
         for o in observations
     )
+    assert all(
+        o.identity.fO2_Pa.is_value and o.identity.fO2_Pa.value == Decimal("20265")
+        for o in observations
+    )
+    for observation in observations:
+        pressure = observation.point_conditions["fO2_Pa"]
+        assert pressure.state.is_value
+        assert pressure.state.value.point == Decimal("20265")
+        assert pressure.inference is not None
+        assert "(1/5 atm)*(101325 Pa/atm)" in pressure.inference.relation
+        assert "fO2=pO2 under the ideal-gas convention" in pressure.inference.relation
+        assert "atm_to_Pa" in pressure.inference.relation
+        assert "printed=point_conditions.fO2_control" in pressure.inference.inputs
+        assert pressure.locator.pdf_page_index == 3
+        assert pressure.locator.published_page == 532
     assert all(
         o.point_conditions["duration_h"].state.is_value
         and o.point_conditions["duration_h"].locator.table == "II"
