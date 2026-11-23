@@ -1171,7 +1171,12 @@ def test_open_creates_a_cache_only_without_migration_leftovers(tmp_path) -> None
 
 
 def test_recover_replaces_an_empty_schema4_file_with_the_backup(tmp_path) -> None:
-    """The rename gap used to leave a user_version-4 file with no rows."""
+    """The rename gap used to leave a user_version-4 file with no rows.
+
+    That file is the one ``_connect`` creates. A hand-written two-column
+    ``engine_outputs`` has no ``row_seq``, so it is not the cache the
+    initializer writes and ``_hot_pairs`` cannot read it.
+    """
 
     path = tmp_path / "emptied.sqlite"
     rows = _schema3_pair(path)
@@ -1181,11 +1186,22 @@ def test_recover_replaces_an_empty_schema4_file_with_the_backup(tmp_path) -> Non
     hot_bak.write_bytes(path.read_bytes())
     cold_bak.write_bytes(cold.read_bytes())
     path.unlink()
-    with sqlite3.connect(path) as connection:
-        connection.execute("PRAGMA user_version=4")
-        connection.execute(
-            "CREATE TABLE engine_outputs (key BLOB PRIMARY KEY, value BLOB) WITHOUT ROWID"
-        )
+    # Build the empty schema-4 file away from the backups. ``_connect``
+    # refuses to create a cache while those leftovers sit beside the path.
+    fresh = tmp_path / "fresh-empty.sqlite"
+    connection = engine_cache._connect(fresh, readonly=False)
+    try:
+        assert connection is not None
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
+    finally:
+        engine_cache._close_connections()
+    for suffix in ("-wal", "-shm"):
+        sidecar = Path(str(fresh) + suffix)
+        if sidecar.exists():
+            sidecar.unlink()
+    fresh.replace(path)
     with sqlite3.connect(cold) as connection:
         connection.execute("PRAGMA user_version=4")
     assert _user_version(path) == 4
