@@ -1868,3 +1868,53 @@ def test_buffer_release_record_counts_live_lots_through_fe_settle():
     assert len(actual_buffer_lots) == 3
     assert record["buffer_postings"] == len(actual_buffer_lots)
     assert record["buffer_postings"] == 3
+
+
+def test_reducing_only_roundoff_does_not_refuse_empty_buffer():
+    """The reducing source's /3600 * 3600 residue belongs in the budget.
+
+    Mutation: restoring the absolute 1e-15 mol slack refuses this hour's
+    1.7763568394002505e-15 mol residue despite its empty buffer.
+    """
+
+    reducing_credit_mol = 14.068359375
+    sim = _sim(CampaignPhase.C4, 1500.0, 20.0)
+    _seed(
+        sim,
+        "process.overhead_gas",
+        {OXYGEN_SPECIES: 1.0},
+        "reducing-only roundoff",
+    )
+    sim._headspace_reducing_overhead_o2_mol = (
+        lambda **_kwargs: reducing_credit_mol
+    )
+
+    def fixed_reducing_split(**_kwargs):
+        return {
+            "direction": "reducing",
+            "o2_account": "process.overhead_gas",
+            "o2_credit_mol": reducing_credit_mol,
+            "status": "ok",
+        }
+
+    sim._apply_fe_redox_respeciation = fixed_reducing_split
+    # This synthetic Fe source does not write a redox transition. Keep the
+    # post-hour gas/ledger identity check outside this roundoff regression.
+    sim._refuse_if_headspace_pressure_is_not_inventory = lambda: None
+    hour = _step(sim, lambda _partials: {}, lambda _species: 0.0)
+    record = next(
+        row
+        for row in sim._headspace_species_notices
+        if row.get("reason") == "headspace_buffer_release"
+    )
+
+    assert hour.shut_path is None
+    assert sim._headspace_balance_terms["path"] == "fast_root"
+    assert record["reducing_credit_mol"] == reducing_credit_mol
+    assert record["excess_integrated"] == 1.7763568394002505e-15
+    assert record["n_open"] == 0.0
+    assert record["n_credit"] == 0.0
+    assert record["n_debit"] == 0.0
+    assert record["n_uptake"] is None
+    assert record["buffer_postings"] == 0
+    assert record["fo2_buffer_after_settle_mol"] == 0.0

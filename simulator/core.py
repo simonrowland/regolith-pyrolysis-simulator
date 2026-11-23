@@ -1130,13 +1130,19 @@ def _headspace_buffer_release_roundoff_slack_mol(
     buffer_release: Mapping[str, Any],
 ) -> float:
     uptake = buffer_release.get("n_uptake")
+    reducing_credit = buffer_release.get("reducing_credit_mol")
+    reducing_credit = (
+        0.0 if reducing_credit is None else float(reducing_credit)
+    )
     stock_operations = (
         0
         if uptake is None
         else 2 + int(float(uptake) != 0.0)
     )
     operation_count = (
-        int(buffer_release.get("buffer_postings", 0)) + stock_operations
+        int(buffer_release.get("buffer_postings", 0))
+        + stock_operations
+        + (2 if reducing_credit != 0.0 else 0)
     )
     magnitude_mol = math.fsum(
         abs(float(term))
@@ -1145,17 +1151,20 @@ def _headspace_buffer_release_roundoff_slack_mol(
             buffer_release.get("n_credit"),
             buffer_release.get("n_debit"),
             uptake,
+            reducing_credit,
             buffer_release.get("fo2_buffer_after_settle_mol"),
         )
         if term is not None
     )
-    # Premise: each nonzero buffer lot rounds one ledger addition; the stock
-    # formula rounds two nontrivial operations at zero uptake and three with
-    # uptake. N is those operations together. Each contributes at most half
-    # an ulp of a running magnitude bounded by M, or 0.5 eps M. The extra
-    # eps M covers the final comparison-side addition, giving (N/2 + 1) eps M.
-    # M and the slack are mol; eps is dimensionless. As M -> 0 the noop is
-    # still the floor. At M = 10.1802 mol and N = 11, slack is 1.47e-14 mol.
+    # Premise: N counts one rounded ledger addition per buffer posting, 2 or
+    # 3 stock operations, and the reducing credit's /3600 and *3600 when it
+    # enters this comparison. Each operation contributes at most half an ulp
+    # of a running magnitude bounded by M; converting the rate error back to
+    # mol preserves that relative bound. Thus operation error is at most
+    # (N/2) eps M. The final threshold addition contributes eps M, giving
+    # (N/2 + 1) eps M. M and the slack are mol; eps is dimensionless. At
+    # M = 14.068359375 mol and N = 2, the bound is 6.25e-15 mol, above the
+    # reducing-only walk's 1.78e-15 mol residue. As M -> 0, noop is the floor.
     return max(
         OXYGEN_RESERVOIR_NOOP_MOL,
         (operation_count / 2.0 + 1.0)
@@ -4634,6 +4643,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         excess_integrated: float,
+        reducing_credit_mol: float,
         signed_open_mol: float,
         signed_after_vapour_mol: float,
         signed_after_settle_mol: float,
@@ -4644,7 +4654,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         The inventory refusal and the hour notice both carry this dict.
         Nothing here posts. The refusal reads the stock terms, the number
-        of nonzero buffer O2 lots posted this hour, and the post-settle buffer.
+        of nonzero buffer O2 lots posted this hour, the reducing credit
+        subtracted from integrated S, and the post-settle buffer.
         n_open, n_credit, n_debit and n_uptake are the arguments the
         stock function last evaluated outside a diagnostic sample.
         n_uptake is None when that evaluation did not ask the Fe split.
@@ -4731,6 +4742,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 above_floor += o2_credit
         return {
             "excess_integrated": float(excess_integrated),
+            "reducing_credit_mol": float(reducing_credit_mol),
             "n_open": terms.get("n_open"),
             "n_credit": terms.get("n_credit"),
             "n_debit": terms.get("n_debit"),
@@ -9928,6 +9940,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         buffer_release = self._headspace_buffer_release_record(
             excess_integrated=excess_integrated,
+            reducing_credit_mol=reducing_overhead_mol,
             signed_open_mol=signed_buffer_mol,
             signed_after_vapour_mol=signed_after_vapour_mol,
             signed_after_settle_mol=signed_after_settle_mol,
