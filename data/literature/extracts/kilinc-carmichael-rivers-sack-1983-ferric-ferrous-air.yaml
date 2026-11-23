@@ -1,0 +1,3998 @@
+schema_version: literature_extract.v1
+source_id: kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
+source:
+  citation: Kilinc, A., Carmichael, I. S. E., Rivers, M. L., and Sack, R. O. (1983). The ferric-ferrous ratio of natural
+    silicate liquids equilibrated in air. Contributions to Mineralogy and Petrology, 83, 136–140.
+  doi: 10.1007/BF00373086
+  year: 1983
+  sha256: c4d4cd7b87e5401c09a422e361ea4f06b326b46f58f86e0f46c6c40a12809a74
+  corpus_asset: raw/kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air/kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air.pdf
+extraction:
+  method: Manual transcription of Tables 1–3 from the primary PDF; pdftotext-layout was used as an aid and values were checked
+    against rendered pages. Table 1 contains 36 glass assays, Table 2 contains 10 duplicate assays, and Table 3 contains
+    five timed glass assays with printed temperatures. The Initial column of Table 3 is retained in the mapping audit because
+    no temperature is printed. No regression output or derived Fe3+/Fe2+ ratio is included.
+  date: '2026-11-23'
+  worker: w1123t1965
+  audit_files:
+  - data/literature/extracts/audits/kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air-mapping.md
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[kilinc_1983_table1_measured_redox_series].values.rows[0].oxide_wt_percent.Fe2O3
+  value: '1.13'
+  locator:
+    published_page: 137
+    pdf_page_index: 1
+    table: '1'
+    record: '1'
+    column: Fe2O3
+- path: species.Fe.observations[kilinc_1983_table1_measured_redox_series].values.rows[0].oxide_wt_percent.FeO
+  value: '0.64'
+  locator:
+    published_page: 137
+    pdf_page_index: 1
+    table: '1'
+    record: '1'
+    column: FeO
+- path: species.Fe.observations[kilinc_1983_table2_duplicate_redox_series].values.rows[0].oxide_wt_percent.Fe2O3
+  value: '2.09'
+  locator:
+    published_page: 139
+    pdf_page_index: 3
+    table: '2'
+    record: '37'
+    column: Fe2O3
+- path: species.Fe.observations[kilinc_1983_table3_equilibrium_time_series].values.rows[0].oxide_wt_percent.FeO
+  value: '2.23'
+  locator:
+    published_page: 139
+    pdf_page_index: 3
+    table: '3'
+    record: 5 h
+    column: FeO
+species:
+  Fe:
+    observations:
+    - observation_id: kilinc_1983_table1_measured_redox_series
+      type: composition_series
+      regime: quench_equilibration
+      phase: quenched silicate glass
+      locator:
+        published_page: 137-138
+        pdf_page_index: 1-2
+        table: '1'
+        note: All 36 assay rows; each row carries its own record locator.
+      units: wt% oxides as printed; T in °C as printed; atmosphere air
+      uncertainty: No run-specific uncertainty is printed for tabulated glass assays.
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        value_status: printed
+        composition_units: wt% oxides as printed
+        temperature_units: °C as printed
+        iron_assay_note: FeO was determined by wet chemical methods; Fe2O3 was calculated by the authors from FeOt and FeO
+          using the printed expression. This extract retains those printed oxide values and does not calculate a ratio.
+        column_method_class:
+          T_C: measured_direct
+          FeO: measured_direct
+          Fe2O3: measured_reduced
+          composition: measured_reduced
+        rows:
+        - experiment_id: '1'
+          sample_identifier_as_printed: CAM-49
+          composition_role_as_printed: analysed glass
+          T_C: '1342'
+          oxide_wt_percent: &id001
+            SiO2: '72.21'
+            TiO2: '0.26'
+            Al2O3: '14.04'
+            Fe2O3: '1.13'
+            Cr2O3: '0.00'
+            FeO: '0.64'
+            MnO: '0.04'
+            MgO: '0.27'
+            CaO: '1.27'
+            Na2O: '4.04'
+            K2O: '4.38'
+            P2O5: '0.04'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '23'
+          locator: &id002
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '1'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1342'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '1'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '1'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id001
+              locator: *id002
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '1.13'
+          FeO_wt_pct: '0.64'
+          run_id_as_printed: '1'
+          T_C_as_printed: 1,342
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '2'
+          sample_identifier_as_printed: '121'
+          composition_role_as_printed: analysed glass
+          T_C: '1344'
+          oxide_wt_percent: &id003
+            SiO2: '71.03'
+            TiO2: '0.28'
+            Al2O3: '8.03'
+            Fe2O3: '7.29'
+            Cr2O3: '0.00'
+            FeO: '1.58'
+            MnO: '0.24'
+            MgO: '0.18'
+            CaO: '0.52'
+            Na2O: '6.08'
+            K2O: '3.81'
+            P2O5: '0.01'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id004
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '2'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1344'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '2'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '2'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id003
+              locator: *id004
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '7.29'
+          FeO_wt_pct: '1.58'
+          run_id_as_printed: '2'
+          T_C_as_printed: 1,344
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '3'
+          sample_identifier_as_printed: '3114'
+          composition_role_as_printed: analysed glass
+          T_C: '1340'
+          oxide_wt_percent: &id005
+            SiO2: '69.15'
+            TiO2: '0.49'
+            Al2O3: '11.26'
+            Fe2O3: '5.71'
+            Cr2O3: '0.00'
+            FeO: '0.71'
+            MnO: '0.27'
+            MgO: '0.21'
+            CaO: '0.40'
+            Na2O: '5.82'
+            K2O: '4.38'
+            P2O5: '0.04'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '47.5'
+          locator: &id006
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '3'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1340'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '3'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '3'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id005
+              locator: *id006
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '5.71'
+          FeO_wt_pct: '0.71'
+          run_id_as_printed: '3'
+          T_C_as_printed: 1,340
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '4'
+          sample_identifier_as_printed: NIC-8
+          composition_role_as_printed: analysed glass
+          T_C: '1344'
+          oxide_wt_percent: &id007
+            SiO2: '61.59'
+            TiO2: '0.67'
+            Al2O3: '15.66'
+            Fe2O3: '5.08'
+            Cr2O3: '0.00'
+            FeO: '1.31'
+            MnO: '0.15'
+            MgO: '1.43'
+            CaO: '3.55'
+            Na2O: '5.66'
+            K2O: '3.77'
+            P2O5: '0.10'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id008
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '4'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1344'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '4'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '4'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id007
+              locator: *id008
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '5.08'
+          FeO_wt_pct: '1.31'
+          run_id_as_printed: '4'
+          T_C_as_printed: 1,344
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '5'
+          sample_identifier_as_printed: 867-114
+          composition_role_as_printed: analysed glass
+          T_C: '1349'
+          oxide_wt_percent: &id009
+            SiO2: '58.06'
+            TiO2: '0.85'
+            Al2O3: '15.44'
+            Fe2O3: '7.12'
+            Cr2O3: '0.00'
+            FeO: '2.34'
+            MnO: '0.16'
+            MgO: '3.19'
+            CaO: '6.83'
+            Na2O: '3.70'
+            K2O: '1.22'
+            P2O5: '0.09'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '25'
+          locator: &id010
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '5'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1349'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '5'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '5'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id009
+              locator: *id010
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '7.12'
+          FeO_wt_pct: '2.34'
+          run_id_as_printed: '5'
+          T_C_as_printed: 1,349
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '6'
+          sample_identifier_as_printed: 780-U-111
+          composition_role_as_printed: analysed glass
+          T_C: '1344'
+          oxide_wt_percent: &id011
+            SiO2: '43.68'
+            TiO2: '4.42'
+            Al2O3: '9.89'
+            Fe2O3: '10.92'
+            Cr2O3: '0.00'
+            FeO: '1.83'
+            MnO: '0.02'
+            MgO: '9.00'
+            CaO: '11.38'
+            Na2O: '2.72'
+            K2O: '4.11'
+            P2O5: '0.03'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id012
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '6'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1344'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '6'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '6'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id011
+              locator: *id012
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '10.92'
+          FeO_wt_pct: '1.83'
+          run_id_as_printed: '6'
+          T_C_as_printed: 1,344
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '7'
+          sample_identifier_as_printed: 780-U-105
+          composition_role_as_printed: analysed glass
+          T_C: '1350'
+          oxide_wt_percent: &id013
+            SiO2: '39.50'
+            TiO2: '5.64'
+            Al2O3: '9.89'
+            Fe2O3: '11.66'
+            Cr2O3: '0.00'
+            FeO: '2.63'
+            MnO: '0.24'
+            MgO: '6.69'
+            CaO: '14.82'
+            Na2O: '2.27'
+            K2O: '4.23'
+            P2O5: '0.61'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '39.5'
+          locator: &id014
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '7'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1350'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '7'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '7'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id013
+              locator: *id014
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '11.66'
+          FeO_wt_pct: '2.63'
+          run_id_as_printed: '7'
+          T_C_as_printed: 1,350
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '8'
+          sample_identifier_as_printed: '20424'
+          composition_role_as_printed: analysed glass
+          T_C: '1342'
+          oxide_wt_percent: &id015
+            SiO2: '38.98'
+            TiO2: '2.93'
+            Al2O3: '13.42'
+            Fe2O3: '11.29'
+            Cr2O3: '0.00'
+            FeO: '1.28'
+            MnO: '0.36'
+            MgO: '5.79'
+            CaO: '16.99'
+            Na2O: '4.04'
+            K2O: '2.73'
+            P2O5: '0.89'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '23'
+          locator: &id016
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '8'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1342'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '8'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '8'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id015
+              locator: *id016
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '11.29'
+          FeO_wt_pct: '1.28'
+          run_id_as_printed: '8'
+          T_C_as_printed: 1,342
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '21'
+          sample_identifier_as_printed: COL-11
+          composition_role_as_printed: analysed glass
+          T_C: '1446'
+          oxide_wt_percent: &id017
+            SiO2: '57.07'
+            TiO2: '0.74'
+            Al2O3: '16.91'
+            Fe2O3: '4.94'
+            Cr2O3: '0.00'
+            FeO: '2.11'
+            MnO: '0.12'
+            MgO: '5.87'
+            CaO: '7.42'
+            Na2O: '3.63'
+            K2O: '0.95'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id018
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '21'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1446'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '21'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '21'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id017
+              locator: *id018
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.94'
+          FeO_wt_pct: '2.11'
+          run_id_as_printed: '21'
+          T_C_as_printed: 1,446
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '22'
+          sample_identifier_as_printed: 1910-199
+          composition_role_as_printed: analysed glass
+          T_C: '1428'
+          oxide_wt_percent: &id019
+            SiO2: '56.74'
+            TiO2: '1.23'
+            Al2O3: '20.15'
+            Fe2O3: '3.72'
+            Cr2O3: '0.00'
+            FeO: '1.49'
+            MnO: '0.19'
+            MgO: '1.04'
+            CaO: '3.09'
+            Na2O: '7.13'
+            K2O: '3.52'
+            P2O5: '0.08'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '25.5'
+          locator: &id020
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '22'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1428'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '22'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '22'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id019
+              locator: *id020
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '3.72'
+          FeO_wt_pct: '1.49'
+          run_id_as_printed: '22'
+          T_C_as_printed: 1,428
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '23'
+          sample_identifier_as_printed: H-96A
+          composition_role_as_printed: analysed glass
+          T_C: '1434'
+          oxide_wt_percent: &id021
+            SiO2: '56.32'
+            TiO2: '0.74'
+            Al2O3: '16.82'
+            Fe2O3: '4.78'
+            Cr2O3: '0.00'
+            FeO: '2.22'
+            MnO: '0.12'
+            MgO: '6.07'
+            CaO: '7.42'
+            Na2O: '3.84'
+            K2O: '0.98'
+            P2O5: '0.04'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id022
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '23'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1434'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '23'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '23'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id021
+              locator: *id022
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.78'
+          FeO_wt_pct: '2.22'
+          run_id_as_printed: '23'
+          T_C_as_printed: 1,434
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '24'
+          sample_identifier_as_printed: 90-05
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id023
+            SiO2: '55.63'
+            TiO2: '0.54'
+            Al2O3: '21.31'
+            Fe2O3: '2.75'
+            Cr2O3: '0.00'
+            FeO: '1.06'
+            MnO: '0.18'
+            MgO: '0.72'
+            CaO: '3.21'
+            Na2O: '3.94'
+            K2O: '8.91'
+            P2O5: '0.04'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id024
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '24'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '24'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '24'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id023
+              locator: *id024
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '2.75'
+          FeO_wt_pct: '1.06'
+          run_id_as_printed: '24'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '25'
+          sample_identifier_as_printed: '20424'
+          composition_role_as_printed: analysed glass
+          T_C: '1447'
+          oxide_wt_percent: &id025
+            SiO2: '39.84'
+            TiO2: '2.97'
+            Al2O3: '14.21'
+            Fe2O3: '10.72'
+            Cr2O3: '0.00'
+            FeO: '2.41'
+            MnO: '0.38'
+            MgO: '6.18'
+            CaO: '17.81'
+            Na2O: '2.80'
+            K2O: '1.10'
+            P2O5: '0.02'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id026
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '25'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1447'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '25'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '25'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id025
+              locator: *id026
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '10.72'
+          FeO_wt_pct: '2.41'
+          run_id_as_printed: '25'
+          T_C_as_printed: 1,447
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '26'
+          sample_identifier_as_printed: G-84
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id027
+            SiO2: '51.17'
+            TiO2: '3.27'
+            Al2O3: '12.75'
+            Fe2O3: '10.09'
+            Cr2O3: '0.00'
+            FeO: '4.60'
+            MnO: '0.31'
+            MgO: '4.09'
+            CaO: '8.60'
+            Na2O: '2.85'
+            K2O: '0.50'
+            P2O5: '0.08'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id028
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '26'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '26'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '26'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id027
+              locator: *id028
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '10.09'
+          FeO_wt_pct: '4.60'
+          run_id_as_printed: '26'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '27'
+          sample_identifier_as_printed: KIL-2
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id029
+            SiO2: '50.29'
+            TiO2: '3.31'
+            Al2O3: '13.91'
+            Fe2O3: '9.17'
+            Cr2O3: '0.00'
+            FeO: '3.45'
+            MnO: '0.17'
+            MgO: '6.01'
+            CaO: '9.78'
+            Na2O: '2.34'
+            K2O: '0.54'
+            P2O5: '0.05'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id030
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '27'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '27'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '27'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id029
+              locator: *id030
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '9.17'
+          FeO_wt_pct: '3.45'
+          run_id_as_printed: '27'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '28'
+          sample_identifier_as_printed: 944-F
+          composition_role_as_printed: analysed glass
+          T_C: '1434'
+          oxide_wt_percent: &id031
+            SiO2: '49.93'
+            TiO2: '3.31'
+            Al2O3: '13.57'
+            Fe2O3: '9.89'
+            Cr2O3: '0.00'
+            FeO: '2.74'
+            MnO: '0.16'
+            MgO: '6.37'
+            CaO: '9.81'
+            Na2O: '2.64'
+            K2O: '0.63'
+            P2O5: '0.28'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id032
+            published_page: 137
+            pdf_page_index: 1
+            table: '1'
+            record: '28'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1434'
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '28'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 137
+                pdf_page_index: 1
+                table: '1'
+                record: '28'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id031
+              locator: *id032
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '9.89'
+          FeO_wt_pct: '2.74'
+          run_id_as_printed: '28'
+          T_C_as_printed: 1,434
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '9'
+          sample_identifier_as_printed: '121'
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id033
+            SiO2: '72.53'
+            TiO2: '0.29'
+            Al2O3: '8.06'
+            Fe2O3: '7.02'
+            Cr2O3: '0.00'
+            FeO: '1.41'
+            MnO: '0.26'
+            MgO: '0.05'
+            CaO: '0.46'
+            Na2O: '5.95'
+            K2O: '3.54'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id034
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '9'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '9'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '9'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id033
+              locator: *id034
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '7.02'
+          FeO_wt_pct: '1.41'
+          run_id_as_printed: '9'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '10'
+          sample_identifier_as_printed: NZC-4
+          composition_role_as_printed: analysed glass
+          T_C: '1454'
+          oxide_wt_percent: &id035
+            SiO2: '72.51'
+            TiO2: '0.24'
+            Al2O3: '10.12'
+            Fe2O3: '5.01'
+            Cr2O3: '0.02'
+            FeO: '1.18'
+            MnO: '0.12'
+            MgO: '0.02'
+            CaO: '0.27'
+            Na2O: '4.98'
+            K2O: '4.10'
+            P2O5: '0.01'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '26'
+          locator: &id036
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '10'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1454'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '10'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '10'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id035
+              locator: *id036
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '5.01'
+          FeO_wt_pct: '1.18'
+          run_id_as_printed: '10'
+          T_C_as_printed: 1,454
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '11'
+          sample_identifier_as_printed: CAM-49
+          composition_role_as_printed: analysed glass
+          T_C: '1434'
+          oxide_wt_percent: &id037
+            SiO2: '72.38'
+            TiO2: '0.27'
+            Al2O3: '13.94'
+            Fe2O3: '1.09'
+            Cr2O3: '0.00'
+            FeO: '0.63'
+            MnO: '0.04'
+            MgO: '0.25'
+            CaO: '1.23'
+            Na2O: '4.21'
+            K2O: '4.23'
+            P2O5: '0.03'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '20'
+          locator: &id038
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '11'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1434'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '11'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '11'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id037
+              locator: *id038
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '1.09'
+          FeO_wt_pct: '0.63'
+          run_id_as_printed: '11'
+          T_C_as_printed: 1,434
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '12'
+          sample_identifier_as_printed: '3114'
+          composition_role_as_printed: analysed glass
+          T_C: '1454'
+          oxide_wt_percent: &id039
+            SiO2: '69.59'
+            TiO2: '0.49'
+            Al2O3: '11.10'
+            Fe2O3: '5.32'
+            Cr2O3: '0.00'
+            FeO: '1.23'
+            MnO: '0.27'
+            MgO: '0.22'
+            CaO: '0.36'
+            Na2O: '5.42'
+            K2O: '4.23'
+            P2O5: '0.02'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '26'
+          locator: &id040
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '12'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1454'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '12'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '12'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id039
+              locator: *id040
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '5.32'
+          FeO_wt_pct: '1.23'
+          run_id_as_printed: '12'
+          T_C_as_printed: 1,454
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '13'
+          sample_identifier_as_printed: '1004'
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id041
+            SiO2: '67.72'
+            TiO2: '0.73'
+            Al2O3: '11.28'
+            Fe2O3: '5.07'
+            Cr2O3: '0.00'
+            FeO: '1.95'
+            MnO: '0.22'
+            MgO: '0.98'
+            CaO: '2.00'
+            Na2O: '4.84'
+            K2O: '3.51'
+            P2O5: '0.05'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id042
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '13'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '13'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '13'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id041
+              locator: *id042
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '5.07'
+          FeO_wt_pct: '1.95'
+          run_id_as_printed: '13'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '14'
+          sample_identifier_as_printed: NIC-8
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id043
+            SiO2: '61.43'
+            TiO2: '0.70'
+            Al2O3: '16.40'
+            Fe2O3: '4.76'
+            Cr2O3: '0.00'
+            FeO: '1.66'
+            MnO: '0.17'
+            MgO: '1.46'
+            CaO: '3.70'
+            Na2O: '5.17'
+            K2O: '3.30'
+            P2O5: '0.10'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id044
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '14'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '14'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '14'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id043
+              locator: *id044
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.76'
+          FeO_wt_pct: '1.66'
+          run_id_as_printed: '14'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '15'
+          sample_identifier_as_printed: G-24
+          composition_role_as_printed: analysed glass
+          T_C: '1447'
+          oxide_wt_percent: &id045
+            SiO2: '60.84'
+            TiO2: '0.93'
+            Al2O3: '17.70'
+            Fe2O3: '4.16'
+            Cr2O3: '0.01'
+            FeO: '1.40'
+            MnO: '0.12'
+            MgO: '0.91'
+            CaO: '2.32'
+            Na2O: '5.49'
+            K2O: '5.56'
+            P2O5: '0.23'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id046
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '15'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1447'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '15'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '15'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id045
+              locator: *id046
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.16'
+          FeO_wt_pct: '1.40'
+          run_id_as_printed: '15'
+          T_C_as_printed: 1,447
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '16'
+          sample_identifier_as_printed: TC-19
+          composition_role_as_printed: analysed glass
+          T_C: '1447'
+          oxide_wt_percent: &id047
+            SiO2: '60.28'
+            TiO2: '0.75'
+            Al2O3: '19.57'
+            Fe2O3: '3.01'
+            Cr2O3: '0.00'
+            FeO: '0.79'
+            MnO: '0.20'
+            MgO: '0.41'
+            CaO: '0.77'
+            Na2O: '8.19'
+            K2O: '5.09'
+            P2O5: '0.06'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id048
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '16'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1447'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '16'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '16'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id047
+              locator: *id048
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '3.01'
+          FeO_wt_pct: '0.79'
+          run_id_as_printed: '16'
+          T_C_as_printed: 1,447
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '17'
+          sample_identifier_as_printed: COL-17
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id049
+            SiO2: '60.21'
+            TiO2: '0.75'
+            Al2O3: '17.36'
+            Fe2O3: '4.19'
+            Cr2O3: '0.00'
+            FeO: '1.96'
+            MnO: '0.12'
+            MgO: '3.21'
+            CaO: '5.64'
+            Na2O: '4.43'
+            K2O: '1.27'
+            P2O5: '0.11'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id050
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '17'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '17'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '17'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id049
+              locator: *id050
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.19'
+          FeO_wt_pct: '1.96'
+          run_id_as_printed: '17'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '18'
+          sample_identifier_as_printed: A-1770
+          composition_role_as_printed: analysed glass
+          T_C: '1429'
+          oxide_wt_percent: &id051
+            SiO2: '59.26'
+            TiO2: '2.87'
+            Al2O3: '11.40'
+            Fe2O3: '3.02'
+            Cr2O3: '0.00'
+            FeO: '1.09'
+            MnO: '0.06'
+            MgO: '6.96'
+            CaO: '3.94'
+            Na2O: '1.12'
+            K2O: '8.91'
+            P2O5: '0.01'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22.5'
+          locator: &id052
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '18'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1429'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '18'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '18'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id051
+              locator: *id052
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '3.02'
+          FeO_wt_pct: '1.09'
+          run_id_as_printed: '18'
+          T_C_as_printed: 1,429
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '19'
+          sample_identifier_as_printed: G-24
+          composition_role_as_printed: analysed glass
+          T_C: '1429'
+          oxide_wt_percent: &id053
+            SiO2: '58.64'
+            TiO2: '1.13'
+            Al2O3: '17.34'
+            Fe2O3: '4.54'
+            Cr2O3: '0.00'
+            FeO: '1.06'
+            MnO: '0.12'
+            MgO: '1.66'
+            CaO: '2.76'
+            Na2O: '5.21'
+            K2O: '5.82'
+            P2O5: '0.29'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22.5'
+          locator: &id054
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '19'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1429'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '19'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '19'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id053
+              locator: *id054
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.54'
+          FeO_wt_pct: '1.06'
+          run_id_as_printed: '19'
+          T_C_as_printed: 1,429
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '20'
+          sample_identifier_as_printed: '442'
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id055
+            SiO2: '57.40'
+            TiO2: '1.49'
+            Al2O3: '18.50'
+            Fe2O3: '4.04'
+            Cr2O3: '0.00'
+            FeO: '1.55'
+            MnO: '0.13'
+            MgO: '1.79'
+            CaO: '4.05'
+            Na2O: '4.81'
+            K2O: '4.89'
+            P2O5: '0.44'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id056
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '20'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '20'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '20'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id055
+              locator: *id056
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '4.04'
+          FeO_wt_pct: '1.55'
+          run_id_as_printed: '20'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '29'
+          sample_identifier_as_printed: 94-8
+          composition_role_as_printed: analysed glass
+          T_C: '1447'
+          oxide_wt_percent: &id057
+            SiO2: '49.46'
+            TiO2: '1.12'
+            Al2O3: '18.50'
+            Fe2O3: '6.64'
+            Cr2O3: '0.00'
+            FeO: '2.14'
+            MnO: '0.15'
+            MgO: '3.96'
+            CaO: '8.64'
+            Na2O: '2.49'
+            K2O: '5.83'
+            P2O5: '0.01'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id058
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '29'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1447'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '29'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '29'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id057
+              locator: *id058
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '6.64'
+          FeO_wt_pct: '2.14'
+          run_id_as_printed: '29'
+          T_C_as_printed: 1,447
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '30'
+          sample_identifier_as_printed: A-1805
+          composition_role_as_printed: analysed glass
+          T_C: '1434'
+          oxide_wt_percent: &id059
+            SiO2: '48.78'
+            TiO2: '2.81'
+            Al2O3: '8.80'
+            Fe2O3: '5.76'
+            Cr2O3: '0.01'
+            FeO: '1.78'
+            MnO: '0.14'
+            MgO: '11.96'
+            CaO: '12.81'
+            Na2O: '0.64'
+            K2O: '3.06'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id060
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '30'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1434'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '30'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '30'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id059
+              locator: *id060
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '5.76'
+          FeO_wt_pct: '1.78'
+          run_id_as_printed: '30'
+          T_C_as_printed: 1,434
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '31'
+          sample_identifier_as_printed: 766-263
+          composition_role_as_printed: analysed glass
+          T_C: '1436'
+          oxide_wt_percent: &id061
+            SiO2: '48.55'
+            TiO2: '2.20'
+            Al2O3: '16.26'
+            Fe2O3: '7.71'
+            Cr2O3: '0.00'
+            FeO: '2.90'
+            MnO: '0.17'
+            MgO: '8.34'
+            CaO: '8.53'
+            Na2O: '3.41'
+            K2O: '1.39'
+            P2O5: '0.05'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '10'
+          locator: &id062
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '31'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1436'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '31'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '31'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id061
+              locator: *id062
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '7.71'
+          FeO_wt_pct: '2.90'
+          run_id_as_printed: '31'
+          T_C_as_printed: 1,436
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '32'
+          sample_identifier_as_printed: 780-U-111
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id063
+            SiO2: '44.62'
+            TiO2: '4.70'
+            Al2O3: '10.12'
+            Fe2O3: '9.73'
+            Cr2O3: '0.00'
+            FeO: '2.95'
+            MnO: '0.16'
+            MgO: '9.22'
+            CaO: '11.76'
+            Na2O: '2.14'
+            K2O: '3.55'
+            P2O5: '0.03'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id064
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '32'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '32'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '32'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id063
+              locator: *id064
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '9.73'
+          FeO_wt_pct: '2.95'
+          run_id_as_printed: '32'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '33'
+          sample_identifier_as_printed: X-973
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id065
+            SiO2: '40.86'
+            TiO2: '4.65'
+            Al2O3: '14.67'
+            Fe2O3: '10.43'
+            Cr2O3: '0.00'
+            FeO: '2.99'
+            MnO: '0.28'
+            MgO: '6.10'
+            CaO: '14.37'
+            Na2O: '2.82'
+            K2O: '0.88'
+            P2O5: '0.02'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id066
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '33'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '33'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '33'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id065
+              locator: *id066
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '10.43'
+          FeO_wt_pct: '2.99'
+          run_id_as_printed: '33'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '34'
+          sample_identifier_as_printed: 780-U-105
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id067
+            SiO2: '40.49'
+            TiO2: '5.96'
+            Al2O3: '9.97'
+            Fe2O3: '11.62'
+            Cr2O3: '0.00'
+            FeO: '3.27'
+            MnO: '0.26'
+            MgO: '7.10'
+            CaO: '15.53'
+            Na2O: '1.57'
+            K2O: '2.89'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id068
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '34'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '34'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '34'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id067
+              locator: *id068
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '11.62'
+          FeO_wt_pct: '3.27'
+          run_id_as_printed: '34'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '35'
+          sample_identifier_as_printed: 944-E
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id069
+            SiO2: '38.68'
+            TiO2: '4.33'
+            Al2O3: '21.66'
+            Fe2O3: '8.91'
+            Cr2O3: '0.01'
+            FeO: '2.86'
+            MnO: '0.26'
+            MgO: '5.07'
+            CaO: '13.22'
+            Na2O: '2.37'
+            K2O: '0.92'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id070
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '35'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '35'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '35'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id069
+              locator: *id070
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '8.91'
+          FeO_wt_pct: '2.86'
+          run_id_as_printed: '35'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '36'
+          sample_identifier_as_printed: 780-K-15
+          composition_role_as_printed: analysed glass
+          T_C: '1445'
+          oxide_wt_percent: &id071
+            SiO2: '49.24'
+            TiO2: '1.65'
+            Al2O3: '19.78'
+            Fe2O3: '6.78'
+            Cr2O3: '0.00'
+            FeO: '2.48'
+            MnO: '0.21'
+            MgO: '3.45'
+            CaO: '8.04'
+            Na2O: '4.85'
+            K2O: '2.36'
+            P2O5: '0.01'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id072
+            published_page: 138
+            pdf_page_index: 2
+            table: '1'
+            record: '36'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1445'
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '36'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 138
+                pdf_page_index: 2
+                table: '1'
+                record: '36'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id071
+              locator: *id072
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '6.78'
+          FeO_wt_pct: '2.48'
+          run_id_as_printed: '36'
+          T_C_as_printed: 1,445
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+      derived_from:
+      - pdf:kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
+    - observation_id: kilinc_1983_table2_duplicate_redox_series
+      type: composition_series
+      regime: quench_equilibration
+      phase: quenched silicate glass
+      locator:
+        published_page: '139'
+        pdf_page_index: '3'
+        table: '2'
+        note: All 10 assay rows; each row carries its own record locator.
+      units: wt% oxides as printed; T in °C as printed; atmosphere air
+      uncertainty: No run-specific uncertainty is printed for tabulated glass assays.
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        value_status: printed
+        composition_units: wt% oxides as printed
+        temperature_units: °C as printed
+        iron_assay_note: FeO was determined by wet chemical methods; Fe2O3 was calculated by the authors from FeOt and FeO
+          using the printed expression. This extract retains those printed oxide values and does not calculate a ratio.
+        column_method_class:
+          T_C: measured_direct
+          FeO: measured_direct
+          Fe2O3: measured_reduced
+          composition: measured_reduced
+        rows:
+        - experiment_id: '37'
+          sample_identifier_as_printed: IC-2
+          composition_role_as_printed: analysed glass
+          T_C: '1344'
+          oxide_wt_percent: &id073
+            SiO2: '74.38'
+            TiO2: '0.23'
+            Al2O3: '12.02'
+            Fe2O3: '2.09'
+            Cr2O3: '0.00'
+            FeO: '1.28'
+            MnO: '0.09'
+            MgO: '0.10'
+            CaO: '1.64'
+            Na2O: '4.32'
+            K2O: '2.72'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id074
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '37'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1344'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '37'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '37'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id073
+              locator: *id074
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '2.09'
+          FeO_wt_pct: '1.28'
+          run_id_as_printed: '37'
+          T_C_as_printed: 1,344
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '38'
+          sample_identifier_as_printed: IC-2
+          composition_role_as_printed: analysed glass
+          T_C: '1342'
+          oxide_wt_percent: &id075
+            SiO2: '72.59'
+            TiO2: '0.24'
+            Al2O3: '12.13'
+            Fe2O3: '2.13'
+            Cr2O3: '0.01'
+            FeO: '1.38'
+            MnO: '0.22'
+            MgO: '0.10'
+            CaO: '1.60'
+            Na2O: '4.22'
+            K2O: '2.75'
+            P2O5: '0.02'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '23'
+          locator: &id076
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '38'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1342'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '38'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '38'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id075
+              locator: *id076
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '2.13'
+          FeO_wt_pct: '1.38'
+          run_id_as_printed: '38'
+          T_C_as_printed: 1,342
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '49'
+          sample_identifier_as_printed: 94-8
+          composition_role_as_printed: analysed glass
+          T_C: '1344'
+          oxide_wt_percent: &id077
+            SiO2: '48.28'
+            TiO2: '1.06'
+            Al2O3: '18.15'
+            Fe2O3: '7.49'
+            Cr2O3: '0.00'
+            FeO: '1.37'
+            MnO: '0.25'
+            MgO: '3.91'
+            CaO: '8.47'
+            Na2O: '2.63'
+            K2O: '6.92'
+            P2O5: '0.03'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id078
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '49'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1344'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '49'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '49'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id077
+              locator: *id078
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '7.49'
+          FeO_wt_pct: '1.37'
+          run_id_as_printed: '49'
+          T_C_as_printed: 1,344
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '40'
+          sample_identifier_as_printed: 94-8
+          composition_role_as_printed: analysed glass
+          T_C: '1340'
+          oxide_wt_percent: &id079
+            SiO2: '48.10'
+            TiO2: '1.05'
+            Al2O3: '18.10'
+            Fe2O3: '7.39'
+            Cr2O3: '0.00'
+            FeO: '1.46'
+            MnO: '0.15'
+            MgO: '4.02'
+            CaO: '8.47'
+            Na2O: '2.63'
+            K2O: '7.10'
+            P2O5: '0.31'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '47.5'
+          locator: &id080
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '40'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1340'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '40'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '40'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id079
+              locator: *id080
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '7.39'
+          FeO_wt_pct: '1.46'
+          run_id_as_printed: '40'
+          T_C_as_printed: 1,340
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '41'
+          sample_identifier_as_printed: G-247
+          composition_role_as_printed: analysed glass
+          T_C: '1443'
+          oxide_wt_percent: &id081
+            SiO2: '56.71'
+            TiO2: '2.40'
+            Al2O3: '13.84'
+            Fe2O3: '8.42'
+            Cr2O3: '0.00'
+            FeO: '3.74'
+            MnO: '0.26'
+            MgO: '2.78'
+            CaO: '6.22'
+            Na2O: '3.33'
+            K2O: '1.11'
+            P2O5: '0.02'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '23'
+          locator: &id082
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '41'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1443'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '41'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '41'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id081
+              locator: *id082
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '8.42'
+          FeO_wt_pct: '3.74'
+          run_id_as_printed: '41'
+          T_C_as_printed: 1,443
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '42'
+          sample_identifier_as_printed: G-247
+          composition_role_as_printed: analysed glass
+          T_C: '1436'
+          oxide_wt_percent: &id083
+            SiO2: '56.44'
+            TiO2: '2.44'
+            Al2O3: '13.87'
+            Fe2O3: '8.24'
+            Cr2O3: '0.00'
+            FeO: '3.91'
+            MnO: '0.26'
+            MgO: '2.85'
+            CaO: '6.28'
+            Na2O: '3.39'
+            K2O: '1.10'
+            P2O5: '0.07'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '10'
+          locator: &id084
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '42'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1436'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '42'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '42'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id083
+              locator: *id084
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '8.24'
+          FeO_wt_pct: '3.91'
+          run_id_as_printed: '42'
+          T_C_as_printed: 1,436
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '43'
+          sample_identifier_as_printed: CSQ-3
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id085
+            SiO2: '46.84'
+            TiO2: '2.43'
+            Al2O3: '15.67'
+            Fe2O3: '8.58'
+            Cr2O3: '0.01'
+            FeO: '2.88'
+            MnO: '0.16'
+            MgO: '9.48'
+            CaO: '9.11'
+            Na2O: '2.98'
+            K2O: '0.92'
+            P2O5: '0.04'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id086
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '43'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '43'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '43'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id085
+              locator: *id086
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '8.58'
+          FeO_wt_pct: '2.88'
+          run_id_as_printed: '43'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '44'
+          sample_identifier_as_printed: CSQ-3
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id087
+            SiO2: '46.73'
+            TiO2: '2.45'
+            Al2O3: '15.58'
+            Fe2O3: '8.32'
+            Cr2O3: '0.00'
+            FeO: '3.04'
+            MnO: '0.16'
+            MgO: '9.49'
+            CaO: '9.13'
+            Na2O: '3.00'
+            K2O: '0.91'
+            P2O5: '0.03'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '24'
+          locator: &id088
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '44'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '44'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '44'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id087
+              locator: *id088
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '8.32'
+          FeO_wt_pct: '3.04'
+          run_id_as_printed: '44'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '45'
+          sample_identifier_as_printed: IC-2
+          composition_role_as_printed: analysed glass
+          T_C: '1443'
+          oxide_wt_percent: &id089
+            SiO2: '74.22'
+            TiO2: '0.26'
+            Al2O3: '12.26'
+            Fe2O3: '2.28'
+            Cr2O3: '0.00'
+            FeO: '1.24'
+            MnO: '0.10'
+            MgO: '0.08'
+            CaO: '1.71'
+            Na2O: '4.11'
+            K2O: '2.64'
+            P2O5: '0.02'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '23'
+          locator: &id090
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '45'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1443'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '45'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '45'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id089
+              locator: *id090
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '2.28'
+          FeO_wt_pct: '1.24'
+          run_id_as_printed: '45'
+          T_C_as_printed: 1,443
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+        - experiment_id: '46'
+          sample_identifier_as_printed: IC-2
+          composition_role_as_printed: analysed glass
+          T_C: '1430'
+          oxide_wt_percent: &id091
+            SiO2: '73.87'
+            TiO2: '0.25'
+            Al2O3: '12.21'
+            Fe2O3: '2.24'
+            Cr2O3: '0.01'
+            FeO: '1.20'
+            MnO: '0.09'
+            MgO: '0.09'
+            CaO: '1.60'
+            Na2O: '4.14'
+            K2O: '2.64'
+            P2O5: '0.01'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: volumetric and colorimetric procedure of Wilson (1960)
+          duration_h_as_printed: '22'
+          locator: &id092
+            published_page: 139
+            pdf_page_index: 3
+            table: '2'
+            record: '46'
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1430'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '46'
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+                note: The paper describes the experiments as conducted in air.
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '2'
+                record: '46'
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id091
+              locator: *id092
+          uncertainty_as_printed: No run-specific uncertainty is printed for these table cells.
+          Fe2O3_wt_pct: '2.24'
+          FeO_wt_pct: '1.20'
+          run_id_as_printed: '46'
+          T_C_as_printed: 1,430
+          cell_locators:
+            run_id_as_printed: 'Sample #'
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            sample_identifier_as_printed: Identifier
+      derived_from:
+      - pdf:kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
+    - observation_id: kilinc_1983_table3_equilibrium_time_series
+      type: composition_series
+      regime: quench_equilibration
+      phase: quenched silicate glass
+      locator:
+        published_page: '139'
+        pdf_page_index: '3'
+        table: '3'
+        note: All 5 assay rows; each row carries its own record locator.
+      units: wt% oxides as printed; T in °C as printed; atmosphere air
+      uncertainty: No run-specific uncertainty is printed for tabulated glass assays.
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        value_status: printed
+        composition_units: wt% oxides as printed
+        temperature_units: °C as printed
+        iron_assay_note: FeO was determined by wet chemical methods; Fe2O3 was calculated by the authors from FeOt and FeO
+          using the printed expression. This extract retains those printed oxide values and does not calculate a ratio.
+        column_method_class:
+          T_C: measured_direct
+          FeO: measured_direct
+          Fe2O3: measured_reduced
+          composition: measured_reduced
+        rows:
+        - experiment_id: time_5h
+          composition_role_as_printed: analysed glass
+          run_id_as_printed: '5'
+          T_C: '1349'
+          oxide_wt_percent: &id093
+            SiO2: '57.61'
+            TiO2: '0.82'
+            Al2O3: '15.54'
+            Fe2O3: '7.04'
+            FeO: '2.23'
+            MnO: '0.17'
+            MgO: '3.20'
+            CaO: '6.71'
+            Na2O: '3.77'
+            K2O: '1.31'
+            P2O5: '0.18'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: wet chemical techniques (Table 3 footnote)
+          printed_total_wt_percent: '98.68'
+          duration_h_as_printed: '5'
+          locator: &id094
+            published_page: 139
+            pdf_page_index: 3
+            table: '3'
+            record: 5 h
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1349'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 5 h
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 5 h
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id093
+              locator: *id094
+          uncertainty_as_printed: No row-specific uncertainty is printed.
+          Fe2O3_wt_pct: '7.04'
+          FeO_wt_pct: '2.23'
+          T_C_as_printed: 1,349
+          cell_locators:
+            run_id_as_printed: Time (h)
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            printed_total_wt_percent: Total
+          sample_description_as_printed: glassy andesite
+          sample_description_locator:
+            published_page: 137
+            pdf_page_index: 1
+            section: Results and Discussion
+            note: Text describes the Table 3 sample as a glassy andesite.
+          run_id_context: Time (h) is the printed point identifier here; no separate run number is given.
+        - experiment_id: time_12h
+          composition_role_as_printed: analysed glass
+          run_id_as_printed: '12'
+          T_C: '1349'
+          oxide_wt_percent: &id095
+            SiO2: '57.19'
+            TiO2: '0.84'
+            Al2O3: '15.62'
+            Fe2O3: '7.28'
+            FeO: '2.21'
+            MnO: '0.16'
+            MgO: '3.27'
+            CaO: '6.78'
+            Na2O: '3.72'
+            K2O: '1.31'
+            P2O5: '0.16'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: wet chemical techniques (Table 3 footnote)
+          printed_total_wt_percent: '98.54'
+          duration_h_as_printed: '12'
+          locator: &id096
+            published_page: 139
+            pdf_page_index: 3
+            table: '3'
+            record: 12 h
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1349'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 12 h
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 12 h
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id095
+              locator: *id096
+          uncertainty_as_printed: No row-specific uncertainty is printed.
+          Fe2O3_wt_pct: '7.28'
+          FeO_wt_pct: '2.21'
+          T_C_as_printed: 1,349
+          cell_locators:
+            run_id_as_printed: Time (h)
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            printed_total_wt_percent: Total
+          sample_description_as_printed: glassy andesite
+          sample_description_locator:
+            published_page: 137
+            pdf_page_index: 1
+            section: Results and Discussion
+            note: Text describes the Table 3 sample as a glassy andesite.
+          run_id_context: Time (h) is the printed point identifier here; no separate run number is given.
+        - experiment_id: time_25h
+          composition_role_as_printed: analysed glass
+          run_id_as_printed: '25'
+          T_C: '1349'
+          oxide_wt_percent: &id097
+            SiO2: '58.06'
+            TiO2: '0.85'
+            Al2O3: '15.44'
+            Fe2O3: '7.22'
+            FeO: '2.25'
+            MnO: '0.16'
+            MgO: '3.19'
+            CaO: '6.83'
+            Na2O: '3.70'
+            K2O: '1.22'
+            P2O5: '0.09'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: wet chemical techniques (Table 3 footnote)
+          printed_total_wt_percent: '99.00'
+          duration_h_as_printed: '25'
+          locator: &id098
+            published_page: 139
+            pdf_page_index: 3
+            table: '3'
+            record: 25 h
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1349'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 25 h
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 25 h
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id097
+              locator: *id098
+          uncertainty_as_printed: No row-specific uncertainty is printed.
+          Fe2O3_wt_pct: '7.22'
+          FeO_wt_pct: '2.25'
+          T_C_as_printed: 1,349
+          cell_locators:
+            run_id_as_printed: Time (h)
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            printed_total_wt_percent: Total
+          sample_description_as_printed: glassy andesite
+          sample_description_locator:
+            published_page: 137
+            pdf_page_index: 1
+            section: Results and Discussion
+            note: Text describes the Table 3 sample as a glassy andesite.
+          run_id_context: Time (h) is the printed point identifier here; no separate run number is given.
+        - experiment_id: time_48h
+          composition_role_as_printed: analysed glass
+          run_id_as_printed: '48'
+          T_C: '1349'
+          oxide_wt_percent: &id099
+            SiO2: '57.92'
+            TiO2: '0.83'
+            Al2O3: '15.77'
+            Fe2O3: '7.03'
+            FeO: '2.34'
+            MnO: '0.15'
+            MgO: '3.13'
+            CaO: '6.85'
+            Na2O: '3.52'
+            K2O: '1.17'
+            P2O5: '0.04'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: wet chemical techniques (Table 3 footnote)
+          printed_total_wt_percent: '98.66'
+          duration_h_as_printed: '48'
+          locator: &id100
+            published_page: 139
+            pdf_page_index: 3
+            table: '3'
+            record: 48 h
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1349'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 48 h
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 48 h
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id099
+              locator: *id100
+          uncertainty_as_printed: No row-specific uncertainty is printed.
+          Fe2O3_wt_pct: '7.03'
+          FeO_wt_pct: '2.34'
+          T_C_as_printed: 1,349
+          cell_locators:
+            run_id_as_printed: Time (h)
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            printed_total_wt_percent: Total
+          sample_description_as_printed: glassy andesite
+          sample_description_locator:
+            published_page: 137
+            pdf_page_index: 1
+            section: Results and Discussion
+            note: Text describes the Table 3 sample as a glassy andesite.
+          run_id_context: Time (h) is the printed point identifier here; no separate run number is given.
+        - experiment_id: time_70h
+          composition_role_as_printed: analysed glass
+          run_id_as_printed: '70'
+          T_C: '1359'
+          oxide_wt_percent: &id101
+            SiO2: '57.34'
+            TiO2: '0.81'
+            Al2O3: '15.73'
+            Fe2O3: '6.80'
+            FeO: '2.58'
+            MnO: '0.16'
+            MgO: '3.27'
+            CaO: '6.75'
+            Na2O: '3.57'
+            K2O: '1.20'
+            P2O5: '0.00'
+          Fe2O3_method_as_printed: calculated from total iron (FeOt) and colorimetric FeO; wt.% Fe2O3 = 1.1113 (FeOt - FeO)
+          FeO_method_as_printed: wet chemical techniques (Table 3 footnote)
+          printed_total_wt_percent: '98.17'
+          duration_h_as_printed: '70'
+          locator: &id102
+            published_page: 139
+            pdf_page_index: 3
+            table: '3'
+            record: 70 h
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1359'
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 70 h
+                column: T °C
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                published_page: 136
+                pdf_page_index: 0
+                section: Abstract
+            fO2_log:
+              state:
+                tag: unknown
+                reason: No numerical log fO2 is printed per row; experiments are reported as equilibrated in air.
+              locator:
+                published_page: 139
+                pdf_page_index: 3
+                table: '3'
+                record: 70 h
+                column: fO2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_phase_composition
+                  amount_basis: mass_percent
+                  components: *id101
+              locator: *id102
+          uncertainty_as_printed: No row-specific uncertainty is printed.
+          Fe2O3_wt_pct: '6.80'
+          FeO_wt_pct: '2.58'
+          T_C_as_printed: 1,359
+          cell_locators:
+            run_id_as_printed: Time (h)
+            T_C: T °C
+            duration_h_as_printed: Time (h)
+            FeO_wt_pct: FeO
+            Fe2O3_wt_pct: Fe2O3
+            printed_total_wt_percent: Total
+          sample_description_as_printed: glassy andesite
+          sample_description_locator:
+            published_page: 137
+            pdf_page_index: 1
+            section: Results and Discussion
+            note: Text describes the Table 3 sample as a glassy andesite.
+          run_id_context: Time (h) is the printed point identifier here; no separate run number is given.
+      derived_from:
+      - pdf:kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
+source_files:
+  corpus_repo: regolith-corpus
+  files:
+  - asset_id: pdf:kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
+    role: pdf
+    path: raw/kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air/kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air.pdf
+    sha256:
+      tag: value
+      value: c4d4cd7b87e5401c09a422e361ea4f06b326b46f58f86e0f46c6c40a12809a74
