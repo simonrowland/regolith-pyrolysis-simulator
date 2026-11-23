@@ -104,7 +104,7 @@ policies:
   - id: DP-007
     condition: "evaporating / sample area unprinted (gram-lab rows)"
     formula: "the size_crucible face area used by the runtime (single owner constant)"
-    formula_owner: "simulator.state.MeltState.melt_surface_area_m2 default"
+    formula_owner: "simulator.equipment.EquipmentDesigner.size_crucible"
     units: m²
     physical_basis: "d-456 apparatus default"
     bias: "rate ∝ area: one-to-one"

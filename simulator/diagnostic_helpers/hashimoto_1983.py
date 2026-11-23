@@ -1,10 +1,10 @@
-"""Hashimoto (1983) residue trajectory scoring without inferred inputs.
+"""Hashimoto (1983) residue trajectory scoring with explicit runtime flags.
 
 The source extract supplies one admitted row per measured oxide. Runtime
 results are keyed by experiment id so one simulator trajectory can serve the
-oxide records from the same physical run. Until the printed free-evaporation
-area is available, the batch emits typed refusal records instead of inventing
-an area or using the simulator's fallback geometry.
+oxide records from the same physical run. An unprinted free-evaporation area
+uses the runtime DP-007 crucible face and carries that run's typed flag into
+each residual record.
 """
 
 from __future__ import annotations
@@ -20,7 +20,9 @@ from typing import Any
 
 import yaml
 
-from simulator.battery.migrate import torr_to_pa
+from simulator.battery.migrate import to_plain, torr_to_pa
+from simulator.battery.enums import NoticeKind, Quantity
+from simulator.battery.records import Notice, NoticePolicy
 from simulator.lab_schedule import _pressure_floor_notice_mbar
 from simulator.physical_constants import PA_PER_MBAR
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -69,9 +71,27 @@ class HashimotoScoreRecord:
     residual: float | None
     units: str
     notice_set: frozenset[str]
+    policy_notice: Notice | None = None
+    policy_detail: str | None = None
+    flagged_strata: frozenset[str] = frozenset()
     refusal_reason: str | None = None
 
+    @property
+    def clean_measured_headline_eligible(self) -> bool:
+        return self.residual is not None and not self.flagged_strata
+
     def as_dict(self) -> dict[str, Any]:
+        notice_details: list[dict[str, Any]] = []
+        if self.policy_notice is not None:
+            policy = self.policy_notice.policy
+            notice_details.append(
+                {
+                    "kind": self.policy_notice.kind.value,
+                    "reason": self.policy_notice.reason,
+                    "detail": self.policy_detail or "",
+                    "policy": None if policy is None else to_plain(policy),
+                }
+            )
         return {
             "observation_id": self.observation_id,
             "source_id": self.source_id,
@@ -83,6 +103,11 @@ class HashimotoScoreRecord:
             "residual": self.residual,
             "units": self.units,
             "notice_set": sorted(self.notice_set),
+            "notice_details": notice_details,
+            "flagged_strata": sorted(self.flagged_strata),
+            "clean_measured_headline_eligible": (
+                self.clean_measured_headline_eligible
+            ),
             "refusal_reason": self.refusal_reason,
         }
 
@@ -122,18 +147,14 @@ def validate_starting_composition(preset: Mapping[str, Any]) -> Mapping[str, flo
 
 
 def require_runtime_inputs(preset: Mapping[str, Any]) -> None:
-    """Refuse if the source does not supply a positive molten exposed area."""
+    """Validate source inputs that are needed before a runtime can be called."""
 
     validate_starting_composition(preset)
     geometry = preset.get("free_evaporation_geometry")
     area = geometry.get("exposed_melt_area_m2") if isinstance(geometry, Mapping) else None
-    if area is None:
-        pending = geometry.get("pending_observation_ids", ()) if isinstance(geometry, Mapping) else ()
-        raise Hashimoto1983Refusal(
-            "missing_exposed_melt_area",
-            ", ".join(str(item) for item in pending),
-        )
-    if _finite_number(area, "free_evaporation_geometry.exposed_melt_area_m2") <= 0.0:
+    if area is not None and _finite_number(
+        area, "free_evaporation_geometry.exposed_melt_area_m2"
+    ) <= 0.0:
         raise Hashimoto1983Refusal("invalid_exposed_melt_area")
     vacuum = preset.get("vacuum")
     if not isinstance(vacuum, Mapping) or vacuum.get("units") != "Torr":
@@ -232,9 +253,10 @@ def score_hashimoto_1983(
     """Emit a residual or typed refusal for every admitted Table 3 row.
 
     ``runtime_outputs`` maps each source experiment id to the process
-    simulator's final oxide wt-percent map. It is explicit so absent output is
-    refused rather than confused with a zero residual. A supplied map also
-    permits synthetic-runtime contract tests while the source area is absent.
+    simulator's final oxide wt-percent map and its ``run_metadata``. The
+    metadata carries runtime-applied defaults so predicted residuals stay out
+    of the clean measured headline. Missing output is refused rather than
+    confused with a zero residual.
     """
 
     active_preset = preset if preset is not None else load_hashimoto_preset()
@@ -255,6 +277,9 @@ def score_hashimoto_1983(
         refusal_reason: str | None = None
         simulated: float | None = None
         notices: set[str] = set()
+        policy_notice: Notice | None = None
+        policy_detail: str | None = None
+        flagged_strata: frozenset[str] = frozenset()
         if input_refusal is not None:
             refusal_reason = input_refusal.reason
             notices.add(input_refusal.reason)
@@ -268,6 +293,21 @@ def score_hashimoto_1983(
                 notices.add(refusal_reason)
             else:
                 try:
+                    area_notice = _dp007_area_notice(run_output)
+                    area_is_missing = (
+                        isinstance(
+                            active_preset.get("free_evaporation_geometry"),
+                            Mapping,
+                        )
+                        and active_preset["free_evaporation_geometry"].get(
+                            "exposed_melt_area_m2"
+                        )
+                        is None
+                    )
+                    if area_is_missing and area_notice is None:
+                        raise Hashimoto1983Refusal(
+                            "runtime_area_default_notice_missing"
+                        )
                     candidate = _finite_number(
                         run_output[observation.oxide],
                         f"runtime_outputs.{observation.experiment_id}.{observation.oxide}",
@@ -275,6 +315,25 @@ def score_hashimoto_1983(
                     if not 0.0 <= candidate <= 100.0:
                         raise Hashimoto1983Refusal("invalid_runtime_output")
                     simulated = candidate
+                    if area_notice is not None:
+                        policy_detail = area_notice["detail"]
+                        policy_notice = Notice(
+                            kind=NoticeKind.KNOB_DEFAULTED,
+                            affected_quantities=(
+                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                            ),
+                            reason=area_notice["reason"],
+                            origin=observation.observation_id,
+                            policy=area_notice["policy"],
+                        )
+                        from simulator.battery.score import (
+                            flagged_strata as classify_flagged_strata,
+                        )
+
+                        notices.add(policy_notice.kind.value)
+                        flagged_strata = frozenset(
+                            classify_flagged_strata((policy_notice,))
+                        )
                 except Hashimoto1983Refusal as exc:
                     refusal_reason = exc.reason
                     notices.add(exc.reason)
@@ -295,6 +354,9 @@ def score_hashimoto_1983(
                 residual=residual,
                 units=RECORD_UNITS,
                 notice_set=frozenset(notices),
+                policy_notice=policy_notice,
+                policy_detail=policy_detail,
+                flagged_strata=flagged_strata,
                 refusal_reason=refusal_reason,
             )
         )
@@ -331,6 +393,58 @@ def _located_value(raw: Any, field: str) -> float:
     ):
         raise Hashimoto1983Refusal("unlocated_point_condition", field)
     return _finite_number(state.get("value"), f"point_conditions.{field}")
+
+
+def _dp007_area_notice(
+    run_output: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    run_metadata = run_output.get("run_metadata")
+    runtime_notices = (
+        run_metadata.get("runtime_notices")
+        if isinstance(run_metadata, Mapping)
+        else None
+    )
+    if not isinstance(runtime_notices, Sequence) or isinstance(
+        runtime_notices, (str, bytes)
+    ):
+        return None
+    for raw_notice in runtime_notices:
+        if not isinstance(raw_notice, Mapping):
+            continue
+        if raw_notice.get("kind") != NoticeKind.KNOB_DEFAULTED.value:
+            continue
+        reason = raw_notice.get("reason")
+        policy = raw_notice.get("policy")
+        if (
+            reason != "exposed_melt_area_not_printed"
+            or not isinstance(policy, Mapping)
+            or set(policy) != {"id", "version", "status", "value", "units"}
+            or policy.get("id") != "DP-007"
+            or policy.get("version") != 1
+            or policy.get("status") != "canonical"
+            or policy.get("units") != "m²"
+            or _finite_number(policy.get("value"), "DP-007.value") <= 0.0
+        ):
+            raise Hashimoto1983Refusal("invalid_runtime_area_default_policy")
+        try:
+            typed_policy = NoticePolicy(
+                id=str(policy["id"]),
+                version=policy["version"],
+                status=str(policy["status"]),
+                value=str(policy["value"]),
+                units=str(policy["units"]),
+            )
+        except (TypeError, ValueError) as exc:
+            raise Hashimoto1983Refusal(
+                "invalid_runtime_area_default_policy", str(exc)
+            ) from exc
+        return {
+            "kind": str(raw_notice["kind"]),
+            "reason": str(reason),
+            "detail": str(raw_notice.get("detail") or ""),
+            "policy": typed_policy,
+        }
+    return None
 
 
 def _validate_admitted_cohort(

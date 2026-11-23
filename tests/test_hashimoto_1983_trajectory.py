@@ -1,8 +1,17 @@
 from __future__ import annotations
 
+from dataclasses import replace
+from decimal import Decimal
+from typing import Any
+
 import pytest
 
 import simulator.diagnostic_helpers.hashimoto_1983 as hashimoto
+from simulator.battery.default_policy import (
+    load_policy_table,
+    resolve as resolve_default_policy,
+)
+from simulator.battery.enums import NoticeKind
 from simulator.diagnostic_helpers.hashimoto_1983 import (
     DEFAULT_OBSERVATIONS_PATH,
     DEFAULT_PRESET_PATH,
@@ -22,7 +31,7 @@ def test_hashimoto_input_is_outside_shipped_runtime_preset_catalog() -> None:
     assert DEFAULT_PRESET_PATH not in catalog_paths
 
 
-def test_preset_loads_printed_inputs_and_missing_area_refuses() -> None:
+def test_unprinted_area_uses_runtime_policy_and_pressure_stays_printed() -> None:
     preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
     assert preset["starting_composition_wt_pct"] == {
         "SiO2": 35.43,
@@ -36,9 +45,11 @@ def test_preset_loads_printed_inputs_and_missing_area_refuses() -> None:
     assert "runtime_pressure_mbar" not in preset["vacuum"]
     assert preset["isothermal_holds"]["temperatures_C"] == [1700, 1800, 1900, 2000]
     assert preset["free_evaporation_geometry"]["exposed_melt_area_m2"] is None
+    assert preset["vacuum"]["value"] == 1.0e-4
+    assert preset["vacuum"]["units"] == "Torr"
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
         require_runtime_inputs(preset)
-    assert exc_info.value.reason == "missing_exposed_melt_area"
+    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
 
 
 def test_missing_starting_oxide_refuses_after_mutation() -> None:
@@ -120,7 +131,10 @@ def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> No
     assert all(row.source_id == "kems-015-hashimoto-1983" for row in observations)
     records = score_hashimoto_1983(observations=observations)
     assert len(records) == 120
-    assert all(record.refusal_reason == "missing_exposed_melt_area" for record in records)
+    assert all(
+        record.refusal_reason == "runtime_pressure_below_implemented_floor"
+        for record in records
+    )
 
     changed = observations[:-1]
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
@@ -171,9 +185,7 @@ def test_loader_refuses_non_table3_row_after_mutation(monkeypatch) -> None:
 
 def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
     observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
-    runtime: dict[str, dict[str, float]] = {}
-    for row in observations:
-        runtime.setdefault(row.experiment_id, {})[row.oxide] = row.published_wt_pct
+    runtime = _runtime_outputs(observations)
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
@@ -181,6 +193,17 @@ def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
     assert len(records) == 120
     assert all(record.sim_wt_pct == record.published_wt_pct for record in records)
     assert all(record.residual == 0.0 for record in records)
+    _assert_dp007_residuals_are_flagged(records)
+    notice_payload = records[0].as_dict()["notice_details"][0]
+    assert notice_payload["kind"] == NoticeKind.KNOB_DEFAULTED.value
+    assert notice_payload["reason"] == "exposed_melt_area_not_printed"
+    assert notice_payload["policy"] == {
+        "id": "DP-007",
+        "version": 1,
+        "status": "canonical",
+        "value": "0.000123",
+        "units": "m²",
+    }
 
     changed_runtime = {key: dict(value) for key, value in runtime.items()}
     first = observations[0]
@@ -192,9 +215,51 @@ def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
     assert changed[0].residual == pytest.approx(1.0)
 
 
+def test_default_flag_mutation_fails_the_clean_headline_invariant() -> None:
+    observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    records = score_hashimoto_1983(
+        observations=observations,
+        runtime_outputs=_runtime_outputs(observations),
+    )
+    assert records[0].policy_notice is not None
+    mutant = replace(
+        records[0],
+        policy_notice=replace(
+            records[0].policy_notice,
+            kind=NoticeKind.SOURCE_DISAGREEMENT,
+        ),
+        notice_set=records[0].notice_set - {NoticeKind.KNOB_DEFAULTED.value},
+        flagged_strata=(
+            records[0].flagged_strata - {NoticeKind.KNOB_DEFAULTED.value}
+        ),
+    )
+    assert mutant.clean_measured_headline_eligible
+    with pytest.raises(AssertionError):
+        _assert_dp007_residuals_are_flagged((mutant,))
+
+
+def test_runtime_area_default_without_policy_metadata_cannot_enter_headline() -> None:
+    observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    runtime = _runtime_outputs(observations)
+    first = observations[0]
+    runtime[first.experiment_id]["run_metadata"] = {"runtime_notices": []}
+
+    records = score_hashimoto_1983(
+        observations=observations,
+        runtime_outputs=runtime,
+    )
+
+    assert records[0].refusal_reason == "runtime_area_default_notice_missing"
+    assert records[0].residual is None
+    assert not records[0].clean_measured_headline_eligible
+
+
 def test_missing_runtime_output_refuses_for_each_observation() -> None:
     observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
-    runtime = {row.experiment_id: {} for row in observations}
+    runtime = _runtime_outputs(observations)
+    for run_output in runtime.values():
+        for oxide in hashimoto.REQUIRED_STARTING_OXIDES:
+            run_output.pop(oxide, None)
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
@@ -211,7 +276,8 @@ def test_invalid_runtime_output_has_no_numeric_prediction_or_residual(
 ) -> None:
     observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
     first = observations[0]
-    runtime = {first.experiment_id: {first.oxide: invalid_output}}
+    runtime = _runtime_outputs(observations)
+    runtime[first.experiment_id][first.oxide] = invalid_output
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
@@ -219,3 +285,45 @@ def test_invalid_runtime_output_has_no_numeric_prediction_or_residual(
     assert records[0].refusal_reason == "invalid_runtime_output"
     assert records[0].sim_wt_pct is None
     assert records[0].residual is None
+
+
+def _runtime_outputs(
+    observations,
+    *,
+    area_m2: Decimal = Decimal("0.000123"),
+) -> dict[str, dict[str, Any]]:
+    resolved = resolve_default_policy("DP-007", runtime_default=area_m2)
+    entry = load_policy_table()["DP-007"]
+    policy = {
+        "id": entry["id"],
+        "version": entry["version"],
+        "status": entry["status"],
+        "value": str(resolved.value),
+        "units": resolved.units,
+    }
+    notice = {
+        "kind": resolved.flag.value,
+        "reason": "exposed_melt_area_not_printed",
+        "detail": "runtime used its size_crucible face area",
+        "policy": policy,
+    }
+    runtime: dict[str, dict[str, Any]] = {}
+    for row in observations:
+        output = runtime.setdefault(
+            row.experiment_id,
+            {"run_metadata": {"runtime_notices": [notice]}},
+        )
+        output[row.oxide] = row.published_wt_pct
+    return runtime
+
+
+def _assert_dp007_residuals_are_flagged(records) -> None:
+    for record in records:
+        assert record.residual is not None
+        assert record.policy_notice is not None
+        assert record.policy_notice.kind is NoticeKind.KNOB_DEFAULTED
+        assert record.policy_notice.policy is not None
+        assert record.policy_notice.policy.id == "DP-007"
+        assert NoticeKind.KNOB_DEFAULTED.value in record.notice_set
+        assert NoticeKind.KNOB_DEFAULTED.value in record.flagged_strata
+        assert not record.clean_measured_headline_eligible

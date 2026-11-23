@@ -153,11 +153,11 @@ def _resolved_value(
             Decimal(0),
         )
     if policy_id == "DP-007":
-        from simulator.state import MeltState
-
+        if "runtime_default" not in context:
+            raise ValueError("DP-007 requires the owning runtime_default")
         return _decimal(
-            MeltState().melt_surface_area_m2,
-            context_name="runtime melt surface area",
+            context["runtime_default"],
+            context_name="runtime size_crucible face area",
         )
     if policy_id == "DP-008":
         if "runtime_default" not in context:

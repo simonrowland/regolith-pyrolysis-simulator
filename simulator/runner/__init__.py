@@ -1575,6 +1575,12 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        dp007_area_notice = getattr(sim, "_dp007_area_notice", None)
+        if dp007_area_notice is not None:
+            run_metadata["runtime_notices"] = _safe_failure_value(
+                lambda: _json_safe([dp007_area_notice]),
+                section="run_metadata.runtime_notices",
+            )
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",

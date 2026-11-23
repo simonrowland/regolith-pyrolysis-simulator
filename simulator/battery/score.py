@@ -8188,24 +8188,27 @@ def _activity_request_or_contract_refusal(
     )
 
 
-# TODO(t-1924c): replace the rejected proposal with the method-specific policy.
-_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID = "DP-101"
-
-
 def _assumption_notice(
-    quantity: Quantity, reason: str, pressure_bar: float
+    quantity: Quantity,
+    reason: str,
+    policy_id: str,
+    resolved_policy: Any,
 ) -> Notice:
+    from simulator.battery import default_policy
+
+    entry = default_policy.load_policy_table()[policy_id]
+    value = Decimal(str(resolved_policy.value))
     return Notice(
-        kind=NoticeKind.ASSUMED_PRESSURE,
+        kind=resolved_policy.flag,
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
         policy=NoticePolicy(
-            id=_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID,
-            version="v1",
-            status="proposed",
-            value=f"{pressure_bar:g}",
-            units="bar",
+            id=str(entry["id"]),
+            version=entry["version"],
+            status=str(entry["status"]),
+            value=format(value.normalize(), "f"),
+            units=resolved_policy.units,
         ),
     )
 
@@ -8655,6 +8658,7 @@ def _comparison_identity(
     identity: Identity,
     reference: Observation,
     prediction: EnginePrediction,
+    method: MethodToken | None = None,
 ) -> Identity:
     """Comparison identity with conditions used by the numeric prediction.
 
@@ -8759,7 +8763,9 @@ def _comparison_identity(
     ):
         quantity = quantity_token(identity)
         if quantity is not None:
-            bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
+            bar, _notice, invalid = total_pressure_bar_for_score(
+                identity, quantity, method=method
+            )
             if invalid is None:
                 updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * PA_PER_BAR_DEC)
     if not updates:
@@ -10140,16 +10146,16 @@ def _predict_redox(
 def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
+    *,
+    method: MethodToken | None = None,
 ) -> tuple[float, Notice | None, str | None]:
-    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+    """Observation pressure in bar, or its method-specific policy default.
 
     A present but non-finite or negative pressure is invalid. It is not
-    replaced by the assumption.
+    replaced by the assumption. Langmuir / free evaporation in vacuum takes
+    the method-implied finite vacuum boundary; other methods with no printed
+    total pressure use DP-001.
     """
-
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        DP_019_VACUUM_BOUNDARY_BAR,
-    )
 
     state = identity.total_pressure_Pa
     if state is not None and state.is_value and state.value is not None:
@@ -10160,14 +10166,28 @@ def total_pressure_bar_for_score(
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
-    # Keep the existing finite low-pressure engine boundary visible as an
-    # assumption, not as a pressure supplied by the source.
+    policy_id = (
+        "DP-019"
+        if method is MethodToken.LANGMUIR_FREE_EVAPORATION
+        else "DP-001"
+    )
+    from simulator.battery import default_policy
+    from simulator.physical_constants import PA_PER_BAR
+
+    resolved = default_policy.resolve(policy_id)
+    pressure_pa = Decimal(str(resolved.value))
+    # For a condensed melt, dln(a) ~= V_m * DeltaP / (R*T). Pa*m^3/mol
+    # divided by J/mol is dimensionless; as pressure approaches zero, this
+    # contribution vanishes. Convert the registered Pa default to bar using
+    # P_bar = P_Pa / (Pa/bar), preserving the existing engine input unit.
+    pressure_bar = pressure_pa / Decimal(str(PA_PER_BAR))
     notice = _assumption_notice(
         quantity,
         detail,
-        DP_019_VACUUM_BOUNDARY_BAR,
+        policy_id,
+        resolved,
     )
-    return float(DP_019_VACUUM_BOUNDARY_BAR), notice, None
+    return float(pressure_bar), notice, None
 
 
 _IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
@@ -15034,8 +15054,15 @@ def _predict_with_engine(
             pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
             knudsen_seed_pressure_bar = pressure_bar
         else:
+            method = (
+                experiment.method.value
+                if experiment is not None and experiment.method.is_value
+                else None
+            )
             pressure_bar, pressure_notice, pressure_invalid = (
-                total_pressure_bar_for_score(identity, quantity)
+                total_pressure_bar_for_score(
+                    identity, quantity, method=method
+                )
             )
             if pressure_invalid is not None:
                 return _input_refusal(
@@ -18676,11 +18703,16 @@ def _compile_residual_with_lineage(
     compared_candidate = candidate.identity
     source_identity = source_reference.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
+        comparison_method = (
+            experiment.method.value
+            if experiment is not None and experiment.method.is_value
+            else None
+        )
         compared_reference = _comparison_identity(
-            compared_reference, reference, prediction
+            compared_reference, reference, prediction, method=comparison_method
         )
         compared_candidate = _comparison_identity(
-            compared_candidate, reference, prediction
+            compared_candidate, reference, prediction, method=comparison_method
         )
         if (
             point_composition_notice is not None

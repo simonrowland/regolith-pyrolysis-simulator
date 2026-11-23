@@ -23,7 +23,6 @@ from simulator.battery.score import (
     flagged_stratum_payloads,
     headline_payloads,
 )
-from simulator.state import MeltState
 
 
 EXPECTED_POLICY_FLAGS = {
@@ -114,9 +113,10 @@ def test_canonical_policy_values() -> None:
 
 
 def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
-    runtime_area = MeltState().melt_surface_area_m2
+    runtime_area = Decimal("0.000123")
 
-    assert resolve("DP-007").value == Decimal(str(runtime_area))
+    assert resolve("DP-007", runtime_default=runtime_area).value == runtime_area
+    assert resolve("DP-007", runtime_default=runtime_area).units == "m²"
     assert resolve("DP-008", runtime_default=runtime_area).value == runtime_area
 
 

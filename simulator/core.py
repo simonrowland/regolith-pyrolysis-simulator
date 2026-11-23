@@ -1322,6 +1322,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._engine_commissioning_steps: list[dict[str, Any]] = []
         self._sulfur_saturation_steps: list[dict[str, Any]] = []
+        self._dp007_area_notice: dict[str, Any] | None = None
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -17013,14 +17014,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # condensation imports core at module level.
             from simulator.condensation import read_gram_lab_exposed_melt_area
 
-            declared_area_m2 = read_gram_lab_exposed_melt_area(
-                self.setpoints.get('lab_geometry'),
-            )
+            area_default_reason: str | None = None
+            area_default_detail = ""
+            try:
+                declared_area_m2 = read_gram_lab_exposed_melt_area(
+                    self.setpoints.get('lab_geometry'),
+                )
+            except LabGeometryError as exc:
+                if exc.code != 'exposed_melt_area_not_printed':
+                    raise
+                declared_area_m2 = None
+                area_default_reason = exc.code
+                area_default_detail = str(exc)
             self.melt.melt_surface_area_m2 = (
                 crucible_area_m2
                 if declared_area_m2 is None
                 else declared_area_m2
             )
+            if area_default_reason is not None:
+                # DP-007 follows the design-teststand ruling: with no printed
+                # evaporating face, use the runtime-sized crucible's exposed
+                # face. The physical premise is that the exposed apparatus
+                # face is the evaporating surface; using its runtime value
+                # preserves m^2 without conversion. A positive face is the
+                # sanity check, while a printed area continues to take the
+                # declared-area branch above.
+                from simulator.battery import default_policy
+
+                resolved = default_policy.resolve(
+                    "DP-007", runtime_default=crucible_area_m2
+                )
+                entry = default_policy.load_policy_table()["DP-007"]
+                policy = {
+                    "id": entry["id"],
+                    "version": entry["version"],
+                    "status": entry["status"],
+                    "value": str(resolved.value),
+                    "units": resolved.units,
+                }
+                self._dp007_area_notice = {
+                    'kind': resolved.flag.value,
+                    'reason': area_default_reason,
+                    'detail': area_default_detail,
+                    'policy': policy,
+                }
 
         pipe = self._equipment.pipe
         geometry_config = copy.deepcopy(self._overhead_condenser_geometry_config)
