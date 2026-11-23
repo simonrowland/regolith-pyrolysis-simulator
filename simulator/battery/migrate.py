@@ -25775,16 +25775,16 @@ class Migrator:
         queue_if_unresolved: bool,
     ) -> tuple[State[MethodToken], Notice | None]:
         experiment = self.result.experiments.get(experiment_id)
-        if experiment is None:
-            return method, None
+        experiment_method = None if experiment is None else experiment.method
 
         if (
-            method.is_unknown
+            experiment_method is not None
+            and method.is_unknown
             and method_raw in (None, "")
-            and experiment.method.is_value
-            and experiment.method.value is not MethodToken.UNSPECIFIED
+            and experiment_method.is_value
+            and experiment_method.value is not MethodToken.UNSPECIFIED
         ):
-            method = experiment.method
+            method = experiment_method
 
         method_notice: Notice | None = None
         method_was_unspecified = (
@@ -25794,8 +25794,8 @@ class Migrator:
             method_evidence = _method_inference_from_evidence(
                 method_raw,
                 *evidence_candidates,
-                experiment.method.reason
-                if experiment.method.is_unknown
+                experiment_method.reason
+                if experiment_method is not None and experiment_method.is_unknown
                 else None,
             )
             if method_evidence is not None:
@@ -25847,11 +25847,16 @@ class Migrator:
                     observation_id,
                 )
 
-        if method.is_value and (
-            experiment.method.is_unknown
-            or (
-                experiment.method.is_value
-                and experiment.method.value is MethodToken.UNSPECIFIED
+        if (
+            method.is_value
+            and experiment is not None
+            and experiment_method is not None
+            and (
+                experiment_method.is_unknown
+                or (
+                    experiment_method.is_value
+                    and experiment_method.value is MethodToken.UNSPECIFIED
+                )
             )
         ):
             self.result.experiments[experiment_id] = replace(

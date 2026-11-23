@@ -154,10 +154,12 @@ def test_calorimetry_table_method_is_inferred_and_flagged(tmp_path: Path) -> Non
 
     assert experiment.method.is_value
     assert experiment.method.value is MethodToken.CALORIMETRY
-    method_notice = next(
+    method_notices = [
         notice for notice in observation.notices
         if notice.kind is NoticeKind.METHOD_INFERRED
-    )
+    ]
+    assert len(method_notices) == 1
+    method_notice = method_notices[0]
     inferred_policy = resolve("DP-107", inferred_method=MethodToken.CALORIMETRY.value)
     assert method_notice.policy == NoticePolicy(**inferred_policy.payload["policy"])
 
@@ -241,11 +243,13 @@ def test_conflicting_method_phrases_remain_queued(tmp_path: Path) -> None:
     experiment = result.experiments[observation.experiment_id]
 
     assert experiment.method.is_unknown
-    assert any(
-        entry.observation_id == observation.observation_id
-        and "method" in entry.axes
+    method_entries = [
+        entry
         for entry in result.queue
-    )
+        if entry.observation_id == observation.observation_id
+        and "method" in entry.axes
+    ]
+    assert len(method_entries) == 1
 
 
 def test_partial_pressure_without_phase_is_inferred_as_gas_and_flagged(

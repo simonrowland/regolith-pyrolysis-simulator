@@ -316,6 +316,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
 
     policy_id = append_proposal(
         {
+            "id": "DP-109",
             "condition": "test-only missing apparatus knob",
             "value": "runtime supplied",
             "units": "knob-specific",
@@ -327,7 +328,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture row and source"],
     )
-    assert policy_id == "DP-108"
+    assert policy_id == "DP-109"
     resolved = resolve(policy_id)
     assert resolved.payload["policy_status"] == "proposed"
     assert resolved.payload["policy_id"] == policy_id
@@ -476,7 +477,7 @@ def test_method_inferred_payload_without_policy_is_rejected_by_headline_census()
         flagged_stratum_rows((residual,), engines=(Engine.NASA_CEA_9,))
 
 
-def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
+def test_proposals_require_allocated_ids_and_refuse_duplicate_ids(
     tmp_path, monkeypatch
 ) -> None:
     import simulator.battery.default_policy as policy_module
@@ -487,6 +488,7 @@ def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
     )
     monkeypatch.setattr(policy_module, "POLICY_PATH", policy_path)
     proposal = {
+        "id": "DP-109",
         "condition": "test",
         "value": 1,
         "units": "dimensionless",
@@ -499,16 +501,18 @@ def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
         proposed_by="test-dispatch",
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture"],
-    ) == "DP-108"
-    assert append_proposal(
-        proposal,
-        proposed_by="test-dispatch",
-        proposed_at="2026-11-23T00:00:00+00:00",
-        evidence=["fixture"],
     ) == "DP-109"
     with pytest.raises(ValueError, match="already exists"):
         append_proposal(
-            {**proposal, "id": "DP-108"},
+            proposal,
+            proposed_by="test-dispatch",
+            proposed_at="2026-11-23T00:00:00+00:00",
+            evidence=["fixture"],
+        )
+    without_id = {key: value for key, value in proposal.items() if key != "id"}
+    with pytest.raises(ValueError, match="must name its allocated DP-1xx id"):
+        append_proposal(
+            without_id,
             proposed_by="test-dispatch",
             proposed_at="2026-11-23T00:00:00+00:00",
             evidence=["fixture"],

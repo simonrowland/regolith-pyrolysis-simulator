@@ -277,7 +277,7 @@ def append_proposal(
     proposed_at: str | None = None,
     evidence: object,
 ) -> str:
-    """Append a proposed entry under the next free DP-1xx id."""
+    """Append a proposal using the id allocated by the controller."""
 
     raw = load_cached_safe_yaml(POLICY_PATH.read_text(encoding="utf-8"))
     if not isinstance(raw, Mapping) or raw.get("schema_version") != 1:
@@ -291,20 +291,14 @@ def append_proposal(
         if isinstance(policy, Mapping) and policy.get("id") is not None
     }
     supplied_id = entry.get("id")
-    if supplied_id is not None and str(supplied_id) in existing_ids:
+    if (
+        not isinstance(supplied_id, str)
+        or re.fullmatch(r"DP-1\d{2}", supplied_id) is None
+    ):
+        raise ValueError("proposal must name its allocated DP-1xx id")
+    if supplied_id in existing_ids:
         raise ValueError(f"default-policy id {supplied_id} already exists")
-    policy_id = next(
-        (
-            f"DP-{number:03d}"
-            for number in range(108, 200)
-            if f"DP-{number:03d}" not in existing_ids
-        ),
-        None,
-    )
-    if policy_id is None:
-        raise ValueError("no free DP-1xx proposal id remains")
-    if supplied_id is not None and str(supplied_id) != policy_id:
-        raise ValueError(f"proposal id must be the next free id {policy_id}")
+    policy_id = supplied_id
 
     required_proposal_fields = {
         "condition",
