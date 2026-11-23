@@ -109,6 +109,20 @@ def test_knudsen_extent_refuses_non_equilibrium_channel_alpha():
     assert exc.value.reason == "knudsen_equilibrium_channels_required"
 
 
+def test_knudsen_extent_limits_rhs_evaluations(monkeypatch):
+    from simulator.battery import residue
+
+    monkeypatch.setattr(residue, "_KNUDSEN_MAX_RHS_EVALUATIONS", 1)
+    with pytest.raises(ResidueInventoryRefusal, match="RHS evaluation limit in 2000 K") as exc:
+        integrate_knudsen_residue_inventory(
+            {"FeO": 1.0}, _channels(),
+            lambda n, p, t: {"FeO": 1.0, "O2": 0.0},
+            temperature_path=((0.25, 2000.0),), measured_mass_loss_fraction=0.25,
+            near_saturated=True, source_fO2_log_by_interval=(-10.0,),
+        )
+    assert exc.value.reason == "knudsen_extent_evaluation_limit"
+
+
 def test_oxygen_only_loss_advances_xi_without_debiting_cations():
     result = integrate_knudsen_residue_inventory(
         {"FeO": 1.0}, _channels("Fe"),
@@ -514,13 +528,15 @@ def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(ox
         initial, channels, pressure, temperature_path=((0.2, 2000),),
         measured_mass_loss_fraction=0.2, near_saturated=True, source_fO2_log_by_interval=(None,),
     )
-    # FeO is exhausted. The remaining 80% of initial mass is entirely MgO:
-    # .8*(.01*.071844+.040304)/.040304 = .8142604208019056 mol.
-    assert result.residue_mol["FeO"] == 0.0
+    # Fe effusion stops at a trace inventory. The remaining 80% of mass
+    # stays in MgO and that retained FeO.
+    retained_feo = result.residue_mol["FeO"]
+    assert 0.0 < retained_feo < 2e-8
+    expected_mgo = (0.8 * (0.01 * 0.071844 + 0.040304) - retained_feo * 0.071844) / 0.040304
     assert result.evaporated_mol["O"] > 0.0
     assert result.evaporated_mol["O2"] > 0.0
-    assert result.residue_mol["MgO"] == pytest.approx(0.8142604208019056, abs=1e-10)
-    assert result.retained_oxygen_atoms_mol == pytest.approx(0.8142604208019056, abs=1e-10)
+    assert result.residue_mol["MgO"] == pytest.approx(expected_mgo, abs=1e-10)
+    assert result.retained_oxygen_atoms_mol == pytest.approx(expected_mgo + retained_feo, abs=1e-10)
     assert max(abs(v) for v in result.atom_closure_mol.values()) < 1e-12
     def mass(amounts):
         return sum(n * float(parse_formula(s).molar_mass_kg_per_mol()) for s, n in amounts.items())
@@ -691,6 +707,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
         Po2Request,
         internal_analytical_residue_vapor_pressure,
     )
+    from simulator.fe_redox import _engine_fe_speciation
 
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
@@ -738,6 +755,9 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     consumed = [equilibrium_cache_value(vars(result), engine_id="internal-analytical") for result in (response, cold, warm)]
     assert consumed[0] == consumed[1] == consumed[2]
     assert response.vapor_pressures_Pa == cold.vapor_pressures_Pa == warm.vapor_pressures_Pa
+    fe_speciation = _engine_fe_speciation(response)
+    assert None not in fe_speciation
+    assert _engine_fe_speciation(cold) == _engine_fe_speciation(warm) == fe_speciation
     omissions = response.diagnostics["vapor_pressure_diagnostic"]["below_reporting_threshold_omissions"]
     record = omissions["Al"]
     assert "Al" not in response.vapor_pressures_Pa
