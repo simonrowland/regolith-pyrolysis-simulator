@@ -21,6 +21,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal
 
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.decimal_tokens import _decimal_rounding_half_width
 from simulator.battery.enums import (
     AmountBasis,
@@ -39,6 +40,7 @@ from simulator.battery.records import (
     Located,
     Locator,
     Notice,
+    NoticePolicy,
     Observation,
     State,
     phase_token,
@@ -313,6 +315,31 @@ def _component_names(composition: Composition) -> set[str]:
     return {name for name, _amount in composition.components}
 
 
+def _phase_composition_policy(
+    composition: Composition, flag: NoticeKind
+) -> NoticePolicy:
+    # DP-017 uses the system charge by mass balance; absent that, the
+    # equilibrium liquid is only a proxy input for a different phase.
+    resolved = resolve_default_policy(
+        "DP-017",
+        value=(
+            f"{composition.basis}/{composition.amount_basis.value}: "
+            f"{composition.components!r}"
+        ),
+        flag=flag.value,
+    )
+    payload = resolved.payload["policy"]
+    if not isinstance(payload, Mapping):
+        raise TypeError("DP-017 resolved policy payload must be a mapping")
+    return NoticePolicy(
+        id=str(payload["id"]),
+        version=payload["version"],
+        status=str(payload["status"]),
+        value=str(payload["value"]),
+        units=str(payload["units"]),
+    )
+
+
 @dataclass(frozen=True)
 class _PhaseCompositionInput:
     composition: Composition | None = None
@@ -443,6 +470,9 @@ def _phase_row_composition_input(
             composition=composition,
             notice=Notice(
                 kind=NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
+                policy=_phase_composition_policy(
+                    composition, NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS
+                ),
                 affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
                 reason=(
                     f"{NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS.value}:"
@@ -633,6 +663,9 @@ def _phase_row_composition_input(
         composition=composition,
         notice=Notice(
             kind=NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
+            policy=_phase_composition_policy(
+                composition, NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE
+            ),
             affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
             reason=(
                 f"{NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value}:"

@@ -818,12 +818,20 @@ def test_phase_row_prefers_printed_sample_start_over_liquid_analysis() -> None:
     )
     assert resolved.notice is not None
     assert resolved.notice.kind is NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS
+    assert resolved.notice.policy is not None
+    assert resolved.notice.policy.id == "DP-017"
+    assert resolved.notice.policy.status == "canonical"
+    assert resolved.notice.policy.units == "composition basis of source row"
+    assert resolved.notice.policy.value.startswith(
+        "printed_oxides/mole_fraction:"
+    )
     assert "original_reason=identity_incomplete:missing_input:composition" in (
         resolved.notice.reason
     )
-    assert flagged_strata((resolved.notice,)) == (
+    assert set(flagged_strata((resolved.notice,))) == {
+        NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS.value,
         FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
-    )
+    }
 
 
 def test_phase_row_uses_assembled_liquid_siblings_only_for_other_phase() -> None:
@@ -874,12 +882,18 @@ def test_phase_row_uses_assembled_liquid_siblings_only_for_other_phase() -> None
     )
     assert resolved.notice is not None
     assert resolved.notice.kind is NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE
+    assert resolved.notice.policy is not None
+    assert resolved.notice.policy.id == "DP-017"
+    assert resolved.notice.policy.value.startswith(
+        "printed_oxides/mass_percent:"
+    )
     assert "original_reason=identity_incomplete:missing_input:composition" in (
         resolved.notice.reason
     )
-    assert flagged_strata((resolved.notice,)) == (
+    assert set(flagged_strata((resolved.notice,))) == {
+        NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value,
         FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
-    )
+    }
     candidate_identity = replace(target_identity, composition=State.of(composition))
     assert _input_composition_echo_detail(candidate_identity) is None
 
@@ -1135,9 +1149,10 @@ def test_compile_residual_passes_resolved_phase_composition_to_engine(
     ]
     assert residual.numeric is not None
     assert FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION in flagged_strata(residual.notices)
-    assert flagged_strata(residual.notices) == (
+    assert set(flagged_strata(residual.notices)) == {
+        NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value,
         FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
-    )
+    }
 
     from simulator.battery.score import headline_rows
 
@@ -1248,6 +1263,13 @@ def test_compile_mass_percent_start_keeps_migrator_notices(
     assert anhydrous_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     assert anhydrous_notice.band == "anhydrous_starting_bulk_omits_h2o"
     assert anhydrous_notice.origin == target.observation_id
+    composition_notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS
+    )
+    assert composition_notice.policy is not None
+    assert composition_notice.policy.id == "DP-017"
 
 
 def _dex(candidate: Decimal, reference: Decimal) -> Decimal:
