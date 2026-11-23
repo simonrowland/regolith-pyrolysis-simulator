@@ -1210,7 +1210,6 @@ def test_scorer_rejects_gate_checks_without_passed():
         _missing_apparatus_fact(
             missing_passed,
             allow_calibration=False,
-            allow_unknown_method=True,
         )
 
     experiment = F.kems_experiment("invalid-check-exp", "invalid-check-work")

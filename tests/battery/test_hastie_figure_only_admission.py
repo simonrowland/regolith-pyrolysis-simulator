@@ -308,12 +308,14 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
             assert not method_check.passed
             assert method_check.detail["reason"] == experiment.method.reason
             assert (
+                # Method inference moved to car A (ownership ruling): this helper no
+                # longer reports an unknown method as a missing apparatus fact. The
+                # residual's METHOD_UNKNOWN refusal below still pins the outcome.
                 _missing_apparatus_fact(
                     method_check,
                     allow_calibration=False,
-                    allow_unknown_method=True,
                 )
-                == "method_unknown"
+                is None
             )
             assert not pressure_sum_check.passed
             assert (
@@ -328,7 +330,6 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 _missing_apparatus_fact(
                     pressure_sum_check,
                     allow_calibration=False,
-                    allow_unknown_method=True,
                 )
                 == "in_cell_partial_pressure_sum"
             )
