@@ -511,6 +511,72 @@ def test_thermal_train_report_is_detached() -> None:
     assert sim.record.snapshots[0].evap_flux.species_kg_hr["Na"] == 1.0
 
 
+def _record_value_diffs(left, right, path=""):
+    """Dotted paths where two record trees differ, including missing keys."""
+    found = []
+    if isinstance(left, dict) and isinstance(right, dict):
+        for key in sorted(set(left) | set(right), key=str):
+            child = f"{path}.{key}" if path else str(key)
+            if key not in left or key not in right:
+                found.append((
+                    child,
+                    left.get(key, "<absent>"),
+                    right.get(key, "<absent>"),
+                ))
+            else:
+                found.extend(_record_value_diffs(left[key], right[key], child))
+        return found
+    if isinstance(left, (list, tuple)) and isinstance(right, (list, tuple)):
+        child_path = path or "$"
+        if len(left) != len(right):
+            found.append((f"{child_path}[len]", len(left), len(right)))
+        for index, (item_left, item_right) in enumerate(zip(left, right)):
+            found.extend(_record_value_diffs(
+                item_left, item_right, f"{child_path}[{index}]",
+            ))
+        return found
+    if left != right:
+        found.append((path or "$", left, right))
+    return found
+
+
+def _record_byte_mismatch_message(
+    called_bytes: bytes,
+    never_bytes: bytes,
+    called_record,
+    never_record,
+) -> str:
+    """Name every dotted record path that makes the two sessions differ."""
+    index = next(
+        (
+            offset
+            for offset, (left_byte, right_byte) in enumerate(
+                zip(called_bytes, never_bytes)
+            )
+            if left_byte != right_byte
+        ),
+        min(len(called_bytes), len(never_bytes)),
+    )
+    called_at = called_bytes[index:index + 1]
+    never_at = never_bytes[index:index + 1]
+    lines = [
+        "record bytes differ: "
+        f"called(second)={called_at!r} never_called(first)={never_at!r} "
+        f"at index {index}"
+    ]
+    diffs = _record_value_diffs(called_record, never_record)
+    shown = diffs[:40]
+    for dotted, left_value, right_value in shown:
+        lines.append(
+            f"{dotted}: called={left_value!r} never_called={right_value!r}"
+        )
+    if len(diffs) > len(shown):
+        lines.append(f"... {len(diffs) - len(shown)} more paths")
+    if not diffs:
+        lines.append("decoded records match; JSON encoding diverged")
+    return "\n".join(lines)
+
+
 def test_report_call_is_run_record_byte_neutral() -> None:
     base = BatchRecord(snapshots=[_snapshot(1, na_kg_hr=1.0, unknown_kg_hr=0.0, o2_mol_hr=10.0)])
     never_called = _sim(deepcopy(base))
@@ -565,13 +631,20 @@ def test_real_deterministic_runs_are_record_and_ledger_byte_neutral() -> None:
     optimize_modules_after = {
         name for name in sys.modules if name == "simulator.optimize" or name.startswith("simulator.optimize.")
     }
-    record_bytes = lambda session: json.dumps(
-        dataclasses.asdict(session.simulator.record), sort_keys=True, default=str
+    called_record = dataclasses.asdict(called.simulator.record)
+    never_record = dataclasses.asdict(never_called.simulator.record)
+    called_record_bytes = json.dumps(
+        called_record, sort_keys=True, default=str
+    ).encode()
+    never_record_bytes = json.dumps(
+        never_record, sort_keys=True, default=str
     ).encode()
     ledger_bytes = lambda session: json.dumps(
         session.simulator.atom_ledger.close_report(), sort_keys=True, default=str
     ).encode()
-    assert record_bytes(called) == record_bytes(never_called)
+    assert called_record_bytes == never_record_bytes, _record_byte_mismatch_message(
+        called_record_bytes, never_record_bytes, called_record, never_record,
+    )
     assert ledger_bytes(called) == ledger_bytes(never_called)
     assert result_document(called) == result_before == result_document(never_called)
     assert optimize_modules_after == optimize_modules_before
