@@ -170,7 +170,7 @@ def capability_summary(
         quantity_token,
         rail_for_quantity,
     )
-    from simulator.battery.score_run import _residue_adapter_binds
+    from simulator.battery.score_run import _residue_adapter_binds, _scoring_quantity
 
     context = ScoreContext(
         {},
@@ -192,6 +192,7 @@ def capability_summary(
             continue
         if quantity in _RESIDUE_QUANTITIES:
             continue
+        quantity = _scoring_quantity(observation, quantity)
         formula = (
             identity.species.formula
             if isinstance(identity, Identity) and identity.species is not None
@@ -227,6 +228,7 @@ def capability_summary(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is None:
             continue
+        quantity = _scoring_quantity(observation, quantity)
         offered = _compilation_engines_for_scoring(
             engine_list,
             observation,

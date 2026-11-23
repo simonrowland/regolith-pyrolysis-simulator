@@ -94,6 +94,30 @@ def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
     return bool(_residue_adapter_kinds(point, engine, experiment, quantity))
 
 
+def _scoring_quantity(point, quantity):
+    """Quantity this pair offers the engine.
+
+    A Zhang implied-alpha row stays an evaporation-coefficient observation.
+    The engine request is the activity coefficient, and coverage follows
+    that request. Every other row keeps its own quantity.
+    """
+
+    from simulator.battery.enums import Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        _implied_alpha_activity_observation,
+        quantity_token,
+    )
+
+    if quantity is not Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        return quantity
+    implied = _implied_alpha_activity_observation(point)
+    if implied is None or not isinstance(getattr(implied, "identity", None), Identity):
+        return quantity
+    rewritten = quantity_token(implied.identity)
+    return quantity if rewritten is None else rewritten
+
+
 def _residue_cohort_selection(
     selected_experiment_ids: frozenset[str] | None,
     test_experiment_ids: frozenset[str] | None,
@@ -559,11 +583,17 @@ def _score_store_with_decisions(
                         # capability-matrix cell, not a residual. Injected
                         # predictors still see every engine. Residue adapters
                         # stay in the loop even though the quantity is absent
-                        # from the generic table.
+                        # from the generic table. Implied-alpha coverage uses
+                        # the activity-coefficient request, not the stored alpha.
+                        offered_quantity = (
+                            None
+                            if quantity is None
+                            else _scoring_quantity(point, quantity)
+                        )
                         if (
                             predict is None
-                            and quantity is not None
-                            and not engine_covers_quantity(engine, quantity)
+                            and offered_quantity is not None
+                            and not engine_covers_quantity(engine, offered_quantity)
                             and not _residue_adapter_binds(
                                 point, engine, experiment, quantity
                             )
