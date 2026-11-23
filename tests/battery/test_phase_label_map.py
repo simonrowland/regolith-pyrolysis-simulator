@@ -56,6 +56,23 @@ def test_selector_matches_liq_and_does_not_call_g_glass():
     assert issue == "phase_not_in_assemblage"
 
 
+def test_non_exact_liquid_name_is_the_shared_role_set(monkeypatch):
+    from simulator.battery import score
+
+    assert score.LIQUID_ROLE_LABELS is LIQUID_ROLE_LABELS
+    monkeypatch.setattr(
+        "simulator.battery.score.LIQUID_ROLE_LABELS",
+        frozenset({"liq"}),
+    )
+    result = EquilibriumResult(
+        liquid_fraction=1.0,
+        phase_compositions={"liquid": {"SiO2": 80.0}},
+    )
+    selected, issue = _select_phase_composition(result, PhaseRole.MELT)
+    assert selected is None
+    assert issue == "phase_not_in_assemblage"
+
+
 def test_two_liquid_names_stay_ambiguous():
     result = EquilibriumResult(
         liquid_fraction=1.0,

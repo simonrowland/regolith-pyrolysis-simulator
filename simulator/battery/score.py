@@ -284,6 +284,7 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     multivalent_components,
 )
+from simulator.melt_backend.phase_composition import LIQUID_ROLE_LABELS
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
@@ -517,7 +518,6 @@ _NOT_VAPOUR_QUANTITIES: frozenset[Quantity] = frozenset(
     }
 )
 _REDOX_DISTRIBUTION_ELEMENTS = frozenset({"Fe", "Cr", "Mn", "Ti", "P"})
-_LIQUID_PHASE_NAMES = frozenset({"liq", "liquid", "melt", "slag", "glass"})
 
 ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.VAPOROCK: "vaporock",
@@ -11344,7 +11344,7 @@ def _select_phase_composition(
     if len(exact) == 1:
         return comps[exact[0]], None
     if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
-        liquids = [name for name in comps if name.casefold() in _LIQUID_PHASE_NAMES]
+        liquids = [name for name in comps if name.casefold() in LIQUID_ROLE_LABELS]
         if len(liquids) > 1:
             return None, "ambiguous_phase"
         if len(liquids) == 1:
