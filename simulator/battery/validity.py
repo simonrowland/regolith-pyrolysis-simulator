@@ -810,9 +810,30 @@ def effusion_regime_unverified(
 
     method_state = experiment.method
     checks: list[GateCheck] = []
-    if method_state.tag is not StateTag.VALUE or method_state.value is None:
-        return _pass(checks)  # not an effusion claim
-    if method_state.value is not MethodToken.KNUDSEN_EFFUSION:
+    if method_state.is_unknown:
+        evidence_state = None if observation is None else observation.evidence.class_
+        pressure_quantity = quantity in {
+            Quantity.P_SAT,
+            Quantity.P_PARTIAL,
+            Quantity.P_REFERENCE,
+        }
+        evidence_needs_regime_check = (
+            evidence_state is not None
+            and (
+                evidence_state.is_unknown
+                or (
+                    evidence_state.is_value
+                    and evidence_state.value is EvidenceClass.FIGURE_ONLY
+                )
+            )
+        )
+        if not pressure_quantity or not evidence_needs_regime_check:
+            return _pass(checks)
+        # A figure-only or evidence-unknown pressure claim cannot rule out
+        # effusion. Require the conservative same-point in-cell fallback.
+    elif method_state.tag is not StateTag.VALUE or method_state.value is None:
+        return _pass(checks)
+    elif method_state.value is not MethodToken.KNUDSEN_EFFUSION:
         return _pass(checks)
     if quantity not in {
         Quantity.P_SAT,
@@ -960,7 +981,11 @@ def effusion_regime_unverified(
             )
         )
         return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            (
+                RefusalReason.METHOD_UNKNOWN
+                if method_state.is_unknown
+                else RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            ),
             checks,
             "in_cell_partial_pressure_sum",
         )

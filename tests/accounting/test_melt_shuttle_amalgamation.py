@@ -262,11 +262,11 @@ def test_evaporated_shuttle_cations_allow_partial_withdrawal_from_overhead_gas(
     ledger.assert_balanced()
 
 
-def test_na_shuttle_residue_partial_evaporation_keeps_origin_shares():
-    """Mixed-origin residue Na evaporates pro rata once the shuttle marks it.
+def test_na_shuttle_cleaned_melt_partial_evaporation_keeps_origin_shares():
+    """Mixed-origin dissolved Na evaporates pro rata once the shuttle marks it.
 
     Recovered feedstock Na and the reagent dose share one reagent pool.
-    The Na shuttle credits both origins into spent-reductant residue.
+    The Na shuttle credits both origins into process.cleaned_melt.
     A partial evaporation must withdraw each origin in that pool's ratio
     and carry both onto the overhead gas, then into the condensation train.
     """
@@ -292,28 +292,24 @@ def test_na_shuttle_residue_partial_evaporation_keeps_origin_shares():
     sim.shuttle_Na_inventory_kg = sim._sync_reagent_counter_from_ledger("Na")
     sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
 
-    residue_origins = sim.atom_ledger.origin_atom_moles_by_account()[
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    melt_origins = sim.atom_ledger.origin_atom_moles_by_account()[
+        "process.cleaned_melt"
     ]["Na"]
-    feedstock_before = float(residue_origins["feedstock"])
-    reagent_before = float(residue_origins["reagent"])
+    feedstock_before = float(melt_origins["feedstock"])
+    reagent_before = float(melt_origins["reagent"])
     assert feedstock_before > 0.0
     assert reagent_before > 0.0
-    residue_kg_before = sim.atom_ledger.kg_by_account(
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    melt_kg_before = sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
     )["Na2O"]
-    assert residue_kg_before > 0.0
+    assert melt_kg_before > 0.0
+    assert sim.atom_ledger.kg_by_account(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    ).get("Na2O", 0.0) == 0.0
 
     sodium_data = sim.vapor_pressures["metals"]["Na"]
     stoich = sim._evaporation_stoich("Na", sodium_data)
-    cleaned_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
-        "Na2O", 0.0
-    )
-    sodium_kg = (
-        0.25
-        * (residue_kg_before + cleaned_kg)
-        / stoich["oxide_per_product_kg"]
-    )
+    sodium_kg = 0.25 * melt_kg_before / stoich["oxide_per_product_kg"]
     sim.melt.campaign = CampaignPhase.C4
     sim.melt.temperature_C = 1670.0
     sim.melt.p_total_mbar = 0.2
@@ -326,12 +322,12 @@ def test_na_shuttle_residue_partial_evaporation_keeps_origin_shares():
         return_transition=True,
     )[1]
     assert transition is not None
-    residue_lot = next(
+    melt_lot = next(
         lot
         for lot in transition.debits
-        if lot.account == SPENT_REDUCTANT_RESIDUE_ACCOUNT
+        if lot.account == "process.cleaned_melt" and "Na2O" in lot.species_kg
     )
-    withdrawn = residue_lot.origin_atom_moles
+    withdrawn = melt_lot.origin_atom_moles
     feedstock_withdrawn = float(withdrawn["feedstock"]["Na"])
     reagent_withdrawn = float(withdrawn["reagent"]["Na"])
     assert feedstock_withdrawn > 0.0
@@ -341,10 +337,10 @@ def test_na_shuttle_residue_partial_evaporation_keeps_origin_shares():
     assert feedstock_withdrawn / reagent_withdrawn == pytest.approx(
         feedstock_before / reagent_before
     )
-    assert residue_lot.attribution_method_by_element["Na"] == "pool_ratio"
+    assert melt_lot.attribution_method_by_element["Na"] == "pool_ratio"
     assert (
-        sim.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT)["Na2O"]
-        < residue_kg_before
+        sim.atom_ledger.kg_by_account("process.cleaned_melt")["Na2O"]
+        < melt_kg_before
     )
 
     overhead_origins = sim.atom_ledger.origin_atom_moles_by_account()[

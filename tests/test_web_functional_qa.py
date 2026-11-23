@@ -3,6 +3,7 @@ import math
 import shutil
 import subprocess
 import time
+from dataclasses import fields
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,7 +13,9 @@ import app as app_module
 import simulator.three_product_report as three_product_report
 import web.events as web_events
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     C7_AL_CREDIT_ACCOUNT,
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     METAL_PHASE_ACCOUNT,
@@ -31,7 +34,7 @@ from simulator.accounting.queries import (
 )
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT
+from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT, PyrolysisRun
 from tests._cpu_budget import DEFAULT_CPU_BUDGET_SECONDS
 from web.events import _clear_simulation_state, _simulations
 from web.run_store import RunArtifactStore
@@ -198,7 +201,7 @@ def headless_full_run_product_story(tmp_path_factory):
         (
             "lunar_mare_low_ti", 24, {},
             {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
-            0.0, 363.32,
+            0.0, 363.7,
         ),
         (
             "mars_basalt", 12, {"C": 30.0},
@@ -405,6 +408,41 @@ def test_advisory_product_story_renders_partial_metadata() -> None:
     assert "includes estimated transport for SiO (status_bearing)" in text
 
 
+def test_advisory_product_list_omits_cartridge_residue() -> None:
+    """The Products heading is the flat separated ledger, not the residue class."""
+    payload = {
+        "product_story_status": "ok",
+        "product_story": {
+            "alkali_cartridge_solid_residue": {
+                "species_kg": {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0},
+                "class_total_kg": 8.0,
+                "account": "process.alkali_cartridge_solid_residue",
+                "disposition": "captured_unseparated",
+            },
+        },
+        "products": {"Fe": 6.0, "Na": 2.0},
+    }
+    rendered = _render_product_story(
+        html=(
+            '<div id="product-ledger-state"></div>'
+            '<div id="product-ledger-content"></div>'
+        ),
+        payload=payload,
+    )
+    text = rendered["text"]["product-ledger-content"]
+    residue_text, products_text = text.split("Products", 1)
+    assert "Stage-4 cartridge solid residue (unseparated)" in residue_text
+    assert "Fe 4 kg" in residue_text
+    assert "SiO2 3 kg" in residue_text
+    assert "MgO 1 kg" in residue_text
+    assert "Fe: 6 kg" in products_text
+    assert "Na: 2 kg" in products_text
+    assert "Fe 4 kg" not in products_text
+    assert "SiO2" not in products_text
+    assert "MgO" not in products_text
+    assert "10" not in products_text
+
+
 def test_advisory_product_story_renders_available_estimated_transport() -> None:
     payload = {
         "product_story_status": "ok",
@@ -438,6 +476,8 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md
+# Nightly campaign-length path: car 1 used 352 s CPU vs green at about 298 s;
+# C2A rose from 103 to 158 s after c3's Stage-3 admission and rerouting.
 # Web-phase CPU budget, raised under owner d-319 (budget may rise as the battery
 # store grows; a raise records the measured cost and margin). Studio-3, process
 # CPU (user + sys), -n 0, alternating with green, 2026-11-04:
@@ -497,10 +537,18 @@ def test_headless_full_run_ledgers_and_product_story_web(
         status="ok",
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
+    # 2f7b45e93 removed the shipped false leaf. The runner writes the key
+    # only when the field is true, so a default run leaves it absent.
     assert (
-        sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
-        is False
+        "allow_unmeasured_alpha_fallback"
+        not in sim.setpoints["chemistry_kernel"]
     )
+    fallback_field = next(
+        item
+        for item in fields(PyrolysisRun)
+        if item.name == "allow_unmeasured_alpha_fallback"
+    )
+    assert fallback_field.default is False
     assert completion["products"] == {
         species: round(value, 2)
         for species, value in sim.product_ledger().items()
@@ -581,19 +629,13 @@ def test_headless_full_run_ledgers_and_product_story_web(
 
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
-    _PINNED_CRO_OFFGAS_KG = 0.0
-    # c679673f5 integrates Stage 2 capture over its temperature band (33 equal
-    # center samples). This captures Cr-bearing vapour the midpoint calculation
-    # sent to terminal.offgas: Cr-equivalent offgas falls from 0.182436796288
-    # to 0.180051898903 kg, while accepted Stage 2 Cr rises from 0.000066897364
-    # to 0.002451792057 kg. The remaining 2.69e-9 kg Cr moves into the rump:
-    # 3.932472e-9 kg extra Cr2O3 times its formula-derived Cr mass fraction.
-    # Thus 2.384897384 g lost from offgas = 2.384894693 g gained in Stage 2
-    # plus 0.000002691 g gained in the rump; the full ledger still totals
-    # 2.459768802 kg Cr against the 2.46 kg feed. CrO offgas remains 0.
-    # 85fedcb8e's per-strip solver moves a further 1.4458e-7 kg from offgas
-    # into Stage 2 capture; the later segment-update refactor leaves the pin
-    # at 0.18005189890349527 until the b-1281 r3 re-pin below.
+    _PINNED_CRO_OFFGAS_KG = 2.4563577999771256
+    # Current terminal pins: 2.4563577999771256 kg CrO and 1.896070159628202 kg
+    # Cr-equivalent across Cr, CrO, CrO2, and CrO3. The positive terminal CrO
+    # stream and separate train-local CrO zero are both checked below.
+    # b-1281 also moved the older Cr-equivalent offgas pin. Both sides'
+    # values stay at the b271 build; needs controller re-measure.
+    _PINNED_CR_OFFGAS_EQ_KG = 1.896070159628202
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -604,52 +646,76 @@ def test_headless_full_run_ledgers_and_product_story_web(
         float(offgas_kg.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
         for species in ("Cr", "CrO", "CrO2", "CrO3")
     )
-    # Stage 4 now captures Na/Mg at 250 C and K at 40 C. That changes per-hour
-    # alkali capture and the later pressure-limited reduction trajectory: the
-    # independent runner and web paths both move Cr2O3 from 3.3280300206015765
-    # to 3.3283236817361845 kg, while Cr-equivalent terminal offgas moves from
-    # 9.216286830238766e-06 to 0.1824367962875407 kg and extracted Cr falls
-    # from 0.18 to 0 kg. The Cr2O3 delta is 0.000293661134608 kg; dividing by
-    # the old residual gives 8.8239e-5 (dimensionless); kg cancel in that
-    # ratio. In the limiting case of
-    # unchanged alkali capture, the late reduction trajectory and delta return
-    # to the old value. The sum still closes the 2.46 kg feed Cr inventory.
-    # d-137 rounds 5-7 (per-strip piecewise capture solution) move this by
-    # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
-    # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
-    # solver's per-call differences at <=1.1e-7 kg.
-    # b-1281: residue Na2O now evaporates, and the later reduction
-    # trajectory moves rump Cr2O3 from 3.328323685668657 to
-    # 3.328320724389875 kg (studio gate at faa88e9ec6, headless full
-    # run). The Cr feed still closes. Amalgamation attributes origins
-    # and does not change this mol; re-measure if a later gate moves it.
-    # b-1281 r3 (studio gate at 2fe7131465, same headless full run):
-    # Cr-equivalent terminal offgas moves from 0.18005189890349527 to
-    # 0.18005392737207107 kg. The difference is 2.0284685758e-6 kg,
-    # relative 1.1266e-5, which exceeds the 1e-6 pin. CrO offgas stays
-    # 0 and rump Cr2O3 stays inside rel 1e-9, and the mass-balance
-    # assertion above this pin already passed. The extra Na vapor shifts
-    # the Stage 2 capture versus terminal-offgas trade; the Cr does not
-    # leave the ledger. Closure below remains the 2.46 kg feed within
-    # 0.02 kg.
-    _PINNED_CR_OFFGAS_EQ_KG = 0.18005392737207107
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328320724389875, rel=1e-9)
-    assert cr_ingot_kg == 0.0
+    # The source-reaction wall refusal leaves proxy CrO on terminal.offgas
+    # instead of booking it on the train. The rump loses the same chromium:
+    # Cr2O3 3.328323685668657 → 0.7042714559225458. Offgas CrO
+    # 0 → 2.4563577999771256, and the Cr-equivalent offgas total
+    # 0.18005189890349527 → 1.896070159628202. Elemental Cr on the train
+    # rounds to the 0.02 kg product. Cartridge residue and the terminal
+    # chromia account hold the rest. Rump + train + offgas + residue +
+    # stored chromia still total 2.459768802 kg Cr against the 2.46 kg feed.
+    # b-1281 measured rump Cr2O3 3.328320724389875 and Cr-equivalent offgas
+    # 0.18005392737207107 on the pre-merge trajectory. These pins stay at
+    # the b271 build; needs controller re-measure.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(0.7042714559225458, rel=1e-9)
+    assert cr_ingot_kg == 0.02
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
-    # story payload values are display-rounded (2 dp), so compare loosely.
-    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
-        cr_ingot_kg, abs=0.005
-    )
+    # The 0.02 kg product is elemental Cr on the train
+    # (0.023451016296130407 kg, display-rounded). The story does not
+    # report train metal as an ingot.
+    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == 0.0
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
-        0.0, abs=0.005
+        round(cro_offgas_kg, 2), abs=0.005
     )
-    # Inventory closure: ceramic Cr + ingot Cr + terminal offgas Cr-eq closes
-    # the ~2.46 kg lunar Cr feed (AtomLedger total 2.459769).
-    assert cr_in_rump_kg + cr_ingot_kg + cr_offgas_eq_kg == pytest.approx(
-        2.46, abs=0.02
+    # Inventory closure follows AtomLedger streams: rump Cr + train Cr +
+    # terminal offgas + cartridge residue + stored chromia. Formula
+    # resolution supplies the Cr mass fraction. A pure Cr formula is 1.
+    train_kg = sim.atom_ledger.project_account_kg(CONDENSATION_TRAIN_ACCOUNT)
+    residue_kg = sim.atom_ledger.project_account_kg(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
     )
+    chromia_kg = sim.atom_ledger.project_account_kg(
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT
+    )
+    train_cro_kg = float(train_kg.get("CrO", 0.0) or 0.0)
+    assert train_cro_kg == 0.0
+    assert float(train_kg.get("Cr", 0.0) or 0.0) == pytest.approx(
+        0.023451016296130407, rel=1e-9
+    )
+    assert float(residue_kg.get("Cr", 0.0) or 0.0) == pytest.approx(
+        0.0568976438016042, rel=1e-9
+    )
+    assert float(chromia_kg.get("Cr2O3", 0.0) or 0.0) == pytest.approx(
+        0.002165922033496538, rel=1e-9
+    )
+    assert story["off_spec_condensate"]["species_kg"].get("CrO", 0.0) == (
+        pytest.approx(round(train_cro_kg, 2), abs=0.005)
+    )
+    # The uncertified-capture flag follows the offgas CrO. The train no
+    # longer holds that mass, so off-spec condensate has no flag.
+    capture_flag = story["escaped_to_vacuum"]["flag"]
+    assert capture_flag["status"] == "flagged prediction"
+    assert capture_flag["authority"] == "proxy/bridge"
+    assert "tier-2 evaporation alpha 0.9" in capture_flag["reason"]
+    assert "cannot certify capture" in capture_flag["reason"]
+    assert "terminal.offgas" in capture_flag["reason"]
+    cr_species = ("Cr", "CrO", "CrO2", "CrO3", "Cr2O3")
+
+    def _cr_eq(payload):
+        return sum(
+            float(payload.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
+            for species in cr_species
+        )
+
+    assert (
+        cr_in_rump_kg
+        + _cr_eq(train_kg)
+        + cr_offgas_eq_kg
+        + _cr_eq(residue_kg)
+        + _cr_eq(chromia_kg)
+    ) == pytest.approx(2.46, abs=0.02)
     assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == (
         pytest.approx(rump.get("Cr2O3", 0.0), abs=0.005)
     )
@@ -739,6 +805,13 @@ def test_headless_full_run_ledgers_and_product_story_web(
         if account == "process.wall_deposit"
         or account.startswith("process.wall_deposit_segment_")
     )
+    # The flat product ledger omits the residue account. The story
+    # class still holds that mass, so closure names the account here.
+    source_total += sum(
+        sim.atom_ledger.project_account_kg(
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+        ).values()
+    )
     source_total += sum(rump.values())
     story_total = _story_total(
         story,
@@ -747,6 +820,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
         "glass",
         "oxygen",
         "captured_volatiles",
+        "alkali_cartridge_solid_residue",
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
@@ -763,6 +837,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
         "glass",
         "oxygen",
         "captured_volatiles",
+        "alkali_cartridge_solid_residue",
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
@@ -793,6 +868,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
         "Glass out",
         "Oxygen out",
         "Captured volatiles out",
+        "Stage-4 cartridge solid residue (unseparated)",
         "Refractory ceramic out",
         "Terminal residue — incompletely extracted",
         "Escaped to vacuum",
@@ -808,6 +884,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
         "glass",
         "oxygen",
         "captured_volatiles",
+        "alkali_cartridge_solid_residue",
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
@@ -1199,6 +1276,7 @@ def test_empty_product_classes_render_from_completion_projection(web_driver):
     ("story_product", "flat_products", "expected_state"),
     [
         ({"refractory_ceramic": 280.0}, {}, "no-products"),
+        ({"alkali_cartridge_solid_residue": 8.0}, {}, "no-products"),
         ({}, {"unspent_Na_reagent": 280.0}, "no-products"),
         ({"metal_ingots": 1.0}, {}, "ok"),
         (None, {"Fe": 1.0}, "ok"),

@@ -155,6 +155,45 @@ def test_wt_percent_conversion_handles_swept_species_and_feot_alias() -> None:
     assert abs(sum(components.values()) - Decimal("1")) < Decimal("1e-27")
 
 
+def test_feo15_mole_fraction_preserves_iron_to_silicon_atom_ratio() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mole_fraction": {
+                "FeO1.5": Decimal("0.5"),
+                "SiO2": Decimal("0.5"),
+            }
+        }
+    )
+
+    assert omitted == ()
+    assert composition is not None
+    components = composition.as_map()
+    assert components == {
+        "Fe2O3": Decimal(1) / Decimal(3),
+        "SiO2": Decimal(2) / Decimal(3),
+    }
+    # Each FeO1.5 carries one Fe; each canonical Fe2O3 carries two.
+    assert abs(components["Fe2O3"] * 2 / components["SiO2"] - 1) < Decimal(
+        "1e-27"
+    )
+
+
+def test_feo15_wt_percent_maps_without_a_formula_unit_factor() -> None:
+    iron_mass = Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["Fe"]))
+    oxygen_mass = Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["O"]))
+    feo15_mass_per_iron = iron_mass + Decimal("1.5") * oxygen_mass
+    fe2o3_mass = Decimal("2") * iron_mass + Decimal("3") * oxygen_mass
+
+    assert fe2o3_mass == Decimal("2") * feo15_mass_per_iron
+    alias = wt_pct_to_mole_fraction(
+        {"FeO1.5": Decimal("50"), "SiO2": Decimal("50")}
+    )
+    canonical = wt_pct_to_mole_fraction(
+        {"Fe2O3": Decimal("50"), "SiO2": Decimal("50")}
+    )
+    assert alias.as_map() == canonical.as_map()
+
+
 def test_wt_percent_conversion_handles_vanadium_pentoxide() -> None:
     wt = {"MgO": Decimal("40"), "V2O5": Decimal("60")}
 
@@ -8039,6 +8078,10 @@ def _internal_engine_point_for_real_extract(
         pytest.param(
             "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
             "aithala_2026_1800_30_xanes",
+            # fam13 binds this reviewed SI-8 / Table S-2 row to its PDF source.
+            # Printed FeO* is 16.04 wt%; the resulting FeO mole fraction stays
+            # 0.13850021506701168 before and after. The notice locator changes
+            # from source_path=None to the hashed supplementary PDF path.
             {
                 "Al2O3": 0.06887361206879163,
                 "CaO": 0.08717220545569997,
@@ -8062,7 +8105,10 @@ def _internal_engine_point_for_real_extract(
                 "table_continued=None, table='S-2', figure=None, "
                 "paragraph=None, section=None, equation=None, "
                 "line_range=None, note='WDS EPMA composition for 1800-30; "
-                "all oxide columns in wt.% as printed.', source_path=None, "
+                "all oxide columns in wt.% as printed.; "
+                "source_sha256=ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa', "
+                "source_path='raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+                "aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', "
                 "record=None)"
             ),
             id="aithala-green-notice-has-one-feot-clause",

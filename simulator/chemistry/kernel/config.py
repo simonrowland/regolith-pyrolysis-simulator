@@ -29,6 +29,11 @@ _AUTHORITY_OPT_IN_BOOL_KEYS = (
 )
 
 DEFAULT_LIQUID_FRACTION_PROVIDER = 'magemin'
+LIQUID_FRACTION_PROVIDER_ORDER = {
+    'magemin': ('magemin', 'alphamelts'),
+    'alphamelts': ('alphamelts',),
+    'analytical': (),
+}
 
 
 def normalize_oxygen_sink_channel_mode(value: Any = None) -> OxygenSinkChannelMode:
@@ -61,8 +66,8 @@ def normalize_chemistry_kernel_config(
         provider = normalized['liquid_fraction_provider']
         if not isinstance(provider, str):
             raise TypeError('liquid_fraction_provider must be a string')
-        if provider not in {'magemin', 'analytical'}:
-            raise ValueError('liquid_fraction_provider must be magemin or analytical')
+        if provider not in LIQUID_FRACTION_PROVIDER_ORDER:
+            raise ValueError('liquid_fraction_provider must be magemin, alphamelts or analytical')
     for key in _AUTHORITY_OPT_IN_BOOL_KEYS:
         if key in normalized and not isinstance(normalized[key], bool):
             raise TypeError(f"chemistry_kernel.{key} must be bool")

@@ -334,10 +334,14 @@ def diagnostic_control_audit(
             if request.fO2_log is not None
             else None
         )
+    oxygen_notice = (
+        transport_pO2_extrapolation_notice(request)
+        if request.intent == ChemistryIntent.VAPOR_PRESSURE else None
+    )
     return ControlAudit(
         requested=requested,
         applied=dict(requested),
-        notes=(note,),
+        notes=(note,) + ((oxygen_notice,) if oxygen_notice else ()),
     )
 
 
@@ -346,7 +350,7 @@ def resolve_transport_pO2_bar(
     *,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Resolve transport oxygen; observations bypass simulated-headspace floors.
+    """Resolve finite positive transport oxygen without clamping to a guard.
 
     ``pO2_admission='observation'`` admits only finite positive oxygen, as
     measured/commanded. It does not change intrinsic/source pressure controls
@@ -370,12 +374,6 @@ def resolve_transport_pO2_bar(
         if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
             raise ValueError(
                 f"pO2_bar must be finite and > 0, got {raw_pO2!r}"
-            )
-        if pO2_bar < floor_bar:
-            raise ValueError(
-                f"explicit pO2_bar={pO2_bar:g} below transport model floor "
-                f"{floor_bar:g}; request the floor explicitly by using "
-                f"pO2_bar={floor_bar:g}"
             )
         return pO2_bar
 
@@ -401,18 +399,31 @@ def resolve_transport_pO2_bar(
             raise ValueError(
                 f"fO2_log resolved to invalid pO2_bar={pO2_bar!r}"
             )
-        if pO2_bar < floor_bar:
-            raise ValueError(
-                f"fO2_log={fO2_log:g} resolves to "
-                f"pO2_bar={pO2_bar:g} below transport model floor "
-                f"{floor_bar:g}; request the floor explicitly by using "
-                f"pO2_bar={floor_bar:g}"
-            )
         return pO2_bar
 
     if observation:
         raise ValueError('observation oxygen requires pO2_bar or fO2_log')
     return floor_bar
+
+
+def transport_pO2_extrapolation_notice(request: IntentRequest) -> str | None:
+    controls = request.control_inputs or {}
+    if controls.get("pO2_admission") == "observation":
+        return None
+    floor = resolve_request_vacuum_floor_bar(request)
+    oxygen = resolve_transport_pO2_bar(request)
+    if oxygen >= floor:
+        return None
+    original_reason = (
+        f"explicit pO2_bar={oxygen:g}"
+        if controls.get("pO2_bar") is not None
+        else f"fO2_log={float(request.fO2_log):g} resolves to pO2_bar={oxygen:g}"
+    )
+    return (
+        f"reason={original_reason} below transport model floor {floor:g}; "
+        "authority_level=extrapolated; certified_band=none (numerical guard, "
+        "not a measured oxygen boundary); actual pO2 retained"
+    )
 
 
 def resolve_request_vacuum_floor_bar(

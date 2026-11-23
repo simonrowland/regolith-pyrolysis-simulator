@@ -539,15 +539,39 @@ def equilibrium_to_hot(
     diagnostics = values.get('diagnostics')
     if isinstance(diagnostics, Mapping) and diagnostics.get('backend_failure_disposition'):
         return EngineCacheValue(values if live_value is None else live_value, cacheable=False)
-    return EngineCacheValue(
-        _intern_equilibrium_source_provenance(
-            equilibrium_cache_value(values, engine_id=engine_id)
-        ),
-        {
-            name: numeric for name in _EQUILIBRIUM_COLD_FIELDS
-            if (numeric := _cold_numbers(values.get(name))) is not None
-        },
+    hot = _intern_equilibrium_source_provenance(
+        equilibrium_cache_value(values, engine_id=engine_id)
     )
+    cold = {
+        name: numeric for name in _EQUILIBRIUM_COLD_FIELDS
+        if (numeric := _cold_numbers(values.get(name))) is not None
+    }
+    status = values.get('status')
+    if engine_id == 'vaporock' and status not in {'ok', 'non_authoritative'}:
+        refusal_reason = None
+        if isinstance(diagnostics, Mapping):
+            refusal_reason = (
+                diagnostics.get('backend_status_reason')
+                or diagnostics.get('backend_failure_reason_code')
+            )
+        if refusal_reason is None:
+            refusal_reason = {
+                'out_of_domain': OutOfDomainReason.OUT_OF_DOMAIN.value,
+                'not_converged': OutOfDomainReason.NOT_CONVERGED.value,
+                'unavailable': OutOfDomainReason.BACKEND_UNAVAILABLE.value,
+            }.get(str(status))
+        if refusal_reason is not None:
+            return EngineCacheValue(
+                hot,
+                cold,
+                refusal_reason=str(refusal_reason),
+                refusal_status=str(status or ''),
+            )
+        return EngineCacheValue(
+            values if live_value is None else live_value,
+            cacheable=False,
+        )
+    return EngineCacheValue(hot, cold)
 
 # More than one oxidation state in silicate melts over the fO2 range these
 # engines are asked to run. The melt-backend contract owns this eligibility

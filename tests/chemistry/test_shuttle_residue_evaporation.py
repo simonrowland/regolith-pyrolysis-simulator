@@ -1,7 +1,8 @@
-"""Shuttle Na2O in the residue account evaporates with native Na2O.
+"""Na2O in the residue account evaporates with native Na2O.
 
-The C3 alkali shuttle credits Na2O to process.spent_reductant_residue.
-Evaporation must draw that account in proportion to its share of the
+The C3 alkali shuttle credits dissolved Na2O to process.cleaned_melt.
+These tests seed process.spent_reductant_residue directly. Evaporation
+must still draw that account in proportion to its share of the
 melt-resident species. Yield completeness still sees a separate account.
 """
 

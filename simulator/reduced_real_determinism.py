@@ -108,7 +108,23 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
-GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
+# One production record for an abandoned freeze-gate dispatch. Digests drop
+# this key whole. It is not curve identity: memo records, cache compares,
+# and store payloads omit the environment keys. The live curve of the hour
+# that retried keeps them, and replay does not restore them.
+ENVIRONMENT_RETRIES_KEY = 'environment_retries'
+GATE_CURVE_ENVIRONMENT_KEYS = (
+    ENVIRONMENT_RETRIES_KEY,
+)
+GATE_CURVE_NOTICE_KEYS = (
+    'composition_projected_notice', 'gate_provider_refusal',
+    'gate_provider_step_down', 'alphamelts_reference_pressure',
+    *GATE_CURVE_ENVIRONMENT_KEYS,
+)
+GATE_CURVE_IDENTITY_NOTICE_KEYS = tuple(
+    key for key in GATE_CURVE_NOTICE_KEYS
+    if key not in GATE_CURVE_ENVIRONMENT_KEYS
+)
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -689,6 +705,26 @@ class PT0DeterminismStore:
                 temperature_K=temperature_K,
             )
         sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
+        # d-401. Replay and the write-through hit both adopt the cached
+        # vapour evaluation here, after the hour reset has cleared the
+        # stamp. The restored diagnostic's pO2 is the pressure that
+        # evaluation consumed. Leaving the stamp unset makes the
+        # snapshot ceiling read the post-bleed reservoir. A diagnostic
+        # that omits pO2 records absence: this path does not hold the
+        # live dispatch argument, and the later reservoir is not a
+        # substitute.
+        from simulator.evaporation import (
+            pressure_vapour_evaluation_consumed,
+            remember_evaluated_transport_pO2,
+        )
+
+        remember_evaluated_transport_pO2(
+            sim,
+            pressure_vapour_evaluation_consumed(
+                vapor_pressure_diagnostic,
+                dispatch_pO2_bar=None,
+            ),
+        )
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
         replay_fO2_log = getattr(result, "requested_fO2_log", None)
@@ -765,7 +801,9 @@ class PT0DeterminismStore:
             isinstance(active_record, Mapping)
             and active_record.get("disposition") in {"live", "memo-hit"}
             and isinstance(active_record.get("curve"), Mapping)
-            and dict(active_record["curve"]) == dict(curve)
+            and _identity_gate_curve(active_record["curve"]) == (
+                _identity_gate_curve(curve)
+            )
             and gate_curve_memo_origin_matches(
                 sim,
                 curve,
@@ -2729,6 +2767,16 @@ class GateCurveProviderOutcome(str, Enum):
     FAILED = "failed"
 
 
+def gate_curve_provider_outcome_token(
+    outcome: GateCurveProviderOutcome | str | None,
+) -> str | None:
+    """JSON payloads store the enum's value. ``type(member) is str`` is false."""
+
+    if outcome is None:
+        return None
+    return GateCurveProviderOutcome(outcome).value
+
+
 _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "engine_crash",
     "engine_worker_unavailable",
@@ -2788,6 +2836,34 @@ def gate_curve_provider_timeout_reason(
     )
 
 
+def failed_provider_attempt_is_environment(attempt: Mapping[str, Any] | None) -> bool:
+    """True exactly when this attempt would trigger the freeze-gate retry.
+
+    The retry calls ``gate_curve_provider_timeout_reason``. An attempt stores
+    that diagnostic under ``diagnostic`` and the same reason codes, joined,
+    on ``reason``. A physics reason (``composition_projected``,
+    ``incomplete_cooling_path``) does not match, and a bare environment
+    disposition does not either.
+    """
+
+    if not isinstance(attempt, Mapping):
+        return False
+    if gate_curve_provider_timeout_reason(attempt) is not None:
+        return True
+    diagnostic = attempt.get("diagnostic")
+    return isinstance(diagnostic, Mapping) and (
+        gate_curve_provider_timeout_reason(diagnostic) is not None
+    )
+
+
+def gate_curve_provider_has_terminal_input(reasons: Sequence[str]) -> bool:
+    """Missing or invalid inputs cannot be repaired by changing engines."""
+    return any(reason in {
+        "missing_input", "invalid_input", "invalid_fo2_log",
+        "invalid_pressure_bar", "non_finite_composition",
+    } for reason in reasons)
+
+
 def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
     return gate_curve_provider_timeout_reason(diagnostic) is not None
 
@@ -2812,10 +2888,7 @@ def gate_curve_provider_outcome_for_status(
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
-    if any(reason in {
-        "missing_input", "invalid_input", "invalid_fo2_log",
-        "invalid_pressure_bar", "non_finite_composition",
-    } for reason in reasons):
+    if gate_curve_provider_has_terminal_input(reasons):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
@@ -2906,6 +2979,21 @@ def gate_curve_provider_outcome_is_reusable(
     }
 
 
+def _identity_gate_curve(curve: Mapping[str, Any]) -> dict[str, Any]:
+    """Shallow copy with environment keys removed.
+
+    Those keys stay on the live curve of the hour that retried. Memo
+    records and identity compares use this view, so a later hit cannot
+    publish that hour's timeout. The input curve is not mutated.
+    """
+
+    return {
+        key: value
+        for key, value in curve.items()
+        if key not in GATE_CURVE_ENVIRONMENT_KEYS
+    }
+
+
 def gate_curve_memo_record(
     curve: Mapping[str, Any],
     origin: Mapping[str, Any] | None,
@@ -2917,7 +3005,7 @@ def gate_curve_memo_record(
     """Build the runtime record shared by the producer and core reader."""
 
     record = {
-        "curve": dict(curve),
+        "curve": _identity_gate_curve(curve),
         "origin": dict(origin) if isinstance(origin, Mapping) else None,
         "repair_notices": [dict(notice) for notice in repair_notices or ()],
         "disposition": disposition,
@@ -2925,6 +3013,17 @@ def gate_curve_memo_record(
     if provider_outcome is not None:
         record["provider_outcome"] = GateCurveProviderOutcome(provider_outcome)
     return record
+
+
+def _gate_curve_live_publication(
+    record: Mapping[str, Any],
+    curve: Mapping[str, Any],
+) -> dict[str, Any]:
+    """The hour's curve. ``record`` remains the identity memo."""
+
+    published = dict(record)
+    published["curve"] = curve
+    return published
 
 
 def gate_curve_memo_record_is_reusable(record: Mapping[str, Any]) -> bool:
@@ -3933,7 +4032,7 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
-    for notice_key in GATE_CURVE_NOTICE_KEYS:
+    for notice_key in GATE_CURVE_IDENTITY_NOTICE_KEYS:
         notice = curve.get(notice_key)
         if isinstance(notice, Mapping):
             payload[notice_key] = _json_ready(notice)
@@ -3950,7 +4049,7 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
-    for notice_key in GATE_CURVE_NOTICE_KEYS:
+    for notice_key in GATE_CURVE_IDENTITY_NOTICE_KEYS:
         notice = payload.get(notice_key)
         if isinstance(notice, Mapping):
             curve[notice_key] = dict(notice)

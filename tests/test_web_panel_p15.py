@@ -1271,6 +1271,43 @@ def test_missing_purity_is_not_derived_from_emitted_stage_masses() -> None:
     assert "0.7778" not in stage
 
 
+def test_metal_product_yield_readout_omits_cartridge_residue() -> None:
+    artifact = {
+        "timesteps": [{
+            "hour": 1,
+            "summary": {
+                "campaign": "C0",
+                "product_ledger_kg_at_hour": {"Fe": 6.0, "Na": 2.0},
+                "metal_yields_kg": {"Fe": 6.0, "Na": 2.0},
+                "alkali_cartridge_solid_residue_kg": {
+                    "Fe": 4.0,
+                    "SiO2": 3.0,
+                    "MgO": 1.0,
+                },
+            },
+            "ledger": {},
+        }],
+        "terminal": {
+            "stage_purity": {},
+            "product_classification": {
+                "alkali_cartridge_solid_residue": {
+                    "kg_by_species": {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0},
+                    "class_total_kg": 8.0,
+                },
+            },
+        },
+    }
+
+    readout = _readout(_run_panel(artifact)["html"], "metal-product-yields")
+
+    assert "6 kg" in readout
+    assert "2 kg" in readout
+    assert "4 kg" not in readout
+    assert "10 kg" not in readout
+    assert "SiO2" not in readout
+    assert "MgO" not in readout
+
+
 def test_product_yield_readout_uses_emitter_semantics() -> None:
     artifact = {
         "timesteps": [{

@@ -80,7 +80,7 @@ def build_provider_account_view(
         }
 
     filtered: dict[str, dict[str, float]] = {}
-    for account in declared_accounts:
+    for account in sorted(declared_accounts, key=str):
         species_mol = (
             overrides[account]
             if account in overrides

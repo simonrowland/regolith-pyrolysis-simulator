@@ -8,6 +8,7 @@ from typing import Any
 from simulator.battery import score
 from simulator.battery.score import SCORE_ENGINE_SET
 from scripts import battery_cache_equivalence as gate
+from scripts import battery_score
 
 
 def _install_fake_slice(
@@ -121,6 +122,57 @@ def test_store_error_fails_whole_store_cache_gate(
     assert "store_error>0" in failure.err
 
 
+def test_score_summary_preserves_dynamic_not_stored_counters() -> None:
+    summary = battery_score._engine_cache_summary(
+        None,
+        local_counters={
+            "vaporock": {
+                "not_stored:cacheable_false": 3,
+                "not_stored:refusal:engine_timeout": 4,
+                "not_stored:readonly": 2,
+                "uncacheable:list": 1,
+            }
+        },
+    )
+
+    # by_engine keeps the hits/misses/stores contract; the full per-reason
+    # breakdown is in counters_by_engine.
+    assert summary["by_engine"]["vaporock"] == {"hits": 0, "misses": 0, "stores": 0}
+    assert summary["counters_by_engine"]["vaporock"] == {
+        "not_stored:cacheable_false": 3,
+        "not_stored:refusal:engine_timeout": 4,
+        "not_stored:readonly": 2,
+        "uncacheable:list": 1,
+    }
+
+
+def test_studio_summary_keeps_not_stored_breakdown() -> None:
+    studio = {
+        "by_engine": {"alphamelts": {"hits": 5, "misses": 7, "stores": 3}},
+        "counters_by_engine": {
+            "alphamelts": {
+                "hits": 5,
+                "misses": 7,
+                "stores": 3,
+                "not_stored:refusal:untyped": 4,
+            }
+        },
+    }
+    summary = battery_score._engine_cache_summary(None, studio_cache_summary=studio)
+
+    assert summary["by_engine"]["alphamelts"] == {"hits": 5, "misses": 7, "stores": 3}
+    assert summary["counters_by_engine"]["alphamelts"]["not_stored:refusal:untyped"] == 4
+    counts = summary["counters_by_engine"]["alphamelts"]
+    assert counts["misses"] == counts["stores"] + counts["not_stored:refusal:untyped"]
+
+
+def test_older_studio_summary_without_counters_still_merges() -> None:
+    studio = {"by_engine": {"alphamelts": {"hits": 2, "misses": 1, "stores": 1}}}
+    summary = battery_score._engine_cache_summary(None, studio_cache_summary=studio)
+
+    assert summary["by_engine"]["alphamelts"] == {"hits": 2, "misses": 1, "stores": 1}
+
+
 def test_parallel_warm_worker_counters_are_summed_per_engine(
     tmp_path: Path,
     monkeypatch: Any,
@@ -140,6 +192,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
             self.report_aggregate = None
             self.static_refusal_counts: dict = {}
             self.selected_reference_ids: set[str] = set()
+            self._database = None
 
         def append_payload_line(self, *_args: Any, **_kwargs: Any) -> None:
             self.count += 1
@@ -150,9 +203,9 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         def close(self) -> None:
             return None
 
-    context = object()
+    context = None
     refs = tuple(
-        SimpleNamespace(observation_id=f"observation-{index}") for index in range(2)
+        SimpleNamespace(observation_id=f"ref-{index}") for index in (1, 2)
     )
     prepared = SimpleNamespace(
         context=context,
@@ -161,7 +214,11 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
     )
     monkeypatch.setattr(score, "_ResidualJsonlStream", _Stream)
     monkeypatch.setattr(score, "_prepare_score_run", lambda *_args, **_kwargs: prepared)
-    monkeypatch.setattr(score, "_partition_score_refs", lambda *_args, **_kwargs: refs)
+    monkeypatch.setattr(
+        score,
+        "_partition_score_refs",
+        lambda *_args, **_kwargs: ((refs[0],), (refs[1],)),
+    )
 
     def _parallel_map(tasks, _worker, **kwargs):
         assert kwargs["max_workers"] == 2
@@ -204,7 +261,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         workers=2,
     )
 
-    assert metadata.selected_reference_ids == {"observation-0", "observation-1"}
+    assert metadata.selected_reference_ids == {"ref-1", "ref-2"}
     assert metadata.engine_cache_counters is not None
     assert set(metadata.engine_cache_counters) == {
         engine.value

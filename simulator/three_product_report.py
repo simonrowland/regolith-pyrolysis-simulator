@@ -25,9 +25,11 @@ Public contract: the original five canonical buckets
 ``industrial_mixed_glass``, ``refractory_ceramic_rump``,
 ``unclassified``) remain stable. PROD-1 added additive convenience
 views (``ingots_metals``, ``oxygen``, ``glass``,
-``captured_volatiles``, ``process_inventory_spent_reductant``) for
-product-specific UI/report slices without removing or reshaping the
-canonical buckets.
+``captured_volatiles``, ``process_inventory_spent_reductant``,
+``alkali_cartridge_solid_residue``) for product-specific UI/report
+slices without removing or reshaping the canonical buckets. The
+cartridge residue is its own captured class. It is not folded into
+ingots or into the train volatile slice.
 
 E6a scope: the classifier function. E6b (deferred) is the runner CLI
 + markdown report wrapping E6a.
@@ -39,6 +41,9 @@ import math
 from typing import Any, Mapping
 
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -51,6 +56,7 @@ from simulator.account_ids import (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     TERMINAL_DRAIN_TAP_ACCOUNT,
 )
+from simulator.alpha_kinetics import PROXY_BRIDGE_ALPHA_STATUS
 from simulator.accounting.completeness import (
     METAL_PRODUCT_SPECIES,
     O2_PRODUCT_SPECIES,
@@ -83,7 +89,12 @@ from simulator.vapour_rail.instrumentation import (
 CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
     'process.condensation_train',
 )
-"""Captured volatile accounts; terminal escape is an offgas_vented loss."""
+"""Train volatile slice only. Terminal escape is an offgas_vented loss.
+
+The cartridge residue is a mixed solid condensate and has its own
+class. Metals and silica on that account would be stripped by the
+volatile exclusions below, so this tuple stays the train.
+"""
 
 PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS: tuple[str, ...] = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
@@ -112,6 +123,64 @@ depends on whether C6 thermite fired. Use the ``has_al_thermite``
 flag on the classifier output to disambiguate. The full element
 ladder is queried via ``ExtractionMixin._RUMP_ELEMENT_SPECIES``
 which carries Si / Al / Mg / Ti routing too."""
+
+
+def _uncertified_cro_proxy_flag(
+    sim,
+    mass_kg: float,
+    account: str,
+) -> dict[str, Any] | None:
+    """Flag proxy-bridge CrO that the wall cannot certify.
+
+    CrO's source reaction carries an activity exponent and a pO2 exponent,
+    so it is not a wall saturation curve. The condenser refuses capture and
+    leaves the mass on ``account``. The flag names that account. A
+    non-positive mass, or any other alpha authority, returns None.
+    """
+
+    if mass_kg <= 0.0:
+        return None
+    alpha_authority = getattr(
+        sim, '_alpha_authority_status_by_species_engaged', {}
+    ) or {}
+    if alpha_authority.get('CrO') != PROXY_BRIDGE_ALPHA_STATUS:
+        return None
+    vapor_pressures = getattr(sim, 'vapor_pressures', {}) or {}
+    oxide_vapors = vapor_pressures.get('oxide_vapors', {}) or {}
+    cro_data = oxide_vapors.get('CrO', {}) or {}
+    alpha_spec = cro_data.get('evaporation_alpha', {}) or {}
+    alpha_spec = alpha_spec if isinstance(alpha_spec, Mapping) else {}
+    flux_diagnostic = getattr(
+        sim, '_last_evaporation_flux_diagnostic', {}
+    ) or {}
+    alpha_used = flux_diagnostic.get('alpha_used_by_species', {}) or {}
+    alpha_value = alpha_used.get('CrO', alpha_spec.get('value'))
+    alpha_text = (
+        f'{float(alpha_value):.15g}'
+        if isinstance(alpha_value, (int, float))
+        else 'unknown'
+    )
+    tier = alpha_spec.get('tier', 'unknown')
+    rail_catalog = getattr(sim, 'vapour_rail_catalog', None)
+    compiled_cro = (
+        rail_catalog.species.get('CrO')
+        if rail_catalog is not None
+        else None
+    )
+    routing = compiled_cro.fiat_routing.raw if compiled_cro is not None else {}
+    routing_note = routing.get('routing_note') or (
+        'Routing note unavailable; capture remains uncertified.'
+    )
+    return {
+        'status': 'flagged prediction',
+        'authority': PROXY_BRIDGE_ALPHA_STATUS,
+        'reason': (
+            f'{mass_kg:.15g} kg CrO is in '
+            f'{account}; it used tier-{tier} '
+            f'evaporation alpha {alpha_text}. Capture is uncertified: '
+            f'{routing_note}'
+        ),
+    }
 
 
 def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
@@ -183,6 +252,13 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'captured_volatiles': {
                 'kg_by_species': {species: kg, ...},
                 'class_total_kg': float,
+            },
+            'alkali_cartridge_solid_residue': {
+                'label': 'Stage-4 cartridge solid residue (unseparated)',
+                'kg_by_species': {species: kg, ...},
+                'class_total_kg': float,
+                'account': 'process.alkali_cartridge_solid_residue',
+                'disposition': 'captured_unseparated',
             },
             'process_inventory_spent_reductant': {
                 'kg_by_species': {species: kg, ...},
@@ -356,6 +432,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     captured_volatiles_total_kg = float(
         sum(captured_volatiles_kg_by_species.values())
     )
+    train_crO_kg = _ledger_species_kg(
+        sim, (CONDENSATION_TRAIN_ACCOUNT,)
+    ).get('CrO', 0.0)
+    captured_volatiles_flag = _uncertified_cro_proxy_flag(
+        sim, train_crO_kg, CONDENSATION_TRAIN_ACCOUNT
+    )
 
     # ----- Process inventory: spent reductant residue -----
     spent_reductant_kg_by_species = _spent_reductant_residue_kg(sim)
@@ -411,7 +493,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         any(amount > 0.0 for amount in oxygen_partition.values())
         or 'O2' in products
     )
-    has_silica_capture = bool(stage_3_kg_by_species)
+    has_silica_capture = stage_3_unavailable_reason is None
     has_silica_product = silica_is_product and has_silica_capture
     has_mixed_glass_inventory = early_tap_mode and bool(mixed_melt_residual_kg)
     computed_product_parts = {
@@ -463,6 +545,14 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             if has_mixed_glass_inventory else {}
         )
 
+    # Full composition, including metals, silica, and O2. This is the
+    # captured-unseparated class, not a volatile slice and not an ingot.
+    residue_kg_by_species = _ledger_species_kg(
+        sim,
+        (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,),
+    )
+    residue_total_kg = float(sum(residue_kg_by_species.values()))
+
     # ----- Unclassified bin -----
     source_account_kg = metal_accounting.get('source_account_kg', {})
     if source_account_kg:
@@ -500,6 +590,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             remaining = amount
             for account in CAPTURED_VOLATILE_ACCOUNTS:
                 remaining -= allocate_source_mass(account, species, remaining)
+        for species, amount in residue_kg_by_species.items():
+            allocate_source_mass(
+                ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+                species,
+                amount,
+            )
         for species, amount in rump_kg_by_species.items():
             allocate_source_mass(
                 C7_AL_CREDIT_ACCOUNT,
@@ -549,6 +645,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             | set(captured_volatiles_kg_by_species.keys())
             | set(spent_reductant_kg_by_species.keys())
             | set(rump_kg_by_species.keys())
+            | set(residue_kg_by_species.keys())
         )
         unclassified = dict(cleanup_native_kg)
         for species, kg in products.items():
@@ -614,6 +711,17 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'captured_volatiles': {
             'kg_by_species': captured_volatiles_kg_by_species,
             'class_total_kg': captured_volatiles_total_kg,
+        },
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS: {
+            'label': ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+            'kg_by_species': residue_kg_by_species,
+            'class_total_kg': residue_total_kg,
+            'account': ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+            'disposition': 'captured_unseparated',
+            'note': (
+                'Mixed condensate captured on the Stage-4 freeze-out '
+                'cartridge. It is not a separated metal product.'
+            ),
         },
         'process_inventory_spent_reductant': {
             'kg_by_species': spent_reductant_kg_by_species,
@@ -699,6 +807,19 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             ('metals_plus_O2', 'O2_partition_kg'),
         ):
             result[name][key] = dict.fromkeys(oxygen_partition)
+    if captured_volatiles_flag is not None:
+        bucket = result['captured_volatiles']
+        existing_flag = bucket.get('flag')
+        if isinstance(existing_flag, Mapping):
+            merged_flag = dict(existing_flag)
+            existing_reason = str(merged_flag.get('reason') or '')
+            proxy_reason = captured_volatiles_flag['reason']
+            merged_flag['reason'] = '; '.join(
+                reason for reason in (existing_reason, proxy_reason) if reason
+            )
+            bucket['flag'] = merged_flag
+        else:
+            bucket['flag'] = captured_volatiles_flag
     return result
 
 
@@ -754,6 +875,9 @@ def _metal_product_accounting(sim, *, products):
     stage_by_source: dict[str, dict[str, float]] = {}
     stage_collections = getattr(sim, '_stage_collection_kg_by_source', {}) or {}
     stages = list(getattr(getattr(sim, 'train', None), 'stages', ()) or ())
+    # The residue account is absent on purpose. Accepting it here would
+    # pull residue metals into clean Fe. classify_products reports the
+    # whole residue balance as its own class instead.
     allowed_stage_sources = set(METAL_PHASE_ACCOUNTS) | {
         CONDENSATION_TRAIN_ACCOUNT,
         CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
@@ -1251,6 +1375,10 @@ def build_product_story(
                 continue
             elif account == CONDENSATION_TRAIN_ACCOUNT:
                 continue
+            elif account == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT:
+                # Own story bucket below. Do not also file it as
+                # unrecovered process inventory.
+                continue
             elif account.startswith('process.'):
                 target = unrecovered_process_inventory
             elif species in _PRODUCT_STORY_CLASSIFIED_SPECIES:
@@ -1304,6 +1432,18 @@ def build_product_story(
             else terminal_residue
         )
         _merge_product_story_mass(target, species, mass)
+
+    residue_class = (
+        classification.get(ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS)
+        if isinstance(classification, Mapping)
+        else None
+    )
+    if isinstance(residue_class, Mapping):
+        residue_story_kg = dict(residue_class.get('kg_by_species') or {})
+    else:
+        residue_story_kg = dict(
+            account_kg.get(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, {})
+        )
 
     oxygen = product_story_bucket(extracted_projection['oxygen'])
     oxygen['partition_kg'] = {
@@ -1368,6 +1508,9 @@ def build_product_story(
         'glass': product_story_bucket(glass),
         'oxygen': oxygen,
         'captured_volatiles': product_story_bucket(captured_volatiles),
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS: product_story_bucket(
+            residue_story_kg
+        ),
         'refractory_ceramic': refractory_ceramic_bucket,
         'terminal_residue': residue_bucket,
         'escaped_to_vacuum': product_story_bucket(escaped_to_vacuum),
@@ -1436,4 +1579,15 @@ def build_product_story(
                     if rump_flag.get('status') == 'unavailable':
                         story['terminal_residue'][field] = None
                         story['terminal_residue']['class_total_kg'] = None
+    # Refused wall capture leaves proxy CrO on terminal.offgas. The same
+    # flag the train path attaches to captured volatiles follows that mass
+    # onto the escaped-to-vacuum bucket.
+    offgas_cro_kg = _ledger_species_kg(
+        sim, (TERMINAL_ESCAPE_ACCOUNT,)
+    ).get('CrO', 0.0)
+    offgas_cro_flag = _uncertified_cro_proxy_flag(
+        sim, offgas_cro_kg, TERMINAL_ESCAPE_ACCOUNT
+    )
+    if offgas_cro_flag is not None:
+        story['escaped_to_vacuum']['flag'] = offgas_cro_flag
     return story

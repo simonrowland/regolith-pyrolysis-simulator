@@ -182,9 +182,6 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     )
     train = sim.atom_ledger.kg_by_account("process.condensation_train")
     stage_2 = sim.train.stages[2].collected_kg
-    later_stages = [
-        stage.collected_kg for stage in sim.train.stages if stage.stage_number != 2
-    ]
 
     assert "CrO2" not in sim._last_vapour_batch_report["refusals_by_species"]
     assert "CrO2" in sim._last_vapour_batch_report["flux_active_species_ids"]
@@ -192,17 +189,37 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         transition.reason == "evaporate_CrO2"
         for transition in sim.atom_ledger.transitions
     )
-    # Stage 2 now materializes the declared stable CrO2 -> Cr2O3 + O2 route;
-    # the terminal cartridge mirrors that product without duplicating atoms.
+    # The declared CrO2 -> Cr2O3 + O2 route still credits the terminal
+    # account. b1113 also condenses that vapour on the other cold stages,
+    # so the terminal is the sum of the stage projections, not stage 2
+    # alone. The mole closure below is what shows the atoms are not copied.
     assert terminal_chromia.get("Cr2O3", 0.0) > 0.0
     assert "Cr2O3" not in train
-    assert stage_2.get("Cr2O3", 0.0) == pytest.approx(terminal_chromia["Cr2O3"])
-    # CrO2 reacts into chromia, but elemental Cr is below wall saturation.
-    assert stage_2.get("Cr", 0.0) == 0.0
+    stage_cr2o3 = sum(
+        stage.collected_kg.get("Cr2O3", 0.0) for stage in sim.train.stages
+    )
+    assert stage_cr2o3 == pytest.approx(terminal_chromia["Cr2O3"])
+    # CrO2 reacts into chromia. d-402's solid-standard-state wall equilibrium
+    # also carries elemental Cr onto colder collectors: 1.03396984e-5 kg on
+    # Stage 1 as an impurity, 1.30930814e-7 kg on Stage 2, and 5.82146862e-5 kg
+    # on Stage 4. The colder Stage-4 surface captures more Cr-bearing vapour.
+    captured_cr_by_stage = {
+        stage.stage_number: stage.collected_kg["Cr"]
+        for stage in sim.train.stages
+        if stage.collected_kg.get("Cr", 0.0) > 0.0
+    }
+    assert captured_cr_by_stage == pytest.approx(
+        {
+            1: 1.0339698354445707e-5,
+            2: 1.3093081434769078e-7,
+            4: 5.821468620201194e-5,
+        },
+        rel=1e-9,
+        abs=0.0,
+    )
     cr_outcomes = sim.condensation_model.last_condensation_refusals_by_species["Cr"]["stage_outcomes"]
     assert any(item["stage_number"] == 2 and item["reason"] == "no_supersaturation"
                and item["eta"] == 0.0 for item in cr_outcomes)
-    assert all("Cr" not in stage for stage in later_stages)
     # The multi-carrier chromium rail may redistribute Cr among melt, vapour,
     # and its designated stage, but cannot create or destroy chromium atoms.
     assert _total_chromium_mol(sim) == pytest.approx(initial_cr_mol, abs=1e-9)

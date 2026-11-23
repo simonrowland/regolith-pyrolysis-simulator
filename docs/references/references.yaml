@@ -24,7 +24,7 @@ references:
     pages: "517-540"
     doi: "10.1021/ie50448a022"
     url: "https://webbook.nist.gov/chemistry/"
-    coefficient_note: "Compilation source for the NIST WebBook pure-component Antoine fit used for Al. The Na/K/Ca pure-component Antoine fits trace instead to their primary vapor-pressure papers REF-041 (Rodebush & Walters 1930), REF-042 (Fiock & Rodebush 1926), REF-043 (Hartmann & Schneider 1929), cited at those rows."
+    coefficient_note: "Compilation source for the NIST WebBook pure-component Antoine fit used for Al. Potassium and calcium pure-component Antoine fits trace to REF-042 (Fiock & Rodebush 1926) and REF-043 (Hartmann & Schneider 1929). Sodium's runtime saturation is the Fink & Leibowitz Browning-Potter equation, certified 864-2499 K, with a solid branch below the melting point; REF-041 is the retired Rodebush measurement, not the runtime owner."
     role: DATA
     topic: vapor-pressure
     status: current
@@ -593,7 +593,7 @@ references:
     role: MEASUREMENT
     topic: vapor-pressure
     status: current
-    coefficient_note: "Na pure-component Antoine source row; NIST WebBook gives 924-1118 K coefficients from Rodebush & Walters data. Publication title not independently verified in this chunk."
+    coefficient_note: "Retired as the sodium runtime source. Runtime pure-sodium saturation is the Fink & Leibowitz Browning-Potter liquid equation, ANL/RE-95/2 section 1.2 equation (1), certified 864-2499 K; the solid branch corrects that liquid pressure by the handbook fusion enthalpy below 370.98 K. This bibliographic row remains the Rodebush & Walters 1930 measurement behind the NIST WebBook Antoine coefficients (924-1118 K). Publication title not independently verified in this chunk."
     found: "2026-07-05 citation-sweep population"
     needs_quote: true
     pull_quotes: []

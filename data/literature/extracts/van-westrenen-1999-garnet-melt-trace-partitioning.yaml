@@ -1,0 +1,1174 @@
+schema_version: literature_extract.v1
+source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+source:
+  citation: van Westrenen, W., Blundy, J. & Wood, B. (1999). Crystal-chemical controls on trace element partitioning
+    between garnet and anhydrous silicate melt. American Mineralogist, 84, 838–847.
+  year: 1999
+extraction:
+  method: Born-digital pdftotext-layout transcription; Table 2 and all Table 4 Gl major and trace cells were checked
+    against the 600 dpi PDF render of physical page 5.
+  date: '2026-10-19'
+  worker: fam13-1019
+review_status: draft
+experiments:
+- experiment_id: vw99_exp11
+  series: Table 2 experiment 11; same starting mixture as experiment 8
+  method: quench_equilibration
+  locator: &id001
+    source_path: 'tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt'
+    source_sha256: 'e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927'
+    table: '2'
+    page: 2
+    published_page: 839
+    pdf_page_index: 1
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 20 wt% G1, 80 wt% G2 (same as experiment 8)
+      locator: *id001
+    initial_composition:
+      state:
+        tag: unknown
+        reason: The printed G1/G2 mixture is not expanded into a complete run composition; no oxide reconstruction
+          was made.
+      locator: *id001
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1838.15'
+      locator: *id001
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '3000000000'
+      locator: *id001
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '3000000000'
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: No sweep-gas or carrier-gas flow is reported.
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: No pressure regime token is printed.
+fidelity_samples:
+- path: species.SiO2.observations[vw99_exp11_gl_lu].values.value
+  value: '1.3'
+  locator: &id002
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '4'
+    page: 5
+    published_page: 842
+    pdf_page_index: 4
+    row: 'experiment 11, Gl'
+  note: Checked against the 600 dpi render of Table 4 on physical page 5.
+- path: species.SiO2.observations[vw99_exp11_gl_k].values.value
+  value: '1731'
+  locator: *id002
+  note: Checked against the 600 dpi render of Table 4 on physical page 5.
+- path: species.SiO2.observations[vw99_exp11_gl_sio2].values.value
+  value: '48.9'
+  locator: *id002
+  note: Checked against the 600 dpi render of Table 4 on physical page 5.
+species:
+  SiO2:
+    observations:
+    - observation_id: vw99_exp11_gl_cao
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.3'
+        units: wt%
+        verbatim: '0.3'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: CaO
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '15.2'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_mgo
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.3'
+        units: wt%
+        verbatim: '0.3'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: MgO
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: MgO wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '19.9'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_al2o3
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.2'
+        units: wt%
+        verbatim: '0.2'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Al2O3
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Al2O3 wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '15.9'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_sio2
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.4'
+        units: wt%
+        verbatim: '0.4'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: SiO2
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '48.9'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_li
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: &vw99_exp11_gl_conditions
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: 'Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)'
+          locator: *id001
+      uncertainty:
+        value: '1'
+        units: ppm
+        verbatim: '1'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Li
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Li ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '10'
+        composition_mass_percent: &vw99_gl_major_composition
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_b
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '27'
+        units: ppm
+        verbatim: '27'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: B
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'B ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '599'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_k
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '178'
+        units: ppm
+        verbatim: '178'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: K
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'K ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '1731'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_sc
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.1'
+        units: ppm
+        verbatim: '0.1'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Sc
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Sc ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '7.0'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_ti
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '7'
+        units: ppm
+        verbatim: '7'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Ti
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Ti ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '64'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_sr
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '13'
+        units: ppm
+        verbatim: '13'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Sr
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Sr ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '241'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_y
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.08'
+        units: ppm
+        verbatim: '0.08'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Y
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Y ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '5.5'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_zr
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.4'
+        units: ppm
+        verbatim: '0.4'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Zr
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Zr ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '32.1'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_nb
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '1'
+        units: ppm
+        verbatim: '1'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Nb
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Nb ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '31'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_cd
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '10'
+        units: ppm
+        verbatim: '10'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Cd
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Cd ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '129'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_in
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '2'
+        units: ppm
+        verbatim: '2'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: In
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'In ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '102'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_la
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '3'
+        units: ppm
+        verbatim: '3'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: La
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'La ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '94'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_pr
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.4'
+        units: ppm
+        verbatim: '0.4'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Pr
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Pr ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '24.2'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_sm
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.6'
+        units: ppm
+        verbatim: '0.6'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Sm
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Sm ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '13.7'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_tb
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.1'
+        units: ppm
+        verbatim: '0.1'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Tb
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Tb ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '9.0'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_er
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.2'
+        units: ppm
+        verbatim: '0.2'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Er
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Er ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '5.9'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_yb
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.2'
+        units: ppm
+        verbatim: '0.2'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Yb
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Yb ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '4.1'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_lu
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.8'
+        units: ppm
+        verbatim: '0.8'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Lu
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Lu ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '1.3'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_hf
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '0.5'
+        units: ppm
+        verbatim: '0.5'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Hf
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Hf ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '12'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_ta
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '16'
+        units: ppm
+        verbatim: '16'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Ta
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Ta ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '563'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_th
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '39'
+        units: ppm
+        verbatim: '39'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: Th
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'Th ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '1421'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_u
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: ppm
+      point_conditions: *vw99_exp11_gl_conditions
+      uncertainty:
+        value: '10'
+        units: ppm
+        verbatim: '10'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        formula: U
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: 'U ppm in glass (Gl), Table 4'
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '249'
+        composition_mass_percent: *vw99_gl_major_composition
+        trace_suite_context: vw99_table4_grt_q_rows
+    context:
+    - observation_id: vw99_table1_starting_materials
+      type: context
+      locator:
+        source_path: 'tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt'
+        source_sha256: 'e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927'
+        table: '1'
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+      units: major oxides wt%; trace elements ppm
+      values:
+        caption: Table 1. Major and trace element compositions of starting materials.
+        reason: Starting mixtures include quoted G1 major elements and author-prepared G2–G4 with a 26-element trace
+          suite; these are supporting charge compositions, not final product compositions.
+    - observation_id: vw99_table2_experimental_conditions
+      type: context
+      locator: *id001
+      units: P kbar, T °C, t h, products wt%
+      values:
+        caption: Table 2. Experimental conditions and products.
+        reason: Five run rows; T and P for experiment 11 are also carried on each typed Gl composition observation.
+          No fO2 is printed.
+    - observation_id: vw99_table3_standard_checks
+      type: context
+      locator:
+        source_path: 'tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt'
+        source_sha256: 'e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927'
+        table: '3'
+        page: 4
+        published_page: 841
+        pdf_page_index: 3
+      units: observed/published ratio
+      values:
+        caption: Table 3. Comparison of observed and published trace element compositions of SIMS secondary standards.
+        reason: Standard calibration comparisons are not run-composition observations.
+    - observation_id: vw99_table4_grt_q_rows
+      type: context
+      locator: *id002
+      units: major elements wt%; trace elements ppm
+      values:
+        caption: Table 4. Major and trace element composition of experimental products.
+        printed_phase_labels:
+        - Grt
+        - Q
+        reason: Grt and Q product rows retained verbatim in context because the schema has no garnet or quench phase
+          token. The Gl trace-element suite is typed under equilibrium_phase_composition using its printed ppm basis.
+    - observation_id: vw99_table5_partition_coefficients
+      type: context
+      locator:
+        source_path: 'tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt'
+        source_sha256: 'e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927'
+        table: '5'
+        page: 6
+        published_page: 843
+        pdf_page_index: 5
+      units: dimensionless D and σ as printed
+      values:
+        caption: Table 5. Garnet-melt partition coefficients.
+        schema_gap: No partition-coefficient quantity token is available; do not score these values.
+    - observation_id: vw99_table6_lattice_strain_fits
+      type: model_derived
+      locator:
+        source_path: 'tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt'
+        source_sha256: 'e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927'
+        table: '6'
+        page: 8
+        published_page: 845
+        pdf_page_index: 7
+      units: r0 Å, D0 dimensionless, E GPa
+      values:
+        caption: Table 6. Results of fitting of partitioning data for Y, REE, In, and Sc to Equation 1.
+        reason: Fitted model parameters, not direct experimental run compositions.
+    - observation_id: vw99_figure1_apparatus
+      type: figure_record
+      locator:
+        figure: '1'
+        page: 3
+        published_page: 840
+        pdf_page_index: 2
+      units: schematic
+      values:
+        quantity: experimental apparatus configuration
+        identity: garnet-melt high-pressure experiment
+        caption: Experimental setup; t/c is a W-3%Re/W-25%Re thermocouple.
+        panel: single
+        axes: none
+        series: []
+        attribution: authors’ apparatus schematic
+        digitisation: no plotted numeric series
+    - observation_id: vw99_figure2_standard_ratios
+      type: figure_record
+      locator:
+        figure: '2'
+        page: 3
+        published_page: 840
+        pdf_page_index: 2
+      units: observed/published ratio
+      values:
+        quantity: SIMS standard observed/published ratios
+        identity: trace elements in glass and garnet standards
+        caption: Comparison of observed and published values for secondary garnet/glass standards.
+        panel: single
+        axes:
+          x: element
+          y: observed/published ratio
+        series:
+        - name: BCR-1 glass
+          marker: open circle
+          marker_count: 16
+          attribution: observed in this study; reference values from Govindaraju (1994)
+        - name: BIR-1 glass
+          marker: open square
+          marker_count: 16
+          attribution: observed in this study; reference values from Jochum et al. (1990)
+        - name: DD1 garnet
+          marker: filled circle
+          marker_count: 7
+          attribution: observed in this study; reference values from Irving and Frey (1978)
+        - name: MU53388 garnet
+          marker: filled square
+          marker_count: 15
+          attribution: observed in this study; reference values from Norman et al. (1996)
+        attribution: observed in this study; published standards compared using Table 3
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+    - observation_id: vw99_figure3_backscatter
+      type: figure_record
+      locator:
+        figure: '3'
+        page: 3
+        published_page: 840
+        pdf_page_index: 2
+      units: micrograph
+      values:
+        quantity: experimental product texture
+        identity: experiment 11 garnet, glass, and quench crystals
+        caption: Backscattered electron image of experiment 11 showing garnet (Gt), quench (Q), glass (G), gold coating (Au), and ion microprobe pits (IP).
+        panel: single
+        axes: none; width of view 350 μm
+        series: []
+        attribution: authors’ backscattered electron image
+        digitisation: no plotted numeric series
+    - observation_id: vw99_figure4_partition_coefficients
+      type: figure_record
+      locator:
+        figure: '4'
+        page: 4
+        published_page: 841
+        pdf_page_index: 3
+      units: dimensionless D and ratio values
+      values:
+        quantity: garnet/melt partition coefficients and D_U/D_Th, CPP
+        identity: experiments 8, 11–14 and garnet compositions along the pyrope-grossular join
+        caption: Spidergram of garnet/melt partition coefficients and variation of D_U/D_Th and CPP along the pyrope-grossular join.
+        panel:
+        - a
+        - b
+        axes:
+          a:
+            x: element
+            y: D (Grt/Melt)
+            y_scale: logarithmic
+          b:
+            x: '% pyrope'
+            y: ratio
+        series:
+        - panel: a
+          name: Py82 (experiment 8)
+          marker: open circle
+          marker_count: 18
+          attribution: partition coefficients measured in this study
+        - panel: a
+          name: Py84 (experiment 11)
+          marker: filled circle
+          marker_count: 21
+          attribution: partition coefficients measured in this study
+        - panel: a
+          name: Py65 (experiment 12)
+          marker: filled triangle
+          marker_count: 21
+          attribution: partition coefficients measured in this study
+        - panel: a
+          name: Py9 (experiment 13)
+          marker: filled square
+          marker_count: 21
+          attribution: partition coefficients measured in this study
+        - panel: a
+          name: Py60 (experiment 14)
+          marker: open triangle
+          marker_count: 21
+          attribution: partition coefficients measured in this study
+        - panel: b
+          name: D_U/D_Th
+          marker: filled circle
+          marker_count: 5
+          attribution: calculated by the authors from this study’s partition coefficients
+        - panel: b
+          name: CPP
+          marker: filled diamond
+          marker_count: 5
+          attribution: Hart and Dunn (1993)
+        attribution: this study; element order follows Sun and McDonough (1989) where possible and In/Li follows Withers (1997)
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+    - observation_id: vw99_figure5_onuma_diagrams
+      type: figure_record
+      locator:
+        figure: '5'
+        page: 7
+        published_page: 844
+        pdf_page_index: 6
+      units: D (Grt/Melt)
+      values:
+        quantity: garnet-melt partition coefficients for trivalent cations and fitted lattice-strain curves
+        identity: experiments 8 and 11–14; garnet X-site
+        caption: Onuma diagrams showing partition coefficients for trivalent cations entering the garnet X-site with non-linear weighted least-squares fits to Equation 1; error bars are ±1σ.
+        panel:
+        - a
+        - b
+        - c
+        - d
+        - e
+        axes:
+          x: ionic radius (Å)
+          y: D (Grt/Melt)
+          y_scale: logarithmic
+        series:
+        - panel: a
+          name: experiment 8 measured cations
+          marker: filled circles
+          marker_count: 10
+          elements: [Sc, Y, La, Pr, Sm, Tb, Er, Tm, Yb, Lu]
+          attribution: Table 5 data from this study
+        - panel: a
+          name: experiment 8 weighted least-squares fit
+          marker: solid curve
+          marker_count: 0
+          attribution: authors’ fit to Equation 1
+        - panel: b
+          name: experiment 11 measured cations
+          marker: filled circles
+          marker_count: 10
+          elements: [Sc, In, Y, La, Pr, Sm, Tb, Er, Yb, Lu]
+          attribution: Table 5 data from this study
+        - panel: b
+          name: experiment 11 weighted least-squares fit
+          marker: solid curve
+          marker_count: 0
+          attribution: authors’ fit to Equation 1
+        - panel: c
+          name: experiment 12 measured cations
+          marker: filled circles
+          marker_count: 10
+          elements: [Sc, In, Y, La, Pr, Sm, Tb, Er, Yb, Lu]
+          attribution: Table 5 data from this study
+        - panel: c
+          name: experiment 12 weighted least-squares fit
+          marker: solid curve
+          marker_count: 0
+          attribution: authors’ fit to Equation 1
+        - panel: d
+          name: experiment 13 measured cations
+          marker: filled circles
+          marker_count: 10
+          elements: [Sc, In, Y, La, Pr, Sm, Tb, Er, Yb, Lu]
+          attribution: Table 5 data from this study
+        - panel: d
+          name: experiment 13 weighted least-squares fit
+          marker: solid curve
+          marker_count: 0
+          attribution: authors’ fit to Equation 1
+        - panel: e
+          name: experiment 14 measured cations
+          marker: filled circles
+          marker_count: 10
+          elements: [Sc, In, Y, La, Pr, Sm, Tb, Er, Yb, Lu]
+          attribution: Table 5 data from this study
+        - panel: e
+          name: experiment 14 weighted least-squares fit
+          marker: solid curve
+          marker_count: 0
+          attribution: authors’ fit to Equation 1
+        attribution: measured partition coefficients and non-linear weighted least-squares fits from this study
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+    - observation_id: vw99_figure6_fit_trends
+      type: figure_record
+      locator:
+        figure: '6'
+        page: 8
+        published_page: 845
+        pdf_page_index: 7
+      units: Å for r0; dimensionless D0
+      values:
+        quantity: fitted r0 and D0 versus pyrope fraction
+        identity: garnet composition; panel b temperatures are printed beside the D0 points
+        caption: Variation of r0 along the pyrope-grossular join and D0 along the pyrope-grossular join.
+        panel:
+        - a
+        - b
+        axes:
+          a:
+            x: '% pyrope'
+            y: fitted r0 (Å)
+          b:
+            x: '% pyrope'
+            y: fitted D0
+        series:
+        - panel: a
+          name: fitted r0 data
+          marker: filled circle
+          marker_count: 5
+          attribution: Table 6 fits from this study
+        - panel: a
+          name: linear fit to r0
+          marker: solid line
+          marker_count: 0
+          attribution: authors’ linear regression
+        - panel: a
+          name: expected X-site radius range
+          marker: shaded band
+          marker_count: 0
+          attribution: Smyth and Bish (1988), with oxygen radius 1.38 Å
+        - panel: b
+          name: fitted D0 data
+          marker: filled circle
+          marker_count: 5
+          point_labels: 'temperatures in °C: experiment 8 = 1560; experiment 11 = 1565; experiment 12 = 1545; experiment 13 = 1530; experiment 14 = 1530'
+          attribution: Table 6 fits from this study
+        attribution: fitted values from this study; expected X-site range is based on Smyth and Bish (1988)
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+    - observation_id: vw99_figure7_bulk_modulus
+      type: figure_record
+      locator:
+        figure: '7'
+        page: 9
+        published_page: 846
+        pdf_page_index: 8
+      units: K in GPa; Zc/d^3 in Å^-3
+      values:
+        quantity: site bulk modulus K versus cation charge divided by metal-oxygen distance cubed
+        identity: garnet X-site, clinopyroxene M2 site, plagioclase, and mineral endmembers
+        caption: Site bulk modulus versus cation charge over metal-oxygen distance cubed; crosses show end-member minerals and the line shows the Hazen-Finger oxide relation.
+        panel: single
+        axes:
+          x: Zc/d^3
+          y: bulk modulus K (GPa)
+        series:
+        - name: garnet, this study
+          marker: filled circle
+          marker_count: 5
+          attribution: this study; values derived from partitioning experiments
+        - name: clinopyroxene M2 site
+          marker: open circle
+          marker_count: 20
+          attribution: Blundy and Wood (1994); Wood and Blundy (1997)
+        - name: plagioclase
+          marker: open square
+          marker_count: 19
+          attribution: Blundy and Wood (1994); Wood and Blundy (1997)
+        - name: mineral endmembers Ab, An, D, G, P
+          marker: cross
+          marker_count: 5
+          attribution: adapted from Wood and Blundy (1997)
+        - name: oxide trend
+          marker: solid line
+          marker_count: 0
+          attribution: Hazen and Finger (1979)
+        attribution: author-derived garnet values compared with published clinopyroxene and plagioclase data
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred

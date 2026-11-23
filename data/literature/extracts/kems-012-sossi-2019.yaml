@@ -7661,9 +7661,7 @@ species:
         note: Residue ppm is what was measured. Do not convert to alpha or to HKL flux;
           1-bar open-furnace transport is not vacuum Langmuir. K* was not fitted for this
           species because no loss was resolved (Table 3 omits Mn/Ti/Sc/V/Zr/REE).
-      uncertainty:
-        note: Table 2 values as published; experimental reproducibility median misfit 6.0% relative
-          (OCR §4.2) for volatile duplicates. Non-volatile scatter is the Table 2 run-to-run range.
+      uncertainty: null
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -7896,18 +7894,7 @@ species:
           Mn | 992.4 | 690.2 | 3.8'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: &sossi_context_values
           furnace_hotspot_length:
@@ -8746,18 +8733,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-15-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -8799,18 +8775,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-15-07-16d.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -8852,18 +8817,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-15-07-16g.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -8905,18 +8859,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-15-07-16h.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -8958,18 +8901,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row P11-06-18a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9011,18 +8943,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-15-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9064,18 +8985,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-15-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9117,18 +9027,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-PS6.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9170,18 +9069,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 3M-18-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9223,18 +9111,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-18-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9276,18 +9153,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-18-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9329,18 +9195,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-PS3.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9382,18 +9237,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-PS2.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9435,18 +9279,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-PS4.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9488,18 +9321,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row P09/06/18b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9541,18 +9363,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row P09/06/18a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9594,18 +9405,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-PS5.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9647,18 +9447,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row P08-02-17b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9700,18 +9489,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 3M-29/2/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9753,18 +9531,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-2/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9806,18 +9573,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row C18/12/15.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9859,18 +9615,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-PS1.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9912,18 +9657,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row P09/06/18c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -9965,18 +9699,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row C17/12/15a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10018,18 +9741,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-1/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10071,18 +9783,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 3M-1/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10124,18 +9825,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row C17/12/15b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10177,18 +9867,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 1M-1/3/16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10230,18 +9909,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 3M-29/2/16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10283,18 +9951,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row C17/12/15c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10336,18 +9993,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16e.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10389,18 +10035,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10442,18 +10077,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10495,18 +10119,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10548,18 +10161,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 3M-2/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10601,18 +10203,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-17-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10654,18 +10245,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-17-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10707,18 +10287,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-17-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10760,18 +10329,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16f.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10813,18 +10371,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16g.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10866,18 +10413,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row P11-06-18b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10919,18 +10455,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16h.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -10972,18 +10497,7 @@ species:
 
           Mn | 992.4 | 690.2 | 3.8'
         note: Run-mapped Mn observation for printed Table 2 row 2M-16-07-16d.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 3.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Mn | 992.4 | 690.2 | 3.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -11407,9 +10921,7 @@ species:
         note: Residue ppm is what was measured. Do not convert to alpha or to HKL flux;
           1-bar open-furnace transport is not vacuum Langmuir. K* was not fitted for this
           species because no loss was resolved (Table 3 omits Mn/Ti/Sc/V/Zr/REE).
-      uncertainty:
-        note: Table 2 values as published; experimental reproducibility median misfit 6.0% relative
-          (OCR §4.2) for volatile duplicates. Non-volatile scatter is the Table 2 run-to-run range.
+      uncertainty: null
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -11494,18 +11006,7 @@ species:
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -12175,18 +11676,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-15-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12228,18 +11718,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-15-07-16d.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12281,18 +11760,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-15-07-16g.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12334,18 +11802,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-15-07-16h.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12387,18 +11844,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row P11-06-18a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12440,18 +11886,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-15-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12493,18 +11928,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-15-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12546,18 +11970,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-PS6.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12599,18 +12012,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 3M-18-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12652,18 +12054,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-18-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12705,18 +12096,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-18-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12758,18 +12138,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-PS3.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12811,18 +12180,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-PS2.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12864,18 +12222,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-PS4.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12917,18 +12264,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row P09/06/18b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -12970,18 +12306,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row P09/06/18a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13023,18 +12348,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-PS5.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13076,18 +12390,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row P08-02-17b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13129,18 +12432,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 3M-29/2/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13182,18 +12474,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-2/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13235,18 +12516,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row C18/12/15.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13288,18 +12558,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-PS1.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13341,18 +12600,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row P09/06/18c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13394,18 +12642,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row C17/12/15a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13447,18 +12684,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-1/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13500,18 +12726,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 3M-1/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13553,18 +12768,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row C17/12/15b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13606,18 +12810,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 1M-1/3/16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13659,18 +12852,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 3M-29/2/16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13712,18 +12894,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row C17/12/15c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13765,18 +12936,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16e.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13818,18 +12978,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13871,18 +13020,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13924,18 +13062,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -13977,18 +13104,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 3M-2/3/16.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14030,18 +13146,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-17-07-16a.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14083,18 +13188,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-17-07-16b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14136,18 +13230,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-17-07-16c.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14189,18 +13272,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16f.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14242,18 +13314,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16g.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14295,18 +13356,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row P11-06-18b.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14348,18 +13398,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16h.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14401,18 +13440,7 @@ species:
 
           Ti | 1008.0 | 1045.0 | 46.6'
         note: Run-mapped Ti observation for printed Table 2 row 2M-16-07-16d.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 46.6
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Ti | 1008.0 | 1045.0 | 46.6'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
@@ -14526,18 +13554,7 @@ species:
           Sc | 970.8 | 850.8 | 28.9'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 28.9
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Sc | 970.8 | 850.8 | 28.9'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -15279,18 +14296,7 @@ species:
           V | 1019.7 | 1024.6 | 32.4'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 32.4
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            V | 1019.7 | 1024.6 | 32.4'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -16032,18 +15038,7 @@ species:
           Zr | 991.9 | 1118.1 | 34.8'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 34.8
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Zr | 991.9 | 1118.1 | 34.8'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -16785,18 +15780,7 @@ species:
           La | 1038.9 | 969.8 | 21.2'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 21.2
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            La | 1038.9 | 969.8 | 21.2'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -17538,18 +16522,7 @@ species:
           Gd | 1063.3 | 1060.6 | 25.2'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 25.2
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Gd | 1063.3 | 1060.6 | 25.2'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -18291,18 +17264,7 @@ species:
           Yb | 1036.2 | 1111.0 | 26.4'
         note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
           measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.
-      uncertainty:
-        note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation
-          rate.
-        starting_measured_stdev_ppm: 26.4
-        locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-          page: 53
-          table: '1'
-          quote: 'Element | Calculated | Measured | St. Dev.
-
-            Yb | 1036.2 | 1111.0 | 26.4'
-          note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
+      uncertainty: null
       values:
         <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
@@ -24764,9 +23726,10 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 690.2
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
-    table: '2'
-    line_range: '1104-1108'
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
+    table: '1'
+    note: 'Mn measured trace row; 690.2 ppm, St. Dev. 3.8'
 - species: Mn
   observable: gibbs_table
   observation_id: sossi_2019_mn_table5_pure_system_not_experimental
@@ -24791,63 +23754,70 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1045.0
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
-    table: '2'
-    line_range: '1104-1108'
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
+    table: '1'
+    note: 'Ti measured trace row; 1045.0 ppm, St. Dev. 46.6'
 - species: Sc
   observable: rate_series
   observation_id: sossi_2019_sc_table1_2_nonvolatile_residue
   field: starting_measured_ppm
   value: 850.8
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
     table: '1'
-    line_range: '1100'
+    note: 'Sc measured trace row; 850.8 ppm, St. Dev. 28.9'
 - species: V
   observable: rate_series
   observation_id: sossi_2019_v_table1_2_nonvolatile_residue
   field: starting_measured_ppm
   value: 1024.6
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
     table: '1'
-    line_range: '1100'
+    note: 'V measured trace row; 1024.6 ppm, St. Dev. 32.4'
 - species: Zr
   observable: rate_series
   observation_id: sossi_2019_zr_table1_2_nonvolatile_residue
   field: starting_measured_ppm
   value: 1118.1
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
     table: '1'
-    line_range: '1100'
+    note: 'Zr measured trace row; 1118.1 ppm, St. Dev. 34.8'
 - species: La
   observable: rate_series
   observation_id: sossi_2019_la_table1_2_nonvolatile_residue
   field: starting_measured_ppm
   value: 969.8
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
     table: '1'
-    line_range: '1100'
+    note: 'La measured trace row; 969.8 ppm, St. Dev. 21.2'
 - species: Gd
   observable: rate_series
   observation_id: sossi_2019_gd_table1_2_nonvolatile_residue
   field: starting_measured_ppm
   value: 1060.6
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
     table: '1'
-    line_range: '1100'
+    note: 'Gd measured trace row; 1060.6 ppm, St. Dev. 25.2'
 - species: Yb
   observable: rate_series
   observation_id: sossi_2019_yb_table1_2_nonvolatile_residue
   field: starting_measured_ppm
   value: 1111.0
   locator:
-    source_path: text/kems-012-sossi-2019/mineru/kems-012-sossi-2019.md
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 53
     table: '1'
-    line_range: '1100'
+    note: 'Yb measured trace row; 1111.0 ppm, St. Dev. 26.4'
 - species: Li
   observable: activity_coefficient
   observation_id: sossi_2019_li_logKstar_table3_Li_g
@@ -25320,7 +24290,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 690.2
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25361,7 +24331,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1045.0
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25374,7 +24344,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 850.8
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25387,7 +24357,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1024.6
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25400,7 +24370,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1118.1
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25413,7 +24383,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 969.8
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25426,7 +24396,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1060.6
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.
@@ -25439,7 +24409,7 @@ fidelity_samples:
   field: starting_measured_ppm
   value: 1111.0
   locator:
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
     page: 53
     table: '1'
     quote: 'Element | Calculated | Measured | St. Dev.

@@ -10,13 +10,19 @@ from functools import wraps
 from types import MappingProxyType
 from typing import Any
 
-from simulator.account_ids import METAL_PHASE_ACCOUNTS
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    METAL_PHASE_ACCOUNTS,
+)
 from simulator.accounting.completeness import (
     product_class_availability,
     product_class_target_species,
 )
 from simulator.accounting.ledger import LedgerTransition
-from simulator.accounting.queries import is_reagent_bookkeeping_product
+from simulator.accounting.queries import (
+    AccountingQueries,
+    is_reagent_bookkeeping_product,
+)
 from simulator.cost_energy import (
     furnace_thermal_flux_hours,
     is_unavailable_quantity,
@@ -37,11 +43,15 @@ from simulator.scalar_boundary import is_declared_real_scalar
 VECTOR_TOLERANCE = 1e-12
 COST_LEDGER_SCHEMA_VERSION = "cost-ledger-v1"
 COST_POLICY_ID = "mass-allocation-default__reagent-full-cost-v1"
+# The residue is captured process inventory, so a credit stays on an
+# active lot under that account. It is not one of the metal-phase
+# accounts: residue Fe does not join process.metal_phase Fe.
 COST_BEARING_ACCOUNTS = frozenset({
     "process.reagent_inventory",
     *METAL_PHASE_ACCOUNTS,
     "process.condensation_train",
     "process.c7_al_credit",
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
 })
 MRE_ELECTRICAL_CAMPAIGNS = frozenset({"C5", "MRE_BASELINE"})
 _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS = (
@@ -949,7 +959,10 @@ def _build_cost_rollup_diagnostic(
         )
     else:
         product_allocation_input = furnace_input + auxiliary_electrical_input
-    product_inputs = _cost_allocation_product_inputs(products_kg)
+    product_inputs = _cost_allocation_product_inputs(
+        products_kg,
+        residue_kg=_cartridge_residue_kg(sim),
+    )
     product_availability = product_class_availability(
         sim,
         product_class_target_species(),
@@ -971,10 +984,7 @@ def _build_cost_rollup_diagnostic(
     }
     for key in sorted(product_alloc, key=_output_sort_key):
         account, species = _normalize_output_key(key)
-        matches = [
-            product_key for product_key in product_costs
-            if product_key.rsplit(":", 1)[-1] == species
-        ]
+        matches = _run_input_product_cost_matches(account, species, product_costs)
         if not matches:
             matches = [f"{account}:{species}"]
             allocation_weights = {matches[0]: 1.0}
@@ -990,9 +1000,10 @@ def _build_cost_rollup_diagnostic(
                 allocation_weights = {product_key: 1.0 for product_key in matches}
         weight_total = sum(allocation_weights.values())
         terminal_quantity = float(product_inputs[key])
-        # The run-input numerator is allocated from terminal product mass, so
-        # each reported denominator must use that same terminal scope. Existing
-        # lot quantities only split a species across matching account rows.
+        # The reported quantity is this allocation key's mass. Lot quantities
+        # only split that key across matching rows. Residue is its own key, so
+        # a separated-product key must not match residue rows: a species-suffix
+        # match would put the residue share back on terminal.product.
         quantities = {
             product_key: terminal_quantity * weight / weight_total
             for product_key, weight in allocation_weights.items()
@@ -1098,12 +1109,54 @@ def _build_cost_rollup_diagnostic(
     return summary
 
 
-def _cost_allocation_product_inputs(products_kg: Mapping[str, float]) -> dict[Any, float]:
-    return _clean_outputs({
+def _cartridge_residue_kg(sim: Any | None) -> dict[str, float]:
+    """Species kilograms on the cartridge residue account.
+
+    The separated product ledger does not include this account. Furnace
+    and pumping allocation reads it here so the share stays on the
+    residue lot instead of being renormalised onto terminal.product.
+    """
+    if getattr(sim, "atom_ledger", None) is None:
+        return {}
+    return AccountingQueries(sim).species_kg_by_accounts(
+        (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,)
+    )
+
+
+def _cost_allocation_product_inputs(
+    products_kg: Mapping[str, float],
+    *,
+    residue_kg: Mapping[str, float] | None = None,
+) -> dict[Any, float]:
+    outputs: dict[Any, float] = {
         ("terminal.product", species): kg
         for species, kg in dict(products_kg or {}).items()
         if not is_reagent_bookkeeping_product(species)
-    })
+    }
+    for species, kg in dict(residue_kg or {}).items():
+        if is_reagent_bookkeeping_product(species):
+            continue
+        key = (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, str(species))
+        outputs[key] = outputs.get(key, 0.0) + float(kg)
+    return _clean_outputs(outputs)
+
+
+def _run_input_product_cost_matches(
+    account: str,
+    species: str,
+    product_costs: Mapping[str, Any],
+) -> list[str]:
+    residue_prefix = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:"
+    if account == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT:
+        return [
+            key for key in product_costs
+            if key == f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:{species}"
+        ]
+    return [
+        key for key in product_costs
+        if key.rsplit(":", 1)[-1] == species
+        and not str(key).startswith(residue_prefix)
+    ]
 
 
 def _run_furnace_input_cost(per_hour: tuple[dict[str, Any], ...]) -> CostVector:
@@ -1502,12 +1555,21 @@ def _split_beneficiary_outputs(lots: tuple[Any, ...]) -> tuple[dict[Any, float],
 
 
 def _is_target_product_account(account: str) -> bool:
+    """Beneficiary product, as opposed to slag or a non-product coproduct.
+
+    The cartridge residue is its own captured product class, so reagent
+    cost may land on it. The lot key stays on the residue account and
+    is not merged into a metal-phase product.
+    """
     account = str(account)
     return (
         account in METAL_PHASE_ACCOUNTS
         or account == "process.condensation_train"
-        or account.startswith("terminal.")
-        and account not in {"terminal.slag"}
+        or account == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+        or (
+            account.startswith("terminal.")
+            and account not in {"terminal.slag"}
+        )
     )
 
 

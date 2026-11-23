@@ -2033,6 +2033,44 @@ def test_staged_beam_ranker_raises_on_duplicate_cache_key() -> None:
         )
 
 
+@pytest.mark.parametrize("unpriced_oxygen", (10.0, 9.0))
+def test_staged_mixed_population_promotion_and_archive_use_shared_policy(unpriced_oxygen):
+    c0_schema = RecipeSchema(allowlist=tuple(spec for spec in SCHEMA.search_allowlist if spec.path[:2] == ("campaigns", "C0")))
+    strategy = StagedStrategy(
+        c0_schema,
+        seed=5,
+        objective_profile={**PROFILE, "staged": {"beam_width": 1, "children_per_parent": 2}},
+    )
+    a, b = strategy.ask(2)
+    priced = _scored(a.patch, candidate_id=a.id, cache_key_value="A", oxygen=10.0, furnace_penalty=1.0)
+    unpriced = _scored(b.patch, candidate_id=b.id, cache_key_value="B", oxygen=unpriced_oxygen)
+    unpriced = replace(unpriced, run_reference=replace(unpriced.run_reference, product_summary={
+        **unpriced.run_reference.product_summary,
+        "furnace_amortization_status": "batch_cost_unavailable",
+        "lifespan_cost_status": "wall_deposit_unavailable",
+        "furnace_amortization_batch_cost_equivalents": None,
+    }))
+    results = [(a, priced), (b, unpriced)]
+    definitions = objective_definitions(PROFILE)
+    ranked = staged_module._rank_stage_results(results, definitions, beam_width=2)
+    assert [row[1].id for row in ranked] == [a.id, b.id]
+    archive = staged_module._pareto_archive(
+        staged_module._archive_members_from_results(results, definitions, c0_schema), definitions,
+    )
+    assert archive[0].candidate.id == a.id
+    assert len(archive) == (2 if unpriced_oxygen == 10.0 else 1)
+    strategy.tell([(a, priced)])
+    strategy.tell([(b, unpriced)])
+    comparison = strategy.furnace_cost_comparisons[0]
+    assert comparison == staged_module.furnace_cost_comparison({a.id: priced.run_reference.product_summary, b.id: unpriced.run_reference.product_summary})
+    assert comparison["flag"] == "furnace cost excluded: 1 of 2 unpriced"
+    assert comparison["candidates"][b.id]["unpriced_reason"] == "wall_deposit_unavailable"
+    assert comparison["candidates"][a.id] == {"unpriced_reason": None, "penalty": 1.0, "applied": False}
+    assert strategy._frontier[0].parent_id == a.id
+    provenance = study._strategy_provenance_payload(strategy)
+    assert provenance["furnace_cost_comparisons"][0] == comparison
+
+
 def test_staged_beam_furnace_cost_is_tunable_and_not_a_hard_block() -> None:
     candidates = (
         Candidate(id="violates", patch=RecipePatch({})),
