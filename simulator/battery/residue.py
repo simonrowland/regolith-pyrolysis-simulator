@@ -48,6 +48,9 @@ _KRESS91_FALLBACK_SOURCE = "kress91_fallback"
 _KRESS91_UNAVAILABLE_STOICHIOMETRIC_FEO_SOURCE = (
     "kress91_unavailable_stoichiometric_feo"
 )
+_KNUDSEN_MAX_RHS_EVALUATIONS = 1024
+_KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
+_KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
 _HASHIMOTO_GEOMETRIES = (
@@ -1314,16 +1317,46 @@ def integrate_knudsen_residue_inventory(
     pressure_law_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
     xi = 0.0
     previous_endpoint, previous_temperature = 0.0, path[0][1]
-    absolute_tolerance = 1e-12 * math.fsum(inventory.values())
+    initial_total_mol = math.fsum(inventory.values())
+    absolute_tolerance = 1e-12 * initial_total_mol
+    pressure_floor = _component_exhaustion_floor_mol(initial_total_mol)
+    volatile_parents = {term.source.parent_oxide for term in terms}
+    active_parents = {
+        k for k in parents if k in volatile_parents and inventory[k] > 0.0
+    }
+    evaluation_limit = (
+        _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS if linear_temperature else _KNUDSEN_MAX_RHS_EVALUATIONS
+    )
+    evaluations = 0
     for (endpoint, temperature), logp in zip(path, source_fO2_log_by_interval):
         if logp is not None and (not math.isfinite(logp) or logp > 0.0):
             raise ResidueInventoryRefusal("oxygen_condition_invalid")
         stop = min(target, endpoint)
+        # The supplementary linear path shares one budget across its ramp.
+        # A slow sensitivity solve must not withhold a step-hold prediction.
+        if not linear_temperature:
+            evaluations = 0
 
         def derivative(extent, amounts):
-            # Adaptive solver trial stages may cross an exhaustion event. Only
-            # nonnegative, active inventories enter the shared pressure path.
-            current = {k: max(0.0, float(v)) for k, v in zip(parents, amounts)}
+            nonlocal evaluations
+            if evaluations >= evaluation_limit:
+                raise ResidueInventoryRefusal(
+                    _KNUDSEN_EXTENT_EVALUATION_LIMIT,
+                    f"RHS evaluation limit in {temperature:g} K interval "
+                    f"ending at mass-loss fraction {stop:g}",
+                )
+            evaluations += 1
+            # Extend the pressure law through zero during trial stages, where
+            # a trace parent can disappear from the engine's pressure output.
+            # Only an accepted zero crossing turns off its channels.
+            # The same integrated flux debits the parent and oxygen and credits
+            # the vapour through that event, closing both atom and mass ledgers.
+            current = {}
+            for k, v in zip(parents, amounts):
+                if k in active_parents:
+                    current[k] = max(pressure_floor, float(v))
+                elif k not in volatile_parents:
+                    current[k] = float(v)
             active = {k: v for k, v in current.items() if v > 0.0}
             current_temperature = temperature
             if linear_temperature:
@@ -1380,8 +1413,7 @@ def integrate_knudsen_residue_inventory(
                     + [products[k] for k in gases])
 
         while xi < stop:
-            event_indices = [i for i, k in enumerate(parents)
-                             if state[i] > 0.0 and any(term.source.parent_oxide == k for term in terms)]
+            event_indices = [i for i, k in enumerate(parents) if k in active_parents]
             if state[oxygen_index] > 0.0:
                 event_indices.append(oxygen_index)
             events = []
@@ -1399,16 +1431,20 @@ def integrate_knudsen_residue_inventory(
                 raise ResidueInventoryRefusal("knudsen_extent_nonconvergence", solution.message)
             state = [float(v) for v in solution.y[:, -1]]
             xi = float(solution.t[-1])
+            if any(v < -absolute_tolerance for v in state):
+                raise ResidueInventoryRefusal("knudsen_inventory_negative")
             for index, hits in zip(event_indices, solution.t_events):
-                if len(hits):
-                    if index == oxygen_index and xi < stop:
+                if index == oxygen_index:
+                    if len(hits) and xi < stop:
                         raise ResidueInventoryRefusal(
                             "knudsen_near_saturation_oxygen_exhausted",
                             "source-conditioned effusion requires more oxygen than the weighed charge contains",
                         )
+                    if len(hits):
+                        state[index] = 0.0
+                elif len(hits) or state[index] <= 0.0:
                     state[index] = 0.0
-            if any(v < -absolute_tolerance for v in state):
-                raise ResidueInventoryRefusal("knudsen_inventory_negative")
+                    active_parents.remove(parents[index])
             state = [max(0.0, v) for v in state]
         previous_endpoint, previous_temperature = endpoint, temperature
         if xi >= target:

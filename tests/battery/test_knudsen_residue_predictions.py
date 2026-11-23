@@ -109,6 +109,20 @@ def test_knudsen_extent_refuses_non_equilibrium_channel_alpha():
     assert exc.value.reason == "knudsen_equilibrium_channels_required"
 
 
+def test_knudsen_extent_limits_rhs_evaluations(monkeypatch):
+    from simulator.battery import residue
+
+    monkeypatch.setattr(residue, "_KNUDSEN_MAX_RHS_EVALUATIONS", 1)
+    with pytest.raises(ResidueInventoryRefusal, match="RHS evaluation limit in 2000 K") as exc:
+        integrate_knudsen_residue_inventory(
+            {"FeO": 1.0}, _channels(),
+            lambda n, p, t: {"FeO": 1.0, "O2": 0.0},
+            temperature_path=((0.25, 2000.0),), measured_mass_loss_fraction=0.25,
+            near_saturated=True, source_fO2_log_by_interval=(-10.0,),
+        )
+    assert exc.value.reason == "knudsen_extent_evaluation_limit"
+
+
 def test_oxygen_only_loss_advances_xi_without_debiting_cations():
     result = integrate_knudsen_residue_inventory(
         {"FeO": 1.0}, _channels("Fe"),
@@ -499,28 +513,36 @@ def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failur
     assert exc.value.reason == "residue_oxygen_pressure_unavailable"
 
 
-@pytest.mark.parametrize("oxygen_parent", (None, ""))
-def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(oxygen_parent):
+@pytest.mark.parametrize("oxygen_parent", (None, ""), ids=("none-parent", "empty-parent"))
+@pytest.mark.parametrize("initial_feo", (0.01, 1e-10), ids=("bulk-iron", "trace-iron"))
+def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(oxygen_parent, initial_feo):
     from simulator.accounting.formulas import parse_formula
     channels = tuple(ResidueChannel(s, s, p, 1.0, "stoichiometric packets")
                      for s, p in (("Fe", "FeO"), ("Mg", "MgO"),
                                   ("O", oxygen_parent), ("O2", oxygen_parent)))
+    iron_active = []
+
     def pressure(n, p, temperature):
+        assert n["MgO"] > 0.0
+        iron_active.append(n.get("FeO", 0.0) > 0.0)
         return {"Fe": 1e-8 * 10**(-p / 2) if n.get("FeO", 0) > 0 else 0.0,
                 "Mg": 1e-10 * 10**(-p / 2) if n.get("MgO", 0) > 0 else 0.0,
                 "O": 1e-6 * 10**(p / 2), "O2": 1e5 * 10**p}
-    initial = {"FeO": 0.01, "MgO": 1.0}
+    initial = {"FeO": initial_feo, "MgO": 1.0}
     result = integrate_knudsen_residue_inventory(
         initial, channels, pressure, temperature_path=((0.2, 2000),),
         measured_mass_loss_fraction=0.2, near_saturated=True, source_fO2_log_by_interval=(None,),
     )
-    # FeO is exhausted. The remaining 80% of initial mass is entirely MgO:
-    # .8*(.01*.071844+.040304)/.040304 = .8142604208019056 mol.
+    # After Fe exhaustion all remaining condensed mass is MgO.
+    assert iron_active[0] and not iron_active[-1]
+    assert sorted(iron_active, reverse=True) == iron_active
     assert result.residue_mol["FeO"] == 0.0
+    assert result.evaporated_mol["Fe"] == pytest.approx(initial_feo, rel=1e-5, abs=1e-15)
+    expected_mgo = 0.8 * (initial_feo * 0.071844 + 0.040304) / 0.040304
     assert result.evaporated_mol["O"] > 0.0
     assert result.evaporated_mol["O2"] > 0.0
-    assert result.residue_mol["MgO"] == pytest.approx(0.8142604208019056, abs=1e-10)
-    assert result.retained_oxygen_atoms_mol == pytest.approx(0.8142604208019056, abs=1e-10)
+    assert result.residue_mol["MgO"] == pytest.approx(expected_mgo, abs=1e-10)
+    assert result.retained_oxygen_atoms_mol == pytest.approx(expected_mgo, abs=1e-10)
     assert max(abs(v) for v in result.atom_closure_mol.values()) < 1e-12
     def mass(amounts):
         return sum(n * float(parse_formula(s).molar_mass_kg_per_mol()) for s, n in amounts.items())

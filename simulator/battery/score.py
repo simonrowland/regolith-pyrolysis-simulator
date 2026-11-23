@@ -17006,6 +17006,7 @@ def _knudsen_residue_prediction(
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         _element_retention_ratio_from_inventories,
         _printed_fm_definition,
         predict_knudsen_residue_composition,
@@ -17118,11 +17119,15 @@ def _knudsen_residue_prediction(
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        attempted = (
+            isinstance(exc, ResidueEngineNonconvergence)
+            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
+        )
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
-            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if attempted else ExecutionState.NOT_PROBED),
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if attempted else RefusalReason.UNSUPPORTED,
             refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
             notices=getattr(exc, "notices", ()), identity=reference.identity,
         )
