@@ -3,6 +3,7 @@
 import re
 from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
+from typing import NamedTuple
 
 from simulator.battery.records import as_decimal
 
@@ -59,19 +60,103 @@ UNCERTAINTY_PAIR_RE = re.compile(
     re.IGNORECASE,
 )
 UNCERTAINTY_SCALAR_RE = re.compile(UNCERTAINTY_NUMBER)
-_PRINTED_WIDTH_FIELDS = (
-    "T_m_uncertainty_K",
-    "gamma_uncertainty",
-    "two_sigma",
-    "limits",
-    "source_uncertainty",
-    "value_uncertainty",
-    "read_uncertainty",
-    "read_uncertainty_K",
-    "log10_K_star_uncertainty",
-    "S_298_over_R_uncertainty",
-    "invT_times_1e4_K_inv_absolute_uncertainty",
+# Top-level keys only. Nested locator text is not a width: recursing into it
+# selected page numbers on Leister ESR rows.
+_WIDTH_KEY_TOKENS = ("uncert", "error", "sigma", "std", "dex", "width", "range")
+_EXACT_WIDTH_NAMES = frozenset(
+    {
+        "sigma",
+        "std",
+        "standard_deviation",
+        "standard_error",
+        "uncertainty",
+        "error",
+        "width",
+        "range",
+        "bounds",
+        "interval",
+        "limits",
+    }
 )
+_UNIT_ALIASES = {
+    "%": "%",
+    "percent": "%",
+    "percentage": "%",
+    "atom%": "atom%",
+    "atom %": "atom%",
+    "dimensionless": "dimensionless",
+    "fraction": "fraction",
+    "1": "1",
+    "dex": "dex",
+}
+_SCALED_PERCENT_CANONICAL = frozenset({"dimensionless", "fraction"})
+_PERCENT_CANONICAL = frozenset({"%", "atom%"})
+# d-460: a percent width with no printed basis is predicted, not refused, and
+# the flag names the default. Relative matches the percent-to-fraction
+# conversion already used when the paper does not say percentage points.
+PERCENT_BASIS_DEFAULT_REASON = (
+    "uncertainty_basis_defaulted: relative; "
+    "printed percent width has no basis"
+)
+_CONFIDENCE_TRAILER_RE = re.compile(
+    r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)"
+    r"|[12]\s*-?\s*(?:sigma|σ)|range|limits?"
+    r"|maximum error|maximum deviation)\s*\)?\s*$",
+    re.IGNORECASE,
+)
+
+
+class WidthUnitBasis(NamedTuple):
+    basis: str | None
+    conflict: str | None
+    basis_default_reason: str | None = None
+
+
+def _is_width_key(name: str) -> bool:
+    folded = name.casefold()
+    if folded in _EXACT_WIDTH_NAMES:
+        return True
+    return any(token in folded for token in _WIDTH_KEY_TOKENS)
+
+
+def _alias_unit(unit: str | None) -> str:
+    text = (unit or "").strip()
+    if not text or text.casefold() == "range":
+        return ""
+    folded = text.casefold()
+    compact = re.sub(r"\s+", "", folded)
+    if compact in _UNIT_ALIASES:
+        return _UNIT_ALIASES[compact]
+    return _UNIT_ALIASES.get(folded, compact)
+
+
+def _clean_unit_suffix(raw: str) -> str | None:
+    suffix = _CONFIDENCE_TRAILER_RE.sub("", raw.strip().strip(" ,;[]()")).strip()
+    if not suffix or not re.search(r"[A-Za-z°µμ%]", suffix):
+        return None
+    if re.fullmatch(r"%|percent|percentage", suffix, re.IGNORECASE):
+        return "%"
+    return suffix
+
+
+def _unit_bound_to_number(raw: str, number: str) -> str | None:
+    """Unit of the selected width number, not an earlier confidence percent."""
+    escaped = re.escape(number)
+    anchored = re.compile(
+        rf"(?:±|\+/-)\s*{escaped}(?![\d.])\s*(.*)\Z",
+        re.IGNORECASE | re.DOTALL,
+    )
+    match = anchored.search(raw)
+    if match is None:
+        loose = re.compile(
+            rf"(?<![\d.]){escaped}(?![\d.])\s*(.*)\Z",
+            re.DOTALL,
+        )
+        found = list(loose.finditer(raw))
+        match = found[-1] if found else None
+    if match is None:
+        return None
+    return _clean_unit_suffix(match.group(1))
 
 
 def uncertainty_scalar_from_text(raw: str) -> str | None:
@@ -137,10 +222,10 @@ def mapping_uncertainty_value(
                     return scalar, unit
             continue
         return value, None
-    for key in _PRINTED_WIDTH_FIELDS:
-        if key not in mapping:
+    for key, value in mapping.items():
+        name = str(key).casefold()
+        if not _is_width_key(name):
             continue
-        value = mapping[key]
         if isinstance(value, (tuple, list)) and len(value) == 2:
             return value, "range"
         try:
@@ -149,42 +234,36 @@ def mapping_uncertainty_value(
             if isinstance(value, str):
                 scalar = uncertainty_scalar_from_text(value)
                 if scalar is not None:
-                    return scalar, _unit_from_width_text(value)
+                    unit = _unit_from_width_text(value)
+                    if unit is None and "dex" in name:
+                        unit = "dex"
+                    return scalar, unit
             continue
-        return value, None
-    for key, value in mapping.items():
-        name = str(key).casefold()
-        if name in {
-            "sigma", "std", "standard_deviation", "standard_error",
-            "uncertainty", "error", "width", "range", "bounds", "interval",
-            "limits",
-        }:
-            if isinstance(value, (tuple, list)) and len(value) == 2:
-                return value, "range"
-            try:
-                as_decimal(value)
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                if isinstance(value, str):
-                    scalar = uncertainty_scalar_from_text(value)
-                    if scalar is not None:
-                        unit = _unit_from_width_text(value)
-                        return scalar, unit
-                continue
-            return value, None
+        return value, "dex" if "dex" in name else None
     return None, None
 
 
 def _unit_from_width_text(raw: str) -> str | None:
-    width = re.search(
-        rf"(?:±|\+/-)\s*{UNCERTAINTY_NUMBER}\s*([A-Za-z%]+)", raw
-    )
-    if width is None:
-        width = re.search(rf"{UNCERTAINTY_NUMBER}\s*([A-Za-z%]+)\s*$", raw)
-    unit_text = width.group(1) if width is not None else raw
-    if re.fullmatch(r"%|percent|percentage", unit_text, re.IGNORECASE):
-        return "%"
-    match = re.search(r"\b(dex|dimensionless|fraction)\b", unit_text, re.IGNORECASE)
-    return None if match is None else match.group(1)
+    number = uncertainty_scalar_from_text(raw)
+    if number is None:
+        return None
+    return _unit_bound_to_number(raw, number)
+
+
+def printed_width_token(raw: str) -> tuple[str, str | None] | None:
+    """Width number and the unit bound to that number."""
+    number = uncertainty_scalar_from_text(raw)
+    if number is None:
+        return None
+    return number, _unit_bound_to_number(raw, number)
+
+
+def printed_width_span(raw: str) -> tuple[str, str, str | None] | None:
+    """Endpoints of a printed range and the unit after the span, if any."""
+    match = UNCERTAINTY_RANGE_RE.search(raw) or UNCERTAINTY_PAIR_RE.search(raw)
+    if match is None:
+        return None
+    return match.group(1), match.group(2), _clean_unit_suffix(raw[match.end() :])
 
 
 def mapping_uncertainty_unit(mapping: Mapping[str, object]) -> str | None:
@@ -237,63 +316,68 @@ def resolve_width_unit_basis(
     printed_value: str | None = None,
     paired_value: str | None = None,
     basis_evidence: str = "",
-) -> tuple[str | None, str | None]:
-    """Resolve width basis; the explicit mapping unit wins when it agrees.
+    printed_units: str | None = None,
+) -> WidthUnitBasis:
+    """Resolve width basis from the original unit declarations.
 
-    Inline units fill a missing explicit unit. Disagreement is returned as a
-    typed conflict instead of choosing either declaration.
+    A range shape is not a unit. A percent width already scaled to a
+    dimensionless or fraction value keeps that canonical unit and the
+    original percent in ``printed_units``; that pair is one declaration.
+    Any other two units, including ones outside the percent vocabulary,
+    are a typed conflict. A percent width with no basis uses the stated
+    relative default and names it.
     """
-    normalized = (unit or "").strip().casefold()
-    inline_normalized = (inline_unit or "").strip().casefold()
-    unit_aliases = {
-        "%": "%",
-        "percent": "%",
-        "percentage": "%",
-        "atom%": "atom%",
-        "atom %": "atom%",
-        "dimensionless": "dimensionless",
-        "fraction": "fraction",
-        "1": "1",
-        "dex": "dex",
-    }
+    left = unit if _alias_unit(unit) else None
+    right = inline_unit if _alias_unit(inline_unit) else None
+    left_key = _alias_unit(left)
+    right_key = _alias_unit(right)
+    printed_key = _alias_unit(printed_units)
     if (
-        normalized
-        and inline_normalized
-        and unit_aliases.get(normalized, normalized)
-        != unit_aliases.get(inline_normalized, inline_normalized)
+        left_key in _SCALED_PERCENT_CANONICAL
+        and printed_key in _PERCENT_CANONICAL
+        and right_key in {"", printed_key}
     ):
-        return None, (
+        right = None
+        right_key = ""
+    if left_key and right_key and left_key != right_key:
+        return WidthUnitBasis(
+            None,
             "width unit declarations disagree: "
-            f"{unit!r} and {inline_unit!r}"
+            f"{left!r} and {right!r}",
+            None,
         )
-    normalized = normalized or inline_normalized
+    normalized = left_key or right_key
     declared = (declared_basis or "").strip().casefold()
     if declared.startswith("uncertainty_convention_conflict:"):
-        return None, declared.partition(":")[2]
+        return WidthUnitBasis(None, declared.partition(":")[2], None)
     evidence = f"{basis_evidence} {printed_value or ''}".casefold()
     relative = declared == "relative" or bool(re.search(r"\brelative\b", evidence))
     absolute = declared in {"absolute", "dimensionless"} or bool(
         re.search(r"percentage\s*points?", evidence)
     ) or "atom%" in evidence or "atom %" in evidence
-    if normalized in {"%", "percent", "percentage", "atom%", "atom %"}:
+    if normalized in _PERCENT_CANONICAL:
         if relative:
-            return "relative", None
-        if absolute or (
-            paired_width_unit(paired_value) is not None
-        ):
-            return "dimensionless", None
-        return None, None
+            return WidthUnitBasis("relative", None, None)
+        if absolute or paired_width_unit(paired_value) is not None:
+            return WidthUnitBasis("dimensionless", None, None)
+        return WidthUnitBasis("relative", None, PERCENT_BASIS_DEFAULT_REASON)
     if normalized in {"dimensionless", "fraction", "1"}:
-        return ("relative" if relative else "dimensionless"), None
+        return WidthUnitBasis(
+            "relative" if relative else "dimensionless", None, None
+        )
     if normalized == "dex":
         if expected_unit and expected_unit.casefold() in {
             "dimensionless", "fraction", "1"
         }:
-            return None, f"dex width is incompatible with {expected_unit} value"
+            return WidthUnitBasis(
+                None, f"dex width is incompatible with {expected_unit} value", None
+            )
         if relative:
-            return None, "relative basis conflicts with dex width unit"
-        return "dex", None
-    return None, None
+            return WidthUnitBasis(
+                None, "relative basis conflicts with dex width unit", None
+            )
+        return WidthUnitBasis("dex", None, None)
+    return WidthUnitBasis(None, None, None)
 
 
 def printed_uncertainty_convention(

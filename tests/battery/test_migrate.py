@@ -21638,9 +21638,19 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
     ambiguous = uncertainty_for(
         {"value": "3", "units": "%", "as_printed": "±3%"}
     )
-    assert _uncertainty_for_value_selection(
+    defaulted = _uncertainty_for_value_selection(
         ambiguous, selection, Quantity.VALENCE_RATIO, "70%"
-    ) == ambiguous
+    )
+    # No printed basis. The stated default is relative, scaled once, and flagged.
+    assert defaulted.value == Decimal("0.03")
+    assert defaulted.basis == "relative"
+    assert defaulted.verbatim["units"] == "fraction"
+    assert defaulted.verbatim["printed_units"] == "%"
+    assert defaulted.verbatim["value"] == "3"
+    assert defaulted.verbatim["basis_default_reason"] == (
+        "uncertainty_basis_defaulted: relative; "
+        "printed percent width has no basis"
+    )
 
     relative = _uncertainty_for_value_selection(
         uncertainty_for(
@@ -21657,7 +21667,9 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
     )
     assert relative.value == Decimal("0.1")
     assert relative.basis == "relative"
-    assert relative.verbatim["units"] == "%"
+    assert relative.verbatim["units"] == "fraction"
+    assert relative.verbatim["printed_units"] == "%"
+    assert "basis_default_reason" not in relative.verbatim
 
     conflicting = _uncertainty_for_value_selection(
         uncertainty_for(
@@ -21699,7 +21711,10 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
 
 
 def test_existing_printed_width_field_census_and_unit_conflict_orders() -> None:
-    from simulator.battery.score import _printed_uncertainty_source
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        _printed_uncertainty_source,
+    )
     from simulator.battery.uncertainty_conventions import (
         mapping_uncertainty_value,
         printed_uncertainty_convention,
@@ -21711,16 +21726,45 @@ def test_existing_printed_width_field_census_and_unit_conflict_orders() -> None:
         "gamma_uncertainty": "1.7",
         "two_sigma": "0.03",
         "limits": ("0.1", "0.3"),
+        "read_uncertainty_dex": "0.000961",
+        "log10_half_width": "0.05",
+        "read_uncertainty_gamma_FeO": "0.02",
     }
     for field, width in expected.items():
         selected, _unit = mapping_uncertainty_value({field: width})
         assert selected == width
     assert mapping_uncertainty_value(
+        {"read_uncertainty_dex": "0.000961"}
+    ) == ("0.000961", "dex")
+    assert mapping_uncertainty_value(
+        {"log10_half_width": "0.05"}
+    ) == ("0.05", None)
+    assert mapping_uncertainty_value(
+        {
+            "form": "relative_bound",
+            "bound_value": "≤15%",
+            "locator": {"note": "relative error ≤15%", "pdf_page_index": 1},
+        }
+    ) == (None, None)
+    assert mapping_uncertainty_value(
         {"sigma": "95% CI ±0.3 dex"}
     ) == ("0.3", "dex")
     assert _printed_uncertainty_source(
         uncertainty_for({"sigma": "95% CI ±0.3 dex"})
-    ) == (Decimal("0.3"), "scalar", "dex", "dex")
+    ) == (Decimal("0.3"), "scalar", "dex", "dex", None)
+    assert _printed_uncertainty_source(
+        uncertainty_for("95% CI ±0.3 dex")
+    ) == (Decimal("0.3"), "scalar", "dex", "dex", None)
+    pressure = _printed_uncertainty_band(
+        Quantity.P_SAT,
+        uncertainty_for("95% CI ±0.3 dex"),
+        Decimal("1"),
+    )
+    # The 95% token is not the width. 0.3 dex passes through the dex metric;
+    # reading the confidence percent as pascals does not.
+    assert pressure.refusal is None
+    assert pressure.band is not None
+    assert pressure.band.value == Decimal("0.3")
     assert printed_uncertainty_convention({"two_sigma": "0.03"}) == (
         "two_sigma",
         Decimal(2),
@@ -21756,6 +21800,22 @@ def test_width_unit_disagreement_is_typed_in_migration_and_scoring() -> None:
         assert scored.band is None
         assert scored.refusal["reason"] == "uncertainty_convention_conflict"
 
+    pressure = {"sigma": "3 Pa", "units": "bar"}
+    migrated_pressure = _uncertainty_for_value_selection(
+        uncertainty_for(pressure),
+        selection,
+        Quantity.VALENCE_RATIO,
+        "70%",
+    )
+    assert migrated_pressure.value is None
+    assert "Pa" in migrated_pressure.basis
+    assert "bar" in migrated_pressure.basis
+    scored_pressure = _printed_uncertainty_band(
+        Quantity.P_SAT, uncertainty_for(pressure), Decimal("1")
+    )
+    assert scored_pressure.band is None
+    assert scored_pressure.refusal["reason"] == "uncertainty_convention_conflict"
+
 
 def test_legacy_width_scoring_uses_shared_absolute_and_relative_basis() -> None:
     from simulator.battery.score import _printed_uncertainty_band
@@ -21773,6 +21833,302 @@ def test_legacy_width_scoring_uses_shared_absolute_and_relative_basis() -> None:
     assert absolute.band is not None
     assert relative.band is not None
     assert absolute.band.value != relative.band.value
+
+
+_PERCENT_BASIS_DEFAULT_REASON = (
+    "uncertainty_basis_defaulted: relative; "
+    "printed percent width has no basis"
+)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    (
+        {"sigma": "3%", "basis": "absolute"},
+        {"sigma": "10%", "basis": "relative"},
+        {"sigma": ["2", "4"], "units": "%", "basis": "absolute"},
+    ),
+)
+def test_migration_and_legacy_use_same_score_band(raw: dict) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    selection = select_declared_source(
+        Quantity.VALENCE_RATIO, "%", {"value": "70"}
+    )
+    original = uncertainty_for(raw)
+    migrated = _uncertainty_for_value_selection(
+        original, selection, Quantity.VALENCE_RATIO, "70(3)%"
+    )
+    # Valence ratio has no metric without an identity. Activity is the
+    # dimensionless dex quantity these bands are compared on.
+    before = _printed_uncertainty_band(
+        Quantity.ACTIVITY, original, Decimal("0.7")
+    )
+    after = _printed_uncertainty_band(
+        Quantity.ACTIVITY, migrated, Decimal("0.7")
+    )
+    assert migrated.basis is not None
+    assert not migrated.basis.startswith("uncertainty_convention_conflict:")
+    assert before.band is not None
+    assert after.band is not None
+    assert before.refusal is None
+    assert after.refusal is None
+    assert before.band.value == after.band.value
+
+
+def test_normalized_percent_and_range_are_not_unit_conflicts() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    selection = select_declared_source(
+        Quantity.VALENCE_RATIO, "%", {"value": "70"}
+    )
+    legacy = uncertainty_for(
+        {"sigma": "3%", "units": "%", "basis": "absolute"}
+    )
+    legacy_band = _printed_uncertainty_band(
+        Quantity.ACTIVITY, legacy, Decimal("0.7")
+    )
+    normalized = replace(
+        uncertainty_for(
+            {
+                "sigma": "3%",
+                "units": "dimensionless",
+                "printed_units": "%",
+                "basis": "absolute",
+            }
+        ),
+        value=Decimal("0.03"),
+        basis="dimensionless",
+    )
+    normalized_band = _printed_uncertainty_band(
+        Quantity.ACTIVITY, normalized, Decimal("0.7")
+    )
+    assert normalized_band.refusal is None
+    assert normalized_band.band is not None
+    assert legacy_band.band is not None
+    assert normalized_band.band.value == legacy_band.band.value
+
+    ranged = _uncertainty_for_value_selection(
+        uncertainty_for(
+            {"sigma": ["2", "4"], "units": "%", "basis": "absolute"}
+        ),
+        selection,
+        Quantity.VALENCE_RATIO,
+        "70%",
+    )
+    assert ranged.value == (Decimal("0.02"), Decimal("0.04"))
+    assert ranged.basis == "dimensionless"
+    assert ranged.verbatim["units"] == "dimensionless"
+    assert ranged.verbatim["printed_units"] == "%"
+    ranged_band = _printed_uncertainty_band(
+        Quantity.ACTIVITY, ranged, Decimal("0.7")
+    )
+    assert ranged_band.refusal is None
+    assert ranged_band.band is not None
+
+
+def test_missing_percent_basis_is_the_stated_relative_default() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    raw = {"sigma": "3", "units": "%", "confidence_level": "one_sigma"}
+    selection = select_declared_source(
+        Quantity.VALENCE_RATIO, "%", {"value": "70"}
+    )
+    original = uncertainty_for(raw)
+    migrated = _uncertainty_for_value_selection(
+        original, selection, Quantity.VALENCE_RATIO, "70%"
+    )
+    assert migrated.value == Decimal("0.03")
+    assert migrated.basis == "relative"
+    assert migrated.verbatim["units"] == "fraction"
+    assert migrated.verbatim["printed_units"] == "%"
+    assert migrated.verbatim["basis_default_reason"] == _PERCENT_BASIS_DEFAULT_REASON
+    before = _printed_uncertainty_band(
+        Quantity.ACTIVITY, original, Decimal("0.7")
+    )
+    after = _printed_uncertainty_band(
+        Quantity.ACTIVITY, migrated, Decimal("0.7")
+    )
+    explicit = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty_for(
+            {"sigma": "3", "units": "%", "basis": "relative", "confidence_level": "one_sigma"}
+        ),
+        Decimal("0.7"),
+    )
+    assert before.band is not None and after.band is not None
+    assert explicit.band is not None
+    assert before.band.value == after.band.value == explicit.band.value
+    assert before.notice is not None and after.notice is not None
+    assert before.notice.reason == _PERCENT_BASIS_DEFAULT_REASON
+    assert after.notice.reason == _PERCENT_BASIS_DEFAULT_REASON
+    assert explicit.notice is None or explicit.notice.reason != _PERCENT_BASIS_DEFAULT_REASON
+
+
+_GREEN_WIDTH_TOKENS = ("uncert", "error", "sigma", "std", "dex", "width", "range")
+_PERSISTED_WIDTH_STORES = (
+    "shornikov-2011-cao-mgo-alumina-melts.yaml",
+    "shornikov-2005-potassium-germanate.yaml",
+    "shornikov-2020-mgo-feo-melts.yaml",
+)
+_PINNED_WIDTHS = {
+    "shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_allibert_marker_01": (
+        "0.000961",
+        "dex",
+    ),
+    "shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_54_80": (
+        "0.05",
+        None,
+    ),
+}
+
+
+def _green_top_level_width(mapping: Mapping) -> tuple[object | None, str | None]:
+    """Green's top-level token rule, without locator recursion or bare two-lists."""
+
+    for key, value in mapping.items():
+        name = str(key).casefold()
+        if not any(token in name for token in _GREEN_WIDTH_TOKENS):
+            continue
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        return value, "dex" if "dex" in name else None
+    return None, None
+
+
+def test_persisted_width_selector_census_matches_green_top_level() -> None:
+    from simulator.battery.uncertainty_conventions import (
+        mapping_uncertainty_value,
+        uncertainty_exact_fields,
+    )
+
+    root = Path(__file__).resolve().parents[2] / "data/literature/extracts-v2"
+    seen_pins: set[str] = set()
+    dex_rows = 0
+    half_rows = 0
+    gamma_rows = 0
+    for name in _PERSISTED_WIDTH_STORES:
+        document = yaml.safe_load((root / name).read_text())
+        for observation in document.get("observations") or []:
+            uncertainty = observation.get("uncertainty")
+            if not isinstance(uncertainty, dict):
+                continue
+            verbatim = uncertainty.get("verbatim")
+            if not isinstance(verbatim, Mapping):
+                continue
+            identity = observation.get("identity")
+            quantity_name = None
+            subtype_name = None
+            if isinstance(identity, Mapping):
+                quantity = identity.get("quantity")
+                if isinstance(quantity, Mapping) and quantity.get("tag") == "value":
+                    quantity_name = quantity.get("value")
+                subtype = identity.get("subtype")
+                if isinstance(subtype, Mapping) and subtype.get("tag") == "value":
+                    subtype_name = subtype.get("value")
+            fields = uncertainty_exact_fields(quantity_name, subtype=subtype_name)
+            green_value, green_unit = _green_top_level_width(verbatim)
+            produced_value, produced_unit = mapping_uncertainty_value(
+                verbatim, exact_fields=fields
+            )
+            if green_value is not None:
+                assert produced_value is not None, observation.get("observation_id")
+                earlier = any(
+                    key in verbatim
+                    for key in (
+                        "value",
+                        "amount",
+                        "error_value",
+                        "uncertainty_value",
+                        *fields,
+                    )
+                )
+                if not earlier:
+                    assert produced_value == green_value
+                    assert produced_unit == green_unit
+            observation_id = observation.get("observation_id")
+            if observation_id in _PINNED_WIDTHS:
+                seen_pins.add(observation_id)
+                assert (produced_value, produced_unit) == _PINNED_WIDTHS[observation_id]
+            if "read_uncertainty_dex" in verbatim:
+                dex_rows += 1
+                assert produced_value is not None
+            if "log10_half_width" in verbatim:
+                half_rows += 1
+                assert produced_value is not None
+            if "read_uncertainty_gamma_FeO" in verbatim:
+                gamma_rows += 1
+                assert produced_value is not None
+    assert seen_pins == set(_PINNED_WIDTHS)
+    assert dex_rows == 12
+    assert half_rows == 7
+    assert gamma_rows == 73
+
+
+def test_width_field_mutation_removes_half_width_token(monkeypatch) -> None:
+    from simulator.battery import uncertainty_conventions as conventions
+
+    test_existing_printed_width_field_census_and_unit_conflict_orders()
+    monkeypatch.setattr(
+        conventions,
+        "_WIDTH_KEY_TOKENS",
+        tuple(token for token in conventions._WIDTH_KEY_TOKENS if token != "width"),
+    )
+    with pytest.raises(AssertionError):
+        test_existing_printed_width_field_census_and_unit_conflict_orders()
+
+
+def test_inline_unit_mutation_hides_genuine_unit_conflict(monkeypatch) -> None:
+    from simulator.battery import migrate as migrate_module
+    from simulator.battery import score as score_module
+    from simulator.battery import uncertainty_conventions as conventions
+
+    test_width_unit_disagreement_is_typed_in_migration_and_scoring()
+    resolve = conventions.resolve_width_unit_basis
+
+    def discard_inline(unit, *, inline_unit=None, **kwargs):
+        return resolve(unit, **kwargs)
+
+    monkeypatch.setattr(migrate_module, "resolve_width_unit_basis", discard_inline)
+    monkeypatch.setattr(score_module, "resolve_width_unit_basis", discard_inline)
+    with pytest.raises(AssertionError):
+        test_width_unit_disagreement_is_typed_in_migration_and_scoring()
+
+
+def test_width_basis_mutation_collapses_absolute_and_relative(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+
+    test_legacy_width_scoring_uses_shared_absolute_and_relative_basis()
+    source = score_module._printed_uncertainty_source
+
+    def drop_basis(*args, **kwargs):
+        parsed = source(*args, **kwargs)
+        return (parsed[0], parsed[1], parsed[2], None, *parsed[4:])
+
+    monkeypatch.setattr(score_module, "_printed_uncertainty_source", drop_basis)
+    with pytest.raises(AssertionError):
+        test_legacy_width_scoring_uses_shared_absolute_and_relative_basis()
+
+
+def test_width_token_unit_mutation_drops_bound_dex(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery import uncertainty_conventions as conventions
+
+    test_existing_printed_width_field_census_and_unit_conflict_orders()
+
+    def unbound(raw):
+        token = conventions.printed_width_token(raw)
+        if token is None:
+            return None
+        return token[0], None
+
+    monkeypatch.setattr(score_module, "printed_width_token", unbound)
+    with pytest.raises(AssertionError):
+        test_existing_printed_width_field_census_and_unit_conflict_orders()
 
 
 def test_exploded_width_and_score_share_exact_derivation_field(tmp_path: Path) -> None:

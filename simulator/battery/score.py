@@ -201,18 +201,15 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.uncertainty_conventions import (
     NORMAL_95_TICKET_MULTIPLIER,
-    UNCERTAINTY_NUMBER as _UNCERTAINTY_NUMBER,
-    UNCERTAINTY_PAIR_RE as _UNCERTAINTY_PAIR_RE,
-    UNCERTAINTY_RANGE_RE as _UNCERTAINTY_RANGE_RE,
-    UNCERTAINTY_SCALAR_RE as _UNCERTAINTY_SCALAR_RE,
     UncertaintyConventionConflict,
     mapping_uncertainty_unit as _mapping_uncertainty_unit,
     mapping_uncertainty_value as _mapping_uncertainty_value,
     printed_uncertainty_convention,
+    printed_width_span,
+    printed_width_token,
     resolve_width_unit_basis,
     standard_uncertainty_width,
     uncertainty_exact_fields,
-    uncertainty_scalar_from_text as _uncertainty_scalar_from_text,
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
@@ -6221,10 +6218,22 @@ def _printed_uncertainty_source(
     str,
     str | None,
     str | None,
+    str | None,
 ]:
+    """Return width, shape, conversion unit, basis, and any basis default.
+
+    Scalar strings and scalar-valued mappings take their number and unit from
+    the shared width-token parser. A stored ``basis_default_reason`` is kept
+    when migration already wrote the stated relative default into ``basis``.
+    """
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
     printed_unit = _mapping_uncertainty_unit(raw) if isinstance(raw, Mapping) else None
+    printed_units_text = None
+    if isinstance(raw, Mapping):
+        stored_printed_units = raw.get("printed_units")
+        if isinstance(stored_printed_units, str):
+            printed_units_text = stored_printed_units
     unit = (
         "dex" if "dex" in basis.casefold()
         else "fraction" if basis.casefold() in {"relative", "fraction"}
@@ -6241,38 +6250,26 @@ def _printed_uncertainty_source(
         )
         if value is None:
             value = mapped_value
-        inline_unit = mapped_unit if mapped_unit != "range" else None
         if mapped_unit == "range":
             shape = "range"
-        unit = _mapping_uncertainty_unit(raw) or inline_unit or unit
-    elif value is None and isinstance(raw, str):
-        match = _UNCERTAINTY_RANGE_RE.search(raw) or _UNCERTAINTY_PAIR_RE.search(raw)
-        if match is not None:
-            value = (match.group(1), match.group(2))
-            shape = "range"
         else:
-            value = _uncertainty_scalar_from_text(raw)
-    if unit is None and isinstance(raw, str):
-        raw_values = value if isinstance(value, (tuple, list)) else (value,)
-        reported: set[Decimal] = set()
-        for part in raw_values:
-            if part is None:
-                continue
-            try:
-                reported.add(as_decimal(part))
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                continue
-        for match in re.finditer(
-            rf"({_UNCERTAINTY_NUMBER})\s*(?:%|percent)(?![A-Za-z])", raw,
-            re.IGNORECASE,
-        ):
-            try:
-                percent_value = as_decimal(match.group(1))
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                continue
-            if percent_value in reported:
-                unit = "%"
-                break
+            inline_unit = mapped_unit
+        unit = printed_unit or inline_unit or unit
+    elif isinstance(raw, str):
+        span = printed_width_span(raw)
+        token = None if span is not None else printed_width_token(raw)
+        if value is None and span is not None:
+            value = (span[0], span[1])
+            shape = "range"
+        elif value is None and token is not None:
+            value = token[0]
+        bound_unit = (
+            span[2] if span is not None else None if token is None else token[1]
+        )
+        if bound_unit:
+            inline_unit = bound_unit
+            if unit is None:
+                unit = bound_unit
     declared_basis = (
         basis
         if basis.startswith("uncertainty_convention_conflict:")
@@ -6291,29 +6288,40 @@ def _printed_uncertainty_source(
         if isinstance(locator, Mapping):
             basis_evidence += " " + str(locator.get("note") or "")
     declared_unit = printed_unit or (None if isinstance(raw, Mapping) else unit)
-    resolved_basis, conflict = resolve_width_unit_basis(
+    resolved = resolve_width_unit_basis(
         declared_unit,
         inline_unit=inline_unit,
         declared_basis=declared_basis,
         printed_value=None if printed_width is None else str(printed_width),
         basis_evidence=basis_evidence,
+        printed_units=printed_units_text,
     )
-    if conflict is not None:
-        raise UncertaintyConventionConflict(conflict)
+    if resolved.conflict is not None:
+        raise UncertaintyConventionConflict(resolved.conflict)
+    resolved_basis = resolved.basis
+    basis_default_reason = resolved.basis_default_reason
+    if basis_default_reason is None and isinstance(raw, Mapping):
+        stored_reason = raw.get("basis_default_reason")
+        if (
+            isinstance(stored_reason, str)
+            and stored_reason
+            and resolved_basis == "relative"
+        ):
+            basis_default_reason = stored_reason
     if value is None:
-        return None, shape, unit, resolved_basis
+        return None, shape, unit, resolved_basis, basis_default_reason
     try:
         if isinstance(value, (tuple, list)) and len(value) == 2:
             lower, upper = as_decimal(value[0]), as_decimal(value[1])
             if not lower.is_finite() or not upper.is_finite() or upper < lower:
-                return None, "range", unit, resolved_basis
-            return (lower, upper), "range", unit, resolved_basis
+                return None, "range", unit, resolved_basis, basis_default_reason
+            return (lower, upper), "range", unit, resolved_basis, basis_default_reason
         parsed = abs(as_decimal(value))
     except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-        return None, shape, unit, resolved_basis
+        return None, shape, unit, resolved_basis, basis_default_reason
     if not parsed.is_finite():
-        return None, shape, unit, resolved_basis
-    return parsed, shape, unit, resolved_basis
+        return None, shape, unit, resolved_basis, basis_default_reason
+    return parsed, shape, unit, resolved_basis, basis_default_reason
 
 
 def _temperature_envelope_value(
@@ -6401,48 +6409,11 @@ def _uncertainty_unit(
             return unit_basis
         if basis.casefold() in {"relative", "fraction"}:
             return basis
-    source_values = (
-        set(source_value)
-        if isinstance(source_value, tuple)
-        else {source_value}
-    )
     if isinstance(source_value, tuple):
         for text in unit_texts:
-            range_match = _UNCERTAINTY_RANGE_RE.search(text) or _UNCERTAINTY_PAIR_RE.search(text)
-            if range_match is not None:
-                unit = text[range_match.end() :].strip().strip(" ,;[]()")
-                unit = re.sub(
-                    r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
-                    "",
-                    unit,
-                    flags=re.IGNORECASE,
-                ).strip()
-                if unit and re.search(r"[A-Za-z°µμ%]", unit):
-                    return unit
-    suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
-    for text in unit_texts:
-        unit_source = re.sub(
-            r"\s*\([^)]*(?:as printed|confidence level)[^)]*\)\s*$",
-            "",
-            text,
-            flags=re.IGNORECASE,
-        )
-        for suffix in reversed(tuple(suffix_re.finditer(unit_source))):
-            try:
-                suffix_value = abs(as_decimal(suffix.group(1)))
-            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                continue
-            if suffix_value not in source_values:
-                continue
-            unit = suffix.group(2).strip().strip(" ,;[]()")
-            unit = re.sub(
-                r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
-                "",
-                unit,
-                flags=re.IGNORECASE,
-            ).strip()
-            if unit and re.search(r"[A-Za-z°µμ%]", unit):
-                return unit
+            span = printed_width_span(text)
+            if span is not None and span[2]:
+                return span[2]
     if observation is not None:
         locator = observation.locator
         note = None if locator is None else locator.note
@@ -7068,6 +7039,7 @@ def _printed_uncertainty_band(
             shape,
             mapped_unit,
             resolved_basis,
+            basis_default_reason,
         ) = _printed_uncertainty_source(uncertainty, exact_fields=exact_fields)
     except UncertaintyConventionConflict as exc:
         return _PrintedBandResolution(
@@ -7102,7 +7074,7 @@ def _printed_uncertainty_band(
         "dex"
         if log10_activity_width
         else mapped_unit
-        if resolved_basis in {"dimensionless", "relative"} and mapped_unit
+        if resolved_basis in {"dimensionless", "relative", "dex"} and mapped_unit
         else _uncertainty_unit(
             quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
         )
@@ -7374,6 +7346,26 @@ def _printed_uncertainty_band(
             and not log10_activity_sigma
         ),
     )
+    if basis_default_reason:
+        # A confidence notice keeps its reason so the two-sigma reading still
+        # attaches. The basis default is named on that notice, or occupies the
+        # single slot when confidence was stated and produced no notice.
+        if notice is None:
+            notice = Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(quantity,),
+                reason=basis_default_reason,
+                origin="decision-band",
+            )
+        else:
+            notice = replace(
+                notice,
+                band=(
+                    f"{notice.band}; {basis_default_reason}"
+                    if notice.band
+                    else basis_default_reason
+                ),
+            )
     standard_uncertainty_dex = None
     standard_uncertainty = None
     standard_uncertainty_unit = None

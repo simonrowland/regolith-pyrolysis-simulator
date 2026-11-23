@@ -15934,9 +15934,11 @@ def _uncertainty_for_value_selection(
         verbatim,
         exact_fields=exact_fields,
     )
+    # "range" is the selector's shape sentinel, not a printed unit.
+    width_unit = None if unit_hint == "range" else unit_hint
     source_unit = (
         mapping_uncertainty_unit(verbatim)
-        or unit_hint
+        or width_unit
         or paired_width_unit(printed_value)
     )
     if width is None:
@@ -15953,15 +15955,23 @@ def _uncertainty_for_value_selection(
     basis_evidence = ""
     if isinstance(locator, Mapping):
         basis_evidence = str(locator.get("note") or "")
-    basis, conflict = resolve_width_unit_basis(
+    stored_printed_units = verbatim.get("printed_units")
+    printed_units = (
+        stored_printed_units if isinstance(stored_printed_units, str) else None
+    )
+    resolved = resolve_width_unit_basis(
         source_unit,
-        inline_unit=unit_hint,
+        inline_unit=width_unit,
         expected_unit="dimensionless",
         declared_basis=str(verbatim.get("basis") or uncertainty.basis or ""),
         printed_value=str(verbatim.get("as_printed") or ""),
         paired_value=printed_value,
         basis_evidence=basis_evidence,
+        printed_units=printed_units,
     )
+    basis = resolved.basis
+    conflict = resolved.conflict
+    default_reason = resolved.basis_default_reason
     if conflict is not None:
         return replace(
             uncertainty,
@@ -15970,9 +15980,13 @@ def _uncertainty_for_value_selection(
         )
     if basis is None:
         return uncertainty
-    if source_unit and source_unit.casefold() in {
-        "%", "percent", "percentage", "atom%", "atom %"
-    }:
+    percent_width = bool(
+        source_unit
+        and source_unit.casefold() in {
+            "%", "percent", "percentage", "atom%", "atom %"
+        }
+    )
+    if percent_width:
         if isinstance(parsed_width, tuple):
             scaled: Decimal | tuple[Decimal, Decimal] = tuple(
                 _percent_to_fraction(value) for value in parsed_width
@@ -15987,7 +16001,16 @@ def _uncertainty_for_value_selection(
         verbatim.setdefault("printed_units", source_unit)
         verbatim["units"] = "dimensionless"
     elif basis == "relative":
-        verbatim["units"] = source_unit
+        # Scale once. "%" is stored as the fraction the scorer must not divide
+        # by 100 again. printed_units keeps the percent the paper used.
+        # atom% is not in the scorer's percent set, so its unit stays put.
+        if source_unit and source_unit.casefold() in {"%", "percent", "percentage"}:
+            verbatim.setdefault("printed_units", source_unit)
+            verbatim["units"] = "fraction"
+        elif source_unit:
+            verbatim["units"] = source_unit
+        if default_reason:
+            verbatim["basis_default_reason"] = default_reason
     return replace(uncertainty, verbatim=verbatim, value=scaled, basis=basis)
 
 

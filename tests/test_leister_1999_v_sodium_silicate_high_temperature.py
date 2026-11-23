@@ -126,7 +126,13 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
             )
         )
         assert migrated_row.uncertainty.verbatim["value"] == "10"
-        assert migrated_row.uncertainty.verbatim["units"] == "%"
+        assert migrated_row.uncertainty.value == Decimal("0.1")
+        assert migrated_row.uncertainty.basis == "relative"
+        # The locator note states a relative error, so the percent is scaled
+        # once to a fraction and the printed percent is kept beside it.
+        assert migrated_row.uncertainty.verbatim["units"] == "fraction"
+        assert migrated_row.uncertainty.verbatim["printed_units"] == "%"
+        assert "basis_default_reason" not in migrated_row.uncertainty.verbatim
         assert migrated_row.uncertainty.verbatim["as_printed"] == "±10%"
         assert migrated_row.uncertainty.verbatim["confidence_level"] == "not_stated"
         assert migrated_row.uncertainty.kind is UncertaintyKind.PRINTED
