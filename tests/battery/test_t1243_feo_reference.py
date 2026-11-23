@@ -1579,7 +1579,10 @@ def test_total_iron_notice_uses_stored_banya_iron_identity(
 
     def assert_identity_scoped_notice() -> None:
         assert takezoe_na2o.identity.species.formula == "Na2O"
-        assert quantity_token(takezoe_na2o.identity) is Quantity.ACTIVITY_COEFFICIENT
+        # The extract row is type activity_coefficient but prints values.quantity: activity
+        # (a_Na2O upper bound), and migrate.map_quantity resolves the alias first, so the
+        # stored token is ACTIVITY (extracts-v2 agrees). Pin the stored identity.
+        assert quantity_token(takezoe_na2o.identity) is Quantity.ACTIVITY
         assert score_module._total_iron_formula_notice(takezoe_na2o) is None
         banya_notice = score_module._total_iron_formula_notice(banya_feto_activity)
         assert banya_notice is not None
