@@ -211,6 +211,11 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     changed = replace(reference, value=Value.point_of(1), point_conditions={"composition": Located(State.unknown("must not read"))})
     same = predict_knudsen_residue_composition("internal-analytical", changed, experiment, rows)
     assert result["escaped_mass_fraction"] == pytest.approx(0.2)
+    # Golden pin for the Knudsen adapter's wt%-to-mol inventory conversion.
+    assert result["composition_wt_pct"] == pytest.approx({
+        "FeO": 55.077219388664986,
+        "MgO": 44.92278061133502,
+    }, abs=1e-12)
     assert first["escaped_mass_fraction"] == pytest.approx(0.1)
     assert first["composition_wt_pct"] != result["composition_wt_pct"]
     assert same["composition_wt_pct"] == result["composition_wt_pct"]
@@ -270,21 +275,39 @@ def test_step_hold_and_linear_are_distinct_temperature_paths():
 
 def test_extent_comparison_preserves_ordinary_identity_guards(extent_point):
     from simulator.battery.enums import IdentityEqualKind
-    from simulator.battery.identity import identity_equal, _same_row_knudsen_residue_identity_equal
+    from simulator.battery.identity import (
+        _same_row_residue_extent_identity_equal,
+        identity_equal,
+    )
     reference, _, _ = extent_point
     identity = reference.identity
     assert identity_equal(identity, identity).kind is IdentityEqualKind.IDENTITY_UNKNOWN
-    assert _same_row_knudsen_residue_identity_equal(identity, identity).kind is IdentityEqualKind.EQUAL
+    assert (
+        _same_row_residue_extent_identity_equal(identity, identity).kind
+        is IdentityEqualKind.EQUAL
+    )
     for field in ("composition", "temperature_K"):
         missing = replace(identity, **{field: State.unknown("missing")})
-        assert _same_row_knudsen_residue_identity_equal(missing, missing).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert (
+            _same_row_residue_extent_identity_equal(missing, missing).kind
+            is IdentityEqualKind.IDENTITY_UNKNOWN
+        )
     changed = replace(identity, species=Species("MgO", Phase.L))
-    assert _same_row_knudsen_residue_identity_equal(identity, changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert (
+        _same_row_residue_extent_identity_equal(identity, changed).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
     changed = replace(identity, temperature_K=State.of(Decimal(2200)))
-    assert _same_row_knudsen_residue_identity_equal(identity, changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert (
+        _same_row_residue_extent_identity_equal(identity, changed).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
     left = replace(identity, fO2_Pa=State.of(Decimal("1e-5")))
     right = replace(identity, fO2_Pa=State.of(Decimal("1e-6")))
-    assert _same_row_knudsen_residue_identity_equal(left, right).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert (
+        _same_row_residue_extent_identity_equal(left, right).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
