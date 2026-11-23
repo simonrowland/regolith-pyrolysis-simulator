@@ -270,6 +270,10 @@ class CapacityShadowRefusal:
     pstar_warm_newton: int | None = None
     pstar_brent_band: int | None = None
     pstar_sign_scan: int | None = None
+    # Post-settle buffer-release record. Set on the inventory refusal
+    # only. The hour notice carries the same dict. The comparison does
+    # not read it. excess_integrated is inside the dict, by that name.
+    buffer_release: dict[str, Any] | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):

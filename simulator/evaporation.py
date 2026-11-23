@@ -371,27 +371,27 @@ def _buffer_destined_stoich_o2_mol(
     return math.fsum(terms) if terms else 0.0
 
 
-def _buffer_oxidative_stoich_o2_mol(
+def _buffer_oxidative_debit_mol_by_species(
     rates_kg_hr: Mapping[str, float],
     stoich_by_species: Mapping[str, Mapping[str, Any]],
     o2_molar_mass_kg_per_mol: float,
     registry: Mapping[str, Any],
-) -> float:
-    """Positive O2 moles an oxidative vapour takes from the fO2 buffer.
+) -> dict[str, float]:
+    """Per-species O2 moles an oxidative vapour takes from the fO2 buffer.
 
-    The credit sum is the other posting and stays positive. This sum
-    is the debit. The headspace excess subtracts it, so the exchange
-    is the buffer that remains. The oxygen is not a headspace source.
-    Algebra: n = fsum(-rate * O2_per / M_O2) over species whose debit
-    account is the buffer. Unit check: (kg/h) / (kg/mol) = mol/h.
-    Limit: a non-negative coproduct adds nothing. No buffer account
-    returns 0.
+    One owner of the debit terms. The total is their sorted fsum.
+    A vapour coproduct is not a term. The oxygen is not a headspace
+    source.
+    Algebra: n_i = -rate_i * O2_per_i / M_O2 when the debit account
+    is the buffer. Unit check: (kg/h) / (kg/mol) = mol/h.
+    Limit: a non-positive rate or a non-negative coproduct is absent.
+    No buffer account returns an empty map.
     """
 
     buffer_account = _stoich_o2_debit_account(-1.0, '', 1.0)
     if not buffer_account:
-        return 0.0
-    terms: list[float] = []
+        return {}
+    terms: dict[str, float] = {}
     for species in sorted(rates_kg_hr, key=str):
         rate_kg_hr = max(0.0, float(rates_kg_hr[species]))
         if rate_kg_hr <= 0.0:
@@ -409,8 +409,36 @@ def _buffer_oxidative_stoich_o2_mol(
         )
         if account != buffer_account:
             continue
-        terms.append((-o2_kg_hr) / o2_molar_mass_kg_per_mol)
-    return math.fsum(terms) if terms else 0.0
+        terms[str(species)] = (-o2_kg_hr) / o2_molar_mass_kg_per_mol
+    return terms
+
+
+def _buffer_oxidative_stoich_o2_mol(
+    rates_kg_hr: Mapping[str, float],
+    stoich_by_species: Mapping[str, Mapping[str, Any]],
+    o2_molar_mass_kg_per_mol: float,
+    registry: Mapping[str, Any],
+) -> float:
+    """Positive O2 moles an oxidative vapour takes from the fO2 buffer.
+
+    The credit sum is the other posting and stays positive. This sum
+    is the debit. The headspace excess subtracts it, so the exchange
+    is the buffer that remains. The oxygen is not a headspace source.
+    Algebra: n = fsum(n_i) over the per-species debit, names sorted.
+    Unit check: (kg/h) / (kg/mol) = mol/h.
+    Limit: a non-negative coproduct adds nothing. No buffer account
+    returns 0.
+    """
+
+    terms = _buffer_oxidative_debit_mol_by_species(
+        rates_kg_hr,
+        stoich_by_species,
+        o2_molar_mass_kg_per_mol,
+        registry,
+    )
+    if not terms:
+        return 0.0
+    return math.fsum(terms[name] for name in sorted(terms))
 
 
 def headspace_buffer_release_stock_mol(

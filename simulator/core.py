@@ -718,6 +718,7 @@ from simulator.evaporation import (
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
     _buffer_destined_stoich_o2_mol,
+    _buffer_oxidative_debit_mol_by_species,
     _buffer_oxidative_stoich_o2_mol,
     _oxidative_vapour_o2_available_kg,
     attach_evaluated_transport_pO2,
@@ -4569,6 +4570,128 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if isinstance(raw, dict):
                 terms = raw
         self._headspace_balance_terms = terms
+
+    def _headspace_buffer_release_record(
+        self,
+        *,
+        excess_integrated: float,
+        signed_open_mol: float,
+        signed_after_vapour_mol: float,
+        signed_after_settle_mol: float,
+        fe_diag_before: int,
+        transition_at: int,
+    ) -> dict[str, Any]:
+        """One post-settle record of the buffer release.
+
+        The inventory refusal and the hour notice both carry this dict.
+        Nothing here posts, and the refusal comparison does not read it.
+        n_open, n_credit, n_debit and n_uptake are the arguments the
+        stock function last evaluated outside a diagnostic sample.
+        n_uptake is None when that evaluation did not ask the Fe split.
+        The three buffer figures are the signed reservoir.fo2_buffer
+        oxygen: hour open, after the vapour commit, and after the
+        settle. The Fe figure is the uptake that settle committed, the
+        o2_debit_mol on a buffer transition it appended. The
+        condensation split is O2 credited to process.overhead_gas by
+        condense_* since the solve opened. A captured vapour mass in
+        (0, 1e-12] kg is the subfloor share. Every other credit,
+        including a prior-holdup credit with no new capture, is the
+        above-floor share. The per-species debit is the map whose
+        sorted fsum is n_debit.
+        """
+
+        from simulator.accounting.formulas import resolve_species_formula
+        from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+
+        terms = getattr(self, "_headspace_buffer_release_terms", None)
+        if not isinstance(terms, dict):
+            terms = {}
+        uptake = terms.get("n_uptake") if "n_uptake" in terms else None
+        species_debit = terms.get("oxidant_debit_mol_by_species")
+        if not isinstance(species_debit, Mapping):
+            species_debit = {}
+        rows = list(
+            getattr(self, "_fe_redox_respeciation_diagnostics_this_hr", [])
+            or []
+        )
+        fe_uptake = 0.0
+        for row in rows[max(0, int(fe_diag_before)):]:
+            if not isinstance(row, dict) or not row.get("transition_name"):
+                continue
+            if str(row.get("o2_account") or "") != FO2_BUFFER_ACCOUNT:
+                continue
+            fe_uptake += max(
+                0.0,
+                float(row.get("o2_debit_mol", 0.0) or 0.0),
+            )
+        above_floor = 0.0
+        subfloor = 0.0
+        registry = self.atom_ledger.registry
+        start = max(0, int(transition_at))
+        for transition in self.atom_ledger.transitions[start:]:
+            name = str(getattr(transition, "name", "") or "")
+            if not name.startswith("condense_"):
+                continue
+            o2_credit = 0.0
+            captured_kg = 0.0
+            for lot in transition.credits:
+                if str(lot.account) != "process.overhead_gas":
+                    continue
+                moles = lot.species_moles_for(registry)
+                o2_credit += float(moles.get(OXYGEN_SPECIES, 0.0) or 0.0)
+            for lot in transition.debits:
+                if str(lot.account) != "process.overhead_gas":
+                    continue
+                for species, mol in lot.species_moles_for(registry).items():
+                    if str(species) == OXYGEN_SPECIES:
+                        continue
+                    mass = resolve_species_formula(
+                        str(species),
+                        registry,
+                    ).molar_mass_kg_per_mol()
+                    captured_kg += float(mol) * float(mass)
+            if o2_credit == 0.0:
+                continue
+            # Premise: the posted vapour debit is the captured share.
+            # 0 < kg <= 1e-12 is the floor the subfloor book keeps.
+            # Unit check: mol * (kg/mol) = kg. The credit stays mol.
+            # Limit: no positive subfloor parcel is the above-floor share.
+            if 0.0 < captured_kg <= EMPTY_KG_TOLERANCE:
+                subfloor += o2_credit
+            else:
+                above_floor += o2_credit
+        return {
+            "excess_integrated": float(excess_integrated),
+            "n_open": terms.get("n_open"),
+            "n_credit": terms.get("n_credit"),
+            "n_debit": terms.get("n_debit"),
+            "n_uptake": None if uptake is None else float(uptake),
+            "fo2_buffer_open_mol": float(signed_open_mol),
+            "fo2_buffer_after_vapour_mol": float(signed_after_vapour_mol),
+            "fo2_buffer_after_settle_mol": float(signed_after_settle_mol),
+            "fe_uptake_committed_mol": float(fe_uptake),
+            "condensation_o2_return_above_floor_mol": float(above_floor),
+            "condensation_o2_return_subfloor_mol": float(subfloor),
+            "oxidant_debit_mol_by_species": {
+                str(species): float(mol)
+                for species, mol in sorted(species_debit.items())
+            },
+        }
+
+    def _publish_headspace_buffer_release(self, record: Mapping[str, Any]) -> None:
+        # The walk publishes species notices. This one is the buffer
+        # release of the hour that just settled. A later replacement
+        # of the solver notices has already happened.
+        notice = {
+            "species": "headspace",
+            "reason": "headspace_buffer_release",
+        }
+        notice.update(copy.deepcopy(dict(record)))
+        existing = getattr(self, "_headspace_species_notices", None)
+        if existing is None:
+            self._headspace_species_notices = (notice,)
+        else:
+            self._headspace_species_notices = tuple(existing) + (notice,)
 
     def _record_overhead_o2_write(self, *, transition=None, lot=None) -> None:
         # One row per O2 lot on the overhead or the fO2 buffer. Other
@@ -8950,13 +9073,41 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         reducing_rate = reducing_overhead_mol / 3600.0
 
-        def _remember_stock(stock_mol: float) -> None:
+        def _remember_stock(
+            stock_mol: float,
+            *,
+            credit_mol: float,
+            debit_mol: float,
+            uptake_mol: float | None,
+            gross: Mapping[str, float],
+        ) -> None:
             # The post debits this stock. A diagnostic sample reads S
             # and must not replace it. The real evaluation overwrites
             # it, including the zero of an unsaturated or empty hour,
-            # so a previous hour cannot leave its stock behind.
-            if diagnostic_flux_sample_active() is None:
-                self._headspace_buffer_release_stock_mol = stock_mol
+            # so a previous hour cannot leave its stock behind. The
+            # terms are the arguments of that same evaluation. The
+            # per-species debit is the map the total fsums.
+            if diagnostic_flux_sample_active() is not None:
+                return
+            self._headspace_buffer_release_stock_mol = stock_mol
+            species_debit = _buffer_oxidative_debit_mol_by_species(
+                gross,
+                stoich,
+                OXYGEN_MOLAR_MASS_KG_PER_MOL,
+                self.species_formula_registry,
+            )
+            self._headspace_buffer_release_terms = {
+                "n_open": float(pre_buffer_mol),
+                "n_credit": float(credit_mol),
+                "n_debit": float(debit_mol),
+                "n_uptake": (
+                    None if uptake_mol is None else float(uptake_mol)
+                ),
+                "oxidant_debit_mol_by_species": {
+                    str(species): float(mol)
+                    for species, mol in sorted(species_debit.items())
+                },
+            }
 
         def redox_at_partials(partials_Pa):
             # S is the stock over the solver hour, plus the reducing
@@ -8971,11 +9122,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             key = _partial_key(partials_Pa)
             credit_mol = float(state['credit_mol'].get(key, 0.0) or 0.0)
             debit_mol = float(state['debit_mol'].get(key, 0.0) or 0.0)
+            gross = dict(state['gross'].get(key) or {})
             if not self._evaporative_redox_is_saturated(
                 internal_o2_capacity_mol=credit_mol,
             ):
                 state['excess_mol'][key] = 0.0
-                _remember_stock(0.0)
+                _remember_stock(
+                    0.0,
+                    credit_mol=credit_mol,
+                    debit_mol=debit_mol,
+                    uptake_mol=None,
+                    gross=gross,
+                )
                 return {OXYGEN_SPECIES: reducing_rate}
             diagnostic = self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
@@ -8999,7 +9157,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 noop_mol=OXYGEN_RESERVOIR_NOOP_MOL,
             )
             state['excess_mol'][key] = stock_mol
-            _remember_stock(stock_mol)
+            _remember_stock(
+                stock_mol,
+                credit_mol=credit_mol,
+                debit_mol=debit_mol,
+                uptake_mol=uptake_mol,
+                gross=gross,
+            )
             if stock_mol <= 0.0:
                 return {OXYGEN_SPECIES: reducing_rate}
             return {OXYGEN_SPECIES: stock_mol / 3600.0 + reducing_rate}
@@ -9672,10 +9836,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                 excess_integrated = 0.0
         # Fe respeciation still runs here. A solved headspace hour
-        # does not let the settle post its own exchange.
+        # does not let the settle post its own exchange. The buffer
+        # read just above the settle is the vapour commit. The read
+        # just under it is the settle. The record carries both, and
+        # the comparison below uses the second read.
+        fe_diag_before = len(
+            list(
+                getattr(self, "_fe_redox_respeciation_diagnostics_this_hr", [])
+                or []
+            )
+        )
+        signed_after_vapour_mol = float(
+            self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                OXYGEN_SPECIES, 0.0,
+            )
+            or 0.0
+        )
         self._settle_evaporative_redox_after_batch(
             post_exchange=solved is None,
         )
+        signed_after_settle_mol = float(
+            self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                OXYGEN_SPECIES, 0.0,
+            )
+            or 0.0
+        )
+        buffer_release = self._headspace_buffer_release_record(
+            excess_integrated=excess_integrated,
+            signed_open_mol=signed_buffer_mol,
+            signed_after_vapour_mol=signed_after_vapour_mol,
+            signed_after_settle_mol=signed_after_settle_mol,
+            fe_diag_before=fe_diag_before,
+            transition_at=ledger_before,
+        )
+        self._publish_headspace_buffer_release(buffer_release)
         if excess_integrated > OXYGEN_RESERVOIR_NOOP_MOL:
             # Algebra: n = ∫S dt − n_reducing. Unit: mol.
             # S was the stock over the solver hour. On a fast root
@@ -9688,12 +9882,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # buffer ends at zero. A larger overdraw is an
             # inconsistency. It is refused. It is not clipped to zero
             # and it is not posted through a negative balance.
-            signed_after_mol = float(
-                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
-                    OXYGEN_SPECIES, 0.0,
-                )
-                or 0.0
-            )
+            signed_after_mol = signed_after_settle_mol
             available_mol = max(0.0, signed_after_mol)
             if (
                 excess_integrated
@@ -9714,6 +9903,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         path=path,
                         buffer_o2_mol=available_mol,
                         buffer_o2_mol_signed=signed_after_mol,
+                        buffer_release=copy.deepcopy(buffer_release),
                     )
                 )
             posted_mol = min(excess_integrated, available_mol)
