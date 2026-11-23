@@ -21,6 +21,7 @@ RENDER_PINS = {
     "sineva23_tii_exp1_slag_feo": ("FeO", Decimal("61.9"), 7, Decimal("-7.1")),
     "sineva23_tiii_exp56_slag_cao": ("CaO", Decimal("14.4"), 10, Decimal("-8.34")),
     "sineva23_tii_exp5_wüstite_feo": ("FeO", Decimal("97.0"), 7, Decimal("-9.0")),
+    "sineva23_tii_exp27_metal_sio2": ("O", Decimal("0.4"), 8, Decimal("-5.3")),
 }
 RUN_PRODUCTS_RENDER_PINS = {
     ("II", "1"): "Metal + Slag + Spinel",
@@ -52,6 +53,13 @@ def _assert_render_pins(document: dict) -> None:
         assert row["locator"]["page"] == page
         assert row["locator"]["pdf_page_index"] == page - 1
         assert row["values"]["log_fO2"]["units"] == "log10(atm)"
+    oxygen = observations["sineva23_tii_exp27_metal_sio2"]
+    assert oxygen in document["species"]["O"]["observations"]
+    assert oxygen not in document["species"]["SiO2"]["observations"]
+    assert oxygen["locator"]["row"] == "27"
+    assert oxygen["locator"]["phase"] == "Metal"
+    assert oxygen["locator"]["column"] == "O"
+    assert oxygen["values"]["basis_as_published"] == "O mass percent in Metal phase"
 
 
 def _assert_phase_role_source_binding(row: dict, printed_phase: str) -> None:
@@ -93,6 +101,23 @@ def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> No
     changed_row["values"]["value"] = 97.1
     with pytest.raises(AssertionError):
         _assert_render_pins(changed)
+
+    changed_oxygen = deepcopy(document)
+    changed_oxygen_row = _observations(changed_oxygen)[
+        "sineva23_tii_exp27_metal_sio2"
+    ]
+    changed_oxygen_row["values"]["component_as_published"] = "SiO2"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed_oxygen)
+
+    changed_species = deepcopy(document)
+    changed_species_row = _observations(changed_species)[
+        "sineva23_tii_exp27_metal_sio2"
+    ]
+    changed_species["species"]["O"]["observations"].remove(changed_species_row)
+    changed_species["species"]["SiO2"]["observations"].append(changed_species_row)
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed_species)
 
     role_row = _observations(document)["sineva23_tii_exp10_metal_cu2o"]
     _assert_phase_role_source_binding(role_row, "Metal")

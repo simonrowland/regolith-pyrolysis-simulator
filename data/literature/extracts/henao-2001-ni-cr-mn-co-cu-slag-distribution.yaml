@@ -655,50 +655,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_1_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.4857669155441513577647609385']
-                  - [NiO, '0.04893803684251665397579679196']
-                  - [MgO, '0.3452483735893540212743928651']
-                  - [SiO2, '0.1200466740239779669850494044']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_1_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '4'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-1_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-1_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-1_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-1_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_1_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_1_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '93.50243615327654320906975250'
-                    locator: *henao_projection_henao_A_1_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_1_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_1_slag_wt_pct
@@ -801,50 +765,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_2_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.5713053308196682842949346678']
-                  - [NiO, '0.03292102969333183992296124809']
-                  - [MgO, '0.2707677612886600971048904837']
-                  - [SiO2, '0.1250058781983397786772136004']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_2_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '5'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-2_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-2_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-2_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-2_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_2_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_2_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.46900660124345341604880967'
-                    locator: *henao_projection_henao_A_2_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_2_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_2_slag_wt_pct
@@ -947,50 +875,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_3_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.5557356626577316738924288223']
-                  - [NiO, '0.01311078944103792908639113750']
-                  - [MgO, '0.2840253446044581955384001550']
-                  - [SiO2, '0.1471282032967722014827798858']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_3_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '6'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-3_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-3_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-3_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-3_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_3_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_3_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.22051132338703973166882700'
-                    locator: *henao_projection_henao_A_3_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_3_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_3_slag_wt_pct
@@ -1093,50 +985,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_4_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.5403806603228356832641281220']
-                  - [NiO, '0.006517469171055843661260738117']
-                  - [MgO, '0.2681634327441284794053908517']
-                  - [SiO2, '0.1849384377619799936692202882']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_4_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '7'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-4_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-4_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-4_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-4_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_4_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_4_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '100.8402518860625301776608478'
-                    locator: *henao_projection_henao_A_4_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_4_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_4_slag_wt_pct
@@ -1239,57 +1095,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_5_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.4584880528823752108943612059']
-                  - [NiO, '0.03182215981238434672704672695']
-                  - [Cr2O3, '0.01367851804334910783500835295']
-                  - [MgO, '0.3529325089488807790293161079']
-                  - [SiO2, '0.1430787603130105555142676067']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_5_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '8'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-5_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-5_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-5_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-5_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-5_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_5_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_5_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_5_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.36542225385950369141045696'
-                    locator: *henao_projection_henao_A_5_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_5_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_5_slag_wt_pct
@@ -1394,57 +1207,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_6_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.4299678501895898936810376390']
-                  - [NiO, '0.02261100516600783173464799861']
-                  - [Cr2O3, '0.01691666587087102911400380162']
-                  - [MgO, '0.3507179626349270801095107932']
-                  - [SiO2, '0.1797865161386041653607997675']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_6_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '9'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-6_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-6_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-6_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-6_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-6_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_6_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_6_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_6_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.34589827246867925930419974'
-                    locator: *henao_projection_henao_A_6_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_6_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_6_slag_wt_pct
@@ -1549,57 +1319,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_7_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.4090623807276840126224661709']
-                  - [NiO, '0.01009449740724858271210962647']
-                  - [Cr2O3, '0.01286309815155746794387164266']
-                  - [MgO, '0.3758423936392841804594972979']
-                  - [SiO2, '0.1921376300742257562620552623']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_7_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '10'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-7_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-7_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-7_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-7_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-7_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_7_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_7_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_7_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.24989349701775808169516883'
-                    locator: *henao_projection_henao_A_7_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_7_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_7_slag_wt_pct
@@ -1704,57 +1431,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_8_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3702212598244129362981380249']
-                  - [NiO, '0.01187374258773023257112356334']
-                  - [Cr2O3, '0.01535774949785004299258706678']
-                  - [MgO, '0.4092284715090866076128824802']
-                  - [SiO2, '0.1933187765809201805252688649']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_8_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '11'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-8_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-8_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-8_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-8_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-8_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_8_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_8_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_8_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.74537214739270480332015532'
-                    locator: *henao_projection_henao_A_8_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_8_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_8_slag_wt_pct
@@ -1859,57 +1543,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_9_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3236602403301936695534995527']
-                  - [NiO, '0.007819495161474275888653263177']
-                  - [Cr2O3, '0.006756221567816400189052889579']
-                  - [MgO, '0.4203451130538518526742477838']
-                  - [SiO2, '0.2414189298866638016945465109']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_9_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '12'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-9_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-9_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-9_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-9_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-9_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_9_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_9_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_9_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.38212106848917389615681285'
-                    locator: *henao_projection_henao_A_9_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_9_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_9_slag_wt_pct
@@ -2014,57 +1655,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_10_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.4150973057512043235461814281']
-                  - [NiO, '0.006462860199461300714186805475']
-                  - [Cr2O3, '0.01325892141732259601710877298']
-                  - [MgO, '0.3256730517321196044966796118']
-                  - [SiO2, '0.2395078608998921752258433817']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_10_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '13'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-10_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-10_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-10_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-10_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-10_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_10_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_10_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_10_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.37850700441643192742445886'
-                    locator: *henao_projection_henao_A_10_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_10_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_10_slag_wt_pct
@@ -2169,57 +1767,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_11_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2826670475552515498484419210']
-                  - [NiO, '0.001499368200464308328232097286']
-                  - [Cr2O3, '0.003490766108810745585082951776']
-                  - [MgO, '0.4203200892193796677304888454']
-                  - [SiO2, '0.2920227289160937285077541843']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_11_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '14'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-11_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-11_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-11_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-11_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-11_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_11_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_11_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_11_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '100.7904784558984968021224746'
-                    locator: *henao_projection_henao_A_11_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_11_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_11_slag_wt_pct
@@ -2324,57 +1879,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_12_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2651079103391435138190958732']
-                  - [NiO, '0.003519658345854853343732576652']
-                  - [Cr2O3, '0.01285708250540990335869550050']
-                  - [MgO, '0.4128926229779591926432705066']
-                  - [SiO2, '0.3056227258316325368352055426']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_12_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '15'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-12_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-12_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-12_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-12_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-12_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_12_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_12_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_12_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.05495529315983267834475180'
-                    locator: *henao_projection_henao_A_12_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_12_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_12_slag_wt_pct
@@ -2479,57 +1991,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_13_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2891642895210855960040858458']
-                  - [NiO, '0.001183359573084935168204560016']
-                  - [Cr2O3, '0.008849548400374924012280172722']
-                  - [MgO, '0.3906119310034923496842192299']
-                  - [SiO2, '0.3101908715019621951312101919']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_13_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '16'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-13_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-13_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-13_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-13_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-13_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_13_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_13_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_13_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.76961963810371253848069475'
-                    locator: *henao_projection_henao_A_13_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_13_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_13_slag_wt_pct
@@ -2634,57 +2103,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_14_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2192229646101104594618454338']
-                  - [NiO, '0.0002883650314410943340659980685']
-                  - [Cr2O3, '0.01399682549007604851217644774']
-                  - [MgO, '0.4087382764179188208469152196']
-                  - [SiO2, '0.3577535684504535768449969012']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_14_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '17'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-14_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-14_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-14_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-14_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-14_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_14_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_14_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_A_14_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.02578146594799409399490422'
-                    locator: *henao_projection_henao_A_14_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_14_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_14_slag_wt_pct
@@ -2789,57 +2215,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_15_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3835495818217268934540446570']
-                  - [NiO, '0.002076870747144301131441017511']
-                  - [MnO, '0.03328256613316247408484006561']
-                  - [MgO, '0.3154099629339190244872106226']
-                  - [SiO2, '0.2656810183640473068424636373']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_15_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '18'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-15_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-15_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-15_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-15_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-15_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_15_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_15_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_15_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '101.2060412861275335379774669'
-                    locator: *henao_projection_henao_A_15_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_15_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_15_slag_wt_pct
@@ -2944,57 +2327,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_16_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3409084808983904458906963313']
-                  - [NiO, '0.001172400499933303462339945980']
-                  - [MnO, '0.03778499722949773800952673389']
-                  - [MgO, '0.3443112657071683441600878999']
-                  - [SiO2, '0.2758228556650101684773490890']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_16_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '19'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-16_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-16_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-16_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-16_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-16_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_16_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_16_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_16_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '100.6383707116474548238114155'
-                    locator: *henao_projection_henao_A_16_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_16_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_16_slag_wt_pct
@@ -3099,57 +2439,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_A_17_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3023420133874967492752643523']
-                  - [NiO, '0.0005677683702273422911738598294']
-                  - [MnO, '0.04013530118963734352893712516']
-                  - [MgO, '0.3445093958943435311712632381']
-                  - [SiO2, '0.3124455211582950337333614246']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_A_17_slag_locator
               page: 2
               pdf_page_index: 1
               published_page: '1960'
               table: '1'
               row: '20'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-17_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-17_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-17_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-17_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t1_A-17_slag_SiO2'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_17_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_17_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_A_17_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '103.1117718937430779961036428'
-                    locator: *henao_projection_henao_A_17_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_A_17_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_1_A_17_slag_wt_pct
@@ -3254,59 +2551,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_1_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2697752843779064402390255923']
-                  - [NiO, '0.009690042741557905675210651988']
-                  - [Cr2O3, '0.02298176803580492948572784819']
-                  - [MgO, '0.3047438815887896152389552247']
-                  - [SiO2, '0.1953607113025329632762220117']
-                  - [CaO, '0.1974483119534081460848586714']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_1_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '4'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-1_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-1_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-1_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-1_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-1_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-1_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_1_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_1_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_B_1_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.00291638503151019302670461'
-                    locator: *henao_projection_henao_B_1_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_1_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_1_slag_wt_pct
@@ -3412,59 +2664,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_2_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3412828899999800545554863049']
-                  - [NiO, '0.004244710814162843519467350718']
-                  - [Cr2O3, '0.02018396662655831235929117422']
-                  - [MgO, '0.2719830891921238426042631033']
-                  - [SiO2, '0.1834843558781078793049381084']
-                  - [CaO, '0.1788209874890670676565539589']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_2_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '5'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-2_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-2_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-2_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-2_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-2_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-2_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_2_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_2_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_B_2_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.20101380752910377320434203'
-                    locator: *henao_projection_henao_B_2_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_2_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_2_slag_wt_pct
@@ -3570,59 +2777,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_3_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2720037349358008357477363759']
-                  - [NiO, '0.002131321710737064207566505932']
-                  - [Cr2O3, '0.005613636560426798872240339276']
-                  - [MgO, '0.2335220632256991990507933227']
-                  - [SiO2, '0.2498434186647966400353856351']
-                  - [CaO, '0.2368858249025394620862778214']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_3_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '6'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-3_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-3_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-3_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-3_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-3_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-3_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_3_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_3_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_B_3_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.80503586173691005047209727'
-                    locator: *henao_projection_henao_B_3_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_3_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_3_slag_wt_pct
@@ -3728,59 +2890,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_4_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2549456803585238696366875846']
-                  - [NiO, '0.0006089701910538963252607013269']
-                  - [Cr2O3, '0.006644943238284409784160972141']
-                  - [MgO, '0.2512666349068938136040920684']
-                  - [SiO2, '0.2379543698657041664168330294']
-                  - [CaO, '0.2485794014395398442329656442']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_4_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '7'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-4_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-4_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-4_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-4_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-4_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-4_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_4_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_4_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_B_4_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.91884289669332319421457487'
-                    locator: *henao_projection_henao_B_4_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_4_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_4_slag_wt_pct
@@ -3946,59 +3063,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_6_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2668650477137942265360037481']
-                  - [NiO, '0.04166263100339473630990640176']
-                  - [MnO, '0.01760491119810227766170596486']
-                  - [MgO, '0.2278970504802382126163982839']
-                  - [SiO2, '0.2257684030611827110960041219']
-                  - [CaO, '0.2202019565432878357799814796']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_6_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '9'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-6_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-6_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-6_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-6_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-6_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-6_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_6_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_6_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_6_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.38782398649828537302794103'
-                    locator: *henao_projection_henao_B_6_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_6_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_6_slag_wt_pct
@@ -4104,59 +3176,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_7_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2376677171780812777395176167']
-                  - [NiO, '0.003486642415177692933029443319']
-                  - [MnO, '0.01915701966672455998469042126']
-                  - [MgO, '0.2306628251788370809056866545']
-                  - [SiO2, '0.2598293967039616028284234319']
-                  - [CaO, '0.2491963988572177856086524320']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_7_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '10'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-7_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-7_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-7_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-7_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-7_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-7_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_7_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_7_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_7_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.47290839120503375248227307'
-                    locator: *henao_projection_henao_B_7_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_7_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_7_slag_wt_pct
@@ -4262,59 +3289,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_8_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1908497794481787494796723740']
-                  - [NiO, '0.001488424667359133666478698631']
-                  - [MnO, '0.02152026986053458682273735191']
-                  - [MgO, '0.2326497519478534591497326467']
-                  - [SiO2, '0.2772294043257549358816841499']
-                  - [CaO, '0.2762623697503191349996947788']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_8_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '11'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-8_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-8_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-8_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-8_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-8_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-8_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_8_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_8_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_8_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.65481823167178920115414857'
-                    locator: *henao_projection_henao_B_8_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_8_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_8_slag_wt_pct
@@ -4420,59 +3402,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_9_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1484419905310126404194595554']
-                  - [NiO, '0.001257599317666825153229771386']
-                  - [MnO, '0.02604447196424450133323222527']
-                  - [MgO, '0.2606224284177943124176758333']
-                  - [SiO2, '0.2882281796901663059922973283']
-                  - [CaO, '0.2754053300791154146841052863']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_9_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '12'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-9_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-9_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-9_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-9_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-9_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-9_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_9_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_9_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_9_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.40205305741256816956722231'
-                    locator: *henao_projection_henao_B_9_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_9_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_9_slag_wt_pct
@@ -4578,59 +3515,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_10_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1262757639684756916578072461']
-                  - [NiO, '0.0008791286424799570268668898818']
-                  - [MnO, '0.02379363760447748705076997104']
-                  - [MgO, '0.2745417182042832854697868178']
-                  - [SiO2, '0.2872196011891784150068968203']
-                  - [CaO, '0.2872901503911051637878722549']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_10_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '13'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-10_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-10_slag_Mn'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-10_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-10_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-10_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-10_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_10_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_10_slag_locator
-                - - source_formula_valence_Mn
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_10_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.38233146895148159499002210'
-                    locator: *henao_projection_henao_B_10_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_10_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_2_B_10_slag_wt_pct
@@ -4736,52 +3628,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_1_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2630010384779388534526378327']
-                  - [NiO, '0.008535234482437373898658608467']
-                  - [MgO, '0.4463350422487694784805794648']
-                  - [SiO2, '0.2179205967000245211400965580']
-                  - [Al2O3, '0.06420808809082977302802753616']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_1_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '4'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-1_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-1_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-1_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-1_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-1_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_1_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_1_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '100.4113019621458645610339742'
-                    locator: *henao_projection_henao_C_1_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_1_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_1_slag_wt_pct
@@ -4848,52 +3702,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_2_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3091848145868110036756724008']
-                  - [NiO, '0.003386244909985066991149530099']
-                  - [MgO, '0.3744689202756810739785102491']
-                  - [SiO2, '0.2191502178441703381100269416']
-                  - [Al2O3, '0.09380980238335251724464087857']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_2_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '5'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-2_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-2_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-2_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-2_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-2_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_2_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_2_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.07163257442131748694644942'
-                    locator: *henao_projection_henao_C_2_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_2_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_2_slag_wt_pct
@@ -4960,52 +3776,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_3_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2814685247363253951643483143']
-                  - [NiO, '0.001813844547771978181792496874']
-                  - [MgO, '0.3635868084581702424275713143']
-                  - [SiO2, '0.2616149287469016476033658707']
-                  - [Al2O3, '0.09151589351083073662292200362']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_3_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '6'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-3_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-3_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-3_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-3_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-3_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_3_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_3_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '95.90722331845705416554465259'
-                    locator: *henao_projection_henao_C_3_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_3_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_3_slag_wt_pct
@@ -5072,52 +3850,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_4_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2699115777441529855957441322']
-                  - [NiO, '0.001065121905557677547972515422']
-                  - [MgO, '0.3222845835996490944022594078']
-                  - [SiO2, '0.2936487676699340692434574637']
-                  - [Al2O3, '0.1130899490807061732105664814']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_4_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '7'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-4_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-4_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-4_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-4_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-4_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_4_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_4_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '88.73135251033386285451177378'
-                    locator: *henao_projection_henao_C_4_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_4_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_4_slag_wt_pct
@@ -5184,52 +3924,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_5_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3336960027157526853100205108']
-                  - [NiO, '0.0007310894012786678257488035280']
-                  - [MgO, '0.3695896829665001348963793906']
-                  - [SiO2, '0.2009908713186483542116631641']
-                  - [Al2O3, '0.09499235359782015775618813108']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_5_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '8'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-5_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-5_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-5_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-5_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-5_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_5_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_5_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.99835848544515473935092179'
-                    locator: *henao_projection_henao_C_5_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_5_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_5_slag_wt_pct
@@ -5296,59 +3998,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_8_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3325143487873671895214020804']
-                  - [NiO, '0.01046750422084857974756691469']
-                  - [Cr2O3, '0.04845789006045013037881104737']
-                  - [MgO, '0.2740401765619289046196519711']
-                  - [SiO2, '0.2309334556474531582279805708']
-                  - [Al2O3, '0.1035866247219520375045874154']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_8_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '11'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-8_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-8_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-8_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-8_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-8_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-8_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_8_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_8_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_8_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.80843903937228341409680146'
-                    locator: *henao_projection_henao_C_8_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_8_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_8_slag_wt_pct
@@ -5416,59 +4073,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_9_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3113436915007468707175429077']
-                  - [NiO, '0.01019646471698336804420848920']
-                  - [Cr2O3, '0.01120691933581875407697076369']
-                  - [MgO, '0.3704379562328686522166516838']
-                  - [SiO2, '0.2096977014147242328694241526']
-                  - [Al2O3, '0.08711726679885812207520200298']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_9_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '12'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-9_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-9_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-9_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-9_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-9_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-9_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_9_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_9_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_9_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.21992071340220082589366642'
-                    locator: *henao_projection_henao_C_9_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_9_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_9_slag_wt_pct
@@ -5536,59 +4148,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_10_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3741316487964691846679512758']
-                  - [NiO, '0.001373536902682068129646137834']
-                  - [Cr2O3, '0.004715963642468071260730613869']
-                  - [MgO, '0.3200379152198479458538016132']
-                  - [SiO2, '0.2180375815476998627497470463']
-                  - [Al2O3, '0.08170335389083286733812331325']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_10_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '13'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-10_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-10_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-10_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-10_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-10_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-10_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_10_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_10_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_10_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '92.32945764815533832925630129'
-                    locator: *henao_projection_henao_C_10_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_10_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_10_slag_wt_pct
@@ -5656,59 +4223,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_11_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3123517970783433035161459669']
-                  - [NiO, '0.004840648689406120805571864253']
-                  - [Cr2O3, '0.04231534056422783015805223937']
-                  - [MgO, '0.2754136804713282969748416594']
-                  - [SiO2, '0.2672262035122335739676767013']
-                  - [Al2O3, '0.09785232968446087457771156859']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_11_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '14'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-11_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-11_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-11_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-11_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-11_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-11_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_11_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_11_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_11_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '100.4444164694650283304006892'
-                    locator: *henao_projection_henao_C_11_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_11_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_11_slag_wt_pct
@@ -5776,59 +4298,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_12_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3244196966450923123785393720']
-                  - [NiO, '0.001565745580880020202422788255']
-                  - [Cr2O3, '0.03257102026143778291505307057']
-                  - [MgO, '0.2833893500781075917368253478']
-                  - [SiO2, '0.2698533234284879048741357194']
-                  - [Al2O3, '0.08820086400599438789302370198']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_12_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '15'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-12_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-12_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-12_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-12_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-12_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-12_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_12_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_12_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_12_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.02683744670733421296305793'
-                    locator: *henao_projection_henao_C_12_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_12_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_12_slag_wt_pct
@@ -5896,59 +4373,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_13_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3380482455255134287016103286']
-                  - [NiO, '0.003955476700153654067928282274']
-                  - [Cr2O3, '0.006286190150584532029362722748']
-                  - [MgO, '0.3001383856261759246487699072']
-                  - [SiO2, '0.2592943617424125237105695451']
-                  - [Al2O3, '0.09227734025515993684175921391']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_13_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '16'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-13_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-13_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-13_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-13_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-13_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-13_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_13_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_13_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_13_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '102.4999571725519656234478718'
-                    locator: *henao_projection_henao_C_13_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_13_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_13_slag_wt_pct
@@ -6016,59 +4448,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_14_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2951744485788302060772580231']
-                  - [NiO, '0.003328587683897026793398709967']
-                  - [Cr2O3, '0.006692731111602829278634038830']
-                  - [MgO, '0.3665780929357360938101027360']
-                  - [SiO2, '0.2509831904740749923113128785']
-                  - [Al2O3, '0.07724294921585885172929361305']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_14_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '17'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-14_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-14_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-14_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-14_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-14_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-14_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_14_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_14_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_14_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.60860148577021990568676111'
-                    locator: *henao_projection_henao_C_14_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_14_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_14_slag_wt_pct
@@ -6136,59 +4523,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_15_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3076375755124041230001151585']
-                  - [NiO, '0.003538227063315696591199102965']
-                  - [Cr2O3, '0.005748888261669532877861852416']
-                  - [MgO, '0.3481911602045440403404764012']
-                  - [SiO2, '0.2503267840094194344646805140']
-                  - [Al2O3, '0.08455736494864717272566697078']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_15_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '18'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-15_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-15_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-15_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-15_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-15_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-15_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_15_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_15_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_15_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.82958075907266494254150978'
-                    locator: *henao_projection_henao_C_15_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_15_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_15_slag_wt_pct
@@ -6256,59 +4598,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_16_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2461711072087315717768664978']
-                  - [NiO, '0.002342243843783392106417264900']
-                  - [Cr2O3, '0.008736477448496285311421871086']
-                  - [MgO, '0.4152440511870708803577755449']
-                  - [SiO2, '0.2407450104646058994812787612']
-                  - [Al2O3, '0.08676110984731197096624006024']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_16_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '19'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-16_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-16_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-16_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-16_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-16_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-16_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_16_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_16_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_16_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.10349799118995752614769577'
-                    locator: *henao_projection_henao_C_16_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_16_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_16_slag_wt_pct
@@ -6376,59 +4673,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_18_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3611004469520298166666495417']
-                  - [NiO, '0.008215952251367761971505257766']
-                  - [Cu2O, '0.0003252236884891677573265351281']
-                  - [MgO, '0.3340771402024553300988607996']
-                  - [SiO2, '0.2188890997167987014168339990']
-                  - [Al2O3, '0.07739213718885922208882386678']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_18_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '21'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-18_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-18_slag_Cu'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-18_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-18_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-18_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-18_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_18_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_18_slag_locator
-                - - source_formula_valence_Cu
-                  - state:
-                      tag: value
-                      value: '1'
-                    locator: *henao_projection_henao_C_18_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.57915802053577321457895927'
-                    locator: *henao_projection_henao_C_18_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_18_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_18_slag_wt_pct
@@ -6496,59 +4748,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_19_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3436798075927093825047274092']
-                  - [NiO, '0.002043756075535628310207845150']
-                  - [Cu2O, '0.0002235419463220563015190774042']
-                  - [MgO, '0.3117235794269437340137099435']
-                  - [SiO2, '0.2605942325859142744840127154']
-                  - [Al2O3, '0.08173508237257492438582300921']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_19_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '22'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-19_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-19_slag_Cu'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-19_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-19_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-19_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-19_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_19_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_19_slag_locator
-                - - source_formula_valence_Cu
-                  - state:
-                      tag: value
-                      value: '1'
-                    locator: *henao_projection_henao_C_19_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.30173364056805276685532852'
-                    locator: *henao_projection_henao_C_19_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_19_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_19_slag_wt_pct
@@ -6616,59 +4823,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_20_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3024357331575251936186052742']
-                  - [NiO, '0.0007351493992029815577283169379']
-                  - [Cu2O, '0.0001600525362568565815193773592']
-                  - [MgO, '0.3196428326561233926415520703']
-                  - [SiO2, '0.2923883641426117480748248554']
-                  - [Al2O3, '0.08463786810827982752577010583']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_20_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '23'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-20_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-20_slag_Cu'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-20_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-20_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-20_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-20_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_20_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_20_slag_locator
-                - - source_formula_valence_Cu
-                  - state:
-                      tag: value
-                      value: '1'
-                    locator: *henao_projection_henao_C_20_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.77604452573783022111820158'
-                    locator: *henao_projection_henao_C_20_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_20_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_20_slag_wt_pct
@@ -6736,59 +4898,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_21_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2401401269831360398815316697']
-                  - [NiO, '0.0009848538300797340536309005260']
-                  - [Cu2O, '0.0001364470300028369906132090854']
-                  - [MgO, '0.3700263077094998158364433657']
-                  - [SiO2, '0.3059402076019471787306693612']
-                  - [Al2O3, '0.08277205684533439450711149382']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_21_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '24'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-21_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-21_slag_Cu'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-21_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-21_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-21_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-21_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_21_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_21_slag_locator
-                - - source_formula_valence_Cu
-                  - state:
-                      tag: value
-                      value: '1'
-                    locator: *henao_projection_henao_C_21_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '102.2075890114627164160649448'
-                    locator: *henao_projection_henao_C_21_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_21_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_21_slag_wt_pct
@@ -6856,59 +4973,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_22_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2417303942765779365690548732']
-                  - [NiO, '0.0005111092887739221433452434134']
-                  - [Cu2O, '0.00008025345620578737808512495920']
-                  - [MgO, '0.3662013951325891819344009826']
-                  - [SiO2, '0.3055644701661147582522587483']
-                  - [Al2O3, '0.08591237767973841372285502740']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_22_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '25'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-22_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-22_slag_Cu'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-22_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-22_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-22_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-22_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_22_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_22_slag_locator
-                - - source_formula_valence_Cu
-                  - state:
-                      tag: value
-                      value: '1'
-                    locator: *henao_projection_henao_C_22_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.82878063011800681853100457'
-                    locator: *henao_projection_henao_C_22_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_22_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_22_slag_wt_pct
@@ -6976,59 +5048,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_23_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2279240975624863963869475788']
-                  - [NiO, '0.0005090678521146778972656797004']
-                  - [Cu2O, '0.00006112516915730325497117911185']
-                  - [MgO, '0.4107017512282758578611772650']
-                  - [SiO2, '0.2934035353106786455448351865']
-                  - [Al2O3, '0.06740042287728711905480311015']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_23_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '26'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-23_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-23_slag_Cu'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-23_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-23_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-23_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-23_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_23_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_23_slag_locator
-                - - source_formula_valence_Cu
-                  - state:
-                      tag: value
-                      value: '1'
-                    locator: *henao_projection_henao_C_23_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.18048982104387693570208418'
-                    locator: *henao_projection_henao_C_23_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_23_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_23_slag_wt_pct
@@ -7096,59 +5123,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_24_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1791220350782476678209719491']
-                  - [NiO, '0.004869406124000674210369809650']
-                  - [CoO, '0.0008434074673668220846484739420']
-                  - [MgO, '0.4917563390304142526146681095']
-                  - [SiO2, '0.2295666513151354398775899992']
-                  - [Al2O3, '0.09384216098483514339175165890']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_24_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '27'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-24_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-24_slag_Co'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-24_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-24_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-24_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-24_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_24_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_24_slag_locator
-                - - source_formula_valence_Co
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_24_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '90.89958690114860110779889294'
-                    locator: *henao_projection_henao_C_24_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_24_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_24_slag_wt_pct
@@ -7216,59 +5198,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_25_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1771350251432142087924382477']
-                  - [NiO, '0.001784526716243778033969215207']
-                  - [CoO, '0.0003949479185502544972418495720']
-                  - [MgO, '0.4778808866715383627365170754']
-                  - [SiO2, '0.2663304983751662464721616797']
-                  - [Al2O3, '0.07647411517528714946767193224']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_25_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '28'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-25_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-25_slag_Co'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-25_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-25_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-25_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-25_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_25_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_25_slag_locator
-                - - source_formula_valence_Co
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_25_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.15024419281130007529089693'
-                    locator: *henao_projection_henao_C_25_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_25_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_25_slag_wt_pct
@@ -7336,59 +5273,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_26_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3042483306599311360222377220']
-                  - [NiO, '0.0009439666662230366112100745193']
-                  - [CoO, '0.0002193626746759312130357761335']
-                  - [MgO, '0.3497765980258533903812966400']
-                  - [SiO2, '0.2735665977802523595825423449']
-                  - [Al2O3, '0.07124514419306414618967744225']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_26_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '29'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-26_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-26_slag_Co'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-26_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-26_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-26_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-26_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_26_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_26_slag_locator
-                - - source_formula_valence_Co
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_26_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.04834092757601350370516739'
-                    locator: *henao_projection_henao_C_26_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_26_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_26_slag_wt_pct
@@ -7456,59 +5348,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_27_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1872356243100365593959013932']
-                  - [NiO, '0.0004003349433731860232687423616']
-                  - [CoO, '0.00004784472187008175366457471067']
-                  - [MgO, '0.4561933639442650727242991834']
-                  - [SiO2, '0.2835300958657244726484723153']
-                  - [Al2O3, '0.07259273621473062745439379100']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_27_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '30'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-27_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-27_slag_Co'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-27_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-27_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-27_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-27_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_27_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_27_slag_locator
-                - - source_formula_valence_Co
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_27_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '95.85651767656948265091627852'
-                    locator: *henao_projection_henao_C_27_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_27_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_27_slag_wt_pct
@@ -7576,59 +5423,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_28_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1888144675297767723890642889']
-                  - [NiO, '0.0002945102811626873190497329974']
-                  - [CoO, '0.00003421972687547375062328914074']
-                  - [MgO, '0.4674854260785415433253727320']
-                  - [SiO2, '0.2829038647779600002282682078']
-                  - [Al2O3, '0.06046751160568352298762174863']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_28_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '31'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-28_slag_Ni'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-28_slag_Co'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-28_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-28_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-28_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-28_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_28_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_28_slag_locator
-                - - source_formula_valence_Co
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_28_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '96.48538359160795369691295873'
-                    locator: *henao_projection_henao_C_28_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_28_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_wt_pct: &henao_composition_3_C_28_slag_wt_pct
@@ -10734,62 +8536,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_B_5_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2474481025364262163771347219']
-                  - [Cr2O3, '0.003603592117165429402923886448']
-                  - [MgO, '0.2237324564313963029546934438']
-                  - [SiO2, '0.2631289151179579374567789916']
-                  - [CaO, '0.2620869337970541138084689563']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_B_5_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '2'
               row: '8'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-5_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-5_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-5_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-5_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t2_B-5_slag_CaO'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_5_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_B_5_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_B_5_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '98.79653791849839470413430866'
-                    locator: *henao_projection_henao_B_5_slag_locator
-                - - below_detection_max_projected_mass_g_per_100g
-                  - state:
-                      tag: value
-                      value: '0.03817758044345701560993229'
-                    locator: *henao_projection_henao_B_5_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_B_5_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_missing_components:
@@ -11437,62 +9191,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_17_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.1836516650452880726037789824']
-                  - [Cr2O3, '0.004170345827308500437957543287']
-                  - [MgO, '0.4086008695176098208601497863']
-                  - [SiO2, '0.3150591012650289299708970247']
-                  - [Al2O3, '0.08851801834476467612721666343']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_17_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '20'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-17_slag_Cr'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-17_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-17_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-17_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-17_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_17_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_17_slag_locator
-                - - source_formula_valence_Cr
-                  - state:
-                      tag: value
-                      value: '3'
-                    locator: *henao_projection_henao_C_17_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '99.39510706093097274450380366'
-                    locator: *henao_projection_henao_C_17_slag_locator
-                - - below_detection_max_projected_mass_g_per_100g
-                  - state:
-                      tag: value
-                      value: '0.03817758044345701560993229'
-                    locator: *henao_projection_henao_C_17_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_17_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_missing_components:
@@ -16085,55 +13791,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_6_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.2593926911897660431458641303']
-                  - [MgO, '0.3423792862324520164023136548']
-                  - [SiO2, '0.2925148583093605250451788362']
-                  - [Al2O3, '0.1057131642684214154066433783']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_6_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '9'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-6_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-6_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-6_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-6_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_6_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_6_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '88.54492613483749664249261348'
-                    locator: *henao_projection_henao_C_6_slag_locator
-                - - below_detection_max_projected_mass_g_per_100g
-                  - state:
-                      tag: value
-                      value: '0.03817758044345701560993229'
-                    locator: *henao_projection_henao_C_6_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_6_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_missing_components:
@@ -16205,55 +13870,14 @@ species:
         point_conditions:
           composition: &henao_projection_henao_C_7_slag
             state:
-              tag: value
-              value:
-                basis: stoichiometric_oxide_projection
-                amount_basis: mole_fraction
-                components:
-                  - [FeO, '0.3355513495200945860565133245']
-                  - [MgO, '0.3609387868394384413135281107']
-                  - [SiO2, '0.2267307193351214896690084769']
-                  - [Al2O3, '0.07677914430534548296095008712']
+              tag: unknown
+              reason: 'searched: Tables 1-3 and Methods; iron valence is not reported.'
             locator: &henao_projection_henao_C_7_slag_locator
               page: 3
               pdf_page_index: 2
               published_page: '1961'
               table: '3'
               row: '10'
-            inference:
-              relation: element_wt_percent_stoichiometric_oxide_projection
-              inputs:
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-7_slag_Fe'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-7_slag_MgO'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-7_slag_SiO2'
-                - 'henao-2001-ni-cr-mn-co-cu-slag-distribution::henao_2001_t3_C-7_slag_Al2O3'
-              parameters:
-                - - assumed_valence_Fe
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_7_slag_locator
-                - - source_formula_valence_Ni
-                  - state:
-                      tag: value
-                      value: '2'
-                    locator: *henao_projection_henao_C_7_slag_locator
-                - - projected_mass_lower_bound_g_per_100g
-                  - state:
-                      tag: value
-                      value: '97.50927746441042170292774644'
-                    locator: *henao_projection_henao_C_7_slag_locator
-                - - below_detection_max_projected_mass_g_per_100g
-                  - state:
-                      tag: value
-                      value: '0.03817758044345701560993229'
-                    locator: *henao_projection_henao_C_7_slag_locator
-                - - oxygen_closure_residual_wt_percent
-                  - state:
-                      tag: unknown
-                      reason: no measured oxygen in the Henao composition table
-                    locator: *henao_projection_henao_C_7_slag_locator
-              output_unit: mole_fraction
         values:
           composition_status: calculated
           composition_missing_components:

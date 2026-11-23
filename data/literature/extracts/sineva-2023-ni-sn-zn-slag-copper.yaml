@@ -26119,76 +26119,6 @@ species:
         reported_status: printed
         as_published: ± 0.1
         confidence_level: not_stated
-    - observation_id: sineva23_tii_exp27_metal_sio2
-      type: equilibrium_phase_composition
-      locator: &id348
-        page: 8
-        pdf_page_index: 7
-        published_page: 4261
-        table: II
-        row: '27'
-        phase: Metal
-        column: SiO2
-      phase: l
-      units: wt.% as printed
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: '27'
-          locator: *id348
-        assemblage_id:
-          state:
-            tag: value
-            value: sinevaii_exp27
-          locator: *id348
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Metal + Slag + Spinel
-          locator: *id348
-        oxygen_control_as_published:
-          state:
-            tag: value
-            value: closed system
-          locator:
-            page: 8
-            pdf_page_index: 7
-            published_page: 4261
-            table: II
-            row: '27'
-        quench_provenance:
-          state:
-            tag: value
-            value: Quenched sample; phase compositions were measured by EPMA after equilibration at 1250 °C.
-          locator:
-            page: 8
-            pdf_page_index: 7
-            published_page: 4261
-            table: II
-            row: '27'
-      values:
-        quantity: equilibrium_phase_composition
-        component_as_published: SiO2
-        basis_as_published: SiO2 mass percent in Metal phase
-        method_class: measured_direct
-        method_as_published: Electron probe microanalysis (EPMA); Zn in metal measured by LA-ICP-MS where marked
-          by the table footnote.
-        T_C: 1250
-        value: 0.4
-        value_as_published: '0.4'
-        log_fO2:
-          value: -5.3
-          units: log10(atm)
-          locator: *id348
-          quote: Log10 [P(O2), atm] = -5.3 (minus sign verified from page render)
-      phase_as_published: Metal
-      experiment: sinevaii_exp27
-      admission_status: admitted
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
     - observation_id: sineva23_tii_exp27_slag_sio2
       type: equilibrium_phase_composition
       locator: &id349
@@ -50836,3 +50766,76 @@ species:
         as_published: ± 0.1
         confidence_level: not_stated
     context: []
+
+  O:
+    observations:
+    - observation_id: sineva23_tii_exp27_metal_sio2
+      type: equilibrium_phase_composition
+      locator: &id348
+        page: 8
+        pdf_page_index: 7
+        published_page: 4261
+        table: II
+        row: '27'
+        phase: Metal
+        column: O
+      phase: l
+      units: wt.% as printed
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: '27'
+          locator: *id348
+        assemblage_id:
+          state:
+            tag: value
+            value: sinevaii_exp27
+          locator: *id348
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Metal + Slag + Spinel
+          locator: *id348
+        oxygen_control_as_published:
+          state:
+            tag: value
+            value: closed system
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 4261
+            table: II
+            row: '27'
+        quench_provenance:
+          state:
+            tag: value
+            value: Quenched sample; phase compositions were measured by EPMA after equilibration at 1250 °C.
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 4261
+            table: II
+            row: '27'
+      values:
+        quantity: equilibrium_phase_composition
+        component_as_published: O
+        basis_as_published: O mass percent in Metal phase
+        method_class: measured_direct
+        method_as_published: Electron probe microanalysis (EPMA); Zn in metal measured by LA-ICP-MS where marked
+          by the table footnote.
+        T_C: 1250
+        value: 0.4
+        value_as_published: '0.4'
+        log_fO2:
+          value: -5.3
+          units: log10(atm)
+          locator: *id348
+          quote: Log10 [P(O2), atm] = -5.3 (minus sign verified from page render)
+      phase_as_published: Metal
+      experiment: sinevaii_exp27
+      admission_status: admitted
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
