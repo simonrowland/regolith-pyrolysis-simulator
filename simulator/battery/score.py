@@ -9608,6 +9608,7 @@ def _predict_distin_closed_feo_activity(
 
 def _unprinted_redox_oxygen(
     experiment: Experiment | None,
+    bench: Bench | None,
     observation: Observation,
     material: _FeRedoxMaterial,
 ) -> tuple[float, State, Notice] | None:
@@ -9619,13 +9620,16 @@ def _unprinted_redox_oxygen(
 
     from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 
+    quantity = quantity_token(observation.identity)
+    if quantity is None:
+        return None
     resolved = resolve_row_fo2(
         experiment,
-        None,
+        bench,
         observation,
         composition_wt=material.composition_wt,
         temperature_K=float(material.temperature),
-        quantity=Quantity.FE3_FE2_RATIO,
+        quantity=quantity,
     )
     if resolved is None:
         return None
@@ -9635,7 +9639,7 @@ def _unprinted_redox_oxygen(
         if resolved.po2_bar is not None
         else log10_fo2_to_pa(Decimal(str(fo2_log)))
     )
-    notice = fo2_tier_notice(Quantity.FE3_FE2_RATIO, resolved)
+    notice = fo2_tier_notice(quantity, resolved)
     qualified = replace(
         notice,
         reason=(
@@ -9655,6 +9659,7 @@ def _predict_redox(
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """Predict Fe redox or a pinned OpenIMCC Cr/Ti valence couple.
 
@@ -9771,7 +9776,9 @@ def _predict_redox(
                     RefusalReason.IDENTITY_INCOMPLETE,
                     {"reason": "missing_input", "input": "printed_fO2"},
                 )
-            selected = _unprinted_redox_oxygen(experiment, observation, material)
+            selected = _unprinted_redox_oxygen(
+                experiment, bench, observation, material
+            )
             if selected is None:
                 return refused(
                     RefusalReason.IDENTITY_INCOMPLETE,
@@ -9780,7 +9787,9 @@ def _predict_redox(
             fo2_log, commanded_fo2_pa, oxygen_notice = selected
             material_notices.append(oxygen_notice)
     elif fo2_log is None:
-        selected = _unprinted_redox_oxygen(experiment, observation, material)
+        selected = _unprinted_redox_oxygen(
+            experiment, bench, observation, material
+        )
         if selected is None:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
@@ -12854,6 +12863,7 @@ def _predict_named_fe_valence(
     handles: Mapping[str, object] | None,
     isolated: bool | None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """Route a named valence to the engine that models its couple.
 
@@ -12895,6 +12905,7 @@ def _predict_named_fe_valence(
                 handles=handles,
                 isolated=isolated,
                 experiment=experiment,
+                bench=bench,
             )
         if engine is Engine.OPENIMCC:
             basis_state = identity.valence_basis
@@ -12939,6 +12950,7 @@ def _predict_named_fe_valence(
         handles=handles,
         isolated=isolated,
         experiment=experiment,
+        bench=bench,
     )
 
 
@@ -14283,6 +14295,7 @@ def _predict_with_engine(
             handles=handles,
             isolated=isolated,
             experiment=experiment,
+            bench=bench,
         )
     phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
@@ -14316,6 +14329,7 @@ def _predict_with_engine(
             handles=handles,
             isolated=isolated,
             experiment=experiment,
+            bench=bench,
         )
     wall_prediction = _wall_deposition_quantity_prediction(
         engine, observation, identity, quantity, channel, sources

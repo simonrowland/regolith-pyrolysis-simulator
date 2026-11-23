@@ -25,6 +25,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
+from simulator.battery.identity import parse_valence_basis
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
@@ -41,7 +42,14 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import Composition, Located, Locator, State, Value
+from simulator.battery.records import (
+    Composition,
+    Located,
+    Locator,
+    Species,
+    State,
+    Value,
+)
 from simulator.battery.score import headline_payload_records, residual_to_plain
 from tests.battery.factories import migrate_one_extract
 
@@ -1760,6 +1768,64 @@ def _without_printed_fo2(observation):
         point_conditions=conditions,
         identity=replace(observation.identity, fO2_Pa=None),
     )
+
+
+def test_unprinted_redox_oxygen_passes_recorded_bench_to_ladder(monkeypatch):
+    from simulator.battery.fo2_ladder import ResolvedFo2
+
+    row = _without_printed_fo2(_borisov_row4())
+    bench = object()
+    calls = []
+
+    def resolve(experiment, recorded_bench, observation, **kwargs):
+        calls.append((experiment, recorded_bench, observation, kwargs))
+        return ResolvedFo2(-8.0, 3, "buffer_relation", False)
+
+    monkeypatch.setattr("simulator.battery.fo2_ladder.resolve_row_fo2", resolve)
+    experiment = object()
+    selected = score_module._unprinted_redox_oxygen(
+        experiment,
+        bench,
+        row,
+        SimpleNamespace(
+            composition_wt={"FeO": 9.94}, temperature=Decimal("1673.15")
+        ),
+    )
+
+    assert selected is not None
+    assert calls[0][:3] == (experiment, bench, row)
+    assert calls[0][3]["quantity"] is Quantity.FE3_FE2_RATIO
+
+
+def test_unprinted_named_valence_notice_names_scored_quantity(monkeypatch):
+    from simulator.battery.fo2_ladder import ResolvedFo2
+
+    row = _without_printed_fo2(_borisov_row4())
+    identity = replace(
+        row.identity,
+        quantity=Quantity.VALENCE_RATIO,
+        species=Species("Cr", Phase.L),
+        valence_basis=State.of(
+            parse_valence_basis("Cr3plus_over_Cr2plus", species_formula="Cr")
+        ),
+    )
+    row = replace(row, identity=identity)
+    monkeypatch.setattr(
+        "simulator.battery.fo2_ladder.resolve_row_fo2",
+        lambda *_args, **_kwargs: ResolvedFo2(-8.0, 3, "buffer_relation", False),
+    )
+
+    selected = score_module._unprinted_redox_oxygen(
+        None,
+        None,
+        row,
+        SimpleNamespace(
+            composition_wt={"FeO": 9.94}, temperature=Decimal("1673.15")
+        ),
+    )
+
+    assert selected is not None
+    assert selected[2].affected_quantities == (Quantity.VALENCE_RATIO,)
 
 
 def _patch_melts_cell(monkeypatch, cell_for):
