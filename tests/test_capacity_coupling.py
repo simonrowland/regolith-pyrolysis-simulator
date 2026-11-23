@@ -4894,3 +4894,458 @@ def test_hour_cost_records_opening_flush_time_and_rhs_span():
     assert holder["_balance_terms"]["composition_tau_s"] == pytest.approx(
         composition_s, rel=1.0e-12,
     )
+
+
+# The frozen-composition hour. Oracles are a pipe bisection and the
+# constant-s exponential written here. They do not call _closed_manifold.
+_FROZEN_T_K = 1453.15
+_FROZEN_DOWNSTREAM_PA = 20.0
+_FROZEN_OFFSET_PA = 1.0e-2
+
+
+def _frozen_masses() -> dict[str, float]:
+    return {
+        "O2": _o2_molar_mass_kg(),
+        "K": MOLAR_MASS["K"] / 1000.0,
+    }
+
+
+def _frozen_pa_per_mol(temperature_K: float) -> float:
+    return GAS_CONSTANT * temperature_K / _HS_V_M3
+
+
+def _pipe_mol_s_at(
+    pressure_pa: float,
+    moles: dict[str, float],
+    temperature_K: float,
+    masses: dict[str, float],
+    downstream_pa: float,
+) -> float:
+    if pressure_pa <= downstream_pa or math.fsum(moles.values()) <= 0.0:
+        return 0.0
+    outflow = pipe_species_outflow_mol_s(
+        pressure_pa,
+        downstream_pa,
+        temperature_K,
+        moles,
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol=masses,
+    )
+    return math.fsum(float(outflow.species_mol_s[name]) for name in moles)
+
+
+def _moles_at_pressure(
+    pressure_pa: float,
+    fractions: dict[str, float],
+    temperature_K: float,
+) -> dict[str, float]:
+    per_pa = _HS_V_M3 / (GAS_CONSTANT * temperature_K)
+    return {
+        name: pressure_pa * fraction * per_pa
+        for name, fraction in fractions.items()
+    }
+
+
+def _bisect_frozen_root(
+    fractions: dict[str, float],
+    s_total: float,
+    temperature_K: float,
+    masses: dict[str, float],
+    downstream_pa: float,
+) -> float:
+    """P* where the pipe outflow equals s_total at these fractions."""
+
+    def residual(pressure_pa: float) -> float:
+        moles = _moles_at_pressure(pressure_pa, fractions, temperature_K)
+        return s_total - _pipe_mol_s_at(
+            pressure_pa, moles, temperature_K, masses, downstream_pa,
+        )
+
+    lo = downstream_pa
+    hi = downstream_pa + 1.0
+    assert residual(lo) > 0.0
+    while residual(hi) > 0.0 and hi < 1.0e6:
+        hi *= 2.0
+    assert residual(hi) < 0.0
+    for _step in range(80):
+        mid = 0.5 * (lo + hi)
+        if residual(mid) > 0.0:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def _split_source(
+    s_total: float,
+    masses: dict[str, float],
+) -> tuple[dict[str, float], dict[str, float], float]:
+    """Vapour kg/h, mole rates s_i, and the O2 redox, summing to s_total.
+
+    The equilibrium composition is half and half. The redox is part of
+    s_O2, so the vapour alone is not the manifold source.
+    """
+
+    redox_o2 = 0.1 * s_total
+    s_mol = {"O2": 0.5 * s_total, "K": 0.5 * s_total}
+    vapour_mol = {"O2": s_mol["O2"] - redox_o2, "K": s_mol["K"]}
+    vapour_kg_h = {
+        name: vapour_mol[name] * masses[name] * 3600.0 for name in masses
+    }
+    return vapour_kg_h, s_mol, redox_o2
+
+
+def _exponential_moles(
+    n_star: dict[str, float],
+    s_mol: dict[str, float],
+    t_s: float,
+) -> dict[str, float]:
+    """n_i(t) = n*_i e^{-t/tau} + s_i tau (1 - e^{-t/tau}).
+
+    tau = n*/Σ s. This is the integral of dn_i/dt = s_i − y_i Σ s,
+    not the production helper.
+    """
+
+    names = tuple(n_star)
+    n_tot = math.fsum(n_star[name] for name in names)
+    s_tot = math.fsum(s_mol[name] for name in names)
+    tau = n_tot / s_tot
+    decay = math.exp(-t_s / tau)
+    return {
+        name: n_star[name] * decay + s_mol[name] * tau * (1.0 - decay)
+        for name in names
+    }
+
+
+def _linear_moles(
+    n_star: dict[str, float],
+    fractions: dict[str, float],
+    s_mol: dict[str, float],
+    t_s: float,
+) -> dict[str, float]:
+    """n*_i + (s_i − y*_i Σ s) t. The t << tau expansion."""
+
+    s_tot = math.fsum(s_mol.values())
+    return {
+        name: n_star[name] + (s_mol[name] - fractions[name] * s_tot) * t_s
+        for name in n_star
+    }
+
+
+def _frozen_notices(result: CapacityShadowResult) -> list:
+    return [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "quasi_steady_frozen_composition"
+    ]
+
+
+def test_frozen_composition_matches_radau_inside_the_gate():
+    """A separated hour matches the exponential and the Radau integral.
+
+    Mutation: publishing s_i tau immediately misses the linear drift
+    by pascals. One Euler step of the hour misses the exponential by
+    more than 1e-6 Pa at this dt/tau. Handing the hour to the fast
+    root leaves the P* counters at zero and drops the notice. The
+    Radau comparison declines the quasi-steady latch, so a pass cannot
+    be the closed manifold calling itself.
+    """
+
+    temperature_K = _FROZEN_T_K
+    downstream_pa = _FROZEN_DOWNSTREAM_PA
+    fractions = {"O2": 0.95, "K": 0.05}
+    masses = _frozen_masses()
+    root_pa = downstream_pa + _FROZEN_OFFSET_PA
+    n_star = _moles_at_pressure(root_pa, fractions, temperature_K)
+    s_total = _pipe_mol_s_at(root_pa, n_star, temperature_K, masses, downstream_pa)
+    assert s_total > 0.0
+    tau = math.fsum(n_star.values()) / s_total
+    ratio = 8.0e-4
+    dt_s = tau * ratio
+    assert dt_s / tau <= capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    vapour_kg_h, s_mol, redox_o2 = _split_source(s_total, masses)
+    holder: dict = {}
+
+    def flux(_partials, rates=vapour_kg_h, store=holder):
+        store["gross_kg_hr"] = dict(rates)
+        return dict(rates)
+
+    result = _as_result(solve_capacity_shadow(
+        pre_holdup_mol=n_star,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        redox_source_mol_s={"O2": redox_o2, "K": 0.0},
+        extent_holder=holder,
+    ))
+    notices = _frozen_notices(result)
+    assert len(notices) == 1
+    assert notices[0]["dt_over_tau"] == pytest.approx(ratio, rel=1.0e-6)
+    assert notices[0]["dt_over_tau"] <= (
+        capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    )
+    terms = holder["_balance_terms"]
+    assert terms["path"] == "frozen_composition"
+    assert terms["pstar_sign_scan"] == 0
+    assert terms["pstar_warm_newton"] + terms["pstar_brent_band"] == 2
+    factor = _frozen_pa_per_mol(temperature_K)
+    expected = _exponential_moles(n_star, s_mol, dt_s)
+    linear = _linear_moles(n_star, fractions, s_mol, dt_s)
+    for name in fractions:
+        partial = result.partial_pressures_Pa[name]
+        booked = terms["n0_mol"][name] + terms["A_mol"][name] - terms["B_mol"][name]
+        assert partial == pytest.approx(booked * factor, abs=1.0e-12)
+        assert partial == pytest.approx(expected[name] * factor, abs=1.0e-6)
+        assert partial == pytest.approx(linear[name] * factor, abs=1.0e-4)
+        assert abs(partial - s_mol[name] * tau * factor) > 1.0
+    assert result.redox_added_mol["O2"] == pytest.approx(redox_o2 * dt_s, rel=1.0e-12)
+    assert result.redox_added_mol["K"] == pytest.approx(0.0, abs=0.0)
+    for name, rate_kg_h in vapour_kg_h.items():
+        assert result.vapour_extent_kg[name] == pytest.approx(
+            rate_kg_h / 3600.0 * dt_s,
+            rel=1.0e-12,
+        )
+    # The latch keeps this integral on Radau. The quasi-steady hold
+    # would book the same closed manifold the hour just used.
+    built = capacity_coupling._build_law(
+        pre_holdup_mol=n_star,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=lambda _partials: dict(vapour_kg_h),
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        downstream_pressure_Pa=downstream_pa,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s={"O2": redox_o2, "K": 0.0},
+    )
+    assert not isinstance(built, CapacityShadowRefusal)
+    radau_law, radau_n0 = built
+    radau_law._quasi_steady_declined = True
+    radau = capacity_coupling._slow_converge(radau_law, radau_n0, dt_s)
+    bound = max(1.0e-6, 10.0 * ratio * ratio * root_pa)
+    for name in fractions:
+        assert result.partial_pressures_Pa[name] == pytest.approx(
+            radau.partials[name],
+            abs=bound,
+        )
+
+
+def test_frozen_composition_projects_an_off_manifold_opening():
+    """The h22 opening relaxes onto P* and then drifts.
+
+    Mutation: integrating the exponential from the off-manifold
+    holdup keeps the opening pressure, about 0.14 Pa high. Gating on
+    the flush time n/Q never publishes this notice: that ratio is
+    tens, and the composition ratio is the 2e-6 of the canon hour.
+    A fast-root admission leaves both P* counters at zero.
+    """
+
+    temperature_K = _FROZEN_T_K
+    downstream_pa = _FROZEN_DOWNSTREAM_PA
+    opening_pa = 20.138586
+    dt_s = 448.142
+    # The canon hour's composition time, n/Σ s at the dosed inventory.
+    composition_time_s = 184433052.09025127
+    fractions = {"O2": 0.95, "K": 0.05}
+    masses = _frozen_masses()
+    n_open = _moles_at_pressure(opening_pa, fractions, temperature_K)
+    n_tot = math.fsum(n_open.values())
+    s_total = n_tot / composition_time_s
+    vapour_kg_h, s_mol, redox_o2 = _split_source(s_total, masses)
+    root_pa = _bisect_frozen_root(
+        fractions, s_total, temperature_K, masses, downstream_pa,
+    )
+    n_star = _moles_at_pressure(root_pa, fractions, temperature_K)
+    q_open = _pipe_mol_s_at(
+        opening_pa, n_open, temperature_K, masses, downstream_pa,
+    )
+    assert q_open > s_total
+    flush_s = n_tot / q_open
+    assert dt_s / flush_s > 1.0
+    tau = math.fsum(n_star.values()) / s_total
+    assert dt_s / tau <= capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    excess = n_tot - math.fsum(n_star.values())
+    t_fast = excess / (q_open - s_total)
+    assert 0.0 < t_fast <= dt_s * capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    holder: dict = {}
+    calls = {"n": 0}
+
+    def flux(_partials, rates=vapour_kg_h, store=holder, counter=calls):
+        counter["n"] += 1
+        store["gross_kg_hr"] = dict(rates)
+        return dict(rates)
+
+    result = _as_result(solve_capacity_shadow(
+        pre_holdup_mol=n_open,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        redox_source_mol_s={"O2": redox_o2, "K": 0.0},
+        extent_holder=holder,
+    ))
+    notices = _frozen_notices(result)
+    assert len(notices) == 1
+    assert notices[0]["dt_over_tau"] == pytest.approx(dt_s / tau, rel=1.0e-4)
+    assert notices[0]["dt_over_tau"] < 1.0e-3
+    assert notices[0]["dt_over_tau"] != pytest.approx(dt_s / flush_s, rel=0.1)
+    terms = holder["_balance_terms"]
+    assert terms["path"] == "frozen_composition"
+    assert terms["pstar_sign_scan"] == 0
+    assert terms["pstar_warm_newton"] + terms["pstar_brent_band"] == 2
+    # The fast root of this opening was a few hundred flux evaluations.
+    # The discovery call and the uncounted opening sample are in `calls`
+    # and not in the solver counter. Two P* solves sit under that root.
+    assert calls["n"] < 200
+    factor = _frozen_pa_per_mol(temperature_K)
+    expected = _exponential_moles(n_star, s_mol, dt_s - t_fast)
+    total_pa = math.fsum(result.partial_pressures_Pa.values())
+    assert total_pa == pytest.approx(root_pa, abs=1.0e-6)
+    assert abs(total_pa - opening_pa) > 0.1
+    for name in fractions:
+        partial = result.partial_pressures_Pa[name]
+        booked = terms["n0_mol"][name] + terms["A_mol"][name] - terms["B_mol"][name]
+        assert partial == pytest.approx(booked * factor, abs=1.0e-12)
+        assert partial == pytest.approx(expected[name] * factor, abs=1.0e-6)
+    assert result.redox_added_mol["O2"] == pytest.approx(
+        redox_o2 * dt_s, rel=1.0e-12,
+    )
+
+
+def test_frozen_composition_stays_off_outside_the_gate():
+    """dt/tau = 0.2 is not frozen, and the frozen exponential misses Radau.
+
+    Mutation: deleting the gate freezes this hour and publishes the
+    notice. Checking the gate after the P* solve spends a bracket the
+    direct call counts. A composition-independent source would make
+    the exponential agree with Radau, so the disagreement below is
+    the y-dependent rate over dt/tau = 0.2.
+    """
+
+    temperature_K = _FROZEN_T_K
+    downstream_pa = _FROZEN_DOWNSTREAM_PA
+    fractions = {"O2": 0.95, "K": 0.05}
+    masses = _frozen_masses()
+    root_pa = downstream_pa + _FROZEN_OFFSET_PA
+    n0 = _moles_at_pressure(root_pa, fractions, temperature_K)
+    base_total = _pipe_mol_s_at(root_pa, n0, temperature_K, masses, downstream_pa)
+    assert base_total > 0.0
+    tau = math.fsum(n0.values()) / base_total
+    ratio = 0.2
+    dt_s = tau * ratio
+    assert ratio > capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    y_k_open = fractions["K"]
+    gain = 2.0
+    base_o2_kg_h = 0.4 * base_total * masses["O2"] * 3600.0
+    base_k_kg_h = 0.5 * base_total * masses["K"] * 3600.0
+    redox_o2 = 0.1 * base_total
+
+    def rates_at(y_k: float) -> dict[str, float]:
+        scale = 1.0 + gain * (y_k - y_k_open)
+        return {"O2": base_o2_kg_h * scale, "K": base_k_kg_h}
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        total = math.fsum(partials.values())
+        y_k = 0.0 if total <= 0.0 else float(partials.get("K", 0.0)) / total
+        return rates_at(y_k)
+
+    holder: dict = {}
+    built = capacity_coupling._build_law(
+        pre_holdup_mol=n0,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        downstream_pressure_Pa=downstream_pa,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s={"O2": redox_o2, "K": 0.0},
+        extent_holder=holder,
+    )
+    assert not isinstance(built, CapacityShadowRefusal)
+    law, opened = built
+    law._record_opening_scales(opened, dt_s)
+    counted = law.flux_evaluations
+    assert capacity_coupling._frozen_composition_hour(law, opened, dt_s) is None
+    assert law.flux_evaluations == counted
+    held: dict = {}
+    held_result = _as_result(solve_capacity_shadow(
+        pre_holdup_mol=n0,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        redox_source_mol_s={"O2": redox_o2, "K": 0.0},
+        extent_holder=held,
+    ))
+    assert _frozen_notices(held_result) == []
+    assert held["_balance_terms"]["path"] != "frozen_composition"
+    opening_rates = rates_at(y_k_open)
+    s_mol = {
+        "O2": opening_rates["O2"] / masses["O2"] / 3600.0 + redox_o2,
+        "K": opening_rates["K"] / masses["K"] / 3600.0,
+    }
+    frozen_end = _exponential_moles(n0, s_mol, dt_s)
+    radau_built = capacity_coupling._build_law(
+        pre_holdup_mol=n0,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        downstream_pressure_Pa=downstream_pa,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s={"O2": redox_o2, "K": 0.0},
+    )
+    assert not isinstance(radau_built, CapacityShadowRefusal)
+    radau_law, radau_n0 = radau_built
+    radau_law._quasi_steady_declined = True
+    radau = capacity_coupling._slow_converge(radau_law, radau_n0, dt_s)
+    factor = _frozen_pa_per_mol(temperature_K)
+    gap = max(
+        abs(frozen_end[name] * factor - radau.partials[name]) for name in fractions
+    )
+    # Measured gap on this hour is about 1.4e-2 Pa. 1e-3 Pa still
+    # sits above the inside-gate Radau band and below that gap.
+    assert gap > 1.0e-3

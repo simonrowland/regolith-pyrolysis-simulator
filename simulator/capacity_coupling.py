@@ -110,7 +110,8 @@ class CapacityShadowRefusal:
     flux_evaluations: int | None = None
     integrator_evaluations: int | None = None
     # Solve path of the hour that refused: fast_root, explicit_euler,
-    # explicit_ladder, midpoint, radau_fallback, or backward_euler.
+    # explicit_ladder, midpoint, radau_fallback, backward_euler, or
+    # frozen_composition.
     # None when the refusal is raised before a path is chosen.
     # The inventory refusal, headspace_negative_bleed, and
     # headspace_balance_nonconvergence carry the per-species ledger
@@ -963,6 +964,13 @@ _KINK_NEWTON_FAILS = 2
 # |P_stall − P*| times this. At the band edge that product is the
 # 1e-6 Pa floor, so a larger fraction is not this shortcut.
 _QUASI_STEADY_MAX_TAU_FRACTION = 1.0e-2
+# dt/tau on the manifold. Freezing s_i(y) over the hour leaves a
+# mole error of order n*(dt/tau)^2 when ds/dy is order s. At 1e-3
+# that relative error is 1e-6. The same cut bounds the fast pressure
+# transient: t_fast/dt <= 1e-3, so the sliver of source during the
+# projection is at most another 1e-6 of the inventory once dt/tau
+# is also inside the gate. A larger gate is not this shortcut.
+_FROZEN_COMPOSITION_MAX_DT_OVER_TAU = 1.0e-3
 
 
 class _BalanceRefused(Exception):
@@ -1384,6 +1392,10 @@ class _HeadspaceLaw:
         self.opening_dt_over_tau: float | None = None
         self.opening_composition_tau_s: float | None = None
         self.opening_dt_over_composition_tau: float | None = None
+        # Opening outflow, mol/s. The frozen-composition hour prices
+        # the fast pressure transient with it. None until that sample
+        # runs.
+        self.opening_q_mol_s: float | None = None
         # Flux from one rhs entry to the next. The mark is the counter
         # at the open entry. None means no interval is open.
         self._rhs_flux_counts: list[int] = []
@@ -1578,6 +1590,8 @@ class _HeadspaceLaw:
         source_mol_s = math.fsum(
             float(source[name]) + float(redox[name]) for name in self.species
         )
+        if math.isfinite(outflow_mol_s) and outflow_mol_s >= 0.0:
+            self.opening_q_mol_s = outflow_mol_s
         if not math.isfinite(total) or total <= 0.0:
             return
         if (
@@ -4978,6 +4992,230 @@ def _closed_pipe_midpoint(
     return None
 
 
+def _refuse_unless_work_or_roots(refused: _BalanceRefused) -> None:
+    """A cap or two roots is the hour's refusal. Anything else falls through."""
+
+    if refused.reason in (
+        "headspace_balance_work_cap",
+        "headspace_balance_multiple_roots",
+    ):
+        raise refused
+
+
+def _frozen_composition_hour(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> _HeadspaceStep | None:
+    """Exact hour when the composition is frozen on the slow manifold.
+
+    Premise: dn_i/dt = s_i(P, n) − y_i Q(P), with y_i = n_i/n and
+    s_i = q_i + S_i. Every species shares the composition time
+    tau = n/Σ s. Total pressure is the fast mode (milliseconds on
+    these hours), so P sits on P*(y), the root of Q(P*) = Σ s at
+    the frozen opening fractions. Freezing s_i(y) over the hour
+    leaves a mole error of order n (dt/tau)^2 when ds/dy is order
+    s. The gate is dt/tau <= 1e-3, which is a relative error of
+    about 1e-6. The same cut bounds the fast transient: its
+    duration t_fast has to be at most dt times that gate, so the
+    source during the projection is another 1e-6 of the inventory.
+    An opening composition time already past the gate returns
+    before any P* solve. An ordinary hour, where tau is a fraction
+    of a second, pays nothing. A missing opening outflow cannot
+    price the transient and falls through.
+
+    Algebra: solve P* once at the opening fractions. Project
+    n*_i = y_i0 P* V / (R T). The excess is n_open − n*. While
+    the excess is draining, the rate is Q_open − Σ s; while it is
+    filling, Σ s − Q_open. t_fast = |excess| / rate, or 0 when
+    the excess is already inside 1e-6 Pa. Over that sliver
+    A_fast,i = s_i t_fast and
+    B_fast,i = A_fast,i + n0_i − n*_i, so
+    n0 + A_fast − B_fast = n*. A bleed past −1e-6 Pa is not this
+    projection. Over t_rem = dt − t_fast the manifold integral is
+    the constant-s solution
+    n_i(t) = n*_i exp(−t/tau) + s_i tau (1 − exp(−t/tau)),
+    booked by the closed manifold (A_slow,i = s_i t_rem and the
+    bleed that recovers that n_i). The hour's states are the sums.
+    G_i = gross_i dt and R_i = S_i dt, split across the same two
+    intervals. Re-solve P* at the end fractions. A move past
+    1e-6 Pa means s(y) left the frozen root, and this hour is
+    not the shortcut.
+
+    Unit check: mol/s · s = mol, and Pa·m³ / (J/(mol·K)·K) = mol.
+    dt/tau is dimensionless.
+
+    Limit: t << tau expands the exponential,
+    n_i(t) = n_i0 + (s_i − y_i0 Q) t, because
+    n_i0/tau = y_i0 Σ s and on the manifold Q = Σ s. That is the
+    opening drift, and it is the drift about n* once the fast
+    mode has put the holdup there. t >> tau sends the exponential
+    to 0, so n_i → s_i tau. A second limit of the fast piece:
+    t_fast = 0 (already on P*) leaves A_fast = 0 and the hour is
+    only the slow integral. Σ s <= 0, a shut pipe, or a transient
+    longer than the gate is not this hour.
+    """
+
+    if not math.isfinite(dt_s) or dt_s <= 0.0:
+        return None
+    opening_tau = law.opening_composition_tau_s
+    if (
+        opening_tau is not None
+        and math.isfinite(opening_tau)
+        and opening_tau > 0.0
+        and dt_s / opening_tau > _FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    ):
+        return None
+    if law.opening_q_mol_s is None:
+        return None
+    fractions = _fractions_of(law, n0)
+    if fractions is None:
+        return None
+    try:
+        kind, root = _open_or_shut_fixed_point(
+            law,
+            fractions,
+            near_Pa=law.pressure_of(n0),
+        )
+    except _BalanceRefused as refused:
+        _refuse_unless_work_or_roots(refused)
+        return None
+    if kind != "open" or root is None:
+        return None
+    try:
+        inflow, redox, gross = _manifold_rates(law, fractions, float(root))
+    except _BalanceRefused as refused:
+        _refuse_unless_work_or_roots(refused)
+        return None
+    n_star = _moles_along(law, fractions, float(root))
+    n_star_tot = math.fsum(n_star[name] for name in law.species)
+    s_sum = math.fsum(float(inflow[name]) for name in law.species)
+    if (
+        n_star_tot <= 0.0
+        or s_sum <= 0.0
+        or not math.isfinite(n_star_tot)
+        or not math.isfinite(s_sum)
+    ):
+        return None
+    tau = n_star_tot / s_sum
+    if not math.isfinite(tau) or tau <= 0.0:
+        return None
+    if dt_s / tau > _FROZEN_COMPOSITION_MAX_DT_OVER_TAU:
+        return None
+    n_open = math.fsum(max(0.0, float(n0[name])) for name in law.species)
+    excess = n_open - n_star_tot
+    pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+    if abs(excess) * pa_per_mol <= DEFAULT_ABS_TOL_PA:
+        t_fast = 0.0
+    else:
+        q_open = float(law.opening_q_mol_s)
+        if excess > 0.0:
+            rate = q_open - s_sum
+        else:
+            rate = s_sum - q_open
+        if not math.isfinite(rate) or rate <= 0.0:
+            return None
+        t_fast = abs(excess) / rate
+        if (
+            not math.isfinite(t_fast)
+            or t_fast < 0.0
+            or t_fast > dt_s * _FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+        ):
+            return None
+    t_rem = dt_s - t_fast
+    if not math.isfinite(t_rem) or t_rem <= 0.0:
+        return None
+    a_fast: dict[str, float] = {}
+    b_fast: dict[str, float] = {}
+    g_fast: dict[str, float] = {}
+    r_fast: dict[str, float] = {}
+    for name in law.species:
+        grown = float(inflow[name]) * t_fast
+        bleed = grown + float(n0[name]) - float(n_star[name])
+        if (
+            not math.isfinite(grown)
+            or not math.isfinite(bleed)
+            or (bleed < 0.0 and -bleed * pa_per_mol > DEFAULT_ABS_TOL_PA)
+        ):
+            return None
+        a_fast[name] = grown
+        b_fast[name] = bleed
+        g_fast[name] = float(gross.get(name, 0.0)) * t_fast
+        r_fast[name] = float(redox.get(name, 0.0)) * t_fast
+    slow = _closed_manifold(
+        law.species,
+        n_star,
+        inflow,
+        redox,
+        gross,
+        t_rem,
+    )
+    if slow is None:
+        return None
+    _n_slow, a_slow, b_slow, g_slow, r_slow, composition_time, _dy = slow
+    added: dict[str, float] = {}
+    bled: dict[str, float] = {}
+    vapour: dict[str, float] = {}
+    redox_added: dict[str, float] = {}
+    n_end: dict[str, float] = {}
+    for name in law.species:
+        grown = a_fast[name] + float(a_slow[name])
+        bleed = b_fast[name] + float(b_slow[name])
+        arrived = float(n0[name]) + grown - bleed
+        if (
+            not all(math.isfinite(item) for item in (grown, bleed, arrived))
+            or (bleed < 0.0 and -bleed * pa_per_mol > DEFAULT_ABS_TOL_PA)
+            or (arrived < 0.0 and -arrived * pa_per_mol > DEFAULT_ABS_TOL_PA)
+        ):
+            return None
+        added[name] = grown
+        bled[name] = bleed
+        n_end[name] = arrived
+        vapour[name] = g_fast[name] + float(g_slow[name])
+        redox_added[name] = r_fast[name] + float(r_slow[name])
+    end_fractions = _fractions_of(law, n_end)
+    if end_fractions is None:
+        return None
+    try:
+        end_kind, end_root = _open_or_shut_fixed_point(
+            law,
+            end_fractions,
+            near_Pa=float(root),
+        )
+    except _BalanceRefused as refused:
+        _refuse_unless_work_or_roots(refused)
+        return None
+    if end_kind != "open" or end_root is None:
+        return None
+    pressure_change = abs(float(end_root) - float(root))
+    if pressure_change > DEFAULT_ABS_TOL_PA:
+        return None
+    if not math.isfinite(composition_time) or composition_time <= 0.0:
+        return None
+    law._remember_species_notices((
+        {
+            "species": "headspace",
+            "reason": "quasi_steady_frozen_composition",
+            "dt_over_tau": dt_s / float(composition_time),
+            "tau_s": float(composition_time),
+            "t_fast_s": float(t_fast),
+            "pressure_change_Pa": float(pressure_change),
+        },
+    ))
+    _mark_balance_path(law, "frozen_composition")
+    return law.step_from_moles(
+        n0,
+        dt_s,
+        n_end,
+        2,
+        pressure_change,
+        added_mol=added,
+        bled_mol_in=bled,
+        vapour_extent_kg=vapour,
+        redox_added_mol=redox_added,
+    )
+
+
 def _commit_one(
     law: _HeadspaceLaw,
     n0: Mapping[str, float],
@@ -4986,6 +5224,9 @@ def _commit_one(
     closed = _closed_pipe_accumulation(law, n0, dt_s)
     if closed is not None:
         return closed
+    frozen = _frozen_composition_hour(law, n0, dt_s)
+    if frozen is not None:
+        return frozen
     _mark_balance_path(law, "fast_root")
     samples = law.g_samples()
     crossings = _crossings(samples)
@@ -5570,6 +5811,9 @@ def _commit_many(
     closed = _closed_pipe_accumulation(law, n0, dt_s)
     if closed is not None:
         return closed
+    frozen = _frozen_composition_hour(law, n0, dt_s)
+    if frozen is not None:
+        return frozen
     _mark_balance_path(law, "fast_root")
     fractions = _fractions_of(law, n0)
     if fractions is None:
