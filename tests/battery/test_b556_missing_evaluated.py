@@ -315,13 +315,22 @@ def test_unusable_fo2_control_stays_in_the_gap() -> None:
         ),
         bench,
     )
-    for result in (zero, categorical, unknown_buffer):
+    for result in (zero, categorical):
         assert result.selected is None
         assert result.absence is not None
         assert "experiment.fO2_control" in result.absence.missing
         assert "fO2_log" in result.absence.missing
+    assert unknown_buffer.selected is None
     assert unknown_buffer.absence is not None
     assert unknown_buffer.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert "fO2_log" in unknown_buffer.absence.missing
+    assert any(
+        item.startswith("experiment.fO2_control")
+        for item in unknown_buffer.absence.missing
+    )
+    assert any(
+        "NOT_A_REAL_BUFFER" in item for item in unknown_buffer.absence.missing
+    )
 
 
 def test_published_buffer_stays_present_when_temperature_is_absent() -> None:

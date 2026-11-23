@@ -74,6 +74,10 @@ from simulator.battery.waypoints import (
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
 from simulator.physical_constants import ATM_PA, PA_PER_BAR
 
+# Dry-air oxygen as a partial pressure in atmospheres. The DP-010 notice
+# and the numeric default both use this premise.
+_DP010_AMBIENT_OXYGEN_ATM = Decimal("0.21")
+
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
     "oxygen_sweep_partial_pressure",
@@ -183,7 +187,8 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         kind = NoticeKind.FO2_VACUUM_CELL_PROXY
     elif resolved.route == "dp010_ambient_air_unprinted_atmosphere":
         reason = (
-            "DP-010 v2; pO2=0.21 atm; fO2/bar=pO2/(1 bar); "
+            "DP-010 v2; "
+            f"pO2={_DP010_AMBIENT_OXYGEN_ATM} atm; fO2/bar=pO2/(1 bar); "
             f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; "
             f"original_reason=no printed ferric ratio or determining method/apparatus; {reason}"
         )
@@ -525,7 +530,7 @@ def resolve_row_fo2(
         None if identity is None else quantity_token(identity)
     )
     if resolved_quantity is not None:
-        oxygen_pa = Decimal("0.21") * Decimal(str(ATM_PA))
+        oxygen_pa = _DP010_AMBIENT_OXYGEN_ATM * Decimal(str(ATM_PA))
         oxygen_bar = float(oxygen_pa / Decimal(str(PA_PER_BAR)))
         resolved = resolve(
             "DP-010",
@@ -875,6 +880,13 @@ def _printed_ferric_fraction(
     observation: Observation | None,
     weights: dict[str, float] | None,
 ) -> tuple[float | None, str]:
+    """Printed ferric evidence only.
+
+    ``weights`` is the row's bulk composition. A solver map or an FeOt
+    conversion is not a reported Fe3+/sumFe, so it is not read here.
+    """
+
+    del weights
     for key in FERRIC_FRACTION_FIELDS:
         number = _printed_number(observation, key)
         if number is not None and 0.0 < number < 1.0:
@@ -885,25 +897,23 @@ def _printed_ferric_fraction(
             fraction = ratio / (1.0 + ratio)
             if 0.0 < fraction < 1.0:
                 return fraction, key
-    if not weights:
-        return None, ""
-    from simulator.feedstock_composition import iron_oxide_values
+    from simulator.battery.migrate import (
+        KRESS_FE2O3_WT_PCT_FIELD,
+        KRESS_FEO_WT_PCT_FIELD,
+        fe3_fe2_ratio_from_oxide_wt_pct,
+    )
 
-    try:
-        feo, fe2o3 = iron_oxide_values(weights)
-    except ValueError:
+    feo = _printed_number(observation, KRESS_FEO_WT_PCT_FIELD)
+    fe2o3 = _printed_number(observation, KRESS_FE2O3_WT_PCT_FIELD)
+    if feo is None or fe2o3 is None or feo <= 0.0 or fe2o3 <= 0.0:
         return None, ""
-    if feo <= 0.0 or fe2o3 <= 0.0:
-        return None, ""
-    from simulator.battery.migrate import fe3_fe2_ratio_from_oxide_wt_pct
-
     ratio = fe3_fe2_ratio_from_oxide_wt_pct(Decimal(str(fe2o3)), Decimal(str(feo)))
     if ratio is None or ratio <= 0:
         return None, ""
     fraction = float(ratio / (Decimal(1) + ratio))
     if not 0.0 < fraction < 1.0:
         return None, ""
-    return fraction, "FeO+Fe2O3"
+    return fraction, f"{KRESS_FEO_WT_PCT_FIELD}+{KRESS_FE2O3_WT_PCT_FIELD}"
 
 
 def _kress_pressure_bar(

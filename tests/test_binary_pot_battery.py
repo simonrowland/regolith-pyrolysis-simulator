@@ -440,6 +440,114 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
     )
 
 
+def test_reused_internal_analytical_core_drops_omitted_controls(monkeypatch):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.state import Atmosphere, MeltState
+
+    snapshots: list[tuple] = []
+
+    class Core:
+        def __init__(self) -> None:
+            self.melt = MeltState()
+            self._last_vapor_pressure_diagnostic: dict = {}
+
+        def _new_atom_ledger(self):
+            return object()
+
+        def _load_ledger_account(self, *_args, **_kwargs):
+            return None
+
+        def _build_chemistry_kernel(self):
+            return None
+
+        def _refresh_vapor_pressures_from_kernel(self, equilibrium, **_kwargs):
+            reservoir = self.melt.oxygen_reservoir
+            snapshots.append(
+                (
+                    self.melt.p_total_mbar,
+                    self.melt.ambient_pressure_mbar,
+                    self.melt.atmosphere,
+                    self.melt.pO2_mbar,
+                    self.melt.fO2_log,
+                    self.melt.melt_fO2_log,
+                    reservoir.melt_intrinsic_fO2_log,
+                    reservoir.headspace_transport_pO2_bar,
+                    reservoir.headspace_ledger_pO2_bar,
+                )
+            )
+            equilibrium.vapor_pressures_Pa = {}
+            equilibrium.vapor_pressures_source = {}
+            self._last_vapor_pressure_diagnostic = {
+                "vapor_pressure_authority": {},
+            }
+
+    cores: list[Core] = []
+
+    def _new_core() -> Core:
+        core = Core()
+        cores.append(core)
+        return core
+
+    monkeypatch.setattr(battery, "_new_internal_analytical_core", _new_core)
+    composition = {"SiO2": 1.0}
+    reused = battery._InternalAnalyticalBatteryBackend()
+    reused.equilibrate(
+        1200.0,
+        composition,
+        pressure_bar=2.5,
+        po2_request=Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0e-4),
+    )
+    pressureless = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    reused.equilibrate(
+        1300.0,
+        composition,
+        pressure_bar=None,
+        po2_request=pressureless,
+    )
+    fresh = battery._InternalAnalyticalBatteryBackend()
+    fresh.equilibrate(
+        1300.0,
+        composition,
+        pressure_bar=None,
+        po2_request=pressureless,
+    )
+
+    assert len(cores) == 2
+    assert cores[0] is reused._core
+    assert snapshots[0][0] == 2500.0
+    assert snapshots[0][2] is Atmosphere.CONTROLLED_O2
+    assert snapshots[1] == snapshots[2]
+    assert snapshots[1][0] == 0.0
+    assert snapshots[1][1] == 0.0
+    assert snapshots[1][2] is Atmosphere.HARD_VACUUM
+    assert snapshots[1][3] == 0.0
+    assert snapshots[1][4] == -9.0
+    assert snapshots[1][5] == -9.0
+    assert snapshots[0] != snapshots[1]
+
+    before = len(snapshots)
+    with pytest.raises(battery._InternalAnalyticalInputRefusal) as caught:
+        reused.equilibrate(
+            1200.0,
+            composition,
+            pressure_bar=None,
+            po2_request=Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0e-8),
+        )
+    assert caught.value.code == "internal_analytical_missing_total_pressure"
+    assert len(snapshots) == before
+
+    commanded = Po2Request(mode=battery.PO2_COMMANDED, po2_bar=3.0e-7)
+    reused.equilibrate(
+        1200.0, composition, pressure_bar=1.25, po2_request=commanded
+    )
+    reused.equilibrate(
+        1200.0, composition, pressure_bar=1.25, po2_request=commanded
+    )
+    assert snapshots[-1] == snapshots[-2]
+    assert snapshots[-1][0] == 1250.0
+    assert snapshots[-1][2] is Atmosphere.CONTROLLED_O2
+
+
 def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
     from engines.vaporock.provider import VapoRockProvider

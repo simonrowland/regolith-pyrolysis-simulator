@@ -795,6 +795,7 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
         fO2_log,
         pressure_bar,
         handles=None,
+        redox_mode=None,
     ):
         calls.append(
             {
@@ -1792,6 +1793,7 @@ def test_alphamelts_phase_score_surfaces_invalid_oxide_notice(
         fO2_log,
         pressure_bar,
         handles=None,
+        redox_mode=None,
     ):
         return EquilibriumResult(
             liquid_fraction=1.0,
@@ -1931,6 +1933,7 @@ def test_distribution_ratio_dex_uses_both_phase_amounts(
     def hook(
         engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
         handles=None,
+        redox_mode=None,
     ):
         return EquilibriumResult(
             liquid_fraction=1.0,
@@ -2151,7 +2154,7 @@ def test_printed_experiment_pressure_reaches_the_scorer(
 
     def hook(
         engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
-        handles=None, bench=None,
+        handles=None, bench=None, redox_mode=None,
     ):
         calls.append(
             {
@@ -2303,6 +2306,7 @@ def test_capacity_scores_only_when_the_adapter_declares_the_solute(
         solute_fugacity_bar=None,
         solute_fugacity_parameter=None,
         handles=None,
+        redox_mode=None,
     ):
         calls.append(
             {
@@ -2498,6 +2502,7 @@ def test_unknown_capacity_equation_is_refused(
         pressure_bar,
         solute_fugacity_bar=None,
         solute_fugacity_parameter=None,
+        redox_mode=None,
     ):
         calls.append(engine)
         return EquilibriumResult(

@@ -415,6 +415,30 @@ def vaporock_pressure_bar_admitted(pressure_bar: Any) -> bool:
     return math.isfinite(value) and value > 0.0
 
 
+def _single_positive_non_oxide(composition: Mapping[str, Any] | None) -> str | None:
+    """One positive component whose formula contains no oxygen.
+
+    VapoRock equilibrates a silicate melt. A pure metal is the saturation
+    observable of another owner, not an omitted-fO2 melt.
+    """
+
+    if not composition:
+        return None
+    positive: list[str] = []
+    for name, amount in composition.items():
+        try:
+            number = float(amount)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(number) or number < 0.0:
+            return None
+        if number > 0.0:
+            positive.append(str(name))
+    if len(positive) != 1 or "O" in positive[0] or "o" in positive[0]:
+        return None
+    return positive[0]
+
+
 def vaporock_fo2_log_admitted(fO2_log: Any) -> bool:
     """True when *fO2_log* is a finite real log10(fO2).
 
@@ -1936,6 +1960,35 @@ class VapoRockBackend(MeltBackend):
             )
 
         if not vaporock_fo2_log_admitted(fO2_log):
+            pure_metal = _single_positive_non_oxide(composition_kg)
+            if pure_metal is None:
+                pure_metal = _single_positive_non_oxide(composition_mol)
+            if pure_metal is not None:
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    liquid_fraction=liquid_fraction,
+                    phase_assemblage_available=False,
+                    status='out_of_domain',
+                    warnings=[
+                        'VapoRock does not compute pure-substance saturation '
+                        f'of {pure_metal}; a pure metal reservoir is not a '
+                        'silicate melt'
+                    ],
+                    diagnostics={
+                        **melt_envelope_diagnostics,
+                        'backend_status_reason': (
+                            OutOfDomainReason.UNSUPPORTED_INPUT.value
+                        ),
+                        'temperature_K': float(temperature_K),
+                        'requested_pressure_bar': (
+                            None if pressure_bar is None else float(pressure_bar)
+                        ),
+                        'pressure_control_authoritative': False,
+                        'pure_substance': pure_metal,
+                    },
+                )
             try:
                 fo2_diag: Any = float(fO2_log)
                 if not math.isfinite(fo2_diag):

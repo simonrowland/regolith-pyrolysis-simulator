@@ -3470,6 +3470,62 @@ def test_degenerate_fo2_log_is_refused_before_engine(monkeypatch):
     assert calls["n"] == 1
 
 
+def test_pure_metal_omitted_oxygen_is_an_unsupported_input_gap(monkeypatch):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_NOT_AN_INPUT,
+        Po2Request,
+        _fo2_log_for_request,
+    )
+
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_):
+        calls["n"] += 1
+        return {"Na": 1.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize(
+        {"warm_worker": False, "vapor_pressure_units": "Pa"}
+    )
+    fo2_log = _fo2_log_for_request(
+        types.SimpleNamespace(supports_intrinsic_fo2=False),
+        Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+    )
+    assert fo2_log is None
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"Na": 1.0},
+        fO2_log=fo2_log,
+        pressure_bar=None,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.UNSUPPORTED_INPUT.value
+    )
+    assert result.diagnostics["pure_substance"] == "Na"
+    assert calls["n"] == 0
+    assert any(
+        "pure-substance saturation" in warning and "not a silicate melt" in warning
+        for warning in result.warnings
+    )
+
+    silicate = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=None,
+        pressure_bar=None,
+    )
+    assert silicate.status == "out_of_domain"
+    assert silicate.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.INVALID_FO2_LOG.value
+    )
+    assert calls["n"] == 0
+
+
 def test_nonfinite_candidate_pressure_is_not_a_completed_speciation(monkeypatch):
     from simulator.melt_backend.vaporock import (
         EmptySpeciationCause,

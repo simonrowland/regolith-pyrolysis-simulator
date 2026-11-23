@@ -10632,6 +10632,21 @@ def _knudsen_oxygen_refusal_notices(
     return (fo2_refusal_notice(quantity),)
 
 
+def _payload_fo2_policy(payload: Mapping) -> NoticePolicy | None:
+    raw = payload.get("fO2_policy")
+    if isinstance(raw, NoticePolicy):
+        return raw
+    if not isinstance(raw, Mapping):
+        return None
+    return NoticePolicy(
+        id=str(raw["id"]),
+        version=raw["version"],
+        status=str(raw["status"]),
+        value=str(raw["value"]),
+        units=str(raw["units"]),
+    )
+
+
 def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
     tier = payload.get("fO2_tier")
     if tier is None:
@@ -10640,6 +10655,8 @@ def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
 
     log = payload.get("fO2_log")
     bar = payload.get("fO2_bar")
+    band_status = payload.get("fO2_temperature_band_status")
+    band_source = payload.get("fO2_temperature_band_source")
     return fo2_tier_notice(
         quantity,
         ResolvedFo2(
@@ -10648,6 +10665,13 @@ def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
             str(payload.get("fO2_route") or ""),
             bool(payload.get("fO2_borrowed")),
             None if bar is None else float(bar),
+            policy=_payload_fo2_policy(payload),
+            temperature_band_status=(
+                None if band_status is None else str(band_status)
+            ),
+            temperature_band_source=(
+                None if band_source is None else str(band_source)
+            ),
         ),
     )
 
@@ -10820,6 +10844,18 @@ def _oxygen_input_request(
             else 10.0 ** resolved.log10_fO2_bar
         )
         return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+    refusal_reason = "missing_fO2"
+    refusal_why: object = oxygen_why
+    if experiment is not None and bench is not None and observation is not None:
+        from simulator.battery.waypoints import GapReason, oxygen_condition
+
+        oxygen_gap = oxygen_condition(experiment, bench, fo2_observation).absence
+        if (
+            oxygen_gap is not None
+            and oxygen_gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        ):
+            refusal_reason = oxygen_gap.reason.value
+            refusal_why = "; ".join(oxygen_gap.missing)
     return _input_refusal(
         engine=engine,
         channel=channel,
@@ -10828,9 +10864,9 @@ def _oxygen_input_request(
         requested=requested,
         reason=RefusalReason.IDENTITY_INCOMPLETE,
         detail={
-            "reason": "missing_fO2",
+            "reason": refusal_reason,
             "quantity": quantity.value,
-            "why": oxygen_why,
+            "why": refusal_why,
             "multivalent": list(redox),
         },
         notices=(
@@ -10973,11 +11009,14 @@ def _battery_hero_oxygen_condition(
     )
     if isinstance(decision, EnginePrediction):
         detail = decision.refusal_detail or {}
-        reason = (
-            "no fO2 for this row"
-            if detail.get("reason") == "missing_fO2"
-            else "scorer did not produce an oxygen request"
-        )
+        detail_reason = detail.get("reason")
+        if detail_reason == "unsupported_print_form":
+            why = detail.get("why")
+            reason = why if isinstance(why, str) and why else detail_reason
+        elif detail_reason == "missing_fO2":
+            reason = "no fO2 for this row"
+        else:
+            reason = "scorer did not produce an oxygen request"
         return "missing", None, None, None, None, reason
     if decision.mode == PO2_NOT_AN_INPUT:
         return (
@@ -11539,6 +11578,7 @@ def _equilibrate_phase_assemblage(
     solute_fugacity_parameter: str | None = None,
     handles: Mapping[str, object] | None = None,
     redox_mode: str | None = None,
+    measured_ferric_fraction: bool = False,
 ) -> EquilibriumResult:
     """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
 
@@ -11557,24 +11597,39 @@ def _equilibrate_phase_assemblage(
         kwargs: dict[str, object] = {
             "temperature_C": temperature_C,
             "composition_kg": dict(composition_kg),
-            "fO2_log": fO2_log,
             "pressure_bar": pressure_bar,
         }
         try:
             parameters = inspect.signature(backend.equilibrate).parameters
         except (TypeError, ValueError):
             parameters = {}
+        accepts_redox = "redox_mode" in parameters or any(
+            item.kind is inspect.Parameter.VAR_KEYWORD
+            for item in parameters.values()
+        )
+        omit_unconsumed_oxygen = False
         if redox_mode is not None:
-            accepts_redox = "redox_mode" in parameters or any(
-                item.kind is inspect.Parameter.VAR_KEYWORD
-                for item in parameters.values()
-            )
-            if not accepts_redox:
-                raise RuntimeError(
-                    f"{type(backend).__name__} does not accept redox_mode; "
-                    "a measured-oxygen ferric fraction is not converted to fO2"
-                )
-            kwargs["redox_mode"] = redox_mode
+            if accepts_redox:
+                kwargs["redox_mode"] = redox_mode
+            else:
+                from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+                # Oxygen that the quantity does not consume is omitted.
+                # A measured ferric fraction still fails closed: this
+                # adapter cannot be told the split, and fO2 is not invented.
+                if (
+                    parameters
+                    and not measured_ferric_fraction
+                    and redox_mode == REDOX_MODE_NOT_AN_INPUT
+                ):
+                    omit_unconsumed_oxygen = True
+                else:
+                    raise RuntimeError(
+                        f"{type(backend).__name__} does not accept redox_mode; "
+                        "a measured-oxygen ferric fraction is not converted to fO2"
+                    )
+        if not (omit_unconsumed_oxygen and fO2_log is None):
+            kwargs["fO2_log"] = fO2_log
         from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
         kwargs.update(isothermal_run_kwargs(handle.name, parameters))
@@ -12200,11 +12255,13 @@ def _predict_element_mass_fraction_phase(
 
     redox_mode: str | None = None
     fo2_log: float | None = None
+    measured_ferric_fraction = False
     if decision.redox_kind == "ferric_fraction":
         from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
 
         weights = decision.ferric_split_wt_percent or ()
         redox_mode = REDOX_MODE_NOT_AN_INPUT
+        measured_ferric_fraction = True
     elif decision.redox_kind == "conditions":
         weights = _feo_t_wt_percent(decision)
         composition_state = identity.composition
@@ -12287,6 +12344,11 @@ def _predict_element_mass_fraction_phase(
             pressure_bar=float(pressure_bar),
             handles=handles,
             redox_mode=redox_mode,
+            **(
+                {"measured_ferric_fraction": True}
+                if measured_ferric_fraction
+                else {}
+            ),
         )
     except Exception as exc:
         return refused(
@@ -13141,8 +13203,9 @@ def _predict_static_sodium_saturation(
     temperature: object,
     reservoir_phase: str,
     block: Mapping[str, object],
+    affected_quantity: Quantity = Quantity.P_SAT,
 ) -> EnginePrediction:
-    """Static-equilibrium pure-Na P_sat from the one saturation owner."""
+    """Pressure-independent pure-substance saturation from the one owner."""
 
     from engines.builtin.sodium_saturation import (
         SodiumSaturationError,
@@ -13191,7 +13254,7 @@ def _predict_static_sodium_saturation(
         notices = (
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.P_SAT,),
+                affected_quantities=(affected_quantity,),
                 reason=saturation.notice or "pure_component_saturation_extrapolated",
                 origin=observation.observation_id,
                 band=f"[{low:g}, {high:g}] K",
@@ -14751,6 +14814,16 @@ def _predict_with_engine(
         and experiment.method.is_value
         and experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
     )
+    pure_reservoir = stated_pure_substance_reservoir(identity)
+    # A stated pure reservoir whose formula is the measured gas is the
+    # saturation observable. Oxide reference states (Na(g) over NaO0.5(l))
+    # are not that row and stay on the melt path.
+    pure_species_saturation = (
+        engine is Engine.INTERNAL_ANALYTICAL
+        and quantity in {Quantity.P_SAT, Quantity.P_REFERENCE}
+        and pure_reservoir is not None
+        and pure_reservoir[0] == formula
+    )
     if is_sf04_workbook(observation) and engine in IMCC_ENGINES:
         return EnginePrediction(
             engine=engine,
@@ -14780,9 +14853,9 @@ def _predict_with_engine(
             identity=identity,
         )
 
-    if static_equilibrium_pressure:
-        reservoir = stated_pure_substance_reservoir(identity)
-        if reservoir is None:
+    if static_equilibrium_pressure or pure_species_saturation:
+        reservoir = pure_reservoir
+        if static_equilibrium_pressure and reservoir is None:
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -14797,7 +14870,11 @@ def _predict_with_engine(
                 },
                 identity=identity,
             )
-        if engine is Engine.INTERNAL_ANALYTICAL:
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and reservoir is not None
+            and reservoir[0] == formula
+        ):
             from engines.antoine import (
                 _AntoineCoefficientRefusal,
                 _antoine_log10_pressure,
@@ -14832,6 +14909,7 @@ def _predict_with_engine(
                     temperature=T,
                     reservoir_phase=reservoir[1],
                     block=saturation_block,
+                    affected_quantity=quantity,
                 )
             try:
                 coefficients, coefficient_block = wall_condensation_antoine_coefficients(

@@ -3561,7 +3561,7 @@ def _internal_analytical_vapor_pressure_adapter(
     """
 
     from types import SimpleNamespace
-    from simulator.state import Atmosphere
+    from simulator.state import Atmosphere, OxygenReservoirState
 
     if not composition_kg and not composition_mol:
         raise _InternalAnalyticalInputRefusal(
@@ -3660,6 +3660,12 @@ def _internal_analytical_vapor_pressure_adapter(
                 f"commanded pO2 must be finite and positive; got {po2_request.po2_bar!r}",
             )
         oxygen_source = "battery_observation_commanded_pO2"
+        if pressure is None:
+            raise _InternalAnalyticalInputRefusal(
+                1,
+                "internal_analytical_missing_total_pressure",
+                "commanded oxygen requires a total pressure",
+            )
     elif po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION:
         if oxygen_balance_backend is None:
             oxygen_balance_backend = _OpenImccBatteryBackend("openimcc")
@@ -3737,9 +3743,20 @@ def _internal_analytical_vapor_pressure_adapter(
     core.melt.composition_kg = dict(validated_melt_mass_kg_by_species)
     core.melt.update_total_mass()
     core.melt.temperature_C = temperature
-    if pressure is not None:
+    # Omitted controls must not keep the previous cell. A fresh MeltState
+    # is hard vacuum, zero total pressure, and the -9 fO2 seed.
+    if pressure is None:
+        core.melt.p_total_mbar = 0.0
+        core.melt.ambient_pressure_mbar = 0.0
+    else:
         core.melt.p_total_mbar = pressure * 1000.0
-    if po2_bar is not None:
+    if po2_bar is None:
+        core.melt.atmosphere = Atmosphere.HARD_VACUUM
+        core.melt.pO2_mbar = 0.0
+        core.melt.fO2_log = -9.0
+        core.melt.melt_fO2_log = -9.0
+        core.melt.oxygen_reservoir = OxygenReservoirState()
+    else:
         core.melt.atmosphere = Atmosphere.CONTROLLED_O2
         core.melt.pO2_mbar = po2_bar * 1000.0
         core.melt.fO2_log = fO2_log_used

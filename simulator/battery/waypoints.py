@@ -2167,6 +2167,9 @@ def oxygen_condition(
                             WaypointAuthority.DERIVED,
                             (("experiment.sample.container",) if inferred_container else ("experiment.fO2_control.buffer",))
                             + (*thermal.inputs, *pressure.inputs)))
+    # Held until after the unsupported-buffer and container checks. An earlier
+    # return would hide an apparatus that cannot state an oxygen condition.
+    vacuum_waypoint: Waypoint | None = None
     # Dalton's law gives pO2 <= P_total. A printed vacuum/total-pressure upper
     # bound is therefore a usable engine point only at its bound, with an
     # extrapolation notice. The bound is method_class calculated, never printed:
@@ -2216,16 +2219,17 @@ def oxygen_condition(
             )
             if value is not None:
                 qualification = "approximate " if pressure.approximate else ""
-                routes.append(Waypoint(
+                vacuum_waypoint = Waypoint(
                     "oxygen_condition",
                     value,
                     "vacuum_total_pressure_upper_bound",
                     WaypointAuthority.EXTRAPOLATED,
                     (*boundary.inputs, "Dalton: pO2 <= P_total"),
                     notice=f"{qualification}upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
-                ))
+                )
     if routes:
-        # A fired route is the decision. The OR-set is consulted only for the gap text.
+        # A fired non-vacuum route is the decision. The vacuum bound is held
+        # until the unsupported-buffer and container checks below.
         return _result(
             "oxygen_condition",
             routes,
@@ -2278,6 +2282,12 @@ def oxygen_condition(
                     "fO2_log",
                 ),
             ),
+        )
+    if vacuum_waypoint is not None:
+        return _result(
+            "oxygen_condition",
+            [vacuum_waypoint],
+            ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"),
         )
     control_present = buffer_known
     oxygen_inputs = {

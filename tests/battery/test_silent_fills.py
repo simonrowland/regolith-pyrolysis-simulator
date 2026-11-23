@@ -848,6 +848,75 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
     )
 
 
+def test_pure_sodium_reference_pressure_uses_the_saturation_owner() -> None:
+    from engines.builtin.sodium_saturation import (
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+    from simulator.battery.records import as_decimal
+    from simulator.config import load_config_bundle
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    temperature = Decimal("500")
+    ident = replace(
+        F.psat_identity("Na", T_K=temperature),
+        quantity=State.of(Quantity.P_REFERENCE),
+    )
+    observation = F.observation("na-pref", "exp", ident, Decimal("1"))
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, isolated=False
+    )
+    view = vapor_pressure_legacy_view(load_config_bundle().vapor_pressures)
+    block = sodium_saturation_block(view["metals"]["Na"])
+    assert block is not None
+    saturation = sodium_saturation_pressure(block, float(temperature))
+    assert prediction.value == as_decimal(str(saturation.pressure_pa))
+    assert prediction.refusal_reason is None, prediction.refusal_detail
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.affected_quantities == (Quantity.P_REFERENCE,)
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in prediction.notices
+    )
+    saturation_row = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "na-psat-500",
+            "exp",
+            F.psat_identity("Na", T_K=temperature),
+            Decimal("1"),
+        ),
+        isolated=False,
+    )
+    assert saturation_row.value == prediction.value
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.affected_quantities == (Quantity.P_SAT,)
+        for notice in saturation_row.notices
+    )
+
+
+def test_oxide_reference_pressure_does_not_use_metal_saturation(monkeypatch) -> None:
+    def _refuse(_row):
+        raise AssertionError(
+            "oxide P_REFERENCE used the sodium saturation owner"
+        )
+
+    monkeypatch.setattr(
+        "engines.builtin.sodium_saturation.sodium_saturation_block",
+        _refuse,
+    )
+    _capture_cell(monkeypatch)
+    observation = F.observation("na-oxide-pref", "exp", F.pref_identity(), Decimal("1"))
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, isolated=False
+    )
+    assert prediction.coefficient_basis != "pure_component_saturation"
+
+
 def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -> None:
     observation, experiment = _kems_partial(cell_material=None)
     experiment = replace(
@@ -861,12 +930,15 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
             ),
         ),
     )
+    point_conditions = dict(observation.point_conditions or {})
+    point_conditions.pop("total_pressure_Pa", None)
     observation = replace(
         observation,
         identity=replace(
             observation.identity,
             total_pressure_Pa=State.unknown("total pressure is not printed"),
         ),
+        point_conditions=point_conditions,
     )
     partials = {"K": 125.0, "KO": 75.0}
 
@@ -880,7 +952,7 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
         )
 
     def _cell(_handle, _pot, *, po2, physical_pressure_bar=None, **_kwargs):
-        assert po2.mode == PO2_COMMANDED
+        assert po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
         assert physical_pressure_bar is None
         return types.SimpleNamespace(
             status="ok",
@@ -913,8 +985,23 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
         isolated=False,
     )
 
-    assert prediction.value == Decimal("125")
+    assert prediction.value == Decimal(str(partials["K"]))
+    assert Decimal(str(sum(partials.values()))) == Decimal("200")
     assert prediction.identity.total_pressure_Pa == State.of(Decimal("200"))
+    from simulator.battery.default_policy import load_policy_table, resolve
+
+    policy = load_policy_table()["DP-108"]
+    assert policy["condition"] == (
+        "vapour equilibrium row with condensed phase; "
+        "method unstated and total pressure unprinted"
+    )
+    assert policy["formula_owner"] == (
+        "simulator.battery.score._sum_gas_partial_pressures_pa"
+    )
+    assert policy["status"] == "proposed"
+    assert resolve(
+        "DP-108", predicted_total_pressure_pa=Decimal("200")
+    ).value == Decimal("200")
     notice = next(
         item
         for item in prediction.notices
