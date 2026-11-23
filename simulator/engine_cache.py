@@ -591,7 +591,7 @@ def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:045e025fd5158001908572fe2b8a841b2f95efbf",
+        "identity": "commit:174cc5006a6ac72b4460462b6cbf811fdb2cada1",
         "date": "2026-11-22",
     },
     "internal-analytical": {
