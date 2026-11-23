@@ -516,6 +516,26 @@ class Locator:
     def _is_pdf_page_index(index: object) -> bool:
         return type(index) is int and index >= 0
 
+    def has_published_page(self) -> bool:
+        """A printed folio, separate from the physical PDF page address."""
+        page = self.published_page
+        if type(page) is int:
+            return page > 0
+        if not isinstance(page, str):
+            return False
+        text = page.strip()
+        if not text:
+            return False
+        if re.fullmatch(
+            r"(?i)(?:page\s+)?(?:[a-z]{1,8}-?)?[1-9]\d*(?:[a-z]{1,8}\d*)?(?:[-–](?:[a-z]{1,8}-?)?[1-9]\d*(?:[a-z]{1,8}\d*)?)?(?:\s+of\s+[1-9]\d*)?(?:\.pdf)?",
+            text,
+        ):
+            return True
+        return re.fullmatch(
+            r"(?i)(?=.)m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})",
+            text,
+        ) is not None
+
     def has_method_location(self) -> bool:
         """A physical page plus a section, paragraph, equation, or table anchor."""
 

@@ -11,7 +11,7 @@ from unittest.mock import patch
 import yaml
 
 from simulator.battery import score
-from simulator.battery.enums import Engine, NoticeKind, Phase, Quantity, RefusalReason
+from simulator.battery.enums import Engine, NoticeKind, Phase, Quantity
 from simulator.battery.fo2_ladder import has_printed_fo2
 from simulator.battery.migrate import (
     Migrator,
@@ -19,6 +19,8 @@ from simulator.battery.migrate import (
     _printed_point_phase_text,
 )
 from simulator.battery.records import ApproxPressure, BandBasis, Located, State
+from simulator.physical_constants import PA_PER_BAR
+import tools.validate_literature_extracts as vle
 from simulator.yaml_cache import yaml_mapping_source_issues
 from tools.validate_literature_extracts import validate_extract_file
 
@@ -295,15 +297,42 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
             assert candidate.identity.fO2_Pa.value == Decimal("10000")
             assert residual.numeric is not None, residual.refusal
 
-            # Green's missing-oxygen gate applies until the canonical default lands.
+            # Missing oxygen uses the shared resolver's flagged default.
             backend.reset_mock()
             for row in missing_oxygen:
-                residual, _ = score.compile_residual(row, engine, context=context)
-                assert residual.numeric is None
-                assert residual.refusal is not None
-                assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-                assert residual.refusal.detail["input"] == "printed_fO2"
-            backend.assert_not_called()
+                residual, candidate = score.compile_residual(row, engine, context=context)
+                backend.assert_called_once()
+                assert residual.numeric is not None, residual.refusal
+                oxygen_notices = [
+                    notice for notice in residual.notices
+                    if notice.origin == "fo2_ladder"
+                ]
+                assert oxygen_notices
+                assert isinstance(oxygen_notices[0].kind, NoticeKind)
+                assert "selected_fO2_Pa=" in oxygen_notices[0].reason
+                assert "source does not print fO2 for this run" in oxygen_notices[0].reason
+                assert row.identity.fO2_Pa.is_unknown
+                assert {
+                    "non_equilibrium_run",
+                    "crystal_bearing_bulk_composition",
+                } <= set(score.flagged_strata(residual.notices))
+                assert candidate is not None
+                if engine is Engine.INTERNAL_ANALYTICAL:
+                    assert isclose(
+                        backend.call_args.kwargs["fO2_log"],
+                        log10(float(candidate.identity.fO2_Pa.value) / PA_PER_BAR),
+                    )
+                else:
+                    assert isclose(
+                        backend.call_args.kwargs["lambda_imposed"],
+                        log(float(candidate.identity.fO2_Pa.value) / PA_PER_BAR),
+                    )
+                payload = score.residual_to_plain(residual)
+                headline = score.headline_payloads([payload], [engine])
+                assert [
+                    item["n_scored"] for item in headline if item["rail"] == "redox"
+                ] == [0]
+                backend.reset_mock()
 
 
 def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: Path):
@@ -344,6 +373,60 @@ def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: P
             False,
             False,
         ),
+        (
+            {
+                "page": 4,
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            False,
+        ),
+        (
+            {
+                "published_page": "civil",
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            False,
+        ),
+        (
+            {
+                "published_page": "0",
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            False,
+        ),
+        (
+            {
+                "published_page": "SI-7",
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            True,
+        ),
+        (
+            {
+                "published_page": "SI-10–SI-11",
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            True,
+        ),
+        (
+            {
+                "published_page": "E02S13",
+                "pdf_page_index": 3,
+                "section": "Experimental Method and Results",
+            },
+            False,
+            True,
+        ),
     ):
         control.clear()
         control.update(original)
@@ -355,10 +438,11 @@ def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: P
             control["inferred"] = True
         path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
         row = _row_at(_migrate_extract(path).observations.values(), "1430", "23")
+        expected_published_page = locator.get("published_page") if locator else None
         assert has_printed_fo2(row, row.identity) == printed
         if printed:
             pressure = row.point_conditions["fO2_Pa"]
-            assert pressure.locator.published_page == 532
+            assert pressure.locator.published_page == expected_published_page
             assert pressure.inference.relation == "atm_to_Pa"
             assert row.identity.fO2_Pa.value == Decimal("20265")
         else:
@@ -393,3 +477,16 @@ def test_kennedy_fidelity_pin_detects_a_changed_table2_cell(tmp_path: Path):
 
     errors = validate_extract_file(path, check_fidelity_match=True)
     assert any("fidelity sample value mismatch" in error for error in errors)
+
+
+def test_kennedy_table2_fidelity_pin_covers_the_observation():
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
+    assert not {
+        warning.kind for warning in warnings
+    } & {"uncovered_observation", "unattested_sample"}
+
+    mutated = deepcopy(source)
+    mutated["fidelity_samples"].pop(0)
+    warnings = vle.fidelity_source_warnings(mutated, label=EXTRACT.stem)
+    assert any(warning.kind == "uncovered_observation" for warning in warnings)

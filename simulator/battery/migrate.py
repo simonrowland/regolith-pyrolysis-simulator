@@ -23254,32 +23254,13 @@ def _walk_printed_oxygen(
             )
             control_address = control.get("locator") if isinstance(control, Mapping) else None
             control_locator = locator_from_mapping(control_address)
-            printed_page = (
-                control_address.get("page")
-                if isinstance(control_address, Mapping)
-                else None
-            )
-            published_page = (
-                control_address.get("published_page")
-                if isinstance(control_address, Mapping)
-                else None
-            )
-            has_printed_page = any(
-                type(page) is int and page > 0
-                or isinstance(page, str)
-                and re.fullmatch(
-                    r"(?i)(?:page\s+)?(?:[a-z]*\d+(?:[.\-/–][a-z]*\d+)*|[ivxlcdm]+)(?:\.pdf)?(?:\s+of\s+\d+)?",
-                    page.strip(),
-                )
-                for page in (printed_page, published_page)
-            )
             if (
                 isinstance(control_text, str)
                 and isinstance(control, Mapping)
                 and control_locator is not None
                 and isinstance(control_address, Mapping)
                 and Locator._is_pdf_page_index(control_address.get("pdf_page_index"))
-                and has_printed_page
+                and control_locator.has_published_page()
                 and control_locator.has_method_location()
                 and not _oxygen_node_rejected(control, control_text)
                 and control.get("inference") is None

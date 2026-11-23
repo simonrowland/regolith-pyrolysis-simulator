@@ -9714,9 +9714,36 @@ def _predict_redox(
                 {"reason": "missing_input", "input": "printed_fO2"},
             )
     elif fo2_log is None:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "printed_fO2"},
+        from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+
+        resolved_fo2 = resolve_row_fo2(
+            experiment,
+            None,
+            observation,
+            composition_wt=material.composition_wt,
+            temperature_K=float(material.temperature),
+            quantity=Quantity.FE3_FE2_RATIO,
+        )
+        if resolved_fo2 is None:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+        fo2_log = resolved_fo2.log10_fO2_bar
+        commanded_fo2_pa = State.of(
+            Decimal(str(resolved_fo2.po2_bar)) * PA_PER_BAR_DEC
+            if resolved_fo2.po2_bar is not None
+            else log10_fo2_to_pa(Decimal(str(fo2_log)))
+        )
+        oxygen_notice = fo2_tier_notice(Quantity.FE3_FE2_RATIO, resolved_fo2)
+        material_notices.append(
+            replace(
+                oxygen_notice,
+                reason=(
+                    f"{oxygen_notice.reason}; selected_fO2_Pa={commanded_fo2_pa.value}; "
+                    "original_reason=source does not print fO2 for this run"
+                ),
+            )
         )
 
     if engine is Engine.OPENIMCC:
