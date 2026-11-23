@@ -463,3 +463,10 @@ def test_isolated_migration_refuses_a_point_value(tmp_path: Path, docs) -> None:
     assert gas.identity.species.phase.value is Phase.G
     assert condensed.identity.species.phase.is_unknown
     assert "condensed" in (condensed.identity.species.phase.reason or "")
+
+
+def test_hill_formula_matches_manifest_carbon_element_order() -> None:
+    from simulator.reference_data.fastchem import hill_formula
+
+    assert hill_formula({"C": 1, "Br": 1, "F": 3}, 0) == "CBrF3"
+    assert hill_formula({"C": 1, "H": 3, "F": 1}, 0) == "CH3F"

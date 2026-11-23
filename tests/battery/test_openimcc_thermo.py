@@ -722,6 +722,19 @@ def test_openimcc_kelley_trihydrate_uses_janaf_h095_formula_key(monkeypatch) -> 
     assert attempt.value == Decimal("25.0")
 
 
+def test_openimcc_grouped_carbon_formula_uses_janaf_hill_key() -> None:
+    from simulator.accounting.formulas import canonicalize_formula
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    root = Path(__file__).resolve().parents[2]
+    janaf = load_cached_safe_yaml(
+        (root / "data/literature/compilations/janaf/tables/C-065.yaml").read_bytes()
+    )
+    expected_formula = janaf["table"]["index_entry"]["formula_normalised"]
+    assert expected_formula == "CH3F"
+    assert canonicalize_formula("C(F)(H3)") == (expected_formula, None, None)
+
+
 def test_openimcc_formula_suffix_phases_use_the_existing_phase_map() -> None:
     from simulator.accounting.formulas import canonicalize_formula
     from simulator.battery.migrate import map_phase
