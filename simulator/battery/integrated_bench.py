@@ -691,7 +691,7 @@ def _project_hour_row(row: Mapping[str, Any]) -> tuple[dict[str, Any], str | Non
             projected["vapor_species_kg_hr"] = copied
             if not clean:
                 issue = "malformed_row"
-        elif species is not None:
+        else:
             projected["vapor_species_kg_hr"] = species
             issue = "malformed_row"
     refusals = row.get("condensation_refusals_by_species")
@@ -744,25 +744,60 @@ def _project_step(row: Any) -> tuple[dict[str, Any], str | None]:
     return projected, None
 
 
+def _species_key_ok(name: Any) -> bool:
+    return (
+        isinstance(name, str)
+        and bool(name)
+        and name.strip() == name
+        and " " not in name
+        and name not in FORBIDDEN_REQUEST_KEYS
+    )
+
+
+def _keep_evidence(value: Any) -> Any:
+    """Copy a rejected leaf so the partial still shows what was wrong."""
+
+    if isinstance(value, Mapping):
+        return {
+            (key if isinstance(key, str) else str(key)): _keep_evidence(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_keep_evidence(item) for item in value]
+    return value
+
+
 def _copy_species_tree(
     value: Mapping[str, Any],
     depth: int = 0,
+    *,
+    nested_ok: bool = False,
 ) -> tuple[dict[str, Any], bool]:
-    """Copy a species map. An empty map is valid. A bad leaf is kept."""
+    """Copy a species map. An empty map is valid. A bad leaf is kept.
 
+    A flat rate field rejects a nested map. ``deposit_by_surface`` is the
+    one map of surface to species map, and only that caller sets
+    ``nested_ok``. ``depth`` is accepted so a caller can pass it through.
+    """
+
+    del depth
     projected: dict[str, Any] = {}
     clean = True
     for name, item in value.items():
-        if not isinstance(name, str) or " " in name or name in FORBIDDEN_REQUEST_KEYS:
-            continue
+        key = name if isinstance(name, str) else str(name)
+        if not _species_key_ok(name):
+            clean = False
         if _finite(item):
-            projected[name] = float(item)
-        elif depth < 2 and isinstance(item, Mapping):
-            child, child_clean = _copy_species_tree(item, depth + 1)
-            projected[name] = child
+            projected[key] = float(item)
+        elif isinstance(item, Mapping) and nested_ok:
+            child, child_clean = _copy_species_tree(item, nested_ok=False)
+            projected[key] = child
             clean = clean and child_clean
+        elif isinstance(item, Mapping):
+            projected[key] = _keep_evidence(item)
+            clean = False
         else:
-            projected[name] = item
+            projected[key] = item
             clean = False
     return dict(sorted(projected.items())), clean
 
@@ -780,7 +815,9 @@ def _project_final_state(state: Any) -> tuple[dict[str, Any], str | None]:
     clean = True
     saw_finite = False
     for account, species in state.items():
+        key = account if isinstance(account, str) else str(account)
         if not isinstance(account, str) or account in FORBIDDEN_REQUEST_KEYS:
+            projected[key] = _keep_evidence(species)
             clean = False
             continue
         if not isinstance(species, Mapping):
@@ -788,7 +825,7 @@ def _project_final_state(state: Any) -> tuple[dict[str, Any], str | None]:
             clean = False
             continue
         mols, mols_clean = _copy_species_tree(species)
-        projected[account] = mols
+        projected[key] = mols
         clean = clean and mols_clean
         if mols_clean and any(_finite(mol) for mol in mols.values()):
             saw_finite = True
@@ -815,11 +852,21 @@ def _project_final_report(final: Any) -> tuple[dict[str, Any], str | None]:
         if key not in final:
             continue
         value = final[key]
-        if value == NOT_APPLICABLE_UNTIL_P0:
+        if (
+            key == "pump_outlet_by_species_kg"
+            and value == NOT_APPLICABLE_UNTIL_P0
+        ):
             projected[key] = NOT_APPLICABLE_UNTIL_P0
             continue
+        if value == NOT_APPLICABLE_UNTIL_P0 or value is None:
+            projected[key] = value
+            clean = False
+            continue
         if isinstance(value, Mapping):
-            child, child_clean = _copy_species_tree(value)
+            child, child_clean = _copy_species_tree(
+                value,
+                nested_ok=(key == "deposit_by_surface_species_kg"),
+            )
             projected[key] = child
             clean = clean and child_clean
             continue
@@ -919,6 +966,10 @@ def project_whole_run(
             elif report_issue is not None:
                 status_text = "partial"
                 reason = report_issue
+        incoming = document.get("reason")
+        if status_text == _SUCCESS_STATUS and incoming not in (None, ""):
+            status_text = "partial"
+            reason = incoming if isinstance(incoming, str) else str(incoming)
 
     hot: dict[str, Any] = {
         "status": status_text,
@@ -936,15 +987,14 @@ def project_whole_run(
 
 
 def _validated_ok_document(result: Any, requested_steps: int) -> bool:
-    """True when a returned document is a complete ``ok`` run.
+    """True when the store projection calls this document a complete ok run.
 
-    Hits of every status use this check. It is the store projection:
-    an index-only row or an empty final is not success.
+    Cold store and every hit, including rows inserted by ``load_cache_rows``,
+    use ``project_whole_run``. Shape, status, and reason are not checked
+    anywhere else.
     """
 
-    if not isinstance(result, Mapping) or result.get("status") != _SUCCESS_STATUS:
-        return False
-    if result.get("reason"):
+    if not isinstance(result, Mapping):
         return False
     _hot, cacheable = project_whole_run(result, requested_steps=requested_steps)
     return cacheable

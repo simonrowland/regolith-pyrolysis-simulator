@@ -1851,3 +1851,126 @@ def test_loaded_species_poison_is_rejected_like_a_cold_row(
     with pytest.raises(IntegratedBenchContractError) as error:
         run_cached_deck(deck, lambda *_args: pytest.fail("cache miss"))
     assert error.value.reason == "cache_hit_not_ok"
+
+
+def _apply_shape_defect(payload: dict, defect: str) -> bool:
+    """Mutate one document. Return whether that shape is still a complete ok."""
+
+    hour = payload["per_hour_summary"][0]
+    token = integrated_bench.NOT_APPLICABLE_UNTIL_P0
+    if defect == "null":
+        hour["vapor_species_kg_hr"] = None
+        return False
+    if defect == "invalid_name":
+        hour["vapor_species_kg_hr"] = {"bad species": "bad"}
+        return False
+    if defect == "nested":
+        hour["vapor_species_kg_hr"] = {"O2": {"unexpected": 1.0}}
+        return False
+    if defect == "reason":
+        payload["reason"] = "failed"
+        return False
+    if defect == "wall_token":
+        payload["final"]["wall_deposit_by_species_kg"] = token
+        return False
+    if defect == "empty_map":
+        hour["vapor_species_kg_hr"] = {}
+        return True
+    if defect == "pump_token":
+        payload["final"]["pump_outlet_by_species_kg"] = token
+        return True
+    raise AssertionError(defect)
+
+
+@pytest.mark.parametrize(
+    "defect",
+    [
+        "null",
+        "invalid_name",
+        "nested",
+        "reason",
+        "wall_token",
+        "empty_map",
+        "pump_token",
+    ],
+)
+def test_cold_and_validated_shape_agree(defect: str) -> None:
+    """Store and hit use one shape judgment, including a present null map."""
+
+    payload = _ok_document(1)
+    expect = _apply_shape_defect(payload, defect)
+    hot, cacheable = project_whole_run(payload, requested_steps=1)
+    assert cacheable is expect
+    assert integrated_bench._validated_ok_document(payload, 1) is expect
+    if defect == "null":
+        assert hot["per_hour_summary"][0]["vapor_species_kg_hr"] is None
+    elif defect == "invalid_name":
+        assert hot["per_hour_summary"][0]["vapor_species_kg_hr"]["bad species"] == (
+            "bad"
+        )
+    elif defect == "nested":
+        assert hot["per_hour_summary"][0]["vapor_species_kg_hr"]["O2"] == {
+            "unexpected": 1.0,
+        }
+    if not expect:
+        assert hot["status"] == "partial"
+        assert hot["reason"]
+
+
+@pytest.mark.parametrize(
+    "defect",
+    ["null", "invalid_name", "nested", "reason", "wall_token"],
+)
+def test_loaded_shape_defect_is_rejected_like_the_cold_row(
+    robinot_deck: DeckRequest,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    defect: str,
+) -> None:
+    payload = _ok_document(robinot_deck.requested_steps)
+    assert _apply_shape_defect(payload, defect) is False
+    assert project_whole_run(
+        payload,
+        requested_steps=robinot_deck.requested_steps,
+    )[1] is False
+    db_path = _configure(monkeypatch, tmp_path)
+    key = _key(robinot_deck.cache_request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    assert engine_cache.load_cache_rows(
+        db_path,
+        [(key, payload, "simulator", version, "s2", first_row)],
+    ) == 1
+    with pytest.raises(IntegratedBenchContractError) as error:
+        run_cached_deck(robinot_deck, lambda *_args: pytest.fail("cache miss"))
+    assert error.value.reason == "cache_hit_not_ok"
+
+
+@pytest.mark.parametrize("defect", ["empty_map", "pump_token"])
+def test_loaded_clean_shape_is_a_hit(
+    robinot_deck: DeckRequest,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    defect: str,
+) -> None:
+    payload = _ok_document(robinot_deck.requested_steps)
+    assert _apply_shape_defect(payload, defect) is True
+    assert project_whole_run(
+        payload,
+        requested_steps=robinot_deck.requested_steps,
+    )[1] is True
+    db_path = _configure(monkeypatch, tmp_path)
+    key = _key(robinot_deck.cache_request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    assert engine_cache.load_cache_rows(
+        db_path,
+        [(key, payload, "simulator", version, "s2", first_row)],
+    ) == 1
+
+    def unexpected(*_args, **_kwargs):
+        pytest.fail("a clean loaded row called the solver")
+
+    hit = run_cached_deck(robinot_deck, unexpected)
+    assert hit["status"] == "ok"
+    assert "reason" not in hit
