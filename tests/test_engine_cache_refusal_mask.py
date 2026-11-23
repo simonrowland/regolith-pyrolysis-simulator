@@ -438,6 +438,42 @@ def test_readonly_serves_a_mask_and_does_not_learn_or_unmask(tmp_path, monkeypat
     assert audit_after == audit
 
 
+def test_disabled_cache_path_does_not_serve_a_mask_replay(tmp_path, monkeypatch):
+    path = tmp_path / "cache.sqlite"
+    path.mkdir()
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    engine = "alphamelts"
+    request = {"temperature_K": 1700.0}
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+    key = engine_cache.engine_cache_key(engine, version, request)
+    calls = []
+
+    def solve():
+        calls.append(1)
+        return {"answer": len(calls)}
+
+    assert _call(engine, request, solve) == {"answer": 1}
+    path_value = engine_cache._configured_engine_cache_path()
+    assert path_value is not None
+    engine_cache._MEMORY_CACHE[(path_value, key, False)] = engine_cache._MaskReplay(
+        "refusal:engine_crash",
+        {"kind": "refusal", "hot": _refusal("engine_crash")},
+    )
+
+    # Once sqlite disabled this path, the early cache-off branch must run
+    # before either an exact HOT or mask replay can be served from memory.
+    assert _call(engine, request, solve) == {"answer": 2}
+    assert calls == [1, 1]
+    counts = engine_cache.engine_cache_counters()[engine]
+    assert counts["not_stored:unopenable"] == 2
+    assert counts.get("mask_hit:refusal:engine_crash", 0) == 0
+
+
 def test_exception_replay_uses_the_real_types(tmp_path, monkeypatch):
     from engines.alphamelts.thermoengine import (
         ThermoEngineFO2OmittedError,

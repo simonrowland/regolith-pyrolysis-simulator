@@ -842,9 +842,11 @@ _ENGINE_CACHE_PATH_OVERRIDE: ContextVar[str | None | object] = ContextVar(
 # Set by the pytest fixture from the runner environment. None outside pytest,
 # so scoring scripts keep the process mode and are not treated as test doubles.
 _RUNNER_CACHE_SNAPSHOT: tuple[str | None, str] | None = None
-# Paths that are the wrong schema or not a sqlite file. The process does not
-# open them again. Migration stays a manual command.
-_SCHEMA_MISMATCH_DISABLED: set[str] = set()
+# Paths this process will not open again. The value is the not_stored
+# reason. ``schema_mismatch`` is a wrong schema or a non-sqlite file.
+# ``unopenable`` is a path sqlite cannot open. A lock is not recorded:
+# the next call opens again. Migration stays a manual command.
+_DISABLED_CACHE_PATHS: dict[str, str] = {}
 _MISSING = object()
 
 ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
@@ -1375,17 +1377,77 @@ def _value_is_double(value: Any, seen: set[int], depth: int) -> bool:
     return _instance_is_double(value, seen)
 
 
+def _sqlite_error_is_lock(exc: BaseException) -> bool:
+    """True when the open failed because the database is locked or busy.
+
+    That failure is retried. It is not a reason to disable the path.
+    """
+
+    message = str(exc).lower()
+    return "locked" in message or "busy" in message
+
+
 def _cache_open_is_schema_mismatch(exc: BaseException) -> bool:
     """True when the file itself is stale, wrong-schema, or not sqlite.
 
-    ``OperationalError`` (locked, busy) is not this: that open can be
-    retried. An exact ``DatabaseError`` is "file is not a database" or a
-    malformed image. Schema mismatch is the typed wrong-schema refusal.
+    A locked or busy ``OperationalError`` is not this: that open is
+    retried. A path sqlite cannot open is not this either: that is
+    ``_cache_open_is_unopenable``. An exact ``DatabaseError`` is "file is
+    not a database" or a malformed image. Schema mismatch is the typed
+    wrong-schema refusal.
     """
 
     if isinstance(exc, EngineCacheSchemaMismatch):
         return True
     return type(exc) is sqlite3.DatabaseError
+
+
+def _cache_open_is_unopenable(exc: BaseException, path: Path) -> bool:
+    """True when sqlite cannot open this path at all.
+
+    Mode 000 raises ``unable to open database file``. A directory does too
+    on a writable open. A read-only URI open of a directory is reported by
+    some sqlite builds as ``disk I/O error`` instead. A directory cannot
+    become a database by retrying. A locked or busy file is not this.
+    """
+
+    if type(exc) is not sqlite3.OperationalError:
+        return False
+    if _sqlite_error_is_lock(exc):
+        return False
+    if "unable to open database file" in str(exc).lower():
+        return True
+    try:
+        return path.is_dir()
+    except OSError:
+        return False
+
+
+def _remember_disabled_cache_path(path_value: str, reason: str) -> tuple[str, bool]:
+    """Disable this path for the process. Return its identity and whether it is new."""
+
+    identity = _cache_path_identity(path_value) or path_value
+    with _LOCK:
+        first = identity not in _DISABLED_CACHE_PATHS
+        if first:
+            _DISABLED_CACHE_PATHS[identity] = reason
+    return identity, first
+
+
+def _disabled_cache_reason(path_value: str) -> str | None:
+    identity = _cache_path_identity(path_value)
+    if identity is None:
+        return None
+    with _LOCK:
+        return _DISABLED_CACHE_PATHS.get(identity)
+
+
+def _count_disabled_cache_open(engine_id: str, reason: str) -> None:
+    with _LOCK:
+        counts = _counter_bucket(engine_id)
+        counts["misses"] += 1
+        name = f"not_stored:{reason}"
+        counts[name] = counts.get(name, 0) + 1
 
 
 def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
@@ -1396,10 +1458,7 @@ def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
     expected and found schema, and ``scripts/engine_cache_sync.py migrate``.
     """
 
-    identity = _cache_path_identity(path_value) or path_value
-    with _LOCK:
-        first = identity not in _SCHEMA_MISMATCH_DISABLED
-        _SCHEMA_MISMATCH_DISABLED.add(identity)
+    identity, first = _remember_disabled_cache_path(path_value, "schema_mismatch")
     if not first:
         return
     if isinstance(exc, EngineCacheSchemaMismatch):
@@ -1421,21 +1480,22 @@ def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
     )
 
 
-def _schema_mismatch_disabled(path_value: str) -> bool:
-    identity = _cache_path_identity(path_value)
-    if identity is None:
-        return False
-    with _LOCK:
-        return identity in _SCHEMA_MISMATCH_DISABLED
+def _disable_unopenable(path_value: str, exc: BaseException) -> None:
+    """Stop opening this path, and say so once.
 
+    A cache sqlite cannot open must not stop the run and must not be
+    retried on every call. The notice names the path and sqlite's reason.
+    A lock is not this path.
+    """
 
-def _count_schema_mismatch(engine_id: str) -> None:
-    with _LOCK:
-        counts = _counter_bucket(engine_id)
-        counts["misses"] += 1
-        counts["not_stored:schema_mismatch"] = (
-            counts.get("not_stored:schema_mismatch", 0) + 1
-        )
+    identity, first = _remember_disabled_cache_path(path_value, "unopenable")
+    if not first:
+        return
+    logging.getLogger(__name__).warning(
+        "engine_cache_unopenable path=%s reason=%s",
+        identity,
+        exc,
+    )
 
 
 def _solve_is_test_double(solve: Any) -> bool:
@@ -1877,7 +1937,7 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                         connection.execute("PRAGMA journal_mode=WAL")
                     break
                 except sqlite3.OperationalError as exc:
-                    if "locked" not in str(exc).lower() and "busy" not in str(exc).lower():
+                    if not _sqlite_error_is_lock(exc):
                         connection.close()
                         raise
                     if time.monotonic() >= deadline:
@@ -2862,7 +2922,6 @@ def _remember_mask(
             memory_key, _MaskReplay(refusal_class, dict(recipe)),
         )
 
-
 def _flag_live(hot: Any, exc: BaseException | None, refusal_class: str) -> Any:
     if exc is not None:
         try:
@@ -3185,10 +3244,13 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     path_value = _configured_engine_cache_path()
     if not path_value:
         return live_hot(solve())
-    # A wrong-schema or non-sqlite file stays closed for this process.
-    # The run solves uncached. Do not migrate it from this path.
-    if _schema_mismatch_disabled(path_value):
-        _count_schema_mismatch(engine_id)
+    # A wrong-schema, non-sqlite, or unopenable path stays closed for this
+    # process. The run solves uncached. Do not migrate it from this path.
+    # A lock is not recorded here, so the next call opens again. This check
+    # precedes memory hits so a disabled cache cannot serve a mask replay.
+    disabled = _disabled_cache_reason(path_value)
+    if disabled is not None:
+        _count_disabled_cache_open(engine_id, disabled)
         return live_hot(solve())
     readonly = _engine_cache_is_readonly(path_value)
     if (
@@ -3252,7 +3314,12 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         if _cache_open_is_schema_mismatch(exc):
             # One notice per path. Later calls skip the open entirely.
             _disable_schema_mismatch(path_value, exc)
-            _count_schema_mismatch(engine_id)
+            _count_disabled_cache_open(engine_id, "schema_mismatch")
+            return live_hot(solve())
+        if _cache_open_is_unopenable(exc, path):
+            # One notice per path. Later calls skip the open entirely.
+            _disable_unopenable(path_value, exc)
+            _count_disabled_cache_open(engine_id, "unopenable")
             return live_hot(solve())
         with _LOCK:
             counts = _counter_bucket(engine_id)

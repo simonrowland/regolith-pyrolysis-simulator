@@ -534,6 +534,204 @@ def test_garbage_file_solves_uncached_and_notifies_once(
     )
 
 
+def _observed_sqlite_open_error(path: Path, *, readonly: bool) -> str:
+    """The message sqlite itself raises for this path. Not the cache classifier."""
+
+    try:
+        if readonly:
+            connection = sqlite3.connect(
+                engine_cache._cache_uri(path), uri=True, timeout=0.2
+            )
+        else:
+            connection = sqlite3.connect(path, timeout=0.2)
+    except sqlite3.OperationalError as exc:
+        return str(exc)
+    else:
+        connection.close()
+        raise AssertionError(f"sqlite opened {path}")
+
+
+def _assert_unopenable_solves_uncached(
+    path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    *,
+    readonly: bool,
+) -> None:
+    """An unopenable cache path is one notice, then uncached solves, and is not retried."""
+
+    reason = _observed_sqlite_open_error(path, readonly=readonly)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    if readonly:
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    else:
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    before = path.stat()
+    calls = {"solve": 0, "connect": 0}
+    real_connect = engine_cache.sqlite3.connect
+
+    def connect(*args, **kwargs):
+        calls["connect"] += 1
+        return real_connect(*args, **kwargs)
+
+    def solve() -> dict[str, int]:
+        calls["solve"] += 1
+        return {"answer": 42}
+
+    request = {"call": "unopenable-cache"}
+    monkeypatch.setattr(engine_cache.sqlite3, "connect", connect)
+    with caplog.at_level("WARNING", logger=engine_cache.__name__):
+        first = engine_cache.cached_engine_call("openimcc", request, solve)
+        second = engine_cache.cached_engine_call("openimcc", request, solve)
+        warmed = engine_cache.engine_cache_counters()["openimcc"]
+        notices = [
+            record.getMessage()
+            for record in caplog.records
+            if record.getMessage().startswith("engine_cache_unopenable")
+        ]
+        engine_cache.engine_cache_counters(reset=True)
+        third = engine_cache.cached_engine_call("openimcc", request, solve)
+        notices_after_reset = [
+            record.getMessage()
+            for record in caplog.records
+            if record.getMessage().startswith("engine_cache_unopenable")
+        ]
+    assert first == second == third == {"answer": 42}
+    assert calls["solve"] == 3
+    assert calls["connect"] == 1
+    assert warmed["hits"] == 0
+    assert warmed["stores"] == 0
+    assert warmed["misses"] == 2
+    assert warmed["not_stored:unopenable"] == 2
+    assert warmed.get("read_error", 0) == 0
+    assert warmed.get("not_stored:readonly", 0) == 0
+    assert warmed.get("not_stored:schema_mismatch", 0) == 0
+    counts = engine_cache.engine_cache_counters()["openimcc"]
+    assert counts["hits"] == 0
+    assert counts["stores"] == 0
+    assert counts["misses"] == 1
+    assert counts["not_stored:unopenable"] == 1
+    assert counts.get("read_error", 0) == 0
+    assert counts.get("not_stored:readonly", 0) == 0
+    assert counts.get("not_stored:schema_mismatch", 0) == 0
+    assert notices == notices_after_reset
+    assert len(notices) == 1
+    identity = os.path.realpath(path)
+    assert notices[0] == f"engine_cache_unopenable path={identity} reason={reason}"
+    after = path.stat()
+    assert (after.st_mode, after.st_size) == (before.st_mode, before.st_size)
+    engine_cache._close_connections()
+
+
+@pytest.mark.parametrize("readonly", [False, True], ids=("writable", "readonly"))
+def test_mode_000_cache_file_is_unopenable_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    readonly: bool,
+) -> None:
+    path = tmp_path / "mode000.sqlite"
+    path.write_bytes(b"sealed")
+    path.chmod(0)
+    try:
+        _assert_unopenable_solves_uncached(
+            path, monkeypatch, caplog, readonly=readonly
+        )
+        assert path.stat().st_mode & 0o777 == 0
+    finally:
+        path.chmod(0o644)
+        engine_cache._close_connections()
+
+
+@pytest.mark.parametrize("readonly", [False, True], ids=("writable", "readonly"))
+def test_directory_cache_path_is_unopenable_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    readonly: bool,
+) -> None:
+    path = tmp_path / "cache-dir"
+    path.mkdir()
+    _assert_unopenable_solves_uncached(path, monkeypatch, caplog, readonly=readonly)
+    assert path.is_dir()
+    engine_cache._close_connections()
+
+
+def test_locked_cache_is_retried_until_it_opens(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A locked database stays retriable. It is not disabled for the process."""
+
+    path = tmp_path / "locked.sqlite"
+    holder = sqlite3.connect(path)
+    holder.execute("BEGIN EXCLUSIVE")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    monkeypatch.setattr(engine_cache, "_TIMEOUT_MS", 200)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    calls = {"solve": 0, "connect": 0}
+    real_connect = engine_cache.sqlite3.connect
+
+    def connect(*args, **kwargs):
+        calls["connect"] += 1
+        return real_connect(*args, **kwargs)
+
+    def solve() -> dict[str, int]:
+        calls["solve"] += 1
+        return {"answer": 7}
+
+    request = {"call": "locked-cache"}
+    monkeypatch.setattr(engine_cache.sqlite3, "connect", connect)
+    try:
+        with caplog.at_level("WARNING", logger=engine_cache.__name__):
+            first = engine_cache.cached_engine_call("openimcc", request, solve)
+            second = engine_cache.cached_engine_call("openimcc", request, solve)
+            notices = [
+                record.getMessage()
+                for record in caplog.records
+                if record.getMessage().startswith("engine_cache_unopenable")
+                or record.getMessage().startswith("engine_cache_schema_mismatch")
+            ]
+        assert first == second == {"answer": 7}
+        assert calls["solve"] == 2
+        assert calls["connect"] == 2
+        assert notices == []
+        blocked = engine_cache.engine_cache_counters()["openimcc"]
+        assert blocked["read_error"] == 2
+        assert blocked["misses"] == 2
+        assert blocked["stores"] == 0
+        assert blocked["not_stored:readonly"] == 2
+        assert blocked.get("not_stored:unopenable", 0) == 0
+        assert blocked.get("not_stored:schema_mismatch", 0) == 0
+        holder.commit()
+        engine_cache._MEMORY_CACHE.clear()
+        stored = engine_cache.cached_engine_call("openimcc", request, solve)
+        assert stored == {"answer": 7}
+        assert calls["solve"] == 3
+        assert calls["connect"] == 3
+        engine_cache._MEMORY_CACHE.clear()
+        hit = engine_cache.cached_engine_call(
+            "openimcc",
+            request,
+            lambda: pytest.fail("expected the stored row after the lock cleared"),
+        )
+        assert hit == {"answer": 7}
+        counts = engine_cache.engine_cache_counters()["openimcc"]
+        assert counts["stores"] == 1
+        assert counts["hits"] == 1
+        assert counts.get("not_stored:unopenable", 0) == 0
+    finally:
+        holder.close()
+        engine_cache._close_connections()
+
+
 def test_engine_cache_key_preserves_exact_float_values() -> None:
     assert engine_cache_key(
         "openimcc", 1, {"temperature_K": 1700.0}
