@@ -60,6 +60,42 @@ def _assert_render_pins(document: dict) -> None:
     assert oxygen["locator"]["phase"] == "Metal"
     assert oxygen["locator"]["column"] == "O"
     assert oxygen["values"]["basis_as_published"] == "O mass percent in Metal phase"
+    table_ii_metals = [
+        (species, row)
+        for species, group in document["species"].items()
+        for row in group["observations"]
+        if row["locator"].get("table") == "II"
+        and row.get("phase_as_published") == "Metal"
+        and row["locator"].get("column") == "O"
+    ]
+    assert len(table_ii_metals) == 36
+    assert not any(
+        row["locator"].get("table") == "II"
+        and row.get("phase_as_published") == "Metal"
+        and row["locator"].get("column") == "SiO2"
+        for group in document["species"].values()
+        for row in group["observations"]
+    )
+    for species, row in table_ii_metals:
+        assert species == "O"
+        assert row["locator"]["column"] == "O"
+        assert row["values"]["component_as_published"] == "O"
+        assert row["values"]["basis_as_published"] == "O mass percent in Metal phase"
+    table_ii_sio2_slags = [
+        (species, row)
+        for species, group in document["species"].items()
+        for row in group["observations"]
+        if row["locator"].get("table") == "II"
+        and row.get("phase_as_published") == "Slag"
+        and row["locator"].get("column") == "SiO2"
+    ]
+    assert len(table_ii_sio2_slags) == 36
+    assert all(
+        species == "SiO2"
+        and row["locator"]["column"] == "SiO2"
+        and row["values"]["component_as_published"] == "SiO2"
+        for species, row in table_ii_sio2_slags
+    )
 
 
 def _assert_phase_role_source_binding(row: dict, printed_phase: str) -> None:
@@ -154,6 +190,19 @@ def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> No
             assert condition.state.is_value
             assert condition.state.value == expected
             assert condition.locator is not None
+
+    table_ii_oxygen_metals = [
+        row
+        for row in observations.values()
+        if row["locator"].get("table") == "II"
+        and row.get("phase_as_published") == "Metal"
+        and row["locator"].get("column") == "O"
+    ]
+    assert len(table_ii_oxygen_metals) == 36
+    for source_row in table_ii_oxygen_metals:
+        migrated_row = by_id[source_row["observation_id"]]
+        assert migrated_row.identity.species.formula == "O"
+        assert migrated_row.value.point == Decimal(str(source_row["values"]["value"]))
 
     role_rows = [
         row

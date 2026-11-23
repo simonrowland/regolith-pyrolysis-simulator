@@ -181,10 +181,31 @@ def _assert_composition_bindings(document: dict) -> None:
     }
     assert by_group[("henao:C-18", "metal")]["Co"] == "3.68"
     assert by_group[("henao:C-28", "metal")]["Co"] == "1.63"
+    bounded_rows = [
+        observation
+        for observation in observations
+        if "composition_missing_components" in observation["values"]
+    ]
+    assert len(bounded_rows) == 18
+    for observation in bounded_rows:
+        values = observation["values"]
+        assert values["composition_missing_components"] == [
+            {
+                "component": "Ni",
+                "reason": "below_detection_limit",
+                "value_as_published": "<0.03",
+            }
+        ]
+        assert "Ni was printed as <0.03 wt% and excluded." in values["note"]
     assert all(
         "composition_status" not in observation["values"]
         for observation in observations
         if observation["values"].get("phase_label") == "metal"
+    )
+    assert all(
+        "note" not in observation["values"]
+        for observation in observations
+        if "composition_missing_components" not in observation["values"]
     )
 
 
