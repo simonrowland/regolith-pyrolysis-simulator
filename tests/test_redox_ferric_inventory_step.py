@@ -551,7 +551,8 @@ def test_ferric_reappearance_reopens_the_tangent(
     assert oxidized.redox_source_terms_applied is True
     assert oxidized.redox_source_skip_reason == ""
     assert sim._ferric_tangent_exhausted is False
-    assert oxidized.melt_intrinsic_fO2_log == pytest.approx(
+    oxidized_log = float(oxidized.melt_intrinsic_fO2_log)
+    assert oxidized_log == pytest.approx(
         stopped + (_STEP_MOL / 1.0) / math.log(10.0)
     )
 
@@ -559,11 +560,13 @@ def test_ferric_reappearance_reopens_the_tangent(
         {"redox_source:test_reducing": -_STEP_MOL},
         temperature_K=_TEMPERATURE_K,
     )
+    # The apply returns the same reservoir object, so the comparison
+    # has to use the float captured above.
     assert resumed_after.redox_source_terms_applied is True
+    assert resumed_after.redox_source_skip_reason == ""
     assert sim._ferric_tangent_exhausted is False
     assert resumed_after.melt_intrinsic_fO2_log == pytest.approx(
-        oxidized.melt_intrinsic_fO2_log
-        + (-_STEP_MOL / 1.0) / math.log(10.0)
+        oxidized_log + (-_STEP_MOL / 1.0) / math.log(10.0)
     )
 
 
