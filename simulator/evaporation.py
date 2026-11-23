@@ -9,7 +9,6 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
-from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     PROXY_BRIDGE_ALPHA_STATUS,
@@ -2154,6 +2153,8 @@ class EvaporationMixin:
         Returns:
             EvaporationFlux with species_kg_hr dict
         """
+        from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+
         T_K = self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
         flux = EvaporationFlux()
         # A previous hour's computed rates must not leak into a tick that
