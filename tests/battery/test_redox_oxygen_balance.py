@@ -88,10 +88,15 @@ def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch
 
     response = SimpleNamespace(
         diagnostics={
-            "fe_redox_split": {"fe3": 0.25, "a_FeO": 0.91},
             "vapor_pressure_diagnostic": {
-                "a_FeO_calphad": 0.37,
-                "kress91_split": {"fe3_over_sigma_fe": 0.5},
+                "a_FeO_calphad": {
+                    "a_FeO_calphad": 0.37,
+                    "a_FeO_authoritative": 0.41,
+                    "kress91_split": {
+                        "fe3_over_sigma_fe": 0.5,
+                        "x_feo": 0.37,
+                    },
+                },
             }
         }
     )
@@ -116,6 +121,65 @@ def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch
     assert evaluated.fe_activity == 0.37
     assert evaluated.speciation_source == "engine"
     assert flags == set()
+
+
+def test_reporting_limit_omission_is_honoured_by_the_exponent_probe() -> None:
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "Fe/O2 root"),
+        ResidueChannel("MgO", "MgO", "MgO", 1.0, "documented omission"),
+        ResidueChannel("O2", "O2", None, 1.0, "Fe/O2 root"),
+    )
+    omission = {
+        "species": "MgO",
+        "reporting_threshold_Pa": 1.0e-8,
+        "computed_pressure_Pa": 9.0e-9,
+        "provenance": "BuiltinVaporPressureProvider.below_reporting_threshold_omissions",
+    }
+
+    def pressure(logp: float) -> PressureEvaluation:
+        pO2_bar = 10.0**logp
+        pressures = {
+            "Fe": 2.114e-7 * pO2_bar**-0.5,
+            "MgO": 1.0e-8,
+            "O2": 1.0e5 * pO2_bar,
+        }
+        omissions = {}
+        if logp > -8.02:
+            pressures["MgO"] = 0.0
+            omissions["MgO"] = omission
+        return PressureEvaluation(
+            pressures,
+            below_threshold_omissions=omissions,
+        )
+
+    pressure.declares_redox_active = True
+    balance = _residue_oxygen_balance(
+        _channel_terms(channels), {"FeO": 1.0, "MgO": 1.0}, pressure, 1800.0,
+    )
+    assert balance.pO2_bar > 0.0
+    assert balance.pressures_Pa["MgO"] == 1.0e-8
+
+
+def test_generic_balance_failure_reaches_finite_step_no_flux_check() -> None:
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "no-flux discriminator"),
+        ResidueChannel("O2", "O2", None, 1.0, "no-flux discriminator"),
+    )
+    calls = 0
+
+    def pressure(_inventory, _logp):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise ValueError("synthetic generic oxygen solver failure")
+        return {"Fe": 0.0, "O2": 0.0}
+
+    result = integrate_residue_inventory(
+        {"FeO": 1.0}, channels, pressure,
+        temperature_K=1800.0, duration_s=1.0, area_evolution_m2=(1.0e-4,),
+    )
+    assert result.pO2_bar_by_step == (None,)
+    assert calls == 2
 
 
 def test_zero_oxygen_boundary_uses_redox_dependent_feo_demand() -> None:

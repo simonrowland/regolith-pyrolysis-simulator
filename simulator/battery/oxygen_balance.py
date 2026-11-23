@@ -13,6 +13,7 @@ from simulator.physical_constants import GAS_CONSTANT
 from simulator.vacuum_oxygen_balance import (
     OxygenBalanceBracketBoundary,
     PressureLawChannelDiagnostic,
+    PressureLawExponentMismatch,
     _OXYGEN_GAS_ALPHA,
     _OXYGEN_GAS_ALPHA_SOURCE,
     _VacuumOxygenBalance,
@@ -340,8 +341,14 @@ def _solve_vacuum_oxygen_balance(
     if bracket_boundary != "lower":
         probe_low = max(low, root - 0.1)
         probe_high = root + 0.1
-        _low_residual, lower_pressures, _low_oxygen, _low_parent, _activity_low, _low_demands, _q_low = evaluate(probe_low)
-        _high_residual, upper_pressures, _high_oxygen, _high_parent, _activity_high, _high_demands, _q_high = evaluate(probe_high)
+        lower_model_pressures = pressure_model(probe_low)
+        upper_model_pressures = pressure_model(probe_high)
+        _low_residual, lower_pressures, _low_oxygen, _low_parent, _activity_low, _low_demands, _q_low = evaluate(
+            probe_low, lower_model_pressures
+        )
+        _high_residual, upper_pressures, _high_oxygen, _high_parent, _activity_high, _high_demands, _q_high = evaluate(
+            probe_high, upper_model_pressures
+        )
         for channel in active_channels:
             pressure = pressures[channel.species]
             if pressure <= 1.0e-300:
@@ -349,6 +356,20 @@ def _solve_vacuum_oxygen_balance(
             lower_pressure = lower_pressures[channel.species]
             upper_pressure = upper_pressures[channel.species]
             if lower_pressure <= 0.0 or upper_pressure <= 0.0:
+                lower_omissions = getattr(
+                    lower_model_pressures, "below_threshold_omissions", {}
+                )
+                upper_omissions = getattr(
+                    upper_model_pressures, "below_threshold_omissions", {}
+                )
+                if (
+                    isinstance(lower_omissions, Mapping)
+                    and channel.species in lower_omissions
+                ) or (
+                    isinstance(upper_omissions, Mapping)
+                    and channel.species in upper_omissions
+                ):
+                    continue
                 raise ValueError(
                     f"pressure law for {channel.species!r} is not positive around the root"
                 )
@@ -359,7 +380,7 @@ def _solve_vacuum_oxygen_balance(
                 # Fixed-activity laws and undeclared callables retain the
                 # supplied stoichiometric exponent as a hard contract.
                 if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
-                    raise ValueError(
+                    raise PressureLawExponentMismatch(
                         f"pressure law exponent mismatch for {channel.species!r}: "
                         f"declared {channel.pO2_exponent}, observed {observed_exponent}"
                     )
@@ -395,6 +416,9 @@ def _solve_vacuum_oxygen_balance(
             fe3_over_sum_fe=getattr(low_model_pressures, "fe3_over_sum_fe", None),
             fe_activity=getattr(low_model_pressures, "fe_activity", None),
             speciation_source=getattr(low_model_pressures, "speciation_source", None),
+            below_threshold_omissions=getattr(
+                low_model_pressures, "below_threshold_omissions", None
+            ),
         )
         (
             residual,

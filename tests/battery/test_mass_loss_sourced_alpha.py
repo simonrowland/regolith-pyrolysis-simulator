@@ -305,6 +305,61 @@ def test_mass_loss_bounds_use_each_channels_worst_oxygen_corner(
         assert corners["inventory_capped_channels"] == ["Ca"]
 
 
+def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueChannel
+
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "unsourced Fe"),
+        ResidueChannel("FeO", "FeO", "FeO", 1.0, "unsourced FeO"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+    )
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        return residue.PressureEvaluation(
+            {
+                "Fe": 1.0e-4 * pO2_bar**-0.5,
+                "FeO": 1.0,
+                "O2": 1.0e5 * pO2_bar,
+            },
+            fe3_over_sum_fe=0.5,
+        )
+
+    pressure.declares_fixed_activities = True
+    selected_pressures = {}
+    production_flux = residue._finite_step_fluxes
+
+    def capture_flux(terms, inventory, **kwargs):
+        selected_pressures.update(kwargs["pressures_Pa"])
+        return production_flux(terms, inventory, **kwargs)
+
+    monkeypatch.setattr(residue, "_finite_step_fluxes", capture_flux)
+    area_m2 = 1.0e-4
+    duration_s = 1.0
+    bounds, corners = residue._mass_loss_corner_bounds(
+        {"FeO": 1.0}, channels, pressure, unsourced=("Fe", "FeO"),
+        temperature_K=1800.0, area_m2=area_m2, duration_s=duration_s,
+    )
+    assert corners["pO2_low_bar"] == pytest.approx(6.071549282154776e-7, rel=1e-9)
+    assert selected_pressures["Fe"] >= 0.1283
+    fe_term = residue._channel_terms(
+        (channels[0],), require_oxygen_channels=False,
+    )
+    arm_rate = production_flux(
+        fe_term,
+        {"FeO": 1.0},
+        temperature_K=1800.0,
+        area_m2=area_m2,
+        pressures_Pa={"Fe": 0.12833651381197933},
+        include_below_threshold=True,
+    )["Fe"]
+    minimum_fe_bound = arm_rate * duration_s * fe_term[0].oxide_per_product_kg
+    assert bounds["Fe"] >= minimum_fe_bound
+
+
 @pytest.fixture
 def r11_inputs():
     from simulator.battery.records import (
@@ -493,10 +548,14 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
                for p in prescribed_pressure_engine["pressures"])
 
 
+@pytest.mark.parametrize("fallback_flag", (
+    "residue_fe_speciation_kress91_fallback",
+    "residue_fe_speciation_unavailable_stoichiometric_feo",
+))
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_redox_fallback_flag_reaches_mass_loss_prediction(
-    fig3_source, r11_inputs, prescribed_pressure_engine, monkeypatch,
+    fallback_flag, fig3_source, r11_inputs, prescribed_pressure_engine, monkeypatch,
 ):
     import simulator.battery.residue as residue
     from simulator.battery.enums import NoticeKind
@@ -506,8 +565,6 @@ def test_redox_fallback_flag_reaches_mass_loss_prediction(
     )
 
     row, experiment = r11_inputs
-    fallback_flag = "residue_fe_speciation_kress91_fallback"
-
     def pressure_factory(_engine, _channels, _pack, **kwargs):
         temperature_K = kwargs["temperature_K"]
         engine_flags = kwargs["engine_flags"]
@@ -534,6 +591,9 @@ def test_redox_fallback_flag_reaches_mass_loss_prediction(
     assert len(fallback) == 1
     assert fallback[0].kind is NoticeKind.FALLBACK
     assert FLAGGED_STRATUM_RESIDUE_REDOX in flagged_strata(prediction.notices)
+    assert flagged_strata(fallback) == (FLAGGED_STRATUM_RESIDUE_REDOX,)
+    if fallback_flag == "residue_fe_speciation_unavailable_stoichiometric_feo":
+        assert "default=1 O/Fe" in fallback[0].origin
 
 
 def test_full_prediction_refuses_non_negligible_unsourced_channel(

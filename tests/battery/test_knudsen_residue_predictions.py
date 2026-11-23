@@ -76,6 +76,13 @@ def _channels(gas="FeO"):
             ResidueChannel("O2", "O2", None, 1.0, "equilibrium effusion"))
 
 
+def _preserve_pressure_contract(source, wrapper):
+    for name in ("declares_fixed_activities", "declares_redox_active", "engine_flags"):
+        if hasattr(source, name):
+            setattr(wrapper, name, getattr(source, name))
+    return wrapper
+
+
 @pytest.mark.parametrize("pressure", (1e-9, 1e6))
 def test_single_volatile_limit_is_exact_and_scale_free(pressure):
     result = integrate_knudsen_residue_inventory(
@@ -573,15 +580,21 @@ def test_real_analytical_closure_and_extent_carry_redox_diagnostic():
     inventory, gas_channels, pressure = _real_analytical_cmas_pressure(1905.15)
     channels = tuple(ResidueChannel(s, s, parent, 1.0, "real analytical closure")
                      for s, (parent, _, _) in gas_channels)
+    pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(inventory, p),
+    )
     balance = _residue_oxygen_balance(
-        _channel_terms(channels), inventory, lambda p: pressure(inventory, p), 1905.15,
+        _channel_terms(channels), inventory, pressure_at, 1905.15,
     )
     iron = [row for row in balance.pressure_law_diagnostics if row.species == "Fe"]
     assert len(iron) == 1
     assert iron[0].reason == "residue_pressure_law_redox_active"
     assert iron[0].declared == -0.5
+    integrate_pressure = _preserve_pressure_contract(
+        pressure, lambda n, p, temperature: pressure(n, p),
+    )
     result = integrate_knudsen_residue_inventory(
-        inventory, channels, lambda n, p, temperature: pressure(n, p),
+        inventory, channels, integrate_pressure,
         temperature_path=((0.01, 1905.15),), measured_mass_loss_fraction=0.01,
         near_saturated=True, source_fO2_log_by_interval=(None,),
     )
@@ -589,9 +602,12 @@ def test_real_analytical_closure_and_extent_carry_redox_diagnostic():
         row.species == "Fe" and row.reason == "residue_pressure_law_redox_active"
         for row in result.pressure_law_diagnostics
     )
+    endpoint_pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(result.residue_mol, p),
+    )
     endpoint_balance = _residue_oxygen_balance(
         _channel_terms(channels), result.residue_mol,
-        lambda p: pressure(result.residue_mol, p), 1905.15,
+        endpoint_pressure_at, 1905.15,
     )
     endpoint_iron = [
         row for row in endpoint_balance.pressure_law_diagnostics
@@ -640,8 +656,11 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperatu
     inventory, gas_channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)
     channels = tuple(ResidueChannel(s, s, parent, 1.0, "printed Markova first interval")
                      for s, (parent, _, _) in gas_channels)
+    pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(inventory, p),
+    )
     balance = _residue_oxygen_balance(
-        _channel_terms(channels), inventory, lambda p: pressure(inventory, p), temperature_K,
+        _channel_terms(channels), inventory, pressure_at, temperature_K,
     )
     iron = [row for row in balance.pressure_law_diagnostics if row.species == "Fe"]
     assert len(iron) == 1
@@ -653,8 +672,11 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperatu
     ]
     assert len(al_notices) == 1
     assert "below_reporting_threshold_omissions" in al_notices[0].reason
+    integrate_pressure = _preserve_pressure_contract(
+        pressure, lambda n, p, t: pressure(n, p),
+    )
     result = integrate_knudsen_residue_inventory(
-        inventory, channels, lambda n, p, t: pressure(n, p),
+        inventory, channels, integrate_pressure,
         temperature_path=((extent, temperature_K),), measured_mass_loss_fraction=extent,
         near_saturated=True, source_fO2_log_by_interval=(None,),
     )
@@ -662,9 +684,12 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperatu
         row.species == "Fe" and row.reason == "residue_pressure_law_redox_active"
         for row in result.pressure_law_diagnostics
     )
+    endpoint_pressure_at = _preserve_pressure_contract(
+        pressure, lambda p: pressure(result.residue_mol, p),
+    )
     endpoint_balance = _residue_oxygen_balance(
         _channel_terms(channels), result.residue_mol,
-        lambda p: pressure(result.residue_mol, p), temperature_K,
+        endpoint_pressure_at, temperature_K,
     )
     endpoint_iron = [
         row for row in endpoint_balance.pressure_law_diagnostics

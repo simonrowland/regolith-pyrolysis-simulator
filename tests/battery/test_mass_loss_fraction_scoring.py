@@ -398,10 +398,26 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
         expected_numeric.unit,
         expected_numeric.value,
     )
-    assert any(
-        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        and notice.reason == "residue_pressure_law_redox_active"
+    redox_notice = next(
+        notice
         for notice in residual.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "residue_pressure_law_redox_active"
+        and "species=Fe" in notice.origin
+    )
+    diagnostic_numbers = {
+        key: float(value)
+        for key, value in (
+            part.strip().split("=", 1)
+            for part in redox_notice.origin.split(";")
+            if "=" in part
+        )
+        if key in {"declared", "observed", "expected"}
+    }
+    assert diagnostic_numbers["declared"] == pytest.approx(-0.5)
+    assert diagnostic_numbers["expected"] < diagnostic_numbers["declared"]
+    assert diagnostic_numbers["observed"] == pytest.approx(
+        diagnostic_numbers["expected"], abs=2e-3,
     )
     assert score_module.FLAGGED_STRATUM_RESIDUE_REDOX in score_module.flagged_strata(
         residual.notices
