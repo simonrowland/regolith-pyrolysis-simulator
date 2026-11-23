@@ -99,6 +99,9 @@ def _printed_cell(value: Located, *, address_only: bool = False) -> _PrintedCell
     # Legacy stores and in-memory callers can still supply an unconverted print.
     scalar = value.state.value
     if isinstance(scalar, Value):
+        if scalar.kind is ValueKind.INTERVAL:
+            # Old records can establish the address even without a raw range.
+            return _PrintedCell(address, None)
         scalar = scalar.point
     if not isinstance(scalar, (str, Decimal, int)) or isinstance(scalar, bool):
         return None
@@ -123,7 +126,8 @@ def same_printed_cell(a: _PrintedCell | None, b: _PrintedCell | None) -> str | N
     try:
         first, second = Decimal(a.value), Decimal(b.value)
     except InvalidOperation:
-        return "ambiguous" if a.value == b.value else None
+        units_agree = a.unit is None or b.unit is None or a.unit == b.unit
+        return "ambiguous" if a.value == b.value and units_agree else None
     return (
         "ambiguous" if first.is_finite() and second.is_finite() and first == second else None
     )

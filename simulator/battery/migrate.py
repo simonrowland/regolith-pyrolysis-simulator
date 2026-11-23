@@ -2747,13 +2747,22 @@ def _condition_value_from_plain(payload: object) -> object:
     return as_decimal(payload)
 
 
-def _raw_scalar_print(payload: object, unit: str | None) -> tuple[str, str | None] | None:
+def _raw_cell_print(payload: object, unit: str | None) -> tuple[str, str | None] | None:
     while isinstance(payload, Mapping):
         units = payload.get("units", payload.get("unit"))
         if isinstance(units, str):
             unit = units
-        if payload.get("kind") not in (None, "point"):
+        if payload.get("kind") not in (None, "point", "interval"):
             return None
+        if payload.get("as_printed") is None and payload.get("as_published") is None:
+            low = payload.get("interval_low", payload.get("low"))
+            high = payload.get("interval_high", payload.get("high"))
+            if low is not None and high is not None:
+                low_unit = payload.get("low_units") or unit
+                high_unit = payload.get("high_units") or unit
+                if low_unit != high_unit:
+                    return f"{low} {low_unit or ''}–{high} {high_unit or ''}".strip(), None
+                return f"{low}–{high}", low_unit
         payload = next(
             (payload[key] for key in ("as_printed", "as_published", "state", "value", "point")
              if payload.get(key) is not None),
@@ -2765,14 +2774,17 @@ def _raw_scalar_print(payload: object, unit: str | None) -> tuple[str, str | Non
 
 
 def _with_located_print(condition: Located, payload: object, unit: str | None) -> Located:
-    raw = _raw_scalar_print(payload, unit)
+    raw = _raw_cell_print(payload, unit)
     if raw is None or condition.locator is None:
         return condition
     return replace(condition, locator=located_printed_cell(condition.locator, *raw))
 
 
 def _retain_condition_print(condition: Located, payload: object, field: str | None) -> Located:
-    unit = _PRESSURE_CONDITION_UNITS.get(field) or dict(_TEMPERATURE_FIELDS).get(field)
+    unit = (
+        _PRESSURE_CONDITION_UNITS.get(field) or dict(_TEMPERATURE_FIELDS).get(field)
+        or ("Pa" if field == "oxygen_partial_pressure_Pa" else None)
+    )
     if condition.inference is None:
         return _with_located_print(condition, payload, unit)
     if not isinstance(payload, Mapping):
@@ -2780,6 +2792,10 @@ def _retain_condition_print(condition: Located, payload: object, field: str | No
     published = payload.get("as_published")
     if isinstance(published, Mapping):
         # The location decoder already verified this conversion.
+        if isinstance(payload.get("as_printed"), str):
+            raw = _raw_cell_print(published, unit)
+            if raw is not None:
+                return _with_located_print(condition, payload["as_printed"], raw[1])
         return _with_located_print(condition, published, unit)
     declaration = payload.get("inference")
     if not isinstance(declaration, Mapping):
@@ -2811,7 +2827,7 @@ def _with_target_print(
         and identity.species is not None and identity.species.formula == "O2"
     ):
         return provenance
-    if selection is None or selection.value.kind is not ValueKind.POINT or not isinstance(payload, Mapping):
+    if selection is None or selection.value.kind not in {ValueKind.POINT, ValueKind.INTERVAL} or not isinstance(payload, Mapping):
         return provenance
     # A ratio reduced from several printed analytes has no single raw scalar.
     if selection.reduction is not None and len(selection.reduction[1]) != 1:
@@ -2827,7 +2843,7 @@ def _with_target_print(
                 if field.startswith("log10_"):
                     units = "log10"
     node = _temperature_field_value(payload, field)
-    raw = _raw_scalar_print(node, units or ("1" if redox else None))
+    raw = _raw_cell_print(node, units or ("1" if redox else None))
     if raw is None:
         return provenance
     printed: dict[str, Any] = {"value": raw[0], "unit": raw[1]}
@@ -4116,13 +4132,23 @@ def _sweep_gas_from_plain(payload: object) -> object:
         return payload
 
 
-def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
+def _experiment_control_from_plain(payload: object, cast, field: str, *, retain_print: bool) -> Located:
+    control = _located_from_plain(payload, cast)
+    if control.state.is_value and (
+        retain_print or isinstance(payload, Mapping) and isinstance(payload.get("as_published"), Mapping)
+    ):
+        return _retain_condition_print(control, payload, field)
+    return control
+
+
+def _pressure_env_from_plain(payload: object, *, retain_print: bool = False) -> PressureEnvironment:
     assert _is_mapping(payload)
     regime_raw = payload.get("regime") or {}
     note = payload.get("cell_internal_pressure_note")
     return PressureEnvironment(
-        total_pressure_Pa=_located_from_plain(
-            payload["total_pressure_Pa"], _value_or_point_from_plain
+        total_pressure_Pa=_experiment_control_from_plain(
+            payload["total_pressure_Pa"], _value_or_point_from_plain, "total_pressure_Pa",
+            retain_print=retain_print,
         ),
         sweep_gas=_located_from_plain(
             payload["sweep_gas"],
@@ -4286,10 +4312,9 @@ def _experiment_from_plain(
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
         try:
-            condition = _located_from_plain(value, _condition_value_from_plain)
-            if retain_print and condition.state.is_value:
-                condition = _retain_condition_print(condition, value, str(key))
-            conditions[str(key)] = condition
+            conditions[str(key)] = _experiment_control_from_plain(
+                value, _condition_value_from_plain, str(key), retain_print=retain_print,
+            )
         except (ArithmeticError, TypeError, ValueError):
             locator = (
                 _locator_from_plain(value.get("locator"))
@@ -4309,19 +4334,21 @@ def _experiment_from_plain(
             channel=_state_from_plain(fo2["channel"], lambda v: FO2Channel(str(v))),
             buffer=None
             if fo2.get("buffer") is None
-            else _located_from_plain(fo2["buffer"], str),
+            else _experiment_control_from_plain(fo2["buffer"], str, "buffer", retain_print=retain_print),
             oxygen_partial_pressure_Pa=None
             if fo2.get("oxygen_partial_pressure_Pa") is None
-            else _located_from_plain(
-                fo2["oxygen_partial_pressure_Pa"], _value_or_point_from_plain
+            else _experiment_control_from_plain(
+                fo2["oxygen_partial_pressure_Pa"], _value_or_point_from_plain,
+                "oxygen_partial_pressure_Pa", retain_print=retain_print,
             ),
             gas_ratio=None
             if fo2.get("gas_ratio") is None
             else GasRatio(
                 numerator_species=str(fo2["gas_ratio"]["numerator_species"]),
                 denominator_species=str(fo2["gas_ratio"]["denominator_species"]),
-                value=_located_from_plain(
-                    fo2["gas_ratio"]["value"], _value_or_point_from_plain
+                value=_experiment_control_from_plain(
+                    fo2["gas_ratio"]["value"], _value_or_point_from_plain,
+                    "gas_ratio", retain_print=retain_print,
                 ),
                 basis=str(fo2["gas_ratio"]["basis"]),
             ),
@@ -4342,7 +4369,7 @@ def _experiment_from_plain(
             registry_issues=registry_issues,
         ),
         conditions=conditions,
-        pressure_environment=_pressure_env_from_plain(payload["pressure_environment"]),
+        pressure_environment=_pressure_env_from_plain(payload["pressure_environment"], retain_print=retain_print),
         work_id=payload.get("work_id"),
         simulated_experiment_id=payload.get("simulated_experiment_id"),
         locator=_locator_from_plain(payload.get("locator")),
@@ -19552,7 +19579,7 @@ def _located_from_hit(
             f"extract {hit.entry.printed} is a bound or approximate value, not a point; "
             f"extract_value={hit.as_published}; {qualification.strip()}"
         )
-    return Located(
+    condition = Located(
         state,
         locator=hit.locator,
         inference=Derivation(
@@ -19571,6 +19598,9 @@ def _located_from_hit(
             output_unit=_output_unit_for(hit.entry.field),
         ),
     )
+    if is_pressure and state.is_value and not inferred:
+        return _with_located_print(condition, hit.mapping or hit.as_published, hit.units)
+    return condition
 
 
 def _unique_located(
@@ -28491,7 +28521,7 @@ class Migrator:
                         t_payload, t_sel.field_name
                     ),
                     read_from=choose_read_from(work, temperature_locator),
-                    printed=_raw_scalar_print(
+                    printed=_raw_cell_print(
                         _temperature_field_value(t_payload, t_sel.field_name),
                         "C" if t_sel.unit_trail == "celsius_to_kelvin" else "K",
                     ) if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO} else None,
@@ -31657,7 +31687,7 @@ class Migrator:
                         else None
                     ),
                     read_from=read_from,
-                    printed=_raw_scalar_print(
+                    printed=_raw_cell_print(
                         _temperature_field_value(raw_item, t_sel.field_name),
                         "C" if t_trail == "celsius_to_kelvin" else "K",
                     ) if q_for_species in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO} else None,

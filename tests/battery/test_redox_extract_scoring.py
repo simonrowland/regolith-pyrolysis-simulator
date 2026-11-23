@@ -30,11 +30,15 @@ from simulator.battery.enums import (
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
+    SourceSelection,
+    _point_condition_from_plain,
+    _with_target_print,
     experiment_from_plain,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     load_yaml,
     observation_from_plain,
+    pressure_from_equipment,
     to_plain,
     write_outputs,
 )
@@ -1759,6 +1763,54 @@ def test_migration_retains_borisov_raw_log_and_temperature_prints():
         assert temperature.state.value == Decimal("1775.15")
 
 
+@pytest.mark.parametrize("field", ("total_pressure_Pa", "oxygen_partial_pressure_Pa"))
+def test_experiment_pressure_retains_printed_source_through_round_trip(field):
+    payload = to_plain(F.tabulation_experiment())
+    source = {
+        "state": {"tag": "value", "value": {"kind": "point", "point": "40000000"}},
+        "as_published": {"value": "400.00", "units": "bar"},
+        "locator": {"page": 3, "table": "2", "record": "run 4", "note": "column=pressure"},
+    }
+    if field == "total_pressure_Pa":
+        payload["pressure_environment"][field] = source
+    else:
+        payload["fO2_control"] = {"channel": {"tag": "value", "value": "commanded"}, field: source}
+    experiment = experiment_from_plain(payload)
+
+    for run in (experiment, experiment_from_plain(to_plain(experiment))):
+        control = run.pressure_environment if field == "total_pressure_Pa" else run.fO2_control
+        pressure = getattr(control, field)
+        printed = _printed_cell(pressure, address_only=True)
+        assert (printed.value, printed.unit) == ("400.00", "bar")
+        assert printed.address[1:] == ("3", "2", None, "run 4", "pressure")
+        assert pressure.state.value.point == Decimal("40000000")
+
+
+def test_experiment_pressure_interval_retains_authored_syntax():
+    payload = to_plain(F.tabulation_experiment())
+    payload["pressure_environment"]["total_pressure_Pa"] = {
+        "state": {"tag": "value", "value": {
+            "kind": "interval", "interval_low": "40000000", "interval_high": "90000000",
+        }},
+        "as_published": {"low": "400.00", "high": "900.00", "units": "bar"},
+        "as_printed": "400.00 to 900.00",
+        "locator": {"page": 3, "table": "2", "record": "run 4", "note": "column=pressure"},
+    }
+    experiment = experiment_from_plain(payload)
+    for run in (experiment, experiment_from_plain(to_plain(experiment))):
+        pressure = run.pressure_environment.total_pressure_Pa
+        printed = _printed_cell(pressure, address_only=True)
+        assert (printed.value, printed.unit) == ("400.00 to 900.00", "bar")
+        assert (pressure.state.value.interval_low, pressure.state.value.interval_high) == (
+            Decimal("40000000"), Decimal("90000000"),
+        )
+
+    equipment = {"chamber_pressure": {"value": "400.00", "units": "bar"}}
+    environment = pressure_from_equipment(equipment, locator=Locator(page=3, record="run 4"))
+    printed = _printed_cell(environment.total_pressure_Pa, address_only=True)
+    assert (printed.value, printed.unit) == ("400.00", "bar")
+
+
 def _without_printed_fo2(observation):
     conditions = dict(observation.point_conditions or {})
     conditions.pop("fO2_log", None)
@@ -2384,6 +2436,17 @@ def borisov_redox_row():
     for (comparison, equal), matches in zip((("equal", True), ("different", False)), expectations)
     for form, reduced in (("raw", False), ("normalised", True))
 ] + [
+    pytest.param("pressure-interval", column, equal, False, matches,
+                 id=f"pressure-interval-{address}-{comparison}")
+    for address, column, expectations in (
+        ("same-cell", "result", (True, True)),
+        ("row-only", None, (True, False)),
+        ("different-cell", "independent", (False, False)),
+    )
+    for (comparison, equal), matches in zip((("equal", True), ("different", False)), expectations)
+] + [
+    pytest.param("pressure-interval", "result", False, True, True, id="review-target-pressure-interval"),
+    pytest.param("pressure-interval", "independent", False, True, False, id="review-independent-pressure-interval"),
     pytest.param("borisov-real-oxygen", None, False, True, False, id="borisov-real-row"),
     pytest.param("condition-value", None, True, True, True, id="review-borisov-raw-copy"),
     pytest.param("derivation-operand", None, True, False, True, id="review-located-operand"),
@@ -2412,6 +2475,42 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
     quantity = Quantity.FE3_FE2_RATIO
     if route == "borisov-real-oxygen":
         target = real
+    elif route == "pressure-interval":
+        raw_interval = {
+            "kind": "interval", "interval_low": "400", "interval_high": "900", "approximate": False,
+        }
+        payload = {
+            "state": {"tag": "value", "value": raw_interval},
+            "locator": to_plain(input_address), "units": "bar", "as_printed": "400 to 900",
+        }
+        condition = _point_condition_from_plain(payload, key="P_total_bar", retain_print=True)
+        if reduced:
+            # The reviewer's old record only retains the typed range and address.
+            condition = replace(condition, locator=input_address)
+        else:
+            printed = _printed_cell(condition)
+            assert (printed.value, printed.unit) == ("400 to 900", "bar")
+        control = Located(State.of(Decimal("25000000")), replace(address, note="column=original pressure"))
+        target_value = real.value if reduced else Value(
+            ValueKind.INTERVAL, interval_low=Decimal("400"),
+            interval_high=Decimal("900" if equal else "800"),
+        )
+        provenance = None
+        if not reduced:
+            selected = SourceSelection(target_value, field_name="result")
+            provenance = _with_target_print(None, selected, {"result": {
+                "kind": "interval", "as_printed": "400 to 900" if equal else "400 to 800",
+                "locator": to_plain(address),
+            }}, "bar", target.identity)
+        target = replace(
+            target, value=target_value, provenance=provenance,
+            point_conditions={"total_pressure_Pa": control, "P_total_bar": condition},
+            identity=replace(target.identity, total_pressure_Pa=control.state),
+            derivation=Derivation(
+                "pressure correction", (), (("original_total_pressure_Pa", control),), "1",
+            ),
+        )
+        experiment = None
     elif route in {"condition-value", "normalised-target-address"}:
         target = replace(target, point_conditions={**target.point_conditions, "fO2_log": operands})
         if route == "normalised-target-address":
@@ -2503,6 +2602,20 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
         )
         assert (pressure_bar, invalid) == (1000, None)
         assert [n.kind for n in notices] == [NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH]
+    elif route == "pressure-interval":
+        bar, _, notice, invalid = score_module._resolve_score_total_pressure(
+            view.identity, quantity, observation=view, experiment=run,
+        )
+        assert invalid is None
+        assert ("P_total_bar" not in view.point_conditions) is matches
+        if matches:
+            assert (bar, notice) == (250.0, None)
+            expected = (NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY if column else
+                        NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL)
+        else:
+            assert bar == 600.0 and notice.policy.id == "DP-114"
+            expected = NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH
+        assert [n.kind for n in notices] == [expected]
     elif route == "independent-log-oxygen":
         assert not run.conditions["fO2_log"].state.is_value
         assert view.identity.fO2_Pa == real.identity.fO2_Pa
