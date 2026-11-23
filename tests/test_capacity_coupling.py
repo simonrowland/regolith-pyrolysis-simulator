@@ -3838,8 +3838,10 @@ def test_quasi_steady_fixed_point_publishes_the_stalled_hour():
     notice = notices[0]
     assert notice["species"] == "headspace"
     assert notice["tau_s"] > 0.0
+    assert notice["composition_time_s"] > notice["t_rem_s"]
     assert notice["t_rem_s"] > 3600.0 - 1.0
     assert notice["tau_over_t_rem"] == notice["tau_s"] / notice["t_rem_s"]
+    assert notice["abs_mole_fraction_change"] > 1.0e-4
     assert (
         notice["tau_over_t_rem"]
         <= capacity_coupling._QUASI_STEADY_MAX_TAU_FRACTION
@@ -3851,39 +3853,73 @@ def test_quasi_steady_fixed_point_publishes_the_stalled_hour():
     for name, n0 in terms["n0_mol"].items():
         identity = n0 + terms["A_mol"][name] - terms["B_mol"][name]
         assert result.partial_pressures_Pa[name] == identity * factor
-    outflow = pipe_species_outflow_mol_s(
-        total,
-        downstream_pa,
-        temperature_K,
-        {
-            name: result.partial_pressures_Pa[name] / factor
-            for name in masses
-        },
-        _HS_D_M,
-        _HS_L_M,
-        molar_mass_kg_mol=masses,
-    )
+    # Independent of the hold. s is the production flux at the published
+    # total, and the pipe outflow is y Q with Q = Σ s. The opening
+    # composition, placed on that total, is the manifold start to the
+    # accuracy of the short prefix.
+    opening = {
+        "O2": 19.999582680051606,
+        "K": 0.00041738395728921866,
+    }
+    opening_total = math.fsum(opening.values())
     inflow = {
-        name: steep(result.partial_pressures_Pa).get(name, 0.0)
+        name: steep(
+            {species: opening[species] / opening_total * total for species in masses}
+        ).get(name, 0.0)
         / masses[name]
         / 3600.0
         for name in masses
     }
-    removed = {
-        name: float(outflow.species_mol_s.get(name, 0.0)) for name in masses
-    }
-    held_source = math.fsum(
-        inflow[name] * notice["t_rem_s"] for name in masses
+    q_sum = math.fsum(inflow.values())
+    n_tot = total / factor
+    composition_time = n_tot / q_sum
+    # The hold evaluates s at the bracket root. This oracle uses the
+    # published total. The cliff is 1e-8 Pa wide, so the two rates
+    # differ in the seventh digit. T_c is still n/Q, not tau.
+    assert notice["composition_time_s"] == pytest.approx(
+        composition_time,
+        rel=1.0e-6,
     )
-    held_outflow = math.fsum(
-        removed[name] * notice["t_rem_s"] for name in masses
-    )
-    assert held_source == pytest.approx(held_outflow, abs=1.0e-12)
+    decay = math.exp(-notice["t_rem_s"] / composition_time)
+    y0 = {name: opening[name] / opening_total for name in masses}
+    expected_partial = {}
+    expected_bleed = {}
     for name in masses:
+        y_inf = inflow[name] / q_sum
+        n0 = y0[name] * n_tot
+        n_inf = y_inf * n_tot
+        n_end = n_inf + (n0 - n_inf) * decay
+        expected_partial[name] = n_end * factor
+        expected_bleed[name] = q_sum * (
+            y_inf * notice["t_rem_s"]
+            + (y0[name] - y_inf) * composition_time * (1.0 - decay)
+        )
+    for name in masses:
+        assert result.partial_pressures_Pa[name] == pytest.approx(
+            expected_partial[name],
+            abs=1.0e-6,
+        )
+        # The prefix is the pipe during the stall, ~1e-12 mol. The
+        # species split is the hold: oxygen leaves, potassium enters.
+        assert terms["B_mol"][name] == pytest.approx(
+            expected_bleed[name],
+            abs=1.0e-9,
+        )
         assert terms["A_mol"][name] == pytest.approx(
             inflow[name] * notice["t_rem_s"],
             abs=1.0e-9,
         )
+    assert terms["B_mol"]["O2"] > terms["B_mol"]["K"]
+    assert result.partial_pressures_Pa["K"] > opening["K"]
+    assert result.partial_pressures_Pa["O2"] < opening["O2"]
+    dy = max(
+        abs(
+            result.partial_pressures_Pa[name] / total
+            - y0[name]
+        )
+        for name in masses
+    )
+    assert notice["abs_mole_fraction_change"] == pytest.approx(dy, abs=1.0e-6)
     assert terms["R_mol"]["K"] == 0.0
     assert terms["R_mol"]["O2"] == 0.0
     assert terms["G_kg"]["K"] == pytest.approx(
@@ -3891,6 +3927,265 @@ def test_quasi_steady_fixed_point_publishes_the_stalled_hour():
         abs=1.0e-15,
     )
     assert terms["G_kg"]["O2"] == pytest.approx(0.0, abs=1.0e-15)
+    assert not any(
+        notice.get("reason") == "shut_path" for notice in result.species_notices
+    )
+
+
+def test_quasi_steady_matched_composition_holds():
+    """A source already in the outflow composition does not drift.
+
+    Oxygen opens at 0 and its source is 0. Potassium carries the
+    pipe, so s_i / Σ s is the opening composition. The manifold keeps
+    that composition: the potassium partial stays on the root, and
+    each species' pipe outflow equals its own source.
+    """
+
+    temperature_K = 1170.0 + 273.15
+    downstream_pa = 20.0
+    factor = GAS_CONSTANT * temperature_K / _HS_V_M3
+    oxygen = _o2_molar_mass_kg()
+    potassium = MOLAR_MASS["K"] / 1000.0
+    masses = {"O2": oxygen, "K": potassium}
+    opening_k_pa = 20.000000064008825
+    pure_k = pipe_species_outflow_mol_s(
+        downstream_pa + 1.0e-7,
+        downstream_pa,
+        temperature_K,
+        {"K": (downstream_pa + 1.0e-7) / factor},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol={"K": potassium},
+    )
+    matched_kg_h = float(pure_k.species_mol_s["K"]) * potassium * 3600.0
+    holder: dict = {}
+
+    def matched(partials: dict[str, float]) -> dict[str, float]:
+        total = math.fsum(partials.values())
+        if partials.get("K", 0.0) > 1.0e-6:
+            rate = matched_kg_h * math.exp(
+                -max(total - (downstream_pa + 1.0e-7), 0.0) / 1.0e-8
+            )
+            return {"O2": 0.0, "K": rate}
+        return {"O2": 0.0, "K": 0.0}
+
+    result = solve_capacity_shadow(
+        pre_holdup_mol={"O2": 0.0, "K": opening_k_pa / factor},
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=matched,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        extent_holder=holder,
+        authoritative=True,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.authoritative
+    terms = holder["_balance_terms"]
+    assert terms["path"] == "radau_fallback"
+    notices = [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "quasi_steady_fixed_point"
+    ]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice["abs_mole_fraction_change"] == 0.0
+    assert notice["composition_time_s"] > notice["t_rem_s"]
+    total = math.fsum(result.partial_pressures_Pa.values())
+    assert result.partial_pressures_Pa["O2"] == 0.0
+    assert result.partial_pressures_Pa["K"] == total
+    assert downstream_pa < total
+    assert total - downstream_pa <= capacity_coupling._KINK_BAND_PA
+    for name, n0 in terms["n0_mol"].items():
+        identity = n0 + terms["A_mol"][name] - terms["B_mol"][name]
+        assert result.partial_pressures_Pa[name] == identity * factor
+        assert terms["B_mol"][name] == pytest.approx(
+            terms["A_mol"][name],
+            abs=1.0e-9,
+        )
+    assert not any(
+        notice.get("reason") == "shut_path" for notice in result.species_notices
+    )
+
+
+def test_quasi_steady_root_past_the_band_keeps_the_buffer_source():
+    """A root past the old 1e-4 Pa cut still continues, with buffer S.
+
+    C4 at 1199.4 C stalled about 1.0e-4 Pa above 20 Pa and the fixed
+    band never fired. This opening is that shape: the pipe root is
+    2e-4 Pa above the downstream pressure. The buffer stock is the
+    walked 0.375 mol, and the oxygen redox is half the pipe at that
+    root, so s_i = q_i + S_i is not the vapour alone. The partials
+    and each species' pipe outflow are the closed form of that source.
+    """
+
+    temperature_K = 1199.4177401340949 + 273.15
+    downstream_pa = 20.0
+    target_pa = downstream_pa + 2.0e-4
+    factor = GAS_CONSTANT * temperature_K / _HS_V_M3
+    oxygen = _o2_molar_mass_kg()
+    potassium = MOLAR_MASS["K"] / 1000.0
+    masses = {"O2": oxygen, "K": potassium}
+    k_share = 0.000609688969231028 / (
+        19.999372746320336 + 0.000609688969231028
+    )
+    opening = {
+        "O2": target_pa * (1.0 - k_share),
+        "K": target_pa * k_share,
+    }
+    outflow = pipe_species_outflow_mol_s(
+        target_pa,
+        downstream_pa,
+        temperature_K,
+        {name: opening[name] / factor for name in masses},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol=masses,
+    )
+    pipe_mol_s = math.fsum(
+        float(outflow.species_mol_s[name]) for name in masses
+    )
+    s_o2 = 0.5 * pipe_mol_s
+    potassium_mol_s = pipe_mol_s - s_o2
+    potassium_kg_h = potassium_mol_s * potassium * 3600.0
+    stock_mol = 0.37542620345555566
+    holder: dict = {
+        "_opening_buffer_o2": {"mol": stock_mol, "signed_mol": stock_mol},
+    }
+
+    def cliff(partials: dict[str, float]) -> dict[str, float]:
+        total = math.fsum(partials.values())
+        if partials.get("O2", 0.0) > 1.0 and partials.get("K", 0.0) > 1.0e-6:
+            rate = potassium_kg_h * math.exp(
+                -max(total - target_pa, 0.0) / 1.0e-8
+            )
+            return {"O2": 0.0, "K": rate}
+        return {"O2": 0.0, "K": 0.0}
+
+    def redox(_partials: dict[str, float]) -> dict[str, float]:
+        if holder["_opening_buffer_o2"]["mol"] <= 0.0:
+            return {"O2": 0.0, "K": 0.0}
+        return {"O2": s_o2, "K": 0.0}
+
+    result = solve_capacity_shadow(
+        pre_holdup_mol={name: opening[name] / factor for name in masses},
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=cliff,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        redox_mol_s_at_partials=redox,
+        extent_holder=holder,
+        authoritative=True,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.authoritative
+    terms = holder["_balance_terms"]
+    assert terms["path"] == "radau_fallback"
+    assert result.iterations < capacity_coupling._MAX_INTEGRATOR_EVALUATIONS
+    notices = [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "quasi_steady_fixed_point"
+    ]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice["species"] == "headspace"
+    assert notice["tau_s"] > 0.0
+    assert notice["composition_time_s"] > 0.0
+    assert notice["t_rem_s"] > 3600.0 - 1.0
+    assert notice["tau_over_t_rem"] == notice["tau_s"] / notice["t_rem_s"]
+    assert (
+        notice["tau_over_t_rem"]
+        <= capacity_coupling._QUASI_STEADY_MAX_TAU_FRACTION
+    )
+    total = math.fsum(result.partial_pressures_Pa.values())
+    assert total - downstream_pa > capacity_coupling._KINK_BAND_PA
+    assert total == pytest.approx(target_pa, abs=1.0e-6)
+    assert holder["_opening_buffer_o2"]["mol"] == stock_mol
+    assert holder["_opening_buffer_o2"]["signed_mol"] == stock_mol
+    for name, n0 in terms["n0_mol"].items():
+        identity = n0 + terms["A_mol"][name] - terms["B_mol"][name]
+        assert result.partial_pressures_Pa[name] == identity * factor
+    placed = {
+        name: opening[name] / target_pa * total for name in masses
+    }
+    inflow = {
+        name: cliff(placed).get(name, 0.0) / masses[name] / 3600.0
+        + redox(placed).get(name, 0.0)
+        for name in masses
+    }
+    q_sum = math.fsum(inflow.values())
+    n_tot = total / factor
+    composition_time = n_tot / q_sum
+    assert notice["composition_time_s"] == pytest.approx(
+        composition_time,
+        rel=1.0e-6,
+    )
+    # A and B include the short prefix, and s is constant across it,
+    # so the oracle is the full hour. 1e-9 mol is about 1e-4 Pa here;
+    # the partial gate is that same mole residual.
+    hour_s = 3600.0
+    decay = math.exp(-hour_s / composition_time)
+    y0 = {name: opening[name] / target_pa for name in masses}
+    for name in masses:
+        y_inf = inflow[name] / q_sum
+        n0 = y0[name] * n_tot
+        n_inf = y_inf * n_tot
+        n_end = n_inf + (n0 - n_inf) * decay
+        assert result.partial_pressures_Pa[name] == pytest.approx(
+            n_end * factor,
+            abs=1.0e-9 * factor,
+        )
+        expected_bleed = q_sum * (
+            y_inf * hour_s
+            + (y0[name] - y_inf) * composition_time * (1.0 - decay)
+        )
+        assert terms["B_mol"][name] == pytest.approx(
+            expected_bleed,
+            abs=1.0e-9,
+        )
+        assert terms["A_mol"][name] == pytest.approx(
+            inflow[name] * hour_s,
+            abs=1.0e-9,
+        )
+    assert terms["B_mol"]["O2"] > terms["B_mol"]["K"]
+    assert terms["R_mol"]["O2"] == pytest.approx(
+        s_o2 * hour_s,
+        rel=1.0e-6,
+        abs=1.0e-12,
+    )
+    assert terms["R_mol"]["K"] == 0.0
+    assert terms["R_mol"]["O2"] > 0.0
+    assert result.partial_pressures_Pa["K"] > opening["K"]
+    assert result.partial_pressures_Pa["O2"] < opening["O2"]
+    dy = max(
+        abs(result.partial_pressures_Pa[name] / total - y0[name])
+        for name in masses
+    )
+    # The notice is the manifold's change from the stall composition.
+    # The opening comparison includes the short prefix, about 1e-5.
+    assert dy > 0.2
+    assert notice["abs_mole_fraction_change"] == pytest.approx(dy, abs=1.0e-4)
     assert not any(
         notice.get("reason") == "shut_path" for notice in result.species_notices
     )

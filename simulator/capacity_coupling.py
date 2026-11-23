@@ -925,11 +925,11 @@ _MAX_INTEGRATOR_EVALUATIONS = 100_000
 _STIFFNESS_STEPS = 200
 _STIFFNESS_REJECTIONS = 16
 # The pipe kink. Q is 0 at and below P_down, and dQ/dP jumps from 0
-# to a finite slope on the open side. Radau's stages straddle that
-# corner, Newton rejects the step, and h collapses. The stall this
-# catches sits inside the band above P_down. An approach from tens of
-# pascals is outside it and keeps integrating.
-# 1e-4 Pa times the tau fraction below is 1e-6 Pa, the partial floor.
+# to a finite slope on the open side. This width is how far a shut
+# stall may be scaled onto P_down, and how close a second open root
+# must lie to count as the one the pressure has reached. It is not
+# the stall detector. A larger source puts the open root itself past
+# this cut: the 1199 C hour stalls about 1.0e-4 Pa above P_down.
 _KINK_BAND_PA = 1.0e-4
 _KINK_STEP_S = 1.0e-3
 # The first Newton miss often refreshes the Jacobian. The second is
@@ -1278,9 +1278,12 @@ class _HeadspaceLaw:
         # Slow-path tape. Set only when a work cap fires inside Radau.
         self.stiffness_diagnostic: dict[str, Any] | None = None
         # This hour already declined the fixed-point hold. A later
-        # step in the same band must not try again: the integrator
-        # is the remaining engine, and the work cap is its refusal.
+        # step must not try again: the integrator is the remaining
+        # engine, and the work cap is its refusal.
         self._quasi_steady_declined = False
+        # Pressure at the previous accepted open step. The stall
+        # detector compares the next collapsed step with it.
+        self._open_step_pressure: float | None = None
         self._last_pipe_piece: tuple | None = None
         self.paired_redox_mol_s: dict[str, float] | None = None
         self.accepted_flux_partials: dict[str, float] | None = None
@@ -1575,12 +1578,13 @@ class _HeadspaceLaw:
             )
         )
 
-    def g_samples(self) -> list[tuple[float, float]]:
+    def g_samples(self, *, refuse_multiple: bool = True) -> list[tuple[float, float]]:
         return _g_pressure_samples(
             self,
             self._scalar_g,
             "G(P) rose on the geometric bracket; the log sign scan "
             "published the crossings",
+            refuse_multiple=refuse_multiple,
         )
 
     def piece_at(self, pressure_pa: float) -> tuple:
@@ -1991,6 +1995,7 @@ def _geometric_sign_samples(
         [list[tuple[float, float]]],
         list[tuple[str, float, float]],
     ] | None = None,
+    refuse_multiple: bool = True,
 ) -> tuple[list[tuple[float, float]], bool]:
     """Walk `points` until one confirmed root, or report a reversal.
 
@@ -1999,7 +2004,8 @@ def _geometric_sign_samples(
     non-decreasing residual (R). Its far side is strictly positive.
     A reversal returns fallback True and the samples taken so far are
     not a bracket: the caller scans. Two filtered crossings are
-    multiple roots, the same refusal as the scan.
+    multiple roots. The fast scan refuses. A running integral asks
+    for the samples instead and keeps the root the pressure approaches.
     One confirming sample past the first far-side value is what catches
     a well that is negative for less than one factor-of-two step and
     then positive. Stopping on the first negative sample would commit
@@ -2027,7 +2033,9 @@ def _geometric_sign_samples(
         previous = value
         found = classify(samples)
         if len(found) >= 2:
-            raise _BalanceRefused("headspace_balance_multiple_roots")
+            if refuse_multiple:
+                raise _BalanceRefused("headspace_balance_multiple_roots")
+            return samples, False
         far = value < 0.0 if direction == "down" else value > 0.0
         if len(found) == 1 and far:
             if armed:
@@ -2042,11 +2050,14 @@ def _g_pressure_samples(
     law: _HeadspaceLaw,
     value_at: Callable[[float], float],
     detail: str,
+    *,
+    refuse_multiple: bool = True,
 ) -> list[tuple[float, float]]:
     samples, fallback = _geometric_sign_samples(
         _geometric_pressures(law.downstream_pa),
         value_at,
         direction="down",
+        refuse_multiple=refuse_multiple,
     )
     if not fallback:
         return samples
@@ -2660,18 +2671,97 @@ def _recording_radau(recorder: _StiffnessRecord, on_step=None):
     return _RecordingRadau
 
 
+def _solve_open_crossing(
+    value_at: Callable[[float], float],
+    piece_at: Callable[[float], tuple],
+    crossing: tuple[str, float, float],
+    downstream: float,
+) -> float | None:
+    """One open root. A work cap still propagates. A bad bracket does not."""
+
+    try:
+        root, _iterations = _solve_bracket(
+            value_at,
+            piece_at,
+            crossing,
+            downstream,
+        )
+    except _BalanceRefused as refused:
+        if refused.reason == "headspace_balance_work_cap":
+            raise
+        return None
+    if not math.isfinite(root) or root <= downstream:
+        return None
+    return float(root)
+
+
+def _pressure_root_attracts(
+    value_at: Callable[[float], float],
+    root: float,
+    downstream: float,
+) -> bool:
+    """True when G falls through the root, so the pressure mode returns to it."""
+
+    span = max(abs(root) * 1.0e-6, 1.0e-9)
+    down = min(span, (root - downstream) * 0.5)
+    if down <= 0.0:
+        return False
+    below = value_at(root - down)
+    above = value_at(root + span)
+    return (
+        math.isfinite(below)
+        and math.isfinite(above)
+        and below > 0.0
+        and above < below
+    )
+
+
+def _continuous_open_root(
+    roots: list[float],
+    pressure: float,
+    residual_at_pressure: float,
+) -> float | None:
+    """The attracting root the integrated pressure is moving toward.
+
+    G > 0 fills, so the pressure rises toward the next root at or
+    above it. G < 0 drains, so the next root is at or below it. A
+    root inside the kink band of the state is the one already in
+    hand. No root on that side means neither root is reachable.
+    """
+
+    if not roots or not math.isfinite(pressure) or not math.isfinite(
+        residual_at_pressure
+    ):
+        return None
+    band = _KINK_BAND_PA
+    if residual_at_pressure > 0.0:
+        ahead = [root for root in roots if root >= pressure - band]
+    elif residual_at_pressure < 0.0:
+        ahead = [root for root in roots if root <= pressure + band]
+    else:
+        ahead = list(roots)
+    if not ahead:
+        return None
+    return min(ahead, key=lambda root: abs(root - pressure))
+
+
 def _open_or_shut_fixed_point(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
+    near_Pa: float | None = None,
 ) -> tuple[str | None, float | None]:
-    """Bracket q + S − Q on the stall composition.
+    """Bracket q + S − Q on one composition.
 
     ("shut", None) when the net source at P_down is <= 0: the fixed
-    point is the shut branch. ("open", P*) is the one crossing with
-    P* > P_down. (None, None) is not a bracket this hour can hold.
-    Two roots raised by the scan propagate. The fast-root admission
-    test is not this decision: a root the sweep will not admit is
-    still the fixed point of the autonomous hour.
+    point is the shut branch. ("open", P*) is the crossing with
+    P* > P_down. One open crossing is that root. Two open crossings
+    keep the root continuous with `near_Pa`, the pressure the
+    integral has already reached, and flag the hour. Neither of
+    those roots lying on the side the residual is moving toward is
+    the multiple-root refusal: the engine cannot pick a value.
+    (None, None) is not a bracket this hour can hold. The fast-root
+    admission test is not this decision, and the fast scan still
+    refuses two roots before an integral starts.
     """
 
     downstream = law.downstream_pa
@@ -2682,7 +2772,7 @@ def _open_or_shut_fixed_point(
         def piece_at(pressure: float) -> tuple:
             return law.piece_at(pressure)
 
-        samples = law.g_samples()
+        samples = law.g_samples(refuse_multiple=False)
     else:
         def value_at(pressure: float) -> float:
             return _mixture_g(law, fractions, pressure)
@@ -2690,7 +2780,7 @@ def _open_or_shut_fixed_point(
         def piece_at(pressure: float) -> tuple:
             return _mixture_piece(law, fractions, pressure)
 
-        samples = _ray_samples(law, fractions)
+        samples = _ray_samples(law, fractions, refuse_multiple=False)
     if value_at(downstream) <= 0.0:
         return "shut", None
     open_crossings = [
@@ -2698,17 +2788,37 @@ def _open_or_shut_fixed_point(
         for crossing in _crossings(samples)
         if max(crossing[1], crossing[2]) > downstream
     ]
-    if len(open_crossings) != 1:
+    if len(open_crossings) == 0:
         return None, None
-    root, _iterations = _solve_bracket(
-        value_at,
-        piece_at,
-        open_crossings[0],
-        downstream,
-    )
-    if not math.isfinite(root) or root <= downstream:
+    roots: list[float] = []
+    for crossing in open_crossings:
+        root = _solve_open_crossing(value_at, piece_at, crossing, downstream)
+        if root is None:
+            continue
+        if all(abs(root - earlier) > 1.0e-9 for earlier in roots):
+            roots.append(root)
+    if len(roots) == 0:
         return None, None
-    return "open", float(root)
+    if len(roots) == 1 and len(open_crossings) == 1:
+        return "open", roots[0]
+    attractors = [
+        root
+        for root in roots
+        if _pressure_root_attracts(value_at, root, downstream)
+    ]
+    anchor = downstream if near_Pa is None else float(near_Pa)
+    chosen = _continuous_open_root(attractors, anchor, value_at(anchor))
+    if chosen is None:
+        raise _BalanceRefused("headspace_balance_multiple_roots")
+    law._remember_species_notices((
+        {
+            "species": "headspace",
+            "reason": "continuous_root",
+            "root_Pa": chosen,
+            "discarded_roots": len(roots) - 1,
+        },
+    ))
+    return "open", chosen
 
 
 def _quasi_steady_tau(jacobian, state) -> float | None:
@@ -2830,6 +2940,360 @@ def _hold_shut_fixed_point(
     )
 
 
+class _ManifoldLost(Exception):
+    """The reduced right-hand side could not re-solve P*."""
+
+
+def _manifold_rates(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+) -> tuple[dict[str, float], dict[str, float], dict[str, float]]:
+    """s_i = q_i + S_i, the redox part, and the gross, at one total pressure."""
+
+    partials = law.partials_of(_moles_along(law, fractions, pressure))
+    source, _outflow, _binding, _piece = law._flows(partials)
+    redox = law._redox_rates(partials)
+    inflow = {
+        name: source[name] + redox[name] for name in law.species
+    }
+    redox_only = {name: float(redox[name]) for name in law.species}
+    gross = {
+        name: float(law._last_gross_kg_s.get(name, 0.0)) for name in law.species
+    }
+    return inflow, redox_only, gross
+
+
+def _inflow_follows_total_pressure(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+    inflow: Mapping[str, float],
+    redox: Mapping[str, float],
+    gross: Mapping[str, float],
+) -> bool:
+    """True when a second composition at the same P* returns the same s.
+
+    One species has no composition to change. A mismatch, or a probe
+    the flux will not evaluate, is the partial-dependent reduction.
+    """
+
+    count = len(law.species)
+    if count <= 1:
+        return True
+    mixed = {
+        name: 0.5 * max(fractions[name], 0.0) + 0.5 / count
+        for name in law.species
+    }
+    total = math.fsum(mixed.values())
+    if total <= 0.0:
+        return False
+    mixed = {name: mixed[name] / total for name in law.species}
+    try:
+        other, other_redox, other_gross = _manifold_rates(law, mixed, pressure)
+    except _BalanceRefused:
+        return False
+    for name in law.species:
+        if (
+            other[name] != inflow[name]
+            or other_redox[name] != redox[name]
+            or other_gross[name] != gross[name]
+        ):
+            return False
+    return True
+
+
+def _closed_manifold(
+    species: tuple[str, ...] | list[str],
+    n_start: Mapping[str, float],
+    inflow: Mapping[str, float],
+    redox: Mapping[str, float],
+    gross: Mapping[str, float],
+    t_rem: float,
+) -> tuple[
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    float,
+    float,
+] | None:
+    """n_i(t) and ∫ y_i Q dt when s_i is constant on the manifold."""
+
+    n_tot = math.fsum(n_start[name] for name in species)
+    q_sum = math.fsum(inflow[name] for name in species)
+    if (
+        n_tot <= 0.0
+        or q_sum <= 0.0
+        or not math.isfinite(n_tot)
+        or not math.isfinite(q_sum)
+    ):
+        return None
+    composition_time = n_tot / q_sum
+    if not math.isfinite(composition_time) or composition_time <= 0.0:
+        return None
+    decay = math.exp(-t_rem / composition_time)
+    if not math.isfinite(decay):
+        return None
+    n_end: dict[str, float] = {}
+    added: dict[str, float] = {}
+    bled: dict[str, float] = {}
+    vapour: dict[str, float] = {}
+    redox_added: dict[str, float] = {}
+    for name in species:
+        n0 = float(n_start[name])
+        rate = float(inflow[name])
+        n_inf = n_tot * rate / q_sum
+        added[name] = rate * t_rem
+        y0 = n0 / n_tot
+        y_inf = rate / q_sum
+        bled[name] = q_sum * (
+            y_inf * t_rem
+            + (y0 - y_inf) * composition_time * (1.0 - decay)
+        )
+        # The identity, not the pre-round exponential. One ulp in the
+        # decay must not split n from n0 + A − B.
+        n_end[name] = n0 + added[name] - bled[name]
+        vapour[name] = float(gross[name]) * t_rem
+        redox_added[name] = float(redox[name]) * t_rem
+        if not all(
+            math.isfinite(item)
+            for item in (
+                n_end[name],
+                added[name],
+                bled[name],
+                vapour[name],
+                redox_added[name],
+            )
+        ):
+            return None
+    n_end_tot = math.fsum(n_end.values())
+    if n_end_tot <= 0.0:
+        return None
+    dy = max(
+        abs(n_start[name] / n_tot - n_end[name] / n_end_tot)
+        for name in species
+    )
+    return n_end, added, bled, vapour, redox_added, composition_time, dy
+
+
+def _reduced_manifold(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    n_start: Mapping[str, float],
+    root: float,
+    t_rem: float,
+    *,
+    track_extent: bool,
+) -> tuple[
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    float,
+    float,
+] | None:
+    """Integrate dn_i/dt = s_i(P*(y)) − y_i Q(P*(y)). One solve_ivp."""
+
+    from scipy.integrate import solve_ivp
+
+    species = list(law.species)
+    count = len(species)
+    blocks = 5 if track_extent else 3
+    y0 = [float(n_start[name]) for name in species]
+    y0.extend(0.0 for _unused in range(count * (blocks - 1)))
+    hint = [float(root)]
+    pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+    atol_mol = _SLOW_ATOL_PA / pa_per_mol
+
+    def rhs(_time: float, state) -> list[float]:
+        raw = [max(float(state[index]), 0.0) for index in range(count)]
+        total = math.fsum(raw)
+        if total <= 0.0:
+            return [0.0] * (blocks * count)
+        evolved = {name: raw[index] / total for index, name in enumerate(species)}
+        kind, found = _open_or_shut_fixed_point(law, evolved, near_Pa=hint[0])
+        if kind != "open" or found is None:
+            raise _ManifoldLost()
+        hint[0] = float(found)
+        inflow, redox, gross = _manifold_rates(law, evolved, float(found))
+        q_sum = math.fsum(inflow.values())
+        if not math.isfinite(q_sum):
+            raise _ManifoldLost()
+        dn: list[float] = []
+        da: list[float] = []
+        db: list[float] = []
+        dg: list[float] = []
+        dr: list[float] = []
+        for index, name in enumerate(species):
+            rate = inflow[name]
+            removed = raw[index] / total * q_sum
+            if not math.isfinite(rate) or not math.isfinite(removed):
+                raise _ManifoldLost()
+            dn.append(rate - removed)
+            da.append(rate)
+            db.append(removed)
+            if track_extent:
+                dg.append(gross[name])
+                dr.append(redox[name])
+        if track_extent:
+            return dn + da + db + dg + dr
+        return dn + da + db
+
+    if track_extent:
+        atol = (
+            [atol_mol] * (3 * count)
+            + [_SLOW_EXTENT_ATOL_KG] * count
+            + [atol_mol] * count
+        )
+    else:
+        atol = atol_mol
+    try:
+        solution = solve_ivp(
+            rhs,
+            (0.0, float(t_rem)),
+            y0,
+            method="RK45",
+            rtol=_SLOW_RTOL,
+            atol=atol,
+        )
+    except _ManifoldLost:
+        return None
+    if not solution.success:
+        return None
+    end = solution.y[:, -1]
+    added = {name: float(end[count + index]) for index, name in enumerate(species)}
+    bled = {
+        name: float(end[2 * count + index]) for index, name in enumerate(species)
+    }
+    n_end = {
+        name: float(n_start[name]) + added[name] - bled[name] for name in species
+    }
+    vapour = {name: 0.0 for name in species}
+    redox_added = {name: 0.0 for name in species}
+    if track_extent:
+        vapour = {
+            name: float(end[3 * count + index]) for index, name in enumerate(species)
+        }
+        redox_added = {
+            name: float(end[4 * count + index]) for index, name in enumerate(species)
+        }
+    if not all(
+        math.isfinite(value)
+        for mapping in (n_end, added, bled, vapour, redox_added)
+        for value in mapping.values()
+    ):
+        return None
+    start_inflow, _redox, _gross = _manifold_rates(law, fractions, root)
+    q_sum = math.fsum(start_inflow.values())
+    n_tot = math.fsum(n_start[name] for name in species)
+    if q_sum <= 0.0 or n_tot <= 0.0:
+        return None
+    composition_time = n_tot / q_sum
+    n_end_tot = math.fsum(n_end.values())
+    if n_end_tot <= 0.0 or not math.isfinite(composition_time):
+        return None
+    dy = max(
+        abs(n_start[name] / n_tot - n_end[name] / n_end_tot) for name in species
+    )
+    return n_end, added, bled, vapour, redox_added, composition_time, dy
+
+
+def _slow_manifold(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    root: float,
+    t_rem: float,
+    *,
+    track_extent: bool,
+) -> tuple[
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    dict[str, float],
+    float,
+    float,
+] | None:
+    """Continue one stalled composition on the slow manifold.
+
+    Two time scales. The total-pressure mode relaxes in
+    tau = 1/|λ|_max. The composition mode relaxes in
+    T_c = n_tot / Σ s. On the walked tape that is ~1e7 s, so freezing
+    the stall composition drops the partials by millipascals over the
+    hour. On the manifold the pressure is algebraic, pinned at the
+    open root P*, and
+      dn_i/dt = s_i(P*) − y_i Q(P*),
+      y_i = n_i / n_tot,  Q(P*) = Σ_i s_i,
+    with s_i = q_i + S_i. n_tot is constant because the two sums match.
+    The pipe's species outflow is y_i Q. It is not an identity residual.
+
+    Where s_i depends only on the total pressure, each species
+    relaxes to the source composition:
+      n_i(t) = n_i∞ + (n_i0 − n_i∞) exp(−t/T_c),
+      n_i∞ = n_tot · s_i / Σ s,
+      A_i = s_i t_rem,
+      B_i = Q (y_i∞ t_rem + (y_i0 − y_i∞) T_c (1 − exp(−t_rem/T_c))).
+    n_end = n0 + A − B by that algebra.
+
+    Where s_i depends on the partials, the same reduced ODE is
+    integrated with one solve_ivp. Each evaluation re-solves P* on
+    the open side, so the state never sits on the pipe kink. There
+    is not a second solver beside that reduction.
+
+    Unit check: (mol/s)·s = mol, and n_tot / (mol/s) = s.
+    Limit: s_i / Σ s = y_i0 leaves the composition fixed, so
+    B_i = A_i and n_i(t) = n_i0. T_c ≫ t_rem is the linear drift
+    n_i(t) ≈ n_i0 + (n_i∞ − n_i0) t / T_c. A non-positive Σ s, or a
+    P* the reduced step cannot re-solve, is not this continuation.
+    """
+
+    n_start = _moles_along(law, fractions, root)
+    try:
+        inflow, redox, gross = _manifold_rates(law, fractions, root)
+    except _BalanceRefused as refused:
+        if refused.reason == "headspace_balance_work_cap":
+            raise
+        return None
+    if any(
+        not math.isfinite(value)
+        for mapping in (inflow, redox, gross)
+        for value in mapping.values()
+    ):
+        return None
+    if math.fsum(inflow.values()) <= 0.0:
+        return None
+    if _inflow_follows_total_pressure(
+        law,
+        fractions,
+        root,
+        inflow,
+        redox,
+        gross,
+    ):
+        # The probe evaluated another composition and may have replaced
+        # the gross. The closed form uses the stall composition.
+        inflow, redox, gross = _manifold_rates(law, fractions, root)
+        return _closed_manifold(
+            law.species,
+            n_start,
+            inflow,
+            redox,
+            gross,
+            t_rem,
+        )
+    return _reduced_manifold(
+        law,
+        fractions,
+        n_start,
+        root,
+        t_rem,
+        track_extent=track_extent,
+    )
+
+
 def _hold_open_fixed_point(
     law: _HeadspaceLaw,
     n0: Mapping[str, float],
@@ -2843,24 +3307,14 @@ def _hold_open_fixed_point(
     *,
     track_extent: bool,
 ) -> _HeadspaceStep | None:
-    """Hold the open fixed point for the rest of the hour.
+    """Book the slow manifold over the time the stall left in the hour.
 
-    The hour's source is a frozen melt, so
-    dn/dt = q(P) + S(P) − Q(P) is autonomous. A stable fixed point
-    P* is the exact continuation: n stays at n(P*), and inflow equals
-    outflow. The approach is exponential with time constant
-    tau = 1/|λ|_max. Stopping at P_stall and holding P* for the
-    remaining time t_rem errs by about (P_stall − P*) * tau / t_rem.
-
-    Algebra: A += (q + S)(P*) t_rem and n_end = n(P*) on the stall
-    composition. B = n0 + A − n_end, so the inventory identity holds
-    by construction. Only the totals of (q + S) and Q match at the
-    root; a species whose source is not its own outflow would make
-    per-species B = Q_i t_rem drop the identity. R and G take their
-    own rates times t_rem and do not enter the identity.
-    Unit check: (mol/s)·s = mol and (kg/s)·s = kg.
-    Limit: a bleed below −1e-6 Pa is not this identity. The caller
-    keeps integrating, and the work cap remains the refusal.
+    The prefix is the integral Radau already accepted. The manifold
+    adds A_i = ∫ s_i dt and B_i = ∫ y_i Q dt. n_end is the manifold
+    end state, and the booked bleed is whatever makes
+    n_end = n0 + A − B, including the projection from the stall
+    pressure onto P*. A bleed below −1e-6 Pa is not that projection.
+    The caller keeps integrating.
     """
 
     t_rem = float(dt_s) - float(t_stall)
@@ -2872,44 +3326,46 @@ def _hold_open_fixed_point(
         state,
         track_extent=track_extent,
     )
-    n_star = _moles_along(law, fractions, root)
-    partials = law.partials_of(n_star)
-    source, outflow, _binding, _piece = law._flows(partials)
-    redox = law._redox_rates(partials)
+    continued = _slow_manifold(
+        law,
+        fractions,
+        root,
+        t_rem,
+        track_extent=track_extent,
+    )
+    if continued is None:
+        return None
+    n_end, added_hold, bled_hold, vapour_hold, redox_hold, composition_time, dy = (
+        continued
+    )
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     added: dict[str, float] = {}
     bled: dict[str, float] = {}
     for name in law.species:
-        inflow = source[name] + redox[name]
-        if not math.isfinite(inflow) or not math.isfinite(outflow[name]):
+        grown = float(added_prefix[name]) + float(added_hold[name])
+        bleed = float(n0[name]) + grown - float(n_end[name])
+        if bleed < 0.0 and -bleed * pa_per_mol > DEFAULT_ABS_TOL_PA:
             return None
-        grown = float(added_prefix[name]) + inflow * t_rem
-        bleed = float(n0[name]) + grown - n_star[name]
         if bleed < 0.0:
-            if -bleed * pa_per_mol > DEFAULT_ABS_TOL_PA:
-                return None
             bleed = 0.0
-        # n is the identity, not the pre-snap composition. Rebuilding
-        # it from n0 + A − B keeps the published partial on that triple.
-        n_star[name] = float(n0[name]) + grown - bleed
+        # Published n is this triple. Rebuilding it keeps the partial
+        # on n0 + A − B when the bleed arithmetic sheds one ulp.
+        n_end[name] = float(n0[name]) + grown - bleed
         added[name] = grown
         bled[name] = bleed
     extent_kwargs: dict = {}
     if track_extent:
         gross_prefix = extent_prefix["vapour_extent_kg"]
         redox_prefix = extent_prefix["redox_added_mol"]
-        vapour: dict[str, float] = {}
-        redox_added: dict[str, float] = {}
-        for name in law.species:
-            gross_rate = float(law._last_gross_kg_s.get(name, 0.0))
-            redox_rate = float(redox[name])
-            if not math.isfinite(gross_rate) or not math.isfinite(redox_rate):
-                return None
-            vapour[name] = float(gross_prefix[name]) + gross_rate * t_rem
-            redox_added[name] = float(redox_prefix[name]) + redox_rate * t_rem
         extent_kwargs = {
-            "vapour_extent_kg": vapour,
-            "redox_added_mol": redox_added,
+            "vapour_extent_kg": {
+                name: float(gross_prefix[name]) + float(vapour_hold[name])
+                for name in law.species
+            },
+            "redox_added_mol": {
+                name: float(redox_prefix[name]) + float(redox_hold[name])
+                for name in law.species
+            },
         }
     gap = abs(float(root) - float(pressure))
     law._remember_species_notices((
@@ -2917,7 +3373,9 @@ def _hold_open_fixed_point(
             "species": "headspace",
             "reason": "quasi_steady_fixed_point",
             "tau_s": float(tau),
+            "composition_time_s": float(composition_time),
             "t_rem_s": t_rem,
+            "abs_mole_fraction_change": float(dy),
             "abs_pressure_gap_Pa": gap,
             "tau_over_t_rem": float(tau) / t_rem,
         },
@@ -2928,7 +3386,7 @@ def _hold_open_fixed_point(
     return law.step_from_moles(
         n0,
         dt_s,
-        n_star,
+        n_end,
         iterations,
         gap,
         added_mol=added,
@@ -3263,13 +3721,16 @@ def _slow_converge(
     recorder = _StiffnessRecord(species, block_names)
 
     def _on_radau_step(solver, accepted, fails_before, _message) -> None:
-        # A stalled step inside the kink band is not another rejected
-        # error test. Newton has already halved h, or the accepted
-        # step itself is below 1e-3 s, and the pressure is still just
-        # above P_down. The fixed point of the autonomous hour then
-        # finishes the interval. No bracket, or a relaxation that is
-        # not fast beside t_rem, leaves the latch set and the
-        # integrator running. The work cap is still the refusal.
+        # A collapsed step on the open path is the stall, wherever
+        # the root sits. Newton has already missed twice, or the
+        # accepted step itself is below 1e-3 s, and the pressure is
+        # not still moving by more than the 1e-6 Pa floor. The 1199 C
+        # hour chatters a few microseconds at a time with its root
+        # just past 1e-4 Pa above P_down; a fixed band there never
+        # fires. An approach from several pascals still moves, so it
+        # keeps integrating. No bracket, or a relaxation that is not
+        # fast beside t_rem, leaves the latch set and the integrator
+        # running. The work cap is still the refusal.
         if law._quasi_steady_declined:
             return
         if law.diameter_m is None or not law.downstream_pa > 0.0:
@@ -3289,14 +3750,29 @@ def _slow_converge(
         moles = moles_of(solver.y)
         pressure = law.pressure_of(moles)
         above = pressure - law.downstream_pa
-        if not (math.isfinite(above) and 0.0 < above <= _KINK_BAND_PA):
+        if not (math.isfinite(above) and above > 0.0):
             return
+        if accepted:
+            previous = law._open_step_pressure
+            law._open_step_pressure = pressure
+        else:
+            previous = law._open_step_pressure
+        if fails < _KINK_NEWTON_FAILS:
+            if (
+                previous is None
+                or abs(pressure - previous) > DEFAULT_ABS_TOL_PA
+            ):
+                return
         fractions = _fractions_of(law, moles)
         if fractions is None:
             law._quasi_steady_declined = True
             return
         try:
-            kind, root = _open_or_shut_fixed_point(law, fractions)
+            kind, root = _open_or_shut_fixed_point(
+                law,
+                fractions,
+                near_Pa=pressure,
+            )
         except _BalanceRefused as refused:
             if refused.reason in (
                 "headspace_balance_multiple_roots",
@@ -3314,11 +3790,31 @@ def _slow_converge(
             raise
         except Exception:
             tau = None
+        t_rem = float(dt_s) - t_stall
         if (
             tau is None
-            or tau / (float(dt_s) - t_stall) > _QUASI_STEADY_MAX_TAU_FRACTION
+            or tau / t_rem > _QUASI_STEADY_MAX_TAU_FRACTION
         ):
             law._quasi_steady_declined = True
+            return
+        # The pressure error of pinning P* now is about
+        # |P − P*| · tau / t_rem. That product is the 1e-6 Pa floor.
+        # P* − P_down is the source/slope offset, so a root past the
+        # old cut still holds, and a drain that is still pascals away
+        # does not. Do not latch on that miss: a later step can arrive.
+        if kind == "open":
+            if root is None:
+                law._quasi_steady_declined = True
+                return
+            gap_to_root = abs(pressure - float(root))
+        else:
+            gap_to_root = above
+        if gap_to_root * tau / t_rem > DEFAULT_ABS_TOL_PA:
+            return
+        # The shut projection refuses a scale farther than the kink
+        # width and would latch the hour on the way there. The open
+        # event still lands that drain.
+        if kind == "shut" and above > _KINK_BAND_PA:
             return
         step = _hold_fixed_point(
             law,
@@ -4566,12 +5062,15 @@ def _mixture_piece(
 def _ray_samples(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
+    *,
+    refuse_multiple: bool = True,
 ) -> list[tuple[float, float]]:
     return _g_pressure_samples(
         law,
         lambda pressure: _mixture_g(law, fractions, pressure),
         "G(P) rose on the geometric bracket; the log sign scan "
         "published the crossings",
+        refuse_multiple=refuse_multiple,
     )
 
 
