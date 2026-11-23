@@ -3151,6 +3151,10 @@ def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
         NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT.value
         == "composition_oxide_from_element_mass_percent"
     )
+    assert (
+        NoticeKind.WUSTITE_REFERENCE_CONVERSION.value
+        == "wustite_reference_conversion"
+    )
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:

@@ -4170,15 +4170,83 @@ def test_species_formula_parser_accepts_published_typography() -> None:
     ) == (("Cl", 1.0), ("H", 1.0))
 
 
-def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
-    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
-        assert parse_species_formula(formula) is None
+def test_species_formula_parser_accepts_ascii_dot_adducts_and_decimal_counts() -> None:
+    assert parse_species_formula("Al₂O₃.3H₂O") == parse_species_formula("Al2O3·3H2O")
+    assert parse_species_formula("$Al_2O_3.3H_2O$") == parse_species_formula(
+        "Al2O3·3H2O"
+    )
+    assert parse_species_formula("CoSO₄.7H₂O") == parse_species_formula("CoSO4·7H2O")
+    assert parse_species_formula("Al2O3.3H2O") == parse_species_formula("Al2O3·3H2O")
+    assert parse_species_formula("ZnSO4.6H2O") == parse_species_formula(
+        "ZnSO4·6H2O"
+    )
+    alumina = dict(score_mod.formula_composition("Al2O3"))
+    silica = dict(score_mod.formula_composition("SiO2"))
+    assert parse_species_formula("3Al2O3.2SiO2") == tuple(
+        sorted(
+            (symbol, 3 * alumina.get(symbol, 0.0) + 2 * silica.get(symbol, 0.0))
+            for symbol in alumina.keys() | silica.keys()
+        )
+    )
+    assert parse_species_formula("SrHgO.4CO2.5H2O") == (
+        ("C", 4.0), ("H", 10.0), ("Hg", 1.0), ("O", 14.0), ("Sr", 1.0)
+    )
 
-    for formula in ("Fe0.947O", "Al2O3.3H2O"):
-        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula("Fe0.947O") == score_mod.formula_composition(
+        "Fe0.947O"
+    )
+    assert parse_species_formula("Fe.9470") == score_mod.formula_composition("Fe0.9470")
+    assert parse_species_formula("NbC.98") == score_mod.formula_composition("NbC0.98")
+    assert parse_species_formula("VC.88") == score_mod.formula_composition("VC0.88")
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_iron_oxide_conventions_and_polymorphs() -> None:
+    feo = score_mod.formula_composition("FeO")
+    assert parse_species_formula("Fe(1-x)O") == feo
+    assert parse_species_formula("Fe_tO") == feo
+    assert parse_species_formula(
+        "Fe(1-x)O(l)", species=Species("Fe(1-x)O", Phase.L)
+    ) == feo
+    assert parse_species_formula(
+        "Fe_tO(l)", species=Species("Fe_tO", Phase.L)
+    ) == feo
+    assert parse_species_formula(
+        "$P(white)$", species=Species("P", Phase.CR, State.of(Polymorph.WHITE))
+    ) == score_mod.formula_composition("P")
+    assert parse_species_formula("Aegirine natural sample") is None
+
+
+def test_species_formula_parser_requires_liquid_axis_for_melt_suffix() -> None:
+    assert parse_species_formula("Na2O_melt") is None
+    assert parse_species_formula(
+        "Na2O_melt", species=Species("Na2O", Phase.CR)
+    ) is None
+    assert parse_species_formula(
+        "Na2O_melt", species=Species("Na2O", Phase.L)
+    ) == score_mod.formula_composition("Na2O")
+
+
+def test_species_formula_parser_accepts_bullet_hydrates_and_unicode_phase() -> None:
+    copper_oxide = dict(score_mod.formula_composition("CuO"))
+    copper_sulfate = dict(score_mod.formula_composition("CuSO4"))
+    assert parse_species_formula("CuO•CuSO₄") == tuple(
+        sorted(
+            (
+                symbol,
+                copper_oxide.get(symbol, 0.0) + copper_sulfate.get(symbol, 0.0),
+            )
+            for symbol in copper_oxide.keys() | copper_sulfate.keys()
+        )
+    )
+    assert parse_species_formula(
+        "H2SO4·6.5H2O(l)", species=Species("H2SO4", Phase.L)
+    ) == (("H", 15.0), ("O", 10.5), ("S", 1.0))
+    assert parse_species_formula("H2SO4.6.5H2O") == (
+        ("H", 15.0), ("O", 10.5), ("S", 1.0)
+    )
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:
@@ -4344,6 +4412,10 @@ def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> No
     assert parse_species_formula(
         "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=0)
     ) is None
+    assert parse_species_formula("AgE-1") is None
+    assert parse_species_formula(
+        "AgE-1", species=Species("AgE-1", Phase.G, charge=-1)
+    ) == score_mod.formula_composition("Ag")
 
 
 def test_species_formula_parser_keeps_deuterium_distinct() -> None:
@@ -8511,6 +8583,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
@@ -8528,6 +8601,16 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     )
 
     cases = (
+        (
+            FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
+            NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+            "total_iron_basis: default=Fe_tO; original_reason=printed formula",
+        ),
+        (
+            FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
+            NoticeKind.WUSTITE_REFERENCE_CONVERSION,
+            "wustite_reference_conversion: default=Fe(1-x)O; original_reason=printed formula",
+        ),
         (
             FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
             NoticeKind.UNVERIFIED_APPARATUS,
@@ -8600,6 +8683,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
 
 def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
@@ -8620,6 +8704,14 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     )
 
     facts = (
+        (
+            NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+            "total_iron_basis: default=Fe_tO; original_reason=printed formula",
+        ),
+        (
+            NoticeKind.WUSTITE_REFERENCE_CONVERSION,
+            "wustite_reference_conversion: default=Fe(1-x)O; original_reason=printed formula",
+        ),
         (NoticeKind.UNVERIFIED_APPARATUS, "calibration_not_grounded:probe"),
         (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
         (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
@@ -8664,6 +8756,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         for kind, reason in facts
     )
     expected = (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
