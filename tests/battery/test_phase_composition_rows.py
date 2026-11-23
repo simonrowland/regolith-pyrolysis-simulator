@@ -891,6 +891,7 @@ def test_missing_pressure_and_fo2_phase_rows_reach_each_melts_adapter(
         pressure_bar,
         handles=None,
         redox_mode=None,
+        bench=None,
     ):
         calls.append(
             {
@@ -992,6 +993,7 @@ def test_missing_pressure_and_fo2_element_rows_reach_each_melts_adapter(
         pressure_bar,
         handles=None,
         redox_mode=None,
+        bench=None,
     ):
         calls.append(
             {
@@ -1757,21 +1759,6 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="fixture-phase-source",
     )
-    missing_pressure = _phase_identity(
-        "SiO2",
-        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-        role=PhaseRole.MELT,
-        total_pressure_Pa=None,
-    )
-    missing_pressure_observation = F.observation(
-        "sio2-no-p",
-        "sample-1",
-        missing_pressure,
-        Decimal("5"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="fixture-phase-source",
-    )
-
     for engine in (Engine.VAPOROCK, Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
         prediction = predict_with_engine(engine, composition_observation)
         assert prediction.execution.state is ExecutionState.UNSUPPORTED
@@ -1788,11 +1775,6 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
         capacity_prediction.refusal_reason
         is RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR
     )
-
-    pressure_prediction = predict_with_engine(Engine.ALPHAMELTS, missing_pressure_observation)
-    assert pressure_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert pressure_prediction.refusal_detail["input"] == "total_pressure_Pa"
-    assert pressure_prediction.execution.state is ExecutionState.NOT_PROBED
 
     phase_prediction = predict_with_engine(Engine.VAPOROCK, composition_observation)
     phase_residual = Residual(
@@ -1893,7 +1875,7 @@ def test_printed_experiment_pressure_reaches_the_scorer(
 
     def hook(
         engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
-        handles=None,
+        handles=None, bench=None,
     ):
         calls.append(
             {
@@ -1933,12 +1915,16 @@ def test_printed_experiment_pressure_reaches_the_scorer(
     missing = _with_bulk(_row(migrate(bare, write=False), "sample1-sio2-melt"))
     assert missing.identity.total_pressure_Pa.is_unknown
     assert missing.identity.total_pressure_Pa.is_not_applicable is False
-    refused = predict_with_engine(Engine.ALPHAMELTS, missing)
-    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert refused.refusal_detail["input"] == "total_pressure_Pa"
-    assert refused.execution.state is ExecutionState.NOT_PROBED
-    assert refused.value is None
-    assert calls == []
+    defaulted = predict_with_engine(Engine.ALPHAMELTS, missing)
+    assert defaulted.execution.state is ExecutionState.PRODUCED
+    assert defaulted.value == Decimal("10")
+    assert any(
+        notice.policy is not None
+        and notice.policy.id in {"DP-001", "DP-002"}
+        and notice.policy.value == "101325"
+        for notice in defaulted.notices
+    )
+    assert calls[-1]["pressure_bar"] == 1.01325
 
 
 def test_legacy_alignment_axes_match_the_stored_ratchet() -> None:
@@ -3171,7 +3157,17 @@ def test_fe3_sumfe_fraction_reference_becomes_one_third(
 ) -> None:
     """r = 0.25 → R = 1/3. The expected ratio is that quotient, not the helper."""
 
-    def hook(engine, observation, identity, channel, *, handles=None, isolated=None, experiment=None):
+    def hook(
+        engine,
+        observation,
+        identity,
+        channel,
+        *,
+        handles=None,
+        isolated=None,
+        experiment=None,
+        bench=None,
+    ):
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -3220,7 +3216,17 @@ def test_fe3_sumfe_fraction_reference_becomes_one_third(
 def test_fe3_fe2_ratio_form_keeps_the_printed_ratio(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def hook(engine, observation, identity, channel, *, handles=None, isolated=None, experiment=None):
+    def hook(
+        engine,
+        observation,
+        identity,
+        channel,
+        *,
+        handles=None,
+        isolated=None,
+        experiment=None,
+        bench=None,
+    ):
         return EnginePrediction(
             engine=engine,
             channel=channel,

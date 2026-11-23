@@ -131,16 +131,7 @@ def _resolved_value(
     if policy_id == "DP-003":
         if "P_total" not in context:
             raise ValueError("DP-003 requires P_total in Pa")
-        assert isinstance(formula, str)
-        match = re.fullmatch(r"pO2 = ([0-9]+(?:\.[0-9]+)?) · P_total", formula)
-        if match is None:
-            raise ValueError("DP-003 formula has an unsupported form")
-        # Premise: dry-air oxygen is its mole fraction times total pressure.
-        # The fraction is dimensionless, so the result remains Pa; at P=0,
-        # pO2=0.
-        return Decimal(match.group(1)) * _decimal(
-            context["P_total"], context_name="P_total"
-        )
+        return _dp003_oxygen_pressure(formula, context["P_total"])
     if policy_id == "DP-004" and "measured_partial_pressures" in context:
         pressures = context["measured_partial_pressures"]
         if not isinstance(pressures, (list, tuple)) or not pressures:
@@ -181,6 +172,41 @@ def _resolved_value(
     raise ValueError(
         f"{policy_id} requires its owning formula result in the resolve context"
     )
+
+
+def _dp003_oxygen_pressure(formula: object, total_pressure: object) -> Decimal:
+    if not isinstance(formula, str):
+        raise ValueError("DP-003 formula must be text")
+    match = re.fullmatch(r"pO2 = ([0-9]+(?:\.[0-9]+)?) · P_total", formula)
+    if match is None:
+        raise ValueError("DP-003 formula has an unsupported form")
+    # Premise: dry-air oxygen is its mole fraction times total pressure. The
+    # fraction is dimensionless, so the result remains Pa; at P=0, pO2=0.
+    return Decimal(match.group(1)) * _decimal(total_pressure, context_name="P_total")
+
+
+def dp003_oxygen_pressure(total_pressure: object) -> Decimal:
+    """Evaluate the DP-003 formula for the scorer's oxygen ladder."""
+
+    entry = load_policy_table().get("DP-003")
+    if entry is None:
+        raise KeyError("unknown default policy id: DP-003")
+    return _dp003_oxygen_pressure(entry.get("formula"), total_pressure)
+
+
+def _policy_value_string(value: object) -> str:
+    if isinstance(value, bool):
+        raise ValueError("policy value cannot be boolean")
+    if isinstance(value, (Decimal, int, float)):
+        numeric = _decimal(value, context_name="policy value")
+        return format(numeric.normalize(), "f")
+    if isinstance(value, str):
+        try:
+            numeric = _decimal(value, context_name="policy value")
+        except ValueError:
+            return value
+        return format(numeric.normalize(), "f")
+    return str(value)
 
 
 def resolve(policy_id: str, **context: object) -> Resolved:
@@ -257,20 +283,34 @@ def resolve(policy_id: str, **context: object) -> Resolved:
     return Resolved(value=value, units=units, flag=flag, payload=payload)
 
 
-def notice_policy(resolved: Resolved):
-    """Build the typed Notice.policy field from a policy resolution."""
+def notice_policy(policy_id: str, value: object, flag: NoticeKind):
+    """Build Notice.policy metadata without coercing a resolver payload."""
 
     from simulator.battery.records import NoticePolicy
 
-    policy = resolved.payload.get("policy")
-    if not isinstance(policy, Mapping):
-        raise ValueError("default-policy resolution omitted Notice policy metadata")
+    try:
+        entry = load_policy_table()[policy_id]
+    except KeyError as exc:
+        raise KeyError(f"unknown default policy id: {policy_id}") from exc
+    status = entry.get("status")
+    if status == "rejected":
+        raise ValueError(f"default policy {policy_id} is rejected")
+    version = entry.get("version")
+    units = entry.get("units")
+    raw_flag = entry.get("flag")
+    flags = raw_flag if isinstance(raw_flag, list) else [raw_flag]
+    if flag.value not in flags:
+        raise ValueError(f"{policy_id} does not use the {flag.value} flag")
+    if not isinstance(version, (str, int)) or isinstance(version, bool):
+        raise ValueError(f"{policy_id} version must be a string or integer")
+    if not isinstance(status, str) or not isinstance(units, str):
+        raise ValueError(f"{policy_id} notice metadata is incomplete")
     return NoticePolicy(
-        id=str(policy["id"]),
-        version=policy["version"],
-        status=str(policy["status"]),
-        value=str(policy["value"]),
-        units=str(policy["units"]),
+        id=policy_id,
+        version=version,
+        status=status,
+        value=_policy_value_string(value),
+        units=units,
     )
 
 

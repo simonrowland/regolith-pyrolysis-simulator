@@ -134,14 +134,12 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             "original_reason=no printed fO2; "
             f"{reason}; borrowed"
         )
-        from simulator.battery.default_policy import (
-            notice_policy,
-            resolve as resolve_policy,
-        )
+        from simulator.battery.default_policy import notice_policy
 
-        policy_result = resolve_policy("DP-010", value=resolved.log10_fO2_bar)
-        policy = notice_policy(policy_result)
-        policy_flag = policy_result.flag
+        policy = notice_policy(
+            "DP-010", resolved.log10_fO2_bar, NoticeKind.ASSUMED_FO2
+        )
+        policy_flag = NoticeKind.ASSUMED_FO2
     assumed_air = resolved.route == "dp003_ambient_air"
     if assumed_air:
         reason = (
@@ -149,17 +147,11 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             f"{reason}"
         )
         if resolved.po2_bar is not None:
-            from simulator.battery.default_policy import (
-                notice_policy,
-                resolve as resolve_policy,
-            )
+            from simulator.battery.default_policy import notice_policy
 
-            policy_result = resolve_policy(
-                "DP-003",
-                value=Decimal(str(resolved.po2_bar)) * Decimal(str(PA_PER_BAR)),
-            )
-            policy = notice_policy(policy_result)
-            policy_flag = policy_result.flag
+            oxygen_pa = Decimal(str(resolved.po2_bar)) * Decimal(str(PA_PER_BAR))
+            policy = notice_policy("DP-003", oxygen_pa, NoticeKind.METHOD_IMPLIED)
+            policy_flag = NoticeKind.METHOD_IMPLIED
     if policy_flag is not None:
         kind = policy_flag
     elif resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
@@ -356,11 +348,9 @@ def resolve_row_fo2(
             # method-implied. The DP-003 owner computes pO2=xO2·P_total in Pa;
             # the dimensionless mole fraction preserves Pa, and pO2→0 as
             # xO2→0. At the DP-002 pressure, pO2 is 21227.6 Pa.
-            from simulator.battery.default_policy import resolve as resolve_policy
+            from simulator.battery.default_policy import dp003_oxygen_pressure
 
-            oxygen_pa = resolve_policy("DP-003", P_total=pressure_pa).value
-            if not isinstance(oxygen_pa, Decimal):
-                raise TypeError("DP-003 did not resolve an oxygen pressure")
+            oxygen_pa = dp003_oxygen_pressure(pressure_pa)
             oxygen_bar = float(oxygen_pa / Decimal(str(PA_PER_BAR)))
             return ResolvedFo2(
                 math.log10(oxygen_bar),

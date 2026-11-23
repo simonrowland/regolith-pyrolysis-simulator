@@ -7,7 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.default_policy import append_proposal, load_policy_table, resolve
+from simulator.battery.default_policy import (
+    append_proposal,
+    dp003_oxygen_pressure,
+    load_policy_table,
+    notice_policy,
+    resolve,
+)
 from simulator.battery.enums import (
     DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
@@ -107,10 +113,27 @@ def test_canonical_policy_values() -> None:
     assert resolve("DP-001").value == Decimal("101325")
     assert resolve("DP-001").units == "Pa"
     assert resolve("DP-003", P_total=Decimal("100000")).value == Decimal("20950")
+    assert dp003_oxygen_pressure(Decimal("100000")) == resolve(
+        "DP-003", P_total=Decimal("100000")
+    ).value
     assert resolve("DP-005").value == Decimal("1")
     assert resolve("DP-006").value == Decimal("1")
     assert resolve("DP-015").value == Decimal("298.15")
     assert resolve("DP-015").units == "K"
+
+
+def test_notice_policy_reads_metadata_and_normalizes_numeric_value() -> None:
+    assert notice_policy(
+        "DP-019", Decimal("1e-1"), NoticeKind.METHOD_IMPLIED
+    ) == NoticePolicy(
+        id="DP-019",
+        version=1,
+        status="canonical",
+        value="0.1",
+        units="Pa",
+    )
+    with pytest.raises(ValueError, match="does not use the assumed_pressure flag"):
+        notice_policy("DP-019", Decimal("1e-1"), NoticeKind.ASSUMED_PRESSURE)
 
 
 def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:

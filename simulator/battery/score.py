@@ -631,12 +631,14 @@ FLAGGED_STRATUM_METHOD_IMPLIED = NoticeKind.METHOD_IMPLIED.value
 FLAGGED_STRATUM_EFFUSION_REGIME_ASSUMED = (
     NoticeKind.EFFUSION_REGIME_ASSUMED.value
 )
-FLAGGED_STRATUM_PROPOSED_POLICY = "PROPOSED-POLICY"
+FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
 _DEFAULT_POLICY_FLAG_VALUES = frozenset(
     kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS
 )
+_DP_001_TOTAL_PRESSURE_PA = ATM_PA_DECIMAL
+_DP_002_TOTAL_PRESSURE_PA = _DP_001_TOTAL_PRESSURE_PA
 
 @dataclass(frozen=True)
 class EnginePrediction:
@@ -8193,22 +8195,22 @@ def _default_policy_notice(
     quantity: Quantity,
     reason: str,
     *,
+    kind: NoticeKind,
+    value: object,
     origin: str,
-    **policy_context: object,
-) -> tuple[object, Notice]:
-    """Resolve scorer defaults and carry the registry's typed flag payload."""
+) -> Notice:
+    """Carry the registered policy metadata with its stated default value."""
 
-    from simulator.battery.default_policy import notice_policy, resolve
+    from simulator.battery.default_policy import notice_policy
 
-    resolved = resolve(policy_id, **policy_context)
-    notice = Notice(
-        kind=resolved.flag,
+    policy = notice_policy(policy_id, value, kind)
+    return Notice(
+        kind=kind,
         affected_quantities=(quantity,),
-        reason=reason.replace("{value}", str(resolved.value)),
-        policy=notice_policy(resolved),
+        reason=reason.replace("{value}", policy.value),
+        policy=policy,
         origin=origin,
     )
-    return resolved, notice
 
 
 def _knudsen_total_pressure_details(
@@ -9388,29 +9390,37 @@ def _resolve_score_total_pressure(
         and stated_vacuum
     )
     if vacuum_method:
-        policy, notice = _default_policy_notice(
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            DP_019_VACUUM_BOUNDARY_BAR,
+        )
+
+        pressure_pa = Decimal(str(DP_019_VACUUM_BOUNDARY_BAR)) * PA_PER_BAR_DEC
+        notice = _default_policy_notice(
             "DP-019",
             quantity,
             "DP-019 default_total_pressure_Pa={value}; "
             f"original_reason={original_reason}; "
             "vacuum method fixes a finite high-vacuum engine boundary",
+            kind=NoticeKind.METHOD_IMPLIED,
+            value=pressure_pa,
             origin="score:total_pressure",
         )
-        pressure_pa = State.of(as_decimal(policy.value))
-        pressure_bar, invalid = _score_pressure_bar(pressure_pa)
+        pressure_state = State.of(pressure_pa)
+        pressure_bar, invalid = _score_pressure_bar(pressure_state)
         if invalid or pressure_bar is None:
-            return 0.0, pressure_pa, None, "total_pressure_invalid"
-        return pressure_bar, pressure_pa, notice, None
+            return 0.0, pressure_state, None, "total_pressure_invalid"
+        return pressure_bar, pressure_state, notice, None
 
     if method is MethodToken.KNUDSEN_EFFUSION:
-        _policy, notice = _default_policy_notice(
+        notice = _default_policy_notice(
             "DP-004",
             quantity,
             "Knudsen method implies molecular effusion inside and vacuum outside; "
             f"original_reason={original_reason}; in-cell total pressure is not "
             "available without the measured partial-pressure sum",
-            origin="score:total_pressure",
+            kind=NoticeKind.EFFUSION_REGIME_ASSUMED,
             value="P_total(cell) = sum of measured partial pressures",
+            origin="score:total_pressure",
         )
         return None, None, notice, None
 
@@ -9429,19 +9439,21 @@ def _resolve_score_total_pressure(
             is AmbientPressureEvidenceClass.GAS_MIXING
             else "atmospheric-pressure statement implies 1 atm"
         )
-        policy, notice = _default_policy_notice(
+        pressure_state = State.of(_DP_002_TOTAL_PRESSURE_PA)
+        notice = _default_policy_notice(
             "DP-002",
             quantity,
             "DP-002 default_total_pressure_Pa={value}; "
             f"original_reason={original_reason}; "
             f"{implied_pressure}",
+            kind=NoticeKind.METHOD_IMPLIED,
+            value=_DP_002_TOTAL_PRESSURE_PA,
             origin="score:total_pressure",
         )
-        pressure_pa = State.of(as_decimal(policy.value))
-        pressure_bar, invalid = _score_pressure_bar(pressure_pa)
+        pressure_bar, invalid = _score_pressure_bar(pressure_state)
         if invalid or pressure_bar is None:
-            return 0.0, pressure_pa, None, "total_pressure_invalid"
-        return pressure_bar, pressure_pa, notice, None
+            return 0.0, pressure_state, None, "total_pressure_invalid"
+        return pressure_bar, pressure_state, notice, None
 
     # Premise: condensed-phase activities and Fe redox are nearly pressure
     # independent between vacuum and 1 atm. For V_m≈2.5e-5 m³/mol at 1500 K,
@@ -9449,19 +9461,21 @@ def _resolve_score_total_pressure(
     # Units: Pa·m³/mol = J/mol, so the ratio to RT is dimensionless. As
     # ΔP→0 the correction tends to zero. This estimates the stated fallback;
     # no measured residual is used to select it.
-    policy, notice = _default_policy_notice(
+    pressure_state = State.of(_DP_001_TOTAL_PRESSURE_PA)
+    notice = _default_policy_notice(
         "DP-001",
         quantity,
         "DP-001 default_total_pressure_Pa={value}; "
         f"original_reason={original_reason}; "
         "method does not fix total pressure",
+        kind=NoticeKind.ASSUMED_PRESSURE,
+        value=_DP_001_TOTAL_PRESSURE_PA,
         origin="score:total_pressure",
     )
-    pressure_pa = State.of(as_decimal(policy.value))
-    pressure_bar, invalid = _score_pressure_bar(pressure_pa)
+    pressure_bar, invalid = _score_pressure_bar(pressure_state)
     if invalid or pressure_bar is None:
-        return 0.0, pressure_pa, None, "total_pressure_invalid"
-    return pressure_bar, pressure_pa, notice, None
+        return 0.0, pressure_state, None, "total_pressure_invalid"
+    return pressure_bar, pressure_state, notice, None
 
 
 def _oxide_weight_fe_ratio(
@@ -18692,14 +18706,15 @@ def _compile_residual_with_lineage(
                     original_reason = _original_pressure_reason(
                         identity, reference, experiment
                     )
-                    _policy, regime_notice = _default_policy_notice(
+                    regime_notice = _default_policy_notice(
                         "DP-004",
                         quantity,
                         "DP-004 measured in-cell total pressure={value} Pa; "
                         f"original_reason={original_reason}; the regime remains "
                         "method-implied",
-                        origin="score:total_pressure",
+                        kind=NoticeKind.EFFUSION_REGIME_ASSUMED,
                         value=measured_total_pressure_pa,
+                        origin="score:total_pressure",
                     )
                     identity = replace(
                         identity,

@@ -939,7 +939,8 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     row4 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_4"]
     # t-1534 scored borisov_2018_table2_row_155 near 3.277. Spreadsheet rows
     # 155-185 are article Table 1 (31 wet-chemical ratios, printed Fe3+/Fe2+
-    # for row 1 is 2.83). That id is not a second scored observation.
+    # for row 1 is 2.83). That id is not a second scored observation. The 404
+    # numeric supplementary predictions carry the missing-pressure flag.
     assert f"{extract.stem}::borisov_2018_table2_row_155" not in rows_by_id
 
     # Hand evaluation of Kress & Carmichael 1991 at row 4's printed T and log fO2,
@@ -1078,7 +1079,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert (
         measured_unknown["certified_numeric"],
         measured_unknown["flagged_numeric"],
-    ) == (0, 10)
+    ) == (0, 404)
     assert not any(
         row.get("source_relation") == "training" and row.get("candidates")
         for row in measured_rows
@@ -2035,7 +2036,12 @@ def test_melts_fe_redox_commissioning_notice_is_the_only_extrapolated_flag(monke
         if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     ]
     assert len(extrapolated) == 1
-    assert len(prediction.notices) == 1
+    assert any(
+        notice.kind is NoticeKind.ASSUMED_PRESSURE
+        and notice.policy is not None
+        and notice.policy.id == "DP-001"
+        for notice in prediction.notices
+    )
 
 
 def test_melts_fe_redox_timeout_is_attempted_unavailable(monkeypatch):
