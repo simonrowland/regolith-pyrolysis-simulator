@@ -658,6 +658,11 @@ from simulator.fe_redox import (
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
 )
+from simulator.metal_saturation_floor import (
+    activities_for_metal_saturation_floor,
+    apply_melt_metal_saturation_floor,
+    melt_metal_saturation_floor_log10_fO2_bar,
+)
 from simulator.oxygen_buffers import (
     Kress91InvalidControls,
     legacy_iw_log10_fO2_bar,
@@ -1973,6 +1978,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._rump_expectation_warnings = []
         self._last_shuttle_refusal_diagnostic = {}
         self._shuttle_refusal_history = []
+        self._melt_metal_saturation_floor_notices = []
         self._last_c4_refusal_diagnostic = {}
         self._c4_campaign_refused = False
         self._last_c6_refusal_diagnostic = {}
@@ -6016,6 +6022,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_K,
             gate_authority=gate_authority,
         )
+        floor_T_K = (
+            float(temperature_K)
+            if temperature_K is not None
+            else float(self.melt.temperature_C) + 273.15
+        )
+        fO2_log = self._floor_published_melt_fO2_log(fO2_log, floor_T_K)
         reservoir = self.melt.oxygen_reservoir
         reservoir.melt_intrinsic_fO2_log = fO2_log
         reservoir.reference_T_K = reference_T_K
@@ -6139,6 +6151,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'melt fO2 reference_T_K must be finite positive or None; '
                     f'got {reference_T_K!r}'
                 )
+        floor_T_K = (
+            reference_T
+            if reference_T is not None
+            else float(self.melt.temperature_C) + 273.15
+        )
+        fO2_log = self._floor_published_melt_fO2_log(fO2_log, floor_T_K)
         head_o2_mol = max(0.0, float(
             self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
@@ -6222,32 +6240,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             liquid_domain=liquid_domain,
         )
 
-    def _fe_metal_floor_log10_fO2(self, T_K: float) -> float | None:
-        """Fe-metal floor at the melt's a_FeO, converted once.
+    def _consistent_stoich_feo_activity(self, T_K: float) -> float | None:
+        """Stoichiometric a_FeO on the Fe-metal line, or None if no FeO.
 
-        d-463: the floor is IW + 2 log10(a_FeO) at the melt's
-        activity, on the wustite basis. ``fe_metal_saturation_log10_fO2_bar``
-        owns that conversion (stoichiometric activity divided once by
-        ``holzheid_stoich_feo_gamma_band``). a_FeO depends on fO2
-        through the Kress split, so the floor is the fixed point of
-        saturation(a(fO2)), started on the pure stoichiometric line
-        and stopped at 1e-9 dex. Native Fe evaluated at that fO2
-        reads the same activity and the same onset.
+        d-463: a_FeO depends on fO2 through the Kress split, so the Fe
+        couple is the fixed point of saturation(a(fO2)), started on
+        the pure stoichiometric line and stopped at 1e-9 dex. Kress
+        does not send a_FeO to 0 just because fO2 is very low; the
+        couple is absent only when this activity is non-positive.
+        That is the post-shuttle case, and the Si line is then free
+        to bind. A non-positive activity is not filled in as 1.
 
-        A non-positive activity is not paired as a_FeO = 1. None
-        means there is no metal couple; the publisher keeps the
-        current fO2.
-
-        Units: log10(fO2/bar). Known value: at 1400 °C a lunar
-        a_FeO near 0.45 puts this floor about 0.69 dex more reducing
-        than ``fe_metal_saturation(T, a_stoich=1)``.
+        Units: dimensionless stoichiometric a_FeO. Known value: at
+        1400 °C a lunar a_FeO near 0.45 is about 0.69 dex more
+        reducing than ``fe_metal_saturation(T, a_stoich=1)`` once the
+        wüstite function consumes it.
         """
 
         fO2_log = fe_metal_saturation_log10_fO2_bar(
             float(T_K),
             a_feo_stoich=1.0,
         )
-        nxt = fO2_log
+        activity: float | None = None
         for _ in range(8):
             activity = self._authoritative_melt_feo_activity(
                 float(T_K),
@@ -6260,9 +6274,48 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 a_feo_stoich=activity,
             )
             if abs(nxt - fO2_log) <= 1.0e-9:
-                return nxt
+                return activity
             fO2_log = nxt
-        return nxt
+        return activity
+
+    def _melt_metal_saturation_activities(self, T_K: float) -> dict[str, float]:
+        """Fe fixed-point activity plus formula activities of the named oxides."""
+
+        account_mol = self.atom_ledger.project_account_mol(
+            'process.cleaned_melt',
+        )
+        return activities_for_metal_saturation_floor(
+            account_mol,
+            float(T_K),
+            a_feo_stoich=self._consistent_stoich_feo_activity(float(T_K)),
+        )
+
+    def _note_melt_metal_saturation_floor(
+        self,
+        notice: dict[str, object] | None,
+    ) -> None:
+        if not notice:
+            return
+        notices = getattr(self, '_melt_metal_saturation_floor_notices', None)
+        if not isinstance(notices, list):
+            notices = []
+            self._melt_metal_saturation_floor_notices = notices
+        notices.append(dict(notice))
+
+    def _floor_published_melt_fO2_log(
+        self,
+        candidate_fO2_log: float,
+        T_K: float,
+    ) -> float:
+        """Published lower bound. Does not apply the effervescence ceiling."""
+
+        floored, notice = apply_melt_metal_saturation_floor(
+            float(candidate_fO2_log),
+            float(T_K),
+            self._melt_metal_saturation_activities(float(T_K)),
+        )
+        self._note_melt_metal_saturation_floor(notice)
+        return floored
 
     def _ferric_release_aim_fO2_log(
         self,
@@ -6361,61 +6414,89 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return melt_mol_fractions_for_kress91(comp_wt)
 
     def _ledger_consistent_melt_fO2_log(self, T_K: float) -> float:
-        """Published melt fO2 from the ledger Fe3+/ΣFe, floored at Fe metal.
+        """Published melt fO2 from the ledger Fe3+/ΣFe, floored at metal saturation.
 
         Owners: ``kress91_log10_fO2_from_fe3_over_sigma_fe`` inverts
-        Kress & Carmichael 1991. ``fe_metal_saturation_log10_fO2_bar``
-        is Holzheid 1997 eq 9 on the wustite-liquid standard
-        (``wustite_FeO_l_holzheid1997_eq9``). The a_FeO it passes to
-        ``feo_iw_log10_fO2_bar`` is the melt's stoichiometric activity
-        divided once by ``holzheid_stoich_feo_gamma_band``, so the
-        activity and the IW line share the wustite basis. a_Fe = 1 is
-        built into ``feo_iw``. Pressure is the vacuum-floored bar the
-        capacity derivative already uses (``floor_vacuum_pressure_bar``
-        of melt.p_total_mbar / 1000). The result is also not published
-        above the effervescence bound ``_melt_redox_fO2_upper_bound_log``.
+        Kress & Carmichael 1991. The lower bound is
+        ``melt_metal_saturation_floor_log10_fO2_bar``. Fe inside that
+        function is still Holzheid 1997 eq 9 on the wustite-liquid
+        standard (``fe_metal_saturation_log10_fO2_bar``), at the
+        fixed-point stoichiometric a_FeO, not at a_stoich = 1. Si, Cr,
+        Ti, Mn, and Ni are the Ellingham couples in that same function
+        when those oxides are present. Pressure is the vacuum-floored
+        bar the capacity derivative already uses
+        (``floor_vacuum_pressure_bar`` of melt.p_total_mbar / 1000).
+        The result is also not published above the effervescence bound
+        ``_melt_redox_fO2_upper_bound_log`` while iron remains.
 
         Premise: the published fO2 is a function of the ledger (d-072,
-        d-463). q = 2 n_Fe2O3 / (n_FeO + 2 n_Fe2O3) from the atom
-        ledger (``iron_oxide_values``, ``feot_equivalent_moles``). The
-        inverse of that q at T, P and the melt mol fractions is
-        log10(fO2/bar). The floor is Fe-metal saturation at the melt's
-        a_FeO (``_fe_metal_floor_log10_fO2``), not at a_stoich = 1.
+        d-463, d-469). q = 2 n_Fe2O3 / (n_FeO + 2 n_Fe2O3) from the
+        atom ledger (``iron_oxide_values``, ``feot_equivalent_moles``).
+        The inverse of that q at T, P and the melt mol fractions is
+        log10(fO2/bar). The floor is the most oxidizing condensed-metal
+        couple present, not the Fe line alone and not a_stoich = 1.
         The published value is the more oxidizing of the inverse and
         that floor, and not above ambient total pressure.
 
-        Algebra: min(max(kress_inverse(q), melt_activity_floor), ceiling).
-        No oxidized iron (total Fe <= 0), or no positive a_FeO, keeps
-        the current fO2: there is no Fe couple to invert and the
-        missing activity is not filled in as 1. q outside (0, 1), an
-        empty composition, or ``Kress91InvalidControls`` returns the
-        floor.
+        Algebra: min(max(kress_inverse(q), metal_saturation_floor), ceiling).
+        No oxidized iron (total Fe <= 0) has nothing to invert. The
+        current fO2 is then only raised to the metal floor; it is not
+        pulled down onto the Si line. q outside (0, 1), an empty
+        composition, or ``Kress91InvalidControls`` still returns the
+        floor when a couple exists, which is the d-463 snap for an
+        Fe-bearing melt and the Si line once a_FeO has collapsed.
 
-        Units: n_FeO and n_Fe2O3 are mol, q is dimensionless, and both
+        Units: n_FeO and n_Fe2O3 are mol, q is dimensionless, and the
         owners return log10(fO2/bar).
 
         Known value: IW(a_wustite=1) at 2298.92 K is -5.873. Passing
-        a_stoich = 1 is the pure line, about 0.69 dex too oxidizing
+        a_stoich = 1 is the pure Fe line, about 0.69 dex too oxidizing
         at 1400 °C for a lunar a_FeO near 0.45. The Robinot
         constant-C_m landing near -4.51 is the tangent, not this
-        function. The tangent is a predictor only.
+        function. The tangent is a predictor only. At 1423.15 K the
+        pure Si line is -24.112, and it binds once a_FeO is about 1e-6.
         """
 
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
         _feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
         total_fe_mol = feot_equivalent_moles(melt_mol)
+        activities = self._melt_metal_saturation_activities(float(T_K))
+        current = self._current_melt_redox_fO2_log()
         if total_fe_mol <= 0.0:
-            return self._current_melt_redox_fO2_log()
-        floor = self._fe_metal_floor_log10_fO2(float(T_K))
+            floored, notice = apply_melt_metal_saturation_floor(
+                current,
+                float(T_K),
+                activities,
+            )
+            self._note_melt_metal_saturation_floor(notice)
+            return floored
+        floor, _metal = melt_metal_saturation_floor_log10_fO2_bar(
+            float(T_K),
+            activities,
+        )
         if floor is None:
-            return self._current_melt_redox_fO2_log()
-        ferric_fraction = (2.0 * fe2o3_mol) / total_fe_mol
+            return current
         ceiling = self._melt_redox_fO2_upper_bound_log()
-        if ferric_fraction <= 0.0 or ferric_fraction >= 1.0:
+        ferric_fraction = (2.0 * fe2o3_mol) / total_fe_mol
+
+        def _snap_to_floor() -> float:
+            # q is undefined. An Fe-bearing melt still publishes the
+            # floor (d-463), which may be below the current fO2. The
+            # notice is only the lower-bound bind, when current is
+            # below that floor.
+            _raised, notice = apply_melt_metal_saturation_floor(
+                current,
+                float(T_K),
+                activities,
+            )
+            self._note_melt_metal_saturation_floor(notice)
             return min(floor, ceiling)
+
+        if ferric_fraction <= 0.0 or ferric_fraction >= 1.0:
+            return _snap_to_floor()
         fractions = melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct())
         if not fractions:
-            return min(floor, ceiling)
+            return _snap_to_floor()
         pressure_bar = floor_vacuum_pressure_bar(
             float(self.melt.p_total_mbar) / 1000.0,
             floor_bar=self._vacuum_floor_bar(),
@@ -6428,8 +6509,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pressure_bar=pressure_bar,
             )
         except Kress91InvalidControls:
-            return min(floor, ceiling)
-        return min(max(inverse, floor), ceiling)
+            return _snap_to_floor()
+        floored, notice = apply_melt_metal_saturation_floor(
+            float(inverse),
+            float(T_K),
+            activities,
+        )
+        self._note_melt_metal_saturation_floor(notice)
+        return min(floored, ceiling)
 
     def _republish_while_ferric_lock_stands(
         self,
@@ -6541,8 +6628,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         -19.74. Inventory-capped predictor: 1.790e-4 / 2.958e-5 / ln(10)
         ≈ 2.63 dex, landing near -4.51. Neither number is the published
         state. The published fO2 is the Kress 1991 inverse of the ledger
-        Fe3+/ΣFe, floored at Fe-metal saturation on the wustite basis
-        at the melt's a_FeO (``_fe_metal_floor_log10_fO2``).
+        Fe3+/ΣFe, floored at condensed-metal saturation
+        (``melt_metal_saturation_floor_log10_fO2_bar``). Fe on that
+        floor is the wüstite line at the melt's a_FeO. Si binds once
+        that activity has collapsed.
         IW(a_wustite=1) at 2298.92 K is -5.873. Passing a_stoich = 1
         is the pure line, not the melt floor. The -4.51 landing is
         the constant-C_m tangent, not the ledger. This helper is that
@@ -6914,12 +7003,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )
+                # The tangent is a predictor. A reducing step with no
+                # ferric left walks through the Fe line. The published
+                # value stops at metal saturation (Si once a_FeO is gone).
+                published_fO2_log = self._floor_published_melt_fO2_log(
+                    candidate_fO2_log,
+                    T_K,
+                )
                 applied_delta_ln = (
-                    candidate_fO2_log - base_fO2_log
+                    published_fO2_log - base_fO2_log
                 ) * math.log(10.0)
                 reservoir.melt_intrinsic_fO2_log = (
                     self._finite_oxygen_reservoir_fO2_log(
-                        candidate_fO2_log,
+                        published_fO2_log,
                         context='redox_source_terms',
                         source_terms_mol_o2_equiv=terms,
                         net_o2_equiv_mol=net_o2_equiv_mol,
@@ -7366,9 +7462,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                 else:
                     reservoir.melt_redox_capacity_mol_per_ln_fO2 = C_m
+                published_fO2_log = self._floor_published_melt_fO2_log(
+                    candidate_fO2_log,
+                    T_K,
+                )
                 reservoir.melt_intrinsic_fO2_log = (
                     self._finite_oxygen_reservoir_fO2_log(
-                        candidate_fO2_log,
+                        published_fO2_log,
                         context='redox_source_terms:o2_bubbler',
                         source_terms_mol_o2_equiv=terms,
                         net_o2_equiv_mol=absorbed_mol,
@@ -8029,9 +8129,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the credit above: y_O2 * P_total from the overhead inventory.
         # Solve dn against that target so the ledger move and the
         # potential stay paired. The melt is not driven by the
-        # effervescence bound. While FeO remains, the published fO2
-        # does not go below the wustite Fe-metal floor; that floor is
-        # the ledger publisher once the ferric cap closes the tangent.
+        # effervescence bound. The published fO2 does not go below
+        # condensed-metal saturation. While FeO remains that is the
+        # wüstite line; once a_FeO is gone the next couple binds. The
+        # ledger publisher applies it once the ferric cap closes the
+        # tangent, and the write below applies the same lower bound.
         if not math.isfinite(log_drive_pO2) or log_drive_pO2 <= 0.0:
             raise AccountingError(
                 'oxygen reservoir exchange requires finite positive drive pO2; '
@@ -8136,8 +8238,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 apply_pressure_ceiling=False,
             )
         )
-        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+        published_fO2_log = self._floor_published_melt_fO2_log(
             candidate_fO2_log,
+            T_K,
+        )
+        applied_delta_ln = (
+            published_fO2_log - base_fO2_log
+        ) * math.log(10.0)
+        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+            published_fO2_log,
             context='oxygen_reservoir_exchange',
             melt_redox_capacity_mol_per_ln_fO2=C_m,
             delta_ln_fO2=applied_delta_ln,
