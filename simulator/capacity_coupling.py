@@ -1080,11 +1080,6 @@ _MONOTONE_ABS = 1.0e-15
 # BDF at 1e-12 is still ~1e-4 Pa high on the choked megapascal piece.
 _SLOW_ATOL_PA = 1.0e-7
 _SLOW_RTOL = 1.0e-12
-# Gross extent is kilograms. 1e-18 kg of SiO is about 1.6e-12 Pa of
-# its stoichiometric O2 on this vessel, under the 1e-9 Pa ledger
-# gate. n, A, B and the redox integral keep the mole tolerance.
-# A scalar atol would retune those.
-_SLOW_EXTENT_ATOL_KG = 1.0e-18
 # One 1250 C hour dispatches the flux about 1253 times, and the
 # sign-scan fallback walks 4096 points. Hour 21 of the canonical
 # lunar walk stayed inside one Radau call for 34 minutes. The caps
@@ -4983,8 +4978,8 @@ def _slow_converge(
     A caller with no holder keeps the three-block state, so its step
     size is the one it had.
     atol on A, on B and on R is the same per-species mole tolerance
-    as n. G's atol is _SLOW_EXTENT_ATOL_KG. A scalar atol would
-    retune n.
+    as n. G's atol is the 1e-6 Pa publication floor in kilograms of
+    that species. A scalar atol would retune n.
     Unit check: (mol/s)·s = mol, (kg/s)·s = kg, and
     Pa·m³/(J/(mol·K)·K) = mol.
     Limit: Q = 0 and constant q gives A = (q + S) dt, B = 0, and
@@ -5015,12 +5010,20 @@ def _slow_converge(
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     # Premise: each partial is held to 1e-7 Pa. Algebra: n = p V / (R T),
     # so the mole tolerance is that pressure times V / (R T). A, B and
-    # R are moles, so they take that same tolerance. G is kilograms.
+    # R are moles, so they take that same tolerance. G is kilograms of
+    # one species. The publication floor is 1e-6 Pa, so
+    # n = P / pa_per_mol and kg = n * M = P * M / pa_per_mol.
+    # Unit check: Pa * (kg/mol) / (Pa/mol) = kg.
+    # A scalar kilogram atol would price every carrier as the same mass.
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
     if track_extent:
+        atol_extent_kg = [
+            DEFAULT_ABS_TOL_PA * law.masses[name] / pa_per_mol
+            for name in species
+        ]
         atol = (
             [atol_mol] * (3 * count)
-            + [_SLOW_EXTENT_ATOL_KG] * count
+            + atol_extent_kg
             + [atol_mol] * count
         )
     else:
@@ -5476,16 +5479,15 @@ def _integrated_holdup(
             redox_added = float(y_end[4 * count + index])
             if not math.isfinite(extent) or not math.isfinite(redox_added):
                 raise _BalanceRefused("headspace_balance_nonconvergence")
-            # Gross and S are nonnegative. A kilogram undershoot is
-            # priced as moles of that species. R is already moles.
-            # Inside the partial floor the integral is zero. Past it
-            # the step failed.
+            # G is the signed vapour extent. A finite negative value
+            # is recondensation (d-468) and is booked. Inside the
+            # 1e-6 Pa floor that negative is the integrator tolerance
+            # and the booked extent is zero. R stays a release:
+            # a redox undershoot past the same floor is a failed step.
             mass = law.masses[name]
-            extent_mol = 0.0 if mass <= 0.0 else -extent / mass
-            if extent < 0.0:
-                if extent_mol * pa_per_mol > DEFAULT_ABS_TOL_PA:
-                    raise _BalanceRefused("headspace_balance_nonconvergence")
-                extent = 0.0
+            if extent < 0.0 and mass > 0.0:
+                if (-extent / mass) * pa_per_mol <= DEFAULT_ABS_TOL_PA:
+                    extent = 0.0
             if redox_added < 0.0:
                 if -redox_added * pa_per_mol > DEFAULT_ABS_TOL_PA:
                     raise _BalanceRefused("headspace_balance_nonconvergence")

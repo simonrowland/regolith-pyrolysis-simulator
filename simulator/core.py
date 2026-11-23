@@ -18055,6 +18055,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         The returned object is not a condensation or melt-debit flux.
         With no solid-host gas it is the ordinary flux itself.
+        A flux whose every rate returns to the melt has no duct load.
+        The inlet is that empty forward part, total zero. One forward
+        rate keeps the caller's object, negatives included.
         """
         solid = getattr(self, "_subsolidus_committed_kg_hr_by_species", None) or {}
         extra: Dict[str, float] = {}
@@ -18064,6 +18067,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             number = float(rate)
             if number > 0.0:
                 extra[str(species)] = number
+        rates = getattr(evap_flux, "species_kg_hr", None) or {}
+        if (
+            not extra
+            and rates
+            and all(float(rate) < 0.0 for rate in rates.values())
+        ):
+            from engines.builtin.evaporation_transition import (
+                nonnegative_evaporation_view,
+            )
+
+            return nonnegative_evaporation_view(evap_flux)
         if not extra:
             return evap_flux
         species_kg_hr = {

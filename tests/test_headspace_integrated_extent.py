@@ -1694,11 +1694,13 @@ def test_hour22_buffer_stays_nonnegative_and_overdraw_refuses():
 
 
 def test_buffer_release_roundoff_scales_with_stock_but_material_overdraw_refuses():
-    """A two-ulp stock mismatch at five mol is roundoff, not a leak.
+    """A few ulps of stock mismatch at five mol is roundoff, not a leak.
 
-    Mutation: restoring the absolute 1e-15 mol slack refuses the first
-    hour because its two-ulp mismatch is 1.78e-15 mol. A 1e-9 mol
-    shortfall remains a real overdraw and must still refuse.
+    The injected gap is two ulps. The 1e-6 Pa extent tolerance moves
+    the integrated release by one further ulp of that stock, so the
+    published gap is three ulps (2.66e-15 mol). Restoring the absolute
+    1e-15 mol slack still refuses that gap. A 1e-9 mol shortfall
+    remains a real overdraw and must still refuse.
     """
 
     opening_pa = 27.174056558659704
@@ -1739,7 +1741,7 @@ def test_buffer_release_roundoff_scales_with_stock_but_material_overdraw_refuses
         release["excess_integrated"]
         - release["fo2_buffer_after_settle_mol"]
     )
-    assert mismatch == 2.0 * math.ulp(5.0)
+    assert mismatch == 3.0 * math.ulp(5.0)
     assert math.ulp(release["excess_integrated"]) == math.ulp(5.0)
 
     _sim_overdraw, refusal = _run_with_shortfall(1.0e-9)
@@ -1927,7 +1929,7 @@ def test_buffer_release_record_counts_live_lots_through_fe_settle():
     stock_only_slack = _headspace_buffer_release_roundoff_slack_mol(
         {**record, "buffer_postings": 0},
     )
-    assert actual_gap == pytest.approx(guard_budget["target_gap"], abs=1.0e-15)
+    assert abs(actual_gap - guard_budget["target_gap"]) <= 1.0e-15
     assert stock_only_slack < actual_gap
     assert actual_gap <= _headspace_buffer_release_roundoff_slack_mol(record)
 
@@ -1980,3 +1982,106 @@ def test_reducing_only_roundoff_does_not_refuse_empty_buffer():
     assert record["n_uptake"] is None
     assert record["buffer_postings"] == 0
     assert record["fo2_buffer_after_settle_mol"] == 0.0
+
+
+def test_supersaturated_hour_commits_a_negative_vapour_extent():
+    """A shut hour returns supersaturated vapour to the melt.
+
+    The law's rate is negative for the whole hour. The closed pipe
+    integrates that gross, and the ledger posts the parent credit.
+    A negative extent past the 1e-6 Pa floor used to be a nonconvergence.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 100.0)
+    seed_pa = 20.0
+    _seed_pa(sim, "K", seed_pa, "supersaturated K")
+    mass = _molar_mass_kg(sim, "K")
+    per_mol = (
+        GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    seed_mol = seed_pa / per_mol
+    rate_kg_hr = -0.1 * seed_mol * mass
+    assert -rate_kg_hr > _NUMERICAL_FLOOR_KG
+
+    def law(_partials):
+        return {"K": rate_kg_hr}
+
+    hour = _step(sim, law, lambda _species: 0.0)
+    extent = float(hour.sim._headspace_capacity_result.vapour_extent_kg["K"])
+    assert extent < 0.0
+    assert abs(extent - rate_kg_hr) <= max(1.0e-9, abs(rate_kg_hr) * 1.0e-4)
+    assert hour.partials_Pa["K"] > 1.0
+    posted = [
+        transition
+        for transition in sim.atom_ledger.transitions
+        if str(transition.reason).startswith("recondense_K")
+        or str(transition.name).startswith("recondense_K")
+    ]
+    assert len(posted) == 1
+    parent_kg = 0.0
+    vapour_kg = 0.0
+    for lot in posted[0].credits:
+        parent_kg += float(dict(lot.species_kg).get("K2O", 0.0) or 0.0)
+    for lot in posted[0].debits:
+        vapour_kg += float(dict(lot.species_kg).get("K", 0.0) or 0.0)
+    assert parent_kg > 0.0
+    assert vapour_kg == abs(extent)
+    _assert_closed(hour)
+
+
+def test_nonfinite_vapour_extent_still_refuses():
+    """A NaN gross is a failed integral. The partial floor still refuses.
+
+    A finite negative extent past that floor is recondensation and is
+    returned. One inside the floor is the integrator tolerance.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.capacity_coupling import _integrated_holdup
+    import simulator.capacity_coupling as coupling
+
+    temperature_K = 1423.15
+    volume_m3 = 0.08538380762699734
+    mass = MOLAR_MASS["K"] / 1000.0
+    law = SimpleNamespace(
+        species=("K",),
+        temperature_K=temperature_K,
+        volume_m3=volume_m3,
+        masses={"K": mass},
+    )
+    n0 = {"K": 1.0e-4}
+    pa_per_mol = GAS_CONSTANT * temperature_K / volume_m3
+    floor_kg = DEFAULT_ABS_TOL_PA * mass / pa_per_mol
+
+    def hold(n, added, bled, extent, redox):
+        return _integrated_holdup(
+            law,
+            n0,
+            [n, added, bled, extent, redox],
+            track_extent=True,
+        )
+
+    _end, _added, _bled, booked = hold(1.0e-4, -1.0e-6 / mass, 0.0, -1.0e-6, 0.0)
+    assert booked["vapour_extent_kg"]["K"] == -1.0e-6
+
+    _end, _added, _bled, dust = hold(
+        1.0e-4, 0.0, 0.0, -0.5 * floor_kg, 0.0,
+    )
+    assert dust["vapour_extent_kg"]["K"] == 0.0
+
+    try:
+        hold(1.0e-4, 0.0, 0.0, float("nan"), 0.0)
+    except coupling._BalanceRefused as refused:
+        assert refused.reason == "headspace_balance_nonconvergence"
+    else:
+        raise AssertionError("non-finite extent was booked")
+
+    try:
+        hold(-1.0, 0.0, 0.0, 0.0, 0.0)
+    except coupling._BalanceRefused as refused:
+        assert refused.reason == "headspace_balance_nonconvergence"
+    else:
+        raise AssertionError("inventory below the partial floor was booked")

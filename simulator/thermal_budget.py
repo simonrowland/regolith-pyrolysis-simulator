@@ -306,7 +306,12 @@ def evaporation_enthalpy_budget(
     sources: dict[str, str] = {}
 
     for species, raw_kg_hr in sorted(species_kg_hr.items()):
-        kg_hr = _non_negative(float(raw_kg_hr), f"species_kg_hr[{species!r}]")
+        signed_kg_hr = float(raw_kg_hr)
+        # Recondensation is not an evaporation sink. The ledger posts
+        # that return. Refusing the sign here stops the hour.
+        if signed_kg_hr < 0.0:
+            continue
+        kg_hr = _non_negative(signed_kg_hr, f"species_kg_hr[{species!r}]")
         if kg_hr <= 0.0:
             continue
 
