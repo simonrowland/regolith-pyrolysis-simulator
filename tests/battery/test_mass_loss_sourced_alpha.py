@@ -360,6 +360,43 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
     assert bounds["Fe"] >= minimum_fe_bound
 
 
+def test_sourced_fe_mixed_alpha_corner_current_output_pin() -> None:
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueChannel
+
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "sourced Fe alpha"),
+        ResidueChannel("FeO", "FeO", "FeO", 1.0, "unsourced FeO alpha"),
+        ResidueChannel("Mg", "Mg", "MgO", 1.0, "unsourced Mg alpha"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+    )
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        return residue.PressureEvaluation(
+            {
+                "Fe": 1.0e-4 * pO2_bar**-0.5,
+                "FeO": 1.0,
+                "Mg": 1.0e-4 * pO2_bar**-0.5,
+                "O2": 1.0e5 * pO2_bar,
+            },
+            fe3_over_sum_fe=0.5,
+        )
+
+    pressure.declares_fixed_activities = True
+    bounds, corners = residue._mass_loss_corner_bounds(
+        {"FeO": 1.0, "MgO": 1.0},
+        channels,
+        pressure,
+        unsourced=("Mg", "FeO"),
+        temperature_K=1800.0,
+        area_m2=1.0e-4,
+        duration_s=1.0,
+    )
+    assert corners["pO2_low_bar"] == pytest.approx(1.2562992493087133e-6)
+    assert bounds["Mg"] == pytest.approx(7.521604749150495e-9)
+
+
 @pytest.fixture
 def r11_inputs():
     from simulator.battery.records import (
