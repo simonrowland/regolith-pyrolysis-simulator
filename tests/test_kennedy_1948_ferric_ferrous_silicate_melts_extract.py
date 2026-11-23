@@ -11,13 +11,14 @@ from unittest.mock import patch
 import yaml
 
 from simulator.battery import score
-from simulator.battery.enums import Engine, NoticeKind, Phase, Quantity
+from simulator.battery.enums import Engine, NoticeKind, Phase, Quantity, RefusalReason
 from simulator.battery.fo2_ladder import has_printed_fo2
 from simulator.battery.migrate import (
     Migrator,
     _printed_point_phase_kind,
     _printed_point_phase_text,
 )
+from simulator.battery.records import ApproxPressure, BandBasis, Located, State
 from simulator.yaml_cache import yaml_mapping_source_issues
 from tools.validate_literature_extracts import validate_extract_file
 
@@ -187,12 +188,35 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
             _row_at(observations, "1200", "16"),
             {"non_equilibrium_run", "crystal_bearing_bulk_composition"},
         ),
-        (
-            _row_at(observations, "1100", "240"),
-            {"non_equilibrium_run", "crystal_bearing_bulk_composition"},
-        ),
         (mutated, set()),
     ]
+    missing_oxygen = [
+        row for row in observations
+        if row.point_conditions["T_C"].state.value == Decimal("1100")
+    ]
+    assert len(missing_oxygen) == 7
+    last = _row_at(missing_oxygen, "1100", "240")
+    pressure_band = ApproxPressure(
+        Decimal("101325"), Decimal("100000"), Decimal("103000"), BandBasis.PRINTED
+    )
+    missing_oxygen.extend(
+        (
+            replace(
+                last,
+                identity=replace(last.identity, total_pressure_Pa=State.of(pressure_band)),
+            ),
+            replace(
+                last,
+                point_conditions={
+                    **last.point_conditions,
+                    "fO2_control": Located(
+                        State.unknown("source does not print a numeric oxygen input"),
+                        locator=last.point_conditions["T_C"].locator,
+                    ),
+                },
+            ),
+        )
+    )
     imcc = SimpleNamespace(
         ferric_fe_mol=2.0,
         ferrous_fe_mol=1.0,
@@ -220,9 +244,7 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
                     "non_equilibrium_run",
                     "crystal_bearing_bulk_composition",
                 } == qualifiers
-                uses_default = row.point_conditions["T_C"].state.value == Decimal("1100")
-                assert any(n.reason.startswith("DP-003:") for n in residual.notices) == uses_default
-                oxygen_bar = 0.212275875 if uses_default else 0.20265
+                oxygen_bar = 0.20265
                 command = backend.call_args.kwargs
                 if engine is Engine.INTERNAL_ANALYTICAL:
                     assert isclose(command["fO2_log"], log10(oxygen_bar))
@@ -252,6 +274,45 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
             assert [
                 item["n_scored"] for item in headline if item["rail"] == "redox"
             ] == [1]
+            # Green's missing-oxygen gate applies until the canonical default lands.
+            backend.reset_mock()
+            for row in missing_oxygen:
+                residual, _ = score.compile_residual(row, engine, context=context)
+                assert residual.numeric is None
+                assert residual.refusal is not None
+                assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+                assert residual.refusal.detail["input"] == "printed_fO2"
+            backend.assert_not_called()
+
+
+def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: Path):
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    control = source["species"]["Fe"]["observations"][0]["values"]["rows"][0][
+        "point_conditions"
+    ]["fO2_control"]
+    original = dict(control)
+    path = tmp_path / EXTRACT.name
+    for keep_locator, inferred in (
+        (True, False), (False, False), (True, True), (False, True)
+    ):
+        control.clear()
+        control.update(original)
+        if not keep_locator:
+            del control["locator"]
+        if inferred:
+            control["inferred"] = True
+        path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
+        row = _row_at(_migrate_extract(path).observations.values(), "1430", "23")
+        printed = keep_locator and not inferred
+        assert has_printed_fo2(row, row.identity) == printed
+        if printed:
+            pressure = row.point_conditions["fO2_Pa"]
+            assert pressure.locator.published_page == 532
+            assert pressure.inference.relation == "atm_to_Pa"
+            assert row.identity.fO2_Pa.value == Decimal("20265")
+        else:
+            assert "fO2_Pa" not in row.point_conditions
+            assert row.identity.fO2_Pa.is_unknown
 
 
 def test_kennedy_point_phase_requires_a_located_affirmative_assemblage():

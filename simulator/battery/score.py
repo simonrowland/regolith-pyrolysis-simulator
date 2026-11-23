@@ -46,11 +46,7 @@ import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
-from simulator.battery.oxygen_identity import (
-    _DP_003_AIR_O2_MOLE_FRACTION,
-    _dry_air_log10_fo2,
-    log10_fo2_to_pa,
-)
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
@@ -9681,38 +9677,6 @@ def _predict_redox(
             return refused(kress_basis.reason, kress_basis.detail)
 
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
-    ambient = experiment.ambient_pressure_evidence if experiment is not None else None
-    total_pressure = identity.total_pressure_Pa
-    point_conditions = observation.point_conditions or {}
-    if (
-        fo2_log is None
-        and not melts
-        and quantity_token(identity) is Quantity.FE3_FE2_RATIO
-        and not {"fO2_Pa", "fO2_log", "fO2_control"}.intersection(point_conditions)
-        and not _derived_fo2_condition(observation)
-        and ambient is not None
-        and ambient.locator is not None
-        and "exposed to the air" in ambient.quote.casefold()
-        and total_pressure is not None
-        and total_pressure.is_value
-        and total_pressure.value > 0
-    ):
-        fo2_log = _dry_air_log10_fo2(
-            as_decimal(total_pressure.value), _DP_003_AIR_O2_MOLE_FRACTION
-        )
-        material_notices.append(
-            Notice(
-                kind=NoticeKind.APPROXIMATE_PRESSURE,
-                affected_quantities=(Quantity.FE3_FE2_RATIO,),
-                reason=(
-                    "DP-003: no row-specific oxygen pressure; assumed ideal dry air "
-                    f"with O2 mole fraction {_DP_003_AIR_O2_MOLE_FRACTION} "
-                    f"at {total_pressure.value} Pa "
-                    f"from the air-exposure statement on folio {ambient.locator.published_page}"
-                ),
-                origin=observation.observation_id,
-            )
-        )
     handle: object | None = None
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.

@@ -98,7 +98,6 @@ from simulator.battery.oxygen_identity import (
     _ATM_BAR,
     _atmosphere_kind,
     _display_fo2_dex,
-    _dry_air_log10_fo2,
     _gas_mixture_evaluation_temperature,
     _last_printed_digit,
     _oxygen_pressure_point,
@@ -22529,7 +22528,8 @@ def _printed_fo2_interval(
                     ),
                     reason,
                 )
-            log_bar = _dry_air_log10_fo2(total_pa, _AIR_O2_MOLE_FRACTION)
+            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
+            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
             condition = value_condition(
                 {
                     "kind": ValueKind.INTERVAL.value,
@@ -23251,7 +23251,19 @@ def _walk_printed_oxygen(
                 and control_state.get("tag") == "value"
                 else None
             )
-            if isinstance(control_text, str):
+            control_locator = (
+                locator_from_mapping(control.get("locator"))
+                if isinstance(control, Mapping)
+                else None
+            )
+            if (
+                isinstance(control_text, str)
+                and isinstance(control, Mapping)
+                and control_locator is not None
+                and not _oxygen_node_rejected(control, control_text)
+                and control.get("inference") is None
+                and control.get("derivation") is None
+            ):
                 fractional_oxygen = re.fullmatch(
                     r"\s*(?P<numerator>\d+)\s*/\s*(?P<denominator>\d+)\s+"
                     r"atmospheres?\s+of\s+(?:oxygen|O2)\s*\.?\s*",
@@ -23262,10 +23274,6 @@ def _walk_printed_oxygen(
                     numerator = Decimal(fractional_oxygen.group("numerator"))
                     denominator = Decimal(fractional_oxygen.group("denominator"))
                     if denominator > 0:
-                        control_locator = (
-                            locator_from_mapping(control.get("locator"))
-                            or local
-                        )
                         pressure = _pressure_located(
                             numerator / denominator,
                             "atm",
@@ -23273,6 +23281,7 @@ def _walk_printed_oxygen(
                             printed_key="point_conditions.fO2_control",
                             published=control_text,
                             quote=control_text,
+                            # Keep the canonical printed unit-conversion relation.
                             source_derivation=None,
                         )
                         if pressure is not None and pressure.inference is not None:

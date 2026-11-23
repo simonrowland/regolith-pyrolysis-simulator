@@ -56,14 +56,6 @@ _ATM_BAR = Decimal("1.01325")
 # every printed four-place pin except when rounding flips its fourth place;
 # these anchors change from -0.6788/-0.6731 to -0.6789/-0.6732.
 _AIR_O2_MOLE_FRACTION = Decimal("0.20946")
-# DP-003 specifies a rounded dry-air fraction for a missing run input.
-_DP_003_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
-
-
-def _dry_air_log10_fo2(
-    total_pressure_pa: Decimal, oxygen_mole_fraction: Decimal
-) -> Decimal:
-    return (oxygen_mole_fraction * total_pressure_pa / BAR_PA).log10()
 
 
 def _oxygen_pressure_point(located: object) -> Decimal | None:
