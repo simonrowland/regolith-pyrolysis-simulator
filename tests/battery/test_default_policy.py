@@ -48,6 +48,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
     assert load_policy_table() is policies
     assert set(policies) == {
         *(f"DP-{number:03d}" for number in range(1, 20)),
+        "DP-100",
         "DP-101",
     }
 
