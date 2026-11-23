@@ -105,6 +105,8 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
+    _uncertainty_for_value_selection,
+    uncertainty_for,
     _initial_charge_only_composition_proxy,
     _named_material_mixture_binding,
     _named_fraction_bound_selection,
@@ -21537,6 +21539,109 @@ def test_transition_point_non_mapping_row_migrates_without_crashing(
     observation = next(iter(result.observations.values()))
     assert quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
     assert observation.value.kind is ValueKind.UNAVAILABLE
+
+
+def test_series_null_point_is_queued_and_scalar_sibling_migrates(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "concentration_series"
+    row["units"] = "%"
+    row["values"] = {
+        "quantity": "valence_ratio",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "points": [None, 74.5],
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert len(result.observations) == 2
+    unavailable = next(
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.UNAVAILABLE
+    )
+    scalar = next(
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.POINT
+    )
+    assert scalar.value.point == Decimal("0.745")
+    assert any(
+        entry.observation_id == unavailable.observation_id
+        and "value" in (entry.axes or ())
+        for entry in result.queue
+    )
+
+
+def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> None:
+    from simulator.battery.score import _mapping_uncertainty_value
+
+    selection = select_declared_source(
+        Quantity.VALENCE_RATIO, "%", {"value": "70"}
+    )
+    probe = {
+        "value": "3",
+        "sigma": "2",
+        "units": "%",
+        "as_printed": "±3 percentage points",
+    }
+    assert _mapping_uncertainty_value(
+        probe, exact_fields=(Quantity.VALENCE_RATIO.value,)
+    ) == ("3", None)
+    absolute = _uncertainty_for_value_selection(
+        uncertainty_for(probe), selection, "%", "70%"
+    )
+    assert absolute.value == Decimal("0.03")
+    assert absolute.basis == "dimensionless"
+
+    already_fractional = _uncertainty_for_value_selection(
+        uncertainty_for(
+            {
+                "value": "0.03",
+                "units": "dimensionless",
+                "as_printed": "±0.03 dimensionless",
+            }
+        ),
+        selection,
+        "%",
+        "70%",
+    )
+    assert already_fractional.value == Decimal("0.03")
+    assert already_fractional.basis == "dimensionless"
+
+    dex_width = uncertainty_for(
+        {"value": "3", "units": "dex", "as_printed": "±3 dex"}
+    )
+    assert _uncertainty_for_value_selection(
+        dex_width, selection, "%", "70%"
+    ) == dex_width
+
+    ambiguous = uncertainty_for(
+        {"value": "3", "units": "%", "as_printed": "±3%"}
+    )
+    assert _uncertainty_for_value_selection(
+        ambiguous, selection, "%", "70%"
+    ) == ambiguous
+
+    relative = _uncertainty_for_value_selection(
+        uncertainty_for(
+            {
+                "value": "10",
+                "units": "%",
+                "as_printed": "±10%",
+                "note": "The relative error is ±10%.",
+            }
+        ),
+        selection,
+        "%",
+        "70%",
+    )
+    assert relative.value == Decimal("0.1")
+    assert relative.basis == "relative"
+    assert relative.verbatim["units"] == "%"
 
 
 def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path) -> None:
