@@ -33,8 +33,12 @@ from typing import Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.source_declarations import B677_SOURCE_ID, SOURCE_DECLARATIONS
+from simulator.battery.engine_capability import (
+    ELLINGHAM_QUANTITIES as _ENGINE_ELLINGHAM_QUANTITIES,
+    THERMO_QUANTITIES as _THERMO_QUANTITIES,
+    engine_thermo_quantities as _engine_thermo_quantities,
+)
 from simulator.battery.enums import (
-    EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
     PURE_STANDARD_THERMO,
@@ -145,31 +149,6 @@ _TE_FORMULA: dict[str, str] = {
     "Prv": "CaTiO3",
 }
 
-_THERMO_QUANTITIES = (
-    FORMATION_QUANTITIES
-    | EQUILIBRIUM_FIT_QUANTITIES
-    | PURE_STANDARD_THERMO
-    | FUSION_QUANTITIES
-)
-_ENGINE_ELLINGHAM_QUANTITIES = frozenset({Quantity.DELTA_FG, Quantity.LOG10_KF})
-_ENGINE_PURE_PHASE_QUANTITIES = frozenset(
-    {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
-)
-_ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
-    Engine.INTERNAL_ANALYTICAL: _ENGINE_ELLINGHAM_QUANTITIES | FUSION_QUANTITIES,
-    Engine.VAPOROCK: _ENGINE_PURE_PHASE_QUANTITIES,
-    Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
-    Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
-    Engine.NASA_CEA_9: frozenset(
-        {
-            Quantity.CP,
-            Quantity.S,
-            Quantity.H_MINUS_H298,
-            Quantity.DELTA_FH,
-            Quantity.DELTA_FG,
-        }
-    ),
-}
 # Engines emit H(T)−H(298.15 K). The Decimal is the subtype anchor; the
 # float is the pure-phase call temperature. They are the same value.
 _ENGINE_ENTHALPY_ANCHOR_K = Decimal("298.15")
@@ -191,10 +170,6 @@ _REFERENCE_PHASE_TOKEN = {
 # Fallback when the engine does not expose V. Derivation is on
 # ``_pressure_effect_bound_J``.
 _STATED_PRESSURE_EFFECT_BOUND_J_MOL = Decimal("4")
-
-
-def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
-    return _ENGINE_THERMO_QUANTITIES.get(engine, frozenset())
 
 
 def _compilation_engines_for_pair(
