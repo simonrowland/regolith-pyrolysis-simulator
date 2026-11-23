@@ -2731,22 +2731,20 @@ def gate_curve_memo_producer_configuration(
         provider_role=provider_role,
         resolve_magemin_database_default=True,
     )
-    sulfur_side = dependency_vector["sulfur_side"]
     model = dependency_vector["model"]
     redox_identity = (
         None if redox_state is None else redox_state.cache_identity()
     )
+    # Sulfur remains in the full dependency vector used for replay identity.
+    # It is not a liquidus input: gate dispatch filters to process.cleaned_melt
+    # and passes its composition/formulae, pressure, and referenced fO2 basis
+    # to find_liquidus_solidus. The Langmuir capacity caller may request this
+    # curve per batch, but adds no SulfSat input to that solver request.
     return {
         "namespace_id": dependency_vector["namespace_id"],
         "vapor_pressure_provider_selection": dependency_vector[
             "vapor_pressure_provider_selection"
         ],
-        "sulfur_side": {
-            "sulfsat_available": sulfur_side["sulfsat_available"],
-            "sulfsat_provider_selection": (
-                sulfur_side["sulfsat_provider_selection"]
-            ),
-        },
         "model": {
             name: model[name]
             for name in ("model", "mode", "magemin_database")
