@@ -4134,6 +4134,15 @@ def test_species_formula_parser_checks_decimal_formula_annotations() -> None:
     ) == expected
 
 
+def test_species_formula_parser_honors_braced_decimal_before_hydrate_split() -> None:
+    assert parse_species_formula("$MgAl_{1.5}H_2O$") == (
+        ("Al", 1.5),
+        ("H", 2.0),
+        ("Mg", 1.0),
+        ("O", 1.0),
+    )
+
+
 def test_decimal_precedence_mutation_recreates_wrong_atoms_and_axis_bypass() -> None:
     from simulator.accounting.formulas import _is_integer_compound_adduct
 
@@ -4148,6 +4157,10 @@ def test_decimal_precedence_mutation_recreates_wrong_atoms_and_axis_bypass() -> 
     assert adduct_first_mutation("MgAl₁.5SiO₃") != expected
     assert adduct_first_mutation("MgAl₁.5SiO₃(g)") == expected
     assert parse_species_formula("MgAl₁.5SiO₃(g)") is None
+
+    janaf_first_mutation = score_mod.formula_composition("MgAl1.5SiO3(g)")
+    assert janaf_first_mutation == expected
+    assert parse_species_formula("MgAl1.5SiO3(g)") is None
 
 
 def test_species_formula_parser_keeps_adjacent_parenthesized_groups() -> None:

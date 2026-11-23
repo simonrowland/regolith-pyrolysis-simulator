@@ -1190,10 +1190,6 @@ def parse_species_formula(
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(formula)
-    if established is not None:
-        return established
-
     text = formula.strip()
     if text.startswith("$") and text.endswith("$"):
         text = text[1:-1].strip()
@@ -1208,7 +1204,7 @@ def parse_species_formula(
     )
     text = fold_subscript_digits(text)
     has_explicit_decimal_subscript = re.search(
-        r"\d\.\d|_\{?\d+\.\d+", formula
+        r"_\{?\d+\.\d+|[₀-₉]+\.\d+", formula
     ) is not None
     phase_labels = {
         "c": Phase.CR,
@@ -1269,6 +1265,12 @@ def parse_species_formula(
             return None
         text = text[: charge_annotation.start()]
 
+    # Validate suffix axes before the JANAF parser can strip a terminal phase
+    # label and return a composition without seeing the required species axis.
+    established = formula_composition(formula)
+    if established is not None:
+        return established
+
     if "." in text and "·" not in text:
         from simulator.accounting.formulas import _is_integer_compound_adduct
 
@@ -1277,11 +1279,7 @@ def parse_species_formula(
         )
         if has_explicit_decimal_subscript:
             normalized_decimal = formula_composition(text)
-            is_unambiguous_adduct = is_adduct and (
-                re.match(r"^\d+", text) is not None
-                or re.search(r"\.\d+H2O$", text) is not None
-            )
-            if normalized_decimal is not None and not is_unambiguous_adduct:
+            if normalized_decimal is not None:
                 return normalized_decimal
 
         # The raw fast path above preserves existing JANAF decimal parses.

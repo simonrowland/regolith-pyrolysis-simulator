@@ -293,6 +293,7 @@ class RawToken:
     record_id: str
     path: str
     as_published: str
+    layout_as_extracted: str | None
     ocr_suspect: bool
     footnote_markers: tuple[str, ...]
     column: str
@@ -404,6 +405,12 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
                 record_id=record_id,
                 path=path,
                 as_published=token,
+                layout_as_extracted=(
+                    str(cell["layout_as_extracted"])
+                    if isinstance(cell, Mapping)
+                    and cell.get("layout_as_extracted") is not None
+                    else None
+                ),
                 ocr_suspect=suspect,
                 footnote_markers=markers,
                 column=column,
@@ -456,11 +463,15 @@ def _corrections_by_token() -> dict[tuple[str, str, str], Mapping[str, Any]]:
 
 
 def _image_evidence(token: RawToken) -> Mapping[str, Any] | None:
-    return _corrections_by_token().get(
-        (token.record_id, token.column, token.as_published)
-    ) or _corrections_by_token().get(
-        (token.record_id, token.column, _strip_oxide_marker(token.as_published))
-    )
+    corrections = _corrections_by_token()
+    for raw_token in (token.layout_as_extracted, token.as_published):
+        if raw_token is None:
+            continue
+        for candidate in (raw_token, _strip_oxide_marker(raw_token)):
+            item = corrections.get((token.record_id, token.column, candidate))
+            if item is not None:
+                return item
+    return None
 
 
 def _image_correction(token: RawToken) -> Mapping[str, Any] | None:

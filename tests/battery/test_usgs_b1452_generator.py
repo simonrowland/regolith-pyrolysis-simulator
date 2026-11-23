@@ -40,7 +40,10 @@ ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 # t-1620 parses the terbium decimals; empty cells are outside the token census.
-B1452_RAW = 54101
+# Independent source-JSON census: nonblank formula weights, uncertainty
+# cells, and declared row columns total 54,104; the 1,603 blanks already
+# include the three withheld entropy-uncertainty cells.
+B1452_RAW = 54104
 B1452_STORED = 15226
 B1452_REFUSED = 19642
 B1452_EXCLUDED = 19233
@@ -455,6 +458,7 @@ def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() 
     generated = _generation(TABLE_298K)
     from simulator.battery.stable_ids import _name_slug
 
+    corrected_observation_ids = set()
     for name, point, uncertainty, stray, page, pdf_page in (
         ("HYDROHAGNESITE", "503.67", "1.55", "1.55", 25, 31),
         ("ARTIWITE", "232.92", "0.67", "0.67", 25, 31),
@@ -471,12 +475,16 @@ def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() 
         assert observations[0].locator is not None
         assert observations[0].locator.published_page == page
         assert observations[0].locator.pdf_page_index == pdf_page
+        corrected_observation_ids.add(observations[0].observation_id)
         row_observations = [
             row
             for row in generated.observations
             if f":name={_name_slug(name)}" in row.observation_id
         ]
         assert row_observations
+        corrected_observation_ids.update(
+            row.observation_id for row in row_observations
+        )
         assert all(
             row.locator is not None
             and row.locator.published_page == page
@@ -495,9 +503,11 @@ def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() 
     assert point.value.point == Decimal("-1243.900")
     assert point.uncertainty.kind is UncertaintyKind.PRINTED
     assert point.uncertainty.verbatim == "0.500 kJ/mol"
+    assert point.evidence.original_method_class == "reconstructed_from_printed_page"
     assert point.locator is not None
     assert point.locator.published_page == 26
     assert point.locator.pdf_page_index == 32
+    corrected_observation_ids.add(point.observation_id)
 
     overridden = [
         row
@@ -506,11 +516,15 @@ def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() 
         and (row.locator.published_page, row.locator.pdf_page_index) == (26, 32)
     ]
     assert overridden == [point]
+    fallback_observations = [
+        row
+        for row in generated.observations
+        if row.observation_id not in corrected_observation_ids
+    ]
     assert all(
         row.locator is None
-        or row is point
         or (row.locator.published_page, row.locator.pdf_page_index) == (12, 18)
-        for row in generated.observations
+        for row in fallback_observations
     )
 
 

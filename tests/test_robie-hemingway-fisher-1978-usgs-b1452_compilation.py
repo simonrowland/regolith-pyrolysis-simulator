@@ -367,6 +367,7 @@ def _assert_image_verified_corrections(records):
         assert record["source_locator"]["pdf_pages"] == [pdf_page]
         row = next(item for item in record["rows"] if item["source_text_line"] == line)
         cell = row["cells"][column]
+        assert "layout_as_extracted" in cell
         assert cell == {
             "layout_as_extracted": ocr_token,
             "as_published": printed_token,
@@ -383,6 +384,7 @@ def test_image_verified_corrections_and_mutation_probe(compilation):
         item
         for item in manifest["corrections"]
         if item.get("action") == "image_verified_correction"
+        and item.get("record_id") != f"{SOURCE_ID}-0003"
     ]
     assert len(corrections) == len(IMAGE_VERIFIED_CORRECTIONS) == 16
     assert {
@@ -403,6 +405,72 @@ def test_image_verified_corrections_and_mutation_probe(compilation):
         _assert_image_verified_corrections(mutated)
 
 
+def _assert_image_verified_locator_entry(item, record):
+    for key in (
+        "record_id",
+        "source_text_line",
+        "column",
+        "published_page",
+        "pdf_page",
+        "ocr_token",
+        "printed_token",
+        "value",
+        "correction_provenance",
+        "image_quote",
+    ):
+        assert key in item, key
+    assert item["record_id"] == record["record_id"]
+    assert item["published_page"] is not None
+    assert item["pdf_page"] is not None
+    assert item["ocr_token"] == item["printed_token"]
+    assert item["correction_provenance"] == "image_read_reconstruction"
+    assert item["printed_token"] in item["image_quote"]
+    row, = [
+        row for row in record["rows"]
+        if row["source_text_line"] == item["source_text_line"]
+    ]
+    cell = row["cells"][item["column"]]
+    assert "layout_as_extracted" in cell
+    assert cell["layout_as_extracted"] == item["ocr_token"]
+    assert cell["as_published"] == item["printed_token"]
+    assert cell["value"] == item["value"]
+    assert cell["ocr_suspect"] is False
+    return cell
+
+
+def _assert_shard_0003_raw_cells(manifest, records):
+    record = next(
+        record for record in records if record["record_id"] == f"{SOURCE_ID}-0003"
+    )
+    for line, token in ((603, "1.55"), (605, "0.67"), (792, "2.51")):
+        row, = [row for row in record["rows"] if row["source_text_line"] == line]
+        cell = row["cells"]["entropy_s298"]
+        assert "layout_as_extracted" in cell
+        assert cell["layout_as_extracted"] == token
+        assert cell["as_published"] == ""
+        assert cell["value"] is None
+        assert cell["ocr_suspect"] is True
+
+    corrections = [
+        item
+        for item in manifest["corrections"]
+        if item.get("record_id") == record["record_id"]
+        and item.get("source_text_line") == 644
+        and item.get("column") == "formation_enthalpy"
+    ]
+    correction, = corrections
+    assert correction["action"] == "image_verified_correction"
+    assert correction["ocr_token"] == "-1243900500"
+    assert correction["printed_token"] == "-1243900"
+    row, = [row for row in record["rows"] if row["source_text_line"] == 644]
+    cell = row["cells"]["formation_enthalpy"]
+    assert "layout_as_extracted" in cell
+    assert cell["layout_as_extracted"] == correction["ocr_token"]
+    assert cell["as_published"] == correction["printed_token"]
+    assert cell["value"] == correction["value"]
+    assert cell["ocr_suspect"] is True
+
+
 def _assert_image_verified_locators(manifest, records):
     by_id = {record["record_id"]: record for record in records}
     locators = [
@@ -410,23 +478,10 @@ def _assert_image_verified_locators(manifest, records):
         for item in manifest["corrections"]
         if item.get("action") == "image_verified_locator"
     ]
-    assert len(locators) == manifest["summary"]["image_verified_locator_count"] == 4
+    assert len(locators) == manifest["summary"]["image_verified_locator_count"] == 3
     for item in locators:
-        assert item["published_page"] is not None
-        assert item["pdf_page"] is not None
-        assert item["ocr_token"] == item["printed_token"]
-        assert item["correction_provenance"] == "image_read_reconstruction"
-        assert item["printed_token"] in item["image_quote"]
         record = by_id[item["record_id"]]
-        row, = [
-            row for row in record["rows"]
-            if row["source_text_line"] == item["source_text_line"]
-        ]
-        cell = row["cells"][item["column"]]
-        assert cell["layout_as_extracted"] == item["ocr_token"]
-        assert cell["as_published"] == item["printed_token"]
-        assert cell["value"] == item["value"]
-        assert cell["ocr_suspect"] is False
+        _assert_image_verified_locator_entry(item, record)
     corrected_formula_tokens = (
         (603, "$SrHgO \\cdot 4CO_{2} \\cdot 5H_{2}O$", "$5MgO \\cdot 4CO_{2} \\cdot 5H_{2}O$"),
         (605, "$Hg_{2}(OH)_{2}CO_{3} \\cdot 3H_{2}O$", "$Mg_{2}(OH)_{2}CO_{3} \\cdot 3H_{2}O$"),
@@ -435,6 +490,7 @@ def _assert_image_verified_locators(manifest, records):
     for line, extracted, printed in corrected_formula_tokens:
         row, = [row for row in record["rows"] if row["source_text_line"] == line]
         cell = row["cells"]["name_and_formula"]
+        assert "layout_as_extracted" in cell
         assert cell["layout_as_extracted"] == extracted
         assert cell["as_published"] == printed
 
@@ -442,6 +498,7 @@ def _assert_image_verified_locators(manifest, records):
 def test_image_verified_locators_preserve_original_tokens_and_mutation_probe(compilation):
     manifest, records = compilation
     _assert_image_verified_locators(manifest, records)
+    _assert_shard_0003_raw_cells(manifest, records)
     mutated_manifest = copy.deepcopy(manifest)
     locator = next(
         item
@@ -471,6 +528,18 @@ def test_image_verified_locators_preserve_original_tokens_and_mutation_probe(com
     del cell["layout_as_extracted"]
     with pytest.raises(AssertionError):
         _assert_image_verified_locators(manifest, mutated_formula)
+
+    mutated_uncertainty = copy.deepcopy(records)
+    target = next(
+        record for record in mutated_uncertainty
+        if record["record_id"] == f"{SOURCE_ID}-0003"
+    )
+    cell = next(row for row in target["rows"] if row["source_text_line"] == 603)[
+        "cells"
+    ]["entropy_s298"]
+    del cell["layout_as_extracted"]
+    with pytest.raises(AssertionError):
+        _assert_shard_0003_raw_cells(manifest, mutated_uncertainty)
 
 
 def _unsuspect_adjacent_entropy_reversals(records):
@@ -831,18 +900,7 @@ def test_corrections_ledger_covers_withheld_numeric_values(compilation):
     for item in manifest["corrections"]:
         record = by_id[item["record_id"]]
         if item["action"] == "image_verified_locator":
-            rows = [
-                row for row in record["rows"] if row["source_text_line"] == item["source_text_line"]
-            ]
-            assert len(rows) == 1, item
-            cell = rows[0]["cells"][item["column"]]
-            assert item["pdf_page"] is not None
-            assert item["published_page"] is not None
-            assert item["ocr_token"] == item["printed_token"]
-            assert cell["layout_as_extracted"] == item["ocr_token"]
-            assert cell["as_published"] == item["printed_token"]
-            assert cell["value"] == item["value"]
-            assert cell["ocr_suspect"] is False
+            _assert_image_verified_locator_entry(item, record)
             continue
         if item["action"] == "image_verified_correction":
             rows = [

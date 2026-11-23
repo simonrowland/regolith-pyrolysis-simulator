@@ -465,8 +465,8 @@ summary:
   image_temperature_grid_unconfirmed_count: 115
   ambiguity_count: 1659
   correction_count: 102
-  image_verified_correction_count: 16
-  image_verified_locator_count: 4
+  image_verified_correction_count: 17
+  image_verified_locator_count: 3
 ambiguities:
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
   kind: image_column_merge
@@ -40766,14 +40766,14 @@ corrections:
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
   census_id: thermodynamic-properties-at-298-15-k
   column: formation_enthalpy
-  ocr_token: '-1243900'
+  ocr_token: '-1243900500'
   printed_token: '-1243900'
   value: -1243900
   uncertainty: '0.500 kJ/mol'
   pdf_page: 32
   published_page: 26
   correction_provenance: image_read_reconstruction
-  action: image_verified_locator
+  action: image_verified_correction
   evidence: crop-verified PDF page 32 (folio 26), szomolnokite row
   image_quote: 'SZOMOLNOKITE FeSO4·H2O; ΔHf=-1243900 J/mol; uncertainty=500 J/mol'
   source_text_line: 644
