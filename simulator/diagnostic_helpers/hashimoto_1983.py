@@ -23,7 +23,7 @@ import yaml
 from simulator.battery.migrate import to_plain, torr_to_pa
 from simulator.battery.enums import NoticeKind, Quantity
 from simulator.battery.records import Notice, NoticePolicy
-from simulator.lab_schedule import _pressure_floor_notice_mbar
+from simulator.lab_schedule import _pressure_domain_notice_mbar
 from simulator.physical_constants import PA_PER_MBAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -73,6 +73,7 @@ class HashimotoScoreRecord:
     notice_set: frozenset[str]
     policy_notice: Notice | None = None
     policy_detail: str | None = None
+    pressure_domain_notice: Mapping[str, Any] | None = None
     flagged_strata: frozenset[str] = frozenset()
     refusal_reason: str | None = None
 
@@ -92,6 +93,8 @@ class HashimotoScoreRecord:
                     "policy": None if policy is None else to_plain(policy),
                 }
             )
+        if self.pressure_domain_notice is not None:
+            notice_details.append(dict(self.pressure_domain_notice))
         return {
             "observation_id": self.observation_id,
             "source_id": self.source_id,
@@ -146,8 +149,10 @@ def validate_starting_composition(preset: Mapping[str, Any]) -> Mapping[str, flo
     return composition
 
 
-def require_runtime_inputs(preset: Mapping[str, Any]) -> None:
-    """Validate source inputs that are needed before a runtime can be called."""
+def require_runtime_inputs(
+    preset: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    """Validate source inputs and return any pressure-domain notice."""
 
     validate_starting_composition(preset)
     geometry = preset.get("free_evaporation_geometry")
@@ -160,16 +165,12 @@ def require_runtime_inputs(preset: Mapping[str, Any]) -> None:
     if not isinstance(vacuum, Mapping) or vacuum.get("units") != "Torr":
         raise Hashimoto1983Refusal("unsupported_runtime_pressure_unit")
     pressure_torr = _finite_number(vacuum.get("value"), "vacuum.value")
+    if pressure_torr <= 0.0:
+        raise Hashimoto1983Refusal("invalid_runtime_pressure")
     pressure_mbar = float(
         torr_to_pa(pressure_torr) / Decimal(str(PA_PER_MBAR))
     )
-    floor_notice = _pressure_floor_notice_mbar(pressure_mbar)
-    if floor_notice is not None:
-        _, detail = floor_notice
-        raise Hashimoto1983Refusal(
-            "runtime_pressure_below_implemented_floor",
-            detail,
-        )
+    return _pressure_domain_notice_mbar(pressure_mbar)
 
 
 def load_admitted_observations(
@@ -266,11 +267,11 @@ def score_hashimoto_1983(
     _validate_admitted_cohort(active_observations)
     validate_starting_composition(active_preset)
     input_refusal: Hashimoto1983Refusal | None = None
-    if runtime_outputs is None:
-        try:
-            require_runtime_inputs(active_preset)
-        except Hashimoto1983Refusal as exc:
-            input_refusal = exc
+    pressure_domain_notice: Mapping[str, Any] | None = None
+    try:
+        pressure_domain_notice = require_runtime_inputs(active_preset)
+    except Hashimoto1983Refusal as exc:
+        input_refusal = exc
 
     records: list[HashimotoScoreRecord] = []
     for observation in active_observations:
@@ -280,6 +281,8 @@ def score_hashimoto_1983(
         policy_notice: Notice | None = None
         policy_detail: str | None = None
         flagged_strata: frozenset[str] = frozenset()
+        if pressure_domain_notice is not None:
+            notices.add(str(pressure_domain_notice["reason"]))
         if input_refusal is not None:
             refusal_reason = input_refusal.reason
             notices.add(input_refusal.reason)
@@ -356,6 +359,7 @@ def score_hashimoto_1983(
                 notice_set=frozenset(notices),
                 policy_notice=policy_notice,
                 policy_detail=policy_detail,
+                pressure_domain_notice=pressure_domain_notice,
                 flagged_strata=flagged_strata,
                 refusal_reason=refusal_reason,
             )

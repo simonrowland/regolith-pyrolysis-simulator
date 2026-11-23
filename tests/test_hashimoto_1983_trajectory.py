@@ -46,9 +46,7 @@ def test_unprinted_area_uses_runtime_policy_and_pressure_stays_printed() -> None
     assert preset["free_evaporation_geometry"]["exposed_melt_area_m2"] is None
     assert preset["vacuum"]["value"] == 1.0e-4
     assert preset["vacuum"]["units"] == "Torr"
-    with pytest.raises(Hashimoto1983Refusal) as exc_info:
-        require_runtime_inputs(preset)
-    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
+    _assert_schedule_pressure_notice(require_runtime_inputs(preset))
 
 
 def test_missing_starting_oxide_refuses_after_mutation() -> None:
@@ -69,29 +67,34 @@ def test_runtime_pressure_floor_is_reported_when_area_is_available() -> None:
         **preset["free_evaporation_geometry"],
         "exposed_melt_area_m2": 1.0e-6,
     }
-    with pytest.raises(Hashimoto1983Refusal) as exc_info:
-        require_runtime_inputs(mutated)
-    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
-    assert str(exc_info.value) == (
-        "runtime_pressure_below_implemented_floor: "
-        "0.000133322 mbar < 0.001 mbar"
-    )
+    notice = require_runtime_inputs(mutated)
+    _assert_schedule_pressure_notice(notice)
+    assert mutated["vacuum"]["value"] == 1.0e-4
+    assert mutated["vacuum"]["units"] == "Torr"
 
 
 def test_runtime_pressure_floor_uses_lab_schedule_owner(monkeypatch) -> None:
     preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
     preset["free_evaporation_geometry"]["exposed_melt_area_m2"] = 1.0e-6
+    assert preset["vacuum"]["value"] == 1.0e-4
+    assert preset["vacuum"]["units"] == "Torr"
     observed: list[float] = []
 
-    def floor_notice(value: float) -> tuple[str, str]:
-        observed.append(value)
-        return "lab_schedule_pressure_below_implemented_floor", "forced notice"
+    expected_notice = {
+        "kind": "lab_schedule_pressure_domain_notice",
+        "reason": "lab_schedule_pressure_below_implemented_floor",
+        "authority": "extrapolated",
+        "pressure_mbar": 0.00013332236842105264,
+        "certified_band": {"minimum_pressure_mbar": 0.001},
+    }
 
-    monkeypatch.setattr(hashimoto, "_pressure_floor_notice_mbar", floor_notice)
-    with pytest.raises(Hashimoto1983Refusal) as exc_info:
-        require_runtime_inputs(preset)
-    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
-    assert exc_info.value.detail == "forced notice"
+    def domain_notice(value: float, *, t_h: float | None = None) -> dict[str, str]:
+        observed.append(value)
+        assert t_h is None
+        return expected_notice
+
+    monkeypatch.setattr(hashimoto, "_pressure_domain_notice_mbar", domain_notice)
+    assert require_runtime_inputs(preset) == expected_notice
     assert observed == pytest.approx(
         [0.00013332236842105264],
         rel=1.0e-15,
@@ -104,10 +107,9 @@ def test_runtime_pressure_override_cannot_bypass_printed_pressure_floor() -> Non
     preset["free_evaporation_geometry"]["exposed_melt_area_m2"] = 1.0e-6
     preset["vacuum"]["runtime_pressure_mbar"] = 0.1
 
-    with pytest.raises(Hashimoto1983Refusal) as exc_info:
-        require_runtime_inputs(preset)
-    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
-    assert exc_info.value.detail == "0.000133322 mbar < 0.001 mbar"
+    _assert_schedule_pressure_notice(require_runtime_inputs(preset))
+    assert preset["vacuum"]["value"] == 1.0e-4
+    assert preset["vacuum"]["units"] == "Torr"
 
 
 def test_printed_pressure_value_crosses_schedule_floor() -> None:
@@ -118,22 +120,34 @@ def test_printed_pressure_value_crosses_schedule_floor() -> None:
     assert require_runtime_inputs(preset) is None
 
     preset["vacuum"]["value"] = 1.0e-4
-    with pytest.raises(Hashimoto1983Refusal) as exc_info:
-        require_runtime_inputs(preset)
-    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
+    _assert_schedule_pressure_notice(require_runtime_inputs(preset))
+    assert preset["vacuum"]["value"] == 1.0e-4
+    assert preset["vacuum"]["units"] == "Torr"
 
 
 def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> None:
     observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
     assert len(observations) == 120
     assert len({row.observation_id for row in observations}) == 120
     assert all(row.source_id == "kems-015-hashimoto-1983" for row in observations)
-    records = score_hashimoto_1983(observations=observations)
+    assert preset["vacuum"]["value"] == 1.0e-4
+    assert preset["vacuum"]["units"] == "Torr"
+    records = score_hashimoto_1983(preset=preset, observations=observations)
     assert len(records) == 120
     assert all(
-        record.refusal_reason == "runtime_pressure_below_implemented_floor"
+        record.refusal_reason == "missing_runtime_output"
         for record in records
     )
+    for record in records:
+        _assert_schedule_pressure_notice(record.pressure_domain_notice)
+        assert (
+            record.pressure_domain_notice["reason"] in record.notice_set
+        )
+        assert (
+            record.pressure_domain_notice
+            in record.as_dict()["notice_details"]
+        )
 
     changed = observations[:-1]
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
@@ -193,7 +207,20 @@ def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
     assert all(record.sim_wt_pct == record.published_wt_pct for record in records)
     assert all(record.residual == 0.0 for record in records)
     _assert_dp007_residuals_are_flagged(records)
-    notice_payload = records[0].as_dict()["notice_details"][0]
+    for record in records:
+        _assert_schedule_pressure_notice(record.pressure_domain_notice)
+        assert (
+            record.pressure_domain_notice["reason"] in record.notice_set
+        )
+        assert (
+            record.pressure_domain_notice
+            in record.as_dict()["notice_details"]
+        )
+    notice_payload = next(
+        notice
+        for notice in records[0].as_dict()["notice_details"]
+        if notice.get("kind") == NoticeKind.KNOB_DEFAULTED.value
+    )
     assert notice_payload["kind"] == NoticeKind.KNOB_DEFAULTED.value
     assert notice_payload["reason"] == "exposed_melt_area_not_printed"
     assert notice_payload["policy"] == {
@@ -249,6 +276,7 @@ def test_runtime_area_default_without_policy_metadata_cannot_enter_headline() ->
     assert records[0].refusal_reason == "runtime_area_default_notice_missing"
     assert records[0].residual is None
     assert not records[0].clean_measured_headline_eligible
+    _assert_schedule_pressure_notice(records[0].pressure_domain_notice)
 
 
 def test_missing_runtime_output_refuses_for_each_observation() -> None:
@@ -265,6 +293,10 @@ def test_missing_runtime_output_refuses_for_each_observation() -> None:
     assert all(record.sim_wt_pct is None for record in records)
     assert all(record.residual is None for record in records)
     assert all(record.refusal_reason == "missing_runtime_output" for record in records)
+    assert all(
+        record.pressure_domain_notice is not None
+        for record in records
+    )
 
 
 @pytest.mark.parametrize("invalid_output", [-1.0, 101.0])
@@ -326,3 +358,16 @@ def _assert_dp007_residuals_are_flagged(records) -> None:
         assert NoticeKind.KNOB_DEFAULTED.value in record.notice_set
         assert NoticeKind.KNOB_DEFAULTED.value in record.flagged_strata
         assert not record.clean_measured_headline_eligible
+
+
+def _assert_schedule_pressure_notice(notice: Any) -> None:
+    assert notice is not None
+    assert notice["kind"] == "lab_schedule_pressure_domain_notice"
+    assert notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+    assert notice["authority"] == "extrapolated"
+    assert notice["pressure_mbar"] == pytest.approx(
+        0.00013332236842105264,
+        rel=1.0e-15,
+        abs=0.0,
+    )
+    assert notice["certified_band"] == {"minimum_pressure_mbar": 0.001}
