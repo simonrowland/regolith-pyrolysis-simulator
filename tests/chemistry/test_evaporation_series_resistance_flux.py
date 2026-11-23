@@ -6,13 +6,6 @@ import math
 
 import pytest
 
-from engines.builtin.evaporation_flux import (
-    BuiltinEvaporationFluxProvider,
-    EvaporationFluxConfigurationError,
-    _oxygen_coproduct_moles_per_carrier_mole,
-    _solve_equal_d_stefan_maxwell,
-    _series_resistance_evaporation_flux_kg_m2_s,
-)
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import (
@@ -22,9 +15,17 @@ from simulator.condensation import (
     _series_resistance_deposition_flux_mol_m2_s,
     common_film_diffusivity,
 )
-from simulator.state import MAX_STIR_FACTOR
 from simulator.lab_geometry import GAS_FILM_DISK, GAS_FILM_SPHERE
+from simulator.state import MAX_STIR_FACTOR
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
+
+from engines.builtin.evaporation_flux import (
+    BuiltinEvaporationFluxProvider,
+    EvaporationFluxConfigurationError,
+    _oxygen_coproduct_moles_per_carrier_mole,
+    _solve_equal_d_stefan_maxwell,
+    _series_resistance_evaporation_flux_kg_m2_s,
+)
 
 
 _K_BASE = {

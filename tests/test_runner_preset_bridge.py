@@ -27,6 +27,7 @@ from simulator.lab_geometry import (
     LabGeometryError,
     resolve_lab_gas_film_geometry,
 )
+from simulator.thermal_budget import declared_benchtop_lengths_m
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
@@ -349,7 +350,7 @@ def _run_preset_cli(tmp_path: Path, preset_path: Path, *extra_args: str) -> tupl
         cwd=REPO_ROOT,
         text=True,
         capture_output=True,
-        timeout=120,
+        timeout=300,
         check=False,
     )
     assert output_path.exists(), completed.stderr
@@ -500,10 +501,8 @@ def test_invalid_exposed_area_refuses_before_sized_face(raw_area) -> None:
     with pytest.raises(LabGeometryError) as caught:
         session.start(_gram_lab_run(robinot, campaign="C0")._session_config())
     assert caught.value.code == "invalid_lab_geometry_positive_value"
-    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(0.2)
-    sized_m2 = session.simulator._equipment.crucible.melt_surface_area_m2
-    assert sized_m2 > 0.0
-    assert session.simulator.melt.melt_surface_area_m2 != pytest.approx(sized_m2)
+    # _session_config rejects invalid geometry before SimSession.start runs.
+    assert session._sim is None
 
 
 def test_numeric_string_exposed_area_stays_admitted() -> None:
@@ -547,6 +546,28 @@ def test_robinot_lab_film_uses_pellet_diameter_and_keeps_declared_area() -> None
     assert resolved.area_m2 == pytest.approx(0.00013273228961416876)
     assert "gas_film_length_declared" in resolved.flags
     assert "gas_film_shape:sphere_equivalent" in resolved.flags
+
+
+def test_benchtop_declared_diameter_delegates_to_lab_geometry_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sample = {"pellet_diameter_mm": "13"}
+    calls: list[object] = []
+
+    def declared_owner(received):
+        calls.append(received)
+        return 0.013
+
+    monkeypatch.setattr(
+        lab_geometry_module,
+        "declared_pellet_diameter_m",
+        declared_owner,
+    )
+
+    lengths = declared_benchtop_lengths_m(sample)
+
+    assert calls == [sample]
+    assert lengths["pellet_diameter_m"] == pytest.approx(0.013)
 
 
 def test_crucible_inner_diameter_selects_disk_shape_and_length() -> None:

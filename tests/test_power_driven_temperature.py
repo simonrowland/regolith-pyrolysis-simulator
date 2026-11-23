@@ -13,7 +13,6 @@ from pathlib import Path
 
 import pytest
 
-from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.campaigns import CampaignManager
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_schedule import lab_schedule_digests
@@ -38,6 +37,7 @@ from simulator.thermal_budget import (
     sample_furnace_power_W,
     solve_power_driven_melt_temperature_C,
 )
+from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 
 
 _REPO = Path(__file__).resolve().parents[1]

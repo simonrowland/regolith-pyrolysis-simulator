@@ -29,11 +29,6 @@ from types import SimpleNamespace
 
 import pytest
 
-from engines.builtin.evaporation_flux import (
-    BuiltinEvaporationFluxProvider,
-    _series_pressure_provenance_diagnostic,
-    _series_resistance_evaporation_flux_kg_m2_s,
-)
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     IntentRequest,
@@ -57,6 +52,12 @@ from simulator.state import (
     DecisionType,
 )
 from tests.chemistry.conftest import _build_sim
+
+from engines.builtin.evaporation_flux import (
+    BuiltinEvaporationFluxProvider,
+    _series_pressure_provenance_diagnostic,
+    _series_resistance_evaporation_flux_kg_m2_s,
+)
 
 
 # shadow-parity simulation runs clip/fail under xdist coscheduling.
@@ -1762,7 +1763,11 @@ def test_silicon_transport_row_computes_with_sodium_in_mixed_batch():
         vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
         molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
         stoich_by_species={
-            "Na": {"parent_oxide": "Na2O", "oxide_per_product_kg": 1.347},
+            "Na": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": 1.347,
+                "O2_per_product_kg": 0.347,
+            },
             "Si": {"parent_oxide": "SiO2", "oxide_per_product_kg": 2.139},
         },
         available_oxide_kg={"Na": 10.0, "Si": 10.0},
