@@ -90,6 +90,18 @@ def test_single_volatile_limit_is_exact_and_scale_free(pressure):
     assert result.retained_oxygen_atoms_mol == pytest.approx(0.75)
 
 
+def test_knudsen_extent_refuses_non_equilibrium_channel_alpha():
+    channels = (replace(_channels()[0], alpha=0.5), *_channels()[1:])
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        integrate_knudsen_residue_inventory(
+            {"FeO": 1.0}, channels,
+            lambda n, p, t: {"FeO": 1.0, "O2": 0.0},
+            temperature_path=((0.25, 2000.0),), measured_mass_loss_fraction=0.25,
+            near_saturated=True, source_fO2_log_by_interval=(-10.0,),
+        )
+    assert exc.value.reason == "knudsen_equilibrium_channels_required"
+
+
 def test_oxygen_only_loss_advances_xi_without_debiting_cations():
     result = integrate_knudsen_residue_inventory(
         {"FeO": 1.0}, _channels("Fe"),
