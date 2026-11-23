@@ -1700,41 +1700,18 @@ def _experiment_sample_phase(
     return None
 
 
-def _vapour_sample_phase(
-    experiment: Experiment | None,
-    *,
-    measured_condensed_form: object = None,
-    measured_sample_phase: object = None,
-    include_characterization: bool = False,
-) -> Phase | None:
-    """Prefer an exact row phase; untyped row prose blocks form fallback."""
-
-    row_phase_recorded, sample_phase = _phase_for_recorded_vapour_sample(
-        measured_condensed_form,
-        measured_sample_phase,
-    )
-    if row_phase_recorded:
-        return sample_phase
-    return _experiment_sample_phase(
-        experiment,
-        include_characterization=include_characterization,
-    )
-
-
 def vapour_crystalline_sample_liquid_engine_refusal(
     identity: Identity,
     *,
     engine: Engine,
     experiment: Experiment | None,
-    measured_condensed_form: object = None,
-    measured_sample_phase: object = None,
 ) -> dict[str, object] | None:
     """Detail when crystalline-sample vapour is outside a liquid engine.
 
-    An explicit row state takes precedence over the experiment form. A
-    liquid engine consumes a typed crystalline sample as one homogeneous
-    liquid, so that sample is another phase. Non-liquid engines are not
-    this refusal. ``None`` means score it.
+    The sample phase is the experiment form, not the gas species. A
+    liquid engine consumes that sample as one homogeneous liquid, so a
+    typed crystal is another phase. Non-liquid engines are not this
+    refusal. ``None`` means score it.
     """
 
     if engine not in SINGLE_LIQUID_ENGINES:
@@ -1743,11 +1720,7 @@ def vapour_crystalline_sample_liquid_engine_refusal(
     if quantity is not Quantity.P_PARTIAL:
         return None
     detail = crystalline_sample_detail(
-        _vapour_sample_phase(
-            experiment,
-            measured_condensed_form=measured_condensed_form,
-            measured_sample_phase=measured_sample_phase,
-        ),
+        _experiment_sample_phase(experiment),
         quantity=quantity,
         reason=SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
     )
@@ -1803,13 +1776,17 @@ def liquid_model_subsolidus_sample_notice(
         Rail.SIO_EVOLUTION,
     }:
         return None
-    sample_phase_detail = crystalline_sample_detail(
-        _vapour_sample_phase(
+    row_phase_recorded, sample_phase = _phase_for_recorded_vapour_sample(
+        measured_condensed_form,
+        measured_sample_phase,
+    )
+    if not row_phase_recorded:
+        sample_phase = _experiment_sample_phase(
             experiment,
-            measured_condensed_form=measured_condensed_form,
-            measured_sample_phase=measured_sample_phase,
             include_characterization=True,
-        ),
+        )
+    sample_phase_detail = crystalline_sample_detail(
+        sample_phase,
         quantity=quantity,
         reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
     )
@@ -14351,12 +14328,6 @@ def _predict_with_engine(
         identity,
         engine=engine,
         experiment=experiment,
-        measured_condensed_form=(observation.provenance or {}).get(
-            "measured_condensed_form"
-        ),
-        measured_sample_phase=(observation.provenance or {}).get(
-            "measured_sample_phase"
-        ),
     )
     if vapour_phase_detail is not None:
         return _sample_phase_not_observable_prediction(
@@ -18122,12 +18093,6 @@ def _compile_residual_with_lineage(
             identity,
             engine=engine,
             experiment=experiment,
-            measured_condensed_form=(reference.provenance or {}).get(
-                "measured_condensed_form"
-            ),
-            measured_sample_phase=(reference.provenance or {}).get(
-                "measured_sample_phase"
-            ),
         )
         if vapour_phase_detail is not None:
             # Phase identity, not an apparatus or engine result. A typed

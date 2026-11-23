@@ -11171,37 +11171,52 @@ def test_recorded_liquid_row_state_overrides_solid_characterization() -> None:
     )
 
 
-@pytest.mark.parametrize(
-    ("recorded_state", "expected_refusal"),
-    (
-        (None, True),
-        ("solid", True),
-        ("liquid_melt", False),
-        ("mostly solid at room temperature", False),
-    ),
-)
-def test_recorded_vapour_sample_phase_precedes_experiment_form_for_refusal(
-    recorded_state: str | None, expected_refusal: bool
-) -> None:
-    from simulator.battery.score import (
-        vapour_crystalline_sample_liquid_engine_refusal,
-    )
+def test_solid_formula_alias_preserves_free_prose_and_row_notice_paths() -> None:
+    from simulator.battery.migrate import map_phase, phase_for_sample_form
+
+    suffix_phase, reason = map_phase("solid")
+    assert suffix_phase.value is Phase.CR
+    assert reason is None
+    assert phase_for_sample_form("solid") is None
 
     experiment, reference = _vapour_over_sample_form("solid")
-    measured_condensed_form = (
-        None
-        if recorded_state is None
-        else {"state": recorded_state, "basis": "explicit_author"}
+    reference = replace(
+        reference,
+        provenance={
+            "measured_condensed_form": {
+                "state": "mostly solid at room temperature",
+                "basis": "explicit_author",
+            }
+        },
+    )
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
     )
 
-    detail = vapour_crystalline_sample_liquid_engine_refusal(
-        reference.identity,
-        engine=Engine.INTERNAL_ANALYTICAL,
-        experiment=experiment,
-        measured_condensed_form=measured_condensed_form,
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, form=None, characterization=None),
     )
-
-    assert (detail is not None) is expected_refusal
+    reference = replace(
+        reference,
+        provenance={"measured_condensed_form": "solid ceramic sample"},
+    )
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
 
 
 @pytest.mark.parametrize(

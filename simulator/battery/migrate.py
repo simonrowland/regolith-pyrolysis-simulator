@@ -562,17 +562,21 @@ _SAMPLE_SOURCE_PHASE_LABELS = frozenset(
 
 
 def phase_for_sample_form(form: str | None) -> Phase | None:
-    """Closed phase for a sample form token. Untyped prose is None.
+    """Resolve a sample-form token without treating ``solid`` as a suffix.
 
-    Same lookup the p_sat reservoir fill uses: strip, casefold, then
-    PHASE_MAP. A miss is not a phase. ``map_phase`` stays separate: it
-    records the original species-phase spelling on an unknown.
+    The bare ``solid`` alias belongs to formula phase parsing; reviewed row
+    descriptions classify it through their exact description map. A miss is
+    not a phase. ``map_phase`` keeps the formula/source-phase lookup.
     """
 
     if form is None:
         return None
     token = form.strip().casefold()
     if not token:
+        return None
+    # ``solid`` is a formula suffix alias in PHASE_MAP, not a typed sample
+    # form. Reviewed row descriptions classify it through the description map.
+    if token == "solid":
         return None
     return PHASE_MAP.get(token)
 
