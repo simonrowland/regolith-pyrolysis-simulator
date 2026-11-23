@@ -449,6 +449,52 @@ def test_merged_two_dot_entropy_splits_on_grain() -> None:
     assert splits["proposed"] == splits["stored"] + splits["refused"] + splits["excluded"]
 
 
+def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() -> None:
+    generated = _generation(TABLE_298K)
+    for name, point, uncertainty, stray in (
+        ("HYDROHAGNESITE", "503.67", "1.55", "1.55"),
+        ("ARTIWITE", "232.92", "0.67", "0.67"),
+        ("ANALCIME", "234.43", "2.51", "2.51"),
+    ):
+        observations = _observations_for(
+            generated, Quantity.S, temperature="298.15", name=name
+        )
+        assert len(observations) == 1
+        assert observations[0].value.point == Decimal(point)
+        assert observations[0].uncertainty.kind is UncertaintyKind.PRINTED
+        assert observations[0].uncertainty.verbatim == uncertainty
+        assert all(row.value.point != Decimal(stray) for row in observations)
+
+    szomolnokite = _observations_for(
+        generated,
+        Quantity.DELTA_FH,
+        temperature="298.15",
+        name="SZOMOLNOKITE",
+    )
+    assert len(szomolnokite) == 1
+    point = szomolnokite[0]
+    assert point.value.point == Decimal("-1243.900")
+    assert point.uncertainty.kind is UncertaintyKind.PRINTED
+    assert point.uncertainty.verbatim == "0.500 kJ/mol"
+    assert point.locator is not None
+    assert point.locator.published_page == 26
+    assert point.locator.pdf_page_index == 32
+
+    overridden = [
+        row
+        for row in generated.observations
+        if row.locator is not None
+        and (row.locator.published_page, row.locator.pdf_page_index) == (26, 32)
+    ]
+    assert overridden == [point]
+    assert all(
+        row.locator is None
+        or row is point
+        or (row.locator.published_page, row.locator.pdf_page_index) == (12, 18)
+        for row in generated.observations
+    )
+
+
 def test_spinel_extra_dot_split_is_proposed_then_10x_refused() -> None:
     """Grain uniquely cuts Spinel 1800 K gef 2.29.48; the page is 229.482.
 

@@ -512,6 +512,9 @@ def _reconstruction_from_image(token: RawToken) -> dict[str, Any] | None:
             f"{printed!r} ({item.get('evidence')})"
         ),
         "as_published": token.as_published,
+        "uncertainty": item.get("uncertainty"),
+        "published_page": item.get("published_page"),
+        "pdf_page": item.get("pdf_page"),
     }
 
 
@@ -1408,6 +1411,11 @@ def _observation(
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
     identity = fill_identity(quantity, species, **known)
     published_page, pdf_page = _pages(record)
+    if reconstruction is not None:
+        if reconstruction.get("published_page") is not None:
+            published_page = int(reconstruction["published_page"])
+        if reconstruction.get("pdf_page") is not None:
+            pdf_page = int(reconstruction["pdf_page"])
     unit = _page_units(token.table_kind, token.column)
     source_path = f"{SOURCE_PATH_PREFIX}/{record_id}.json"
     unit_locator = (

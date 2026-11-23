@@ -40718,3 +40718,50 @@ corrections:
   action: value_withheld
   evidence: page image render (250 dpi, pdftoppm) of the cited printed page, read cell by cell 2026-09-07
   source_text_line: 25
+
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  column: entropy_s298
+  ocr_token: '503.67'
+  printed_token: '503.67'
+  value: 503.67
+  uncertainty: '1.55'
+  action: image_verified_correction
+  evidence: crop-verified PDF page 31 (folio 25), entropy row
+  image_quote: 'HYDROMAGNESITE 503.67 / 1.55 J/mol·K'
+  source_text_line: 602
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  column: entropy_s298
+  ocr_token: '232.92'
+  printed_token: '232.92'
+  value: 232.92
+  uncertainty: '0.67'
+  action: image_verified_correction
+  evidence: crop-verified PDF page 31 (folio 25), entropy row
+  image_quote: 'ARTINITE 232.92 / 0.67 J/mol·K'
+  source_text_line: 604
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  column: entropy_s298
+  ocr_token: '234.43'
+  printed_token: '234.43'
+  value: 234.43
+  uncertainty: '2.51'
+  action: image_verified_correction
+  evidence: crop-verified PDF page 35 (folio 29), entropy row
+  image_quote: 'ANALCIME 234.43 / 2.51 J/mol·K'
+  source_text_line: 791
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  column: formation_enthalpy
+  ocr_token: '-1243900'
+  printed_token: '-1243900'
+  value: -1243900
+  uncertainty: '0.500 kJ/mol'
+  pdf_page: 32
+  published_page: 26
+  action: image_verified_correction
+  evidence: crop-verified PDF page 32 (folio 26), szomolnokite row
+  image_quote: 'SZOMOLNOKITE FeSO4·H2O; ΔHf=-1243900 J/mol; uncertainty=500 J/mol'
+  source_text_line: 644
