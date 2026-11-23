@@ -208,6 +208,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         for observation in species.get("observations", [])
     }
     assert len(table1) + len(s2) == 1461
+    assert len(observations) == len(table1) + len(s2) + 1
     phase_ids = {row["observation_id"] for row in table1 + s2}
     assert len({row["experiment"] for row in table1}) == 21
     fe_observation_id = "xu_2026_moessbauer_starting_glass_fe3_fet"

@@ -9373,10 +9373,10 @@ def _apply_equilibrium_starting_bulk(
     anhydrous normalization still carries the oxide bulk and says that
     identity.composition omits H2O. A missing or unusable start stays
     missing, except a b-704 mass-percent refusal, which remains an explicit
-    unknown on the observation. A row that already prints ``composition``
-    or ``initial_composition_as_published`` as unknown keeps that blank:
-    the experiment bulk is not this row's printed start. Residue quantities
-    do not call this.
+    unknown on the observation. For phase-composition rows, a usable sample
+    start takes precedence over a row-level analyzed-product composition.
+    A row that prints ``composition`` or ``initial_composition_as_published``
+    as unknown keeps that blank. Residue quantities do not call this.
     """
 
     if experiment is None:
@@ -9419,7 +9419,10 @@ def _apply_equilibrium_starting_bulk(
         return point_conditions, []
     if _row_printed_composition_unknown(point_conditions):
         return point_conditions, []
-    if _keeps_existing_composition(ident_kwargs.get("composition")):
+    if (
+        quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and _keeps_existing_composition(ident_kwargs.get("composition"))
+    ):
         return point_conditions, []
     composition_for_row = composition
     if composition.proxy_flag != "composition_from_sample_catalog":

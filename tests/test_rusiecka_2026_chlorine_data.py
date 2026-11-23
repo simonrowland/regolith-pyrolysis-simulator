@@ -21,6 +21,7 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -620,6 +621,7 @@ def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None
     assert not result.validation.hard_issues, result.validation.hard_issues
     assert len(result.observations) == 1911
     target_runs = []
+    expected_start_by_experiment = {}
     for row_number, sample_code in expected_rows.items():
         experiment = next(
             migrated
@@ -638,6 +640,7 @@ def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None
         )
         assert initial.state.value.components == expected.components
         target_runs.append(experiment.experiment_id)
+        expected_start_by_experiment[experiment.experiment_id] = expected
 
     phase_rows = [
         row
@@ -659,6 +662,9 @@ def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None
         and raw.get("values", {}).get("phase") == "glass"
     ]
     assert len(source_glass_rows) == 272
+    source_glass_by_id = {
+        raw["observation_id"]: raw for raw in source_glass_rows
+    }
     for raw in source_glass_rows:
         quench = raw["values"]["quench_statement"]
         assert quench["preservation"] == "not_stated"
@@ -668,6 +674,20 @@ def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None
         assert quench["locator"]["published_page"] == 3
         assert "no quench or glass-preservation statement located" in (
             quench["locator"]["note"]
+        )
+    for row in phase_rows:
+        composition = row.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.components == expected_start_by_experiment[
+            row.experiment_id
+        ].components
+        assert composition.value.input_provenance == PRINTED_STARTING_BULK
+        product_composition = row.point_conditions["composition"]
+        assert product_composition.state.is_value
+        assert product_composition.state.value.amount_basis is AmountBasis.MASS_PERCENT
+        raw_id = row.observation_id.rsplit("::", 1)[-1]
+        assert row.value.point == Decimal(
+            source_glass_by_id[raw_id]["values"]["component_amount"]
         )
 
     mutated_doc = deepcopy(doc)
@@ -697,3 +717,24 @@ def test_starting_materials_bind_to_all_2026_experiments(tmp_path: Path) -> None
     assert changed_experiment.sample.initial_composition.state.value.components != (
         original_experiment.sample.initial_composition.state.value.components
     )
+    changed_phase_row = next(
+        row
+        for row in changed_result.observations.values()
+        if row.observation_id.endswith("::rusiecka_2026_data_row81_sio2")
+    )
+    original_phase_row = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::rusiecka_2026_data_row81_sio2")
+    )
+    assert changed_phase_row.identity.composition.value.components != (
+        original_phase_row.identity.composition.value.components
+    )
+    assert changed_phase_row.identity.composition.value.components == (
+        changed_experiment.sample.initial_composition.state.value.components
+    )
+    assert (
+        changed_phase_row.identity.composition.value.input_provenance
+        == PRINTED_STARTING_BULK
+    )
+    assert changed_phase_row.value.point == original_phase_row.value.point
