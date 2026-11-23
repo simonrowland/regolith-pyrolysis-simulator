@@ -373,6 +373,54 @@ def test_fe_1_minus_x_identity_uses_existing_d420_wustite_conversion() -> None:
     )
 
 
+def test_feox_identity_uses_only_its_typed_wustite_reference() -> None:
+    temperature = Decimal("1673.15")
+    reference = _wustite_row(temperature)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, formula="FeOx"),
+        ),
+    )
+
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert converted.value.point == reference.value.point * _independent_factor(
+        temperature
+    )
+    assert converted.identity.species.formula == "FeO"
+    assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+        converted.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+        and "original_reason=species_formula=FeOx" in notice.reason
+        and "standard_formula=Fe(1-x)O" in notice.reason
+        for notice in converted.notices
+    )
+
+    standard = reference.identity.reference_state.value
+    assert isinstance(standard, StandardState)
+    stoichiometric_standard = replace(
+        standard,
+        endmember=replace(standard.endmember, formula="FeO"),
+        component_basis="FeO",
+    )
+    untyped_alias = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reference_state=State.of(stoichiometric_standard),
+        ),
+    )
+    assert fusion_comparison_reference(
+        untyped_alias, engine=Engine.INTERNAL_ANALYTICAL
+    ) is untyped_alias
+
+
 def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
     temperature = Decimal("1673.15")
     work = F.work()

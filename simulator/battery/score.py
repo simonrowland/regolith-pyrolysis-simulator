@@ -4390,6 +4390,7 @@ def _banya_feto_activity_comparison(
             identity,
             species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
         )
+    identity = _canonicalize_feox_species_identity(identity)
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),
@@ -4692,6 +4693,17 @@ def _stoichiometric_standard(standard_state: StandardState) -> StandardState:
     )
 
 
+def _canonicalize_feox_species_identity(identity: Identity) -> Identity:
+    """Use the FeO comparison label after typed d-420 wüstite conversion."""
+
+    if identity.species is None or identity.species.formula != "FeOx":
+        return identity
+    return replace(
+        identity,
+        species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
+    )
+
+
 @lru_cache(maxsize=1)
 def _iron_saturated_feo_calibration() -> tuple[
     _IronSaturatedFeOCalibration, tuple[Decimal, ...]
@@ -4809,6 +4821,12 @@ def _iron_saturated_feo_comparison(
         if banya_source_relation
         else {_FEO_STOICHIOMETRIC_FORMULA, _FEO_WUSTITE_FORMULA}
     )
+    # FeOx has no exact composition on its own. Accept that label only when
+    # this observation's typed standard state identifies liquid wüstite; the
+    # d-420 conversion below then replaces the label with the FeO comparison
+    # identity without assigning a vacancy fraction.
+    if standard_state.endmember.formula == _FEO_WUSTITE_FORMULA:
+        species_formulas.add("FeOx")
     standard_formulas = (
         {_FEO_WUSTITE_FORMULA, "Fe_tO"}
         if banya_source_relation
@@ -4983,6 +5001,7 @@ def _iron_saturated_feo_comparison(
     if row_band.notice is not None:
         notices += (row_band.notice,)
     notices += (composition_notice,)
+    identity = _canonicalize_feox_species_identity(identity)
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),
