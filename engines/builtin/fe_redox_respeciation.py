@@ -44,6 +44,20 @@ BUFFER_BACKED_OXYGEN_SOURCES = frozenset({
 })
 NOOP_MOL = 1.0e-12
 TRANSITION_NAME = "fe_redox_respeciation"
+# Fe2O3 → 2 FeO + 1/2 O2. Each mol of Fe2O3 books 1/2 mol of O2,
+# which is 1/4 mol of O2 per mol of Fe3+. The oxidizing arm
+# (2 FeO + 1/2 O2 → Fe2O3) debits the same factor.
+_O2_MOL_PER_FE2O3_MOL = 0.5
+
+
+def ferric_couple_o2_mol(fe2o3_mol: float) -> float:
+    """Return the O2 (mol) the ferric couple books for a Fe2O3 amount."""
+    return _O2_MOL_PER_FE2O3_MOL * float(fe2o3_mol)
+
+
+def fe2o3_mol_for_ferric_o2(o2_mol: float) -> float:
+    """Return the Fe2O3 (mol) that books a given ferric-couple O2 amount."""
+    return float(o2_mol) / _O2_MOL_PER_FE2O3_MOL
 
 
 class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
@@ -228,13 +242,13 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
 
         registry = request.account_view.species_formula_registry
         if delta_fe2o3_mol > 0.0:
-            required_o2_mol = 0.5 * delta_fe2o3_mol
+            required_o2_mol = ferric_couple_o2_mol(delta_fe2o3_mol)
             if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES:
                 available_o2_mol = internal_o2_capacity_mol
                 applied_delta_fe2o3_mol = min(
                     delta_fe2o3_mol,
                     0.5 * feo_mol,
-                    2.0 * available_o2_mol,
+                    fe2o3_mol_for_ferric_o2(available_o2_mol),
                 )
             else:
                 available_o2_mol = max(
@@ -249,7 +263,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 )
                 applied_delta_fe2o3_mol = delta_fe2o3_mol
             feo_debit_mol = 2.0 * applied_delta_fe2o3_mol
-            o2_debit_mol = 0.5 * applied_delta_fe2o3_mol
+            o2_debit_mol = ferric_couple_o2_mol(applied_delta_fe2o3_mol)
             if (
                 applied_delta_fe2o3_mol <= NOOP_MOL
                 or feo_debit_mol > feo_mol + NOOP_MOL
@@ -322,13 +336,13 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     },
                 )
             debits = {CLEANED_MELT_ACCOUNT: {"Fe2O3": fe2o3_debit_mol}}
+            o2_credit = ferric_couple_o2_mol(fe2o3_debit_mol)
             credits = {
                 CLEANED_MELT_ACCOUNT: {"FeO": 2.0 * fe2o3_debit_mol},
-                o2_account: {OXYGEN_SPECIES: 0.5 * fe2o3_debit_mol},
+                o2_account: {OXYGEN_SPECIES: o2_credit},
             }
             direction = "reducing"
             o2_debit = 0.0
-            o2_credit = 0.5 * fe2o3_debit_mol
 
         proposal = LedgerTransitionProposal(
             debits=debits,
