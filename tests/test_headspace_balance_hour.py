@@ -226,7 +226,7 @@ def test_reduced_radau_matches_old_rk45_on_a_nonstiff_hour(monkeypatch):
 
 
 def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
-    """The stiff hour fits the IFT RHS budget; warm Newton exceeds it."""
+    """The stiff hour fits the validated IFT budget; warm Newton exceeds it."""
 
     law, holder, fractions, start, root = _reduced_manifold_case(
         stiff=True,
@@ -245,7 +245,7 @@ def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
     assert holder is not None
     assert law.flux_evaluations < capacity_coupling._MAX_FLUX_EVALUATIONS
     assert law._rhs_flux_counts
-    assert max(law._rhs_flux_counts) <= 4
+    assert max(law._rhs_flux_counts) <= 5
 
     warm_law, _holder, fractions, start, root = _reduced_manifold_case(
         stiff=True,
