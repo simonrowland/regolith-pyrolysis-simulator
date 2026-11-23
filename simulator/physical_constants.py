@@ -28,6 +28,7 @@ STEFAN_BOLTZMANN = 5.670374419e-8  # W/(m2 K4); exact-derived.
 PLANCK = 6.62607015e-34  # J s; exact by SI definition.
 ELEMENTARY_CHARGE = 1.602176634e-19  # C; exact by SI definition.
 STANDARD_GRAVITY = 9.80665  # m/s2; exact defined standard gravity.
+PLANCK_SECOND_RADIATION_CONSTANT_UM_K = 14388.0  # um K; rounded per d-464.
 
 # Spellings that are not bit-identical to the values above. Each relative
 # gap is (spelling - full) / full.
@@ -107,6 +108,7 @@ __all__ = (
     "PA_PER_BAR",
     "PA_PER_MBAR",
     "PLANCK",
+    "PLANCK_SECOND_RADIATION_CONSTANT_UM_K",
     "STANDARD_ATMOSPHERE_PA",
     "STANDARD_GRAVITY",
     "STEFAN_BOLTZMANN",

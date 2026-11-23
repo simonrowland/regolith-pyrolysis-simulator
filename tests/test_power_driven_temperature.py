@@ -27,6 +27,7 @@ from simulator.thermal_budget import (
     measured_furnace_power_trace,
     melt_temperature_from_furnace_power,
     reported_temperature_observations,
+    robinot_pyrometer_brightness_temperature_C,
     sample_furnace_power_W,
     solve_power_driven_melt_temperature_C,
 )
@@ -37,6 +38,24 @@ _ROBINOT = _REPO / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
 _SESKO = _REPO / "data" / "presets" / "vacuum_pyrolysis" / "sesko_2024.yaml"
 _DT_S = 60.0
 _DT_H = _DT_S / 3600.0
+
+
+def test_robinot_planck_brightness_temperature_checks() -> None:
+    assert robinot_pyrometer_brightness_temperature_C(
+        1859.0,
+        emissivity=1.0,
+        path_transmittance=1.0,
+    ) == pytest.approx(1859.0, abs=1.0e-9)
+    assert robinot_pyrometer_brightness_temperature_C(
+        1859.0,
+        emissivity=0.95,
+        path_transmittance=1.0,
+    ) == pytest.approx(1800.0, abs=1.0)
+    assert robinot_pyrometer_brightness_temperature_C(
+        2026.0,
+        emissivity=0.95,
+        path_transmittance=1.0,
+    ) == pytest.approx(1960.0, abs=1.0)
 
 
 def _robinot_schedule() -> dict:

@@ -40,7 +40,10 @@ from simulator.diagnostic_helpers.timeseries_concordance import (
 )
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    PLANCK_SECOND_RADIATION_CONSTANT_UM_K,
+)
 from simulator.process_timestep import PROCESS_HOUR_S
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
@@ -1820,6 +1823,39 @@ def _tonne_sky_loss_W(
     """
 
     return STEFAN_BOLTZMANN * emissivity * area_m2 * temperature_K ** 4
+
+
+def robinot_pyrometer_brightness_temperature_C(
+    true_temperature_C: float,
+    *,
+    emissivity: float,
+    path_transmittance: float,
+) -> float:
+    """Return Robinot's 5 um Planck brightness temperature.
+
+    At one wavelength, Planck radiance is proportional to
+    ``1 / (exp(x) - 1)``, with ``x = c2 / (lambda * T)``. The measured
+    radiance ratio is ``tau * eps``, so
+    ``1 / (exp(x_b) - 1) = tau * eps / (exp(x) - 1)``. Inverting gives
+    ``T_b = c2 / (lambda * log(1 + (exp(x) - 1) / (tau * eps)))``.
+    The exponent and logarithm arguments are dimensionless; c2 is in
+    um K and lambda is in um, so the result is kelvin before converting
+    to Celsius. Unit checks are tau * eps = 1 -> T_b = T, true 1859 C
+    at eps 0.95 -> about 1800 C, and true 2026 C at eps 0.95 -> about
+    1960 C; tests pin those three checks.
+    """
+
+    wavelength_um = 5.0
+    true_temperature_K = true_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    x = PLANCK_SECOND_RADIATION_CONSTANT_UM_K / (
+        wavelength_um * true_temperature_K
+    )
+    radiance_ratio = path_transmittance * emissivity
+    x_b = math.log1p(math.expm1(x) / radiance_ratio)
+    brightness_temperature_K = (
+        PLANCK_SECOND_RADIATION_CONSTANT_UM_K / (wavelength_um * x_b)
+    )
+    return brightness_temperature_K - CELSIUS_TO_KELVIN_OFFSET
 
 
 def _optional_positive_length(

@@ -17,6 +17,7 @@ from simulator.physical_constants import (
     GAS_CONSTANT,
     GAS_CONSTANT_6SIG,
     PA_PER_BAR,
+    PLANCK_SECOND_RADIATION_CONSTANT_UM_K,
     STANDARD_ATMOSPHERE_PA,
     STEFAN_BOLTZMANN,
     STEFAN_BOLTZMANN_7SIG,
@@ -39,6 +40,7 @@ def test_codata_leaf_bits() -> None:
     assert GAS_CONSTANT == 8.31446261815324
     assert PA_PER_BAR == 1e5
     assert STANDARD_ATMOSPHERE_PA == 101325.0
+    assert PLANCK_SECOND_RADIATION_CONSTANT_UM_K == 14388.0
 
 
 def test_state_truncations_stay_distinct_from_the_leaf() -> None:
