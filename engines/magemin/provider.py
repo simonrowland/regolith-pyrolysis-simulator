@@ -359,6 +359,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     **domain_diagnostic,
                 ).as_diagnostic(),
                 warnings=(
+                    *gate_warnings,
                     'MAGEMin adapter not available (binary not located '
                     'and no Python bridge importable)',
                 ),

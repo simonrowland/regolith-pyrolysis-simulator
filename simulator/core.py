@@ -5237,6 +5237,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if gate_authority is None:
             return gate_authority
         if isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback):
+            if gate_authority is getattr(
+                self,
+                '_melt_redox_gate_authority_this_tick',
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            ):
+                has_pin, pinned_authority = (
+                    self._melt_redox_gate_current_hour_pin()
+                )
+                if has_pin:
+                    return pinned_authority
+                return self._establish_melt_redox_gate_authority_for_current_hour(
+                    **redox_state_kwargs,
+                )
             if self._liquid_fraction_provider == 'magemin':
                 verdict, _ = (
                     self._melt_redox_gate_current_pin_verdict()
@@ -5263,7 +5276,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     **redox_state_kwargs,
                 )
             if gate_authority.get('disposition') == 'replay':
-                return gate_authority['curve']
+                return None
             if (
                 gate_authority.get('disposition')
                 in _MELT_REDOX_GATE_PIN_DISPOSITIONS
@@ -5341,6 +5354,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
         )
         if pinned_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
+            return False, None
+        if not (
+            _melt_redox_gate_authority_is_pin_candidate(pinned_authority)
+            or isinstance(pinned_authority, _MeltRedoxLiquidusFloorFallback)
+        ):
             return False, None
         if pinned_hour != int(self.melt.hour):
             self._melt_redox_gate_authority_this_tick = (

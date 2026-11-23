@@ -63,6 +63,7 @@ from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 from tests.chemistry.test_evaporation_freeze_gate import (
+    _install_magemin_subprocess_gate,
     _freeze_gate_redox_state_pair,
 )
 from tests.binding_admission_fixtures import (
@@ -4449,7 +4450,7 @@ def test_pt1_domain_gate_prediction_replays_with_qualification(
     assert notice['certified_band']['max_T_C'] == 1630.0
     seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(
-        sim, fO2_log=sim._compute_intrinsic_melt_fO2(), curve=curve,
+        sim, fO2_log=sim._current_melt_redox_fO2_log(), curve=curve,
     )
 
     replay_sim = _build_pt0_sim(PT0DeterminismStore('replay', db_path=db_path))
@@ -4599,6 +4600,160 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     recapture = PT0DeterminismStore('replay', db_path=db_path)
     assert recapture._lookup('freeze_gate_curve', key) == valid_payload
     assert recapture.hits == 1
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "markerless-gate-row-recapture.sqlite" if persistent else None
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    legacy_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [],
+        },
+    }
+    current_payload = {
+        "curve": {
+            **legacy_payload["curve"],
+            "is_liquidus_floor": False,
+        },
+    }
+
+    store._store(
+        "freeze_gate_curve",
+        key,
+        legacy_payload,
+        law_disclosures=[],
+    )
+    with pytest.raises(PT0CacheMiss):
+        store._lookup("freeze_gate_curve", key)
+
+    store._store(
+        "freeze_gate_curve",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else store
+    )
+
+    assert replay._lookup("freeze_gate_curve", key) == current_payload
+
+
+def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
+    composition_wt_pct = {
+        "SiO2": 80.001,
+        "MgO": 10.0,
+        "FeO": 9.999,
+    }
+    db_path = tmp_path / "legacy-magemin-domain-curve.sqlite"
+
+    def configure_sim(store):
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim._liquid_fraction_provider = "magemin"
+        register_synthetic_gate_curve_producer(sim)
+        composition_mol = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            composition_mol,
+            source="r32 legacy MAGEMin replay regression",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        sim.inventory.inert_melt_components_kg.clear()
+        sim._project_cleaned_melt_from_atom_ledger()
+        _install_magemin_subprocess_gate(sim, monkeypatch)
+        return sim
+
+    live_sim = configure_sim(PT0DeterminismStore("capture"))
+    live_curve = live_sim._freeze_gate_curve_record()["curve"]
+    assert live_curve["authority"] == "extrapolated"
+    assert live_curve["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
+    assert live_curve["is_liquidus_floor"] is False
+    assert live_curve["gate_provider_step_down"]["magemin_sourced"] is True
+
+    fO2_log = float(live_sim._current_melt_redox_fO2_log())
+    key = canonical_replay_key(
+        live_sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=fO2_log,
+        fe_redox_policy="intrinsic",
+        provider_role="fallback",
+    )
+    payload = {"curve": rrd._curve_payload(live_curve)}
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    legacy_payload = copy.deepcopy(payload)
+    legacy_curve = legacy_payload["curve"]
+    legacy_curve["is_liquidus_floor"] = False
+    legacy_curve["gate_provider_step_down"].pop("magemin_sourced")
+    store._store(
+        "freeze_gate_curve",
+        key,
+        legacy_payload,
+        law_disclosures=[],
+    )
+
+    legacy_replay = PT0DeterminismStore("replay", db_path=db_path)
+    with pytest.raises(PT0CacheMiss):
+        legacy_replay._lookup("freeze_gate_curve", key)
+
+    store._store(
+        "freeze_gate_curve",
+        key,
+        payload,
+        law_disclosures=[],
+    )
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = configure_sim(replay)
+    curve = replay_sim._establish_melt_redox_gate_authority_for_current_hour()
+    assert curve["authority"] == "extrapolated"
+    assert replay.last_cache_state == "cached_exact"
+
+    activity = replay_sim._native_fe_saturation_state(
+        composition_wt_pct,
+        fe3_over_sigma_fe=0.1,
+        T_K=1800.0 + 273.15,
+        pressure_bar=float(replay_sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=float(replay_sim._current_melt_redox_fO2_log()),
+    )
+    identity_notice = next(
+        notice
+        for notice in activity["notices"]
+        if notice.get("kind") == "magemin_domain_identity"
+    )
+    assert identity_notice["authority"] == "extrapolated"
+    assert identity_notice["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
 
 
 def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(

@@ -115,6 +115,7 @@ GATE_CURVE_NOTICE_KEYS = (
 GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
 PT0_GATE_CURVE_CODEC_VERSION = 3
 PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION = 2
+_MAGEMIN_SHADOW_PROVIDER_ID = "magemin-shadow"
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -180,13 +181,21 @@ def _payload_codec_is_current(
         curve = payload.get("curve")
         if not isinstance(curve, Mapping):
             return False
-        if curve.get("is_liquidus_floor") is not True:
-            return True
+        if not _curve_floor_marker_is_valid(curve, require_present=True):
+            return False
         step_down = curve.get("gate_provider_step_down")
-        return (
-            isinstance(step_down, Mapping)
-            and type(step_down.get("magemin_sourced")) is bool
+        if not isinstance(step_down, Mapping):
+            return True
+        magemin_sourced = (
+            step_down.get("realized_provider") == _MAGEMIN_SHADOW_PROVIDER_ID
+            or step_down.get("magemin_sourced") is True
         )
+        if (
+            "magemin_sourced" in step_down
+            and type(step_down["magemin_sourced"]) is not bool
+        ):
+            return False
+        return not magemin_sourced or "magemin_sourced" in step_down
     if artifact == "equilibrium_post_record":
         if version != PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION:
             return False
@@ -1341,9 +1350,7 @@ class PT0DeterminismStore:
                 continue
             if artifact == "freeze_gate_curve":
                 curve_payload = (entry.get("payload") or {}).get("curve")
-                if not isinstance(curve_payload, Mapping) or not (
-                    _curve_floor_marker_is_valid(curve_payload, require_present=True)
-                ):
+                if not isinstance(curve_payload, Mapping):
                     continue
             if require_gate_curve_domain_diagnostic:
                 identity = _magemin_identity_from_replay_key(key)
@@ -1612,6 +1619,25 @@ class PT0DeterminismStore:
         physics_bucket_hash = _sha256(physics_bucket_bytes)
         key_hash = self.physics_bucket_entries.get(physics_bucket_hash)
         entry = self._entries.get(key_hash) if key_hash is not None else None
+        if (
+            entry is not None
+            and entry.get("artifact") == artifact
+            and entry.get("physics_bucket_hash") == physics_bucket_hash
+            and _payload_codec_is_current(artifact, entry.get("payload"))
+        ):
+            return entry
+        entry = None
+        for candidate in self._entries.values():
+            if (
+                candidate.get("artifact") == artifact
+                and candidate.get("physics_bucket_hash") == physics_bucket_hash
+                and _payload_codec_is_current(
+                    artifact,
+                    candidate.get("payload"),
+                )
+            ):
+                entry = candidate
+                break
         if entry is None and self.persistent_store is not None:
             entry = self.persistent_store.get_by_physics_bucket(
                 artifact=artifact,
@@ -1619,6 +1645,11 @@ class PT0DeterminismStore:
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
             )
+            if entry is not None and not _payload_codec_is_current(
+                artifact,
+                entry.get("payload"),
+            ):
+                entry = None
             if entry is not None:
                 row_hash = str(entry["key_hash"])
                 self._entries[row_hash] = copy.deepcopy(entry)
@@ -2168,7 +2199,6 @@ class PT1PersistentEquilibriumStore:
               AND physics_bucket_sha256 = ?
               AND replay_scope_sha256 = ?
             ORDER BY key_hash
-            LIMIT 1
             """
         params = (
             artifact,
@@ -2178,26 +2208,26 @@ class PT1PersistentEquilibriumStore:
         )
         with self._connect() as conn:
             self._initialize(conn)
-            row = conn.execute(
-                query.format(table=PT1_EQUILIBRIUM_TABLE),
-                params,
-            ).fetchone()
-            if row is None:
-                read_only_table = self._read_only_equilibrium_table(conn)
-                if read_only_table is not None:
-                    row = conn.execute(
-                        query.format(table=read_only_table),
-                        params,
-                    ).fetchone()
-            if row is None:
-                return None
-            return self._entry_from_physics_bucket_row(
-                row,
-                artifact=artifact,
-                physics_bucket_key=physics_bucket_key,
-                physics_bucket_bytes=physics_bucket_bytes,
-                physics_bucket_hash=physics_bucket_hash,
-            )
+            tables = [PT1_EQUILIBRIUM_TABLE]
+            read_only_table = self._read_only_equilibrium_table(conn)
+            if read_only_table is not None:
+                tables.append(read_only_table)
+            for table in tables:
+                rows = conn.execute(query.format(table=table), params)
+                for row in rows:
+                    entry = self._entry_from_physics_bucket_row(
+                        row,
+                        artifact=artifact,
+                        physics_bucket_key=physics_bucket_key,
+                        physics_bucket_bytes=physics_bucket_bytes,
+                        physics_bucket_hash=physics_bucket_hash,
+                    )
+                    if _payload_codec_is_current(
+                        artifact,
+                        entry.get("payload"),
+                    ):
+                        return entry
+            return None
 
     def list_interpolation_candidates(
         self,
@@ -2307,6 +2337,11 @@ class PT1PersistentEquilibriumStore:
                         rung_key=rung_key,
                         rung_hash=rung_hash,
                     )
+                    if not _payload_codec_is_current(
+                        artifact,
+                        entry.get("payload"),
+                    ):
+                        continue
                     if query_key is not None and _physics_ladder_coarsens_controls(
                         rung_tag
                     ):
@@ -4068,15 +4103,15 @@ def _row_provider_matches_family(
             resolved in allowed_resolved
             and role == "authoritative"
             and authoritative == resolved
-            and fallback in {"", "magemin-shadow"}
+            and fallback in {"", _MAGEMIN_SHADOW_PROVIDER_ID}
         )
     if family is RealBackendFamily.MAGEMIN:
-        if resolved != "magemin-shadow":
+        if resolved != _MAGEMIN_SHADOW_PROVIDER_ID:
             return False
         if role == "authoritative":
-            return authoritative == "magemin-shadow" and fallback in {
+            return authoritative == _MAGEMIN_SHADOW_PROVIDER_ID and fallback in {
                 "",
-                "magemin-shadow",
+                _MAGEMIN_SHADOW_PROVIDER_ID,
             }
         if role == "fallback":
             return (
@@ -4085,7 +4120,7 @@ def _row_provider_matches_family(
                     _ALPHAMELTS_PROVIDER_ID,
                     _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID,
                 }
-                and fallback == "magemin-shadow"
+                and fallback == _MAGEMIN_SHADOW_PROVIDER_ID
             )
     return False
 
@@ -4808,16 +4843,16 @@ def _cached_real_provider_identity(
         return None
     if intent == ChemistryIntent.GATE_LIQUID_FRACTION and provider_role == "fallback":
         return {
-            "resolved_provider_id": "magemin-shadow",
+            "resolved_provider_id": _MAGEMIN_SHADOW_PROVIDER_ID,
             "resolved_role": "fallback",
             "authoritative_provider_id": None,
-            "fallback_provider_id": "magemin-shadow",
+            "fallback_provider_id": _MAGEMIN_SHADOW_PROVIDER_ID,
             "fallback_allowed": bool(fallback_allowed),
             "model": "MAGEMinShadowProvider",
             "mode": "subprocess",
         }
     fallback_provider_id = (
-        "magemin-shadow"
+        _MAGEMIN_SHADOW_PROVIDER_ID
         if intent == ChemistryIntent.GATE_LIQUID_FRACTION
         else None
     )
@@ -4890,7 +4925,7 @@ def _provider_mode(provider: Any) -> str | None:
         mode_text = str(mode).strip()
         if mode_text:
             return mode_text
-    if _provider_id(provider) == "magemin-shadow":
+    if _provider_id(provider) == _MAGEMIN_SHADOW_PROVIDER_ID:
         return "subprocess"
     return str(type(provider).__name__)
 

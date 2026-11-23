@@ -687,6 +687,9 @@ _PER_HOUR_DETAIL_FIELDS = (
     'condensation_refusals_by_species',
     'vapour_batch_summary',
     'vapour_batch_flux_overlay',
+    # The detailed activity audit remains in runner artifacts; the socket has
+    # no consumer for it and it can dominate a single hourly summary.
+    'high_t_melt_activity',
 )
 _PER_HOUR_CARRIER_MAP_FIELDS = (
     'condensation_train_kg',

@@ -455,7 +455,9 @@ def test_obsolete_exact_row_does_not_hide_current_physics_bucket_row(
     )
 
     assert payload is not None
+    assert payload["equilibrium_result"]["liquid_fraction"] == 0.7
     assert store.replay_sequence[-1]["cache_state"] == "cached_physics_bucket"
+    assert store.replay_sequence[-1]["physics_bucket_rung"] == "h40"
 
 
 def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
