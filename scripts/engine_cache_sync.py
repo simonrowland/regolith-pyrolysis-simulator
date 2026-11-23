@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Snapshot live caches, accumulate a master, and seed new box-local files.
 
-expire and prune are manual. They print counts and delete nothing unless
-``--apply`` is set. Nothing in the cache read or write path calls them.
+expire, prune, and clear-mask are manual. They print counts and delete
+nothing unless ``--apply`` is set. Nothing in the cache read or write path
+calls them.
 """
 
 from __future__ import annotations
@@ -168,6 +169,14 @@ def main(argv: list[str] | None = None) -> int:
             "from hard-linked backups, then remove leftover migration files"
         ),
     )
+    clear_mask = commands.add_parser(
+        "clear-mask",
+        help="delete one engine's refusal-mask cells and audit rows for one class",
+    )
+    clear_mask.add_argument("file", type=Path)
+    clear_mask.add_argument("--engine", required=True)
+    clear_mask.add_argument("--class", required=True, dest="refusal_class")
+    _add_apply_flags(clear_mask)
     args = parser.parse_args(argv)
     try:
         if args.command in {"snapshot", "seed"}:
@@ -194,6 +203,13 @@ def main(argv: list[str] | None = None) -> int:
                 result = cache.recover_cache_file(args.file)
             else:
                 result = cache.migrate_cache_file(args.file, vacuum=not args.no_vacuum)
+        elif args.command == "clear-mask":
+            result = cache.clear_refusal_mask(
+                args.file,
+                engine=args.engine,
+                refusal_class=args.refusal_class,
+                apply=_apply(parser, args),
+            )
         else:
             result = cache.engine_cache_stats(args.file.expanduser())
     except (OSError, sqlite3.Error, ValueError, cache.EngineCacheSchemaMismatch) as exc:
