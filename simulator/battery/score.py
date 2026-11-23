@@ -14854,6 +14854,112 @@ def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
     )
 
 
+def _excluded_oxygen_command(notices: tuple[Notice, ...]) -> bool:
+    prefix = "experiment.fO2_control"
+    for notice in notices:
+        for item in notice.dropped or ():
+            if item == prefix or item.startswith(prefix + "."):
+                return True
+    return False
+
+
+def _without_unsourced_scored_oxygen(
+    observation: Observation, experiment: Experiment | None,
+) -> Observation:
+    """Drop an identity fO2 that is the scored number and has no source.
+
+    The input filter already clears an axis whose recorded source was
+    excluded. An unsourced copy of the scored oxygen would otherwise come
+    back as a tier-1 identity echo.
+    """
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return observation
+    fo2 = identity.fO2_Pa
+    scored = getattr(observation.value, "point", None)
+    if (
+        fo2 is None
+        or not fo2.is_value
+        or fo2.value is None
+        or scored is None
+        or fo2.value != scored
+        or redox_identity_sources(observation, experiment).get("fO2_Pa")
+    ):
+        return observation
+    return replace(observation, identity=replace(identity, fO2_Pa=None))
+
+
+def _lost_exemption_oxygen_prediction(
+    prediction: EnginePrediction,
+    observation: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+    quantity: Quantity | None,
+    exclusion_notices: tuple[Notice, ...],
+) -> EnginePrediction:
+    """Predict a fugacity row whose oxygen command was excluded.
+
+    d-460: losing the setpoint exemption is a stated default with its notice,
+    not a refusal. Partial pressure stays on the ordinary cell path.
+    """
+
+    if quantity is not Quantity.FUGACITY or not _excluded_oxygen_command(exclusion_notices):
+        return prediction
+    if prediction.refusal_reason is not RefusalReason.UNSUPPORTED:
+        return prediction
+    if prediction.refusal_detail.get("reason") != "quantity_not_predicted":
+        return prediction
+    identity = observation.identity
+    if (
+        not isinstance(identity, Identity)
+        or identity.species is None
+        or identity.species.formula != "O2"
+    ):
+        return prediction
+    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+
+    fo2_observation = _without_unsourced_scored_oxygen(observation, experiment)
+    resolved = resolve_row_fo2(experiment, bench, fo2_observation, quantity=quantity)
+    if resolved is None or resolved.closure:
+        return prediction
+    bar = resolved.po2_bar
+    if bar is None and math.isfinite(resolved.log10_fO2_bar):
+        bar = 10.0 ** resolved.log10_fO2_bar
+    if bar is None or not math.isfinite(bar) or bar <= 0.0:
+        return prediction
+    value = Decimal(str(bar)) * PA_PER_BAR_DEC
+    identity_out = replace(identity, fO2_Pa=State.of(value))
+    return EnginePrediction(
+        engine=prediction.engine,
+        channel=prediction.channel,
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence=resolved.route),
+        value=value,
+        unit="Pa",
+        notices=(fo2_tier_notice(quantity, resolved),),
+        coefficient_sources=prediction.coefficient_sources,
+        identity=identity_out,
+    )
+
+
+def _with_exclusion_notices(
+    prediction: EnginePrediction, exclusion_notices: tuple[Notice, ...],
+) -> EnginePrediction:
+    if not exclusion_notices:
+        return prediction
+    present = {
+        (notice.kind, notice.reason, notice.dropped, notice.origin)
+        for notice in prediction.notices
+    }
+    fresh = tuple(
+        notice for notice in exclusion_notices
+        if (notice.kind, notice.reason, notice.dropped, notice.origin) not in present
+    )
+    if not fresh:
+        return prediction
+    return replace(prediction, notices=(*fresh, *prediction.notices))
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -14866,7 +14972,52 @@ def _predict_with_engine(
     phase_siblings: Mapping[str, Decimal] | None = None,
     phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
-    """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
+    """Filter every non-catalog row once, then predict from those inputs."""
+
+    _require_score_engine(engine)
+    if engine is Engine.CATALOG_EVALUATOR:
+        return _predict_catalog_evaluator(observation)
+    identity = observation.identity
+    quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    exclusion_notices: tuple[Notice, ...] = ()
+    if quantity is not None and experiment is not None:
+        observation, experiment, exclusion_notices = _redox_input_view(
+            observation, quantity, experiment,
+        )
+    prediction = _predict_engine_from_supplied_inputs(
+        engine,
+        observation,
+        handles=handles,
+        isolated=isolated,
+        experiment=experiment,
+        bench=bench,
+        fo2_mode=fo2_mode,
+        phase_siblings=phase_siblings,
+        phase_sibling_refusal=phase_sibling_refusal,
+    )
+    prediction = _lost_exemption_oxygen_prediction(
+        prediction, observation, experiment, bench, quantity, exclusion_notices,
+    )
+    return _with_exclusion_notices(prediction, exclusion_notices)
+
+
+def _predict_engine_from_supplied_inputs(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
+) -> EnginePrediction:
+    """Dispatch one engine at the observation Identity. Isolated MELTS cells.
+
+    The caller supplies the filtered experiment. Exclusion notices are
+    attached by that caller. This body only adds the imposed-control flag.
+    """
 
     _require_score_engine(engine)
     if engine is Engine.CATALOG_EVALUATOR:
@@ -14878,8 +15029,7 @@ def _predict_with_engine(
     ):
         from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
 
-        input_view, run_view, exclusion_notices = _redox_input_view(observation, quantity, experiment)
-        value = imposed_oxygen_pressure_pa(run_view, bench, input_view)
+        value = imposed_oxygen_pressure_pa(experiment, bench, observation)
         if value is not None:
             return EnginePrediction(
                 engine=engine,
@@ -14888,7 +15038,7 @@ def _predict_with_engine(
                 value=value,
                 unit="Pa",
                 authority=Authority.DERIVED_FROM_APPARATUS,
-                notices=(*exclusion_notices, Notice(
+                notices=(Notice(
                     kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
                     affected_quantities=(quantity,),
                     reason="scored oxygen is the run setpoint",

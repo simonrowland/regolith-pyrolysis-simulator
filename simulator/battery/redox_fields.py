@@ -113,6 +113,32 @@ def _match_target_cell(targets: tuple[_PrintedCell, ...], candidate: _PrintedCel
     return "same" if "same" in matches else "ambiguous" if "ambiguous" in matches else None
 
 
+def _declared_imposed_oxygen_target(
+    observation: Observation, candidate: CandidateInput,
+) -> bool:
+    """True when the row records that its oxygen value is the imposed control.
+
+    An observation has no condition-role field. The typed record the extract
+    or migration already stores is a derivation whose only input is this
+    imposed-oxygen field and which has no correction parameters. A matching
+    cell, a restored printed target, or a correction's original operand is
+    not that declaration.
+    """
+
+    derivation = observation.derivation
+    if (
+        derivation is None
+        or derivation.parameters
+        or derivation.inputs != (candidate.field,)
+        or not candidate.imposed_oxygen
+    ):
+        return False
+    species = observation.identity.species
+    if species is None or species.formula != "O2":
+        return False
+    return quantity_token(observation.identity) in {Quantity.FUGACITY, Quantity.P_PARTIAL}
+
+
 def classify_target_provenance(
     observation: Observation, candidate: CandidateInput,
 ) -> TargetProvenance:
@@ -163,6 +189,8 @@ def classify_target_provenance(
     dependency = derivation_match(condition)
     if dependency is not None:
         return TargetProvenance(TargetRelation.DERIVED_FROM_TARGET, dependency == "ambiguous")
+    if _declared_imposed_oxygen_target(observation, candidate):
+        return TargetProvenance(TargetRelation.IMPOSED_CONTROL_TARGET)
 
     cell = _printed_cell(condition, address_only=condition.inference is not None)
     match = _match_target_cell(targets, cell)
@@ -172,29 +200,6 @@ def classify_target_provenance(
     derivation = observation.derivation
     field = candidate.field
     references = _condition_references(observation, field)
-    if candidate.imposed_oxygen and (
-        match == "same" or (
-            derivation is not None
-            and derivation.inputs == (field,)
-            and not derivation.parameters
-            and observation.value.point is not None
-            and condition.state.value in (observation.value, observation.value.point)
-            # The named scalar copy establishes provenance. If both locators
-            # are present, they must agree with that provenance.
-            and (
-                observation.locator is None or condition.locator is None
-                or same_printed_cell(
-                    _printed_cell(Located(State.of(observation.value), observation.locator)),
-                    _printed_cell(condition),
-                ) is not None
-            )
-        )
-    ):
-        species = observation.identity.species
-        if species is not None and species.formula == "O2" and quantity_token(observation.identity) in {
-            Quantity.FUGACITY, Quantity.P_PARTIAL,
-        }:
-            return TargetProvenance(TargetRelation.IMPOSED_CONTROL_TARGET)
     if match is not None:
         return TargetProvenance(TargetRelation.SAME_PRINTED_CELL)
     target_operand = derivation is not None and (
