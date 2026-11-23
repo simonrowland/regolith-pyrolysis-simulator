@@ -78,7 +78,7 @@ experiments:
   method_as_printed: loop technique in a one atmosphere vertical tube furnace
   atmosphere_as_printed: air
   total_pressure_atm: 1
-  total_pressure_quote_as_printed: The experiments were conducted in a one atmosphere vertical tube furnace.
+  total_pressure_quote_as_printed: The experiments were conducted with the loop technique in a one atmosphere vertical tube furnace.
   total_pressure_locator:
     published_page: 546
     pdf_page_index: 1
@@ -91,6 +91,9 @@ experiments:
     T_C: '1400'
     T_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
     log_fO2: '-12.3'
+    log_fO2_basis: log10(fO2 / 1 atm)
+    log_fO2_locator: {published_page: 547, pdf_page_index: 2, figure: '3'}
+    fO2_as_printed: 10⁻¹²·³ atm
     fO2_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
     numeric_Fe3_over_Fe2: not_printed
     numeric_ratio_locator: {published_page: 547, pdf_page_index: 2, table: '3', note: Table 3 reports Fe2+ hyperfine parameters only}
@@ -101,6 +104,9 @@ experiments:
     T_C: '1400'
     T_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
     log_fO2: '-12.3'
+    log_fO2_basis: log10(fO2 / 1 atm)
+    log_fO2_locator: {published_page: 547, pdf_page_index: 2, figure: '3'}
+    fO2_as_printed: 10⁻¹²·³ atm
     fO2_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
     numeric_Fe3_over_Fe2: not_printed
     numeric_ratio_locator: {published_page: 547, pdf_page_index: 2, table: '3', note: Table 3 reports Fe2+ hyperfine parameters only}
@@ -111,10 +117,13 @@ experiments:
     T_C: '1400'
     T_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
     log_fO2: '-12.3'
+    log_fO2_basis: log10(fO2 / 1 atm)
+    log_fO2_locator: {published_page: 547, pdf_page_index: 2, figure: '3'}
+    fO2_as_printed: 10⁻¹²·³ atm
     fO2_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
     numeric_Fe3_over_Fe2: not_printed
     numeric_ratio_locator: {published_page: 547, pdf_page_index: 2, table: '3', note: Table 3 reports Fe2+ hyperfine parameters only}
-  atmosphere_quote_as_printed: All experiments were conducted in air.
+  atmosphere_quote_as_printed: All experiments were conducted in air
   atmosphere_locator:
     published_page: 546
     pdf_page_index: 1
