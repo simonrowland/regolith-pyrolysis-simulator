@@ -829,6 +829,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     )
 
     assert flagged_strata(residual.notices) == (
+        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
         score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
     )
     assert [
@@ -841,7 +842,10 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         for row in flagged_stratum_rows(
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
-    ] == [(score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1)]
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
+        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+    ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
     )
@@ -853,7 +857,10 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             row["n"],
         )
         for row in serialized_strata
-    ] == [(score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1)]
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
+        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+    ]
     clean_residual = replace(
         residual,
         notices=tuple(
@@ -1326,7 +1333,10 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
-    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+    assert (
+        "| calibration-not-grounded | vapour | internal-analytical | — | — | 1 |"
+        in report
+    )
 
 
 def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
@@ -19061,7 +19071,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
+        f"{residual.rail.value} | {Engine.OPENIMCC.value} | — | — | 1 |"
     ) in report
 
     source_point_reference = replace(

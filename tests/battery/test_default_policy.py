@@ -219,12 +219,18 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
 
     headlines = headline_payloads([row], [Engine.INTERNAL_ANALYTICAL])
     assert not any(int(headline["n_candidates"]) for headline in headlines)
-    assert _flagged_payload_strata(row) == ("proposed-policy",)
+    assert _flagged_payload_strata(row) == (
+        "knob_defaulted",
+        "proposed-policy",
+    )
     assert not _headline_payload_admits(row, tier="measured")
     flagged = flagged_stratum_payloads([row], [Engine.INTERNAL_ANALYTICAL])
-    assert [item["stratum"] for item in flagged] == ["proposed-policy"]
-    assert flagged[0]["policy_id"] == policy_id
-    assert flagged[0]["policy_status"] == "proposed"
+    assert [item["stratum"] for item in flagged] == [
+        "knob_defaulted",
+        "proposed-policy",
+    ]
+    assert all(item["policy_id"] == policy_id for item in flagged)
+    assert all(item["policy_status"] == "proposed" for item in flagged)
 
     canonical_policy = {**notice_policy, "status": "canonical"}
     canonical_row = {
