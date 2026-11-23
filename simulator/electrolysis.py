@@ -46,11 +46,8 @@ Standard MRE Baseline (root branch alternative).
             w = a * exp(min(max(dV, 0) / (RT/F), 3))
         with dV = applied_V - E_nernst (positive overvoltage).
         Larger overvoltage increases weight; that is not voltage
-        proximity. On that same step_hour() path, more than one
-        oxide_to_metal target is not partitioned: the method returns
-        reason_refused=uncertified_multi_oxide_current_partition
-        and applies no Faraday reduction. A ferric_to_ferrous row
-        is not counted as an oxide_to_metal target by that detector.
+        proximity. Multi-oxide current partition uses this same heuristic
+        with an extrapolated notice and remains denied certification.
 
 DECOMP_VOLTAGES fallback anchors (imported; not the live 1873 K ladder):
     NiO:   0.39 V   Na2O:  0.5 V    K2O:    0.5 V
@@ -92,8 +89,11 @@ from simulator.core import (
 )
 from simulator.mre_ladder import (
     DECOMP_VOLTAGES,
+    MRE_LIQUID_STANDARD_MISSING_INPUT,
     MREDecompositionVoltageReference,
+    _mre_raw_graph_requirement,
     mre_decomposition_voltage_reference,
+    mre_liquid_standard_missing_notice,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -187,15 +187,12 @@ def _mre_raw_margin_assessment(
     if reference is None or reference.raw_graph_voltage_V is None:
         return None, None, None
 
-    # Premise: fallback and raw E0 share the same Nernst activity, pO2, and
-    # product-phase terms. Thus E_raw = E_fallback + (E0_raw - E0_fallback),
-    # with every term in V. The raw margin is V_applied - E_raw; it is zero at
-    # the support boundary, which is refused below (<= 0 V).
-    raw_requirement_V = (
-        fallback_requirement_V
-        + reference.raw_graph_voltage_V
-        - reference.voltage
+    raw_requirement_V = _mre_raw_graph_requirement(
+        reference,
+        fallback_requirement_V,
     )
+    if raw_requirement_V is None:
+        return None, None, None
     raw_margin_V = voltage_V - raw_requirement_V
     refusal = None
     if (
@@ -751,6 +748,19 @@ def uncertified_multi_oxide_partition_targets(reducible) -> tuple[str, ...]:
     return tuple(targets) if len(targets) > 1 else ()
 
 
+def multi_oxide_partition_notices(reducible) -> tuple[dict, ...]:
+    targets = uncertified_multi_oxide_partition_targets(reducible)
+    if not targets:
+        return ()
+    return ({
+        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+        "authority_level": "extrapolated",
+        "certified_band": {"oxide_to_metal_target_count": (0, 1)},
+        "reducible_oxide_targets": targets,
+        "source": MRE_CURRENT_PARTITION_SOURCE,
+    },)
+
+
 class ElectrolysisModel:
     """
     Molten Regolith Electrolysis simulator.
@@ -872,10 +882,8 @@ class ElectrolysisModel:
         Inside this method, each oxide whose Nernst voltage is below
         the applied voltage is collected as a reducible row. If more
         than one oxide_to_metal target is in that set, the method
-        returns reason_refused=uncertified_multi_oxide_current_partition,
-        omits product and energy quantities, and applies no Faraday reduction.
-        A single oxide_to_metal target is weighted by SEL-1 and reduced by
-        Faraday's law. A ferric-to-ferrous row may also be reduced without
+        uses SEL-1 with an extrapolated current-partition notice.
+        Reducible targets are reduced by Faraday's law. A ferric-to-ferrous row may also be reduced without
         consuming the oxide-to-metal current partition.
 
         Args:
@@ -982,6 +990,15 @@ class ElectrolysisModel:
                 result['mre_ellingham_phase_basis_by_oxide'][oxide] = (
                     reference.ellingham_phase_basis
                 )
+            missing_notice = mre_liquid_standard_missing_notice(reference)
+            if missing_notice is not None:
+                result.setdefault(
+                    'mre_liquid_standard_missing_targets', {}
+                )[oxide] = missing_notice
+                result['notices'] = tuple(
+                    result.get('notices', ()) or ()
+                ) + (missing_notice,)
+                continue
             E_nernst = self.nernst_voltage(
                 oxide,
                 T_C,
@@ -1076,17 +1093,17 @@ class ElectrolysisModel:
                 result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
             if result['mre_phase_refused_targets']:
                 result['reason_refused'] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+            if result.get('mre_liquid_standard_missing_targets'):
+                result['reason_refused'] = MRE_LIQUID_STANDARD_MISSING_INPUT
             if 'reason_refused' in result:
                 return _without_mre_quantities(result)
             if voltage_V > 0.0 and current_A > 0.0:
                 result['energy_kWh'] = voltage_V * current_A / 1000.0
             return result
 
-        refused_targets = uncertified_multi_oxide_partition_targets(reducible)
-        if refused_targets:
-            result['reason_refused'] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
-            result['reducible_oxide_targets'] = refused_targets
-            return _without_mre_quantities(result)
+        partition_notices = multi_oxide_partition_notices(reducible)
+        if partition_notices:
+            result['notices'] = tuple(result.get('notices', ())) + partition_notices
 
         # Partition current among reducible species            [SEL-1]
         # Weight = activity × exp(positive overvoltage / (RT/F)),
@@ -1271,6 +1288,8 @@ class ElectrolysisModel:
                     gas_product_fugacity_bar[metal]
                 ) if metal in gas_product_fugacity_bar else None,
             )
+            if not math.isfinite(E):
+                continue
             sequence.append((oxide, E))
 
         sequence.sort(key=lambda x: x[1])
@@ -1308,7 +1327,11 @@ class ElectrolysisModel:
 
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
-            if reference is None:
+            if (
+                reference is None
+                or reference.liquid_standard_missing
+                or not math.isfinite(reference.voltage)
+            ):
                 continue
             E0 = reference.voltage
             if E0 > max_voltage_V:

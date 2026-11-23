@@ -220,6 +220,209 @@ def test_recovered_condensate_can_carry_prior_cost_back_to_reagent_inventory():
     assert summary["transition_balance_max_abs"] <= 1e-12
 
 
+def test_cartridge_residue_keeps_its_own_cost_bearing_lot():
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    )
+    from simulator.cost_ledger import (
+        _is_cost_bearing_account,
+        _is_target_product_account,
+    )
+
+    assert _is_target_product_account(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT)
+    assert _is_cost_bearing_account(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT)
+    assert not _is_target_product_account(ALKALI_CARTRIDGE_ACCOUNT)
+    assert not _is_cost_bearing_account(ALKALI_CARTRIDGE_ACCOUNT)
+    assert not _is_target_product_account("terminal.slag")
+
+    ledger = CostLedger()
+    ledger.seed_external_material(
+        account="process.reagent_inventory",
+        species="Fe",
+        quantity_kg=6.0,
+        cost=CostVector(electrical_kWh=6.0),
+    )
+    ledger.apply_reagent_full_cost_event(
+        process_step="residue_capture",
+        reagent_account="process.reagent_inventory",
+        reagent_species="Fe",
+        reagent_quantity_kg=6.0,
+        beneficiary_outputs_kg={
+            ("process.metal_phase", "Fe"): 2.0,
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "Fe"): 4.0,
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "SiO2"): 3.0,
+        },
+    )
+
+    summary = ledger.summary()
+    metal_key = "process.metal_phase:Fe"
+    residue_fe = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:Fe"
+    residue_silica = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:SiO2"
+    assert summary["product_costs"][metal_key]["quantity_kg"] == pytest.approx(2.0)
+    assert summary["product_costs"][residue_fe]["quantity_kg"] == pytest.approx(4.0)
+    assert summary["product_costs"][residue_silica]["quantity_kg"] == pytest.approx(3.0)
+    assert metal_key in summary["active_inventory_costs"]
+    assert residue_fe in summary["active_inventory_costs"]
+    assert residue_silica in summary["active_inventory_costs"]
+    assert f"{ALKALI_CARTRIDGE_ACCOUNT}:Fe" not in summary["product_costs"]
+    assert "terminal.product:Fe" not in summary["product_costs"]
+
+    from simulator.cost_ledger import _split_beneficiary_outputs
+
+    beneficiary, coproduct = _split_beneficiary_outputs((
+        MaterialLot(
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+            {"Fe": 4.0, "SiO2": 3.0},
+        ),
+        MaterialLot("process.metal_phase", {"Fe": 2.0}),
+    ))
+    residue_fe_key = (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "Fe")
+    residue_silica_key = (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "SiO2")
+    assert beneficiary[residue_fe_key] == pytest.approx(4.0)
+    assert beneficiary[residue_silica_key] == pytest.approx(3.0)
+    assert residue_fe_key not in coproduct
+    assert residue_silica_key not in coproduct
+    assert ("terminal.product", "Fe") not in beneficiary
+    assert ("terminal.product", "Fe") not in coproduct
+
+
+def test_run_input_allocation_keeps_residue_share_on_its_own_lot():
+    """Furnace and pumping follow residue mass onto the residue lot.
+
+    Separated products are metal-phase Fe 6 kg and train Na 2 kg. The
+    residue account holds Fe 4 kg, SiO2 3 kg, and MgO 1 kg, and the flat
+    product map does not. The allocation base is those 16 kg. One hour at
+    1000 C is thermal_flux_h = (1000 + 273.15) * 1 = 1273.15 and
+    furnace_h = 1. Each lot's share is its kilograms over 16. Residue Fe
+    over terminal Fe is 4/6. Dropping the 8 kg of residue and
+    renormalising onto the separated 8 kg would give terminal Fe 6/8 of
+    the furnace vector and would leave no residue lot.
+    """
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    from simulator.accounting import AtomLedger
+    from simulator.accounting.queries import AccountingQueries
+
+    residue = {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0}
+    separated = {"Fe": 6.0, "Na": 2.0}
+    total_kg = sum(separated.values()) + sum(residue.values())
+    atoms = AtomLedger()
+    atoms.load_external(
+        "process.metal_phase",
+        {"Fe": separated["Fe"]},
+        source="metal phase",
+        material_origin="feedstock",
+    )
+    atoms.load_external(
+        "process.condensation_train",
+        {"Na": separated["Na"]},
+        source="condensation train",
+        material_origin="feedstock",
+    )
+    atoms.load_external(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        residue,
+        source="stage-4 cartridge solids",
+        material_origin="feedstock",
+    )
+    sim = SimpleNamespace(
+        atom_ledger=atoms,
+        _unspent_additive_reagents_kg=lambda: {},
+        record=SimpleNamespace(snapshots=()),
+    )
+    products = AccountingQueries(sim).product_ledger()
+    assert products["Fe"] == pytest.approx(separated["Fe"])
+    assert products["Na"] == pytest.approx(separated["Na"])
+    assert "SiO2" not in products
+    assert "MgO" not in products
+
+    cost_ledger = CostLedger()
+    cost_ledger.apply_mass_allocated_event(
+        process_step="seed_residue_lot",
+        outputs_kg={
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "Fe"): residue["Fe"],
+        },
+        processing_cost=CostVector(external_reagent_kg=1.0),
+    )
+    diagnostic = build_cost_rollup_diagnostic(
+        sim=sim,
+        cost_ledger=cost_ledger,
+        per_hour=({"T_C": 1000.0},),
+        products_kg=products,
+        pumping_context={
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "ambient_pressure_source": "test.mars_datum",
+            "rows": (
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 100.0,
+                    "offgas_mol_per_s": 0.01,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                    "validated_line_conductance_m3_s": 100.0,
+                },
+            ),
+        },
+    )
+
+    assert diagnostic["run_input_cost"]["allocation_status"] == (
+        "allocated_by_product_mass"
+    )
+    costs = diagnostic["product_costs"]
+    residue_fe = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:Fe"
+    residue_silica = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:SiO2"
+    residue_mgo = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:MgO"
+    terminal_fe = "terminal.product:Fe"
+    terminal_na = "terminal.product:Na"
+    assert set(costs) == {
+        residue_fe,
+        residue_silica,
+        residue_mgo,
+        terminal_fe,
+        terminal_na,
+    }
+    thermal = diagnostic["run_input_cost"]["physical_cost"]["thermal_flux_h"]
+    assert thermal == pytest.approx((1000.0 + 273.15) * 1.0)
+    vectors = {
+        key: CostVector(**costs[key]["accumulated_cost"]) for key in costs
+    }
+    masses = {
+        residue_fe: residue["Fe"],
+        residue_silica: residue["SiO2"],
+        residue_mgo: residue["MgO"],
+        terminal_fe: separated["Fe"],
+        terminal_na: separated["Na"],
+    }
+    for key, mass in masses.items():
+        assert costs[key]["quantity_kg"] == pytest.approx(mass)
+        assert vectors[key].thermal_flux_h == pytest.approx(
+            thermal * mass / total_kg
+        )
+        assert vectors[key].furnace_h == pytest.approx(mass / total_kg)
+    assert (
+        vectors[residue_fe].thermal_flux_h
+        / vectors[terminal_fe].thermal_flux_h
+    ) == pytest.approx(residue["Fe"] / separated["Fe"])
+    assert vectors[residue_fe].external_reagent_kg == pytest.approx(1.0)
+    assert vectors[terminal_fe].external_reagent_kg == pytest.approx(0.0)
+    assert sum(item.thermal_flux_h for item in vectors.values()) == pytest.approx(
+        thermal
+    )
+    assert sum(item.furnace_h for item in vectors.values()) == pytest.approx(1.0)
+    pumping = diagnostic["pumping_diagnostic"]
+    assert pumping["status"] == "ok"
+    pumping_kwh = pumping["pumping_electrical_kWh"]
+    assert pumping_kwh > 0.0
+    assert sum(item.electrical_kWh for item in vectors.values()) == pytest.approx(
+        pumping_kwh
+    )
+    assert (
+        vectors[residue_fe].electrical_kWh
+        / vectors[terminal_fe].electrical_kWh
+    ) == pytest.approx(residue["Fe"] / separated["Fe"])
+
+
 def test_import_modes_are_reporting_only_and_apply_launch_penalty_when_enabled():
     mature = CostImportContext.mature()
     bootstrap = CostImportContext.bootstrap_narrative(available_supplier_species=("Na",))
@@ -642,6 +845,10 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
     assert fe.thermal_flux_h == pytest.approx(1273.15)
 
 
+# Same session fixture as the ungrouped runner-golden consumers. The
+# collection hook puts those on magemin_golden, so this consumer joins
+# them. One worker builds runner_golden_loader once.
+@pytest.mark.xdist_group("magemin_golden")
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
     runner_golden_loader,
 ):
@@ -650,14 +857,18 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
     from tests.test_runner_smoke import SCENARIOS
 
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
     actual, _, expected_text = runner_golden_loader(SCENARIOS[0])
     expected = json.loads(expected_text)
     assert "cost_rollup_diagnostic" in actual["run_metadata"]
     assert actual["run_metadata"]["cost_rollup_diagnostic"]["price_basis"] == (
         "legacy_placeholder_awaiting_owner_ratification"
     )
-    stripped_actual = copy.deepcopy(actual)
-    stripped_expected = copy.deepcopy(expected)
+    stripped_actual = deterministic_gate_payload(copy.deepcopy(actual))
+    stripped_expected = deterministic_gate_payload(copy.deepcopy(expected))
     stripped_actual["run_metadata"].pop("cost_rollup_diagnostic", None)
     stripped_expected["run_metadata"].pop("cost_rollup_diagnostic", None)
     assert stripped_actual == stripped_expected

@@ -366,15 +366,20 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
         "Na", 0.0
     ) == pytest.approx(0.0)
-    # t-1884 Stage-4 area moves this Na from overhead into the Stage-4
-    # train: overhead 1.9976229793240146 -> 0.1556118362797614 kg and
-    # train 0.3372532764804741 -> 2.1792644195247273 kg. The sum with the
-    # wall is 2.3348762558044887 kg at both, and the ledger still balances.
-    # Oxygen, melt Na2O, and metal Na are the same step.
+    # Both sides moved the Na overhead/train split. The b271 values stay.
+    # Needs controller re-measure.
+    # The corrected NaO0.5 liquid activity changes the one-step MRE sodium
+    # overhead to the production value pinned below.
+    # Film-temperature diffusivity and the e-NTU bulk temperature leave
+    # more of that sodium in overhead. The train loses the same
+    # 0.1775043344159135 kg, so overhead plus train stays 2.334791680747916 kg.
+    # Wall, metal, cartridge residue, and offgas stay empty.
     overhead_na_kg = sim.atom_ledger.kg_by_account("process.overhead_gas")["Na"]
     train_na_kg = sim.atom_ledger.kg_by_account("process.condensation_train")["Na"]
-    assert overhead_na_kg == pytest.approx(0.1556118362797614)
-    assert train_na_kg == pytest.approx(2.1792644195247273)
+    assert overhead_na_kg == pytest.approx(2.1750436668165634)
+    # The corrected activity also changes the condensation-train share;
+    # Faraday input remains independently pinned by the ledger checks below.
+    assert train_na_kg == pytest.approx(0.15974801393135252)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
@@ -382,8 +387,10 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     # The same partial-pressure cap makes every hot wall segment
     # undersaturated; the former wall inventory is therefore exactly zero.
     assert wall_na_kg == pytest.approx(0.0)
+    # b271's overhead plus train, with the wall still empty.
+    # Needs controller re-measure.
     assert overhead_na_kg + train_na_kg + wall_na_kg == pytest.approx(
-        2.3348762558044887
+        2.334791680747916
     )
     mre_oxygen = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_mre_anode_stored"

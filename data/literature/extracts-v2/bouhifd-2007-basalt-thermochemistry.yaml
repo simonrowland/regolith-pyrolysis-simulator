@@ -186,6 +186,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - transition_temperature
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -217,6 +222,22 @@ observations:
         published_page: 690
         pdf_page_index: 1
         section: Experimental methods, Basalt sample
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 690
+        pdf_page_index: 1
+        section: Experimental methods, Basalt sample
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion

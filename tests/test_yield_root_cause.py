@@ -176,7 +176,7 @@ def test_c5_provider_faraday_throughput_at_limited_current():
 def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
     provider = BuiltinMetallothermicStepProvider
     crossover_C = provider._crossover_temperature_C("Na", "Fe")
-    assert crossover_C == pytest.approx(1181.5, abs=0.1)
+    assert crossover_C == pytest.approx(1183.6715578613794, abs=0.1)
     assert crossover_C < 1200.0
 
 
@@ -216,15 +216,20 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # This test asserts Fe reduction and Na2O pins, not extraction success.
     # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
     # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    # t-1884 Stage-4 area (106.44 m2 vs green 0.051 m2) restores the Stage-4
-    # Na harvest. The zero-dose C3 shuttle credits that Na2O to
-    # process.spent_reductant_residue (metallothermic_step.py), not
-    # process.cleaned_melt. C4 evaporation's depletion cap and ledger debit
-    # read only cleaned_melt (evaporation.py), so the residue stays in the
-    # composition_kg projection (core.py) and does not re-evaporate. This
-    # pin is that C5-entry residual and it carries the pre-existing defect
-    # b-1281. FeO reduction is unchanged.
-    assert na2o_left == pytest.approx(2.670007811193671, abs=1e-6)
+    # Both sides moved this Na2O pin. The b271 value stays.
+    # Needs controller re-measure.
+    # d-329 (owner 2026-11-03, all three approved): the d-137 capture law
+    # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
+    # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
+    # is the production value (train rpp nightly and the laptop run agree).
+    # Condenser branch (d-344 14.74 m2 cartridge + e-NTU stage capture): more
+    # Na is held in the train, so the zero-dose shuttle returns less Na2O to
+    # the melt; 0.0763 -> 4.1e-5 kg. Studio-3 actual; the laptop agrees.
+    # FeO reduction (>80 %) and the 5e-12 % closure still hold.
+    # Freeze-gate liquidus fix (285420627): the gate follows composition, so
+    # the zero-dose C5 Na2O moves 4.1155e-5 -> 4.5216e-5 kg. Studio-3 full
+    # gate actual at 101aebdaf.
+    assert na2o_left == pytest.approx(4.5215994651378906e-05, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT

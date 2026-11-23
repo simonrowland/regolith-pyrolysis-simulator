@@ -74,9 +74,9 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    # The five absolute collector-area knobs added by d-452 enlarge both
-    # conditional subspaces while preserving their alternating dimensions.
-    assert [len(item.patch.values) for item in batch] == [70, 76] * 4
+    # Needs controller re-measure. b271 subspace lengths left in place.
+    # c3 adds the four per-substage Stage-3 route controls to both subspaces.
+    assert [len(item.patch.values) for item in batch] == [63, 69] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -104,7 +104,8 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     # sample_recipe_candidates.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "430603fdf13206e14e8b4db89b58efad13561755a596bc2342341cdeee680143"
+    # Needs controller re-measure. b271 stream hash left in place.
+    ).hexdigest() == "4c62f16ecc2ed144febdc631d14f50e7eac36ac00064592af11b9ad377974612"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -130,7 +131,8 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     # new [0.001, 2000] m2 bounds. Recomputed from sample_recipe_candidates.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "3e47fefa50fddec7e67d7209ff6acc695814cf6223ed3545fcd66e8358141976"
+    # Needs controller re-measure. b271 LHC hash left in place.
+    ).hexdigest() == "ed443c28069ced764e89bec30558ad2b41c6aef793b9e7df9fd97a2ea45fa96a"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

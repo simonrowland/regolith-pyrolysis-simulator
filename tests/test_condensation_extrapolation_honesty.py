@@ -31,7 +31,98 @@ def _stage3_unavailable_psat_model():
     return model
 
 
-def test_stage3_unavailable_psat_predicts_flagged_capture():
+def _interval_straddling_wall_route(*, committed_o2: bool, two_stages: bool = False):
+    from tests.chemistry.test_rail_debit_chokepoint import _carrier_record
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+    )
+
+    model = _stage3_unavailable_psat_model()
+    model.pipe_segments = []
+    stage3 = next(stage for stage in model.train.stages if stage.stage_number == 3)
+    stage3.temp_range_C = (20.0, 80.0)
+    model.train.collection_route["stage3_route"] = "through"
+    if two_stages:
+        stage1 = next(stage for stage in model.train.stages if stage.stage_number == 1)
+        stage1.temp_range_C = (100.0, 120.0)
+        model.train.stages = [stage1, stage3]
+    else:
+        model.train.stages = [stage3]
+    model.retained_vapor_mol = {"O2": 0.0} if committed_o2 else {}
+    return model.route(
+        EvaporationFlux(
+            species_kg_hr={"SiO": 1.0},
+            total_kg_hr=1.0,
+            carrier_authority_by_species=_carrier_record(
+                "SiO", VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+            ),
+        ),
+        MeltState(temperature_C=1500.0),
+    )
+
+
+def test_interval_straddling_band_downgrades_known_o2_route_authority():
+    result = _interval_straddling_wall_route(committed_o2=True)
+    capture = result.condensed_by_stage_species["stage_3_sio_zone"]["SiO"]
+    assert capture == pytest.approx(0.9992791217271582, rel=0.0, abs=1e-15)
+
+    authority = result.condensation_authority_by_species["SiO"]
+    assert authority["authoritative_for_condensation"] is False
+    assert authority["authority_level"] == "extrapolated"
+    stage_outcome = next(
+        item for item in authority["stage_outcomes"]
+        if item["stage_number"] == 3
+    )
+    notices = stage_outcome["wall_saturation_pressure_notices"]
+    extrapolated = [
+        notice for notice in notices
+        if notice.get("authority_level") == "extrapolated"
+    ]
+    # The band spans 293.15–353.15 K; 60 K / 33 gives 1.818 K per strip,
+    # leaving four midpoint strips below the 300 K wall-law bound. That count
+    # falls to zero when the band starts at or above the bound.
+    assert len(notices) == len(extrapolated) == 4
+    assert authority["valid_range_K"] == extrapolated[0]["valid_range_K"]
+
+
+def test_unknown_o2_interval_straddling_records_bound_and_extrapolated_strips():
+    result = _interval_straddling_wall_route(committed_o2=False)
+    authority = result.condensation_authority_by_species["SiO"]
+    assert authority["authority_level"] == "extrapolated"
+    stage_outcome = next(
+        item for item in authority["stage_outcomes"]
+        if item["stage_number"] == 3
+    )
+    notices = stage_outcome["wall_saturation_pressure_notices"]
+    assert len(notices) == 33  # The 20–80 C band integrates all 33 strips.
+    assert any(
+        notice.get("reason") == "wall_pO2_unknown_pO2_free_route_used"
+        for notice in notices
+    )
+    assert any(
+        notice.get("authority_level") == "extrapolated"
+        and "wall_pO2_unknown_pO2_free_route_used" in notice.get("notices", ())
+        for notice in notices
+    )
+
+
+def test_route_authority_uses_least_authoritative_stage():
+    result = _interval_straddling_wall_route(
+        committed_o2=False, two_stages=True,
+    )
+    authority = result.condensation_authority_by_species["SiO"]
+    outcomes_by_stage = {
+        item["stage_number"]: item
+        for item in authority["stage_outcomes"]
+        if item["stage_number"] in {1, 3}
+    }
+    assert outcomes_by_stage[1]["authority_level"] == "status_bearing"
+    assert outcomes_by_stage[3]["authority_level"] == "extrapolated"
+    assert authority["authority_level"] == "extrapolated"
+    assert authority["valid_range_K"] == outcomes_by_stage[3]["valid_range_K"]
+
+
+def test_stage3_unknown_po2_predicts_flagged_capture():
     model = _stage3_unavailable_psat_model()
     outcomes = []
     stage = next(stage for stage in model.train.stages if stage.stage_number == 3)
@@ -40,11 +131,9 @@ def test_stage3_unavailable_psat_predicts_flagged_capture():
         available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
     )
     assert 0.0 < eta <= 1.0
-    flag = next(item for item in outcomes if item["status"] == "extrapolated")
-    assert flag["authority_level"] == "extrapolated"
-    assert flag["reason"] == "antoine_psat_unavailable_at_T"
-    assert flag["original_reason"]
-    assert flag["valid_range_K"]
+    flag = next(item for item in outcomes if item["status"] == "status_bearing")
+    assert flag["authority_level"] == "status_bearing"
+    assert flag["reason"] == "wall_pO2_unknown_pO2_free_route_used"
     assert flag["eta"] == eta
 
 
@@ -61,7 +150,8 @@ def test_stage3_unavailable_psat_missing_flow_refuses():
 
 def test_missing_collector_area_refuses_capture_quantity_without_aborting_route():
     model = _stage3_unavailable_psat_model()
-    model.stage_area_m2_by_stage = {}
+    # Isolate the missing collector input; this geometry has no K cartridge.
+    model.stage_area_m2_by_stage = {"k_stage4b": 0.0}
     result = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1500.0),
@@ -125,6 +215,59 @@ def test_missing_collector_area_refuses_capture_quantity_without_aborting_route(
     )
 
 
+@pytest.mark.parametrize("cartridge_area", [None, 0.0], ids=["missing", "off"])
+def test_k_trap_area_admission_keeps_sio_route_authority(cartridge_area):
+    model = _stage3_unavailable_psat_model()
+    model.stage_area_m2_by_stage.pop("4")
+    model.stage_area_m2_by_stage["alkali_stage4"] = 1.0
+    if cartridge_area is not None:
+        model.stage_area_m2_by_stage["k_stage4b"] = cartridge_area
+
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+
+    authority = result.condensation_authority_by_species["SiO"]
+    assert authority["authority_level"] == "status_bearing"
+    assert authority["reason"] == "wall_pO2_unknown_pO2_free_route_used"
+    notice = authority["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "status_bearing"
+    assert notice["reason"] == authority["reason"]
+    # The conservative pO2-free bound is never authoritative, so a missing
+    # cartridge cannot certify terminal offgas downstream.
+    assert authority["authoritative_for_condensation"] is False
+    # The terminal-offgas flag may be unset (None) when nothing escapes; it
+    # must never be True.
+    assert authority.get("authoritative_for_terminal_offgas") is not True
+    outcomes = result.condensation_refusals_by_species["SiO"]["stage_outcomes"]
+    if cartridge_area is None:
+        refusal = next(item for item in outcomes if item.get("parameter") == "k_stage4b")
+        assert refusal["status"] == "refused"
+        assert refusal["refusal_type"] == "DepositionInputRefusal"
+        assert refusal["eta"] is None
+    else:
+        pass_through = next(
+            item for item in outcomes
+            if item.get("reason") == "no_configured_capture_area"
+        )
+        assert pass_through["status"] == "pass_through"
+        assert pass_through["output_status"] == "status_bearing"
+
+
+def test_committed_zero_wall_oxygen_is_not_unknown():
+    model = _stage3_unavailable_psat_model()
+    model.retained_vapor_mol = {"O2": 0.0}
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    assert not any(
+        record.get("reason") == "wall_pO2_unknown_pO2_free_route_used"
+        for record in result.antoine_extrapolations.values()
+    )
+
+
 @pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
 def test_declared_non_sio_extension_preserves_physical_zeros(case):
     model = _stage3_unavailable_psat_model()
@@ -134,13 +277,15 @@ def test_declared_non_sio_extension_preserves_physical_zeros(case):
         model.stage_area_m2_by_stage = {"4": 0.0}
     outcomes = []
     if case == "positive":
-        # A source-reaction pressure is not a wall saturation curve. The
-        # removed numerical budget must not invent a positive capture.
-        with pytest.raises(condensation.WallSaturationPressureRefusal):
-            model._condensation_efficiency(
-                stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-                available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
-            )
+        # d-402 selects Na2's pO2-free association route; capture remains
+        # status-bearing because oxygen was not supplied to the wall.
+        eta = model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        )
+        assert eta > 0.0
+        flag = next(item for item in outcomes if item["status"] == "status_bearing")
+        assert flag["reason"] == "wall_pO2_unknown_pO2_free_route_used"
     else:
         eta = model._condensation_efficiency(
             stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
@@ -195,11 +340,17 @@ def test_declared_non_sio_extension_area_does_not_supply_missing_wall_pressure()
     model.wall_species_partial_pressures_pa = {"Na2": 100.0}
     model.stage_area_m2_by_stage = {"stage_5": 1.0}
     stage = next(stage for stage in model.train.stages if stage.stage_number == 5)
-    with pytest.raises(condensation.WallSaturationPressureRefusal):
-        model._condensation_efficiency(
-            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-            available_kg=1.0, alpha_s_value=1.0,
-        )
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+    )
+    assert eta > 0.0
+    assert any(
+        item.get("reason") == "wall_pO2_unknown_pO2_free_route_used"
+        and item.get("authority_level") == "status_bearing"
+        for item in outcomes
+    )
 
 
 def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
@@ -280,16 +431,19 @@ def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pre
     assert diagnostic["wall_saturation_pressure_refused"] is False
 
 
-def test_predict_flag_cold_na_pole_is_unavailable_with_band():
+def test_predict_flag_cold_na_is_a_flagged_number():
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(
         "Na", 100.0, 298.15, diagnostic_out=diagnostic,
     )
-    assert diagnostic["wall_saturation_pressure_pa"] is None
+    pressure = diagnostic["wall_saturation_pressure_pa"]
+    assert pressure is not None and math.isfinite(pressure) and pressure > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
     notice = diagnostic["wall_saturation_pressure_notice"]
-    assert notice["authority_level"] == "unavailable"
-    assert notice["valid_range_K"] == [924.0, 1118.0]
-    assert "no extrapolation available" in notice["reason"]
+    assert notice["authority_level"] == "extrapolated"
+    assert tuple(notice["valid_range_K"]) == (864.0, 2499.0)
+    assert "24%" in notice["notice"]
+    assert "fusion" in notice["notice"]
 
 
 @pytest.mark.parametrize("invalid_value", [None, float("nan")], ids=["missing_B", "nan_B"])
@@ -386,23 +540,26 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         wall = row["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
-        refused = wall["wall_saturation_pressure_refusals_by_species"]
-        assert {"Na", "Al2"} <= refused.keys()
+        refused = wall.get("wall_saturation_pressure_refusals_by_species", {})
+        # Sodium's cold wall is the Browning-Potter saturation, flagged outside
+        # 864-2499 K. It is no longer the retired Antoine pole refusal.
+        assert "Na" not in refused
+        na_wall = wall["wall_saturation_pressure_extrapolations_by_species"].get("Na", {})
+        assert na_wall
+        for record in na_wall.values():
+            assert record["authority_level"] == "extrapolated"
+            assert tuple(record["valid_range_K"]) == (864.0, 2499.0)
+            assert "24%" in str(record.get("notice") or "")
+        assert "Al2" not in refused
+        # d-019 predicts Al2 wall saturation by continuing the nearest cited
+        # thermochemistry record and carries the out-of-range authority flag.
+        al2_wall = wall["wall_saturation_pressure_extrapolations_by_species"]["Al2"]
         assert any(
-            "no extrapolation available" in record["reason"]
-            for record in refused["Na"].values()
-        )
-        # Al2 has no reactive-product backstop, so reactivity metadata is not
-        # applicable.  Its real reversible wall route instead refuses because
-        # the available reaction-term source is not a wall saturation curve.
-        assert any(
-            "no extrapolation available" in record["reason"]
-            and record.get("refusal_type") == "WallSaturationPressureRefusal"
-            for record in refused["Al2"].values()
-        ), [
-            (record["reason"], record.get("refusal_type"))
-            for record in refused["Al2"].values()
-        ]
+            record["authority_level"] == "extrapolated"
+            and record["reason"] == "wall_condensation_thermo_extrapolated"
+            and record["valid_range_K"]
+            for record in al2_wall.values()
+        ), al2_wall
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
@@ -415,7 +572,14 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert transport["Si"]["evaporation"]["authority_level"] == "extrapolated"
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
-    assert pareto["Na"]["status"] == "unavailable"
+    # The cold wall flags Na. The coating pareto does not promote an
+    # unavailable flux (Na is absent from that series) into a status of
+    # extrapolated; the extrapolation record and its authority still travel.
+    na_pareto = pareto["Na"]
+    assert na_pareto["status"] == "unavailable", na_pareto
+    assert na_pareto["authority_level"] == "extrapolated", na_pareto
+    assert "wall_saturation_pressure_refusals" not in na_pareto
+    assert na_pareto["wall_saturation_pressure_extrapolations"]
     assert pareto["Al2"]["status"] == "unavailable"
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
@@ -573,10 +737,29 @@ def test_sio_wall_temperature_diagnostic_keeps_missing_value_unavailable(monkeyp
     assert diagnostics["wall_deposit_liner_temperature_C"] is None
 
 
-@pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
-def test_predict_flag_underflow_is_unavailable(species, temperature):
+def test_predict_flag_sodium_just_above_the_retired_pole_is_a_flagged_number():
+    # 417 K is 0.6 K above the retired Rodebush pole (T+C = 0 at 416.372 K).
+    # That Antoine underflow is gone. Browning-Potter at 417 K is below its
+    # certified band and above the melting point, so the liquid equation is
+    # evaluated and flagged.
     diagnostic = {}
-    condensation._wall_deposition_driving_pressure_pa(species, 100.0, temperature, diagnostic_out=diagnostic)
+    condensation._wall_deposition_driving_pressure_pa(
+        "Na", 100.0, 417.0, diagnostic_out=diagnostic
+    )
+    pressure = diagnostic["wall_saturation_pressure_pa"]
+    assert pressure is not None and pressure > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert tuple(notice["valid_range_K"]) == (864.0, 2499.0)
+    assert "24%" in notice["notice"]
+
+
+def test_predict_flag_underflow_is_unavailable():
+    diagnostic = {}
+    condensation._wall_deposition_driving_pressure_pa(
+        "Mg", 100.0, 115.0, diagnostic_out=diagnostic
+    )
     assert diagnostic["wall_saturation_pressure_pa"] is None
     assert "no extrapolation available" in diagnostic["wall_saturation_pressure_refusal_reason"]
 
@@ -773,9 +956,8 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
 
     SiO is a melt standard-reaction term (fit_target=standard_reaction_term),
     not a pure-species wall P_sat. Its oxide Antoine coefficients are not
-    wall-condensation certified; the reactive wall path uses the product
-    backstop. Probe Antoine telemetry on Ca, which still has a pure-component
-    condensed rail with a declared valid_range_K.
+    wall-condensation certified. Probe Antoine telemetry on Ca, which still
+    has a pure-component condensed rail with a declared valid_range_K.
     """
     T_wall_K = 1900.0  # above Ca pure-component certified band
     local_pressure_pa = 100.0
@@ -810,30 +992,26 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
         for warning in antoine_warnings
     )
 
-    # SiO standard-reaction term: no pure wall Antoine, no false extrapolation
-    # telemetry, and non-reactive driving pressure is zero without a product
-    # backstop (documented; not a silent pure-SiO Psat).
+    # SiO is a wall-reaction term, not a pure-SiO Antoine pressure. With no
+    # wall pO2, use the d-402 pO2-free route and carry its status-bearing bound.
     sio_range = condensation.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"][
         "valid_range_K"
     ]
     assert sio_range == [1400, 2273.15]
     sio_extrap: dict[str, dict[str, object]] = {}
     sio_warns: list[str] = []
-    with pytest.raises(
-        condensation.WallSaturationPressureRefusal,
-        match="reason=source_certified_range_refused",
-    ):
-        condensation._wall_deposition_driving_pressure_pa(
-            "SiO",
-            local_pressure_pa,
-            1173.15,
-            reactive_product_backstop=False,
-            antoine_extrapolations=sio_extrap,
-            antoine_extrapolation_warnings=sio_warns,
-        )
-    refusal = sio_extrap["SiO#wall:1173.15"]
-    assert refusal["authority_level"] == "unavailable"
-    assert "no extrapolation available" in refusal["reason"]
+    sio_driving_pressure = condensation._wall_deposition_driving_pressure_pa(
+        "SiO",
+        local_pressure_pa,
+        1173.15,
+        reactive_product_backstop=False,
+        antoine_extrapolations=sio_extrap,
+        antoine_extrapolation_warnings=sio_warns,
+    )
+    assert sio_driving_pressure > 0.0
+    notice = sio_extrap["SiO"]
+    assert notice["authority_level"] == "status_bearing"
+    assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_wall_deposit_query_reports_out_of_domain_antoine_prediction():

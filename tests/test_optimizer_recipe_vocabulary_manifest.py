@@ -24,15 +24,17 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     assert generated.read_bytes() == MANIFEST.read_bytes()
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
-    # d-283 adds five collector areas; d-452 adds throat and per-stage vane
-    # controls. Regenerated with scripts/generate_optimizer_recipe_vocabulary.py
-    # after the stage-area search high bound moved from 10 m2 to 2000 m2.
-    # The five stage_areas_m2 rows are the only allowlist changes; subspace
-    # digests stay [70, 76].
+    # Both sides regenerated this manifest. The b271 digest stays.
+    # Needs controller re-measure: the merged schema also has the stack's
+    # stage-area, throat and vane rows.
+    # b-282: upstream wall knobs search down to the coldest downstream
+    # collector interface (20 C) instead of the SiO-quiescent 1400 C figure.
+    # Regenerated from the merged schema (b261 wall floor + constackfix routes).
+    # Conditional subspace dimensions stay unchanged.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "a2e815945eeba73ddbbd05f0e976e4a4587dbf558db95446977104ba38e7108a"
+        "36c51c35fc374986022dff805db288fbf2ef09d63f49f04ef6990d66064d0698"
     )
-    assert digest == "8b2c75c390474488d63ecfbebb1ce1cb18b9a8af8f8cd5f69271fd7d79328dd2"
+    assert digest == "5a830cfc005bc6674cec2895d92bd80bca5ce151e10d436ce7af0c93eaf02e8b"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -47,7 +49,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [70, 76]
+    # Needs controller re-measure. b271 subspace dimensions left in place.
+    # The merged allowlist must also name the five absolute collector areas.
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [63, 69]
     assert {
         path
         for path in paths

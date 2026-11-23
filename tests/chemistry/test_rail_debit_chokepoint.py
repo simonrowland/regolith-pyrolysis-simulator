@@ -156,6 +156,12 @@ def test_stage3_extrapolation_flag_reaches_product_ledger(
 ):
     sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
     model = sim.condensation_model
+    # d-268: this direct SiO-only route explicitly opens the silica cartridge.
+    model.train.collection_route["stage3_route"] = "through"
+    model.pipe_segments = []
+    stage3 = next(stage for stage in model.train.stages if stage.stage_number == 3)
+    stage3.temp_range_C = (20.0, 80.0)
+    model.train.stages = [stage3]
     model.configure_operating_conditions(
         wall_temperature_C=1500.0, overhead_pressure_mbar=1.0,
         species_partial_pressures_mbar={"SiO": 1.0},
@@ -164,10 +170,14 @@ def test_stage3_extrapolation_flag_reaches_product_ledger(
     )
     route = model.route(EvaporationFlux(
         species_kg_hr={"SiO": 1e-6}, total_kg_hr=1e-6,
-        carrier_authority_by_species=_carrier_record("SiO", VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING),
+        carrier_authority_by_species=_carrier_record("SiO", VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE),
     ), sim.melt)
     captured = route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"]
     assert captured > 0.0
+    route_authority = route.condensation_authority_by_species["SiO"]
+    assert route_authority["authority_level"] == "extrapolated"
+    assert route_authority["authoritative_for_condensation"] is False
+    assert route_authority["valid_range_K"] is not None
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"SiO": 1.0}, material_origin="feedstock",
     )
@@ -183,9 +193,14 @@ def test_stage3_extrapolation_flag_reaches_product_ledger(
     for lot in lots:
         flag = lot["meta"]["condensation_authority"]
         assert flag["authority_level"] == "extrapolated"
-        assert flag["reason"] == "antoine_psat_unavailable_at_T"
-        assert flag["valid_range_K"]
-        assert any(item.get("original_reason") for item in flag["stage_outcomes"])
+        assert tuple(flag["valid_range_K"]) == tuple(
+            route_authority["valid_range_K"]
+        )
+        assert flag["authoritative_for_condensation"] is False
+        assert any(
+            item.get("authority_level") == "extrapolated"
+            for item in flag["stage_outcomes"]
+        )
 
 
 def test_admission_refusal_does_not_debit_parent_oxide(

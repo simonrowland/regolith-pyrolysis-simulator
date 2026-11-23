@@ -490,7 +490,8 @@ def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
             for item in composition.inference.inputs
         )
     ]
-    assert len(aithala_rows) == 28
+    # The 28 original observations plus 61 S-5 summary observations are migrated.
+    assert len(aithala_rows) == 89
     assert len(feot_rows) == 28
     projected_redox_rows = [
         row

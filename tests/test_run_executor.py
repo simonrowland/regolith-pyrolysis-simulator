@@ -68,7 +68,11 @@ def test_run_executor_returns_structured_execution():
 def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     run = _run()
     execution = RunExecutor().execute(run._session_config())
-    payload = run._build_output(execution)
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    payload = deterministic_gate_payload(run._build_output(execution))
     payload_bytes = (
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")
@@ -107,8 +111,9 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
+    # constack merge: repin on gate box
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
+        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
@@ -378,7 +383,8 @@ def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
     )
 
 
-def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> None:
+def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel(
+) -> None:
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -389,29 +395,37 @@ def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> N
     backend.initialize({})
     session = SimSession()
     session.start(config, backend=backend)
+    session.simulator.record.branch = "two"
     session.simulator.campaign_mgr.campaigns["C4"][
         "max_target_acquisition_hr"
     ] = 1.0
 
     execution = RunExecutor().execute_session(session, hours=1)
+    sim = session.simulator
 
-    assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
-    assert execution.error_message == execution.reason
-    assert execution.refusal_diagnostic["campaign"] == "C4"
-    assert execution.refusal_diagnostic["reaction_family"] == (
-        "c4_mg_selective_pyrolysis"
+    assert execution.status == "ok"
+    assert execution.reason == ""
+    assert execution.error_message == ""
+    assert execution.refusal_diagnostic == {}
+    assert sim.campaign_mgr.last_c4_termination["stop_reason"] == "time_cap"
+    assert sim.campaign_mgr.last_c4_termination["residual_melt"]["flag"] == (
+        "time_cap"
     )
-    assert execution.refusal_diagnostic["diagnostic"]["reason_refused"] == (
-        execution.reason
-    )
-    assert session.simulator._last_c6_refusal_diagnostic == {}
+    residual = sim.campaign_mgr.last_c4_termination["residual_melt"]
+    assert residual["Na_kg"] > 0.0
+    assert residual["Mg_kg"] > 0.0
+    assert sim._c4_campaign_refused is False
+    assert sim.campaign_endpoint_refused() is False
+    assert sim.melt.campaign == CampaignPhase.C2A
+    assert sim._last_c6_refusal_diagnostic == {}
 
 
 def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
-    """After a typed C4 endpoint refusal, core/session must not expose or
-    apply a next campaign decision. AUTO_APPLY and decide('yes') must not
-    start C6 (review construction: terminality fail-open)."""
+    """A missing Na limit is a typed refusal and remains non-resumable.
+
+    AUTO_APPLY and decide('yes') must not start the successor after this
+    genuine invalid-input refusal (review construction: terminality fail-open).
+    """
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -424,14 +438,17 @@ def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
     session.start(config, backend=backend)
     # Branch two is the C4→C6 decision path under default-off C5.
     session.simulator.record.branch = "two"
-    session.simulator.campaign_mgr.campaigns["C4"][
-        "max_target_acquisition_hr"
-    ] = 1.0
+    session.simulator.campaign_mgr.setpoints.pop(
+        "outdoor_alkali_loss_limit_fraction_of_feed"
+    )
 
     execution = RunExecutor().execute_session(session, hours=1)
     assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
+    assert execution.reason == "c4_outdoor_alkali_limit_missing"
     sim = session.simulator
+    assert sim._last_c4_refusal_diagnostic["diagnostic"]["reason_refused"] == (
+        "c4_outdoor_alkali_limit_missing"
+    )
     assert sim._c4_campaign_refused is True
     assert sim.campaign_endpoint_refused() is True
     assert sim.melt.campaign == CampaignPhase.C4
@@ -1152,11 +1169,8 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
 ):
     """Exercise the finite-capacity shadow at a hot, in-domain C4 point.
 
-    The parent finite-capacity run poisons at the live/solved rate-set
-    assertion, so these expected rates come from the same parent commit with
-    runtime enforcement disabled (the non-binding fallback required by the
-    b-582 proof). The external ``b582_probe_wrap.py`` records the fixed
-    shadow's non-empty rate map for this exact setup.
+    The expected rates are pinned to the production resolver output for this
+    setup, including c3's sequential redox clamp-order change.
     """
     from simulator.thermal_train import FiniteCapacity
 
@@ -1195,18 +1209,16 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # Recorded on parent 5672e61d9 by the non-binding fallback probe:
-    # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
-    # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
-    # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
+    # Re-pinned from the production resolver after c3's clamp-order change;
+    # the four changed rates move by at most 1.4%.
     expected_rates = {
         "Al": 1.776974630811854e-10,
-        "AlO": 2.622990526227972e-10,
+        "AlO": 2.5868512647895485e-10,
         "Ca": 6.00143229355403e-09,
         "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.355218555260953e-05,
-        "CrO": 9.136286575214734e-06,
-        "CrO2": 3.1730720722299763e-06,
+        "Cr": 4.3552191736308734e-05,
+        "CrO": 9.129280757927083e-06,
+        "CrO2": 3.170453002929102e-06,
         "CrO3": 9.294384109563237e-10,
         "K": 1.8395070246088384e-04,
         "K2": 1.6813544178336032e-11,

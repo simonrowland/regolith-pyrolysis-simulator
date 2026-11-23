@@ -9,7 +9,7 @@ is not read by the production flux path; behavior-changing adoption is a
 separate gated landing. The one wired exception is the b-314 flux-admission
 predicate :func:`is_broad_proxy_not_intrinsic_row`, which
 ``simulator.evaporation._load_evaporation_alpha_by_species`` consults so a
-tier-2 broad-proxy row cannot satisfy the measured-alpha requirement (SC-67).
+tier-2 broad-proxy row executes with its proxy authority preserved.
 
 Design authority:
 ``docs-private/research/2026-08-09-evap-class-model/design.md``.
@@ -29,6 +29,11 @@ from engines.builtin.evaporation_flux import (
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
+from simulator.source_ids import (
+    FEDKIN_SOURCE_ID,
+    SCHAEFER_FEGLEY_SOURCE_ID,
+    SOSSI_SOURCE_ID,
+)
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -233,7 +238,7 @@ _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
 
 _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
     EvidenceRow(
-        source_id="kems-005-fedkin-2006",
+        source_id=FEDKIN_SOURCE_ID,
         observation_id="fedkin_2006_na_yu_langmuir",
         species="Na",
         system_class="silicate_melt",
@@ -244,7 +249,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.26,
     ),
     EvidenceRow(
-        source_id="kems-005-fedkin-2006",
+        source_id=FEDKIN_SOURCE_ID,
         observation_id="fedkin_2006_k_yu_langmuir",
         species="K",
         system_class="silicate_melt",
@@ -255,7 +260,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.13,
     ),
     EvidenceRow(
-        source_id="kems-012-sossi-2019",
+        source_id=SOSSI_SOURCE_ID,
         observation_id="sossi_2019_na_alpha_e_authors_adopted_unity",
         species="Na",
         system_class="silicate_melt",
@@ -266,7 +271,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=1.0,
     ),
     EvidenceRow(
-        source_id="kems-012-sossi-2019",
+        source_id=SOSSI_SOURCE_ID,
         observation_id="sossi_2019_k_open_furnace_alpha_e_context",
         species="K",
         system_class="silicate_melt",
@@ -280,7 +285,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
 
 _OXIDE_SURVEY_EVIDENCE: tuple[EvidenceRow, ...] = (
     EvidenceRow(
-        source_id="kems-008-schaefer-fegley-2004",
+        source_id=SCHAEFER_FEGLEY_SOURCE_ID,
         observation_id="schaefer_fegley_2004_sio_alpha_s_survey",
         species="SiO",
         system_class="pure_oxide_condensed",
@@ -291,7 +296,7 @@ _OXIDE_SURVEY_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.2,
     ),
     EvidenceRow(
-        source_id="kems-008-schaefer-fegley-2004",
+        source_id=SCHAEFER_FEGLEY_SOURCE_ID,
         observation_id="schaefer_fegley_2004_mg_forsterite_alpha_s_survey",
         species="Mg",
         system_class="pure_oxide_condensed",
@@ -630,15 +635,9 @@ def grounding_evidence(class_id: str) -> tuple[EvidenceRow, ...]:
 # Given (species, current production alpha source metadata) return whether that
 # source is class-comparable for the production silicate-melt carrier.
 #
-# b-314: the structured ``broad_proxy_not_intrinsic`` tag IS wired into flux
-# admission — ``simulator.evaporation._load_evaporation_alpha_by_species``
-# consults :func:`is_broad_proxy_not_intrinsic_row` and emits tagged rows as
-# provenance-carrying mappings (``alpha_proxy_tag``), and the provider-facing
-# ``simulator.evaporation._measured_alpha_control_view`` strips them so a
-# tier-2 proxy cannot satisfy the measured-alpha requirement (the SC-67
-# unmeasured-alpha refusal fires instead). The richer
-# :func:`gate_production_alpha_source` instrument (free-text refinement,
-# system-class fences) is still NOT wired into flux.
+# Tagged broad proxies remain executable with proxy/bridge authority. The loader
+# preserves provenance; the flux provider evaluates and flags the prediction.
+# gate_production_alpha_source remains a separate class-comparability diagnostic.
 
 BROAD_PROXY_NOT_INTRINSIC_TAG: Final[str] = "broad_proxy_not_intrinsic"
 
@@ -647,7 +646,7 @@ def is_broad_proxy_not_intrinsic_row(alpha_data: Any) -> bool:
     """True when an ``evaporation_alpha`` contract row is tagged as a tier-2
     broad proxy — inherited from another measurement family, not an intrinsic
     melt coefficient. Such a row is proxy evidence, never a measurement, and
-    must not satisfy the flux path's measured-alpha requirement."""
+    executes only as a flagged proxy/bridge prediction."""
 
     if not isinstance(alpha_data, Mapping):
         return False

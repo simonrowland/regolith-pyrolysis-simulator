@@ -61,14 +61,18 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
         assert exclusion["upper_bound_kg"] > 0.0
         assert exclusion["upper_bound_basis"] == "conservative_ledger_bound"
 
-    # This run has no captured volatile mass, so its refused contribution
-    # cannot make that class partial. The computed classes above remain partial.
-    assert products["captured_volatiles"]["status"] == "unavailable"
-    assert products["captured_volatiles"]["class_total_kg"] is None
+    # d-019/d-402 carry status-bearing wall estimates into the product view.
+    # Captured volatiles therefore remain partial even when no authoritative
+    # volatile mass was committed to a condenser account.
+    captured = products["captured_volatiles"]
+    assert captured["status"] == "partial"
+    assert isinstance(captured["class_total_kg"], (int, float))
+    assert math.isfinite(captured["class_total_kg"])
+    assert captured["estimated_contributions"]
 
     silica = products["pure_silica_glass"]
-    assert silica["stage_3_capture_kg"] > 0.0
-    assert silica["stage_3_kg_by_species"]
+    assert silica["stage_3_capture_kg"] == 0.0
+    assert silica["stage_3_kg_by_species"] == {}
     sio_estimate = next(
         item
         for item in silica["estimated_contributions"]

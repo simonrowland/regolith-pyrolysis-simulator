@@ -13,7 +13,13 @@ from types import MappingProxyType, SimpleNamespace
 from collections.abc import Callable, Mapping as MappingABC, Sequence
 from typing import Any, Mapping, TypeVar
 
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+    METAL_PHASE_ACCOUNTS,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    STAGE_COLLECTION_BACKING_ACCOUNTS,
+)
 from simulator.accounting.completeness import evaporation_quantity_unavailability
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.backend_names import canonical_backend_name
@@ -28,7 +34,12 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
+    _WALL_SUPPLY_WINDOW_REPORT_KEY,
+    _WallSupplyIntegral,
+    _WallSupplyWindow,
+    _classify_refused_wall_supply_window,
     _coating_wall_quantity_unavailable,
+    _coating_wall_refused_species,
     extraction_completeness_report,
     target_species_yield_report,
 )
@@ -40,6 +51,11 @@ from simulator.cost_energy import (
     unavailable_reason_of,
 )
 from simulator.core import read_high_t_melt_activity_fallback_notice
+from simulator.wall_deposit_availability import (
+    WALL_SATURATION_PRESSURE_REFUSED_CODE,
+    _authority_without_booked_refusals,
+    wall_deposit_figure_availability,
+)
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import (
     OXYGEN_MOLAR_MASS_KG_PER_MOL,
@@ -48,14 +64,14 @@ from simulator.thermal_train import (
     oxygen_cp_shomate_j_per_mol_k,
     thermal_train_parameters_from_mapping,
 )
-from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
     wall_deposit_remobilization_by_segment_species,
     wall_deposit_sticking_authority_status,
 )
-from simulator.trace import wall_deposit_kg_by_zone_species
+from simulator.state import PIPE_SEGMENT_NAMES
+from simulator.trace import _priced_wall_deposit_kg, wall_deposit_kg_by_zone_species
 from simulator.optimize.backend_status import (
     backend_statuses_from_carrier as _backend_statuses_from_carrier,
     carrier_has_crash_point as _carrier_has_crash_point,
@@ -66,6 +82,12 @@ from simulator.optimize.backend_status import (
 
 
 _MISSING = object()
+BELOW_WALL_SUPPLY_UPPER_BOUND = "below_wall_supply_upper_bound"
+WALL_DEPOSIT_UPPER_BOUND_USED = "wall_deposit_upper_bound_used"
+UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT = "unlocated_supply_bound_worst_segment"
+WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN = (
+    "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+)
 FURNACE_INSTANT_DEATH_FACTOR = 10.0
 # NIST Chemistry WebBook SRD 69 gas data and phase-change rows. N2 uses
 # Cp=7/2 R at 300 K; monatomic Ar and Kr use Cp=5/2 R. O2 phase constants
@@ -94,6 +116,9 @@ _CARRIER_CONDENSATION_PROPERTIES = {
 # operational lifetime observation (one completed campaign). The model's
 # EPSILON_KG is mass-space and cannot dimensionally define a campaign floor.
 FURNACE_MIN_MEANINGFUL_LIFETIME_CAMPAIGNS = 1.0e-6
+# A null liner threshold cannot become a campaign count. Physical
+# objectives stay scores. ``cost_adjusted_objective_scores`` owns this.
+FURNACE_AMORTIZATION_STATUS_UNGROUNDED = "resinter_threshold_ungrounded"
 VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
@@ -383,6 +408,16 @@ _OXIDE_KEY_ALIASES = MappingProxyType(
 )
 _VENTED_PRODUCT_ACCOUNTS = frozenset(
     {"terminal.oxygen_melt_offgas_vented_to_vacuum", "vent"}
+)
+# Metal phases plus the condenser-train backing accounts. The backing
+# tuple is the owner of train, cartridge, residue, and chromium.
+# Chromium is also matched by the terminal.* arm; each account is
+# visited once. Residue species count as captured for venting rank.
+_CAPTURED_PROCESS_ACCOUNTS = frozenset(
+    {
+        *METAL_PHASE_ACCOUNTS,
+        *STAGE_COLLECTION_BACKING_ACCOUNTS,
+    }
 )
 # Source: AccountingQueries.product_ledger merges sim._unspent_additive_reagents_kg(),
 # which emits unspent_<element>_reagent entries for additive bookkeeping.
@@ -2747,24 +2782,36 @@ def _tap_coating_product_summary(
         hour,
     )
     authority = _coating_authority_status(raw_by_segment, run_execution)
-    lifetime = _coating_lifetime_projection(
+    # Same chokepoint as the terminal coating summary. The integral stops
+    # at the tap hour: later vapour is not this projection's supply.
+    booked = _book_wall_deposits_at_vapour_supply(
         raw_by_segment,
+        authority,
+        run_execution,
+        snapshots=tuple(
+            snapshot
+            for snapshot in snapshots
+            if _snapshot_hour(snapshot) <= hour
+        ),
         campaigns_elapsed=campaigns_elapsed,
-        authority=authority,
     )
-    if not raw_by_segment:
+    priced_deposit = booked["deposit"]
+    availability = booked["availability_authority"]
+    notice = booked["notice_authority"]
+    booking_fields = _wall_supply_booking_fields(booked)
+    if not priced_deposit:
         return MappingProxyType(
             {
                 "wall_deposit_kg_by_segment_species": MappingProxyType({}),
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
-                **lifetime,
                 **_furnace_lifespan_cost_summary_from_raw(
-                    raw_by_segment,
+                    priced_deposit,
                     campaigns_elapsed=campaigns_elapsed,
-                    authority=authority,
+                    authority=availability,
                 ),
-                **_coating_authority_summary(authority),
+                **_coating_authority_summary(notice),
+                **booking_fields,
             }
         )
     zone_by_segment = _coating_zone_by_segment(run_execution)
@@ -2772,16 +2819,16 @@ def _tap_coating_product_summary(
         raise ObjectiveComputationError(
             "best_tap coating projection requires wall_zone_by_segment trace"
         )
-    by_segment = _wall_deposit_by_segment_species_summary(raw_by_segment)
+    by_segment = _wall_deposit_by_segment_species_summary(priced_deposit)
     try:
-        by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
+        by_zone = wall_deposit_kg_by_zone_species(priced_deposit, zone_by_segment)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(str(exc)) from exc
     sim = getattr(run_execution, "simulator", run_execution)
     remobilization = wall_deposit_remobilization_by_segment_species(
         sim,
         snapshots=snapshots,
-        cumulative_deposits_kg=raw_by_segment,
+        cumulative_deposits_kg=priced_deposit,
         through_hour=hour,
     )
     return MappingProxyType(
@@ -2800,13 +2847,13 @@ def _tap_coating_product_summary(
                 })
                 for segment, species_map in remobilization.items()
             }),
-            **lifetime,
             **_furnace_lifespan_cost_summary_from_raw(
-                raw_by_segment,
+                priced_deposit,
                 campaigns_elapsed=campaigns_elapsed,
-                authority=authority,
+                authority=availability,
             ),
-            **_coating_authority_summary(authority),
+            **_coating_authority_summary(notice),
+            **booking_fields,
         }
     )
 
@@ -3942,13 +3989,7 @@ def _captured_products_mol(
                     continue
                 if not (
                     account_name.startswith("terminal.")
-                    or account_name
-                    in {
-                        "process.metal_phase",
-                        "process.metal_phase_bottom_pool",
-                        "process.metal_phase_float_layer",
-                        "process.condensation_train",
-                    }
+                    or account_name in _CAPTURED_PROCESS_ACCOUNTS
                 ):
                     continue
                 species_mol = (
@@ -4346,17 +4387,64 @@ def furnace_amortization_cost_per_run(
     )
 
 
+def _unpriced_lifespan_reason(summary: Mapping[str, Any]) -> str | None:
+    reason = summary.get("lifespan_cost_status")
+    if reason in {"threshold_unavailable", "wall_deposit_unavailable"}:
+        return str(reason)
+    if summary.get("furnace_amortization_status") == FURNACE_AMORTIZATION_STATUS_UNGROUNDED:
+        return "threshold_unavailable"
+    return None
+
+
+def furnace_cost_comparison(
+    product_summaries: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Own d-429 scoring policy and provenance for one comparison set."""
+    reasons = {
+        candidate_id: _unpriced_lifespan_reason(summary)
+        for candidate_id, summary in product_summaries.items()
+    }
+    count = sum(reason is not None for reason in reasons.values())
+    # A priced maximize score is s/(1+p), with dimensionless p >= 0.
+    # Returning s only for an unpriced candidate implicitly assigns it p=0,
+    # so equal physical scores cease to tie. Excluding p for the entire set
+    # compares s with s (and -s with -s for minimize), in the original units.
+    # At count=0 retain the shipped transform; at count=n all scores stay raw.
+    excluded = count > 0
+    return {
+        "excluded": excluded,
+        "flag": f"furnace cost excluded: {count} of {len(reasons)} unpriced" if excluded else None,
+        "unpriced_count": count,
+        "candidate_count": len(reasons),
+        "candidates": {
+            candidate_id: {
+                "unpriced_reason": reasons[candidate_id],
+                "penalty": summary.get("furnace_amortization_batch_cost_equivalents"),
+                "applied": not excluded and summary.get("furnace_amortization_status") == "available",
+            }
+            for candidate_id, summary in product_summaries.items()
+        },
+    }
+
+
 def cost_adjusted_objective_scores(
     objectives: ObjectiveLike,
     definitions: Sequence[ObjectiveDefinition],
     *,
     product_summary: Mapping[str, Any] | None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[float | None, ...]:
     """Apply the continuous furnace cost in batch-equivalent objective units."""
 
     scores = objective_scores(objectives, definitions)
     summary = product_summary or {}
     status = summary.get("furnace_amortization_status")
+    if _unpriced_lifespan_reason(summary) is not None:
+        # d-367/d-412: an unavailable lifespan is unpriced and flagged,
+        # whether the threshold or wall figure is missing. Keep other
+        # objectives rankable; objective_scores retains None for a
+        # requested unavailable lifespan objective.
+        return scores
     if status != "available":
         raise ObjectiveComputationError(
             f"furnace amortization unavailable: {status}"
@@ -4367,6 +4455,8 @@ def cost_adjusted_objective_scores(
     penalty = _finite_float(raw_penalty, "furnace amortization penalty")
     if penalty < 0.0:
         raise ObjectiveComputationError("furnace amortization penalty must be non-negative")
+    if comparison is not None and comparison["excluded"]:
+        return scores
     cost_factor = 1.0 + penalty
     adjusted: list[float | None] = []
     for score, definition in zip(scores, definitions):
@@ -4627,7 +4717,13 @@ def product_summary(
             else None
         )
         margin_status = str(getattr(coating_margin, "status", ""))
-        if margin_status == "unavailable" or verdict == "unavailable":
+        if (
+            (margin_status == "unavailable" or verdict == "unavailable")
+            and not _booked_margin_refusal_is_priced(
+                summary,
+                margin_payload if isinstance(margin_payload, Mapping) else {},
+            )
+        ):
             coating_unavailable_reason = (
                 str(getattr(coating_margin, "status_reason", "") or "")
                 or str(summary.get("coating_unavailable_reason", "") or "")
@@ -4649,12 +4745,12 @@ def product_summary(
                     getattr(coating_margin, "status_reason", "") or ""
                 )
     coating_status = str(summary.get("coating_status", ""))
-    lifetime = summary.get(
+    lifetime = summary.get("aggregate_campaigns_to_resinter", math.inf)
+    has_positive_fouling = summary.get("has_positive_qualified_fouling", False)
+    summary["campaigns_to_resinter_worst_segment"] = summary.get(
         "campaigns_to_resinter_worst_segment",
         summary.get("campaigns_to_resinter", math.inf),
     )
-    has_positive_fouling = summary.get("has_positive_qualified_fouling", False)
-    summary["campaigns_to_resinter_worst_segment"] = lifetime
     summary["has_positive_qualified_fouling"] = has_positive_fouling
     refusal = summary.get("wall_deposit_refusal")
     if cost_parameters is not None:
@@ -4725,6 +4821,7 @@ def _furnace_amortization_summary(
     if has_positive_fouling is None or refusal is not None:
         payload = {
             "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_cost_per_run_usd": None,
             "furnace_amortization_batch_cost_equivalents": None,
         }
         if refusal is not None:
@@ -4777,13 +4874,12 @@ def _furnace_amortization_summary(
         and campaigns_to_resinter.startswith("resinter_threshold_kg / ")
     ):
         return MappingProxyType({
-            "furnace_amortization_status": "resinter_threshold_ungrounded",
+            "furnace_amortization_status": FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
             "furnace_amortization_status_reason": (
                 "resinter_threshold_kg is not qualified"
             ),
             "furnace_amortization_cost_per_run_usd": None,
             "furnace_amortization_batch_cost_equivalents": None,
-            "campaigns_to_resinter": campaigns_to_resinter,
         })
     amortization = furnace_amortization_cost_per_run(
         batch_cost,
@@ -4874,33 +4970,33 @@ def _coating_product_summary(
         )
     # A null kilogram is unknown. Leave it out of every numeric sum. Do not
     # price it as zero, and do not abort a quantity the gate has classified.
-    known_by_segment = {
-        key: kg for key, kg in raw_by_segment.items() if kg is not None
-    }
-    by_segment = _wall_deposit_by_segment_species_summary(known_by_segment)
     zone_by_segment = getattr(trace, "wall_zone_by_segment", None)
     if zone_by_segment is None:
         raise ObjectiveComputationError("wall_zone_by_segment trace is missing")
     if not isinstance(zone_by_segment, Mapping):
         raise ObjectiveComputationError("wall_zone_by_segment trace is not a mapping")
+    sim = getattr(run_execution, "simulator", run_execution)
+    authority = _coating_authority_status(raw_by_segment, run_execution)
+    booked = _book_wall_deposits_at_vapour_supply(
+        raw_by_segment,
+        authority,
+        run_execution,
+    )
+    priced_deposit = booked["deposit"]
+    known_priced = {
+        key: kg for key, kg in priced_deposit.items() if kg is not None
+    }
+    by_segment = _wall_deposit_by_segment_species_summary(known_priced)
     try:
-        by_zone = wall_deposit_kg_by_zone_species(known_by_segment, zone_by_segment)
+        by_zone = wall_deposit_kg_by_zone_species(known_priced, zone_by_segment)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(str(exc)) from exc
-    sim = getattr(run_execution, "simulator", run_execution)
     remobilization = wall_deposit_remobilization_by_segment_species(
         sim,
-        cumulative_deposits_kg=known_by_segment,
+        cumulative_deposits_kg=known_priced,
     )
-    authority = _coating_authority_status(raw_by_segment, run_execution)
     campaigns_elapsed = _campaigns_elapsed(run_execution)
-    lifetime = _coating_lifetime_projection(
-        raw_by_segment,
-        campaigns_elapsed=campaigns_elapsed,
-        authority=authority,
-        coating_margin=coating_margin,
-    )
-    return MappingProxyType({
+    summary: dict[str, Any] = {
         "wall_deposit_kg_by_segment_species": by_segment,
         "wall_deposit_kg_by_zone_species": MappingProxyType({
             zone: MappingProxyType(dict(species_kg))
@@ -4913,15 +5009,16 @@ def _coating_product_summary(
             })
             for segment, species_map in remobilization.items()
         }),
-        **lifetime,
         **_furnace_lifespan_cost_summary_from_raw(
-            raw_by_segment,
+            priced_deposit,
             campaigns_elapsed=campaigns_elapsed,
-            authority=authority,
+            authority=booked["availability_authority"],
             coating_margin=coating_margin,
         ),
-        **_coating_authority_summary(authority),
-    })
+        **_coating_authority_summary(booked["notice_authority"]),
+    }
+    summary.update(_wall_supply_booking_fields(booked))
+    return MappingProxyType(summary)
 
 
 def _coating_authority_status(
@@ -5034,6 +5131,10 @@ def _product_bins(product_classes: Mapping[str, Any]) -> Mapping[str, Any]:
         ("oxygen", "O2"),
         ("captured_volatiles", "Captured volatiles"),
         ("refractory_ceramic_rump", "Refractory ceramic/rump"),
+        (
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+        ),
     ):
         value = product_classes.get(key)
         if not isinstance(value, Mapping):
@@ -5256,10 +5357,17 @@ def _wall_deposit_by_segment_species_summary(
         amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
         if amount < 0.0:
             continue
-        if amount <= _EPS:
-            amount = 0.0
+        # A measured zero stays a recorded zero. Every positive kilogram is
+        # kept: _priced_wall_deposit_kg is the only reader floor, and it does
+        # not replace a supply above ledger resolution with zero.
+        if amount == 0.0:
+            priced = 0.0
+        else:
+            priced = _priced_wall_deposit_kg(amount)
+            if priced is None:
+                continue
         species_kg = by_segment.setdefault(segment, {})
-        species_kg[species] = species_kg.get(species, 0.0) + amount
+        species_kg[species] = species_kg.get(species, 0.0) + priced
     return MappingProxyType({
         segment: MappingProxyType(dict(sorted(species_kg.items())))
         for segment, species_kg in sorted(by_segment.items())
@@ -5292,6 +5400,664 @@ def _aggregate_campaigns_to_resinter(
     )["aggregate_campaigns_to_resinter"]
 
 
+def _mass_balance_ledger_resolution_kg(mass_basis_kg: float) -> float:
+    """Absolute kilogram the mass-balance gate cannot tell from zero.
+
+    ``mass_balance_error_pct`` is ``|mass_in - mass_out| / mass_in * 100``.
+    The closure gate is that percent of the charge, so a vapour supply
+    smaller than this mass is below the ledger resolution.
+    """
+
+    from simulator.optimize.evaluate import MASS_BALANCE_ABORT_PCT
+
+    basis = _finite_float(mass_basis_kg, "ledger mass basis")
+    if basis <= 0.0:
+        raise ObjectiveComputationError("ledger mass basis must be positive")
+    return basis * float(MASS_BALANCE_ABORT_PCT) / 100.0
+
+
+def _run_charge_mass_kg(run_execution: Any) -> float | None:
+    sim = getattr(run_execution, "simulator", None)
+    record = getattr(sim, "record", None)
+    raw = getattr(record, "batch_mass_kg", None)
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return None
+    mass = float(raw)
+    if not math.isfinite(mass) or mass <= 0.0:
+        return None
+    return mass
+
+
+def _refused_vapour_supply_kg(
+    run_execution: Any,
+    refused_species: tuple[str, ...],
+    snapshots: Sequence[Any] | None = None,
+    *,
+    campaigns_elapsed: float = 1.0,
+) -> _WallSupplyIntegral:
+    """Per-campaign view of each refused species' supply integral.
+
+    Missing species stay missing. A flux that was not computed is not
+    zero. A refused interval is the activity-1 Hertz-Knudsen bound when
+    saturation pressure exists. The returned mapping is normalized using
+    the campaigns_elapsed for this window; ``.window`` retains its run
+    totals and interval diagnostics. An interval with no flux law and no
+    saturation pressure leaves the species missing: the other hours are
+    not its supply. The tap-hour projection passes the hours up to the tap
+    and that window's elapsed campaigns.
+    """
+
+    if not refused_species:
+        return _WallSupplyIntegral(
+            _WallSupplyWindow(
+                run_total_kg={},
+                campaigns_elapsed=campaigns_elapsed,
+            )
+        )
+    from simulator.optimize.physics import (
+        _execution_vapour_catalog,
+        _optimizer_refused_flux_bounds,
+    )
+
+    if snapshots is None:
+        snapshots = getattr(run_execution, "snapshots", ())
+    # The window record retains kg/run for cutoff classification and
+    # booking. The catalog is the run's; the integral does not open the
+    # default vapour file.
+    return _optimizer_refused_flux_bounds(
+        snapshots,
+        refused_species,
+        campaigns_elapsed=campaigns_elapsed,
+        catalog=_execution_vapour_catalog(run_execution),
+    )
+
+
+def _drop_species_wall_deposit(
+    wall_deposit: dict[Any, Any],
+    species: str,
+) -> None:
+    for key in [
+        key
+        for key in wall_deposit
+        if isinstance(key, tuple) and len(key) == 2 and str(key[1]) == species
+    ]:
+        del wall_deposit[key]
+
+
+def _replace_species_deposit_with_supply(
+    wall_deposit: dict[Any, Any],
+    species: str,
+    segment: str,
+    supply: float,
+) -> None:
+    """Book ``supply`` once for ``species`` on ``segment``.
+
+    Measured kilograms are the same vapour, not a second source. Leaving
+    them and also writing the supply counts that mass twice. Keeping only
+    the measured part prices a partial deposit under the supply-bound
+    flag. ``segment`` is this species' best closed-form segment: the
+    argmax of the closed form over segments where it is eligible. The
+    smaller segment id wins a tie. That is the binding segment whenever
+    the species is eligible there.
+    """
+
+    _drop_species_wall_deposit(wall_deposit, species)
+    wall_deposit[(segment, species)] = supply
+
+
+def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
+    fields: dict[str, Any] = {}
+    notice_authority = booked.get("notice_authority")
+    if isinstance(notice_authority, MappingABC):
+        if UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT in notice_authority:
+            fields[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = notice_authority[
+                UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT
+            ]
+        upper_bounds = notice_authority.get(
+            WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN
+        )
+        if isinstance(upper_bounds, MappingABC):
+            fields[WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN] = dict(
+                upper_bounds
+            )
+    bookings = booked.get("bookings") or ()
+    if not bookings:
+        return fields
+    from simulator.optimize.physics import SUPPLY_INTERVAL_UPPER_BOUND_USED
+
+    fields["wall_supply_bound_bookings"] = bookings
+    if any(
+        isinstance(item, Mapping)
+        and item.get("reason") == WALL_DEPOSIT_UPPER_BOUND_USED
+        for item in bookings
+    ):
+        fields["wall_deposit_upper_bound_used"] = True
+    # Only a booking that actually used the activity-1 bound grows this
+    # key. A computed supply does not.
+    counts: dict[str, int] = {}
+    for item in bookings:
+        if not isinstance(item, Mapping):
+            continue
+        raw_count = item.get(SUPPLY_INTERVAL_UPPER_BOUND_USED)
+        species = item.get("species")
+        if (
+            isinstance(raw_count, bool)
+            or not isinstance(raw_count, int)
+            or raw_count <= 0
+            or not species
+        ):
+            continue
+        counts[str(species)] = int(raw_count)
+    if counts:
+        fields[SUPPLY_INTERVAL_UPPER_BOUND_USED] = counts
+    return fields
+
+
+def _refusal_candidate_segments(
+    authority: Mapping[str, Any],
+    species: str,
+) -> tuple[str, ...]:
+    records = authority.get("wall_saturation_pressure_refusals_by_species")
+    if isinstance(records, Mapping):
+        by_segment = records.get(species)
+        if isinstance(by_segment, Mapping) and by_segment:
+            return tuple(sorted(str(segment) for segment in by_segment))
+    return ()
+
+
+def _refusal_reason(
+    authority: Mapping[str, Any],
+    species: str,
+    segment: str,
+) -> str:
+    records = authority.get("wall_saturation_pressure_refusals_by_species")
+    reason = ""
+    if isinstance(records, Mapping):
+        by_segment = records.get(species)
+        if isinstance(by_segment, Mapping):
+            record = by_segment.get(segment)
+            if isinstance(record, Mapping):
+                raw_reason = record.get("reason")
+                if isinstance(raw_reason, str):
+                    reason = raw_reason.strip()
+    if reason:
+        return reason
+    message = authority.get("message")
+    if isinstance(message, str) and message.strip():
+        return message.strip()
+    return "wall saturation pressure refusal"
+
+
+def _positive_segment_loads_kg(
+    wall_deposit: Mapping[Any, Any],
+    excluded_species: set[str],
+) -> dict[str, float]:
+    """Segment loads that stay booked while refused supplies are replaced.
+
+    A refused species' measured kilograms are the same vapour as its
+    supply. They are excluded here and written back once, on one segment.
+    """
+
+    loads: dict[str, float] = {}
+    for key, kg in wall_deposit.items():
+        if not isinstance(key, tuple) or len(key) != 2 or kg is None:
+            continue
+        if str(key[1]) in excluded_species:
+            continue
+        try:
+            amount = float(kg)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(amount) or amount <= 0.0:
+            continue
+        segment = str(key[0])
+        loads[segment] = loads.get(segment, 0.0) + amount
+    return loads
+
+
+def _assign_refused_supplies_at_binding_load(
+    existing_loads: Mapping[str, float],
+    supplies: Mapping[str, float],
+    eligible: Mapping[str, Sequence[str]],
+    *,
+    unlocated_segments: Sequence[str] = PIPE_SEGMENT_NAMES,
+) -> dict[str, Any]:
+    """Place located supplies and bound unlocated supplies over possible walls.
+
+    Invariant, independent of species order. Each supply is booked
+    wholly on one eligible segment when eligibility is evidenced:
+
+        chosen(i) = argmax over s eligible for i of closed_form(s)
+        tie-break: smaller segment id
+
+        closed_form(s) = existing_booked_load_s
+            + sum over refused species j eligible at s of supply_j
+
+        s* = argmax over every segment of closed_form(s)
+        same tie-break
+        worst_max_load = closed_form(s*)
+
+    Species eligible at s* are booked on s*. s* is the global argmax and
+    the smallest id on a tie, so it wins inside every candidate set that
+    contains it. A species not eligible at s* takes the argmax over its
+    own candidates, not the smallest eligible id. That segment's closed
+    form cannot exceed closed_form(s*), so the booked maximum stays
+    worst_max_load. The smaller id breaks ties only. It is not a
+    placement rule for every off-s* species.
+
+    The max-segment load governs per-segment coating limits, separately
+    from the aggregate furnace re-sinter capacity. It is maximised by
+    concentrating every eligible supply into one segment.
+    Splitting a supply across segments never raises that maximum:
+    segment s can receive at most the supplies eligible there, so no
+    assignment exceeds the closed form, and putting every species
+    eligible at s* onto s* meets it.
+
+    Placing species one at a time understates the maximum. With empty
+    walls, Mg eligible at A and B ties and the smaller id takes A; SiO
+    eligible only at B is booked afterwards. The maximum is then 3 kg.
+    Both supplies are eligible at B, and B's closed form is 4 kg.
+
+    Off s*: C already holds 10 kg, B holds 3 kg, and 1 kg of SiO is
+    eligible at A and B. Closed form A=1, B=4, C=10, so s* is C. SiO's
+    best closed-form segment is B. Booking A, the smaller id, leaves B
+    at its existing 3 kg.
+
+    An empty eligible set provides no location evidence. Its full supply
+    is a separate alternative bound on every declared wall (or the explicit
+    laboratory surfaces), never an entry in ``segment_by_species`` or the
+    booked loads. The returned per-segment loads contain only located mass.
+    ``binding_segment`` is s*. ``closed_form_kg`` is the per-segment
+    closed form, including the unlocated bound and walls receiving no booking.
+    """
+
+    closed_form: dict[str, float] = {
+        str(segment): float(load)
+        for segment, load in existing_loads.items()
+        if float(load) > 0.0
+    }
+    normalized: dict[str, tuple[str, ...]] = {}
+    for species in supplies:
+        candidates = tuple(
+            dict.fromkeys(
+                str(segment)
+                for segment in eligible.get(species, ())
+                if str(segment)
+            )
+        )
+        normalized[species] = candidates
+        for segment in candidates:
+            closed_form.setdefault(segment, float(existing_loads.get(segment, 0.0)))
+    unlocated_supply = {
+        species: float(supplies[species])
+        for species, candidates in normalized.items()
+        if not candidates
+    }
+    unlocated_bound = sum(unlocated_supply.values())
+    if unlocated_supply:
+        for segment in unlocated_segments:
+            closed_form.setdefault(str(segment), 0.0)
+    # d-430: if u_s is the unknown kg landing on wall s, 0 <= u_s <= U,
+    # where U is the full unlocated supply bound. Thus L_s + u_s <= L_s + U
+    # and max_s(L_s + U) bounds any wall's load. These are ALTERNATIVES,
+    # never booked mass on every wall. Units: kg + kg = kg. U=0 leaves the
+    # load unchanged; with one segment the bound is exact at full supply.
+    for segment in tuple(closed_form):
+        extra = sum(
+            float(supplies[species])
+            for species, candidates in normalized.items()
+            if segment in candidates
+        )
+        closed_form[segment] = float(existing_loads.get(segment, 0.0)) + extra + unlocated_bound
+
+    def best_segment(candidates: Sequence[str]) -> str:
+        # One rank for s* and for every species. The smaller segment id
+        # wins only when the closed-form loads are equal.
+        return min(
+            candidates,
+            key=lambda segment: (-closed_form[segment], segment),
+        )
+
+    binding_segment = best_segment(tuple(closed_form))
+    segment_by_species = {
+        species: best_segment(candidates)
+        for species, candidates in normalized.items()
+        if candidates
+    }
+    segment_loads: dict[str, float] = {
+        str(segment): float(load)
+        for segment, load in existing_loads.items()
+        if float(load) > 0.0
+    }
+    for species, segment in segment_by_species.items():
+        segment_loads[segment] = (
+            segment_loads.get(segment, 0.0) + float(supplies[species])
+        )
+    return {
+        "segment_by_species": segment_by_species,
+        "binding_segment": binding_segment,
+        "segment_loads_kg": segment_loads,
+        "closed_form_kg": closed_form,
+        "worst_max_load_kg": closed_form[binding_segment],
+        # d-431: the bound is an alternative upper-bound scenario, not booked
+        # mass. For a furnace-wide limit, sum_s(L_s) + U bounds the load
+        # wherever U lands; for a per-segment limit use max_s(L_s + U) above.
+        # Both are kg + kg = kg; U=0 recovers their respective booked loads.
+        "aggregate_potential_load_kg": sum(segment_loads.values()) + unlocated_bound,
+        "unlocated_bound_kg": unlocated_bound,
+        "unlocated_supply_kg_by_species": unlocated_supply,
+    }
+
+
+def _book_wall_deposits_at_vapour_supply(
+    wall_deposit: Mapping[Any, Any],
+    authority: Mapping[str, Any],
+    run_execution: Any,
+    snapshots: Sequence[Any] | None = None,
+    *,
+    campaigns_elapsed: float | None = None,
+) -> dict[str, Any]:
+    """Book each refused species at its vapour-supply bound.
+
+    Product summary, furnace lifespan, and the tap-hour projection all
+    read the map this function returns. The coating gate uses the same
+    physics-owned run-total classifier. This function does not integrate.
+
+    - The interval invariant lives in ``_classify_wall_supply_interval``,
+      which ``_optimizer_refused_flux_bounds`` is the only caller of.
+      Refused kilograms are allocated only by
+      ``_allocate_parent_oxide_supply``. Each positive-duration interval
+      is a computed rate, an evidenced physical zero, an activity-1
+      supply bound, or unavailable. A species absent from the returned
+      map has no finite bound. One interval had no flux law and no
+      saturation pressure, or a refused bound whose parent oxide was
+      never recorded (``missing_parent_oxide_inventory``). A partial
+      sum is not booked. The computed debit of that species still
+      reserves the parent oxide for its siblings. A refused interval
+      with a saturation pressure and a known charge is in the map at
+      the allocated bound and is flagged
+      ``supply_interval_upper_bound_used``. A sibling that the integral
+      did return is still booked.
+    - Run-total supply at or below the mass-balance ledger resolution:
+      authorized physical zero (``below_wall_supply_upper_bound``),
+      carrying the bound. Existing entries of that species are removed,
+      so a measurement above the supply cannot stay priced.
+      ``deposit_wall,i`` is 0, which is <= ``supply_i``.
+    - Supply above that resolution: the priced aggregate equals the
+      supply, once (``wall_deposit_upper_bound_used``). With eligibility it
+      occupies one segment; without it the separate worst-segment bound
+      carries the mass. Partial measurements of that species are removed
+      first. ``deposit_wall,i == supply_i``.
+
+    Booked masses stay in kg/run here. The per-campaign authority is
+    normalized only when it is published under its per-campaign key.
+    The shared physics classifier applies the ledger cutoff to the same
+    run-total supply on both booking paths.
+
+    The segments are chosen together, not one species at a time. The
+    maximum segment load equals the closed form in
+    ``_assign_refused_supplies_at_binding_load`` and does not depend on
+    species order. ``binding_segment`` is the argmax s* of that closed
+    form. Each species, including one that cannot use s*, is booked on
+    its own argmax of that same closed form. ``segment_loads_kg`` is the
+    located load on each segment. ``worst_max_load_kg`` includes the full
+    unlocated bound as an alternative on every declared segment.
+
+    The refusal stays on the notice authority in every branch.
+    """
+
+    notice_authority = _plain_payload(authority)
+    refused = _coating_wall_refused_species(notice_authority)
+    if not refused or run_execution is None:
+        return {
+            "deposit": wall_deposit,
+            "availability_authority": notice_authority,
+            "notice_authority": notice_authority,
+            "bookings": (),
+        }
+    window_campaigns_elapsed = (
+        _campaigns_elapsed(run_execution)
+        if campaigns_elapsed is None
+        else campaigns_elapsed
+    )
+    supply_kg = _refused_vapour_supply_kg(
+        run_execution,
+        refused,
+        snapshots,
+        campaigns_elapsed=window_campaigns_elapsed,
+    )
+    from simulator.optimize.physics import (
+        COMPUTED_EXCEEDS_INVENTORY,
+        INVENTORY_CAPPED,
+        SUPPLY_INTERVAL_UPPER_BOUND_USED,
+        SUPPLY_UNAVAILABLE,
+    )
+
+    raw_unavailable = getattr(supply_kg, SUPPLY_UNAVAILABLE, None)
+    if isinstance(raw_unavailable, MappingABC) and raw_unavailable:
+        notice_authority[SUPPLY_UNAVAILABLE] = {
+            str(species): list(reasons)
+            for species, reasons in raw_unavailable.items()
+            if str(species) not in supply_kg and reasons
+        }
+    charge_kg = _run_charge_mass_kg(run_execution)
+    if charge_kg is None or not supply_kg:
+        return {
+            "deposit": wall_deposit,
+            "availability_authority": notice_authority,
+            "notice_authority": notice_authority,
+            "bookings": (),
+        }
+
+    resolution_kg = _mass_balance_ledger_resolution_kg(charge_kg)
+    classified_supply = _classify_refused_wall_supply_window(
+        supply_kg.window,
+        resolution_kg,
+    )
+    notice_authority[WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN] = {
+        species: float(bound)
+        for species, bound in sorted(
+            classified_supply.upper_bound_kg_per_campaign.items()
+        )
+    }
+    raw_counts = supply_kg.window.supply_interval_upper_bound_used
+    bound_counts = raw_counts if isinstance(raw_counts, Mapping) else {}
+    interval_counts = {
+        str(species): int(bound_counts[species])
+        for species in supply_kg
+        if (
+            species in bound_counts
+            and isinstance(bound_counts[species], int)
+            and not isinstance(bound_counts[species], bool)
+            and bound_counts[species] > 0
+        )
+    }
+    if interval_counts:
+        notice_authority[SUPPLY_INTERVAL_UPPER_BOUND_USED] = interval_counts
+    raw_capped = supply_kg.window.inventory_capped
+    if isinstance(raw_capped, Mapping) and raw_capped:
+        notice_authority[INVENTORY_CAPPED] = {
+            str(species): True
+            for species in raw_capped
+            if species in supply_kg
+        }
+    raw_exceeded = supply_kg.window.computed_exceeds_inventory
+    if isinstance(raw_exceeded, Mapping) and raw_exceeded:
+        notice_authority[COMPUTED_EXCEEDS_INVENTORY] = {
+            str(species): True
+            for species in raw_exceeded
+            if species in supply_kg
+        }
+    booked_deposit = dict(wall_deposit)
+    bookings: list[dict[str, Any]] = []
+    booked_species: set[str] = set()
+    classified: list[tuple[str, float, tuple[str, ...], float]] = []
+    for species in refused:
+        if species not in supply_kg:
+            continue
+        supply = float(supply_kg.window.run_total_kg[species])
+        candidates = _refusal_candidate_segments(notice_authority, species)
+        # The window classifier compares this run total to ledger resolution
+        # and publishes its same-window per-campaign bound above.
+        booked_kg = classified_supply.booked_run_total_kg[species]
+        classified.append((species, supply, candidates, booked_kg))
+    for species, _supply, _candidates, booked_kg in classified:
+        if booked_kg == 0.0:
+            # Authorized physical zero. deposit_wall,i <= supply_i still
+            # applies: a kept measurement would price mass above the
+            # supply. Drop it before the closed form reads existing load.
+            _drop_species_wall_deposit(booked_deposit, species)
+    upper_species = {
+        species for species, _supply, _candidates, booked_kg in classified
+        if booked_kg > 0.0
+    }
+    model = getattr(getattr(run_execution, "simulator", None), "condensation_model", None)
+    assignment: dict[str, Any] | None = None
+    if upper_species:
+        assignment = _assign_refused_supplies_at_binding_load(
+            _positive_segment_loads_kg(booked_deposit, upper_species),
+            {
+                species: supply
+                for species, supply, _candidates, booked_kg in classified
+                if booked_kg > 0.0
+            },
+            {
+                species: candidates
+                for species, _supply, candidates, booked_kg in classified
+                if booked_kg > 0.0
+            },
+            unlocated_segments=(
+                tuple(segment.name for segment in model.pipe_segments)
+                if getattr(model, "lab_geometry", None) is not None
+                else PIPE_SEGMENT_NAMES
+            ),
+        )
+        unlocated = assignment["unlocated_supply_kg_by_species"]
+        if unlocated:
+            segment = assignment["binding_segment"]
+            zones = _coating_zone_by_segment(run_execution)
+            if zones is None or segment not in zones:
+                raise ObjectiveComputationError(f"missing wall zone for segment {segment}")
+            notice_authority[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = {
+                "bound_kg": assignment["unlocated_bound_kg"],
+                "supply_kg_by_species": unlocated,
+                "governing_segment": segment,
+                "governing_zone": zones[segment],
+                "potential_load_kg": assignment["worst_max_load_kg"],
+                "aggregate_potential_load_kg": assignment["aggregate_potential_load_kg"],
+                "campaigns_elapsed": window_campaigns_elapsed,
+            }
+    placements = (
+        {}
+        if assignment is None
+        else assignment["segment_by_species"]
+    )
+    for species, supply, candidates, booked_kg in classified:
+        if booked_kg == 0.0:
+            refusal_reason = _refusal_reason(
+                notice_authority,
+                species,
+                candidates[0] if candidates else "",
+            )
+            bookings.append({
+                "species": species,
+                "reason": BELOW_WALL_SUPPLY_UPPER_BOUND,
+                "deposit_kg": booked_kg,
+                "supply_upper_bound_kg": supply,
+                "ledger_resolution_kg": resolution_kg,
+                "refusal_reason": refusal_reason,
+            })
+            booked_species.add(species)
+            continue
+        # d-376 amendment 1 wall-deposit ruling: the scored mass is the
+        # supply bound. A partial deposit kept in another segment is the
+        # same vapour, so the aggregate is the supply and not
+        # measured + supply. Unlocated kilograms stay outside the segment map.
+        segment = placements.get(species)
+        refusal_reason = _refusal_reason(notice_authority, species, segment or "")
+        if segment is None:
+            _drop_species_wall_deposit(booked_deposit, species)
+        else:
+            _replace_species_deposit_with_supply(booked_deposit, species, segment, booked_kg)
+        bookings.append({
+            "species": species,
+            "reason": WALL_DEPOSIT_UPPER_BOUND_USED,
+            "deposit_kg": booked_kg,
+            "supply_upper_bound_kg": supply,
+            "ledger_resolution_kg": resolution_kg,
+            "refusal_reason": refusal_reason,
+            "flag": WALL_DEPOSIT_UPPER_BOUND_USED,
+        })
+        booked_species.add(species)
+    for booking in bookings:
+        species = str(booking["species"])
+        interval_count = bound_counts.get(species, 0)
+        if (
+            isinstance(interval_count, int)
+            and not isinstance(interval_count, bool)
+            and interval_count > 0
+        ):
+            booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] = int(interval_count)
+    if bookings:
+        notice_authority["wall_supply_bound_bookings"] = tuple(bookings)
+    booked = {
+        "deposit": booked_deposit,
+        "availability_authority": _authority_without_booked_refusals(
+            notice_authority,
+            booked_species,
+        ),
+        "notice_authority": notice_authority,
+        "bookings": tuple(bookings),
+    }
+    if assignment is not None:
+        booked["binding_segment"] = assignment["binding_segment"]
+        booked["segment_loads_kg"] = assignment["segment_loads_kg"]
+        booked["closed_form_kg"] = assignment["closed_form_kg"]
+        booked["worst_max_load_kg"] = assignment["worst_max_load_kg"]
+    return booked
+
+
+def _margin_wall_refused_species(payload: Mapping[str, Any]) -> tuple[str, ...]:
+    """Saturation-refused species named on a coating-margin payload."""
+
+    sources: list[Mapping[str, Any]] = [payload]
+    for key in ("sticking_alpha_authority", "wall_deposit_sticking_authority"):
+        nested = payload.get(key)
+        if isinstance(nested, Mapping):
+            sources.append(nested)
+    refusal = payload.get("wall_deposit_refusal")
+    if isinstance(refusal, Mapping):
+        authority = refusal.get("authority")
+        if isinstance(authority, Mapping):
+            sources.append(authority)
+    return _coating_wall_refused_species(*sources)
+
+
+def _booked_margin_refusal_is_priced(
+    summary: Mapping[str, Any],
+    payload: Mapping[str, Any],
+) -> bool:
+    """True when the margin's saturation refusals are already supply-booked.
+
+    The margin is the pre-booking gate. Copying its unavailable verdict
+    back onto the summary would unprice a figure the supply bound replaced.
+    A margin that names no saturation refusal, or a summary whose coating
+    quantity is still unavailable, keeps the gate verdict.
+    """
+
+    refused = _margin_wall_refused_species(payload)
+    if not refused or str(summary.get("coating_status", "")) == "unavailable":
+        return False
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=False,
+        authority={
+            "wall_saturation_pressure_refused_species": refused,
+            "wall_supply_bound_bookings": summary.get("wall_supply_bound_bookings") or (),
+        },
+    )
+    return availability.status != "refused"
+
+
 def _coating_lifetime_projection(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
@@ -5312,15 +6078,21 @@ def _coating_lifetime_projection(
         for species_kg in by_segment.values()
         if sum(species_kg.values()) > 0.0
     ]
-    by_species = _wall_deposit_by_species_summary(
-        wall_deposit_by_segment_species
-    )
-    aggregate_load = sum(by_species.values()) / elapsed
+    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
+    unlocated = (authority or {}).get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
+    if unlocated:
+        segment_loads.append(float(unlocated["potential_load_kg"]) / elapsed)
+    aggregate_load = (
+        float(unlocated["aggregate_potential_load_kg"])
+        if unlocated else sum(by_species.values())
+    ) / elapsed
+    threshold = _wall_resinter_threshold_kg()
+    if threshold is not None and threshold <= 0.0:
+        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
     if not segment_loads:
         campaigns_to_resinter: float | str = "infinite"
         aggregate_campaigns_to_resinter: float | str = "infinite"
     else:
-        threshold = _wall_resinter_threshold_kg()
         controlling_load = max(segment_loads)
         campaigns_to_resinter = (
             _ungrounded_campaigns_to_resinter(controlling_load)
@@ -5340,7 +6112,7 @@ def _coating_lifetime_projection(
     lifetime = campaigns_to_resinter
     has_positive_fouling: bool | None = _has_positive_wall_deposit(
         wall_deposit_by_segment_species
-    )
+    ) or bool(unlocated and unlocated["bound_kg"] > 0.0)
     availability = wall_deposit_figure_availability(
         has_positive_deposit=has_positive_fouling,
         authority=authority,
@@ -5350,7 +6122,18 @@ def _coating_lifetime_projection(
     if isinstance(payload, Mapping) and payload.get(
         "coating_constraint_mode"
     ) != "no_unqualified_deposition":
-        if "campaigns_to_resinter_worst_segment" in payload:
+        # The coating margin is the pre-booking gate. Once every
+        # saturation refusal it names has been booked, its rate and
+        # lifetime describe the unbooked deposit. The booked deposit
+        # is the priced mass (the supply, or the authorized zero). A
+        # null rate with no named saturation refusal is still unavailable.
+        margin_refusals_are_booked = (
+            availability.status != "refused"
+            and bool(_margin_wall_refused_species(payload))
+        )
+        if not margin_refusals_are_booked and (
+            "campaigns_to_resinter_worst_segment" in payload
+        ):
             rate = payload.get("wall_deposit_kg_per_campaign")
             raw_lifetime = payload["campaigns_to_resinter_worst_segment"]
             if raw_lifetime is None or rate is None:
@@ -5368,7 +6151,8 @@ def _coating_lifetime_projection(
                 lifetime = raw_lifetime
                 has_positive_fouling = numeric_rate > 0.0
         elif (
-            "wall_deposit_kg_per_campaign" in payload
+            not margin_refusals_are_booked
+            and "wall_deposit_kg_per_campaign" in payload
             and payload["wall_deposit_kg_per_campaign"] is None
         ):
             unavailable = True
@@ -5383,6 +6167,10 @@ def _coating_lifetime_projection(
         "aggregate_campaigns_to_resinter": aggregate_campaigns_to_resinter,
         "campaigns_to_resinter_worst_segment": lifetime,
         "has_positive_qualified_fouling": has_positive_fouling,
+        "resinter_threshold_kg": threshold,
+        "furnace_lifespan_consumed_fraction": (
+            None if unavailable or threshold is None else aggregate_load / threshold
+        ),
     }
     if availability.refusal is not None:
         result["wall_deposit_refusal"] = availability.refusal
@@ -5415,6 +6203,9 @@ def _campaigns_elapsed(run_execution: Any) -> float:
 def _wall_deposit_by_species_summary(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
 ) -> Mapping[str, float]:
+    # Booked totals contain only physical-segment entries. An unlocated supply
+    # bound predicts an alternative load; adding it here would report scenario
+    # kilograms as booked mass. Lifetime consumes the separate bound record.
     by_species: dict[str, float] = {}
     for key, kg in wall_deposit_by_segment_species.items():
         if not isinstance(key, tuple) or len(key) != 2:
@@ -5425,8 +6216,9 @@ def _wall_deposit_by_species_summary(
         if kg is None:
             continue
         amount = _finite_float(kg, f"wall_deposit[{key!r}]")
-        if amount > 1e-12:
-            by_species[species] = by_species.get(species, 0.0) + amount
+        priced = _priced_wall_deposit_kg(amount)
+        if priced is not None:
+            by_species[species] = by_species.get(species, 0.0) + priced
     return MappingProxyType(dict(sorted(by_species.items())))
 
 
@@ -5456,13 +6248,19 @@ def _furnace_lifespan_cost_summary(
     sim: Any,
 ) -> Mapping[str, Any]:
     raw = _wall_deposit_metric_raw(run_execution, sim)
-    return _furnace_lifespan_cost_summary_from_raw(
-        raw,
-        campaigns_elapsed=(
-            _campaigns_elapsed(run_execution) if run_execution is not None else 1.0
-        ),
-        authority=_coating_authority_status(raw, run_execution),
+    authority = _coating_authority_status(raw, run_execution)
+    booked = _book_wall_deposits_at_vapour_supply(raw, authority, run_execution)
+    summary = dict(
+        _furnace_lifespan_cost_summary_from_raw(
+            booked["deposit"],
+            campaigns_elapsed=(
+                _campaigns_elapsed(run_execution) if run_execution is not None else 1.0
+            ),
+            authority=booked["availability_authority"],
+        )
     )
+    summary.update(_wall_supply_booking_fields(booked))
+    return MappingProxyType(summary)
 
 
 def _furnace_lifespan_cost_summary_from_raw(
@@ -5476,7 +6274,7 @@ def _furnace_lifespan_cost_summary_from_raw(
     if elapsed <= 0.0:
         raise ObjectiveComputationError("campaigns_elapsed must be positive")
     cumulative_by_species = _wall_deposit_by_species_summary(
-        wall_deposit_by_segment_species
+        wall_deposit_by_segment_species,
     )
     cumulative_total_wall_load_kg = sum(cumulative_by_species.values())
     by_species = MappingProxyType({
@@ -5484,9 +6282,6 @@ def _furnace_lifespan_cost_summary_from_raw(
         for species, kg in cumulative_by_species.items()
     })
     total_wall_load_kg = cumulative_total_wall_load_kg / elapsed
-    threshold = _wall_resinter_threshold_kg()
-    if threshold is not None and threshold <= 0.0:
-        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
     lifetime = _coating_lifetime_projection(
         wall_deposit_by_segment_species,
         campaigns_elapsed=elapsed,
@@ -5496,8 +6291,9 @@ def _furnace_lifespan_cost_summary_from_raw(
     wall_deposit_unavailable = (
         lifetime["has_positive_qualified_fouling"] is None
     )
+    threshold = lifetime["resinter_threshold_kg"]
     summary: dict[str, Any] = {
-        "furnace_lifespan_consumed_fraction": None,
+        **lifetime,
         "lifespan_cost_status": (
             "wall_deposit_unavailable"
             if wall_deposit_unavailable
@@ -5532,7 +6328,6 @@ def _furnace_lifespan_cost_summary_from_raw(
         return MappingProxyType(summary)
     if threshold is None:
         return MappingProxyType(summary)
-    summary["furnace_lifespan_consumed_fraction"] = total_wall_load_kg / threshold
     summary["lifespan_cost_status"] = "available"
     summary["lifespan_cost_status_reason"] = ""
     return MappingProxyType(summary)
@@ -6470,20 +7265,13 @@ def _depreciation_expense_per_run_summary(
         return MappingProxyType(payload)
     threshold = summary.get("resinter_threshold_kg")
     wall_load = _finite_float(summary.get("wall_deposit_total_kg", 0.0), "wall_deposit_total_kg")
-    availability = wall_deposit_figure_availability(
-        has_positive_deposit=wall_load > 0.0,
-        refusal=summary.get("wall_deposit_refusal"),
-    )
     if threshold is not None:
-        threshold_kg = _finite_float(threshold, "resinter_threshold_kg")
-        if threshold_kg <= 0.0:
-            raise ObjectiveComputationError("resinter_threshold_kg must be positive")
-        if availability.status == "measured_empty":
+        if not summary["has_positive_qualified_fouling"]:
             campaigns_to_resinter = None
             depreciation = 0.0
             status = "no_wall_deposit"
         else:
-            campaigns_to_resinter = threshold_kg / wall_load
+            campaigns_to_resinter = summary["aggregate_campaigns_to_resinter"]
             if campaigns_to_resinter <= 0.0:
                 raise ObjectiveComputationError(
                     "aggregate campaigns_to_resinter must be positive"
@@ -6495,7 +7283,7 @@ def _depreciation_expense_per_run_summary(
         campaigns_to_resinter = None
         depreciation = cost_parameters.depreciation_expense_per_run
         status = "configured_default"
-    return MappingProxyType({
+    payload = {
         "status": status,
         "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
         "depreciation_expense_per_run_usd": depreciation,
@@ -6505,7 +7293,10 @@ def _depreciation_expense_per_run_summary(
         "campaigns_to_resinter": campaigns_to_resinter,
         "resinter_threshold_kg": threshold,
         "wall_deposit_total_kg": wall_load,
-    })
+    }
+    if UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT in summary:
+        payload[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] = summary[UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT]
+    return MappingProxyType(payload)
 
 
 def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float | None]:

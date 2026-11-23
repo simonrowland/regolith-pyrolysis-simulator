@@ -81,7 +81,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - transition_temperature
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: archakov-1999-titania-slag-evaporation::archakov_1999_melting_point_tio2_37_60::T=1643:h=132caa56cecd
   source_id: archakov-1999-titania-slag-evaporation
   locator:
     page: 3
@@ -127,6 +132,22 @@ observations:
         published_page: 1466
         pdf_page_index: 2
         section: Results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 3
+        published_page: 1466
+        pdf_page_index: 2
+        section: Results and discussion
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: identity:K
     inputs:

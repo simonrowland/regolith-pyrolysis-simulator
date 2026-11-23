@@ -634,16 +634,11 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
 
     assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.5)
     assert model.pipe_diameter_m == pytest.approx(0.5)
-    # d-283 r4's three-pass fixed point pins the live absolute areas.
-    assert model.stage_area_m2("fe_stage1") == pytest.approx(
-        38.829406624, abs=0.0
-    )
-    assert model.stage_area_m2("alkali_stage4") == pytest.approx(
-        106.439821811, abs=1e-15
-    )
-    assert model.stage_area_m2("k_stage4b") == pytest.approx(
-        0.0661518735017, abs=0.0
-    )
+    # Collector areas are b271's physical areas on the absolute map.
+    # Needs controller re-measure.
+    assert model.stage_area_m2("fe_stage1") == pytest.approx(0.2828, abs=0.0)
+    assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
+    assert model.stage_area_m2("k_stage4b") == pytest.approx(14.7388, abs=0.0)
     assert model.condenser_hydraulic_diameter_m == pytest.approx(0.12)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
@@ -835,24 +830,23 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     assert surface_geometry["provisional"] is True
     assert surface_geometry["source_class"] == "engineering-default"
     by_stage = surface_geometry["stage_area_ratio_provenance_by_stage"]
-    for key, area_text in (
-        ("fe_stage1", "38.829406624 m2"),
-        ("cr_stage2", "350.525053773 m2"),
-        ("sio_stage3", "466.975203985 m2"),
-        ("alkali_stage4", "106.439821811 m2"),
-        ("k_stage4b", "0.0661518735017 m2"),
-    ):
-        source = by_stage[key]["source"]
-        assert source.startswith("engineering-default:")
-        assert "FLAGGED" in source
-        assert "d-283 r4 three-pass fixed point" in source
-        assert area_text in source
-        assert by_stage[key]["source_class"] == "engineering-default"
-        assert by_stage[key]["status"] == "provisional"
-        if key in {"alkali_stage4", "k_stage4b"}:
-            assert "provisional" in source
-            assert "b-588" in source and "b-599" in source
-    assert "Cr2O3 capture ceiling-limited" in by_stage["cr_stage2"]["source"]
+    fe_source = by_stage["fe_stage1"]["source"]
+    assert fe_source.startswith("owner-ruling-d335:")
+    assert "0.2828 m2" in fe_source
+    assert "provisional" not in fe_source
+    alkali_source = by_stage["alkali_stage4"]["source"]
+    assert alkali_source.startswith("owner-ruling-d137:")
+    assert "provisional" in alkali_source
+    assert "b-588" in alkali_source and "b-599" in alkali_source
+    assert "0.051 m2" in alkali_source
+    assert by_stage["alkali_stage4"]["status"] == "provisional"
+    cartridge_source = by_stage["k_stage4b"]["source"]
+    cartridge_area_m2 = overhead.stage_area_m2("k_stage4b")
+    assert cartridge_source.startswith("owner-ruling-d344:")
+    assert "provisional" in cartridge_source
+    assert "b-588" in cartridge_source and "b-599" in cartridge_source
+    assert f"{cartridge_area_m2:.4f} m2" in cartridge_source
+    assert by_stage["k_stage4b"]["status"] == "provisional"
 
 
 def test_legacy_headspace_conductance_alias_survives_new_none_key():

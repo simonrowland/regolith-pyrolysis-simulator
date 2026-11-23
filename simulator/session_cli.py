@@ -14,6 +14,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.campaigns import parse_campaign_override_value
 from simulator.backends import BackendSelectionPolicy
 from simulator.config import load_config_bundle
 from simulator.runner import DATA_DIR, RunnerError, build_per_hour_summary
@@ -180,7 +181,7 @@ class SessionScriptRunner:
             campaign, field = args[1], args[2]
             value = " ".join(args[3:])
             if field != "carrier_gas":
-                value = float(value)
+                value = parse_campaign_override_value(field, value)
             self.session.adjust(
                 "campaign_override",
                 value,
@@ -463,7 +464,8 @@ def _parse_setpoint_overrides(
                 f"expected CAMPAIGN.FIELD=VALUE setpoint, got {item!r}"
             )
         overrides.setdefault(campaign, {})[field] = (
-            value if field == "carrier_gas" else float(value)
+            value if field == "carrier_gas"
+            else parse_campaign_override_value(field, value)
         )
     from simulator.campaigns import CampaignManager
 
@@ -488,7 +490,8 @@ def _parse_override_json(
         for field, value in fields.items():
             field_name = str(field)
             target[field_name] = (
-                value if field_name == "carrier_gas" else float(value)
+                value if field_name == "carrier_gas"
+                else parse_campaign_override_value(field_name, value)
             )
     from simulator.campaigns import CampaignManager
 

@@ -953,4 +953,3 @@ def render_payload_score_report_markdown(
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
     return "\n".join(lines)
-

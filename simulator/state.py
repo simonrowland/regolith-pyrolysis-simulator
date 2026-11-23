@@ -20,10 +20,16 @@ from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     K_TRAP_SUB_ORDER,
     NA_COLLECTOR_STAGE_KEY,
+    STAGE3_BYPASS_SEGMENT_NAME,
+    pipe_segment_name,
     target_species_for_stage_key,
     target_species_for_stage_number,
 )
-from simulator.config import resolve_collector_bands_C, resolve_substage_bands_C
+from simulator.config import (
+    resolve_alkali_cartridge_melt_out_C,
+    resolve_collector_bands_C,
+    resolve_substage_bands_C,
+)
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
@@ -752,6 +758,9 @@ class CondensationStage:
     # stage 4 and keeps stage_number 4. route() is the visit-order owner.
     sub_order: int = 0
     stage_key: str = ''
+    # Alkali freeze-out cartridge only. None means the swing does not
+    # move the hour's capture off the train.
+    melt_out_temperature_C: float | None = None
 
     def total_collected_kg(self) -> float:
         return sum(self.collected_kg.values())
@@ -764,9 +773,9 @@ class CondensationStage:
 
 
 PIPE_SEGMENT_NAMES = tuple(
-    f'stage_{stage_number}_to_stage_{stage_number + 1}'
+    pipe_segment_name(stage_number, stage_number + 1)
     for stage_number in range(7)
-)
+) + (STAGE3_BYPASS_SEGMENT_NAME,)
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX = 'process.wall_deposit_segment_'
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'
@@ -877,11 +886,11 @@ class CondensationTrain:
     stay those public stages. route() visits it after stage 4.
 
     Stage 0: Hot duct (>1400°C) — IR spectroscopy, no condensation
-    Stage 1: Fe condenser (1150°C wall)
+    Stage 1: Fe condenser (1100°C wall)
     Stage 2: Cr oxide harvester (1100-1300°C)
     Stage 3: SiO zone (900-1200°C) — removable fused silica baffles
     Stage 4: Na collector / alkali cyclone (250°C wall). Mg stays here.
-    Stage 4b: K cold trap (40°C wall), sub_order 1
+    Stage 4b: Alkali freeze-out cartridge (40°C wall), sub_order 1
     Stage 5: Vortex dust filter (200-350°C)
     Stage 6: Turbine/compressor — pressure regulation
     Stage 7: O₂ accumulator (~3 bar)
@@ -890,6 +899,16 @@ class CondensationTrain:
     after devolatilisation.
     """
     stages: List[CondensationStage] = field(default_factory=list)
+
+    # Ideal isolation of both ends of the fused-silica cartridge.
+    collection_route: dict[str, Any] = field(
+        default_factory=lambda: {"stage3_route": "divert"})
+
+    @property
+    def active_stages(self) -> List[CondensationStage]:
+        return [stage for stage in self.stages
+                if stage.stage_number != 3
+                or self.collection_route["stage3_route"] == "through"]
 
     # Volatiles train (sealed after C0/C0b)
     volatiles_collected_kg: Dict[str, float] = field(default_factory=dict)
@@ -913,6 +932,7 @@ class CondensationTrain:
         """
         bands = resolve_collector_bands_C(setpoints)
         k_band = resolve_substage_bands_C(setpoints)[K_TRAP_STAGE_KEY]
+        melt_out_C = resolve_alkali_cartridge_melt_out_C(setpoints)
         stages = [
             CondensationStage(0, 'Hot Duct (IR)',
                               bands[0], []),
@@ -935,11 +955,12 @@ class CondensationTrain:
                               bands[6], []),
             CondensationStage(7, 'Turbine Outlet Monitor',
                               bands[7], []),
-            CondensationStage(4, 'K Cold Trap',
+            CondensationStage(4, 'Alkali freeze-out cartridge',
                               k_band,
                               target_species_for_stage_key(K_TRAP_STAGE_KEY),
                               sub_order=K_TRAP_SUB_ORDER,
-                              stage_key=K_TRAP_STAGE_KEY),
+                              stage_key=K_TRAP_STAGE_KEY,
+                              melt_out_temperature_C=melt_out_C),
         ]
         return CondensationTrain(stages=stages)
 
@@ -1212,6 +1233,7 @@ class HourSnapshot:
     mre_declared_rung_V: float = 0.0
     mre_current_A: float = 0.0  # Effective Faradaic current, never nominal dispatch
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
+    mre_decomposition_voltage_status_by_oxide: Dict[str, str] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
     mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)
     metal_phase_stratification: Dict[str, Any] = field(default_factory=dict)

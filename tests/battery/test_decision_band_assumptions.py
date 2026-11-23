@@ -12,6 +12,7 @@ from simulator.battery import method_class_bands as owner
 from simulator.battery import score
 from simulator.battery.enums import (
     MEASURED_EVIDENCE,
+    AdmissionStatus,
     AmountBasis,
     EvidenceClass,
     MethodToken,
@@ -21,7 +22,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.migrate import Migrator, to_plain
-from simulator.battery.records import Composition, State, Uncertainty
+from simulator.battery.records import Composition, DecisionBand, State, Uncertainty
 from simulator.battery.score import ScoreContext
 from simulator.battery.score_metrics import metric_operation_for_identity
 from tests.battery import factories as F
@@ -487,7 +488,24 @@ def _derived_band_for(observation, bands, empirical_ids):
 
 
 def test_real_source_rows_assert_scorer_owned_assumption_outcomes():
-    """Pin positive and negative d-443 outcomes from real migrated rows."""
+    """Pin positive and negative d-443 outcomes from real migrated rows.
+
+    Before car unc a6c901c2d the scorer treated a non-cell note as a printed
+    uncertainty. Sossi Table 2 residue points were 430
+    ``printed_uncertainty_unit_unmapped`` (Table 1 ``starting_measured_stdev_ppm``
+    on rows whose note says Table 2 prints no per-run uncertainty) and 86
+    ``unparseable_printed_uncertainty`` (the 6.0% median-misfit note). MS2000
+    Table 1 activities were 24 measured and 24 non-measured
+    ``unparseable_printed_uncertainty`` (the note "Table 1 states no uncertainty
+    for this point."). Those cells are now ``UncertaintyKind.NONE``
+    (6002e7f575, 414715770e, 9bff044d6f). The four old refusal counts are 0.
+    A measured row with no printed uncertainty and no matching method class
+    records ``method_class_applicability_unknown`` and does not invent a band.
+    A non-measured row stays out of the stratum. Both cohorts still have a
+    numeric comparison whose headline ``decision_band`` is None and whose
+    status is ``NO_BAND``. A band returned on that comparison fails the pin
+    even when the assumed stratum stays empty.
+    """
 
     context = _survey_context()
     entries, _missing, _history = score._read_decision_band_ratchet(context.root)
@@ -543,6 +561,53 @@ def test_real_source_rows_assert_scorer_owned_assumption_outcomes():
             assert residual.assumed_band is None
             assert reason == "conversion_uncertainty_unprinted"
             continue
+        if (
+            observation.source_id == "kems-012-sossi-2019"
+            and token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and observation.uncertainty.kind is UncertaintyKind.NONE
+        ):
+            # 344 admitted + 172 superseded = the old 430 + 86 points.
+            counts["sossi_residue_none"] += 1
+            assert evidence.is_value and evidence.value in MEASURED_EVIDENCE
+            assert reason is None
+            assert residual.assumed_band is None
+            assert residual.assumed_band_details is not None
+            assert "band" not in residual.assumed_band_details
+            assert (
+                residual.assumed_band_details["refusal"]["reason"]
+                == "method_class_applicability_unknown"
+            )
+            assert residual.numeric is not None
+            assert residual.numeric.decision_band is None
+            assert residual.status is score.ResidualStatus.NO_BAND
+            continue
+        if (
+            observation.source_id == "kems-ms2000-044"
+            and token is Quantity.ACTIVITY
+            and observation.uncertainty.kind is UncertaintyKind.NONE
+            and observation.admission.status is AdmissionStatus.ADMITTED
+        ):
+            cohort = (
+                "measured"
+                if evidence.is_value and evidence.value in MEASURED_EVIDENCE
+                else "other"
+            )
+            counts[("ms2000_none", cohort)] += 1
+            assert reason is None
+            assert residual.assumed_band is None
+            assert residual.numeric is not None
+            assert residual.numeric.decision_band is None
+            assert residual.status is score.ResidualStatus.NO_BAND
+            if cohort == "measured":
+                assert residual.assumed_band_details is not None
+                assert "band" not in residual.assumed_band_details
+                assert (
+                    residual.assumed_band_details["refusal"]["reason"]
+                    == "method_class_applicability_unknown"
+                )
+            else:
+                assert residual.assumed_band_details is None
+            continue
         if reason not in {
             "printed_uncertainty_unit_unmapped",
             "unparseable_printed_uncertainty",
@@ -561,7 +626,51 @@ def test_real_source_rows_assert_scorer_owned_assumption_outcomes():
             counts[(observation.source_id, reason, cohort)] += 1
             assert residual.assumed_band_details is None
     assert counts["kambayashi"] == 20
-    assert counts[("kems-012-sossi-2019", "printed_uncertainty_unit_unmapped")] == 430
-    assert counts[("kems-012-sossi-2019", "unparseable_printed_uncertainty")] == 86
-    assert counts[("kems-ms2000-044", "unparseable_printed_uncertainty", "measured")] == 24
-    assert counts[("kems-ms2000-044", "unparseable_printed_uncertainty", "other")] == 24
+    assert counts["sossi_residue_none"] == 516
+    assert counts[("kems-012-sossi-2019", "printed_uncertainty_unit_unmapped")] == 0
+    assert counts[("kems-012-sossi-2019", "unparseable_printed_uncertainty")] == 0
+    assert counts[("ms2000_none", "measured")] == 24
+    assert counts[("ms2000_none", "other")] == 24
+    assert counts[("kems-ms2000-044", "unparseable_printed_uncertainty", "measured")] == 0
+    assert counts[("kems-ms2000-044", "unparseable_printed_uncertainty", "other")] == 0
+
+
+def test_derived_ms2000_headline_band_fails_the_real_source_survey(monkeypatch):
+    """Restoring a headline band on the 24 derived MS2000 activities turns the pin red.
+
+    Those rows are outside the assumed stratum, so the stratum checks pass
+    while ``numeric.decision_band`` is filled and match status leaves
+    ``NO_BAND``. Removing both headline asserts lets this mutation complete.
+    """
+
+    original = score.compile_residual
+    mutated = False
+
+    def observe(observation, *args, **kwargs):
+        nonlocal mutated
+        residual, candidate = original(observation, *args, **kwargs)
+        identity = observation.identity
+        token = quantity_token(identity) if isinstance(identity, Identity) else None
+        evidence = observation.evidence.class_
+        measured = evidence.is_value and evidence.value in MEASURED_EVIDENCE
+        if (
+            observation.source_id == "kems-ms2000-044"
+            and token is Quantity.ACTIVITY
+            and observation.admission.status is AdmissionStatus.ADMITTED
+            and observation.uncertainty.kind is UncertaintyKind.NONE
+            and not measured
+            and residual.numeric is not None
+        ):
+            mutated = True
+            band = DecisionBand(Decimal("0.01"), residual.numeric.unit, "mutation")
+            numeric = replace(residual.numeric, decision_band=band)
+            residual = replace(
+                residual, numeric=numeric, status=score.match_status(numeric)
+            )
+        return residual, candidate
+
+    monkeypatch.setattr(score, "compile_residual", observe)
+    with pytest.raises(AssertionError) as rejected:
+        test_real_source_rows_assert_scorer_owned_assumption_outcomes()
+    assert mutated
+    assert "decision_band" in str(rejected.value)

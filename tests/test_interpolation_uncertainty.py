@@ -146,7 +146,10 @@ def test_threshold_touch_is_categorical_non_interpolable(
 @pytest.mark.parametrize("alkali", ("Na", "K"))
 def test_alkali_boiling_threshold_touch_uses_yaml_nist_rows(alkali: str) -> None:
     row = _load_vapor_pressures()["metals"][alkali]
-    assert "NIST Chemistry WebBook SRD 69" in row["pure_component_antoine"]["source"]
+    if alkali == "Na":
+        assert "ANL/RE-95/2" in row["pure_component_saturation"]["source"]
+    else:
+        assert "NIST Chemistry WebBook SRD 69" in row["pure_component_antoine"]["source"]
     boiling_K = float(row["boiling_point_C"]) + 273.15
     vector = build_interpolation_uncertainty_vector(
         _key(
@@ -174,7 +177,10 @@ def test_alkali_boiling_threshold_touch_uses_yaml_nist_rows(alkali: str) -> None
     assert len(surfaces) == 1
     assert surfaces[0]["surface"] == f"{alkali}_normal_boiling_point"
     assert surfaces[0]["threshold_K"] == pytest.approx(boiling_K)
-    assert "data/vapor_pressures.yaml NIST WebBook SRD 69" in surfaces[0]["source"]
+    if alkali == "Na":
+        assert surfaces[0]["source"] == "data/vapor_pressures.yaml boiling_point_C 883"
+    else:
+        assert "data/vapor_pressures.yaml NIST WebBook SRD 69" in surfaces[0]["source"]
 
 
 def test_nonlinearity_component_uses_quadratic_fit_when_neighborhood_exists() -> None:

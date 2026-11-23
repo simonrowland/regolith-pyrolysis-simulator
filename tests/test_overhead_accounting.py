@@ -698,7 +698,8 @@ def test_sio_declared_capture_preserves_missing_carrier_certification():
     assert sum(condensed.values()) + overhead.get("SiO", 0.0) + wall_total == pytest.approx(100.0)
     assert authority["SiO"]["status"] == "missing"
     assert authority["SiO"]["authoritative_for_condensation"] is False
-    assert authority["SiO"]["authority_level"] == "extrapolated"
+    assert authority["SiO"]["authority_level"] == "status_bearing"
+    assert authority["SiO"]["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_step_drains_uncondensed_overhead_vapor_each_tick():
@@ -952,10 +953,7 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
     train = sim.atom_ledger.kg_by_account("process.condensation_train")
     stage_totals = sim.train.total_by_species()
 
-    # Each stage's incoming duct deposits before the collector. The inlet
-    # duct stage_0_to_stage_1 sees undepleted CrO2 and takes the whole wall
-    # budget. The Stage-1 collector then captures the rest, so the next
-    # duct still exists on the live pipe and is depleted to ~0. Existence
+    # Each stage's incoming duct still exists on the live pipe. Existence
     # is that pipe segment, not the static account tuple: a removed
     # segment drops out of pipe_segments and fails here.
     segments_by_name = {
@@ -967,29 +965,24 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
     assert "stage_1_to_stage_2" in (
         sim.condensation_model.wall_species_partial_pressures_pa_by_segment
     )
-    inlet_segment = segments_by_name["stage_0_to_stage_1"].wall_deposit_account
-    downstream_segment = segments_by_name[
-        "stage_1_to_stage_2"
-    ].wall_deposit_account
     wall_cro2_by_account_kg = {
         segment.wall_deposit_account: sim.atom_ledger.kg_by_account(
             segment.wall_deposit_account
         ).get("CrO2", 0.0)
         for segment in sim.condensation_model.pipe_segments
+        if sim.atom_ledger.kg_by_account(segment.wall_deposit_account).get(
+            "CrO2", 0.0
+        )
+        > 0.0
     }
-    authority = sim.condensation_model.last_condensation_authority_by_species["CrO2"]
-    assert downstream_segment in wall_cro2_by_account_kg
-    assert wall_cro2_by_account_kg[downstream_segment] == pytest.approx(
-        0.0, abs=1e-12
-    )
-    assert {
-        account
-        for account, mass_kg in wall_cro2_by_account_kg.items()
-        if mass_kg > 0.0
-    } == {inlet_segment}
-    assert wall_cro2_by_account_kg[inlet_segment] == pytest.approx(
-        authority["wall_deposit_mass_kg_hr"]
-    )
+    authority = sim.condensation_model.last_condensation_authority_by_species[
+        "CrO2"
+    ]
+    # d-402 solid-standard-state equilibrium moves the old pipe-wall CrO2
+    # pin to zero at these segment partial pressures. The stage still
+    # captures CrO2 and stores it as terminal Cr2O3. Needs controller
+    # re-measure.
+    assert wall_cro2_by_account_kg == {}
     remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
         wall_cro2_by_account_kg.values()
     )

@@ -115,6 +115,12 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "TiO2",
     "Cr2O3",
     "REE_oxides",
+    "Y2O3",
+    "Sc2O3",
+    "ZrO2",
+    "HfO2",
+    "ThO2",
+    "UO2",
 }) | REE_OXIDE_SPECIES
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({"Fe", "Ni", "Co", "Mn"})
@@ -309,6 +315,14 @@ class AccountingQueries:
         )
 
     def product_ledger(self) -> dict[str, float]:
+        """Flat kilogram map of separated products only.
+
+        ``process.alkali_cartridge_solid_residue`` is not a member.
+        That mixed condensate stays on its own account.
+        ``classify_products`` reports it as the
+        ``alkali_cartridge_solid_residue`` class. Merging it into this
+        map made readers treat residue metal as an ingot.
+        """
         products: dict[str, float] = {}
         for account in PRODUCT_LEDGER_ACCOUNTS:
             _merge_masses(
@@ -648,10 +662,12 @@ class AccountingQueries:
         initial_total_kg = sum(initial.values())
         terminal_total_kg = sum(terminal.values())
         initial_ree_kg = sum(
-            float(initial.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+            float(initial.get(species, 0.0))
+            for species in sorted(REE_OXIDE_SPECIES, key=str)
         )
         terminal_ree_kg = sum(
-            float(terminal.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+            float(terminal.get(species, 0.0))
+            for species in sorted(REE_OXIDE_SPECIES, key=str)
         )
         initial_wt_pct = (
             initial_ree_kg / initial_total_kg * 100.0
@@ -924,6 +940,13 @@ class AccountingQueries:
         return bound_kg
 
     def condensation_totals_with_terminal_oxygen(self) -> dict[str, float]:
+        """Live condenser-train inventory, plus stored melt-offgas oxygen.
+
+        The freeze-out swing returns liquid Na and K to this train and
+        parks every other solid on the cartridge residue. This reader
+        stays on the train: it is current train inventory, not the
+        residue census and not gross capture.
+        """
         totals = {
             species: float(kg)
             for species, kg in self.ledger.project_account_kg(

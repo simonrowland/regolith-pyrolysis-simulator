@@ -19,8 +19,17 @@ from simulator.accounting.queries import (
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import EvaporationFlux, MOLAR_MASS
-from simulator.trace import PhysicsTrace
+from simulator.optimize.objective import (
+    _assign_refused_supplies_at_binding_load,
+    _refusal_candidate_segments,
+)
+from simulator.state import EvaporationFlux, MOLAR_MASS, PIPE_SEGMENT_NAMES
+from simulator.condensation_routing import STAGE3_BYPASS_SEGMENT_NAME, pipe_segment_name
+from simulator.trace import (
+    PhysicsTrace,
+    WALL_DEPOSIT_ZONE_NAMES,
+    wall_deposit_kg_by_zone_species,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -182,6 +191,58 @@ def test_snapshot_deltas_sum_to_cumulative_trace_totals():
     for key, kg in wall_by_segment_species.items():
         assert trace.wall_deposit_by_segment_species_kg.get(
             key, 0.0) == pytest.approx(kg, abs=1e-9)
+
+
+@pytest.mark.parametrize("route", ["through", "divert"])
+def test_wall_zone_map_covers_every_declared_wall_and_booking_candidate(route):
+    sim = _representative_sim(hours=0)
+    model = sim.condensation_model
+    sim.campaign_mgr.overrides.setdefault(sim.melt.campaign.name, {})["stage3_route"] = route
+    sim.campaign_mgr.apply_collection_route(sim.melt, sim.train)
+    model.configure_operating_conditions()
+    active = {segment.name for segment in model.active_pipe_segments}
+    declared_segments = set(PIPE_SEGMENT_NAMES)
+    assert active <= declared_segments
+    assert {segment.name for segment in model.pipe_segments} | {STAGE3_BYPASS_SEGMENT_NAME} == declared_segments
+    assert (STAGE3_BYPASS_SEGMENT_NAME in active) == (route == "divert")
+    assert all(segment.length_m > 0 for segment in model.active_pipe_segments)
+    refusal_authority = {
+        "wall_saturation_pressure_refusals_by_species": {
+            "Fe": {segment: {} for segment in declared_segments},
+        },
+    }
+    candidate_segments = _refusal_candidate_segments(refusal_authority, "Fe")
+    zone_by_segment = PhysicsTrace.from_simulator(sim).wall_zone_by_segment
+    assert set(candidate_segments) == declared_segments == zone_by_segment.keys()
+    assert _refusal_candidate_segments({}, "Fe") == ()
+    assert all(zone in WALL_DEPOSIT_ZONE_NAMES for zone in zone_by_segment.values())
+    for segment in PIPE_SEGMENT_NAMES:
+        assignment = _assign_refused_supplies_at_binding_load(
+            {}, {"Fe": 0.25}, {"Fe": (segment,)},
+        )
+        assert assignment["segment_by_species"] == {"Fe": segment}
+        booked_by_zone = wall_deposit_kg_by_zone_species(
+            {(segment, "Fe"): 0.25}, zone_by_segment,
+        )
+        assert booked_by_zone[zone_by_segment[segment]]["Fe"] == 0.25
+
+
+def test_cooler_stage_zero_duct_uses_its_own_temperature_zone():
+    sim = _representative_sim(hours=0)
+    model = sim.condensation_model
+    duct = pipe_segment_name(0, 1)
+    other_temperatures = [
+        segment.wall_temperature_C for segment in model.pipe_segments
+        if segment.name != duct
+    ] + [model.stage3_bypass["wall_temperature_C"]]
+    model.operating_history.clear()
+    model.configure_operating_conditions(
+        pipe_segment_temperatures_C={duct: min(other_temperatures) - 1.0},
+    )
+    zones = PhysicsTrace.from_simulator(sim).wall_zone_by_segment
+    assert zones[duct] == "Rest"
+    assert any(zone == "Hottest" for zone in zones.values())
+    assert "upstream" not in zones
 
 
 def test_snapshot_o2_delta_cannot_overwrite_terminal_oxygen_trace_total():

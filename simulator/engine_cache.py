@@ -1,8 +1,7 @@
 """One process-local HOT SQLite cache for engine outputs.
 
-Code-side numeric changes require a chemistry-version bump. The key also
-contains the selected engine pin and bytes of its runtime data files, so those
-input edits miss old rows without expiring or deleting them.
+Chemistry changes expire cached outputs only when the engine's manually
+maintained chemistry version is bumped.
 """
 
 from __future__ import annotations
@@ -31,11 +30,17 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import quote
 
+
 @dataclass(frozen=True)
 class EngineCacheValue:
     hot: object
     cold: Mapping = field(default_factory=dict)
     cacheable: bool = True
+    # Ephemeral refusal metadata: the stored HOT value keeps its existing
+    # projection and wire shape. These fields only let the cache apply its
+    # refusal allowlist before encoding that projection.
+    refusal_reason: str | None = None
+    refusal_status: str | None = None
 
 
 @dataclass(frozen=True)
@@ -289,35 +294,73 @@ REFUSAL_ENGINE_CRASH = "engine_crash"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
+# engine_cache is a standard-library leaf (tests/test_import_boundary.py::
+# test_engine_cache_is_a_standard_library_leaf), so it cannot import
+# engines.domain_reason. These literals mirror the enum's values;
+# tests/test_engine_cache_refusal_codes.py pins each one to it.
+REFUSAL_FORBIDDEN_SPECIES = "forbidden_species"
+REFUSAL_LIQUID_STATE = "liquid_state"
+REFUSAL_INVALID_PRESSURE_BAR = "invalid_pressure_bar"
+REFUSAL_INVALID_FO2_LOG = "invalid_fo2_log"
+REFUSAL_SUM_PRESSURE_SANITY = "sum_pressure_sanity"
+REFUSAL_SPECIATION_NO_FINITE_VALUES = "speciation_no_finite_values"
 
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID,
+    REFUSAL_FORBIDDEN_SPECIES,
+    REFUSAL_LIQUID_STATE,
+    REFUSAL_INVALID_PRESSURE_BAR,
+    REFUSAL_INVALID_FO2_LOG,
+    REFUSAL_SUM_PRESSURE_SANITY,
+    REFUSAL_SPECIATION_NO_FINITE_VALUES,
 })
 
 
+def _cacheable_refusal_status(
+    refusal_reason: str | None, status: str | None,
+) -> bool:
+    if status in {
+        None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+    }:
+        return True
+    return (
+        refusal_reason == REFUSAL_SPECIATION_NO_FINITE_VALUES
+        and status == "not_converged"
+    )
+
+
 def cacheable_refusal(result) -> bool:
+    if isinstance(result, EngineCacheValue):
+        return (
+            result.cacheable
+            and result.refusal_reason in CACHEABLE_REFUSAL_CODES
+            and _cacheable_refusal_status(
+                result.refusal_reason, result.refusal_status,
+            )
+        )
     return (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
         and result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES
-        and result.get("engine_status") in {None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok"}
+        and _cacheable_refusal_status(
+            result.get("refusal_reason"), result.get("engine_status"),
+        )
         and not result.get("exit_signal")
         and not result.get("exit_code")
     )
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 2,
+    "internal-analytical": 3,
     "vaporock": 1,
-    "magemin": 3,
-    "alphamelts": 3,
-    "thermoengine": 3,
+    "magemin": 4,
+    "alphamelts": 4,
+    "thermoengine": 4,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
-# diagnostic; the declared engine pin and runtime data bytes are separate key
-# material because they can change outputs without a code-side version bump.
+# diagnostic and does not change cache keys or expire cached outputs.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
 # thermoengine v1: 2026-11-08 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache version
@@ -331,6 +374,10 @@ ENGINE_CHEMISTRY_VERSION = {
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
+# magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
+# alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
+# thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
 
 
 @dataclass(frozen=True)
@@ -431,7 +478,7 @@ ENGINE_CACHE_INPUTS = {
     ),
 }
 _ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
-_ENGINE_CACHE_KEY_PREFIX_BYTES = 4 + _ENGINE_CACHE_INPUT_IDENTITY_BYTES
+_ENGINE_CACHE_KEY_PREFIX_BYTES = 4
 
 
 class EngineCacheInputIdentityError(ValueError):
@@ -517,7 +564,7 @@ def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes
         ) from exc
 
 
-@lru_cache(maxsize=len(ENGINE_CHEMISTRY_VERSION))
+@lru_cache(maxsize=None)
 def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
     try:
         inputs = ENGINE_CACHE_INPUTS[engine_id]
@@ -549,7 +596,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
     "internal-analytical": {
         "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
     "vaporock": {
         "identity": "version:1.0.0;record-sha256:89e860e3d6995f542337748019c4f6198f76c127ce3ca90fbbc2063bd401fc5a",
@@ -557,15 +604,15 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
     "magemin": {
         "identity": "sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
     "alphamelts": {
         "identity": "sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
     "thermoengine": {
         "identity": "version:1.2.0;record-sha256:462a81b3fda92acf74a1e9e38f260dac65232d855340f72307e05a65219c1b27",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
 }
 
@@ -788,7 +835,6 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     header = (
         bytes((_ENGINE_NUMBERS[engine_id],))
         + version.to_bytes(2, "big")
-        + _engine_cache_input_identity_digest(engine_id)
     )
     if len(payload) + _ENGINE_CACHE_KEY_PREFIX_BYTES > _NATURAL_KEY_LIMIT:
         return header + b"\xff" + hashlib.blake2b(payload, digest_size=16).digest()
@@ -1438,11 +1484,19 @@ def _read_provenance(connection: sqlite3.Connection, provenance_id: int) -> byte
 
 
 def _initialize_cold(connection: sqlite3.Connection, schema: str = "main") -> None:
+    # Trace metadata only; cache lookup reads HOT and never consults this field.
     connection.execute(f"CREATE TABLE IF NOT EXISTS {schema}.engine_values "
-                       "(key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID")
+                       "(key BLOB PRIMARY KEY, value BLOB NOT NULL, "
+                       "input_fingerprint BLOB) WITHOUT ROWID")
 
 
-def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: Mapping[str, Any]) -> None:
+def _store_cold(
+    connection: sqlite3.Connection,
+    path: Path,
+    key: bytes,
+    values: Mapping[str, Any],
+    input_fingerprint: bytes | None = None,
+) -> None:
     if not any(row[1] == "cold" for row in connection.execute("PRAGMA database_list")):
         cold_path = _cache_pair(path)[1]
         if not values and not cold_path.exists():
@@ -1457,7 +1511,11 @@ def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: 
         _check_cold_schema(connection)
     if values:
         value = zlib.compress(pack(values), level=6)
-        connection.execute("INSERT OR REPLACE INTO cold.engine_values VALUES (?,?)", (key, value))
+        connection.execute(
+            "INSERT OR REPLACE INTO cold.engine_values "
+            "(key, value, input_fingerprint) VALUES (?, ?, ?)",
+            (key, value, input_fingerprint),
+        )
     else:
         connection.execute("DELETE FROM cold.engine_values WHERE key=?", (key,))
 
@@ -1495,8 +1553,10 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         connection = _connect(path, readonly=readonly)
     except (sqlite3.Error, OSError):
         with _LOCK:
+            counts = _counter_bucket(engine_id)
             counts["read_error"] += 1
             counts["misses"] += 1
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
         return live_hot(solve())
     with _LOCK:
         try:
@@ -1520,9 +1580,41 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
 
     solved = solve()
     hot = live_hot(solved)
-    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+    if readonly or connection is None:
+        # Readonly state takes precedence: a refusal or uncacheable value
+        # cannot be stored either way, so count this miss in one bucket.
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
         return hot
-    if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
+    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:cacheable_false"] = counts.get(
+                "not_stored:cacheable_false", 0
+            ) + 1
+        return hot
+    wrapped_refusal = (
+        isinstance(solved, EngineCacheValue)
+        and solved.refusal_reason is not None
+    )
+    refusal_not_cacheable = (
+        wrapped_refusal and not cacheable_refusal(solved)
+    ) or (
+        _is_refusal(hot) and not cacheable_refusal(hot)
+    )
+    if refusal_not_cacheable:
+        refusal_reason = (
+            solved.refusal_reason if wrapped_refusal
+            else hot.get("refusal_reason") if isinstance(hot, Mapping)
+            else getattr(hot, "refusal_reason", None)
+        )
+        reason_label = str(refusal_reason) if refusal_reason is not None else "untyped"
+        with _LOCK:
+            counter = f"not_stored:refusal:{reason_label}"
+            counts = _counter_bucket(engine_id)
+            counts[counter] = counts.get(counter, 0) + 1
+    if refusal_not_cacheable:
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (
@@ -1550,7 +1642,22 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 provenance=provenance,
             )
             if inserted:
-                _store_cold(connection, path, cache_key, solved.cold if isinstance(solved, EngineCacheValue) else {})
+                cold_values = solved.cold if isinstance(solved, EngineCacheValue) else {}
+                input_fingerprint = None
+                # Fingerprint source inputs only for a newly created COLD output row.
+                if cold_values:
+                    try:
+                        input_fingerprint = _engine_cache_input_identity_digest(engine_id)
+                    except EngineCacheInputIdentityError:
+                        # Trace metadata must never prevent an otherwise valid cache write.
+                        pass
+                _store_cold(
+                    connection,
+                    path,
+                    cache_key,
+                    cold_values,
+                    input_fingerprint,
+                )
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
@@ -1593,6 +1700,12 @@ def load_cache_rows(
     for digest, hot, engine, version, source_box, row_seq in rows:
         if isinstance(hot, EngineCacheValue) and not hot.cacheable:
             raise ValueError("transient engine results are not cacheable")
+        if (
+            isinstance(hot, EngineCacheValue)
+            and hot.refusal_reason is not None
+            and not cacheable_refusal(hot)
+        ):
+            raise ValueError("refusal code is not cacheable")
         if not isinstance(digest, bytes) or not 4 <= len(digest) <= _NATURAL_KEY_LIMIT:
             raise ValueError("cache keys must be natural packed keys or 16-byte request digests")
         if engine not in ENGINE_CHEMISTRY_VERSION:
@@ -1662,7 +1775,7 @@ def _cache_uri(path: Path, mode: str = "ro") -> str:
 
 
 def _check_cold_schema(connection: sqlite3.Connection) -> None:
-    expected = ["key", "value"]
+    expected = ["key", "value", "input_fingerprint"]
     found = [row[1] for row in connection.execute("PRAGMA cold.table_info(engine_values)")]
     if found != expected:
         raise EngineCacheSchemaMismatch("cold.engine_values", expected, found)
@@ -1785,13 +1898,17 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                     for key, value, engine, version, seq, provenance in cursor:
                         counts["read"] += 1
                         incoming_cold = source.execute(
-                            "SELECT value FROM cold.engine_values WHERE key=?", (key,),
+                            "SELECT value,input_fingerprint FROM cold.engine_values WHERE key=?", (key,),
                         ).fetchone() if has_cold else None
-                        kept_cold = destination.execute("SELECT value FROM cold.engine_values WHERE key=?", (key,)).fetchone()
+                        kept_cold = destination.execute(
+                            "SELECT value,input_fingerprint FROM cold.engine_values WHERE key=?", (key,),
+                        ).fetchone()
                         inserted, conflict = _insert_cache_row_if_absent(
                             destination, key, value, engine, version, box, seq, provenance=provenance,
                         )
-                        conflict = conflict or bool(incoming_cold and kept_cold and incoming_cold != kept_cold)
+                        conflict = conflict or bool(
+                            incoming_cold and kept_cold and incoming_cold[0] != kept_cold[0]
+                        )
                         counts["inserted"] += int(inserted)
                         counts["conflicts"] += int(conflict)
                         counts["already_present"] += int(not inserted and not conflict)
@@ -1804,7 +1921,11 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                                 "input": {"source_box": box, "row_seq": seq},
                             }, sort_keys=True) + "\n")
                         elif incoming_cold:
-                            destination.execute("INSERT OR IGNORE INTO cold.engine_values VALUES (?,?)", (key, incoming_cold[0]))
+                            destination.execute(
+                                "INSERT OR IGNORE INTO cold.engine_values "
+                                "(key, value, input_fingerprint) VALUES (?, ?, ?)",
+                                (key, incoming_cold[0], incoming_cold[1]),
+                            )
                         last = seq
                     if last > (watermark[0] if watermark else 0):
                         destination.execute(

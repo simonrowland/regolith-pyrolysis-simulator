@@ -95,20 +95,23 @@ def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
     )
 
 
-def test_subfloor_sio_materializes_declared_stage3_product():
-    # Unavailable pure-SiO saturation continues the declared product route.
-    assert _stage3_silica_kg(1400.0) > 0.0
+def test_subfloor_sio_purity_veto_bypasses_stage3_product():
+    assert _stage3_silica_kg(1400.0) == 0.0
     retained_mol = _retained_holdup_sio_mol(1400.0)
     escape_mol = _terminal_escape_sio_mol(1400.0)
     assert retained_mol >= 0.0
     assert escape_mol >= 0.0
+    # The veto still keeps this SiO out of the stage-3 product. Cold stages
+    # condense that vapour, so the parcel is capture, not escape.
+    assert (
+        retained_mol
+        + escape_mol
+        + _captured_sio_equivalent_mol(1400.0)
+    ) > 0.0
     # Float64 rounds 1 - exp(-NTU) to 1.0 once NTU is past ~37, while
     # math.exp(-NTU) is still nonzero (it underflows only near NTU 709).
-    # Stage-3 eta is (p_in - pressure_pa) / p_in at condensation.py:4577,
-    # returned raw at 4589, with no min(1, eta). The ledger leftover is
-    # then exactly zero. It stays within the smallest Stage-3 NTU this
-    # run evaluated. NTU and available_kg come from that call, not a pin.
-    assert retained_mol + escape_mol >= 0.0
+    # Escape stays within the smallest Stage-3 NTU this run evaluated.
+    # NTU and available_kg come from that call, not a pin.
     observed = _stage3_sio_capture[1400.0]
     assert observed, "stage-3 SiO never evaluated the capture exponential"
     molar_mass_kg = MOLAR_MASS["SiO"] / 1000.0

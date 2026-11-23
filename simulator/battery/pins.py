@@ -545,7 +545,7 @@ def _pin_failures_from_live(
                         and live.engine is comparison_engine
                     )
             if not comparison_matches and quantity is not None:
-                for item in references:
+                for item in sorted(references, key=str):
                     comparison_matches.extend(
                         by_comparison_identity.get(
                             (item, quantity, comparison_engine), ()
@@ -620,7 +620,7 @@ def _pin_failures_from_live(
                 )
                 continue
             if not matches:
-                for item in references:
+                for item in sorted(references, key=str):
                     matches.extend(by_identity.get((item, quantity, engine), ()))
             if not matches:
                 failures.append(

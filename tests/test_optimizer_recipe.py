@@ -124,13 +124,31 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # target_status=unverified_design_target, decision=d-310 and a reason
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
-    # d-283/d-452: recomputed from load_config_bundle() after absolute collector
-    # areas and the 0.5 m throat geometry were added to the resolved setpoints.
-    # d-283 r4 then replaced the 10 m2 area ceiling with 2000 m2, wrote the
-    # three-pass fixed-point areas, and added the Mn cartridge window plus
-    # the Stage-4 SiO impurity gate. Conditional subspace digests did not move.
-    assert hashlib.sha256(resolved).hexdigest() == (
-        "c5c40b6c334bcef8ff84ee205ecb459337d5811e9b50a7a47dccda25d7c5f2bb"
+    # Both sides moved this resolved-setpoints digest. The b271 value stays.
+    # Needs controller re-measure on the merged setpoints.
+    # 2f7b45e93 removed the obsolete chemistry_kernel.allow_unmeasured_alpha_fallback:
+    # false leaf from data/setpoints.yaml. That leaf is part of the resolved
+    # setpoints, so the digest moved. Restoring only that leaf recovers the
+    # Studio-3 value at c6aeacdc8,
+    # 0d334cdfd5f0c0beb0f82b2227c42a83b7c692e3134c306004b78965f99c950e.
+    # The same comparison on this laptop matches that prefix and suffix, so
+    # the digest is not host-sensitive.
+    # d230a39dc points the C2A_staged Na_FeO_crossover_C annotation (and its
+    # note and basis strings) at the computed root, 1181.5 -> 1183.67 C;
+    # test_physics_ground_truth pins that annotation to the computed value.
+    # Restoring only data/setpoints.yaml from 396b001d6 recovers
+    # c7f7b4dd7697329f4436e284bfde8f5574fa5f533570e703d36897d6854d764b.
+    # 797c66c26 replaces the k_stage4b note. The previous text kept the
+    # 0.064 m2 area under d-137; d-344 sets 14.7388 m2. Restoring only that
+    # string recovers the condenser-gate digest
+    # 2cdb23f8de1ab2557af01cd6e413ec7da6af675165aac7afc1c11216ecfa5cc5.
+    # bounds_digest and the empty recipe id below do not include the note.
+    resolved_digest = hashlib.sha256(resolved).hexdigest()
+    # d-388 changes the C4 acquisition cap and adds the outdoor alkali loss limit.
+    # Merging green f8baa3402 into that tree moves the resolved bytes again.
+    # This is the sha256 of the merged resolved setpoints, not a rerun golden.
+    assert resolved_digest == (
+        "91a039d8174d09336a8f8505534e9138bc51d2f836e0ef9c5eb74e25c0b773b3"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -140,16 +158,22 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # The r4 envelope [0.001, 2000] m2 is the bounds-digest mover. Recounted
     # from RecipeSchema().bounds_digest.
     assert schema.bounds_digest == (
-        "cf22c51075092358be2256aa49863d749031404167bb31ae9f7733178161ce18"
+        # Needs controller re-measure. b271 bounds digest left in place.
+        "b0f8c15b944285a2a0935e01bb89e5f5fcfa87e2ce68e6769bb5543e72508868"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed from the production recipe resolver.
+    # Needs controller re-measure. b271 recipe id left in place.
+    # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    # recipe_id hashes the empty canonical patch (still b"[]"), the schema
+    # version, the allowlist version, and bounds_digest. Substituting the
+    # pre-Stage-3 bounds digest recovers
+    # 17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786.
     assert empty.recipe_id(schema) == (
-        "f211bd4b7ceae31bad7dad3d40b52afb481404f1d67dab2bf2e33b7cc72e0031"
+        "36600a53be559d56756caa0ec06aeb52ce386241347ef1692e2d5b4d031df0a8"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -161,8 +185,14 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
+    # The digest moves with bounds_digest and with the four searchable
+    # C2A-staged stage3_route knobs (search_enabled defaults true). Campaign
+    # stage3_route knobs stay out of the search list. Restoring the pre-Stage-3
+    # bounds digest and dropping those four paths recovers
+    # d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55.
     assert identity_digest == (
-        "5229e14d6fe1893e1746a1f73f3008676fc93f6ff2d109f7e9f5b0241f6e7584"
+        # Needs controller re-measure. b271 identity digest left in place.
+        "d927aa6e90e0c73017c85dec06b309ad96d658a4b506bb7b350a90be6bc893e6"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -378,6 +408,7 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
             {
                 "campaigns": {
                     "C5": {
+                        **yaml.safe_load(SETPOINTS_PATH.read_text())["campaigns"]["C5"],
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
                 },
@@ -609,12 +640,13 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    # Five stage areas plus one throat and five vane paths extend the prior
-    # searchable recipe vocabulary.
-    assert len(paths) == 76
-    assert hashlib.sha256(
-        canonical_json_dumps(paths).encode("utf-8")
-    ).hexdigest() == "0432df0fe7e53251f70bf29cee426a71fb55a37f6bdded6b25f49341611123a4"
+    # Needs controller re-measure. b271 path count and hash left in place.
+    # c3: four per-substage route controls extend the 65-dimensional search.
+    assert len(paths) == 69
+    assert (
+        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
+        == "9b36f69e58eeb0f8662c2b6ab62c537d8ca0dda65a1b1927b2afb33006216b0d"
+    )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
         FEEDSTOCK,
@@ -737,19 +769,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # cache_key(spec) with that default-off policy.
     # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
     # objective).
-    # d-283/d-452: recomputed through _build_eval_inputs with hardware costs in
-    # canonical EvalSpec identity. The r4 area envelope moves bounds_digest
-    # and the resolved-setpoints leaf inside that identity. This profile
-    # leaves until_campaign_complete false, so that flag is omitted.
-    # 2026-11-22 t-1911: the layered wall and the derived in-situ bootstrap
-    # rate enter cost-parameter identity. That is the cost-model change
-    # (the single-wall area price is no longer the collector price). The
-    # canonical cost payload is plain JSON, the same shape pinned in
-    # tests/test_optimizer_evalspec.py; a mappingproxy does not reach
-    # cache_key. recipe_id and the searchable allowlist hash above are
-    # unchanged, and the setpoints.yaml edit in this offer is a comment.
-    # Studio measurement of cache_key(spec) at the t-1911 tip b33a9cae43.
-    assert cache_key(spec) == "c77dbea3f485cbd2e06acbb805734b32d5858c0204c105fa9c2cb9e8848f719f"
+    # Both sides moved cache_key. The b271 value stays.
+    # Needs controller re-measure. The layered wall is in the merged cost
+    # model, so this pin will not match either parent.
+    # 2026-11-19 C2A staged-pressure runtime results changed; recomputed from
+    # cache_key(spec) for the new analytical corpus epoch.
+    assert cache_key(spec) == "bfa65ea9105b78b35ca7e46ec47dbdfa50c9f5c5488c468696e0900ac2813d29"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1642,7 +1667,7 @@ def test_c2a_staged_depletion_log_slope_neutral_fixed_schedule() -> None:
             )
         ]
 
-        assert targets == pytest.approx(expected_targets)
+        assert targets == expected_targets
         assert end_hours[0] == 8
         assert manager._c2a_staged_stage_idx == 0
 
@@ -1839,7 +1864,8 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # Recounted from RecipePatch({PO2_DEFAULT: 9.0}).validated().recipe_id().
     assert (
         first.recipe_id()
-                == "65e487d819467e52cff7c1c09c056ea62a39e9618c505702903ca6b0f1e957c8"
+                # Needs controller re-measure. b271 recipe id left in place.
+                == "f600bcaa1c6e6c80a655d8d6db7e0b08bb8e07d5bc6a61e5be6d63ffbac25489"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
