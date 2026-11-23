@@ -209,7 +209,7 @@ def test_vacuum_method_uses_dp019_method_implied_pressure() -> None:
     assert notice.kind is NoticeKind.METHOD_IMPLIED
     assert notice.policy is not None
     assert notice.policy.id == "DP-019"
-    assert notice.policy.value == str(dp019_pa)
+    assert notice.policy.value == "0.1"
     assert notice.policy.units == "Pa"
     assert invalid is None
 
