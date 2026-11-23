@@ -20,6 +20,22 @@ transcription:
     printed_string: 'FUN1-10 15 0.0214 0.0078'
     found_on_pdf_page: 5
     published_page: 372
+  locator_proofs:
+    - locator: Experimental section pressure and temperature
+      printed_string: 'temperature was raised to 1900 °C'
+      pdf_page: 4
+      pdf_page_index: 3
+      published_page: 371
+    - locator: FUN1 starting composition row
+      printed_string: 'FUN1 starting 53.14 2.97 41.27 2.36'
+      pdf_page: 5
+      pdf_page_index: 4
+      published_page: 372
+    - locator: FUN2 starting composition row
+      printed_string: 'FUN2 starting 33.03±0.05 15.18±0.05'
+      pdf_page: 5
+      pdf_page_index: 4
+      published_page: 372
   layout_check: Render confirms Table 1 row and initial/final column assignment.
   mismatches: none
 row_count:
@@ -28,127 +44,210 @@ row_count:
   FUN1: 14
   FUN2: 10
   excluded: B133R-10 is a standard; FUN1 starting and FUN2 starting have no run weights.
+starting_charge_links:
+  FUN1:
+    experiment: mendybaev-fun1-vacuum-evaporation
+    table_row: FUN1 starting
+    source_role: initial charge, identified by the Table 1 starting row
+    printed_wt_pct: {MgO: '53.14', Al2O3: '2.97', SiO2: '41.27', CaO: '2.36'}
+    printed_sum_wt_pct: '99.74'
+  FUN2:
+    experiment: mendybaev-fun2-vacuum-evaporation
+    table_row: FUN2 starting
+    source_role: initial charge, identified by the Table 1 starting row
+    printed_wt_pct: {MgO: '33.03', Al2O3: '15.18', SiO2: '38.39', CaO: '13.40'}
+    printed_sum_wt_pct: '100.00'
+  row_linkage: Each bead points to its own experiment and references that experiment's sample.printed_composition with the Table 1 starting-row locator; no run-order index is printed for independent beads. Car 1 design excludes a composition_role field.
+  unresolved: FUN1's four printed oxides sum to 99.74 wt%; no missing 0.26 wt% component is inferred.
 full_cell_audit:
-  numeric_cells: 48
-  verification: Render checked because pdftotext was the only machine-readable table transcription available.
+  printed_numeric_cells: 72
+  stored_numeric_values: 96
+  verification: PDF page 5 render checked the 48 weight cells, 24 duration cells, and row/column assignments. The two starting-composition rows and bead linkage were checked in the rendered table; the 24 fractions are derived from the recorded weights.
   rows:
     - sample: FUN1-3
+      run_duration_min: '0'
       initial_weight_g: '0.0161'
       final_weight_g: '0.0148'
       mass_loss_fraction: '0.0807453416149068322981366459627329192546'
     - sample: FUN1-12
+      run_duration_min: '0'
       initial_weight_g: '0.0214'
       final_weight_g: '0.0176'
       mass_loss_fraction: '0.1775700934579439252336448598130841121495'
     - sample: FUN1-15
+      run_duration_min: '5'
       initial_weight_g: '0.0258'
       final_weight_g: '0.0208'
       mass_loss_fraction: '0.1937984496124031007751937984496124031007'
     - sample: FUN1-13
+      run_duration_min: '10'
       initial_weight_g: '0.0286'
       final_weight_g: '0.0210'
       mass_loss_fraction: '0.2657342657342657342657342657342657342657'
     - sample: FUN1-1
+      run_duration_min: '15'
       initial_weight_g: '0.0103'
       final_weight_g: '0.0049'
       mass_loss_fraction: '0.5242718446601941747572815533980582524271'
     - sample: FUN1-10
+      run_duration_min: '15'
       initial_weight_g: '0.0214'
       final_weight_g: '0.0078'
       mass_loss_fraction: '0.6355140186915887850467289719626168224299'
     - sample: FUN1-5
+      run_duration_min: '20'
       initial_weight_g: '0.0180'
       final_weight_g: '0.0057'
       mass_loss_fraction: '0.6833333333333333333333333333333333333333'
     - sample: FUN1-11
+      run_duration_min: '25'
       initial_weight_g: '0.0300'
       final_weight_g: '0.0045'
       mass_loss_fraction: '0.8500000000000000000000000000000000000000'
     - sample: FUN1-16
+      run_duration_min: '25'
       initial_weight_g: '0.0238'
       final_weight_g: '0.0100'
       mass_loss_fraction: '0.5798319327731092436974789915966386554621'
     - sample: FUN1-4
+      run_duration_min: '30'
       initial_weight_g: '0.0278'
       final_weight_g: '0.0037'
       mass_loss_fraction: '0.8669064748201438848920863309352517985611'
     - sample: FUN1-14
+      run_duration_min: '30'
       initial_weight_g: '0.0290'
       final_weight_g: '0.0094'
       mass_loss_fraction: '0.6758620689655172413793103448275862068965'
     - sample: FUN1-9
+      run_duration_min: '35'
       initial_weight_g: '0.0377'
       final_weight_g: '0.0126'
       mass_loss_fraction: '0.6657824933687002652519893899204244031830'
     - sample: FUN1-17
+      run_duration_min: '35'
       initial_weight_g: '0.0278'
       final_weight_g: '0.0059'
       mass_loss_fraction: '0.7877697841726618705035971223021582733812'
     - sample: FUN1-18
+      run_duration_min: '40'
       initial_weight_g: '0.0312'
       final_weight_g: '0.0060'
       mass_loss_fraction: '0.8076923076923076923076923076923076923076'
     - sample: FUN2-4
+      run_duration_min: '0'
       initial_weight_g: '0.0334'
       final_weight_g: '0.0319'
       mass_loss_fraction: '0.0449101796407185628742514970059880239520'
     - sample: FUN2-5
+      run_duration_min: '10'
       initial_weight_g: '0.0315'
       final_weight_g: '0.0243'
       mass_loss_fraction: '0.2285714285714285714285714285714285714285'
     - sample: FUN2-1
+      run_duration_min: '20'
       initial_weight_g: '0.0619'
       final_weight_g: '0.0431'
       mass_loss_fraction: '0.3037156704361873990306946688206785137318'
     - sample: FUN2-2
+      run_duration_min: '20'
       initial_weight_g: '0.0455'
       final_weight_g: '0.0298'
       mass_loss_fraction: '0.3450549450549450549450549450549450549450'
     - sample: FUN2-3
+      run_duration_min: '25'
       initial_weight_g: '0.0372'
       final_weight_g: '0.0206'
       mass_loss_fraction: '0.4462365591397849462365591397849462365591'
     - sample: FUN2-8
+      run_duration_min: '30'
       initial_weight_g: '0.0309'
       final_weight_g: '0.0137'
       mass_loss_fraction: '0.5566343042071197411003236245954692556634'
     - sample: FUN2-7
+      run_duration_min: '35'
       initial_weight_g: '0.0418'
       final_weight_g: '0.0194'
       mass_loss_fraction: '0.5358851674641148325358851674641148325358'
     - sample: FUN2-6
+      run_duration_min: '40'
       initial_weight_g: '0.0419'
       final_weight_g: '0.0160'
       mass_loss_fraction: '0.6181384248210023866348448687350835322195'
     - sample: FUN2-9
+      run_duration_min: '50'
       initial_weight_g: '0.0559'
       final_weight_g: '0.0215'
       mass_loss_fraction: '0.6153846153846153846153846153846153846153'
     - sample: FUN2-10
+      run_duration_min: '55'
       initial_weight_g: '0.0514'
       final_weight_g: '0.0176'
       mass_loss_fraction: '0.6575875486381322957198443579766536964980'
-  derivation: (initial_weight_g - final_weight_g) / initial_weight_g
+  derivation: >-
+    Each row stores both printed grams and the fraction (initial_weight_g - final_weight_g) / initial_weight_g.
+    The extract's measured_reduced derivation points to the existing Table 1 printed-data context and records each
+    operand with its own column locator.
   zero_time_beads:
-    - FUN1-3
-    - FUN1-12
-    - FUN2-4
-    result: All three printed ratios are positive.
+    samples:
+      - FUN1-3
+      - FUN1-12
+      - FUN2-4
+    positive_mass_loss_fraction: true
+    fun1_fractions_differ: true
 table_tool:
   status: unavailable
   reason: No MinerU table blocks or tables index were present to convert or compare.
   comparison_output: Not generated; the full render audit above covers the stored cells.
 migration:
-  status: blocked
-  required_mutation: Changing FUN1-10 final_weight_g must change its migrated fraction.
+  status: isolated_migration_complete_identity_binding_conflict
+  required_mutation: The authored focused test changes FUN1-10 final_weight_g, recomputes the fraction, and pins the changed migrated value; the pytest mutation is not run under owner hold.
   code_path_checked:
     - simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
     - simulator/battery/migrate.py::_MASS_LOSS_YIELD_FIELDS
     - simulator/battery/migrate.py::_item_mass_loss_field
-  finding: The current mass-loss reader selects a precomputed numeric yield field; it does not derive a fraction from initial and final weights.
-  scope_rule: Extraction work may not change simulator/battery/migrate.py; no extraction rows were admitted without the required mutation path.
-  isolated_migration: Not run under the task's owner hold against simulator execution and store regeneration.
-expected_store_delta_if_unblocked: 24 mass-loss observations; sample_mass_kg remains unknown.
+  finding: The existing mass-loss reader consumes values.mass_loss_fraction. Printed grams and their arithmetic derivation are retained on every row. The extract also binds each row to its printed initial-charge composition and initial_mass basis.
+  scope_rule: No simulator or migrator code changed.
+  isolated_migration: Direct in-memory Migrator run; 120 observations, 24 mass_loss_fraction and 96 residue_component_composition, 0 hard issues, 0 unavailable values, 0 registry issues, 0 quantity-unknown observations. Species phase is unknown for all 120 observations; Car 1 does not assign a single phase to this integrated mass-loss quantity, and the existing composition rows are unchanged. This was not a simulator run or store regeneration.
+  uncertainty_counts:
+    printed: 96
+    none: 24
+    confidence_not_stated: 96
+    confidence_not_recorded: 24
+  identity_axes_after_migration:
+    FUN1-3: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN1-10: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN2-10: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+  identity_binding_conflict: >-
+    Printed starting compositions are linked through sample.printed_composition and each mass-loss observation's
+    point_conditions.printed_composition, but the isolated Migrator still leaves identity.composition unknown
+    without composition_role initial_charge_only (the existing path is
+    simulator/battery/migrate.py::_declared_composition_role). Car 1's design explicitly prohibits composition_role. The
+    generic identity-binding rule requires printed composition to reach identity; no existing extraction-only
+    path found satisfies both requirements. No migrator/schema change was made; controller ruling is needed.
+  identity_pressure: >-
+    Car 1 design section 4 directs this case: retain the printed one-sided ceiling in point_conditions and leave
+    identity.total_pressure_Pa unknown. The existing simulator/battery/migrate.py::_point_pressure_for_identity
+    path cannot represent this bound as an identity pressure; no point value is inferred.
+engine_readiness:
+  observable: mass_loss_fraction, used as the per-bead gravimetric extent anchor by the later residue comparison.
+  rows: 24
+  ready_for_extent_anchor: 24
+  direct_mass_loss_profile_ready: 0
+  experiment_links: FUN1 and FUN2 remain separate; each row points to its experiment's starting composition and has its own printed temperature and pressure bound. The identity composition gap is recorded above.
+  missing_or_deferred_inputs:
+    identity.composition: Printed starting compositions are present and linked to each run, but not promoted to identity because Car 1 forbids composition_role; see identity_binding_conflict.
+    identity.total_pressure_Pa: The printed one-sided ceiling remains in point_conditions; the design directs identity pressure to remain unknown for a bound.
+    identity.fO2_Pa: No absolute fO2 value or oxygen-buffer condition is printed; every row carries a located unknown.
+    identity.sample_mass_kg: The observation profile requires it, but Car 1 forbids sample.mass_kg; the initial and final grams remain in the mass-loss values and are not converted to kilograms.
+    identity.reservoir: The design leaves this bulk-bead phase unspecified.
+    identity.sweep_gas: No gas mixture or carrier-flow value is reported for the vacuum-furnace conditions.
+    identity.exposure: Run duration is printed per bead; exposed area is not printed.
+    identity.per: Bound to the printed fraction denominator with simulator/battery/enums.py::PerBasis.INITIAL_MASS.
+  method_token: vacuum_evaporation still awaits the separate Car 2 alias.
+  next_car_note: >-
+    Car 1 emits no scored or predicted residue rows, so steer 4 requires no changes here. For Car 3, phrase DP-005 alpha_assumed as relative-alpha sensitivity for MgO and SiO2, and add the typed melt_well_mixed_assumed notice using diffusion time R^2/D against evaporation time; bead radius is unprinted. Reuse an existing notice mechanism and add no DP id. Leave method fields to the separate alias fold.
+expected_store_delta: +24 mass-loss observations; the existing 96 composition points remain unchanged and sample_mass_kg remains unknown. No battery-store regen was committed.
 queued_tests:
   - tests/test_mendybaev_2013_fun_cai_extract.py
   - tests/test_yaml_flow_scalar_commas.py
