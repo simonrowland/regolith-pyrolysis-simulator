@@ -1033,9 +1033,9 @@ def test_headline_grid_keeps_mask_hit_on_the_result_and_the_exception(monkeypatc
         timeout_s=1.0,
     )
     assert result_cell.mask_hit == "refusal:unavailable"
-    assert result_cell.as_payload()["mask_hit"] == "refusal:unavailable"
+    assert "mask_hit" not in result_cell.as_payload()
     restored = type(result_cell).from_payload(result_cell.as_payload())
-    assert restored.mask_hit == "refusal:unavailable"
+    assert restored.mask_hit is None
 
     class _MaskedBoom:
         def equilibrate(self, **_kwargs):
@@ -1058,7 +1058,106 @@ def test_headline_grid_keeps_mask_hit_on_the_result_and_the_exception(monkeypatc
         timeout_s=1.0,
     )
     assert boom_cell.mask_hit == "refusal:engine_crash"
-    assert boom_cell.as_payload()["mask_hit"] == "refusal:engine_crash"
+    assert "mask_hit" not in boom_cell.as_payload()
+
+
+def test_mask_hit_does_not_change_score_json():
+    """A mask hit is cache state. Score JSON, residuals, and envelope raw stay put."""
+
+    from dataclasses import replace
+
+    from scripts.calibration_battery import envelope, rail_for
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EquilibrateCell,
+        Po2Request,
+        pairwise_residuals,
+    )
+    from simulator.diagnostic_helpers.binary_pot_scoring import (
+        ActivityComparator,
+        ScoringPot,
+        score_scoring_arm,
+    )
+
+    taught = EquilibrateCell(
+        pot_id="mask-score",
+        engine="alphamelts",
+        temperature_K=1500.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={"SiO2": 0.4},
+        gas_partial_pressures_Pa={"SiO": 12.0},
+        liquid_fraction=1.0,
+        wall_s=0.1,
+        cpu_s=0.1,
+        hostname="test",
+        mask_hit=None,
+    )
+    hit = replace(taught, mask_hit="refusal:engine_crash")
+    assert json.dumps(taught.as_payload(), sort_keys=True) == json.dumps(
+        hit.as_payload(), sort_keys=True
+    )
+    partner = replace(
+        taught,
+        engine="thermoengine",
+        melt_activities={"SiO2": 0.5},
+        gas_partial_pressures_Pa={"SiO": 20.0},
+    )
+    taught_residuals = pairwise_residuals([taught, partner])
+    hit_residuals = pairwise_residuals([hit, partner])
+    assert taught_residuals
+    assert taught_residuals == hit_residuals
+    pot = ScoringPot(
+        pot_id="mask-score",
+        source_id="mask-source",
+        observation_id="mask-obs",
+        sample_no=None,
+        temperatures_K=(1500.0,),
+        composition_basis="wt_pct",
+        composition_conversion="as_printed",
+        composition_as_printed={"SiO2": 50.0, "Al2O3": 50.0},
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+        why="mask score independence",
+    )
+    comparator = ActivityComparator(
+        source_id=pot.source_id,
+        observation_id="mask-obs",
+        species="SiO2",
+        observable="activity",
+        method_class="measured",
+        sample_no=None,
+        temperature_K=1500.0,
+        measured=0.35,
+        units="1",
+        standard_state=None,
+        uncertainty=None,
+        doi=None,
+        row={"value": 0.35},
+    )
+
+    def _raws(cells, comparators):
+        return [
+            row["raw"]
+            for row in score_scoring_arm(
+                pots=(pot,),
+                cells=cells,
+                comparators=comparators,
+                envelope=envelope,
+                rail_for=rail_for,
+            )
+        ]
+
+    taught_cell_raw = _raws((taught,), ())
+    hit_cell_raw = _raws((hit,), ())
+    taught_comparator_raw = _raws((taught,), (comparator,))
+    hit_comparator_raw = _raws((hit,), (comparator,))
+    assert taught_cell_raw and taught_comparator_raw
+    assert taught_cell_raw == hit_cell_raw
+    assert taught_comparator_raw == hit_comparator_raw
+    assert all("mask_hit" not in row["cell"] for row in taught_cell_raw)
+    assert all("mask_hit" not in row["cell"] for row in taught_comparator_raw)
 
 
 def test_cached_equilibrate_copies_mask_hit_off_a_list_before_decode(monkeypatch):

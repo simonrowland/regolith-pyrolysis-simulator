@@ -635,6 +635,7 @@ class EquilibrateCell:
     backend_failure_disposition: str | None = None
     # Class string when the refusal mask returned this cell. None on a
     # live engine call. A default keeps payloads written before the field.
+    # Score JSON omits it: a mask hit must not change the payload.
     mask_hit: str | None = None
 
     def to_cache_payload(self) -> str:
@@ -700,7 +701,6 @@ class EquilibrateCell:
             "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
             "fe_redox_split": dict(self.fe_redox_split),
             "backend_failure_disposition": self.backend_failure_disposition,
-            "mask_hit": self.mask_hit,
         }
 
     @classmethod
