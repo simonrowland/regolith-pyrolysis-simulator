@@ -14,6 +14,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     _melt_recipe_mol,
     load_adopted_observations,
     observation_admission_reason,
+    _pressure_standard_state_kind,
 )
 
 
@@ -176,3 +177,17 @@ def test_figure_only_exception_requires_parsed_digitized_points() -> None:
     assert observation_admission_reason(model_marked) == (
         "model_output_not_measurement"
     )
+
+
+def test_demaria_k_reservoir_reason_selects_melt_standard_state() -> None:
+    obs = _adopted_observation(
+        "kems-022-demaria-1971",
+        "K",
+        "demaria_1971_k_psat_figure2_digitized",
+    )
+
+    assert obs.reservoir == {
+        "tag": "not_applicable",
+        "reason": "p_partial over multicomponent melt; no single pure-substance reservoir",
+    }
+    assert _pressure_standard_state_kind(obs) == "melt"
