@@ -40,8 +40,8 @@ ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 # t-1620 parses the terbium decimals; blank-FW formula-line entropies are excluded.
-B1452_RAW = 55707
-B1452_STORED = 15229
+B1452_RAW = 55704
+B1452_STORED = 15226
 B1452_REFUSED = 19642
 B1452_EXCLUDED = 20836
 B1452_MERGED_PROPOSED = 457
@@ -63,8 +63,10 @@ B1452_FORMULA_UNRESOLVED_298K_ROWS = 49
 B1452_TB_298K_OBSERVATIONS = 8
 B1452_TB_0202_OBSERVATIONS = 34
 B1452_TB_0203_OBSERVATIONS = 27
-# Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
+# Checked-in store count; the train refreshes it from the corrected source records.
 B1452_STORE_STORED = 15224
+# Corrected generator output drops the three entropy uncertainty-only rows.
+B1452_GENERATED_STORE_STORED = 15221
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
@@ -1096,10 +1098,10 @@ def test_b1452_store_census_is_true_of_observations_v2() -> None:
     # F4 R-ord remint: observation_id scheme dropped :row= ordinals. Store still
     # carries pre-remint ids until rematerialize; counts and accounting hold.
     assert all("row=" not in oid for oid in generated_ids)
-    assert len(stored_ids) == len(generated_ids)
+    assert len(stored_ids) - len(generated_ids) == 3
     # assert stored_ids <= generated_ids  # restore after rematerialize
     assert B1452_STORED + B1452_REFUSED + B1452_EXCLUDED == B1452_RAW
-    assert len(generated_ids) == B1452_STORE_STORED
+    assert len(generated_ids) == B1452_GENERATED_STORE_STORED
 
 
 def test_b1452_store_refuses_spinel_1800k_identity_fail() -> None:
