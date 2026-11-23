@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Run checker-level probes that restore each t-1788 resolver defect."""
+"""Run checker-level mutations for the signature compatibility rules."""
 
 from __future__ import annotations
 
-import inspect
+import ast
 import sys
 import tempfile
 import textwrap
@@ -11,6 +11,24 @@ import types
 from pathlib import Path
 
 from tools import test_double_signatures as checker
+
+
+class _DescriptorFixture:
+    @staticmethod
+    def static_call(value):
+        return value
+
+    @classmethod
+    def class_call(cls, value):
+        return cls, value
+
+    def sleep(self, seconds=0):
+        return seconds
+
+
+class _NarrowBoundFixture:
+    def sleep(self):
+        return None
 
 
 def load_mutant(name: str, replacements: tuple[tuple[str, str], ...]):
@@ -26,6 +44,13 @@ def load_mutant(name: str, replacements: tuple[tuple[str, str], ...]):
     return module
 
 
+def signature(module, arguments: str):
+    node = ast.parse(f"lambda {arguments}: None", mode="eval").body
+    result = module._replacement_signature(node)
+    assert result is not None
+    return result
+
+
 def scan_fixture(module, filename: str, source: str):
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -33,107 +58,195 @@ def scan_fixture(module, filename: str, source: str):
         return module.scan_tests(root)
 
 
-def probe_variadic_collision() -> None:
-    production = inspect.signature(lambda *args, **kwargs: None)
-    double = inspect.signature(lambda value=None, *args, **kwargs: None)
+def probe_positional_rule() -> None:
+    production = signature(checker, "first, second, /")
+    double = signature(checker, "first, /")
     assert not checker._compatible(production, double)
     mutant = load_mutant(
-        "variadic",
+        "positional",
         ((
-            "    if any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in production_params) and any(\n"
-            "        p.kind is inspect.Parameter.VAR_KEYWORD for p in production_params\n"
-            "    ):\n"
-            "        double_positional = [\n"
-            "            p for p in double_params\n"
-            "            if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD\n"
-            "        ]\n"
-            "        for index, param in enumerate(double_positional):\n"
-            "            shapes.append(([object() for _ in range(index + 1)], {param.name: object()}))\n",
-            "",
+            "    if len(production_positional) > len(double_positional) and not _has_vararg(double, inspect.Parameter.VAR_POSITIONAL):\n"
+            "        return False\n",
+            "    if False:\n        return False\n",
         ),),
     )
     assert mutant._compatible(production, double)
-    print("PASS mutation: variadic argument collision is detected")
+    print("PASS mutation: positional-slot narrowing is detected")
 
 
-def importorskip_fixture() -> str:
+def probe_keyword_rule() -> None:
+    production = signature(checker, "value=42")
+    double = signature(checker, "other=42")
+    assert not checker._compatible(production, double)
+    mutant = load_mutant(
+        "keyword",
+        ((
+            "            if not _keyword_accepted(double, parameter.name):\n                return False\n",
+            "            if False:\n                return False\n",
+        ),),
+    )
+    assert mutant._compatible(production, double)
+    print("PASS mutation: keyword-name narrowing is detected")
+
+
+def probe_required_rule() -> None:
+    production = signature(checker, "target=0, **kwargs")
+    double = signature(checker, "target=0, *, root, **kwargs")
+    assert not checker._compatible(production, double)
+    mutant = load_mutant(
+        "required",
+        ((
+            "    if not _required_parameters_compatible(production, double):\n        return False\n",
+            "    if False:\n        return False\n",
+        ),),
+    )
+    assert mutant._compatible(production, double)
+    print("PASS mutation: a new required root parameter is detected")
+
+
+def probe_collision_rule() -> None:
+    production = signature(checker, "*args, **kwargs")
+    double = signature(checker, "value=None, *args, **kwargs")
+    assert not checker._compatible(production, double)
+    identical = signature(checker, "target, *args, **kwargs")
+    assert checker._compatible(identical, identical)
+    optional_production = signature(checker, "x=None, **kwargs")
+    renamed_double = signature(checker, "y=None, **kwargs")
+    optional_production.bind(1, y=2)
+    assert not checker._compatible(optional_production, renamed_double)
+    prefix_production = signature(checker, "x, /, *args, y")
+    prefix_double = signature(checker, "x, y=None, *args, **kwargs")
+    prefix_production.bind(1, 2, y=3)
+    assert not checker._compatible(prefix_production, prefix_double)
+    fixed_production = signature(checker, "a=1, **kwargs")
+    fixed_double = signature(checker, "root=None, /, value=None, **kwargs")
+    fixed_production.bind(1, value=2)
+    assert checker._compatible(fixed_production, fixed_double)
+    mutant = load_mutant(
+        "collision",
+        ((
+            "    return not _has_positional_keyword_collision(production, double)\n",
+            "    return True\n",
+        ),),
+    )
+    assert mutant._compatible(production, double)
+    print("PASS mutation: positional/keyword collisions are detected")
+
+
+def descriptor_fixture() -> str:
     return """
-        import pytest
-        module_alias = pytest.importorskip('collections')
-        def replacement(iterable=(), /, **kwargs): return None
-        def test_patch(monkeypatch):
-            monkeypatch.setattr(module_alias, 'Counter', replacement)
+        from __main__ import _DescriptorFixture
+        from random import Random
+        def replacement(value): return value
+        def no_args(): return None
+        def test_static(monkeypatch):
+            receiver = _DescriptorFixture()
+            monkeypatch.setattr(receiver, 'static_call', replacement)
+        def test_class(monkeypatch):
+            receiver = _DescriptorFixture()
+            monkeypatch.setattr(receiver, 'class_call', replacement)
+        def test_python_bound(monkeypatch):
+            receiver = _DescriptorFixture()
+            monkeypatch.setattr(receiver, 'sleep', receiver.sleep)
+        def test_random(monkeypatch):
+            receiver = Random()
+            monkeypatch.setattr(receiver, 'random', no_args)
     """
 
 
-def probe_class_only_constructor_inference() -> None:
-    census = scan_fixture(checker, "test_alias.py", importorskip_fixture())
-    assert census.scanned == census.resolved == 1
-    assert not census.skipped
-
+def probe_descriptor_rule() -> None:
+    census = scan_fixture(checker, "test_descriptors.py", descriptor_fixture())
+    assert census.scanned == census.resolved == 4
+    assert not census.violations
     mutant = load_mutant(
-        "class_constructor",
+        "descriptor",
         ((
-            "            if constructor is not None and _is_class_constructor(\n"
-            "                constructor, call, parents, modules, objects\n"
-            "            ):\n",
-            "            if constructor is not None:\n",
+            "return _signature_of(getattr(receiver, target.elts[1].value))",
+            "return _signature_of(getattr(type(receiver), target.elts[1].value))",
         ),),
     )
-    mutated = scan_fixture(mutant, "test_alias.py", importorskip_fixture())
-    assert mutated.resolved == 0 and len(mutated.skipped) == 1
-    print("PASS mutation: non-class importorskip callee is not a constructor")
+    mutated = scan_fixture(mutant, "test_descriptors.py", descriptor_fixture())
+    assert mutated.resolved == 4
+    assert len(mutated.violations) == 2
+    assert any("test_python_bound" in item for item in mutated.violations)
+    assert any("test_random" in item for item in mutated.violations)
+    print("PASS mutation: descriptor binding uses the patched receiver")
+
+
+def probe_bound_method_narrowing() -> None:
+    census = scan_fixture(
+        checker,
+        "test_bound_double.py",
+        """
+            from __main__ import _DescriptorFixture, _NarrowBoundFixture
+            def test_narrow(monkeypatch):
+                receiver = _DescriptorFixture()
+                replacement = _NarrowBoundFixture()
+                monkeypatch.setattr(receiver, 'sleep', replacement.sleep)
+        """,
+    )
+    assert census.scanned == census.resolved == 1
+    assert len(census.violations) == 1
+    print("PASS probe: pure-Python bound method narrowing is reported")
+
+
+def probe_opaque_builtin_is_skipped() -> None:
+    census = scan_fixture(
+        checker,
+        "test_opaque_builtin.py",
+        """
+            import time
+            def replacement(seconds): return None
+            def test_sleep(monkeypatch):
+                monkeypatch.setattr(time, 'sleep', replacement)
+        """,
+    )
+    assert census.scanned == 1 and census.resolved == 0 and len(census.skipped) == 1
+    print("PASS probe: builtin without a signature is counted as skipped")
 
 
 def probe_importorskip_alias() -> None:
-    alias_block = (
-        "        elif isinstance(node, (ast.Assign, ast.AnnAssign)):\n"
-        "            value = node.value\n"
-        "            if (\n"
-        "                isinstance(value, ast.Call)\n"
-        "                and _dotted(value.func) in {\"pytest.importorskip\", \"importorskip\"}\n"
-        "                and value.args\n"
-        "                and isinstance(value.args[0], ast.Constant)\n"
-        "                and isinstance(value.args[0].value, str)\n"
-        "            ):\n"
-        "                targets = node.targets if isinstance(node, ast.Assign) else [node.target]\n"
-        "                for target in targets:\n"
-        "                    if isinstance(target, ast.Name):\n"
-        "                        modules[target.id] = value.args[0].value\n"
+    census = scan_fixture(
+        checker,
+        "test_importorskip_alias.py",
+        """
+            import pytest
+            module_alias = pytest.importorskip('collections')
+            def replacement(iterable=(), /, **kwargs): return None
+            def test_patch(monkeypatch):
+                monkeypatch.setattr(module_alias, 'Counter', replacement)
+        """,
     )
-    mutant = load_mutant("importorskip_alias", ((alias_block, ""),))
-    mutated = scan_fixture(mutant, "test_alias.py", importorskip_fixture())
-    assert mutated.resolved == 0 and len(mutated.skipped) == 1
-    print("PASS mutation: pytest.importorskip module alias is resolved")
-
-
-def classmethod_fixture() -> str:
-    return """
-        from collections import UserDict
-        def replacement(value=None): return None
-        def test_patch(monkeypatch):
-            mapping = UserDict()
-            monkeypatch.setattr(mapping, 'fromkeys', replacement)
-    """
-
-
-def probe_bound_classmethod() -> None:
-    census = scan_fixture(checker, "test_classmethod.py", classmethod_fixture())
-    assert census.resolved == 1 and len(census.violations) == 1
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and not census.violations
     mutant = load_mutant(
-        "classmethod",
+        "importorskip_alias",
         ((
-            "                if bound_target and inspect.isfunction(value):\n",
-            "                if bound_target:\n",
+            "                        modules[target.id] = value.args[0].value\n",
+            "                        pass\n",
         ),),
     )
-    mutated = scan_fixture(mutant, "test_classmethod.py", classmethod_fixture())
-    assert mutated.resolved == 1 and not mutated.violations
-    print("PASS mutation: already-bound classmethod keeps its first parameter")
+    mutated = scan_fixture(
+        mutant,
+        "test_importorskip_alias.py",
+        """
+            import pytest
+            module_alias = pytest.importorskip('collections')
+            def replacement(iterable=(), /, **kwargs): return None
+            def test_patch(monkeypatch):
+                monkeypatch.setattr(module_alias, 'Counter', replacement)
+        """,
+    )
+    assert mutated.resolved == 0 and len(mutated.skipped) == 1
+    print("PASS mutation: pytest.importorskip module aliases resolve")
 
 
 if __name__ == "__main__":
-    probe_variadic_collision()
-    probe_class_only_constructor_inference()
+    probe_positional_rule()
+    probe_keyword_rule()
+    probe_required_rule()
+    probe_collision_rule()
+    probe_descriptor_rule()
+    probe_bound_method_narrowing()
+    probe_opaque_builtin_is_skipped()
     probe_importorskip_alias()
-    probe_bound_classmethod()

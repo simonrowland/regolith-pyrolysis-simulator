@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Find test doubles whose callable signature is narrower than production's."""
+"""Find test doubles whose callable signature is narrower than production's.
+
+Compatibility rules:
+1. Every production positional slot is accepted positionally or by ``*args``.
+2. Every production keyword-capable name is accepted by name or by ``**kwargs``.
+3. The double requires no argument production leaves optional.
+4. A keyword production can pass alongside positional arguments is not bound
+   to an already-filled positional slot by the double (including the
+   ``*args``/``**kwargs`` collision).
+5. Descriptor signatures come from ``inspect.signature(getattr(receiver,
+   name))`` on the receiver surface being patched; receivers are never stripped
+   by hand.
+"""
 
 from __future__ import annotations
 
@@ -79,11 +91,11 @@ def _callable_definition(
     return None
 
 
-def _assigned_constructor(
+def _assigned_constructor_call(
     name: str,
     at: ast.AST,
     parents: dict[ast.AST, ast.AST],
-) -> ast.AST | None:
+) -> ast.Call | None:
     scope: ast.AST | None = at
     while scope is not None:
         if isinstance(scope, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -97,39 +109,11 @@ def _assigned_constructor(
                 if any(isinstance(target, ast.Name) and target.id == name for target in targets):
                     value = item.value
                     if isinstance(value, ast.Call):
-                        declarations.append(value.func)
+                        declarations.append(value)
             if declarations:
                 return max(declarations, key=lambda item: item.lineno)
         scope = parents.get(scope)
     return None
-
-
-def _local_method(
-    node: ast.AST,
-    at: ast.AST,
-    parents: dict[ast.AST, ast.AST],
-) -> tuple[ast.AST | None, bool]:
-    """Resolve a method on a locally constructed object; bool means bound."""
-    if not isinstance(node, ast.Attribute) or not isinstance(node.value, ast.Name):
-        return None, False
-    constructor = _assigned_constructor(node.value.id, at, parents)
-    if constructor is None:
-        return None, False
-    cls = _callable_definition(constructor, at, parents, ast.Module(body=[], type_ignores=[]))
-    if isinstance(cls, ast.ClassDef):
-        method = next((item for item in cls.body if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == node.attr), None)
-        return method, _method_has_receiver(method)
-    return None, False
-
-
-def _method_has_receiver(method: ast.AST | None) -> bool:
-    if not isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        return False
-    for decorator in method.decorator_list:
-        name = _dotted(decorator.func) if isinstance(decorator, ast.Call) else _dotted(decorator)
-        if name in {"classmethod", "staticmethod"}:
-            return False
-    return True
 
 
 def _within_direct_scope(node: ast.AST, scope: ast.AST, parents: dict[ast.AST, ast.AST]) -> bool:
@@ -235,6 +219,74 @@ def _resolve_alias(name: str, modules: dict[str, str], objects: dict[str, str]) 
     return name
 
 
+def _imported_object(
+    dotted: str,
+    modules: dict[str, str],
+    objects: dict[str, str],
+):
+    resolved = _resolve_alias(dotted, modules, objects)
+    try:
+        return importlib.import_module(resolved)
+    except Exception:
+        pass
+    parts = resolved.split(".")
+    for split in range(len(parts) - 1, 0, -1):
+        try:
+            value = importlib.import_module(".".join(parts[:split]))
+            for attribute in parts[split:]:
+                value = getattr(value, attribute)
+            return value
+        except Exception:
+            continue
+    return None
+
+
+def _constructed_receiver(
+    call: ast.Call,
+    modules: dict[str, str],
+    objects: dict[str, str],
+):
+    constructor = _imported_object(_dotted(call.func) or "", modules, objects)
+    if not inspect.isclass(constructor):
+        return None
+    try:
+        args = [ast.literal_eval(value) for value in call.args]
+        kwargs = {
+            keyword.arg: ast.literal_eval(keyword.value)
+            for keyword in call.keywords
+            if keyword.arg is not None
+        }
+        if len(kwargs) != len(call.keywords):
+            return None
+        return constructor(*args, **kwargs)
+    except Exception:
+        return None
+
+
+def _receiver(
+    node: ast.AST,
+    at: ast.AST,
+    parents: dict[ast.AST, ast.AST],
+    modules: dict[str, str],
+    objects: dict[str, str],
+):
+    if isinstance(node, ast.Name):
+        constructor_call = _assigned_constructor_call(node.id, at, parents)
+        if constructor_call is not None:
+            receiver = _constructed_receiver(constructor_call, modules, objects)
+            if receiver is not None:
+                return receiver
+    dotted = _dotted(node)
+    return _imported_object(dotted, modules, objects) if dotted else None
+
+
+def _signature_of(value) -> inspect.Signature | None:
+    try:
+        return inspect.signature(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _production_signature(
     target: ast.AST,
     modules: dict[str, str],
@@ -242,50 +294,24 @@ def _production_signature(
     call: ast.Call,
     parents: dict[ast.AST, ast.AST],
 ):
-    bound_target = False
     if isinstance(target, ast.Constant) and isinstance(target.value, str):
         dotted = target.value
     elif isinstance(target, ast.Tuple) and len(target.elts) == 2 and isinstance(target.elts[1], ast.Constant):
-        base = _dotted(target.elts[0])
-        if isinstance(target.elts[0], ast.Name):
-            constructor = _assigned_constructor(target.elts[0].id, call, parents)
-            if constructor is not None and _is_class_constructor(
-                constructor, call, parents, modules, objects
-            ):
-                base = _dotted(constructor)
-                bound_target = True
-        if not base:
+        receiver = _receiver(target.elts[0], call, parents, modules, objects)
+        if receiver is None:
             return None
-        dotted = f"{_resolve_alias(base, modules, objects)}.{target.elts[1].value}"
+        try:
+            return _signature_of(getattr(receiver, target.elts[1].value))
+        except Exception:
+            return None
     else:
         base = _dotted(target)
         if not base:
             return None
         dotted = _resolve_alias(base, modules, objects)
 
-    parts = dotted.split(".")
-    for split in range(len(parts) - 1, 0, -1):
-        try:
-            value = importlib.import_module(".".join(parts[:split]))
-        except Exception:
-            continue
-        try:
-            for attribute in parts[split:]:
-                value = getattr(value, attribute)
-        except AttributeError:
-            return None
-        if callable(value):
-            try:
-                signature = inspect.signature(value)
-                if bound_target and inspect.isfunction(value):
-                    parameters = list(signature.parameters.values())
-                    if parameters:
-                        signature = signature.replace(parameters=parameters[1:])
-                return signature
-            except (TypeError, ValueError):
-                return None
-        return None
-    return None
+    value = _imported_object(dotted, modules, objects)
+    return _signature_of(value) if callable(value) else None
 
 
 def _replacement_signature(node: ast.AST) -> inspect.Signature | None:
@@ -324,88 +350,166 @@ def _replacement_signature(node: ast.AST) -> inspect.Signature | None:
         return None
 
 
-def _compatible(production: inspect.Signature, double: inspect.Signature) -> bool:
-    production_params = list(production.parameters.values())
-    double_params = list(double.parameters.values())
-    accepts_var_pos = any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in double_params)
-    accepts_var_kw = any(p.kind is inspect.Parameter.VAR_KEYWORD for p in double_params)
-    if any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in production_params) and not accepts_var_pos:
-        return False
-    if any(p.kind is inspect.Parameter.VAR_KEYWORD for p in production_params) and not accepts_var_kw:
-        return False
-    positional_only = [p for p in production_params if p.kind is inspect.Parameter.POSITIONAL_ONLY]
-    positional_or_keyword = [p for p in production_params if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD]
-    keyword_only_params = [p for p in production_params if p.kind is inspect.Parameter.KEYWORD_ONLY]
-    optional = {p.name for p in production_params if p.default is not inspect.Parameter.empty and p.kind is not inspect.Parameter.VAR_POSITIONAL and p.kind is not inspect.Parameter.VAR_KEYWORD}
-    shapes: list[tuple[list[object], dict[str, object]]] = []
+def _has_vararg(signature: inspect.Signature, kind: inspect._ParameterKind) -> bool:
+    return any(parameter.kind is kind for parameter in signature.parameters.values())
 
-    def shape(omitted: frozenset[str], positional_count: int) -> None:
-        args = [object() for param in positional_only if param.name not in omitted]
-        kwargs = {}
-        for index, param in enumerate(positional_or_keyword):
-            if param.name in omitted:
-                continue
-            if index < positional_count and not any(p.name in omitted for p in positional_or_keyword[:index]):
-                args.append(object())
-            else:
-                kwargs[param.name] = object()
-        for param in keyword_only_params:
-            if param.name not in omitted:
-                kwargs[param.name] = object()
-        shapes.append((args, kwargs))
 
-    # Probe the minimal valid call, every individual optional omission, and
-    # every positional/keyword split for positional-or-keyword parameters.
-    shape(frozenset(optional), 0)
-    for name in optional:
-        shape(frozenset({name}), 0)
-    for positional_count in range(len(positional_or_keyword) + 1):
-        shape(frozenset(), positional_count)
-    if any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in production_params) and any(
-        p.kind is inspect.Parameter.VAR_KEYWORD for p in production_params
+def _positional_parameters(signature: inspect.Signature) -> list[inspect.Parameter]:
+    return [
+        parameter
+        for parameter in signature.parameters.values()
+        if parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+    ]
+
+
+def _keyword_accepted(signature: inspect.Signature, name: str) -> bool:
+    parameter = signature.parameters.get(name)
+    return (
+        parameter is not None
+        and parameter.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
+    ) or _has_vararg(signature, inspect.Parameter.VAR_KEYWORD)
+
+
+def _keyword_is_production_accepted(signature: inspect.Signature, name: str) -> bool:
+    parameter = signature.parameters.get(name)
+    if parameter is not None and parameter.kind in (
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        inspect.Parameter.KEYWORD_ONLY,
     ):
-        double_positional = [
-            p for p in double_params
-            if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
-        ]
-        for index, param in enumerate(double_positional):
-            shapes.append(([object() for _ in range(index + 1)], {param.name: object()}))
-    # Required positional-only parameters cannot be omitted; make sure the
-    # constructed minimal call still supplies them positionally.
-    for args, kwargs in shapes:
-        try:
-            production.bind(*args, **kwargs)
-            double.bind(*args, **kwargs)
-        except TypeError:
+        return True
+    return _has_vararg(signature, inspect.Parameter.VAR_KEYWORD)
+
+
+def _required_parameters_compatible(
+    production: inspect.Signature,
+    double: inspect.Signature,
+) -> bool:
+    production_parameters = list(production.parameters.values())
+    double_parameters = list(double.parameters.values())
+    production_keyword = {
+        parameter.name: parameter
+        for parameter in production_parameters
+        if parameter.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
+    }
+    production_positional_only_required = 0
+    for parameter in production_parameters:
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and parameter.default is inspect.Parameter.empty:
+            production_positional_only_required += 1
+        elif parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):
+            break
+
+    for index, parameter in enumerate(double_parameters):
+        if parameter.default is not inspect.Parameter.empty or parameter.kind in (
+            inspect.Parameter.VAR_POSITIONAL,
+            inspect.Parameter.VAR_KEYWORD,
+        ):
+            continue
+        if parameter.kind is inspect.Parameter.KEYWORD_ONLY:
+            required_production = production_keyword.get(parameter.name)
+            if not (
+                required_production is not None
+                and required_production.kind is inspect.Parameter.KEYWORD_ONLY
+                and required_production.default is inspect.Parameter.empty
+            ):
+                return False
+            continue
+        positional_index = sum(
+            earlier.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+            for earlier in double_parameters[:index]
+        )
+        if positional_index < production_positional_only_required:
+            continue
+        required_production = production_keyword.get(parameter.name)
+        if required_production is None or required_production.default is not inspect.Parameter.empty:
             return False
+        if required_production.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD:
+            production_index = _positional_parameters(production).index(required_production)
+            if positional_index > production_index:
+                return False
     return True
 
 
-def _is_class_constructor(
-    constructor: ast.AST,
-    at: ast.AST,
+def _has_positional_keyword_collision(
+    production: inspect.Signature,
+    double: inspect.Signature,
+) -> bool:
+    production_positional = _positional_parameters(production)
+    double_positional = _positional_parameters(double)
+    production_positional_only_required = 0
+    for parameter in production.parameters.values():
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and parameter.default is inspect.Parameter.empty:
+            production_positional_only_required += 1
+        elif parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):
+            break
+    has_production_varargs = _has_vararg(production, inspect.Parameter.VAR_POSITIONAL)
+    maximum_positional = float("inf") if has_production_varargs else len(production_positional)
+    production_keywords = {
+        parameter.name: index
+        for index, parameter in enumerate(production_positional)
+        if parameter.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
+    }
+
+    for double_index, parameter in enumerate(double_positional):
+        if parameter.kind is not inspect.Parameter.POSITIONAL_OR_KEYWORD:
+            continue
+        if not _keyword_is_production_accepted(production, parameter.name):
+            continue
+        minimum_positional = max(double_index + 1, production_positional_only_required)
+        if minimum_positional > maximum_positional:
+            continue
+        production_index = production_keywords.get(parameter.name)
+        if production_index is not None and minimum_positional > production_index:
+            continue
+        return True
+    return False
+
+
+def _compatible(production: inspect.Signature, double: inspect.Signature) -> bool:
+    production_params = list(production.parameters.values())
+    double_params = list(double.parameters.values())
+    production_positional = _positional_parameters(production)
+    double_positional = _positional_parameters(double)
+    if len(production_positional) > len(double_positional) and not _has_vararg(double, inspect.Parameter.VAR_POSITIONAL):
+        return False
+    if _has_vararg(production, inspect.Parameter.VAR_POSITIONAL) and not _has_vararg(double, inspect.Parameter.VAR_POSITIONAL):
+        return False
+    if _has_vararg(production, inspect.Parameter.VAR_KEYWORD) and not _has_vararg(double, inspect.Parameter.VAR_KEYWORD):
+        return False
+    for parameter in production_params:
+        if parameter.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY):
+            if not _keyword_accepted(double, parameter.name):
+                return False
+    if not _required_parameters_compatible(production, double):
+        return False
+    return not _has_positional_keyword_collision(production, double)
+
+
+def _replacement_signature_for_site(
+    node: ast.AST,
+    site: DoubleSite,
+    tree: ast.Module,
     parents: dict[ast.AST, ast.AST],
     modules: dict[str, str],
     objects: dict[str, str],
-) -> bool:
-    tree = ast.Module(body=[], type_ignores=[])
-    local = _callable_definition(constructor, at, parents, tree)
-    if isinstance(local, ast.ClassDef):
-        return True
-    dotted = _dotted(constructor)
-    if not dotted:
-        return False
-    dotted = _resolve_alias(dotted, modules, objects)
-    parts = dotted.split(".")
-    for split in range(len(parts) - 1, 0, -1):
+) -> inspect.Signature | None:
+    definition = _callable_definition(node, site.call, parents, tree)
+    if definition is not None:
+        return _replacement_signature(definition)
+    if isinstance(node, ast.Attribute):
+        receiver = _receiver(node.value, site.call, parents, modules, objects)
+        if receiver is None:
+            return None
         try:
-            value = importlib.import_module(".".join(parts[:split]))
-            for attribute in parts[split:]:
-                value = getattr(value, attribute)
+            return _signature_of(getattr(receiver, node.attr))
         except Exception:
-            continue
-        return inspect.isclass(value)
-    return False
+            return None
+    if isinstance(node, ast.Name):
+        value = _imported_object(_dotted(node) or "", modules, objects)
+        return _signature_of(value) if callable(value) else None
+    if isinstance(node, ast.Call):
+        value = _constructed_receiver(node, modules, objects)
+        return _signature_of(value) if callable(value) else None
+    return None
 
 
 def scan_tests(root: Path) -> Census:
@@ -428,15 +532,11 @@ def scan_tests(root: Path) -> Census:
         for site in _sites(path, tree):
             scanned += 1
             production = _production_signature(site.target, modules, objects, site.call, parents)
-            replacement_node = _callable_definition(site.replacement, site.call, parents, tree) if site.replacement is not None else None
-            bound_method = False
-            if replacement_node is None and site.replacement is not None:
-                replacement_node, bound_method = _local_method(site.replacement, site.call, parents)
-            double = _replacement_signature(replacement_node) if replacement_node else None
-            if double is not None and bound_method:
-                parameters = list(double.parameters.values())
-                if parameters:
-                    double = double.replace(parameters=parameters[1:])
+            double = (
+                _replacement_signature_for_site(site.replacement, site, tree, parents, modules, objects)
+                if site.replacement is not None
+                else None
+            )
             if production is None or double is None:
                 skipped.append(f"{path}:{site.line}: SKIPPED-UNRESOLVABLE")
                 continue

@@ -1,6 +1,6 @@
-from pathlib import Path
 import ast
-import inspect
+from collections import Counter
+from pathlib import Path
 
 import pytest
 
@@ -10,21 +10,39 @@ from tools.test_double_signatures import _compatible, scan_tests
 ALLOWLIST = Path(__file__).parents[1] / "tools" / "test_double_signature_allowlist.txt"
 
 
+class _DescriptorFixture:
+    @staticmethod
+    def static_call(value):
+        return value
+
+    @classmethod
+    def class_call(cls, value):
+        return cls, value
+
+    def sleep(self, seconds=0):
+        return seconds
+
+
+class _NarrowBoundFixture:
+    def sleep(self):
+        return None
+
+
 def test_patch_double_violation_allowlist_only_shrinks() -> None:
     census = scan_tests(Path(__file__).parent)
     assert census.resolved + len(census.skipped) == census.scanned
     assert census.scanned > 0
     assert census.resolved > 0
     print(f"UNRESOLVED-SKIPPED: {len(census.skipped)}")
-    allowed = {
+    allowed = Counter(
         line.strip()
         for line in ALLOWLIST.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
-    }
-    actual = set(census.violations)
+    )
+    actual = Counter(census.violations)
     assert actual == allowed, (
-        f"unlisted violations: {sorted(actual - allowed)}\n"
-        f"stale allowlist entries: {sorted(allowed - actual)}\n"
+        f"unlisted violation occurrences: {sorted((actual - allowed).items())}\n"
+        f"stale allowlist occurrences: {sorted((allowed - actual).items())}\n"
         f"unresolved skipped: {len(census.skipped)}"
     )
 
@@ -37,6 +55,12 @@ def test_patch_double_violation_allowlist_only_shrinks() -> None:
         ("value=42", "value=42, **kwargs", True),
         ("first, second=2, *, flag=False", "first, second=2, *, flag=False", True),
         ("*args, **kwargs", "value=None, *args, **kwargs", False),
+        ("target, *args, **kwargs", "target, *args, **kwargs", True),
+        ("target, *args, **kwargs", "target, *, root, **kwargs", False),
+        ("first, second=2", "first, *args, **kwargs", True),
+        ("a=1, **kwargs", "root=None, /, value=None, **kwargs", True),
+        ("x=None, **kwargs", "y=None, **kwargs", False),
+        ("x, /, *args, y", "x, y=None, *args, **kwargs", False),
     ],
 )
 def test_compatibility_covers_keyword_names_and_optional_omissions(
@@ -53,19 +77,51 @@ def test_compatibility_covers_keyword_names_and_optional_omissions(
     assert _compatible(production_signature, double_signature) is compatible
 
 
-def test_variadic_arguments_cannot_collide_with_a_double_parameter() -> None:
-    def production(*args, **kwargs):
-        return args, kwargs
+@pytest.mark.parametrize(
+    ("production", "double", "args", "kwargs", "compatible"),
+    [
+        ("*args, **kwargs", "value=None, *args, **kwargs", (1,), {"value": 2}, False),
+        ("x=None, **kwargs", "y=None, **kwargs", (1,), {"y": 2}, False),
+        ("x, /, *args, y", "x, y=None, *args, **kwargs", (1, 2), {"y": 3}, False),
+        ("target, *args, **kwargs", "target, *args, **kwargs", (1, 2), {"other": 3}, True),
+        ("a=1, **kwargs", "root=None, /, value=None, **kwargs", (1,), {"value": 2}, True),
+        ("x, /, *args, **kwargs", "x, *args, **kwargs", (1, 2), {"x": 3}, False),
+    ],
+)
+def test_parameter_comparison_matches_python_call_binding(
+    production: str,
+    double: str,
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+    compatible: bool,
+) -> None:
+    from tools.test_double_signatures import _replacement_signature
 
-    def double(value=None, *args, **kwargs):
-        return value, args, kwargs
+    production_node = ast.parse(f"lambda {production}: None", mode="eval").body
+    double_node = ast.parse(f"lambda {double}: None", mode="eval").body
+    production_signature = _replacement_signature(production_node)
+    double_signature = _replacement_signature(double_node)
+    assert production_signature is not None and double_signature is not None
+    production_signature.bind(*args, **kwargs)
+    if compatible:
+        double_signature.bind(*args, **kwargs)
+    else:
+        with pytest.raises(TypeError):
+            double_signature.bind(*args, **kwargs)
+    assert _compatible(production_signature, double_signature) is compatible
 
-    production_signature = inspect.signature(production)
-    double_signature = inspect.signature(double)
-    production_signature.bind(1, value=2)
-    with pytest.raises(TypeError, match="multiple values"):
-        double_signature.bind(1, value=2)
-    assert not _compatible(production_signature, double_signature)
+
+def test_required_root_parameter_is_rejected() -> None:
+    from tools.test_double_signatures import _replacement_signature
+
+    production = _replacement_signature(
+        ast.parse("lambda target=0, **kwargs: None", mode="eval").body
+    )
+    double = _replacement_signature(
+        ast.parse("lambda target=0, *, root, **kwargs: None", mode="eval").body
+    )
+    assert production is not None and double is not None
+    assert not _compatible(production, double)
 
 
 def test_scan_reports_unresolvable_discovered_candidate(tmp_path: Path) -> None:
@@ -125,18 +181,60 @@ def test_scan_preserves_pytest_importorskip_module_alias(tmp_path: Path) -> None
 
 def test_scan_resolves_a_bound_method_double(tmp_path: Path) -> None:
     (tmp_path / "test_bound_method.py").write_text(
-        "import time\n"
-        "class StepwiseDriver:\n"
-        "    def sleep(self, seconds=0): return None\n"
-        "driver = StepwiseDriver()\n"
+        f"from {__name__} import _DescriptorFixture, _NarrowBoundFixture\n"
         "def test_bound_sleep(monkeypatch):\n"
-        "    monkeypatch.setattr(time, 'sleep', driver.sleep)\n",
+        "    driver = _DescriptorFixture()\n"
+        "    monkeypatch.setattr(driver, 'sleep', driver.sleep)\n"
+        "def test_narrow_bound_sleep(monkeypatch):\n"
+        "    driver = _DescriptorFixture()\n"
+        "    narrow = _NarrowBoundFixture()\n"
+        "    monkeypatch.setattr(driver, 'sleep', narrow.sleep)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == 2
+    assert census.resolved == 2
+    assert not census.skipped
+    assert len(census.violations) == 1
+    assert "test_narrow_bound_sleep" in census.violations[0]
+
+
+def test_scan_reads_method_descriptors_as_accessed_on_receiver(tmp_path: Path) -> None:
+    (tmp_path / "test_descriptors.py").write_text(
+        f"from {__name__} import _DescriptorFixture\n"
+        "from random import Random\n"
+        "def replacement(value): return value\n"
+        "def no_args(): return None\n"
+        "def test_static(monkeypatch):\n"
+        "    receiver = _DescriptorFixture()\n"
+        "    monkeypatch.setattr(receiver, 'static_call', replacement)\n"
+        "def test_class(monkeypatch):\n"
+        "    receiver = _DescriptorFixture()\n"
+        "    monkeypatch.setattr(receiver, 'class_call', replacement)\n"
+        "def test_native(monkeypatch):\n"
+        "    receiver = Random()\n"
+        "    monkeypatch.setattr(receiver, 'random', no_args)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == 3
+    assert census.resolved == 3
+    assert not census.skipped
+    assert not census.violations
+
+
+def test_builtin_without_signature_is_counted_as_skipped(tmp_path: Path) -> None:
+    (tmp_path / "test_opaque_builtin.py").write_text(
+        "import time\n"
+        "def replacement(seconds): return None\n"
+        "def test_sleep(monkeypatch):\n"
+        "    monkeypatch.setattr(time, 'sleep', replacement)\n",
         encoding="utf-8",
     )
     census = scan_tests(tmp_path)
     assert census.scanned == 1
-    assert census.resolved == 1
-    assert not census.skipped
+    assert census.resolved == 0
+    assert len(census.skipped) == 1
     assert not census.violations
 
 
@@ -156,20 +254,3 @@ def test_scan_keeps_bound_classmethod_parameters(tmp_path: Path) -> None:
     assert census.violations[0].startswith(
         "test_bound_classmethod.py::test_bound_fromkeys::"
     )
-
-
-def test_local_method_receiver_detection_respects_descriptors() -> None:
-    from tools.test_double_signatures import _method_has_receiver
-
-    source = ast.parse(
-        "class Example:\n"
-        "    def bound(self, value): pass\n"
-        "    @classmethod\n"
-        "    def class_bound(cls, value): pass\n"
-        "    @staticmethod\n"
-        "    def static(value): pass\n"
-    )
-    methods = source.body[0].body
-    assert _method_has_receiver(methods[0])
-    assert not _method_has_receiver(methods[1])
-    assert not _method_has_receiver(methods[2])
