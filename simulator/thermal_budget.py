@@ -1262,9 +1262,15 @@ NU_STILL_SPHERE = 2.0
 # = 1.327e-4 m². At 4000 K, T**4 = 2.56e14, sigma*T**4 = 1.45e7 W/m²,
 # times A and 0.85 is about 1640 W. That is above the Robinot focal
 # peak (1469 W) and above the doubled-power test's absorbed watts.
-# A flux refusal at or above this temperature is the hot side of the
-# bracket, not a missed root. Below it, a refusal still fails the step.
+# A flux refusal at any temperature inside the bracket is the hot side
+# of that probe, not an aborted step. The balance reports the best
+# finite temperature and a typed flag. This ceiling remains the name
+# of the hot-side sentinel the campaign callback uses at or above it.
 EVAPORATIVE_BRACKET_CEILING_K = 4000.0
+_FLUX_REFUSAL_REASONS = frozenset({
+    "evaporative_flux_above_bracket",
+    "evaporative_flux_refused",
+})
 # NIST argon thermal conductivity, lambda column, at 1000 K. Monatomic
 # conductivity tracks viscosity, so the exponent 0.75 is that scaling.
 ARGON_CONDUCTIVITY_ANCHOR_K = 1000.0
@@ -1858,6 +1864,7 @@ def _side_node_temperature_K(
     emissivity: float,
     boundary_K: float,
     half_conductance_W_per_K: float,
+    notices: list[dict[str, Any]] | None = None,
 ) -> float:
     """Quasi-steady temperature of the lower body.
 
@@ -1900,11 +1907,24 @@ def _side_node_temperature_K(
     high = max(temperature_top_K, boundary_K)
     if high <= low:
         return float(boundary_K)
-    if residual(low) < 0.0 or residual(high) > 0.0:
-        raise PowerTemperatureRefusal(
-            "power_temperature_balance_did_not_close",
-            "side-node conduction has no bracket",
-        )
+    f_low = residual(low)
+    f_high = residual(high)
+    if f_low < 0.0 or f_high > 0.0:
+        # No sign change. The endpoint closer to zero is the prediction.
+        chosen = low if abs(f_low) <= abs(f_high) else high
+        if notices is not None:
+            notices.append({
+                "kind": TYPED_UNKNOWN,
+                "knob": "side_node_temperature_K",
+                "value": "power_temperature_balance_did_not_close",
+                "unit": "1",
+                "source": (
+                    "side-node conduction has no bracket. "
+                    f"The reported side temperature is {chosen} K, "
+                    "the endpoint whose residual is closer to zero."
+                ),
+            })
+        return float(chosen)
     for _step in range(_BISECTION_STEPS):
         mid = 0.5 * (low + high)
         if residual(mid) > 0.0:
@@ -2015,7 +2035,8 @@ def two_node_pellet_loss_W(
     diameter_m: float,
     species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
     vapor_pressures: Mapping[str, Any] | None = None,
-) -> tuple[float, float]:
+    notices: list[dict[str, Any]] | None = None,
+) -> tuple[float, float, float, float]:
     """External watts from the two-node pellet, and the side temperature.
 
     Premise: the preset books the top face plus the hot upper side.
@@ -2064,6 +2085,7 @@ def two_node_pellet_loss_W(
         emissivity=emissivity,
         boundary_K=boundary_K,
         half_conductance_W_per_K=half,
+        notices=notices,
     )
     rates = _species_rates_kg_hr(
         temperature_top_K,
@@ -2540,12 +2562,13 @@ def solve_power_driven_melt_temperature_C(
 
         root_loss = sky_loss
         other_loss = None
-    root_K = _bisect_power_temperature_K(
+    root_K, root_flags = _bisect_power_temperature_K(
         power_W=absorbed,
         previous_K=previous_K,
         capacity_W_per_K=capacity,
         loss_W=root_loss,
     )
+    notices.extend(root_flags)
     node_1_area_m2 = None
     node_2_area_m2 = None
     if nodes == "two_node":
@@ -2558,6 +2581,7 @@ def solve_power_driven_melt_temperature_C(
             height_m=height_m,
             diameter_m=pellet_d,
             species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
+            notices=notices,
         )
         notices.append({
             "kind": TYPED_UNKNOWN,
@@ -2585,12 +2609,16 @@ def solve_power_driven_melt_temperature_C(
         )
     sensitivity = None
     if other_loss is not None:
-        other_K = _bisect_power_temperature_K(
+        other_K, other_flags = _bisect_power_temperature_K(
             power_W=absorbed,
             previous_K=previous_K,
             capacity_W_per_K=capacity,
             loss_W=other_loss,
         )
+        for flag in other_flags:
+            sensitivity_flag = dict(flag)
+            sensitivity_flag["knob"] = "sensitivity_" + str(flag["knob"])
+            notices.append(sensitivity_flag)
         sensitivity = {
             "face_set": other_face,
             "area_m2": other_area,
@@ -2863,13 +2891,50 @@ def _power_trace_curve_s(
         ) from exc
 
 
+def _balance_prediction_flags(
+    temperature_K: float,
+    *,
+    closed: bool,
+    saw_refusal: bool,
+) -> list[dict[str, Any]]:
+    """Typed flags for a root that is a prediction rather than a closure."""
+
+    flags: list[dict[str, Any]] = []
+    if not closed:
+        flags.append({
+            "kind": TYPED_UNKNOWN,
+            "knob": "power_temperature_balance",
+            "value": "power_temperature_balance_did_not_close",
+            "unit": "1",
+            "source": (
+                "the watt residual did not change sign or did not "
+                f"close. The reported temperature {temperature_K} K is "
+                "the bracket point whose finite residual is closest "
+                "to zero."
+            ),
+        })
+    if saw_refusal:
+        flags.append({
+            "kind": TYPED_UNKNOWN,
+            "knob": "evaporative_flux_inside_bracket",
+            "value": "predicted_below_refused_probe",
+            "unit": "1",
+            "source": (
+                "a flux refusal inside the bracket was the hot side of "
+                "that probe. The reported temperature is the prediction "
+                "from the probes that returned a number."
+            ),
+        })
+    return flags
+
+
 def _bisect_power_temperature_K(
     *,
     power_W: float,
     previous_K: float,
     capacity_W_per_K: float,
     loss_W: Callable[[float], float],
-) -> float:
+) -> tuple[float, list[dict[str, Any]]]:
     """Root of capacity * (T - T_prev) + loss(T) - power = 0.
 
     ``loss_W`` is ``pellet_energy_loss_W`` or ``_tonne_sky_loss_W``.
@@ -2878,25 +2943,44 @@ def _bisect_power_temperature_K(
     k_Ar proportional to T**0.75. The bracket is the adiabatic upper
     bound, which ignores a non-negative high-T loss and so still
     lies above the root.
+
+    A flux refusal, at any temperature, is the hot side of that probe.
+    A missing or non-numeric input still raises. When the residual
+    does not close, the return is the finite probe closest to zero
+    plus a typed flag. It is not an aborted step.
     """
 
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    best_temperature_K: float | None = None
+    best_abs = None
+    saw_refusal = False
+
     def residual(temperature_K: float) -> float:
+        nonlocal best_temperature_K, best_abs, saw_refusal
         try:
             loss = loss_W(temperature_K)
         except PowerTemperatureRefusal as exc:
-            if (
-                exc.reason == "evaporative_flux_above_bracket"
-                and temperature_K >= EVAPORATIVE_BRACKET_CEILING_K
-            ):
+            if exc.reason in _FLUX_REFUSAL_REASONS:
+                saw_refusal = True
                 return math.inf
             raise
+        except EvaporationFluxRefusal:
+            saw_refusal = True
+            return math.inf
         if not math.isfinite(loss):
             return math.inf
-        return (
+        value = (
             loss
             + capacity_W_per_K * (temperature_K - previous_K)
             - power_W
         )
+        if math.isfinite(value) and (
+            best_abs is None or abs(value) < best_abs
+        ):
+            best_abs = abs(value)
+            best_temperature_K = float(temperature_K)
+        return value
 
     lower = 0.0
     adiabatic = previous_K + power_W / capacity_W_per_K
@@ -2921,32 +3005,37 @@ def _bisect_power_temperature_K(
         upper = min(1.0e7, upper * 2.0 if upper > 0.0 else 1.0)
         f_upper = residual(upper)
         guard += 1
-    if f_lower > 0.0:
-        raise PowerTemperatureRefusal(
-            "power_temperature_balance_did_not_close",
-            "residual has no root at or above 0 K",
+    can_bisect = (
+        math.isfinite(f_lower)
+        and f_lower <= 0.0
+        and (f_upper >= 0.0 or math.isinf(f_upper))
+    )
+    if can_bisect:
+        for _step in range(_BISECTION_STEPS):
+            mid = 0.5 * (lower + upper)
+            if residual(mid) < 0.0:
+                lower = mid
+            else:
+                upper = mid
+        root = 0.5 * (lower + upper)
+        closed_residual = residual(root)
+        scale = max(1.0, abs(power_W), abs(capacity_W_per_K * previous_K))
+        closed = (
+            math.isfinite(root)
+            and math.isfinite(closed_residual)
+            and abs(closed_residual) <= 1.0e-6 * scale
         )
-    if f_upper < 0.0:
-        raise PowerTemperatureRefusal(
-            "power_temperature_balance_did_not_close",
-            "residual stays negative across the bracket",
-        )
-    for _step in range(_BISECTION_STEPS):
-        mid = 0.5 * (lower + upper)
-        if residual(mid) < 0.0:
-            lower = mid
-        else:
-            upper = mid
-    root = 0.5 * (lower + upper)
-    closed = residual(root)
-    scale = max(1.0, abs(power_W), abs(capacity_W_per_K * previous_K))
-    if (
-        not math.isfinite(root)
-        or not math.isfinite(closed)
-        or abs(closed) > 1.0e-6 * scale
-    ):
-        raise PowerTemperatureRefusal(
-            "power_temperature_balance_did_not_close",
-            "bisection did not close the watt balance",
-        )
-    return root
+        if closed:
+            return root, _balance_prediction_flags(
+                root,
+                closed=True,
+                saw_refusal=saw_refusal,
+            )
+    predicted = (
+        best_temperature_K if best_temperature_K is not None else lower
+    )
+    return predicted, _balance_prediction_flags(
+        predicted,
+        closed=False,
+        saw_refusal=saw_refusal,
+    )

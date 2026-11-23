@@ -17754,8 +17754,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         An empty cleaned-melt inventory is a physical zero. A melt that
         has composition and whose booking raises is not turned into a
-        zero. A refusal at or above ``ceiling_K`` is the hot side of
-        the bracket (see ``EVAPORATIVE_BRACKET_CEILING_K``).
+        zero. A flux refusal is the hot side of that probe. At or above
+        ``ceiling_K`` the reason is ``evaporative_flux_above_bracket``;
+        below it the reason is ``evaporative_flux_refused``. The balance
+        reports a flagged temperature either way.
         """
 
         from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
@@ -17799,12 +17801,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             try:
                 flux = self._calculate_evaporation(cache["equilibrium"])
             except EvaporationFluxRefusal as exc:
-                if temperature_K >= ceiling_K:
-                    raise PowerTemperatureRefusal(
-                        "evaporative_flux_above_bracket",
-                        str(exc),
-                    ) from exc
-                raise
+                # A flux refusal is the hot side of this probe. The
+                # balance keeps the best finite temperature and flags
+                # it. It does not abort the step.
+                reason = (
+                    "evaporative_flux_above_bracket"
+                    if temperature_K >= ceiling_K
+                    else "evaporative_flux_refused"
+                )
+                raise PowerTemperatureRefusal(reason, str(exc)) from exc
             # The mutating depletion wrapper records a phase diagnostic
             # and overlays wall supply. The pure rate is what that
             # wrapper debits. scalar 1.0 is the value
