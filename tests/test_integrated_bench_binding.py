@@ -22,8 +22,6 @@ from simulator.battery.integrated_bench import (
     cache_key_document,
     classify_observation,
     consumed_chamber_pressure_dt_s,
-    iter_resolved_leaves,
-    metadata_only_key,
     project_whole_run,
     run_cached_deck,
     score_bound_decks,
@@ -358,7 +356,6 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
         assert token not in blob
     for banned in (
         "input_role",
-        "source_class",
         "elemental_composition_wt_pct",
         "conditional_covariate",
         "printed_input",
@@ -368,6 +365,11 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
         "uncertainty",
     ):
         assert banned not in blob
+    assert "paper_id" not in request["preset"]
+    assert "trajectory_comparison" not in request["preset"]
+    assert "comparison_contract" not in request["preset"]
+    holder_curve = request["schedule"]["surface_temperature_C"]["holder"]
+    assert holder_curve[-1]["value"] == pytest.approx(1500.0)
     assert robinot_deck.preset_digest.startswith("sha256:")
     assert robinot_deck.preset_digest not in blob
 
@@ -563,18 +565,6 @@ def test_effective_timestep_is_the_chamber_pressure_step(
             1,
             id="paper_id",
         ),
-        pytest.param(
-            b"schema_version: vacuum_pyrolysis_preset.v1\n",
-            (
-                b"schema_version: vacuum_pyrolysis_preset.v1\n"
-                b"observed_o2_mass_fraction: 0.0105\n"
-                b"observed_feed_oxygen_fraction: 0.0247\n"
-                b"other_trial_fraction: 0.0117\n"
-                b"uncertainty: 0.001\n"
-            ),
-            1,
-            id="observed_numbers",
-        ),
     ],
 )
 def test_comparison_metadata_leaves_the_request_and_observable_unchanged(
@@ -592,11 +582,16 @@ def test_comparison_metadata_leaves_the_request_and_observable_unchanged(
         assert token not in blob
 
 
-def test_sticking_coefficient_changes_the_cache_key(
+def test_sticking_provenance_coefficient_is_over_keyed(
     robinot_deck: DeckRequest,
     tmp_path: Path,
 ) -> None:
-    """The coefficient is a solve input. Its citation text is not."""
+    """Provenance over-keying, not the runtime sticking selector.
+
+    The runner copies ``sticking_provenance`` into provenance. The liner
+    material selects ``alpha_s``. The coefficient stays in the key
+    because a name-based drop would also drop a live curve.
+    """
 
     mutant = build_deck_request(_rewrite(
         tmp_path,
@@ -613,7 +608,6 @@ def test_sticking_coefficient_changes_the_cache_key(
     assert [pair["sticking_coefficient"] for pair in base_pairs] == [1.0, 1.0]
     assert [pair["sticking_coefficient"] for pair in mutant_pairs] == [0.5, 0.5]
     assert _key(mutant.cache_request) != _key(robinot_deck.cache_request)
-    assert "source_class" not in json.dumps(mutant.cache_request)
 
 
 @pytest.mark.parametrize(
@@ -1056,27 +1050,46 @@ def test_quoted_exposed_area_changes_the_cache_key(
     assert _key(low.cache_request) != _key(high.cache_request)
 
 
-def test_metadata_target_and_uncertainty_keep_the_cache_key(
+def test_unreviewed_fields_are_keyed_deny_by_default(
     robinot_deck: DeckRequest,
     tmp_path: Path,
 ) -> None:
-    path = _rewrite(
+    """A name is not metadata. An unlisted field stays in the key.
+
+    ``uncertainty`` is a measurement token, so it is rejected rather
+    than dropped. ``target`` and an ``observed_`` field are keyed.
+    """
+
+    target = build_deck_request(_rewrite(
         tmp_path,
         b"schema_version: vacuum_pyrolysis_preset.v1\n",
         (
             b"schema_version: vacuum_pyrolysis_preset.v1\n"
             b"target: 0.0105\n"
+            b"observed_o2_mass_fraction: 0.0105\n"
+        ),
+        count=1,
+        name="target.yaml",
+    ))
+    assert target.cache_request["preset"]["target"] == pytest.approx(0.0105)
+    assert target.cache_request["preset"]["observed_o2_mass_fraction"] == (
+        pytest.approx(0.0105)
+    )
+    assert _key(target.cache_request) != _key(robinot_deck.cache_request)
+
+    uncertain = _rewrite(
+        tmp_path,
+        b"schema_version: vacuum_pyrolysis_preset.v1\n",
+        (
+            b"schema_version: vacuum_pyrolysis_preset.v1\n"
             b"uncertainty: 0.001\n"
         ),
         count=1,
+        name="uncertainty.yaml",
     )
-    mutant = build_deck_request(path)
-    assert mutant.cache_request == robinot_deck.cache_request
-    assert _key(mutant.cache_request) == _key(robinot_deck.cache_request)
-    blob = json.dumps(mutant.cache_request)
-    assert "target" not in mutant.cache_request
-    assert "target" not in mutant.cache_request["preset"]
-    assert "uncertainty" not in blob
+    with pytest.raises(IntegratedBenchContractError) as caught:
+        build_deck_request(uncertain)
+    assert caught.value.reason == "measurement_in_request"
 
 
 def test_checked_in_robinot_deck_starts_the_real_runner() -> None:
@@ -1332,119 +1345,156 @@ def test_loaded_hit_of_any_status_must_be_a_complete_ok(
     assert caught.value.reason == "cache_hit_not_ok"
 
 
-def _assign(root, path, value) -> None:
+# Own copy of the reviewed path list. This test does not call the
+# production walker or a name matcher.
+_REVIEWED_METADATA_PATHS = {
+    "/area_notice": "area-bridge display notice, not a melt input",
+    "/preset/paper_id": "paper label",
+    "/preset/paper_citation_id": "citation id",
+    "/preset/measurement_id": "measurement label",
+    "/preset/extraction_status": "extraction status label; the refusal gate reads it before the key",
+    "/preset/source_notes": "source notes",
+    "/preset/measurement_selectors": "observation selectors, not the solve",
+    "/preset/comparison_contract": "comparison policy, sidecar path, and fast-tier policy",
+    "/preset/digests": "provenance digests, including schedule_digest",
+    "/preset/trajectory_comparison": "comparison grid and figure targets",
+    "/preset/lab_geometry/sample/exposed_melt_area_notice": "geometry display notice",
+    "/preset/lab_geometry/pump/model": "pump model name, not a solve input",
+    "/preset/lab_geometry/pump/model_source_class": "pump model citation class",
+    "/preset/lab_geometry/pump/model_citation_id": "pump model citation id",
+    "/preset/lab_geometry/pump/model_digest": "pump model citation text",
+    "/preset/lab_schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot",
+    "/preset/lab_schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot",
+    "/preset/lab_schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot",
+    "/schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot on the resolved schedule",
+    "/schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot on the resolved schedule",
+    "/schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot on the resolved schedule",
+    "/feedstock/entry/name": "feedstock display name",
+    "/feedstock/entry/label": "feedstock display label",
+    "/feedstock/entry/source": "feedstock citation source",
+    "/feedstock/entry/confidence": "feedstock confidence label",
+    "/feedstock/entry/note": "feedstock display note",
+    "/feedstock/entry/paper_aliases": "feedstock paper aliases",
+    "/feedstock/entry/provenance": "feedstock citation provenance",
+    "/feedstock/entry/simulant_vs_real_caveat": "feedstock display caveat",
+    "/feedstock/entry/process_notes": "feedstock process notes",
+    "/feedstock/entry/composition_basis": "composition citation basis",
+    "/feedstock/entry/composition_status": "composition status label",
+    "/feedstock/entry/sum_check": "oxide sum cross-check, not an input mass",
+    "/feedstock/entry/elemental_composition_wt_pct": "elemental cross-check, not the loadable oxide table",
+    "/feedstock/entry/elemental_sum_check": "elemental sum cross-check",
+    "/feedstock/entry/elemental_composition_status": "elemental cross-check status",
+    "/feedstock/entry/elemental_cross_check_note": "elemental cross-check note",
+}
+
+
+def _pointer(path: tuple) -> str:
+    chunks = []
+    for step in path:
+        text = str(step).replace("~", "~0").replace("/", "~1")
+        chunks.append("/" + text)
+    return "".join(chunks)
+
+
+def _pointer_steps(pointer: str) -> list[str]:
+    assert pointer.startswith("/") and pointer != "/"
+    return [
+        step.replace("~1", "/").replace("~0", "~")
+        for step in pointer[1:].split("/")
+    ]
+
+
+def _walk_resolved(value, path: tuple = ()):
+    """Independent walk. An exclusion path is yielded whole and not descended."""
+
+    pointer = _pointer(path)
+    excluded = bool(path) and pointer in _REVIEWED_METADATA_PATHS
+    if excluded:
+        yield path, value, True
+        return
+    if isinstance(value, dict):
+        if not value:
+            yield path, value, False
+            return
+        for key in sorted(value, key=str):
+            yield from _walk_resolved(value[key], path + (str(key),))
+        return
+    if isinstance(value, list):
+        if not value:
+            yield path, value, False
+            return
+        for index, item in enumerate(value):
+            yield from _walk_resolved(item, path + (index,))
+        return
+    yield path, value, False
+
+
+def _set_pointer(root: dict, pointer: str, value) -> None:
     cursor = root
-    for step in path[:-1]:
-        cursor = cursor[step]
-    cursor[path[-1]] = value
+    steps = _pointer_steps(pointer)
+    for step in steps[:-1]:
+        if isinstance(cursor, list):
+            cursor = cursor[int(step)]
+            continue
+        child = cursor.get(step)
+        if not isinstance(child, (dict, list)):
+            child = {}
+            cursor[step] = child
+        cursor = child
+    last = steps[-1]
+    if isinstance(cursor, list):
+        cursor[int(last)] = value
+    else:
+        cursor[last] = value
 
 
-def _mutate_leaf(value):
-    """A value whose canonical form cannot match the original leaf."""
-
-    if isinstance(value, bool):
-        return not value
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        shifted = float(value) + 1.0
-        if shifted == float(value):
-            return -1.0
-        return shifted
-    if value is None:
-        return 0.0
-    if isinstance(value, str):
-        return value + "\x1f"
-    if isinstance(value, (list, tuple, dict)):
-        return {"__mutated__": 1}
-    return {"__mutated__": 1}
-
-
-def test_every_non_metadata_leaf_changes_the_cache_key(
+def test_reviewed_metadata_paths_stay_out_of_the_key(
     robinot_deck: DeckRequest,
 ) -> None:
-    """Mutate each resolved leaf outside the metadata list.
+    """Every reviewed path is excluded. The walk is not the production walker."""
 
-    The walk is the production walker. A hand-written input list is not
-    the census. Metadata nodes are not descended into.
-    """
-
+    assert integrated_bench.METADATA_EXCLUSION_PATHS == _REVIEWED_METADATA_PATHS
     resolved = robinot_deck.resolved_configuration
     base = cache_key_document(resolved)
     assert base == robinot_deck.cache_request
-    base_key = _key(base)
-    data_leaves = []
-    for path, value in iter_resolved_leaves(resolved):
-        if path and isinstance(path[-1], str) and metadata_only_key(path[-1]):
+    found = set()
+    holder_terminal = False
+    for path, value, excluded in _walk_resolved(resolved):
+        if excluded:
+            found.add(_pointer(path))
             continue
-        data_leaves.append((path, value))
-    assert data_leaves
-    joined = [".".join(str(step) for step in path) for path, _value in data_leaves]
-    for needle in (
-        "temperature_profile",
-        "pumping_speed_m3_s",
-        "conductance_path",
-        "vacuum_limit_mbar",
-        "pressed_at_tons",
-        "composition_wt_pct",
-        "stage0_profile",
-        "power_W",
-        "effective_dt_s",
-        "exposed_area_m2",
-        "sticking_coefficient",
-    ):
-        assert any(needle in path for path in joined), needle
-    for path, value in data_leaves:
-        _assign(resolved, path, _mutate_leaf(value))
-        try:
-            changed = _key(cache_key_document(resolved))
-        finally:
-            _assign(resolved, path, value)
-        assert changed != base_key, path
-    assert cache_key_document(resolved) == base
-    resolved["future_prediction_input"] = 1.0
-    try:
-        assert _key(cache_key_document(resolved)) != base_key
-    finally:
-        del resolved["future_prediction_input"]
-    assert cache_key_document(resolved) == base
-
-
-def test_every_metadata_field_keeps_the_cache_key(
-    robinot_deck: DeckRequest,
-) -> None:
-    """Each metadata field the walk yields is outside the key."""
-
-    resolved = robinot_deck.resolved_configuration
-    base = cache_key_document(resolved)
-    seen: set[str] = set()
-    for path, value in iter_resolved_leaves(resolved):
-        if not path or not isinstance(path[-1], str):
-            continue
-        if not metadata_only_key(path[-1]):
-            continue
-        seen.add(path[-1])
-        _assign(resolved, path, {"mutated": "metadata"})
-        try:
-            assert cache_key_document(resolved) == base, path
-        finally:
-            _assign(resolved, path, value)
-    assert {
-        "trajectory_comparison",
-        "source_class",
-        "model",
-        "elemental_composition_wt_pct",
-        "area_notice",
-        "paper_id",
-        "comparison_contract",
-        "note",
-        "label",
-        "provenance",
-        "duration_source_class",
-    } <= seen
-    resolved["note"] = "a display note added after the load"
-    try:
-        assert cache_key_document(resolved) == base
-    finally:
-        del resolved["note"]
+        if (
+            len(path) >= 4
+            and path[-4] == "surface_temperature_C"
+            and path[-3] == "holder"
+            and path[-2] == 1
+            and path[-1] == "value"
+            and value in (1500, 1500.0)
+        ):
+            holder_terminal = True
+    assert holder_terminal
+    assert found, "the deck should contain reviewed metadata"
+    assert found <= set(_REVIEWED_METADATA_PATHS)
+    for pointer in _REVIEWED_METADATA_PATHS:
+        mutant = copy.deepcopy(resolved)
+        _set_pointer(mutant, pointer, {"sentinel": pointer})
+        assert cache_key_document(mutant) == base, pointer
+    holder = resolved["schedule"]["surface_temperature_C"]["holder"]
+    assert holder[-1]["value"] == pytest.approx(1500.0)
+    shifted = copy.deepcopy(resolved)
+    shifted["schedule"]["surface_temperature_C"]["holder"][-1]["value"] = 1400.0
+    assert _key(cache_key_document(shifted)) != _key(base)
+    for name in ("observed_holder", "holder_reason", "note"):
+        left = copy.deepcopy(resolved)
+        right = copy.deepcopy(resolved)
+        for tree, terminal in ((left, 1500.0), (right, 1400.0)):
+            curve = [
+                {"t_h": 0.0, "value": 25, "unit": "C"},
+                {"t_h": 1.0, "value": terminal, "unit": "C"},
+            ]
+            tree["schedule"]["surface_temperature_C"][name] = curve
+        assert _key(cache_key_document(left)) != _key(cache_key_document(right)), name
+        assert _key(cache_key_document(left)) != _key(base), name
 
 
 def test_holder_profile_binding_changes_the_cache_key(
@@ -1484,6 +1534,63 @@ def test_holder_profile_binding_changes_the_cache_key(
     for deck, temperature in zip(decks, holder):
         run_cached_deck(deck, solve_at(temperature))
     assert solved == holder
+    assert _key(decks[0].cache_request) != _key(decks[1].cache_request)
+
+
+@pytest.mark.parametrize("profile", ["observed_holder", "holder_reason", "note"])
+def test_renamed_holder_curve_changes_the_cache_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    profile: str,
+) -> None:
+    """A dynamic profile id is keyed, including names that look like notes.
+
+    The holder surface still reads that curve. Two decks that differ only
+    in its terminal temperature do not share a key, and each miss solves.
+    """
+
+    _configure(monkeypatch, tmp_path)
+    source = (REPO / ROBINOT_PRESET).read_text(encoding="utf-8")
+    assert source.count("    holder:\n") == 1
+    assert source.count("temperature_profile: holder") == 1
+    assert source.count("value: 1500, unit: C") == 1
+    renamed = source.replace("    holder:\n", f"    {profile}:\n", 1)
+    renamed = renamed.replace(
+        "temperature_profile: holder",
+        f"temperature_profile: {profile}",
+        1,
+    )
+    decks = []
+    temperatures = []
+    for terminal in (1500, 1400):
+        path = tmp_path / f"{profile}-{terminal}.yaml"
+        path.write_text(
+            renamed.replace(
+                "value: 1500, unit: C",
+                f"value: {terminal}, unit: C",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        deck = build_deck_request(path)
+        sim = deck.run._start_session().simulator
+        temperatures.append(sim._resolve_lab_surface_temperatures(
+            sim._active_surface_temperature_schedule(),
+            sample_time_h=1.0,
+        )["holder"])
+        decks.append(deck)
+    assert temperatures == [1500.0, 1400.0]
+    solved = []
+
+    def solve_at(temperature):
+        def solve(_request):
+            solved.append(temperature)
+            return _ok_document(decks[0].requested_steps)
+        return solve
+
+    for deck, temperature in zip(decks, temperatures):
+        run_cached_deck(deck, solve_at(temperature))
+    assert solved == temperatures
     assert _key(decks[0].cache_request) != _key(decks[1].cache_request)
 
 

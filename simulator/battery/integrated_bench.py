@@ -7,9 +7,11 @@ disposition. A cached value is a whole-run projection or it is not stored.
 The chemistry version for engine ``simulator`` lives in
 ``simulator.engine_cache``. Bump that version when a cached number
 changes. The cache key is the runner's resolved configuration after the
-one load, minus the metadata list below; a new prediction field is in
-the key without a version bump. The runner file hash and the preset
-digest are provenance and stay out of the cache key.
+one load, minus the exact metadata paths below. A new prediction field,
+including a user-named curve, is in the key without a version bump.
+Paths are matched exactly: not by name, prefix, or suffix. The runner
+file hash and the preset digest are provenance and stay out of the
+cache key.
 """
 
 from __future__ import annotations
@@ -72,133 +74,95 @@ _SESKO_IDS = (
     "kems-036-sesko-2024::sesko_2024_table2_factsage_and_literature_o2_yield",
 )
 
-# Comparison and provenance names. A request that contains one of these
-# has copied a measurement into the solve input.
+# Measurement tokens. A request that contains one has copied a result
+# into the solve input. Provenance names are not matched: a dynamic
+# curve may carry a citation, and that citation stays in the key.
 FORBIDDEN_REQUEST_KEYS = frozenset({
-    "trajectory_comparison",
     "comparison_points",
-    "comparison_contract",
     "expected_value",
     "expected_values",
-    "measurement_selectors",
-    "source_notes",
-    "extraction_note",
-    "citation_id",
-    "digest",
-    "digests",
-    "elemental_composition_wt_pct",
-    "elemental_composition_status",
-    "uncertainty",
     "observation_id",
-    "observed",
-    "sidecar",
-    "provenance",
-    "qualifier",
-    "extraction_status",
-    "source_ref",
-    "input_role",
-    "source_class",
-    "basis",
-    "lineage",
-    "trial_id",
-})
-
-# Metadata only. Anything else in the resolved configuration is key material,
-# including a field that shows up later. Over-keying misses; a wrong hit does not.
-METADATA_ONLY_KEYS = frozenset({
-    "area_notice",
-    "basis",
-    "citation_id",
-    "comparison_contract",
-    "comparison_points",
-    "composition_basis",
-    "confidence",
-    "digest",
-    "digests",
-    "display_name",
-    "elemental_composition_status",
-    "elemental_composition_wt_pct",
-    "elemental_cross_check_note",
-    "elemental_sum_check",
-    "expected_value",
-    "expected_values",
-    "exposed_melt_area_notice",
-    "extraction_note",
-    "extraction_status",
-    "fast_tier_policy",
-    "findings_ref",
-    "grid_end_min",
-    "grid_interval_min",
-    "grid_resampling",
-    "input_role",
-    "label",
-    "lineage",
-    "measurement_id",
-    "measurement_selectors",
-    "model",
-    "named_missing_fields",
-    "note",
-    "notes",
-    "notices",
-    "observation_id",
-    "observation_sidecar_path",
-    "observable_id",
-    "observed",
-    "other_trial_fraction",
-    "paper_aliases",
-    "paper_citation_id",
-    "paper_id",
-    "process_notes",
-    "provenance",
-    "qualifier",
-    "reason",
-    "resolution_rationale",
-    "sidecar",
-    "simulant_vs_real_caveat",
-    "source",
-    "source_class",
-    "source_notes",
-    "source_ref",
-    "target",
-    "trajectory_comparison",
     "trial_id",
     "uncertainty",
 })
-METADATA_ONLY_SUFFIXES = (
-    "_citation_id",
-    "_digest",
-    "_extraction_note",
-    "_note",
-    "_notes",
-    "_qualifier",
-    "_reason",
-    "_source_class",
-    "_source_ref",
-)
-METADATA_ONLY_PREFIXES = ("observed_",)
+
+# Exact schema paths omitted from the cache key, with the node and its
+# subtree. A path not listed here is key material, whatever it is named.
+# Over-keying misses; a wrong hit does not. Dynamic curve, profile, and
+# surface ids are not listed.
+METADATA_EXCLUSION_PATHS: dict[str, str] = {
+    "/area_notice": "area-bridge display notice, not a melt input",
+    "/preset/paper_id": "paper label",
+    "/preset/paper_citation_id": "citation id",
+    "/preset/measurement_id": "measurement label",
+    "/preset/extraction_status": "extraction status label; the refusal gate reads it before the key",
+    "/preset/source_notes": "source notes",
+    "/preset/measurement_selectors": "observation selectors, not the solve",
+    "/preset/comparison_contract": "comparison policy, sidecar path, and fast-tier policy",
+    "/preset/digests": "provenance digests, including schedule_digest",
+    "/preset/trajectory_comparison": "comparison grid and figure targets",
+    "/preset/lab_geometry/sample/exposed_melt_area_notice": "geometry display notice",
+    "/preset/lab_geometry/pump/model": "pump model name, not a solve input",
+    "/preset/lab_geometry/pump/model_source_class": "pump model citation class",
+    "/preset/lab_geometry/pump/model_citation_id": "pump model citation id",
+    "/preset/lab_geometry/pump/model_digest": "pump model citation text",
+    "/preset/lab_schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot",
+    "/preset/lab_schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot",
+    "/preset/lab_schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot",
+    "/schedule/melt_temperature_C/0/source_class": "citation class of the initial melt knot on the resolved schedule",
+    "/schedule/melt_temperature_C/0/citation_id": "citation id of the initial melt knot on the resolved schedule",
+    "/schedule/melt_temperature_C/0/extraction_note": "citation note of the initial melt knot on the resolved schedule",
+    "/feedstock/entry/name": "feedstock display name",
+    "/feedstock/entry/label": "feedstock display label",
+    "/feedstock/entry/source": "feedstock citation source",
+    "/feedstock/entry/confidence": "feedstock confidence label",
+    "/feedstock/entry/note": "feedstock display note",
+    "/feedstock/entry/paper_aliases": "feedstock paper aliases",
+    "/feedstock/entry/provenance": "feedstock citation provenance",
+    "/feedstock/entry/simulant_vs_real_caveat": "feedstock display caveat",
+    "/feedstock/entry/process_notes": "feedstock process notes",
+    "/feedstock/entry/composition_basis": "composition citation basis",
+    "/feedstock/entry/composition_status": "composition status label",
+    "/feedstock/entry/sum_check": "oxide sum cross-check, not an input mass",
+    "/feedstock/entry/elemental_composition_wt_pct": "elemental cross-check, not the loadable oxide table",
+    "/feedstock/entry/elemental_sum_check": "elemental sum cross-check",
+    "/feedstock/entry/elemental_composition_status": "elemental cross-check status",
+    "/feedstock/entry/elemental_cross_check_note": "elemental cross-check note",
+}
 
 
-def metadata_only_key(name: str) -> bool:
-    """True when this field is a label, citation, note, target, or uncertainty."""
+def _json_pointer(path: tuple[Any, ...]) -> str:
+    """JSON pointer for a resolved path. ``~`` and ``/`` in a key are escaped."""
 
-    return (
-        name in METADATA_ONLY_KEYS
-        or name.startswith(METADATA_ONLY_PREFIXES)
-        or name.endswith(METADATA_ONLY_SUFFIXES)
-    )
+    chunks: list[str] = []
+    for step in path:
+        text = str(step).replace("~", "~0").replace("/", "~1")
+        chunks.append("/")
+        chunks.append(text)
+    return "".join(chunks)
 
 
-def _canonicalize(value: Any) -> Any:
-    """Sorted keys and the runner's numeric-string parse, metadata omitted."""
+def _canonicalize(value: Any, path: tuple[Any, ...] = ()) -> Any:
+    """Sorted keys and the runner's numeric-string parse.
+
+    A listed metadata path is omitted with its subtree. Every other
+    field is kept, including a curve whose name looks like a note.
+    """
 
     if isinstance(value, Mapping):
-        return {
-            str(key): _canonicalize(item)
-            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
-            if not metadata_only_key(str(key))
-        }
+        packed: dict[str, Any] = {}
+        for key, item in sorted(value.items(), key=lambda pair: str(pair[0])):
+            name = str(key)
+            child = path + (name,)
+            if _json_pointer(child) in METADATA_EXCLUSION_PATHS:
+                continue
+            packed[name] = _canonicalize(item, child)
+        return packed
     if isinstance(value, (list, tuple)):
-        return [_canonicalize(item) for item in value]
+        return [
+            _canonicalize(item, path + (index,))
+            for index, item in enumerate(value)
+        ]
     if isinstance(value, bool) or value is None:
         return value
     if is_declared_real_scalar(value, allow_numeric_str=True):
@@ -232,60 +196,6 @@ def cache_key_document(resolved: Mapping[str, Any]) -> dict[str, Any]:
             reason="non_numeric",
         )
     return document
-
-
-def iter_resolved_leaves(
-    value: Any,
-    path: tuple[Any, ...] = (),
-):
-    """Yield ``(path, value)`` for each leaf and each metadata field.
-
-    Metadata fields are yielded whole and are not descended into. Every
-    other leaf of a mapping or sequence is yielded, including an empty
-    container.
-    """
-
-    if isinstance(value, Mapping):
-        yielded = False
-        for key in sorted(value, key=str):
-            child = path + (str(key),)
-            item = value[key]
-            if metadata_only_key(str(key)):
-                yielded = True
-                yield child, item
-                continue
-            if isinstance(item, (Mapping, list, tuple)):
-                nested = False
-                for leaf in iter_resolved_leaves(item, child):
-                    nested = True
-                    yielded = True
-                    yield leaf
-                if not nested:
-                    yielded = True
-                    yield child, item
-            else:
-                yielded = True
-                yield child, item
-        if not yielded:
-            yield path, value
-        return
-    if isinstance(value, (list, tuple)):
-        if len(value) == 0:
-            yield path, value
-            return
-        for index, item in enumerate(value):
-            child = path + (index,)
-            if isinstance(item, (Mapping, list, tuple)):
-                nested = False
-                for leaf in iter_resolved_leaves(item, child):
-                    nested = True
-                    yield leaf
-                if not nested:
-                    yield child, item
-            else:
-                yield child, item
-        return
-    yield path, value
 
 
 _SUCCESS_STATUS = "ok"
