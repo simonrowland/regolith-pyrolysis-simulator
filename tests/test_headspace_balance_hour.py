@@ -1778,6 +1778,13 @@ def test_cro3_band_hour_oxygen_matches_the_integrated_captured_mass():
     integrated over the hour equals the oxygen the route posts for
     the integrated mass. A mass whose product clears the floor posts
     the same oxygen with the flag and without it.
+
+    The evaporation oxidant is one debit of the seeded buffer. The
+    booking's oxygen is an overhead credit, not a second buffer debit.
+
+    Mutation: debiting reservoir.fo2_buffer from the condensation
+    booking, on either flag, leaves a mol other than the seeded stock
+    plus mass * O2_per_product_kg / M_O2.
     """
 
     from engines.builtin.condensation_route import (
@@ -1837,10 +1844,26 @@ def test_cro3_band_hour_oxygen_matches_the_integrated_captured_mass():
     assert per_hour * hours == posted_o2
 
     chromium = BuiltinCondensationRouteProvider.CHROMIUM_CONDENSED_ACCOUNT
-    parent = sim._evaporation_stoich("CrO3", row)["parent_oxide"]
+    stoich = sim._evaporation_stoich("CrO3", row)
+    parent = stoich["parent_oxide"]
     parent_molar = resolve_species_formula(
         parent, registry,
     ).molar_mass_kg_per_mol()
+    # Premise: CrO1.5(l) + oxidant -> CrO3(g). The oxidant is one
+    # debit of the gross vapour, and O2_per_product_kg is that
+    # kilogram ratio, negative.
+    # Algebra: n = n_seed + m_vapour * (kg_O2 / kg_vapour) / M_O2.
+    # Unit check: kg * (kg/kg) / (kg/mol) = mol.
+    # Limit: m_vapour = 0 leaves the seeded 1 mol. A second debit of
+    # the same oxidant, or of the condensation credit, does not.
+    o2_per_product_kg = float(stoich["O2_per_product_kg"])
+    assert o2_per_product_kg < 0.0
+    o2_molar = resolve_species_formula(
+        "O2", registry,
+    ).molar_mass_kg_per_mol()
+
+    def _buffer_after_one_debit(mass_kg: float) -> float:
+        return 1.0 + mass_kg * o2_per_product_kg / o2_molar
 
     def _routed(mass_kg: float, *, headspace: bool) -> tuple[float, float]:
         trial = _lunar()
@@ -1862,6 +1885,9 @@ def test_cro3_band_hour_oxygen_matches_the_integrated_captured_mass():
             booking=booking,
         )
         after = _ledger_mol(trial, "process.overhead_gas", "O2")
+        assert _ledger_mol(trial, "reservoir.fo2_buffer", "O2") == (
+            _buffer_after_one_debit(mass_kg)
+        )
         return after - before, _ledger_mol(trial, chromium, "Cr2O3")
 
     delta, oxide = _routed(integral_kg, headspace=True)
