@@ -235,13 +235,13 @@ observable_audit:
     composition: 1461/1461 have the linked starting bulk
     temperature: 1461/1461 printed
     total_pressure: 1461/1461 printed
-    actual_fO2: 0/1461 printed as an absolute run value; Table 1 and the page 7 statement leave the actual value unknown for d-460's flagged default handling
+    actual_fO2: 0/1461 printed as an absolute run value; Table 1 and the page 7 statement leave the actual value unknown
     actual_fO2_locator_proof:
       physical_page: 7
       pdf_page_index: 6
       published_page: 7
       proof_string: no PtO2 is present in the samples after the experiments, so the real fO2 in the experiments is more reduced than the fO2 of the Pt–PtO2 buffer
-    outcome: all 1461 are candidates for flagged-default prediction after the non-echo initial-bulk stamp; none has an unflagged actual-fO2 identity
+    outcome: all 1461 phase rows are currently refused at the shared phase-row preflight with missing_input fO2_Pa because no absolute fO2 is printed; the d-460 fix is owned by the canonical-buffer car and will resolve the policy registry rungs DP-112, DP-003, and DP-010, in that precedence order
   quench_audit:
     target_rows: 1461 glass-component observations plus the starting-glass Fe3+/ΣFe observation
     product_row_status: not_stated for preservation of the reported component composition; the source notes that some EO may have degassed during quenching but does not say that the listed component analyses preserve the run composition
