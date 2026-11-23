@@ -141,6 +141,16 @@ def _resolved_value(
         return Decimal(match.group(1)) * _decimal(
             context["P_total"], context_name="P_total"
         )
+    if policy_id == "DP-011":
+        inferred_method = context.get("inferred_method")
+        if not isinstance(inferred_method, str) or not inferred_method.strip():
+            raise ValueError("DP-011 requires an inferred method from its quantity")
+        return inferred_method
+    if policy_id == "DP-018":
+        method_condition = context.get("method_condition")
+        if not isinstance(method_condition, str) or not method_condition.strip():
+            raise ValueError("DP-018 requires the method-implied condition")
+        return method_condition
     if policy_id == "DP-007":
         from simulator.state import MeltState
 

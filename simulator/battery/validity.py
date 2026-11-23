@@ -61,6 +61,7 @@ from simulator.battery.enums import (
     StateTag,
     ValueKind,
 )
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.identity import (
     Identity,
     log10K_from_delta_fG_kJ_mol,
@@ -73,6 +74,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     State,
     Value,
@@ -95,27 +97,6 @@ KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
 # from an unsourced collision diameter. Without a located diameter, use the
 # ~10 Pa ceiling alone.
 KEMS_CELL_PRESSURE_MAX_PA = Decimal("10")
-
-# Policy ids stay here until the shared DP registry lands. Each value has one
-# owner and can then be replaced mechanically by the registry resolver.
-DP_004_POLICY_ID = "DP-004"
-_KNUDSEN_FIXED_PRESSURE_CONDITIONS = (
-    "vacuum outside",
-    "total pressure is the sum of partials in the cell, NOT 1 atm",
-)
-DP_004_METHOD_IMPLICATION = (
-    "molecular effusion inside the cell",
-    *_KNUDSEN_FIXED_PRESSURE_CONDITIONS,
-)
-DP_005_POLICY_ID = "DP-005"
-DP_005_ALPHA = "1"
-DP_011_POLICY_ID = "DP-011"
-DP_011_METHOD_EQUILIBRIUM_PRESSURE = "equilibrium_partial_pressure"
-DP_011_METHOD_HKL = "hertz_knudsen_langmuir"
-DP_018_POLICY_ID = "DP-018"
-DP_018_METHOD_IMPLICATION = _KNUDSEN_FIXED_PRESSURE_CONDITIONS
-DP_100_POLICY_ID = "DP-100"
-DP_POLICY_VERSION = "v1"
 
 EFFUSION_REGIME_PREDICTION_FLAGS = frozenset(
     {
@@ -228,27 +209,27 @@ def apparatus_prediction_notices(
             )
         )
     if flag in EFFUSION_REGIME_PREDICTION_FLAGS:
+        # Knudsen cells are built for molecular effusion; when the check cannot
+        # run, DP-004 records that method-defined regime and its cell conditions.
         # DP-018 records the Knudsen method's fixed external vacuum and
         # in-cell total pressure convention separately from the DP-004 regime.
+        implied_conditions = str(resolve_default_policy("DP-004").value)
+        implied_policy = _notice_policy_from_registry(
+            "DP-018", method_condition=implied_conditions
+        )
         notices.append(
             Notice(
                 kind=NoticeKind.METHOD_IMPLIED,
                 affected_quantities=(quantity,),
                 reason=(
                     "method_implied; condition=Knudsen effusion implies "
-                    f"{'; '.join(DP_018_METHOD_IMPLICATION)}; "
+                    f"{implied_conditions}; "
                     f"original_reason={original_reason}; evidence={evidence_text}"
                 ),
                 origin=origin,
                 band=band,
                 authority=Authority.EXTRAPOLATED,
-                policy={
-                    "id": DP_018_POLICY_ID,
-                    "version": DP_POLICY_VERSION,
-                    "status": "canonical",
-                    "value": "; ".join(DP_018_METHOD_IMPLICATION),
-                    "units": "pressure in Pa",
-                },
+                policy=implied_policy,
             )
         )
     return tuple(notices)
@@ -256,44 +237,35 @@ def apparatus_prediction_notices(
 
 def _apparatus_policy(
     flag: object, detail: Mapping[str, Any]
-) -> Mapping[str, str] | None:
+) -> NoticePolicy | None:
     """Attach the DP table identity to the notice that carries its flag."""
 
     if flag == NoticeKind.METHOD_ASSUMED.value:
-        return {
-            "id": DP_011_POLICY_ID,
-            "version": DP_POLICY_VERSION,
-            "status": "canonical",
-            "value": str(detail.get("assumed_method") or "inferred_from_quantity"),
-            "units": "method",
-        }
+        return _notice_policy_from_registry(
+            "DP-011",
+            inferred_method=str(
+                detail.get("assumed_method") or "inferred_from_quantity"
+            ),
+        )
     if flag == NoticeKind.ALPHA_ASSUMED.value:
-        return {
-            "id": DP_005_POLICY_ID,
-            "version": DP_POLICY_VERSION,
-            "status": "canonical",
-            "value": DP_005_ALPHA,
-            "units": "dimensionless",
-        }
+        return _notice_policy_from_registry("DP-005")
     if flag == NoticeKind.EFFUSION_REGIME_ASSUMED.value:
-        return {
-            "id": DP_004_POLICY_ID,
-            "version": DP_POLICY_VERSION,
-            "status": "canonical",
-            "value": "; ".join(DP_004_METHOD_IMPLICATION),
-            "units": "regime; pressure in Pa",
-        }
+        return _notice_policy_from_registry("DP-004")
     if flag == NoticeKind.EFFUSION_REGIME_VIOLATED.value:
         # DP-100 is proposed because the v1 table has no entry for contrary
         # regime evidence; these rows stay in their own proposed-policy tier.
-        return {
-            "id": DP_100_POLICY_ID,
-            "version": DP_POLICY_VERSION,
-            "status": "proposed",
-            "value": "retain numeric pressure residual; measured pressure is below equilibrium pressure",
-            "units": "Pa",
-        }
+        return _notice_policy_from_registry("DP-100")
     return None
+
+
+def _notice_policy_from_registry(
+    policy_id: str, **context: object
+) -> NoticePolicy:
+    resolved = resolve_default_policy(policy_id, **context)
+    policy = resolved.payload["policy"]
+    if not isinstance(policy, Mapping):
+        raise ValueError(f"{policy_id} did not resolve NoticePolicy metadata")
+    return NoticePolicy(**policy)
 
 _CALIBRATION_STANDARD_FIELDS = frozenset(
     {
@@ -1038,7 +1010,7 @@ def _method_assumption_detail(
         # DP-005 sets alpha=1 as the maximum HKL flux. J = alpha*P_eq /
         # sqrt(2*pi*M*R*T); with M in kg/mol, units reduce to mol m^-2 s^-1.
         # alpha=0 gives zero flux and alpha=1 gives the one-sided upper bound.
-        assumed_method = DP_011_METHOD_HKL
+        assumed_method = "hertz_knudsen_langmuir"
         alpha_value, alpha_source_evidence, invalid_alpha = (
             _sourced_evaporation_alpha(observation)
         )
@@ -1050,9 +1022,9 @@ def _method_assumption_detail(
                 "original_reason": method_reason,
             }
         if alpha_value is None:
-            alpha = DP_005_ALPHA
+            alpha = str(resolve_default_policy("DP-005").value)
             alpha_assumption = {
-                "alpha": DP_005_ALPHA,
+                "alpha": alpha,
                 "physical_basis": "Hertz-Knudsen-Langmuir maximum flux",
                 "bias": "upper_bound_on_flux",
             }
@@ -1066,13 +1038,13 @@ def _method_assumption_detail(
         # The identity is already a pressure observable, so the scorer compares
         # it with the engine equilibrium pressure without inventing an apparatus
         # reduction. The absent experimental method remains visible in the flag.
-        assumed_method = DP_011_METHOD_EQUILIBRIUM_PRESSURE
+        assumed_method = "equilibrium_partial_pressure"
         alpha = None
     elif "knudsen" in source_text or "kems" in source_text:
         assumed_method = MethodToken.KNUDSEN_EFFUSION.value
         alpha = None
     elif "langmuir" in source_text or "free evaporation" in source_text:
-        assumed_method = DP_011_METHOD_HKL
+        assumed_method = "hertz_knudsen_langmuir"
         alpha = None
     elif quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         # Activity and its coefficient are thermodynamic quantities; the engine

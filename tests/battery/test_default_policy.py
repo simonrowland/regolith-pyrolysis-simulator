@@ -110,6 +110,30 @@ def test_canonical_policy_values() -> None:
     assert resolve("DP-015").units == "K"
 
 
+def test_kems_method_policies_resolve_owner_results() -> None:
+    regime = resolve("DP-004")
+    assert regime.value.startswith("molecular effusion inside the cell")
+    assert regime.units == "method-implied conditions"
+    assert NoticePolicy(**regime.payload["policy"]).value == regime.value
+
+    method = resolve(
+        "DP-011", inferred_method="equilibrium_partial_pressure"
+    )
+    assert method.value == "equilibrium_partial_pressure"
+    assert method.flag is NoticeKind.METHOD_ASSUMED
+    assert NoticePolicy(**method.payload["policy"]).value == method.value
+
+    conditions = resolve("DP-018", method_condition=str(regime.value))
+    assert conditions.value == regime.value
+    assert conditions.flag is NoticeKind.METHOD_IMPLIED
+    assert NoticePolicy(**conditions.payload["policy"]).value == conditions.value
+
+    with pytest.raises(ValueError, match="DP-011 requires an inferred method"):
+        resolve("DP-011")
+    with pytest.raises(ValueError, match="DP-018 requires the method-implied condition"):
+        resolve("DP-018")
+
+
 def test_numeric_policy_payloads_construct_notice_policy_with_normalized_values() -> None:
     expected = {
         "DP-001": ("101325", Decimal("101325")),
@@ -177,12 +201,7 @@ def test_contextual_formula_does_not_return_its_text_as_a_value() -> None:
 
 
 def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
-    assert load_policy_table()["DP-004"]["formula_owner"] == (
-        "simulator.battery.score._sum_gas_partial_pressures_pa"
-    )
     cases = (
-        ("DP-004", {"measured_partial_pressures": [Decimal("1"), Decimal("2")]}),
-        ("DP-004", {"value": Decimal("3")}),
         (
             "DP-013",
             {
