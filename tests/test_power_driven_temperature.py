@@ -61,6 +61,10 @@ def _melt(temperature_C: float = 25.0) -> MeltState:
 
 
 def _step(manager, melt, step_index: int):
+    # _update_temperature clears the coupled record before the step's
+    # first read. This helper calls get_temp_target directly, so it
+    # clears here. A same-step reuse test must not.
+    manager.__dict__.pop("_power_temperature_for_step", None)
     elapsed_h = step_index * manager._process_dt_h
     previous = float(melt.temperature_C)
     target, ramp = manager.get_temp_target(
@@ -330,6 +334,74 @@ def test_power_driven_target_skips_the_furnace_clamp_and_the_c0_forecast_cap():
     record = manager._power_temperature_for_step
     assert record["exceeds_furnace_max"] is True
     assert target == pytest.approx(record["temperature_C"])
+
+
+def test_a_later_call_in_the_same_step_reuses_the_coupled_record():
+    schedule = _robinot_schedule()
+    manager = _manager(schedule)
+    melt = _melt()
+    calls = {"n": 0}
+
+    def rates(temperature_K: float) -> dict[str, float]:
+        calls["n"] += 1
+        if float(temperature_K) < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            return {}
+        return {"SiO": 0.01}
+
+    manager._species_rate_kg_hr_at_K = rates
+    hour = 0.0
+    target, ramp = manager.get_temp_target(CampaignPhase.C2A, hour, melt)
+    record = manager._power_temperature_for_step
+    sink = record["evaporative_sink_W"]
+    solved_calls = calls["n"]
+    assert sink > 0.0
+    assert solved_calls > 0
+    assert record["campaign_phase"] is CampaignPhase.C2A
+    assert record["campaign_hour"] == hour
+    assert record["ramp_C_per_hr"] == pytest.approx(ramp)
+
+    again, again_ramp = manager.get_temp_target(CampaignPhase.C2A, hour, melt)
+    assert calls["n"] == solved_calls
+    assert again == pytest.approx(target)
+    assert again_ramp == pytest.approx(ramp)
+    assert manager._power_temperature_for_step["evaporative_sink_W"] == sink
+
+    # The step has applied the temperature. A re-solve would book a new
+    # ramp from here, and with the callback gone it would book no sink.
+    melt.temperature_C = float(target)
+    manager.__dict__.pop("_species_rate_kg_hr_at_K", None)
+    booked, booked_ramp = manager.get_temp_target(CampaignPhase.C2A, hour, melt)
+    assert calls["n"] == solved_calls
+    assert booked == pytest.approx(target)
+    assert booked_ramp == pytest.approx(ramp)
+    assert booked_ramp > 0.0
+    assert manager._power_temperature_for_step["evaporative_sink_W"] == sink
+
+    # Hour matches. Campaign does not. These reads must not adopt the
+    # coupled temperature or replace the record.
+    sodium, _sodium_ramp = manager.get_temp_target(
+        CampaignPhase.C3_NA,
+        0,
+        melt,
+    )
+    mre, _mre_ramp = manager.get_temp_target(
+        CampaignPhase.MRE_BASELINE,
+        0,
+        melt,
+    )
+    assert sodium == pytest.approx(1150.0)
+    assert mre == pytest.approx(1575.0)
+    assert manager._power_temperature_for_step["temperature_C"] == pytest.approx(
+        target
+    )
+    assert manager._power_temperature_for_step["evaporative_sink_W"] == sink
+    assert manager._power_temperature_for_step["campaign_phase"] is CampaignPhase.C2A
+
+    fresh, _fresh_ramp, fresh_record, _previous = _step(manager, melt, 1)
+    assert calls["n"] == solved_calls
+    assert fresh_record["evaporative_sink_W"] == pytest.approx(0.0)
+    assert fresh_record["campaign_hour"] == pytest.approx(_DT_H)
+    assert fresh != pytest.approx(target)
 
 
 def test_a_printed_area_and_emissivity_emit_no_knob_defaulted_notice():

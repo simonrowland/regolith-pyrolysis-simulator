@@ -17892,6 +17892,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
             self.campaign_mgr._species_rate_kg_hr_at_K = _rates
             installed = True
+        # The previous step's coupled record is not this step. Clear it
+        # before the first read, on a setpoint step as well, so the only
+        # reuse is a later C0 or C6 read in this same step.
+        self.campaign_mgr.__dict__.pop("_power_temperature_for_step", None)
         try:
             target_T, ramp_rate = self.campaign_mgr.get_temp_target(
                 self.melt.campaign, self.melt.campaign_hour, self.melt)

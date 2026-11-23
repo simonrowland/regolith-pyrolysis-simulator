@@ -2413,7 +2413,9 @@ class CampaignManager:
         # setpoint. The furnace clamp and the C0 forecast cap would pin
         # every power level to the same ceiling. Flags record the
         # exceedance; the solved temperature is what the step applies.
-        power_step = self.__dict__.get("_power_temperature_for_step")
+        # Only this campaign and hour. A C3, C7, or MRE read in the same
+        # step must not adopt or rewrite the coupled record.
+        power_step = self._stored_power_step(campaign, campaign_hour)
         if power_step is not None:
             if target_T is None or not math.isfinite(float(target_T)):
                 raise ValueError(
@@ -2464,12 +2466,39 @@ class CampaignManager:
             )
         return min(requested, self.furnace_max_T_C)
 
+    def _stored_power_step(
+        self,
+        campaign: CampaignPhase,
+        campaign_hour: int,
+    ) -> Optional[Mapping]:
+        """Coupled balance already solved for this campaign and hour.
+
+        C0 exit and the C6 hold read the temperature again after the
+        step has applied it. They return this record, including the ramp
+        from before the melt moved, and they do not re-solve. A call for
+        another campaign or hour is not this step.
+        """
+        record = self.__dict__.get("_power_temperature_for_step")
+        if not isinstance(record, Mapping):
+            return None
+        if record.get("campaign_phase") != campaign:
+            return None
+        if record.get("campaign_hour") != campaign_hour:
+            return None
+        if "ramp_C_per_hr" not in record:
+            return None
+        return record
+
     def _get_base_temp_target(self, campaign: CampaignPhase,
                                campaign_hour: int,
                                melt: MeltState) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
-        if "_power_temperature_for_step" in self.__dict__:
-            del self._power_temperature_for_step
+        coupled = self._stored_power_step(campaign, campaign_hour)
+        if coupled is not None:
+            return (
+                float(coupled["temperature_C"]),
+                float(coupled["ramp_C_per_hr"]),
+            )
         lab_schedule = self._lab_schedule(campaign)
         if lab_schedule is not None:
             sample_time_h = schedule_sample_time_h(
@@ -2495,9 +2524,18 @@ class CampaignManager:
                         self, "_species_rate_kg_hr_at_K", None
                     ),
                 )
-                self._power_temperature_for_step = record
                 target = float(record["temperature_C"])
-                return (target, abs(target - float(melt.temperature_C)))
+                ramp = abs(target - float(melt.temperature_C))
+                # A record for another campaign or hour stays. This call
+                # does not replace it. The step clears the record before
+                # its own first read.
+                held = self.__dict__.get("_power_temperature_for_step")
+                if not isinstance(held, Mapping):
+                    record["ramp_C_per_hr"] = ramp
+                    record["campaign_phase"] = campaign
+                    record["campaign_hour"] = campaign_hour
+                    self._power_temperature_for_step = record
+                return (target, ramp)
             target = interpolate_schedule_points(
                 lab_schedule['melt_temperature_C'],
                 sample_time_h,
