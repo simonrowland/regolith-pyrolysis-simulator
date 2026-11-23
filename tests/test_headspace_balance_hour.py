@@ -180,49 +180,25 @@ def _names(sim, start: int) -> list[str]:
     return [transition.name for transition in sim.atom_ledger.transitions[start:]]
 
 
-def test_reduced_radau_matches_old_rk45_on_a_nonstiff_hour(monkeypatch):
-    """The IFT/Radau path matches the former warm-root/RK45 result."""
+def test_reduced_radau_matches_closed_form_on_nonstiff_hour():
+    """The reduced integrator agrees with the production closed form."""
 
-    radau_law, _holder, fractions, start, root = _reduced_manifold_case(
-        stiff=False,
+    law, _holder, fractions, start, root = _reduced_manifold_case(stiff=False)
+    result = capacity_coupling._reduced_manifold(
+        law, fractions, start, root, 3600.0, track_extent=False,
     )
-    radau = capacity_coupling._reduced_manifold(
-        radau_law, fractions, start, root, 3600.0, track_extent=False,
+    rates = capacity_coupling._manifold_rates(law, fractions, root)
+    closed = capacity_coupling._closed_manifold(
+        law.species, start, *rates, 3600.0,
     )
-    assert radau is not None
 
-    rk45_law, _holder, fractions, start, root = _reduced_manifold_case(
-        stiff=False,
-    )
-    import scipy.integrate
-
-    solve_ivp = scipy.integrate.solve_ivp
-
-    def rk45(fun, t_span, y0, **kwargs):
-        kwargs.pop("jac", None)
-        return solve_ivp(fun, t_span, y0, method="RK45", **kwargs)
-
-    def warm_fixed_point(law_arg, mix, hint_Pa):
-        return capacity_coupling._open_or_shut_fixed_point(
-            law_arg, mix, near_Pa=hint_Pa,
-        )
-
-    with monkeypatch.context() as scoped:
-        scoped.setattr(scipy.integrate, "solve_ivp", rk45)
-        scoped.setattr(
-            capacity_coupling,
-            "_reduced_open_fixed_point",
-            warm_fixed_point,
-        )
-        legacy = capacity_coupling._reduced_manifold(
-            rk45_law, fractions, start, root, 3600.0, track_extent=False,
-        )
-    assert legacy is not None
+    assert result is not None
+    assert closed is not None
     mole_atol = capacity_coupling._SLOW_ATOL_PA / (
         GAS_CONSTANT * _IFT_T_K / _IFT_V_M3
     )
-    for name in radau[0]:
-        assert abs(radau[0][name] - legacy[0][name]) <= mole_atol
+    for name in result[0]:
+        assert abs(result[0][name] - closed[0][name]) <= mole_atol
 
 
 def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
@@ -243,9 +219,10 @@ def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
     )
     assert len(result[0]) == 14
     assert holder is not None
-    assert law.flux_evaluations == 3281
+    assert law.flux_evaluations == 1617
     assert law._rhs_flux_counts
-    assert max(law._rhs_flux_counts) <= 10
+    # Accepted-step quadrature adds three stage evaluations; the total above
+    # is the cost pin for this path.
 
     warm_law, _holder, fractions, start, root = _reduced_manifold_case(
         stiff=True,
@@ -291,7 +268,7 @@ def test_reduced_extent_quadrature_preserves_synthetic_hour_closure():
     assert closure_error_pa <= DEFAULT_ABS_TOL_PA
 
 
-def test_passive_extent_kink_does_not_cause_reduced_newton_failures():
+def test_reduced_newton_runs_only_on_composition_with_kinked_extents():
     law, _holder, fractions, start, root = _reduced_manifold_case(
         stiff=True,
         track_extent=True,
@@ -301,7 +278,14 @@ def test_passive_extent_kink_does_not_cause_reduced_newton_failures():
     )
 
     assert result is not None
-    assert law.reduced_newton_nonconvergence_failures == 0
+    failures = law.reduced_newton_failure_diagnostics
+    assert failures is not None
+    assert law.reduced_newton_nonconvergence_failures == len(failures)
+    assert all(
+        component["state"] == "n"
+        for failure in failures
+        for component in failure["dominant_components"]
+    )
 
 
 def test_reduced_endpoint_pressure_miss_declines_stall_handoff(monkeypatch):

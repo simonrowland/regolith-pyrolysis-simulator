@@ -4213,23 +4213,38 @@ def _reduced_manifold(
     float,
     float,
 ] | None:
-    """Integrate dn_i/dt = s_i(P*(y)) − y_i Q(P*(y)). One solve_ivp."""
+    """Integrate composition with Radau and book passive extents by quadrature."""
 
     import numpy as np
     from scipy.integrate import solve_ivp
+    from scipy.integrate._ivp.radau import C as radau_nodes
 
     species = list(law.species)
     count = len(species)
-    blocks = 5 if track_extent else 3
     law.reduced_time_covered_s = 0.0
     y0 = [float(n_start[name]) for name in species]
-    y0.extend(0.0 for _unused in range(count * (blocks - 1)))
+    nodes = np.asarray(radau_nodes, dtype=float)
+    powers = np.arange(nodes.size)
+    # SciPy exposes C but not b. The moment equations Σ b_j c_j^k =
+    # ∫₀¹ x^k dx = 1/(k+1), for k=0,1,2, recover the three IIA weights;
+    # nodes and weights are dimensionless.
+    moments = 1.0 / (powers + 1.0)
+    quadrature_weights = np.linalg.solve(
+        nodes[None, :] ** powers[:, None], moments,
+    )
+    added = {name: 0.0 for name in species}
+    bled = {name: 0.0 for name in species}
+    vapour = {name: 0.0 for name in species}
+    redox_added = {name: 0.0 for name in species}
+    extent_accumulators = [added, bled]
+    if track_extent:
+        extent_accumulators.extend((vapour, redox_added))
     accepted_root = [float(root)]
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
     recorder = _StiffnessRecord(
         species,
-        ("n", "A", "B", "G", "R") if track_extent else ("n", "A", "B"),
+        ("n",),
         capture_reduced_diagnostics=True,
     )
     last_stage_drive_delta_Pa: list[dict[str, float] | None] = [None]
@@ -4284,14 +4299,17 @@ def _reduced_manifold(
         if crossed:
             recorder.note_drive_crossings(crossed)
 
-    def evaluate(
-        state,
-        root_hint: float,
-    ) -> tuple[list[float], float, dict[str, float] | None]:
+    def evaluate(state, root_hint: float):
         raw = [max(float(state[index]), 0.0) for index in range(count)]
         total = math.fsum(raw)
         if total <= 0.0:
-            return [0.0] * (blocks * count), float(root_hint), None
+            zero = [0.0] * count
+            return (
+                zero,
+                tuple([0.0] * count for _unused in extent_accumulators),
+                float(root_hint),
+                None,
+            )
         evolved = {name: raw[index] / total for index, name in enumerate(species)}
         kind, found = _reduced_open_fixed_point(
             law, evolved, hint_Pa=root_hint,
@@ -4320,32 +4338,40 @@ def _reduced_manifold(
             if track_extent:
                 dg.append(gross[name])
                 dr.append(redox[name])
+        extent_rates = (da, db)
         if track_extent:
-            return dn + da + db + dg + dr, float(found), drive_delta_Pa
-        return dn + da + db, float(found), drive_delta_Pa
+            extent_rates += (dg, dr)
+        return dn, extent_rates, float(found), drive_delta_Pa
 
-    def rhs(_time: float, state) -> list[float]:
+    def rhs_rates(_time: float, state, root_hint: float):
         law.reduced_rhs_calls += 1
         law._note_rhs_flux()
-        rates, _found, drive_delta_Pa = evaluate(state, accepted_root[0])
+        rates, extent_rates, found, drive_delta_Pa = evaluate(state, root_hint)
         record_crossings(
             law.reduced_evaporation_drive_stage_crossing_counts,
             last_stage_drive_delta_Pa[0],
             drive_delta_Pa,
         )
         last_stage_drive_delta_Pa[0] = drive_delta_Pa
+        return rates, extent_rates, found
+
+    def rhs(_time: float, state) -> list[float]:
+        rates, _extent_rates, _found = rhs_rates(
+            _time, state, accepted_root[0],
+        )
         return rates
 
     def jacobian(time: float, state):
         law.reduced_jacobian_builds += 1
-        # A, B, G and R do not enter the rates, so their Jacobian columns
-        # are zero. Each species column differences the reduced RHS once;
-        # that RHS uses one IFT correction, not the bracketed warm solve.
+        # Each composition column differences the reduced RHS once; that
+        # RHS uses one IFT correction, not the bracketed warm solve.
         law._note_rhs_flux()
         base_hint = accepted_root[0]
-        base_rates, _base_root, base_drive_delta_Pa = evaluate(state, base_hint)
+        base_rates, _base_extents, _base_root, base_drive_delta_Pa = evaluate(
+            state, base_hint,
+        )
         base = np.asarray(base_rates, dtype=float)
-        matrix = np.zeros((len(y0), len(y0)), dtype=float)
+        matrix = np.zeros((count, count), dtype=float)
         fd_scale = math.sqrt(np.finfo(float).eps)
         scale = max(
             math.fsum(max(float(state[i]), 0.0) for i in range(count)),
@@ -4362,8 +4388,8 @@ def _reduced_manifold(
             sample = np.asarray(state, dtype=float).copy()
             sample[column] += step
             law._note_rhs_flux()
-            perturbed, _sample_root, sample_drive_delta_Pa = evaluate(
-                sample, base_hint,
+            perturbed, _sample_extents, _sample_root, sample_drive_delta_Pa = (
+                evaluate(sample, base_hint)
             )
             record_crossings(
                 law.reduced_evaporation_drive_jacobian_crossing_counts,
@@ -4389,6 +4415,22 @@ def _reduced_manifold(
         evolved = {
             name: raw[index] / total for index, name in enumerate(species)
         }
+        # The collocation polynomial for n is cubic and n' = dA-dB is
+        # quadratic. At the three Radau IIA nodes n' = f; the quadrature is
+        # exact for n', so h Σ b_j(dA-dB)_j = ∫n' dt = n_end-n_start.
+        # dA,dB,dR are mol/s and dG is kg/s; multiplying by h seconds gives
+        # mol for A/B/R and kg for G. If dA=dB=0, n_end=n_start and closure is 0.
+        dense = solver.dense_output()
+        stage_root_hint = accepted_root[0]
+        for node, weight in zip(nodes, quadrature_weights):
+            stage_time = float(solver.t_old) + float(node) * step_s
+            stage_state = dense(stage_time)
+            _dn, extent_rates, stage_root_hint = rhs_rates(
+                stage_time, stage_state, stage_root_hint,
+            )
+            for accumulator, rates in zip(extent_accumulators, extent_rates):
+                for index, name in enumerate(species):
+                    accumulator[name] += step_s * float(weight) * rates[index]
         law._note_rhs_flux()
         kind, found = _reduced_open_fixed_point(
             law, evolved, hint_Pa=accepted_root[0],
@@ -4397,14 +4439,7 @@ def _reduced_manifold(
             raise _ManifoldLost()
         accepted_root[0] = float(found)
 
-    if track_extent:
-        atol = (
-            [atol_mol] * (3 * count)
-            + [_SLOW_EXTENT_ATOL_KG] * count
-            + [atol_mol] * count
-        )
-    else:
-        atol = [atol_mol] * (3 * count)
+    atol = [atol_mol] * count
     try:
         with _RadauNormTape(recorder):
             solution = solve_ivp(
@@ -4458,27 +4493,25 @@ def _reduced_manifold(
     if not solution.success:
         return None
     end = solution.y[:, -1]
-    added = {name: float(end[count + index]) for index, name in enumerate(species)}
-    bled = {
-        name: float(end[2 * count + index]) for index, name in enumerate(species)
-    }
-    n_end = {
-        name: float(n_start[name]) + added[name] - bled[name] for name in species
-    }
-    vapour = {name: 0.0 for name in species}
-    redox_added = {name: 0.0 for name in species}
-    if track_extent:
-        vapour = {
-            name: float(end[3 * count + index]) for index, name in enumerate(species)
-        }
-        redox_added = {
-            name: float(end[4 * count + index]) for index, name in enumerate(species)
-        }
+    n_end = {name: float(end[index]) for index, name in enumerate(species)}
     if not all(
         math.isfinite(value)
         for mapping in (n_end, added, bled, vapour, redox_added)
         for value in mapping.values()
     ):
+        return None
+    closure_error_pa = max(
+        abs(
+            (
+                n_end[name]
+                - float(n_start[name])
+                - added[name]
+                + bled[name]
+            ) * pa_per_mol
+        )
+        for name in species
+    )
+    if closure_error_pa > DEFAULT_ABS_TOL_PA:
         return None
     start_inflow, _redox, _gross = _manifold_rates(law, fractions, root)
     q_sum = math.fsum(start_inflow.values())
