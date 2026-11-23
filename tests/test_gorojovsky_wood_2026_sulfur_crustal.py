@@ -1,7 +1,9 @@
-"""Regression pins for the printed Tables 2 and 3 in Gorojovsky and Wood (2026)."""
+"""Regression pins for the printed Tables 1-3 in Gorojovsky and Wood (2026)."""
 
 from __future__ import annotations
 
+from collections import Counter
+from copy import deepcopy
 import subprocess
 from decimal import Decimal
 from pathlib import Path
@@ -9,8 +11,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, PhaseRole, Quantity, ValueKind
-from simulator.battery.migrate import _log_fO2_to_pa
+from simulator.battery.enums import (
+    EvidenceClass,
+    Phase,
+    PhaseRole,
+    Quantity,
+    UncertaintyKind,
+    ValueKind,
+)
+from simulator.battery.migrate import _log_fO2_to_pa, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -40,6 +49,12 @@ T2_R003_PRODUCT_GLASS_COMPOSITION = [
     ["Na2O", "7.3"],
     ["K2O", "1.6"],
 ]
+
+TABLE1_STARTING_RENDER_PINS = {
+    "t2-r002": ("SiO2", "64.2", "DAC"),
+    "t2-r004": ("K2O", "15.9", "Foidite"),
+    "t2-r008": ("TiO2", "3.7", "T-Andesite"),
+}
 
 
 def _source_doc() -> dict:
@@ -101,12 +116,133 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
     experiment_by_id = {
         experiment["experiment_id"]: experiment for experiment in doc["experiments"]
     }
+    table1_starting = {
+        experiment["experiment_id"]: experiment
+        for experiment in doc["experiments"]
+        if experiment.get("sample", {})
+        .get("initial_composition", {})
+        .get("locator", {})
+        .get("table")
+        == "1"
+        and experiment["sample"]["initial_composition"]["state"]["tag"]
+        == "value"
+    }
+    assert len(table1_starting) == 74
+    assert all(
+        "printed_composition" not in experiment["sample"]
+        for experiment in table1_starting.values()
+    )
+    migrated_experiments = {
+        experiment.experiment_id.rsplit("::", 1)[-1]: experiment
+        for experiment in result.experiments.values()
+    }
+    usable_initial_compositions = 0
+    refused_initial_compositions = 0
+    for experiment_id, source_experiment in table1_starting.items():
+        source_initial = source_experiment["sample"]["initial_composition"]
+        locator = source_initial["locator"]
+        assert locator["page"] == 39
+        assert locator["pdf_page_index"] == 38
+        assert locator["table"] == "1"
+        migrated_initial = migrated_experiments[
+            experiment_id
+        ].sample.initial_composition
+        assert migrated_initial is not None
+        if migrated_initial.state.is_value:
+            usable_initial_compositions += 1
+            assert migrated_initial.locator is not None
+            assert migrated_initial.locator.page == 39
+            assert migrated_initial.locator.table == "1"
+            raw_components = source_initial["state"]["value"]["components"]
+            expected = wt_pct_to_mole_fraction(
+                {name: Decimal(amount) for name, amount in raw_components}
+            )
+            assert migrated_initial.state.value.components == expected.components
+        else:
+            refused_initial_compositions += 1
+            assert migrated_initial.state.is_unknown
+            assert "printed total wt.% = 98.6" in locator["note"]
+            assert "kept sum=94.37 wt% is below 95 wt%" in (
+                migrated_initial.state.reason or ""
+            )
+    assert usable_initial_compositions == 68
+    assert refused_initial_compositions == 6
+    for experiment_id, (component, expected, row_label) in (
+        TABLE1_STARTING_RENDER_PINS.items()
+    ):
+        starting = table1_starting[experiment_id]["sample"]["initial_composition"]
+        assert starting["state"]["value"]["components"]
+        assert dict(starting["state"]["value"]["components"])[component] == expected
+        assert row_label in starting["locator"]["note"]
+
     raw_observations = {
         raw["observation_id"]: (formula, raw)
         for formula, container in doc["species"].items()
         for raw in container.get("observations", [])
     }
     assert len(raw_observations) == len(all_rows)
+    sample_labels_by_experiment: dict[str, set[str]] = {}
+    for _formula, raw in raw_observations.values():
+        experiment_id = raw.get("experiment")
+        sample_label = raw.get("values", {}).get("sample_name_as_printed")
+        if experiment_id in table1_starting and isinstance(sample_label, str):
+            sample_labels_by_experiment.setdefault(experiment_id, set()).add(
+                sample_label
+            )
+    for experiment_id, experiment in table1_starting.items():
+        labels = sample_labels_by_experiment[experiment_id]
+        assert len(labels) == 1, (experiment_id, labels)
+        table1_note = experiment["sample"]["initial_composition"]["locator"]["note"]
+        assert next(iter(labels)).casefold() in table1_note.casefold()
+    glass_rows = [
+        raw
+        for _formula, raw in raw_observations.values()
+        if raw.get("type") == "composition_series"
+        and raw.get("values", {}).get("phase") == "glass"
+    ]
+    assert len(glass_rows) == 936
+    for raw in glass_rows:
+        quench = raw["values"]["quench_statement"]
+        assert quench["preservation"] == "not_stated"
+        assert quench["quench_direction"] == "not_stated"
+        assert quench["locator"]["page"] == 8
+        assert quench["locator"]["pdf_page_index"] == 7
+        assert "quenched by rapidly raising the chandelier" in quench["statement"]
+
+    zero_width_rows = [
+        raw
+        for _formula, raw in raw_observations.values()
+        if raw.get("uncertainty", {}).get("sigma") == "0.0"
+    ]
+    assert len(zero_width_rows) == 35
+    assert Counter(row.uncertainty.kind for row in all_rows) == {
+        UncertaintyKind.PRINTED: 973,
+        UncertaintyKind.NONE: 10,
+    }
+    assert sum(
+        row.uncertainty.verbatim.get("confidence_level") == "two_sigma"
+        for row in all_rows
+        if isinstance(row.uncertainty.verbatim, dict)
+    ) == 966
+    zero_width_render_pins = {
+        "t2-r018-capacity": ("-6.1 (0.0)", "2", 40, 39),
+        "t2-r037-tio2": ("1.6 (0.0)", "2", 40, 39),
+        "t3-r056-k2o": ("1.0 (0.0)", "3", 41, 40),
+    }
+    for raw_id, (published, table, page, pdf_page_index) in (
+        zero_width_render_pins.items()
+    ):
+        raw = raw_observations[raw_id][1]
+        assert raw["values"]["value_as_published"] == published
+        assert raw["locator"]["table"] == table
+        assert raw["locator"]["page"] == page
+        assert raw["locator"]["pdf_page_index"] == pdf_page_index
+        assert raw["uncertainty"]["sigma"] == "0.0"
+        assert raw["uncertainty"]["confidence_level"] == "two_sigma"
+        migrated_uncertainty = migrated_by_raw_id[raw_id].uncertainty
+        assert isinstance(migrated_uncertainty.verbatim, dict)
+        assert migrated_uncertainty.verbatim["sigma"] == "0.0"
+        assert migrated_uncertainty.verbatim["confidence_level"] == "two_sigma"
 
     refused_partial_analyses = 0
     for raw_id, (formula, raw) in raw_observations.items():
@@ -126,21 +262,21 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         assert printed_oxygen.state.value == Decimal(raw["values"]["point_conditions"]["fO2_log"]["state"]["value"])
         assert printed_oxygen.locator is not None
         sample = experiment_by_id[raw["experiment"]].get("sample", {})
-        printed_composition = sample.get("printed_composition")
+        initial_composition = sample.get("initial_composition")
         if (
             observation.identity.quantity.is_value
             and observation.identity.quantity.value
             is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         ):
             if (
-                isinstance(printed_composition, dict)
-                and printed_composition["state"]["tag"] == "value"
+                isinstance(initial_composition, dict)
+                and initial_composition["state"]["tag"] == "value"
             ):
                 if observation.identity.composition.is_value:
                     assert observation.identity.composition.value is not None
                 else:
-                    # Green's mass-percent refusal gate runs before the
-                    # stack-4 conversion when a printed subset does not close.
+                    # Preserve the Table 1 total/component mismatch as a
+                    # typed refusal instead of filling or renormalizing it.
                     assert observation.identity.composition.is_unknown, raw_id
                     reason = observation.identity.composition.reason or ""
                     if "kept sum=94.37 wt% is below 95 wt%" in reason:
@@ -186,6 +322,24 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
 
     assert refused_partial_analyses == 54
 
+    mutated_doc = deepcopy(doc)
+    mutated_start = next(
+        experiment
+        for experiment in mutated_doc["experiments"]
+        if experiment["experiment_id"] == "t2-r002"
+    )["sample"]["initial_composition"]["state"]["value"]["components"]
+    next(pair for pair in mutated_start if pair[0] == "SiO2")[1] = "64.1"
+    mutated_result = _migrate_real_extract(
+        tmp_path / "starting-composition-mutated",
+        EXTRACT_NAME,
+        extract_doc=mutated_doc,
+    )
+    mutated_row = _row(mutated_result, "t2-r002-sio2")
+    original_row = migrated_by_raw_id["t2-r002-sio2"]
+    assert mutated_row.identity.composition.value.components != (
+        original_row.identity.composition.value.components
+    )
+
     for suffix, quantity, expected in RENDER_PINS:
         observation = _row(result, suffix)
         assert observation.identity.quantity.value is quantity
@@ -215,6 +369,9 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
     printed_logs = first_silica.point_conditions["fO2_log"]
     assert printed_logs.state.is_value
     assert printed_logs.state.value == Decimal("-11.2")
+    assert printed_logs.locator is not None
+    assert printed_logs.locator.page == 40
+    assert printed_logs.locator.table == "2"
 
     row5 = _row(result, "t2-r005-tio2")
     source_row5 = next(
@@ -303,6 +460,7 @@ def test_physical_page_locators_match_source_when_corpus_is_available() -> None:
     pages = (
         (4, "sulfide capacity"),
         (8, "at atmospheric pressure"),
+        (8, "quenched by rapidly raising the chandelier"),
         (9, "Figure 1."),
         (12, "Figure 2."),
         (17, "Figure 3."),
