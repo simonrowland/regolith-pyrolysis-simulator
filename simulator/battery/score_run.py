@@ -345,11 +345,11 @@ def _score_store_with_decisions(
         _compilation_decision_strata,
         _compile_residual_with_lineage,
         _duplicate_observation_refusal_detail,
+        _extent_residue_prediction,
         _group_token,
         _has_duplicate_observation_link,
         _has_intrinsic_redox_activity,
         _hashimoto_residue_prediction,
-        _knudsen_residue_prediction,
         _prepare_score_run,
         _source_alignment_group_key,
         _sossi_residue_prediction,
@@ -584,14 +584,8 @@ def _score_store_with_decisions(
                             and duplicate_detail is None
                             and predict is None
                             and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and experiment is not None and experiment.method.is_value
-                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
                         ):
-                            prediction = _knudsen_residue_prediction(
+                            prediction = _extent_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(

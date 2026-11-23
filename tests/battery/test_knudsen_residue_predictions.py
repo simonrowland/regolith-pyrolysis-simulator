@@ -264,21 +264,39 @@ def test_step_hold_and_linear_are_distinct_temperature_paths():
 
 def test_extent_comparison_preserves_ordinary_identity_guards(extent_point):
     from simulator.battery.enums import IdentityEqualKind
-    from simulator.battery.identity import identity_equal, _same_row_knudsen_residue_identity_equal
+    from simulator.battery.identity import (
+        _same_row_residue_extent_identity_equal,
+        identity_equal,
+    )
     reference, _, _ = extent_point
     identity = reference.identity
     assert identity_equal(identity, identity).kind is IdentityEqualKind.IDENTITY_UNKNOWN
-    assert _same_row_knudsen_residue_identity_equal(identity, identity).kind is IdentityEqualKind.EQUAL
+    assert (
+        _same_row_residue_extent_identity_equal(identity, identity).kind
+        is IdentityEqualKind.EQUAL
+    )
     for field in ("composition", "temperature_K"):
         missing = replace(identity, **{field: State.unknown("missing")})
-        assert _same_row_knudsen_residue_identity_equal(missing, missing).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert (
+            _same_row_residue_extent_identity_equal(missing, missing).kind
+            is IdentityEqualKind.IDENTITY_UNKNOWN
+        )
     changed = replace(identity, species=Species("MgO", Phase.L))
-    assert _same_row_knudsen_residue_identity_equal(identity, changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert (
+        _same_row_residue_extent_identity_equal(identity, changed).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
     changed = replace(identity, temperature_K=State.of(Decimal(2200)))
-    assert _same_row_knudsen_residue_identity_equal(identity, changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert (
+        _same_row_residue_extent_identity_equal(identity, changed).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
     left = replace(identity, fO2_Pa=State.of(Decimal("1e-5")))
     right = replace(identity, fO2_Pa=State.of(Decimal("1e-6")))
-    assert _same_row_knudsen_residue_identity_equal(left, right).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert (
+        _same_row_residue_extent_identity_equal(left, right).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
 
 
 def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(extent_point):
