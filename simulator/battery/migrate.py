@@ -15901,8 +15901,9 @@ def _uncertainty_for_value_selection(
     uncertainty: Uncertainty,
     selection: SourceSelection | None,
     printed_units: str | None,
+    printed_value: str | None = None,
 ) -> Uncertainty:
-    """Carry a percent-to-fraction conversion through its printed width."""
+    """Carry a value conversion through its uncertainty using printed convention."""
 
     if (
         selection is None
@@ -15925,25 +15926,42 @@ def _uncertainty_for_value_selection(
         return uncertainty
     if width is None:
         return uncertainty
+    evidence = " ".join(
+        str(value)
+        for key, value in verbatim.items()
+        if key in {"as_printed", "note", "source", "description"}
+    )
+    locator = verbatim.get("locator")
+    if isinstance(locator, Mapping):
+        evidence += " " + str(locator.get("note", ""))
+    evidence = evidence.casefold()
+    if re.search(r"\brelative\b", evidence):
+        basis = "relative"
+    elif (
+        printed_value is not None
+        and re.search(r"\d\s*\(\s*\d+(?:\.\d+)?\s*\)\s*%", printed_value)
+    ) or any(
+        re.match(r"\s*(?:±|\+/-)\s*\d", str(verbatim.get(key, "")))
+        for key in ("as_printed",)
+    ):
+        basis = "dimensionless"
+    else:
+        return uncertainty
     if isinstance(width, tuple):
         scaled: Decimal | tuple[Decimal, Decimal] = tuple(
             _percent_to_fraction(value) for value in width
         )
     else:
         scaled = _percent_to_fraction(width)
-    if uncertainty.basis is not None and uncertainty.basis not in {
-        "fraction",
-        "relative",
-    }:
-        verbatim.setdefault("printed_basis", uncertainty.basis)
-    if printed_units:
-        verbatim.setdefault("printed_units", printed_units)
-    verbatim["units"] = "fraction"
+    if basis == "dimensionless":
+        if printed_units:
+            verbatim.setdefault("printed_units", printed_units)
+        verbatim["units"] = "dimensionless"
     return replace(
         uncertainty,
         verbatim=verbatim,
         value=scaled,
-        basis="fraction",
+        basis=basis,
     )
 
 
@@ -29908,7 +29926,14 @@ class Migrator:
 
         uncertainty = uncertainty_for(obs.get("uncertainty"))
         uncertainty = _uncertainty_for_value_selection(
-            uncertainty, value_sel, str(obs.get("units") or "")
+            uncertainty,
+            value_sel,
+            str(obs.get("units") or ""),
+            str(
+                obs.get("value_as_published")
+                or values.get("value_as_published")
+                or ""
+            ),
         )
         uncertainty = _uncertainty_as_log10_dex(
             uncertainty, value_sel.printed_form
@@ -31401,7 +31426,16 @@ class Migrator:
                         basis="log10_dex",
                     )
         if value_sel is not None:
-            unc = _uncertainty_for_value_selection(unc, value_sel, units)
+            unc = _uncertainty_for_value_selection(
+                unc,
+                value_sel,
+                units,
+                str(
+                    raw_item.get("value_as_published")
+                    or raw_item.get("value_as_printed")
+                    or ""
+                ),
+            )
             unc = _uncertainty_as_log10_dex(unc, value_sel.printed_form)
         point_conditions = None
         if coord is not None:
