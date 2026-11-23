@@ -11,8 +11,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AmountBasis, NoticeKind
+from simulator.battery.enums import AmountBasis, Engine, NoticeKind
 from simulator.battery.migrate import Migrator
+from simulator.battery.score import _predict_with_engine
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -312,6 +313,18 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert a1_slag.identity.composition.is_unknown
     assert a1_slag.identity.composition.reason == IRON_VALENCE_UNKNOWN_REASON
     assert a1_slag.point_conditions["composition"].inference is None
+    a1_prediction = _predict_with_engine(
+        Engine.THERMOENGINE,
+        a1_slag,
+        experiment=result.experiments[a1_slag.experiment_id],
+    )
+    assert a1_prediction.execution.state.value == "not_probed"
+    assert a1_prediction.refusal_detail == {
+        "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
+        "input": "run_composition",
+        "default_policy_id": "DP-017",
+        "rule": "analysed liquid composition predicts other phases only",
+    }
     a1_metal = by_id["henao_2001_t1_A-1_alloy_Ni"]
     assert a1_metal.identity.composition.is_value
     composition = a1_metal.identity.composition.value
@@ -337,6 +350,25 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
         and row.point_conditions["composition"].state.reason == IRON_VALENCE_UNKNOWN_REASON
         and row.point_conditions["composition"].inference is None
         for row in unresolved_slag
+    )
+    slag_predictions = [
+        _predict_with_engine(
+            Engine.THERMOENGINE,
+            row,
+            experiment=result.experiments[row.experiment_id],
+        )
+        for row in unresolved_slag
+    ]
+    assert len(slag_predictions) == 298
+    assert all(
+        prediction.refusal_detail
+        == {
+            "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
+            "input": "run_composition",
+            "default_policy_id": "DP-017",
+            "rule": "analysed liquid composition predicts other phases only",
+        }
+        for prediction in slag_predictions
     )
     assert all(
         row.identity.composition.value.input_provenance is None

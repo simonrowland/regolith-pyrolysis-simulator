@@ -12397,6 +12397,34 @@ def _predict_phase_row(
         or not composition_state.is_value
         or not isinstance(composition_state.value, Composition)
     ):
+        point_composition = (observation.point_conditions or {}).get(
+            "composition"
+        )
+        printed_composition = (observation.point_conditions or {}).get(
+            "printed_composition"
+        )
+        role_state = identity.phase_role
+        is_analysed_liquid = (
+            role_state is not None
+            and role_state.is_value
+            and role_state.value in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
+            and isinstance(point_composition, Located)
+            and point_composition.state.is_unknown
+            and isinstance(printed_composition, Located)
+            and printed_composition.state.is_value
+            and isinstance(printed_composition.state.value, Mapping)
+        )
+        if is_analysed_liquid:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": "run_composition_unprinted_analysed_phase_echo_excluded",
+                    "input": "run_composition",
+                    "default_policy_id": "DP-017",
+                    "rule": "analysed liquid composition predicts other phases only",
+                },
+                execution=ExecutionState.NOT_PROBED,
+            )
         return refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "composition"},
