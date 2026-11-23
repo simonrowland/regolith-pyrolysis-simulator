@@ -8621,9 +8621,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # parent stoich, or a parent debit the melt does not cover.
             # The kilogram floor is not that test. A covered debit
             # below the floor is still the gas, and q is the gross.
-            # Above the floor, q = gross * (1 - f). A captured parcel
+            # Above the floor, q = gross * (1 - f). A captured rate
             # at or below the floor does not leave the overhead: the
-            # condensation debit does not fire, and q stays the gross.
+            # condensation debit would not fire, and q stays the gross.
+            # The floor is this instantaneous kg/h. The commit posts
+            # the integrated captured share even when that integral is
+            # at or under the same number, because this q already
+            # removed it.
             # Overhead O2 is the projector on the parcels that post, plus
             # the O2 the condensation route will credit. A booking
             # replaces the static product map: CrO3's oxygen is that

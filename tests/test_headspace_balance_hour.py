@@ -1185,3 +1185,308 @@ def test_subfloor_evaporation_parcel_does_not_post():
         1.0,
     ) is True
     assert sim._evaporation_transition_posts_parcel(1.0e-9, {}, 0.0) is True
+
+
+def test_continuation_posts_the_captured_share_not_the_gross():
+    """A held interval credits A to overhead and G − A to the condenser.
+
+    Capture is 0.9999. CrO, CrO2 and CrO3 integrate to 9e-13 kg. That
+    mass is under the kilogram floor, and the same mass over 3.24 s is
+    a rate above the floor, so the solve's q is already net of capture.
+    Mg, Fe, Na and K integrate above the floor. CrO3 carries the
+    declared oxygen-crediting wall booking. Na and K are on the K trap.
+    """
+
+    from engines.builtin.condensation_route import (
+        BuiltinCondensationRouteProvider,
+        booking_scaled_to_vapour_split,
+    )
+    from engines.builtin.evaporation_transition import (
+        evaporation_parent_is_below_floor,
+    )
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    )
+    from simulator.capacity_coupling import (
+        _closed_manifold,
+        headspace_capture_fractions,
+        headspace_capture_scale,
+    )
+    from simulator.condensation import CondensationRouteResult
+    from simulator.condensation_routing import (
+        K_TRAP_STAGE_KEY,
+        K_TRAP_STAGE_NUMBER,
+        K_TRAP_SUB_ORDER,
+        stage_index_for_visit_identity,
+    )
+    from simulator.evaporation import _stoich_o2_is_overhead
+    from simulator.state import EvaporationFlux
+    from simulator.vapour_rail.wall_saturation import _assert_atom_balance
+
+    capture = 0.9999
+    held_s = 3.24
+    subfloor_kg = 9.0e-13
+    above_kg = 1.0e-6
+    gross_kg = {
+        "CrO": subfloor_kg,
+        "CrO2": subfloor_kg,
+        "CrO3": subfloor_kg,
+        "Mg": above_kg,
+        "Fe": above_kg,
+        "Na": above_kg,
+        "K": above_kg,
+    }
+    # The capture scale is the production remainder. One dummy partial
+    # of 1 Pa matches the total passed to the scale, so q = gross * (1 − f).
+    _frozen, scale = headspace_capture_scale(
+        gross_kg,
+        {species: capture for species in gross_kg},
+        1.0,
+        fractions_frozen={},
+        capture_C={},
+    )
+    fractions = headspace_capture_fractions(
+        gross_kg,
+        {"held": 1.0},
+        capture_C=scale,
+        fractions_frozen=_frozen,
+    )
+    net_kg = {}
+    for species, kilograms in gross_kg.items():
+        assert fractions[species] == capture
+        net_kg[species] = min(
+            kilograms,
+            max(0.0, float(scale[species])) / 1.0,
+        )
+        assert kilograms - net_kg[species] > 0.0
+
+    sim = _lunar()
+    registry = sim.species_formula_registry
+
+    def _row(species: str) -> dict:
+        metals = sim.vapor_pressures.get("metals", {}) or {}
+        oxides = sim.vapor_pressures.get("oxide_vapors", {}) or {}
+        row = dict(metals.get(species) or oxides.get(species) or {})
+        assert row.get("parent_oxide"), species
+        return row
+
+    def _molar(species: str) -> float:
+        return resolve_species_formula(
+            species, registry,
+        ).molar_mass_kg_per_mol()
+
+    rows = {species: _row(species) for species in gross_kg}
+    stoich = {
+        species: sim._evaporation_stoich(species, rows[species])
+        for species in gross_kg
+    }
+    # t_rem = 1 in the manifold's product, so vapour is the integral and
+    # added is the net moles. The 3.24 s figure is that integral divided
+    # by a rate the instantaneous floor would still treat as captured.
+    inflow = {
+        species: (net_kg[species] / _molar(species))
+        for species in gross_kg
+    }
+    held = _closed_manifold(
+        tuple(gross_kg),
+        {species: 1.0 for species in gross_kg},
+        inflow,
+        {species: 0.0 for species in gross_kg},
+        dict(gross_kg),
+        1.0,
+    )
+    assert held is not None
+    _n_end, added, _bled, vapour, _redox, _composition_time, _dy = held
+    extent = {}
+    remaining = {}
+    for species in gross_kg:
+        assert vapour[species] == gross_kg[species]
+        assert added[species] == inflow[species]
+        extent[species] = vapour[species]
+        remaining[species] = added[species] * _molar(species)
+    assert extent["CrO"] <= EMPTY_KG_TOLERANCE
+    assert extent["CrO"] / (held_s / 3600.0) > EMPTY_KG_TOLERANCE
+    assert 0.0 < extent["CrO"] - remaining["CrO"] <= EMPTY_KG_TOLERANCE
+    assert extent["Na"] - remaining["Na"] > EMPTY_KG_TOLERANCE
+
+    parent_mol: dict[str, float] = {}
+    for species in gross_kg:
+        parent = stoich[species]["parent_oxide"]
+        parent_mol.setdefault(parent, 1.0 / _molar(parent))
+    _seed(sim, "process.cleaned_melt", parent_mol, "continuation parents")
+    _seed(sim, "reservoir.fo2_buffer", {"O2": 1.0}, "continuation oxidant")
+    available = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    post_subfloor = []
+    for species, kilograms in extent.items():
+        parent = stoich[species]["parent_oxide"]
+        oxide_kg = kilograms * stoich[species]["oxide_per_product_kg"]
+        stock = float(available.get(parent, 0.0) or 0.0)
+        posts = sim._evaporation_transition_posts_parcel(
+            kilograms,
+            stoich[species],
+            stock,
+        )
+        if evaporation_parent_is_below_floor(oxide_kg, stock) or not posts:
+            post_subfloor.append(species)
+    assert set(post_subfloor) == {"CrO", "CrO2", "CrO3"}
+
+    # The booking is the declared reaction that credits oxygen, per mol
+    # of vapour. The saturation ladder is not required to scale it:
+    # vapour_stoichiometry is the divisor the ledger already uses.
+    declared = rows["CrO3"]["wall_reactions"]["reactions"]
+    crediting = next(
+        reaction
+        for reaction in declared
+        if float(reaction["oxygen_stoichiometry"]) < 0.0
+        and float(reaction["vapour_stoichiometry"]) > 0.0
+    )
+    _assert_atom_balance("CrO3", crediting)
+    nu_vapour = float(crediting["vapour_stoichiometry"])
+    nu_oxygen = float(crediting["oxygen_stoichiometry"])
+    products = {
+        str(product["species"]): float(product["stoichiometry"]) / nu_vapour
+        for product in crediting["products"]
+    }
+    oxygen_credit = (-nu_oxygen) / nu_vapour
+    booking = {
+        "baffle_products_mol": products,
+        "baffle_oxygen_credit_mol": oxygen_credit,
+        "baffle_oxygen_debit_mol": 0.0,
+        "wall_products_mol_by_account": {},
+        "wall_oxygen_credit_mol": 0.0,
+        "wall_oxygen_debit_mol": 0.0,
+        "reaction_legs": [
+            {
+                "surface": "baffle",
+                "vapour_mol": 1.0,
+                "products_mol": dict(products),
+                "oxygen_credit_mol": oxygen_credit,
+                "oxygen_debit_mol": 0.0,
+                "reaction_id": crediting.get("id"),
+            },
+        ],
+    }
+    assert stage_index_for_visit_identity(
+        sim.train, K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER,
+    ) is not None
+    route_result = CondensationRouteResult(
+        remaining_by_species={
+            species: extent[species] for species in gross_kg
+        },
+        condensed_by_stage_species={
+            K_TRAP_STAGE_KEY: {
+                "Na": extent["Na"],
+                "K": extent["K"],
+            },
+        },
+        capture_kg_by_stage_identity={
+            (K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER): {
+                "Na": extent["Na"],
+                "K": extent["K"],
+            },
+        },
+    )
+    sim.condensation_model.route = lambda _flux, _melt: route_result
+    flux = EvaporationFlux(species_kg_hr=dict(extent))
+    flux.update_totals()
+    sim._route_to_condensation(
+        flux,
+        headspace_remaining_kg_hr=remaining,
+        headspace_booking_by_species={"CrO3": booking},
+        headspace_wall_fraction_by_species={},
+        headspace_wall_accounts_by_species={},
+        post_subfloor_species=post_subfloor,
+    )
+
+    def _mol(account: str, species: str) -> float:
+        return float(
+            sim.atom_ledger.mol_by_account(account).get(species, 0.0) or 0.0
+        )
+
+    train = "process.condensation_train"
+    overhead = "process.overhead_gas"
+    chromium = BuiltinCondensationRouteProvider.CHROMIUM_CONDENSED_ACCOUNT
+    for species in ("CrO", "Mg", "Fe", "Na", "K"):
+        # One gross credit, split. Overhead is what the captured share
+        # leaves behind. The condenser holds (G − A) / M. Summing the
+        # two mols is the gross mol, so G is not posted twice.
+        captured_kg = extent[species] - remaining[species]
+        captured_mol = captured_kg / _molar(species)
+        gross_mol = extent[species] / _molar(species)
+        overhead_mol = _mol(overhead, species)
+        train_mol = _mol(train, species)
+        assert train_mol == captured_mol
+        assert overhead_mol == gross_mol - captured_mol
+        assert overhead_mol + train_mol == gross_mol
+        assert overhead_mol != gross_mol
+        assert train_mol != 0.0
+    cro2_captured = extent["CrO2"] - remaining["CrO2"]
+    cro2_mol, _cro2_kg = sim._condensed_products_for_vapor(
+        "CrO2",
+        cro2_captured,
+        rows["CrO2"],
+    )
+    cro2_accounts = dict(
+        rows["CrO2"].get("condensation_product_accounts") or {}
+    )
+    assert cro2_accounts["Cr2O3"] == chromium
+    assert cro2_accounts["O2"] == overhead
+    cro3_captured_mol = (
+        extent["CrO3"] - remaining["CrO3"]
+    ) / _molar("CrO3")
+    scaled = booking_scaled_to_vapour_split(
+        booking,
+        baffle_mol=cro3_captured_mol,
+        wall_mol=0.0,
+    )
+    for species in ("CrO2", "CrO3"):
+        captured_kg = extent[species] - remaining[species]
+        captured_mol = captured_kg / _molar(species)
+        gross_mol = extent[species] / _molar(species)
+        assert _mol(overhead, species) == gross_mol - captured_mol
+        assert _mol(overhead, species) != gross_mol
+    assert _mol(train, "CrO2") == 0.0
+    assert _mol(train, "CrO3") == 0.0
+    assert _mol(chromium, "Cr2O3") == (
+        float(cro2_mol["Cr2O3"])
+        + float(scaled["baffle_products_mol"]["Cr2O3"])
+    )
+    expected_overhead_o2 = float(cro2_mol["O2"]) + float(
+        scaled["baffle_oxygen_credit_mol"]
+    )
+    for species, kilograms in extent.items():
+        o2_kg = kilograms * float(stoich[species]["O2_per_product_kg"])
+        if o2_kg <= 0.0:
+            continue
+        atoms = float(
+            resolve_species_formula(species, registry).elements.get("O", 0.0)
+            or 0.0
+        )
+        if _stoich_o2_is_overhead(
+            o2_kg,
+            str(stoich[species].get("oxygen_destination") or ""),
+            atoms,
+        ):
+            expected_overhead_o2 += o2_kg / _molar("O2")
+    assert _mol(overhead, "O2") == expected_overhead_o2
+    assert _mol(CONDENSATION_RETAINED_HOLDUP_ACCOUNT, "CrO") == 0.0
+    assert _mol(CONDENSATION_RETAINED_HOLDUP_ACCOUNT, "CrO2") == 0.0
+    assert _mol(ALKALI_CARTRIDGE_ACCOUNT, "Na") == 0.0
+    assert _mol(ALKALI_CARTRIDGE_ACCOUNT, "K") == 0.0
+    assert _mol(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "Na") == 0.0
+    assert _mol(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "K") == 0.0
+    names = [transition.name for transition in sim.atom_ledger.transitions]
+    for species in ("Na", "K"):
+        assert f"alkali_cartridge_accumulate_{species}" in names
+        assert f"alkali_cartridge_melt_out_{species}" in names
+        accumulate = next(
+            transition
+            for transition in sim.atom_ledger.transitions
+            if transition.name == f"alkali_cartridge_accumulate_{species}"
+        )
+        moved = float(accumulate.credits[0].species_kg[species])
+        assert moved == extent[species] - remaining[species]

@@ -6015,11 +6015,11 @@ class EvaporationMixin:
         """Replace the commit route's booking with the one S scaled.
 
         S credits oxygen from one booking scaled to the captured
-        vapour. The commit's own route has a different extent, and its
-        products can sit under the floor while S's do not. The provider
-        then retains the parcel and posts no oxygen. This puts S's
-        scaled booking on the dispatch, so the ledger posts those mols.
-        A species S treated as static loses the fresh booking.
+        vapour. The commit's own route has a different extent. A
+        positive captured share is scaled, including a share at or
+        under the kilogram floor: the route posts that share. A zero
+        share is not a booking. A species S treated as static loses
+        the fresh booking.
         """
 
         from dataclasses import replace
@@ -6027,9 +6027,6 @@ class EvaporationMixin:
         from engines.builtin.condensation_route import (
             booking_scaled_to_vapour_split,
             booking_wall_account_fractions,
-        )
-        from engines.builtin.evaporation_transition import (
-            _NUMERICAL_FLOOR_KG,
         )
 
         quoted_bookings = {
@@ -6094,7 +6091,7 @@ class EvaporationMixin:
                 route_result.remaining_by_species.get(label, 0.0) or 0.0
             )
             condensed_kg = max(0.0, rate_kg - remaining_kg)
-            if condensed_kg <= _NUMERICAL_FLOOR_KG:
+            if condensed_kg <= 0.0:
                 continue
             vapor_mass = resolve_species_formula(
                 label,
@@ -6361,6 +6358,9 @@ class EvaporationMixin:
                 post_subfloor_coupled_legs=(
                     str(species) in post_subfloor_species
                 ),
+                post_subfloor_captured_share=(
+                    headspace_remaining_kg_hr is not None
+                ),
             )
             if route_outcome.get('evaporation_transition') is not None:
                 committed_species_kg_hr[species] = rate_kg_hr
@@ -6461,6 +6461,7 @@ class EvaporationMixin:
         *,
         apply_evaporative_redox_source_terms: bool = True,
         post_subfloor_coupled_legs: bool = False,
+        post_subfloor_captured_share: bool = False,
     ) -> dict[str, Any]:
         authority = dict(
             getattr(route_result, 'condensation_authority_by_species', {}).get(
@@ -6542,7 +6543,11 @@ class EvaporationMixin:
             0.0, rate_kg_hr - remaining_kg_hr,
         )
         credited_condensed_kg = self._dispatch_condensation_route(
-            species, condensed_kg, sp_data, route_result,
+            species,
+            condensed_kg,
+            sp_data,
+            route_result,
+            post_subfloor_captured_share=post_subfloor_captured_share,
         )
         self._project_routed_condensate(
             route_result, species, credited_condensed_kg, sp_data,
@@ -6689,6 +6694,8 @@ class EvaporationMixin:
         condensed_kg: float,
         sp_data: dict,
         route_result,
+        *,
+        post_subfloor_captured_share: bool = False,
     ) -> float:
         """Dispatch CONDENSATION_ROUTE through the kernel + commit.
 
@@ -6747,6 +6754,10 @@ class EvaporationMixin:
                    if species in route_result.wall_reaction_booking_by_species else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
+                **(
+                    {'post_subfloor_captured_share': True}
+                    if post_subfloor_captured_share else {}
+                ),
                 'wall_temperature_K': (
                     float(self.condensation_model.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
                     if self.condensation_model.wall_temperature_C is not None else None

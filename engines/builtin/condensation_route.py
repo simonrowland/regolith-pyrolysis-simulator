@@ -350,7 +350,44 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         )
         retained_holdup_kg = prior_holdup_mol * vapor_molar_mass
 
-        if current_condensed_kg <= 1e-12:
+        # Absent, the kilogram floor leaves the parcel in overhead.
+        # The headspace commit sets the flag for every species: q is
+        # already net of capture, so this parcel is the captured share
+        # and it has to reach the condenser. An above-floor parcel
+        # ignores the flag. A non-bool is not a second floor.
+        post_subfloor_captured_share = controls.get(
+            "post_subfloor_captured_share", False,
+        )
+        if (
+            post_subfloor_captured_share is not True
+            and post_subfloor_captured_share is not False
+        ):
+            return IntentResult(
+                intent=ChemistryIntent.CONDENSATION_ROUTE,
+                status="unsupported",
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": (
+                        "post_subfloor_captured_share must be a bool"
+                    ),
+                },
+            )
+        captured_below_floor = (
+            post_subfloor_captured_share
+            and current_condensed_kg > 0.0
+            and current_condensed_kg <= EMPTY_KG_TOLERANCE
+        )
+        # The wall plan and the baffle fold are the two places a
+        # positive product at or under the floor is retained instead
+        # of posted. Zero keeps this parcel on the same accounts an
+        # above-floor hour uses. The alkali deferral and the prior
+        # holdup stay on the kilogram floor.
+        parcel_floor_kg = (
+            0.0 if captured_below_floor else EMPTY_KG_TOLERANCE
+        )
+        if current_condensed_kg <= EMPTY_KG_TOLERANCE and (
+            not captured_below_floor
+        ):
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
@@ -518,7 +555,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 ),
                 registry,
                 resolve_species_formula,
-                EMPTY_KG_TOLERANCE,
+                parcel_floor_kg,
             )
         )
 
@@ -564,7 +601,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             wall_plan["product_mol_by_account"],
             registry,
             resolve_species_formula,
-            EMPTY_KG_TOLERANCE,
+            parcel_floor_kg,
         )
         retained_baffle_kg = 0.0
         if subfloor_baffle_credits_kg:
