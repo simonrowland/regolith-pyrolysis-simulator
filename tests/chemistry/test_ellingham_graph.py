@@ -143,6 +143,33 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
             assert notice["was_clamped"] is False
 
 
+def test_every_catalog_metal_saturation_pressure_resolves(
+    vapor_pressure_data,
+) -> None:
+    """Each metals-catalog row must provide an elemental saturation rail."""
+
+    from engines.builtin.sodium_saturation import (
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+
+    temperature_K = 1423.15
+    metals = vapor_pressure_data["metals"]
+    assert "Na" in metals
+    for species, row in metals.items():
+        pressure = ellingham_graph.metal_saturation_pressure_Pa(
+            species,
+            temperature_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        assert math.isfinite(pressure) and pressure >= 0.0, species
+        block = sodium_saturation_block(row)
+        if block is not None:
+            assert pressure == sodium_saturation_pressure(
+                block, temperature_K
+            ).pressure_pa
+
+
 @pytest.mark.parametrize(
     ("species", "expected_pressure_pa"),
     (("Cr", 48.022), ("Al", 3.495e-4), ("Ti", 1.685e-6), ("Mn", None)),

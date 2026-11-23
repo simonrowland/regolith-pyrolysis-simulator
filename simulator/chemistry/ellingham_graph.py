@@ -290,7 +290,7 @@ def metal_saturation_pressure_Pa(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
-    """Pure-metal saturation pressure (Pa) from the pure-component rail.
+    """Pure-metal saturation pressure (Pa) from the catalog elemental rail.
 
     This is *not* oxide-dissociation ``P_eff``. C7's Ca product is metal
     vapor; the metallothermic vapor term needs condensed-metal ``P_sat``. The
@@ -299,12 +299,17 @@ def metal_saturation_pressure_Pa(
 
     Fail-closed categories (same three-way rule as
     :func:`_antoine_reference_pressure_Pa`):
-    (1) unknown metal, missing/corrupt Antoine: raise
+    (1) unknown metal, missing/corrupt saturation record: raise
         :class:`EllinghamPressureRefusal` (missing input — not a zero).
-    (2) out-of-domain T with evaluable coefficients: compute.
+    (2) out-of-domain T with an evaluable record: compute.
     (3) catalog ``consumer_status=inactive``: return ``0.0`` (proven zero).
     """
 
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
     from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
 
     data = _resolve_vapor_pressure_data(vapor_pressure_data)
@@ -317,6 +322,22 @@ def metal_saturation_pressure_Pa(
     sp_data = metals[species] or {}
     if str(sp_data.get("consumer_status", "")).lower() == "inactive":
         return 0.0
+    # Na's elemental rail is pure_component_saturation, not an Antoine
+    # sidecar. Other metal rows use the wall selector so a melt-source
+    # Antoine reference cannot replace a pure-metal saturation record.
+    saturation_block = sodium_saturation_block(sp_data)
+    if saturation_block is not None:
+        try:
+            return sodium_saturation_pressure(
+                saturation_block, float(temperature_K)
+            ).pressure_pa
+        except SodiumSaturationError as exc:
+            raise EllinghamPressureRefusal(
+                f"elemental saturation pressure unavailable for {species!r} "
+                f"at T_K={temperature_K!r}; refusing P_sat=0.0 "
+                f"(missing/corrupt saturation record is not proof of "
+                f"nonvolatility)"
+            ) from exc
     antoine, _src = wall_condensation_antoine_coefficients(
         sp_data,
         temperature_K=float(temperature_K),
