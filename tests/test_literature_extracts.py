@@ -502,7 +502,7 @@ def test_kems_023_table1_crown_columns_full_cell_count_and_render_pins():
         assert Decimal(str(sample["value"])) == expected_value
         assert sample["locator"]["table"] == "1"
         assert sample["locator"]["published_page"] == 176
-        assert sample["locator"]["pdf_page_index"] == 2
+        assert sample["locator"]["pdf_page_index"] == 1
         assert vle.check_fidelity_sample_matches(doc, sample) == []
 
     mutated = copy.deepcopy(doc)

@@ -27,6 +27,7 @@ import re
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -62,7 +63,7 @@ from simulator.physical_constants import (
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
 )
-from simulator.state import MOLAR_MASS
+from simulator.battery import migrate as battery_migrate
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_STATUSES,
@@ -314,7 +315,9 @@ def load_vapor_pressure_data(
     return dict(data)
 
 
-def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
+def _refusal_marker_reason(
+    markers: Mapping[str, Any], *, ignored_tokens: frozenset[str] = frozenset()
+) -> str | None:
     for key, vocabulary in _EVIDENCE_VOCABULARY.items():
         try:
             token = _evidence_marker(markers, key)
@@ -324,14 +327,15 @@ def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
             return f"unknown_evidence_marker:{key}={token}"
     # Validation precedes role refusal so novel tokens cannot hide behind a known role.
     for key, vocabulary in _EVIDENCE_VOCABULARY.items():
-        reason = vocabulary.get(_evidence_marker(markers, key))
-        if reason:
+        token = _evidence_marker(markers, key)
+        reason = vocabulary.get(token)
+        if reason and token not in ignored_tokens:
             return reason
     nested = markers.get("admission_metadata")
     if nested is not None:
         if not isinstance(nested, Mapping):
             return "invalid_admission_metadata"
-        return _refusal_marker_reason(nested)
+        return _refusal_marker_reason(nested, ignored_tokens=ignored_tokens)
     return None
 
 
@@ -564,7 +568,20 @@ def observation_admission_reason(obs: AdoptedObservation) -> str | None:
     """Shared scoring/selection gate; supersession is resolved by the loader."""
     if obs.adoption_basis == "superseded":
         return "superseded"
-    return _refusal_marker_reason(obs.admission_metadata) or _refusal_marker_reason(obs.values)
+    refusal = _refusal_marker_reason(obs.admission_metadata) or _refusal_marker_reason(
+        obs.values
+    )
+    if refusal != "unsupported_observable:figure_only_not_digitized":
+        return refusal
+    if obs.obs_type != "psat_series":
+        return refusal
+    points, _skip, _drops = _literature_pressure_points(obs)
+    if not points:
+        return refusal
+    ignored_tokens = frozenset({"figure_only"})
+    return _refusal_marker_reason(
+        obs.admission_metadata, ignored_tokens=ignored_tokens
+    ) or _refusal_marker_reason(obs.values, ignored_tokens=ignored_tokens)
 
 
 def load_adopted_observations(
@@ -3083,6 +3100,15 @@ def _evaluate_psat(
             "standard_state_kind": standard_state_kind,
             "melt_recipe_source": melt_recipe_source,
         }
+        initial_charge_only = (
+            f"({battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG})"
+            in melt_recipe_source
+        )
+        if initial_charge_only:
+            runtime["input_assumption"] = {
+                "flag": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                "reason": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+            }
         unsupported = False
         out_of_domain = False
         matched_species: str | None = None
@@ -3199,7 +3225,7 @@ def _evaluate_psat(
             runtime={**runtime, "uncertainty_defaulted": bool(unc.get("defaulted"))},
             unsupported_speciation=unsupported and actual is None,
             out_of_domain=out_of_domain and actual is None,
-            assumed_input=False,
+            assumed_input=initial_charge_only and actual is not None,
         )
         evaluation.records.append(record)
         if record.status == "mismatch":
@@ -3681,6 +3707,7 @@ def _melt_recipe_mol(
         # t-383 DeMaria digitized rows carry sample-specific oxide suites.
         or values.get("sample_oxide_composition_wt_pct")
     )
+    located_composition: Mapping[str, Any] | None = None
     provenance = "extract composition_wt_pct"
     if isinstance(values.get("sample_oxide_composition_wt_pct"), Mapping) and raw_wt is values.get(
         "sample_oxide_composition_wt_pct"
@@ -3705,13 +3732,13 @@ def _melt_recipe_mol(
             and composition.get("amount_basis") == "mass_percent"
             and isinstance(composition.get("components"), list)
         ):
-            raw_wt = {
-                str(component[0]): component[1]
-                for component in composition["components"]
-                if isinstance(component, (list, tuple)) and len(component) == 2
-            }
+            located_composition = composition
             provenance = "extract point_conditions.composition"
-    if not isinstance(raw_wt, Mapping) and values.get("composition_source_gap"):
+    if (
+        located_composition is None
+        and not isinstance(raw_wt, Mapping)
+        and values.get("composition_source_gap")
+    ):
         return (
             None,
             "extract composition_source_gap",
@@ -3720,21 +3747,52 @@ def _melt_recipe_mol(
     composition_role = values.get("composition_role")
     if isinstance(composition_role, Mapping):
         composition_role = composition_role.get("value")
-    if composition_role == "initial_charge_only" and isinstance(raw_wt, Mapping):
-        provenance = f"{provenance} (initial_charge_only)"
+    if composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG and (
+        located_composition is not None or isinstance(raw_wt, Mapping)
+    ):
+        provenance = (
+            f"{provenance} ({battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG})"
+        )
     # Prefer the printed alkali overlay when an extract gives it alongside a
     # complete melt recipe.
-    if isinstance(raw_wt, Mapping) and values.get("sample_Na2O_wt_pct") is not None:
+    overlays: dict[str, Any] = {}
+    if values.get("sample_Na2O_wt_pct") is not None:
         try:
-            overlaid = dict(raw_wt)
-            overlaid["Na2O"] = float(values["sample_Na2O_wt_pct"])
+            overlays["Na2O"] = float(values["sample_Na2O_wt_pct"])
             if values.get("sample_K2O_wt_pct") is not None:
-                overlaid["K2O"] = float(values["sample_K2O_wt_pct"])
-            raw_wt = overlaid
-            provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+                overlays["K2O"] = float(values["sample_K2O_wt_pct"])
         except (TypeError, ValueError):
-            pass
-    if isinstance(raw_wt, Mapping) and raw_wt:
+            overlays = {}
+    if located_composition is not None and overlays:
+        components = located_composition.get("components")
+        if isinstance(components, list):
+            overlaid_components = []
+            replaced: set[str] = set()
+            for component in components:
+                if (
+                    isinstance(component, (list, tuple))
+                    and len(component) == 2
+                    and str(component[0]) in overlays
+                ):
+                    oxide = str(component[0])
+                    overlaid_components.append([component[0], overlays[oxide]])
+                    replaced.add(oxide)
+                else:
+                    overlaid_components.append(component)
+            overlaid_components.extend(
+                [oxide, amount]
+                for oxide, amount in overlays.items()
+                if oxide not in replaced
+            )
+            located_composition = {
+                **located_composition,
+                "components": overlaid_components,
+            }
+            provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+    elif isinstance(raw_wt, Mapping) and raw_wt and overlays:
+        raw_wt = {**raw_wt, **overlays}
+        provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+    if located_composition is not None or (isinstance(raw_wt, Mapping) and raw_wt):
         source_observation_id = values.get("composition_source_observation_id")
         if (
             source_observation_id
@@ -3742,13 +3800,27 @@ def _melt_recipe_mol(
         ):
             provenance = f"{provenance} ({source_observation_id})"
         try:
-            mol = {
-                str(oxide): float(wt) / float(MOLAR_MASS[str(oxide)])
-                for oxide, wt in raw_wt.items()
-                if float(wt) > 0.0 and str(oxide) in MOLAR_MASS
-            }
-        except (TypeError, ValueError):
-            return None, provenance, "invalid_melt_composition_wt_pct"
+            composition = (
+                battery_migrate._composition_from_plain(located_composition)
+                if located_composition is not None
+                else battery_migrate.wt_pct_to_mole_fraction(
+                    {
+                        str(oxide): Decimal(str(wt))
+                        for oxide, wt in raw_wt.items()
+                    }
+                )
+            )
+        except (ArithmeticError, TypeError, ValueError) as exc:
+            return None, provenance, (
+                str(exc)
+                if located_composition is not None
+                else "invalid_melt_composition_wt_pct"
+            )
+        mol = {
+            str(oxide): float(amount)
+            for oxide, amount in composition.components
+            if amount > 0
+        }
         if mol:
             return mol, provenance, None
     binary_mol, binary_source, binary_error = _binary_system_closure_mol(values)
