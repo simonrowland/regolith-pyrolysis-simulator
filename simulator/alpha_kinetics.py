@@ -8,6 +8,7 @@ from copy import deepcopy
 from numbers import Real
 from typing import Any
 
+from simulator.battery.default_policy import resolve as _resolve_default_policy
 from simulator.physical_constants import GAS_CONSTANT_10SIG
 
 
@@ -22,9 +23,12 @@ ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
 # DP-005 is the one-sided fallback for an unsourced evaporation coefficient.
 # Keep the scalar and authority provenance beside the shared alpha validation
 # rules so the engine adapter and battery scorer use one owner.
+# HKL mass flux is J = α P_sat sqrt(M / (2πRT)); α is dimensionless, so J
+# retains kg m⁻² s⁻¹. The accommodation coefficient satisfies 0 ≤ α ≤ 1,
+# making α = 1 the upper flux bound; at α → 0 the flux vanishes.
 _DP_005_ALPHA = {
     "form": "scalar",
-    "value": 1.0,
+    "value": float(_resolve_default_policy("DP-005").value),
     ALPHA_AUTHORITY_STATUS_FIELD: ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
     "source": (
         "Hertz-Knudsen-Langmuir alpha=1 upper bound; "

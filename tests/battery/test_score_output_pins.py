@@ -2457,6 +2457,7 @@ def test_assumed_pressure_notice_token_is_pinned() -> None:
             units="Pa",
         ),
     )
+    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
     residual = replace(
         F.residual(
             "assumed-pressure::partial",
@@ -2467,6 +2468,7 @@ def test_assumed_pressure_notice_token_is_pinned() -> None:
     )
     payload = json.loads(score_mod.dumps_residual_line(residual))
 
+    assert payload["notices"][0]["kind"] == NoticeKind.ASSUMED_PRESSURE.value
     assert payload["notices"][0]["policy"] == {
         "id": "DP-001",
         "version": 1,

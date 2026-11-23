@@ -78,6 +78,7 @@ from simulator.battery.records import (
     _bound_operator_semantics,
     as_decimal,
 )
+from simulator.battery.default_policy import load_policy_table, resolve
 from simulator.reference_data.janaf import formula_composition
 from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
@@ -119,15 +120,10 @@ _KEMS_REDUCED_QUANTITIES = frozenset(
     }
 )
 
-_DP_004_REGIME_CONDITION = (
-    "molecular effusion inside the cell; vacuum outside; "
-    "P_total(cell) = Σ measured partials. Never 1 atm"
-)
-_DP_011_METHOD_INFERENCE = (
-    "infer from the printed quantity: equilibrium partial/saturation pressure "
-    "→ equilibrium comparison; flux or mass-loss rate → HKL with DP-005"
-)
-_DP_012_SOURCE_REDUCED_VALUE = "no calibration needed; use the printed reduced value"
+_DEFAULT_POLICY_TABLE = load_policy_table()
+_DP_004_REGIME_CONDITION = str(_DEFAULT_POLICY_TABLE["DP-004"]["formula"])
+_DP_011_METHOD_INFERENCE = str(_DEFAULT_POLICY_TABLE["DP-011"]["formula"])
+_DP_012_SOURCE_REDUCED_VALUE = str(_DEFAULT_POLICY_TABLE["DP-012"]["formula"])
 
 
 @dataclass(frozen=True)
@@ -212,7 +208,7 @@ def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None
     return value if _positive_decimal(value) else None
 
 
-_DP_006_CLAUSING_FACTOR = Decimal("1")
+_DP_006_CLAUSING_FACTOR = Decimal(str(resolve("DP-006").value))
 
 
 def _clausing_value_ok(value: Decimal | None) -> bool:

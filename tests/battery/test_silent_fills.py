@@ -862,7 +862,6 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
     assert seen["wt"] == {"Na": 100.0}
-    assert seen["po2_bar"] is None
     assert any(
         notice.kind is NoticeKind.INPUT_OMITTED
         and "p_sat does not take oxygen" in notice.reason

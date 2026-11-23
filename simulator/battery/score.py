@@ -45,6 +45,7 @@ from typing import (
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.battery.default_policy import load_policy_table, resolve
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
@@ -624,7 +625,6 @@ FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
-FLAGGED_STRATUM_ASSUMED_PRESSURE = NoticeKind.ASSUMED_PRESSURE.value
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -636,23 +636,30 @@ _DEFAULT_POLICY_FLAG_VALUES = frozenset(
 
 
 def _notice_policy(policy_id: str, value: object, units: str) -> NoticePolicy:
-    """Build the versioned DP payload with numeric values as canonical strings."""
+    """Build policy metadata from the registry and owning formula outputs."""
 
-    try:
-        numeric_value = Decimal(str(value))
-    except (InvalidOperation, ValueError):
-        normalized_value = str(value)
+    if policy_id in {"DP-004", "DP-011"}:
+        # These formulas are owned by the validity scorer. The registry's
+        # resolver deliberately refuses caller-supplied formula values; retain
+        # the owner's result and take only canonical metadata from the table.
+        entry = load_policy_table()[policy_id]
+        payload = {
+            "id": entry["id"],
+            "version": entry["version"],
+            "status": entry["status"],
+            "value": str(value),
+            "units": units,
+        }
     else:
-        normalized_value = (
-            _dec_token(numeric_value) if numeric_value.is_finite() else str(value)
-        )
-    return NoticePolicy(
-        id=policy_id,
-        version=1,
-        status="canonical",
-        value=normalized_value,
-        units=units,
-    )
+        context = {"printed_value": value} if policy_id == "DP-012" else {}
+        resolved = resolve(policy_id, **context)
+        payload = dict(resolved.payload["policy"])
+        if policy_id == "DP-007":
+            # DP-007's value is the mass-specific EquipmentDesigner face area;
+            # b-1284 rejects the registry's fixed 0.2 m² plant default.
+            numeric_value = as_decimal(str(value))
+            payload["value"] = _dec_token(numeric_value)
+    return NoticePolicy(**payload)
 
 
 @dataclass(frozen=True)
@@ -2216,7 +2223,8 @@ def _unverified_apparatus_notices(
     if not isinstance(identity, Identity):
         return ()
     quantity = quantity_token(identity)
-    if quantity is None or point_magnitude(reference.value) is None:
+    printed_value = point_magnitude(reference.value)
+    if quantity is None or printed_value is None:
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
@@ -2243,7 +2251,7 @@ def _unverified_apparatus_notices(
                     origin=reference.observation_id,
                     policy=_notice_policy(
                         str(detail["policy_id"]),
-                        detail["policy_value"],
+                        printed_value,
                         str(detail["policy_units"]),
                     ),
                 )
@@ -2588,12 +2596,26 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata = _classify_flagged_notice_facts(
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
-    if any(
-        notice.policy is not None and notice.policy.status == "proposed"
-        for notice in notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+    if (
+        _has_proposed_policy(notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
+
+
+def _has_proposed_policy(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> bool:
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is not None and notice.policy.status == "proposed":
+                return True
+        elif isinstance(notice, Mapping):
+            policy = notice.get("policy")
+            if isinstance(policy, Mapping) and policy.get("status") == "proposed":
+                return True
+    return False
 
 
 def _classify_flagged_notice_facts(
@@ -2659,11 +2681,6 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
-    if (
-        NoticeKind.ASSUMED_PRESSURE.value in kinds
-        and FLAGGED_STRATUM_ASSUMED_PRESSURE not in strata
-    ):
-        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -10238,7 +10255,7 @@ def total_pressure_bar_for_score(
     """Observation pressure in bar, or a method-specific default with a notice.
 
     A present but non-finite or negative pressure is invalid. It is not
-    replaced by the assumption.
+    replaced by this fallback.
     """
 
     state = identity.total_pressure_Pa
@@ -10259,34 +10276,26 @@ def total_pressure_bar_for_score(
         else "DP-001"
     )
     if policy_id == "DP-019":
-        from simulator.diagnostic_helpers.binary_pot_battery import (
-            DP_019_VACUUM_BOUNDARY_BAR,
-        )
-
+        resolved = resolve("DP-019")
         # DP-019 uses the existing high-vacuum boundary, converted as
         # bar × Pa/bar = Pa. The gas-film resistance vanishes as that boundary
         # tends to vacuum.
-        pressure_pa = Decimal(str(DP_019_VACUUM_BOUNDARY_BAR)) * PA_PER_BAR_DEC
-        flag = NoticeKind.METHOD_IMPLIED
-        condition = "vacuum method has no printed total pressure"
-        units = "Pa"
+        pressure_pa = as_decimal(str(resolved.value))
     else:
+        resolved = resolve("DP-001")
         # Premise: for condensed phases, Δln(a) = V_m·ΔP/(R·T). The
         # correction is dimensionless because V_m·ΔP has units J/mol, and
         # it vanishes as ΔP approaches zero.
-        pressure_pa = ATM_PA_DECIMAL
-        flag = NoticeKind.ASSUMED_PRESSURE
-        condition = "total pressure unprinted; method does not fix it"
-        units = "Pa"
+        pressure_pa = as_decimal(str(resolved.value))
     notice = Notice(
-        kind=flag,
+        kind=resolved.flag,
         affected_quantities=(quantity,),
         reason=(
-            f"{flag.value}:{condition}; "
+            f"{resolved.flag.value}:{resolved.payload['condition']}; "
             f"original_reason={detail}"
         ),
         origin="score:predict_with_engine",
-        policy=_notice_policy(policy_id, pressure_pa, units),
+        policy=NoticePolicy(**resolved.payload["policy"]),
     )
     pressure_bar = pressure_pa / PA_PER_BAR_DEC
     return float(pressure_bar), notice, None
@@ -23278,7 +23287,8 @@ def flagged_stratum_rows(
                 ).append(residual)
     rows: list[dict[str, object]] = []
     for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
-        groups.items()
+        groups.items(),
+        key=lambda item: _flagged_census_sort_key(item[0]),
     ):
         dex_values = [
             residual.numeric.value
@@ -23299,6 +23309,12 @@ def flagged_stratum_rows(
             row["policy_status"] = policy_status
         rows.append(row)
     return rows
+
+
+def _flagged_census_sort_key(
+    key: tuple[str, str, str, str | None, str | None],
+) -> tuple[str, ...]:
+    return tuple("" if value is None else value for value in key)
 
 
 def headline_records(
@@ -24561,12 +24577,10 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         for notice in raw_notices
     )
     strata = _classify_flagged_notice_facts(notices)
-    if any(
-        notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
-        and isinstance(notice.get("policy"), Mapping)
-        and notice["policy"].get("status") == "proposed"
-        for notice in raw_notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
+    if (
+        _has_proposed_policy(raw_notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
         return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
 
@@ -25072,7 +25086,9 @@ def flagged_stratum_payloads(
                 else {}
             ),
         }
-        for stratum, rail, engine, policy_id, policy_status in sorted(counts)
+        for stratum, rail, engine, policy_id, policy_status in sorted(
+            counts, key=_flagged_census_sort_key
+        )
     ]
 
 
