@@ -98,6 +98,9 @@ KEMS_SOURCE_PREFIX = "kems-"
 # Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 1 atm.
 # JANAF construction boiling temperatures are 1-bar (fugacity = 1), not 1 atm.
 STANDARD_BAR_PA = PA_PER_BAR
+_UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT = (
+    battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
+)
 
 # Documented defaults when an observation carries no usable numeric uncertainty.
 # These are stated per-observation on the comparison record (defaulted=true).
@@ -3104,14 +3107,15 @@ def _evaluate_psat(
     assert points is not None
     candidates = _engine_species_candidates(obs)
     standard_state_kind = _pressure_standard_state_kind(obs)
-    demaria_k_migrated_observations: list[tuple[Any, Any, Any]] = []
-    if (
+    demaria_k_effusion_closure = (
         pO2 is None
         and standard_state_kind == "melt"
         and obs.source_id == "kems-022-demaria-1971"
         and obs.species_id == "K"
         and obs.observation_id == "demaria_1971_k_psat_figure2_digitized"
-    ):
+    )
+    demaria_k_migrated_observations: list[tuple[Any, Any, Any]] = []
+    if demaria_k_effusion_closure:
         if obs.extract_path is not None:
             migrator = battery_migrate.Migrator(root=REPO_ROOT)
             migrator._migrate_extract(obs.extract_path)
@@ -3159,8 +3163,27 @@ def _evaluate_psat(
         initial_charge_only = (
             composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
         )
+        defaulted_composition_role = (
+            composition_role_refusal is not None and melt_recipe is not None
+        )
         typed_input_reason: str | None = None
         point_melt_only_assumption: str | None = None
+        if defaulted_composition_role:
+            role_flag = (
+                "composition_role_defaulted_to_"
+                f"{_UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT}"
+            )
+            runtime["input_assumption"] = {
+                "flag": role_flag,
+                "default_role": _UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT,
+                "original_reason": composition_role_refusal,
+            }
+            typed_input_reason = (
+                f"{_TYPED_SKIP_PREFIX}{role_flag}: "
+                f"default={_UNKNOWN_POINT_COMPOSITION_ROLE_DEFAULT}; "
+                f"original_reason={composition_role_refusal}"
+            )
+            runtime["typed_input_reason"] = typed_input_reason
         if initial_charge_only:
             role_reason = battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE
             runtime["input_assumption"] = {
@@ -3221,13 +3244,7 @@ def _evaluate_psat(
             point_pO2 = pO2
             point_melt_recipe = melt_recipe
             if pO2 is None:
-                if (
-                    standard_state_kind == "melt"
-                    and obs.source_id == "kems-022-demaria-1971"
-                    and obs.species_id == "K"
-                    and obs.observation_id
-                    == "demaria_1971_k_psat_figure2_digitized"
-                ):
+                if demaria_k_effusion_closure:
                     migrated_context = None
                     for candidate, candidate_experiment, candidate_bench in (
                         demaria_k_migrated_observations
@@ -3445,7 +3462,9 @@ def _evaluate_psat(
             unsupported_speciation=unsupported and actual is None,
             out_of_domain=out_of_domain and actual is None,
             assumed_input=(
-                initial_charge_only or point_melt_only_assumption is not None
+                initial_charge_only
+                or defaulted_composition_role
+                or point_melt_only_assumption is not None
             )
             and actual is not None,
         )
@@ -3455,7 +3474,7 @@ def _evaluate_psat(
                 evaluation.skip_reason = typed_input_reason
             if typed_input_reason not in evaluation.skip_reasons:
                 evaluation.skip_reasons.append(typed_input_reason)
-        if composition_role_refusal is not None:
+        if composition_role_refusal is not None and not defaulted_composition_role:
             role_reason = f"{_TYPED_SKIP_PREFIX}{composition_role_refusal}"
             if evaluation.skip_reason is None:
                 evaluation.skip_reason = role_reason
@@ -3985,9 +4004,7 @@ def _melt_recipe_mol(
         )
         if (
             isinstance(composition, Mapping)
-            and composition.get("basis") == "oxide_weight_percent_as_published"
-            and composition.get("amount_basis") == "mass_percent"
-            and isinstance(composition.get("components"), list)
+            and isinstance(composition.get("components"), (list, tuple))
         ):
             located_composition = composition
             provenance = "extract point_conditions.composition"
@@ -4004,7 +4021,12 @@ def _melt_recipe_mol(
     composition_role, role_refusal = battery_migrate._declared_composition_role(
         point, obs.values
     )
-    if role_refusal is not None:
+    point_role_is_unknown = (
+        isinstance(point, Mapping)
+        and "composition_role" in point
+        and role_refusal is not None
+    )
+    if role_refusal is not None and not point_role_is_unknown:
         return None, "extract composition_role", role_refusal
     if composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG and (
         located_composition is not None or isinstance(raw_wt, Mapping)
@@ -4022,7 +4044,11 @@ def _melt_recipe_mol(
                 overlays["K2O"] = float(values["sample_K2O_wt_pct"])
         except (TypeError, ValueError):
             overlays = {}
-    if located_composition is not None and overlays:
+    if (
+        located_composition is not None
+        and located_composition.get("amount_basis") == "mass_percent"
+        and overlays
+    ):
         components = located_composition.get("components")
         if isinstance(components, list):
             overlaid_components = []

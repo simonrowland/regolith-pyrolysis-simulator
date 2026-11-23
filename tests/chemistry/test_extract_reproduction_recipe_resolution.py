@@ -79,6 +79,162 @@ def test_bischof_value_point_assay_overrides_parent_and_partial_assay_refuses() 
     assert error is not None and "partial analysis" in error
 
 
+def test_located_mole_fraction_composition_overrides_parent_recipe() -> None:
+    from types import SimpleNamespace
+
+    payload = {
+        "basis": "oxide_mole_fraction_as_published",
+        "amount_basis": "mole_fraction",
+        "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+    }
+    obs = SimpleNamespace(values={"composition_mol": {"SiO2": 0.7, "MgO": 0.3}})
+    point = {
+        "composition_role": "datum_state",
+        "point_conditions": {
+            "composition": {"state": {"tag": "value", "value": payload}}
+        },
+    }
+
+    recipe, source, error = _melt_recipe_mol(obs, point=point)
+
+    expected = battery_migrate._composition_from_plain(payload)
+    assert error is None
+    assert source == "extract point_conditions.composition"
+    assert recipe == pytest.approx(
+        {name: float(amount) for name, amount in expected.components}
+    )
+    assert recipe == pytest.approx({"SiO2": 0.6, "MgO": 0.4})
+
+
+def test_unknown_point_composition_role_defaults_for_usable_assays(monkeypatch) -> None:
+    obs = _adopted_observation(
+        "kems-022-demaria-1971",
+        "K",
+        "demaria_1971_k_psat_figure2_digitized",
+    )
+    original_point = obs.values["points"][0]
+    provider_calls: list[dict[str, float]] = []
+    runtimes: list[dict[str, object]] = []
+    compare_point = extract_reproduction._compare_point
+
+    def melt_stub(_species, _temperature_K, _pO2_bar, _vp_data, *, account_mol):
+        provider_calls.append(dict(account_mol))
+        return 1.0, None, {"provider_status": "ok"}
+
+    def capture_runtime(**kwargs):
+        runtimes.append(dict(kwargs["runtime"]))
+        return compare_point(**kwargs)
+
+    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", melt_stub)
+    monkeypatch.setattr(extract_reproduction, "_compare_point", capture_runtime)
+
+    for field, assay in (
+        ("composition_wt_pct", {"SiO2": 60.0, "MgO": 40.0}),
+        ("composition_mol", {"SiO2": 0.6, "MgO": 0.4}),
+    ):
+        calls_before = len(provider_calls)
+        point = deepcopy(original_point)
+        for key in (
+            "composition_mol",
+            "composition_wt_pct",
+            "melt_composition_mol",
+            "melt_composition_wt_pct",
+            "sample_oxide_composition_wt_pct",
+            "sample_Na2O_wt_pct",
+            "sample_K2O_wt_pct",
+            "composition_source_observation_id",
+            "composition_source_gap",
+            "point_conditions",
+        ):
+            point.pop(key, None)
+        point["composition_role"] = {
+            "value": "unreported",
+            "evidence_class": "model",
+        }
+        point[field] = assay
+        probe = replace(
+            obs,
+            observation_id=f"unknown-role-{field}",
+            values={**obs.values, "points": [point]},
+        )
+
+        evaluation = extract_reproduction._evaluate_psat(
+            probe,
+            extract_reproduction.ObservationEvaluation(probe),
+            {},
+            5e-9,
+        )
+        record = evaluation.records[0]
+        coverage = extract_reproduction.coverage_summary([evaluation])[
+            "entries"
+        ][0]
+
+        assert len(provider_calls) == calls_before + 1
+        assert provider_calls[-1] == pytest.approx(
+            _melt_recipe_mol(probe, point=point)[0]
+        )
+        assert record.status == "assumed-input"
+        assert runtimes[-1]["input_assumption"] == {
+            "flag": "composition_role_defaulted_to_initial_charge_only",
+            "default_role": "initial_charge_only",
+            "original_reason": (
+                "composition_role 'unreported' is not one of "
+                "['datum_state', 'initial_charge_only']; composition left unstamped"
+            ),
+        }
+        assert runtimes[-1]["typed_input_reason"].startswith(
+            "typed-refusal:composition_role_defaulted_to_initial_charge_only:"
+        )
+        assert coverage["comparable_points"] == 0
+        assert coverage["gap_points"] == 1
+        assert "default=initial_charge_only" in coverage["primary_skip_reason"]
+
+    partial_point = deepcopy(original_point)
+    for key in (
+        "composition_mol",
+        "composition_wt_pct",
+        "melt_composition_mol",
+        "melt_composition_wt_pct",
+        "sample_oxide_composition_wt_pct",
+        "sample_Na2O_wt_pct",
+        "sample_K2O_wt_pct",
+        "composition_source_observation_id",
+        "composition_source_gap",
+    ):
+        partial_point.pop(key, None)
+    partial_point["composition_role"] = {
+        "value": "unreported",
+        "evidence_class": "model",
+    }
+    partial_point["point_conditions"]["composition"]["state"]["value"][
+        "components"
+    ] = [["Na2O", "0.23"]]
+    partial_probe = replace(
+        obs,
+        observation_id="unknown-role-partial-assay",
+        values={**obs.values, "points": [partial_point]},
+    )
+    calls_before = len(provider_calls)
+    partial_evaluation = extract_reproduction._evaluate_psat(
+        partial_probe,
+        extract_reproduction.ObservationEvaluation(partial_probe),
+        {},
+        5e-9,
+    )
+    partial_coverage = extract_reproduction.coverage_summary(
+        [partial_evaluation]
+    )["entries"][0]
+
+    assert len(provider_calls) == calls_before
+    assert partial_evaluation.records[0].status == "unsupported-speciation"
+    assert partial_coverage["comparable_points"] == 0
+    assert partial_coverage["gap_points"] == 1
+    assert any(
+        "partial analysis" in reason
+        for reason in partial_evaluation.skip_reasons
+    )
+
+
 def test_non_value_point_wrapper_recipe_census_has_no_parent_recipe_regressions() -> None:
     observations = load_adopted_observations()
     assert len(observations) == 2340
@@ -386,12 +542,19 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
             **composition_role,
             "value": "datum_state",
         }
-        point["composition_mol"] = {
-            oxide: float(amount)
-            for oxide, amount in battery_migrate._composition_from_plain(
-                located_composition
-            ).components
+        mole_fraction = battery_migrate._composition_from_plain(
+            located_composition
+        )
+        point["point_conditions"]["composition"]["state"]["value"] = {
+            **located_composition,
+            "basis": "oxide_mole_fraction_as_published",
+            "amount_basis": "mole_fraction",
+            "components": [
+                [oxide, str(amount)]
+                for oxide, amount in mole_fraction.components
+            ],
         }
+        assert "composition_mol" not in point
     datum_dir = tmp_path / "datum-extracts"
     datum_dir.mkdir()
     (datum_dir / source_path.name).write_text(
