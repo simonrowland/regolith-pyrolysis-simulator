@@ -313,6 +313,62 @@ def compare_o2_release_time_series(
     )
 
 
+def _compare_pointwise_observations(
+    observations: Sequence[tuple[float, float, Mapping[str, Any] | None, Any]],
+    samples: Sequence[tuple[float, float | None]],
+    *,
+    case_id: str,
+    source_id: str,
+    observable_id: str,
+    species: str | None,
+    coordinate_key: str,
+    coordinate_scale: float,
+    units: str,
+    evidence_scope: str,
+    source_locator: Mapping[str, Any] | str,
+    recipe: Mapping[str, Any],
+    observation: Mapping[str, Any],
+    runtime: Mapping[str, Any],
+    unsupported_speciation: bool = False,
+    assumed_input: bool = False,
+    out_of_domain: bool = False,
+) -> tuple[tuple[ComparisonRecord, ...], list[float]]:
+    """Interpolate runtime values and build records for normalized points."""
+
+    sample_times = [time for time, _ in samples]
+    actual_values = [
+        _interpolate_runtime_sample(time, samples, sample_times)
+        for time, _, _, _ in observations
+    ]
+
+    records = []
+    for (time, expected, uncertainty, point_locator), actual in zip(
+        observations, actual_values
+    ):
+        records.append(
+            compare_values(
+                case_id=case_id,
+                source_id=source_id,
+                observable_id=observable_id,
+                species=species,
+                coordinate={coordinate_key: time * coordinate_scale},
+                expected_value=expected,
+                expected_uncertainty=uncertainty,
+                actual_value=actual,
+                units=units,
+                evidence_scope=evidence_scope,
+                source_locator=_series_point_locator(source_locator, point_locator),
+                recipe=recipe,
+                observation=observation,
+                runtime=runtime,
+                unsupported_speciation=unsupported_speciation,
+                assumed_input=assumed_input,
+                out_of_domain=out_of_domain,
+            )
+        )
+    return tuple(records), actual_values
+
+
 def compare_time_series(
     *,
     case_id: str,
@@ -350,37 +406,26 @@ def compare_time_series(
         )
     if len(observations) < 2:
         raise ValueError("time-series integral requires at least two observations")
-    sample_times = [time_min for time_min, _ in samples]
-    actual_values = [
-        _interpolate_runtime_sample(time_min, samples, sample_times)
-        for time_min, _, _, _ in observations
-    ]
-
-    records = []
-    for (time_min, expected, uncertainty, point_locator), actual in zip(
-        observations, actual_values
-    ):
-        records.append(
-            compare_values(
-                case_id=case_id,
-                source_id=source_id,
-                observable_id=observable_id,
-                species=species,
-                coordinate={"time_min": time_min},
-                expected_value=expected,
-                expected_uncertainty=uncertainty,
-                actual_value=actual,
-                units=units,
-                evidence_scope=evidence_scope,
-                source_locator=_series_point_locator(source_locator, point_locator),
-                recipe=recipe,
-                observation=observation,
-                runtime=runtime,
-                unsupported_speciation=unsupported_speciation,
-                assumed_input=assumed_input,
-                out_of_domain=out_of_domain,
-            )
-        )
+    point_records, actual_values = _compare_pointwise_observations(
+        observations,
+        samples,
+        case_id=case_id,
+        source_id=source_id,
+        observable_id=observable_id,
+        species=species,
+        coordinate_key="time_min",
+        coordinate_scale=1.0,
+        units=units,
+        evidence_scope=evidence_scope,
+        source_locator=source_locator,
+        recipe=recipe,
+        observation=observation,
+        runtime=runtime,
+        unsupported_speciation=unsupported_speciation,
+        assumed_input=assumed_input,
+        out_of_domain=out_of_domain,
+    )
+    records = list(point_records)
 
     if series_semantics == "rate":
         times = [time_min for time_min, _, _, _ in observations]

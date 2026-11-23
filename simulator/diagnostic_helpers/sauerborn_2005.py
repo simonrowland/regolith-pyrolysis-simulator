@@ -14,11 +14,9 @@ from simulator.corpus_paths import regolith_corpus_root
 from simulator.diagnostic_helpers.reproduction_compare import (
     ComparisonRecord,
     TimeSeriesComparisonRefusal,
-    _interpolate_runtime_sample,
+    _compare_pointwise_observations,
     _normalise_observation_points,
     _normalise_runtime_samples,
-    _series_point_locator,
-    compare_values,
 )
 
 
@@ -154,7 +152,6 @@ def compare_sauerborn_o2_partial_pressure_time_series(
             }
         )
     samples = _normalise_runtime_samples(normalized_runtime)
-    sample_times = [time_min for time_min, _ in samples]
 
     normalized_observations = [
         {
@@ -166,26 +163,20 @@ def compare_sauerborn_o2_partial_pressure_time_series(
         for point in observation_points
     ]
     observations = _normalise_observation_points(normalized_observations)
-
-    records = []
-    for time_min, expected, uncertainty, point_locator in observations:
-        actual = _interpolate_runtime_sample(time_min, samples, sample_times)
-        records.append(
-            compare_values(
-                case_id=case_id,
-                source_id=source_id,
-                observable_id=observable_id,
-                species="O2",
-                coordinate={"time_s": time_min * 60.0},
-                expected_value=expected,
-                expected_uncertainty=uncertainty,
-                actual_value=actual,
-                units="mbar",
-                evidence_scope=evidence_scope,
-                source_locator=_series_point_locator(source_locator, point_locator),
-                recipe=recipe,
-                observation=observation,
-                runtime=runtime,
-            )
-        )
-    return tuple(records)
+    records, _ = _compare_pointwise_observations(
+        observations,
+        samples,
+        case_id=case_id,
+        source_id=source_id,
+        observable_id=observable_id,
+        species="O2",
+        coordinate_key="time_s",
+        coordinate_scale=60.0,
+        units="mbar",
+        evidence_scope=evidence_scope,
+        source_locator=source_locator,
+        recipe=recipe,
+        observation=observation,
+        runtime=runtime,
+    )
+    return records
