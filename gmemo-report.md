@@ -33,4 +33,4 @@ The cache-rule consolidation is in `EvaporationMixin._freeze_gate_curve_is_solve
   "$GOALFLIGHT_REMOTE_RUN" --kind gate --cmd-id regolith-focused-tests -- python3 -m pytest -q -p no:cacheprovider tests/chemistry/test_evaporation_freeze_gate.py
   ```
 
-No golden or digest files changed. The expected golden move is **NONE**; byte-identical receipts remain for the controller to verify after the hold lifts. `engines/engines.local.toml` was copied into this seat and remains gitignored. No native engine was started.
+No golden or digest files changed. The expected golden move is **NONE**; byte-identical receipts remain for the controller to verify after the hold lifts. `engines/engines.local.toml` was copied into this seat and remains gitignored. This dispatch started no native engine. Both required process checks (`pgrep -fl alphamelts` and `pgrep -fl MAGEMin`) were refused by the host with `sysmond service not found` / `Cannot get process list`; the controller must perform the process check.
