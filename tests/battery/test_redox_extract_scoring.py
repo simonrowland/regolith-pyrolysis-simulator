@@ -315,7 +315,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     assert not any(residual.score_eligible for residual in residuals)
 
 
-def test_openimcc_redox_without_printed_fo2_uses_intrinsic_ladder_default():
+def test_openimcc_redox_without_ferric_ratio_or_control_uses_dp010_air():
     pytest.importorskip("openimcc")
     _context, observations = _sossi_aithala_redox_context()
     observation = observations[
@@ -337,12 +337,14 @@ def test_openimcc_redox_without_printed_fo2_uses_intrinsic_ladder_default():
     assert prediction.identity is not None
     assert prediction.identity.fO2_Pa is not None
     assert prediction.identity.fO2_Pa.is_value
-    assert any(
-        notice.kind is NoticeKind.ASSUMED_FO2
-        and notice.policy is not None
-        and notice.policy.id == "DP-010"
+    ambient_notice = next(
+        notice
         for notice in prediction.notices
+        if notice.kind
+        is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
     )
+    assert prediction.identity.fO2_Pa.value == Decimal("21278.25")
+    assert "log10(fO2/bar)=-0.672064092852" in ambient_notice.reason
 
 
 def _openimcc_row_with_mass_composition(components):
@@ -1041,12 +1043,13 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing_fo2)
     assert missing_prediction.value is not None
     assert missing_prediction.refusal_reason is None
-    assert any(
-        notice.kind is NoticeKind.ASSUMED_FO2
-        and notice.policy is not None
-        and notice.policy.id == "DP-010"
+    ferric_notice = next(
+        notice
         for notice in missing_prediction.notices
+        if notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
     )
+    assert "Kress-Carmichael inverse at row T and P" in ferric_notice.reason
+    assert ferric_notice.reason.count("log10(fO2/bar)=") == 1
 
     unsupported = predict_with_engine(Engine.MAGEMIN, row4)
     assert unsupported.value is None
@@ -1974,8 +1977,18 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
 
 
-def test_melts_fe_redox_uses_shared_intrinsic_fo2_when_unprinted(monkeypatch):
+def test_melts_fe_redox_uses_printed_ferric_ratio_fo2_when_unprinted(monkeypatch):
     row4 = _without_printed_fo2(_borisov_row4())
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    resolved_fo2 = resolve_row_fo2(
+        None,
+        None,
+        row4,
+        quantity=Quantity.FE3_FE2_RATIO,
+    )
+    assert resolved_fo2 is not None
+    assert resolved_fo2.route.startswith("kress_inverse:")
     calls = _patch_melts_cell(
         monkeypatch,
         lambda _handle: _ok_cell(
@@ -1988,12 +2001,16 @@ def test_melts_fe_redox_uses_shared_intrinsic_fo2_when_unprinted(monkeypatch):
     assert alphamelts.identity is not None
     assert alphamelts.identity.fO2_Pa is not None
     assert alphamelts.identity.fO2_Pa.is_value
-    assert any(
-        notice.kind is NoticeKind.ASSUMED_FO2
-        and notice.policy is not None
-        and notice.policy.id == "DP-010"
-        for notice in alphamelts.notices
+    assert alphamelts.identity.fO2_Pa.value == log10_fo2_to_pa(
+        Decimal(str(resolved_fo2.log10_fO2_bar))
     )
+    ferric_notice = next(
+        notice
+        for notice in alphamelts.notices
+        if notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
+    )
+    assert "Kress-Carmichael inverse at row T and P" in ferric_notice.reason
+    assert "log10(fO2/bar)=" in ferric_notice.reason
     assert len(calls) == 1
 
     thermoengine = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)

@@ -964,13 +964,13 @@ def test_missing_pressure_and_fo2_phase_rows_reach_each_melts_adapter(
             notice.policy is not None and notice.policy.id == "DP-001"
             for notice in prediction.notices
         )
-        intrinsic_policy = any(
-            notice.policy is not None and notice.policy.id == "DP-010"
+        ferric_ratio_flag = any(
+            notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
             for notice in prediction.notices
         )
-        assert intrinsic_policy is (
-            resolved_fo2.route == "intrinsic_melt_fO2" and resolved_fo2.borrowed
-        )
+        assert ferric_ratio_flag
+        assert resolved_fo2 is not None
+        assert resolved_fo2.route.startswith("kress_inverse:")
 
     assert [call["engine"] for call in calls] == [
         Engine.ALPHAMELTS,
@@ -1071,10 +1071,13 @@ def test_missing_pressure_and_fo2_element_rows_reach_each_melts_adapter(
             notice.policy is not None and notice.policy.id == "DP-001"
             for notice in prediction.notices
         )
-        assert any(
-            notice.policy is not None and notice.policy.id == "DP-010"
+        fo2_default = next(
+            notice
             for notice in prediction.notices
+            if notice.kind
+            is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
         )
+        assert "log10(fO2/bar)=-0.672064092852" in fo2_default.reason
 
     assert [call["engine"] for call in calls] == [
         Engine.ALPHAMELTS,
@@ -1083,7 +1086,7 @@ def test_missing_pressure_and_fo2_element_rows_reach_each_melts_adapter(
     ]
     for call in calls:
         assert call["pressure_bar"] == pressure_bar
-        assert isinstance(call["fO2_log"], float)
+        assert call["fO2_log"] == pytest.approx(-0.672064092852, abs=5e-13)
 
 
 def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(

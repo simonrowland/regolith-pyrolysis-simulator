@@ -6,6 +6,7 @@ from decimal import Decimal
 from simulator.battery.default_policy import resolve as resolve_policy
 from simulator.battery.enums import (
     AmbientPressureEvidenceClass,
+    Engine,
     DEFAULT_POLICY_NOTICE_KINDS,
     MethodToken,
     NoticeKind,
@@ -22,6 +23,7 @@ from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.score import (
     flagged_strata,
     _resolve_score_total_pressure,
+    _pressure_refusal,
     total_pressure_bar_for_score,
 )
 from tests.battery import factories as F
@@ -154,6 +156,8 @@ def test_knudsen_pressure_uses_dp004_and_its_own_flag() -> None:
 def test_method_fixed_ambient_pressure_uses_dp002() -> None:
     for evidence_class, quote in (
         (AmbientPressureEvidenceClass.GAS_MIXING, "gas-mixing furnace"),
+        (AmbientPressureEvidenceClass.GAS_FLOW, "gas flow"),
+        (AmbientPressureEvidenceClass.VENTED, "vented run"),
         (
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
             "in air",
@@ -187,6 +191,86 @@ def test_method_fixed_ambient_pressure_uses_dp002() -> None:
         )
         assert "method_implied" in flagged_strata((notice,))
         assert invalid is None
+
+
+def test_reference_pressure_quantity_does_not_consume_total_pressure() -> None:
+    identity = replace(
+        F.pref_identity(),
+        total_pressure_Pa=State.unknown("ambient pressure unknown"),
+    )
+    pressure = _resolve_score_total_pressure(
+        identity,
+        Quantity.P_REFERENCE,
+        experiment=F.tabulation_experiment(),
+        engine=Engine.INTERNAL_ANALYTICAL,
+    )
+
+    assert pressure == (None, None, None, None)
+
+
+def test_closed_system_pressure_uses_supported_path_or_typed_capability_gap() -> None:
+    experiment = _without_run_pressure(F.tabulation_experiment())
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            container=F.located("sealed silica ampoule"),
+        ),
+    )
+    identity = replace(
+        F.pref_identity(),
+        total_pressure_Pa=State.unknown("closed ampoule has no run background"),
+    )
+
+    supported = _resolve_score_total_pressure(
+        identity,
+        Quantity.P_PARTIAL,
+        experiment=experiment,
+        engine=Engine.OPENIMCC,
+    )
+    assert supported == (None, None, None, None)
+
+    unsupported = _resolve_score_total_pressure(
+        identity,
+        Quantity.ACTIVITY,
+        experiment=experiment,
+        engine=Engine.ALPHAMELTS,
+    )
+    assert unsupported[3] == "closed_system_engine_capability_gap"
+    assert unsupported[3] is not None
+    refusal, detail = _pressure_refusal(
+        Engine.ALPHAMELTS, Quantity.ACTIVITY, unsupported[3]
+    )
+    assert refusal.value == "unsupported"
+    assert detail["engine"] == Engine.ALPHAMELTS.value
+    assert detail["quantity"] == Quantity.ACTIVITY.value
+
+
+def test_unstated_method_vapour_pressure_waits_for_partial_sum_and_rate_names_gap() -> None:
+    experiment = replace(
+        _without_run_pressure(F.tabulation_experiment()),
+        method=State.unknown("method not printed"),
+    )
+    identity = replace(
+        F.pref_identity(),
+        quantity=State.of(Quantity.P_PARTIAL),
+        total_pressure_Pa=State.unknown("total pressure not printed"),
+    )
+    vapor = _resolve_score_total_pressure(
+        identity,
+        Quantity.P_PARTIAL,
+        experiment=experiment,
+        engine=Engine.INTERNAL_ANALYTICAL,
+    )
+    assert vapor == (None, None, None, None)
+
+    rate = _resolve_score_total_pressure(
+        identity,
+        Quantity.EVAPORATION_RATE,
+        experiment=experiment,
+        engine=Engine.INTERNAL_ANALYTICAL,
+    )
+    assert rate[3] == "rate_quantity_requires_method_for_ambient_regime"
 
 
 def test_vacuum_method_uses_dp019_method_implied_pressure() -> None:

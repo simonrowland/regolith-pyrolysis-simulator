@@ -162,14 +162,24 @@ def _resolved_value(
             "DP-004 requires the total from its owning partial-pressure sum"
         )
     if policy_id == "DP-010":
-        if "intrinsic_fo2_log10_bar" not in context:
+        if "resolved_fo2_log10_bar" not in context:
             raise ValueError(
                 "DP-010 requires the owning formula result from its oxygen ladder"
             )
         return _decimal(
-            context["intrinsic_fo2_log10_bar"],
-            context_name="intrinsic fO2 in log10(bar)",
+            context["resolved_fo2_log10_bar"],
+            context_name="resolved fO2 in log10(bar)",
         )
+    if policy_id == "DP-108":
+        if "predicted_total_pressure_pa" not in context:
+            raise ValueError("DP-108 requires its owning predicted partial-pressure sum")
+        pressure = _decimal(
+            context["predicted_total_pressure_pa"],
+            context_name="predicted total pressure in Pa",
+        )
+        if pressure <= 0:
+            raise ValueError("DP-108 predicted total pressure must be positive")
+        return pressure
     if policy_id == "DP-007":
         from simulator.state import MeltState
 

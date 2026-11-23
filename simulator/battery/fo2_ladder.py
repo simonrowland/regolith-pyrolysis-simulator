@@ -7,7 +7,8 @@ The general ladder is the seeding order from d-160/d-163:
 3. the experiment's controlled atmosphere or buffer, including the
    effusion oxygen-mass-balance closure; unsupported FeO(l) metal-saturation
    activity targets are refused under d-305;
-4. the melt's intrinsic fO2, flagged borrowed.
+4. DP-010 v2's proposed ambient-air default, except vacuum methods use the
+   legacy intrinsic-melt clamp only as a flagged vacuum-cell proxy.
 
 Knudsen vapour rows keep printed fO2 and explicit atmosphere/buffer routes
 first, then use a measured same-cell oxygen condition, then congruent effusion
@@ -20,9 +21,9 @@ same-cell pressure, or an effusion closure whose shared input is not a number.
 Tiers 1 and the atmosphere part of tier 3 reuse ``oxygen_condition`` routes.
 The Kress inverse lives in ``simulator.fe_redox``. The effusion closure is
 the existing oxygen-balance solver; this module only names the route.
-Tier 4 is ``intrinsic_melt_fO2``, the ledger diagnostic in this tree (the
-d-160 feedstock seeder is not on this commit). A row that resolves nothing
-returns None; callers refuse every engine the same way.
+The intrinsic-melt clamp remains the furnace-headspace diagnostic; lab rows
+use it only for the flagged vacuum proxy. A row that resolves nothing returns
+None; callers refuse every engine the same way.
 """
 
 from __future__ import annotations
@@ -32,6 +33,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from decimal import Decimal
 
+from simulator.battery.default_policy import resolve
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -65,10 +67,11 @@ from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,
     WaypointResult,
+    _is_vacuum_pressure_method,
     oxygen_condition,
 )
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import ATM_PA, PA_PER_BAR
 
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
@@ -77,9 +80,12 @@ _TIER1_DIRECT_ROUTES = frozenset({
 })
 _TIER3_ATMOSPHERE_ROUTES = (
     "observation_gas_composition",
+    "observation_gas_composition_method_implied_pressure",
     "observation_gas_couple_equilibrium",
     "graphite_c_co_buffer",
     "buffer_relation",
+    "container_graphite_c_co_buffer",
+    "container_buffer_relation",
 )
 _VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
@@ -120,10 +126,12 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     reason = f"fo2_tier={resolved.tier}"
     policy = None
     policy_flag = None
-    assumed_intrinsic = (
-        resolved.tier == 4
-        and resolved.route == "intrinsic_melt_fO2"
-        and resolved.borrowed
+    kind: NoticeKind | None = None
+    ferric_ratio = resolved.route.startswith("kress_inverse:")
+    vacuum_proxy = resolved.route == "fo2_vacuum_cell_proxy"
+    container_buffer = resolved.route.startswith("container_")
+    method_implied_gas_mix = (
+        resolved.route == "observation_gas_composition_method_implied_pressure"
     )
     if resolved.physics_rung is not None:
         reason += (
@@ -131,20 +139,49 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             f"{_PHYSICS_RUNG_LABELS[resolved.physics_rung]}"
         )
     reason += f"; route={resolved.route}"
-    if assumed_intrinsic:
+    if ferric_ratio:
         reason = (
-            "DP-010 default=intrinsic_melt_fO2; "
-            "original_reason=no printed fO2; "
-            f"{reason}; borrowed"
+            "fo2_from_printed_ferric_ratio; Kress-Carmichael inverse at row T and P; "
+            f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; {reason}"
         )
-        from simulator.battery.default_policy import resolve
-
-        policy_result = resolve(
-            "DP-010",
-            intrinsic_fo2_log10_bar=resolved.log10_fO2_bar,
+        kind = NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
+    elif container_buffer:
+        reason = (
+            "fo2_buffer_from_container; buffer fixed by the printed sample container; "
+            f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; {reason}"
         )
-        policy = NoticePolicy(**policy_result.payload["policy"])
-        policy_flag = policy_result.flag
+        kind = NoticeKind.FO2_BUFFER_FROM_CONTAINER
+    elif method_implied_gas_mix:
+        po2_bar = resolved.po2_bar
+        if po2_bar is None:
+            po2_bar = 10.0**resolved.log10_fO2_bar
+        reason = (
+            "DP-002 method_implied total pressure for printed gas composition; "
+            "pO2=xO2*P_total; "
+            f"pO2/bar={po2_bar:.12g}; "
+            f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; {reason}"
+        )
+        policy = resolved.policy
+        if policy is None:
+            raise ValueError("gas-mixture fO2 is missing its DP-002 policy")
+        policy_flag = NoticeKind.METHOD_IMPLIED
+    elif vacuum_proxy:
+        reason = (
+            "fo2_vacuum_cell_proxy; legacy intrinsic-melt clamp used only as a "
+            "vacuum-cell proxy; "
+            f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; {reason}"
+        )
+        kind = NoticeKind.FO2_VACUUM_CELL_PROXY
+    elif resolved.route == "dp010_ambient_air_unprinted_atmosphere":
+        reason = (
+            "DP-010 v2; pO2=0.21 atm; fO2/bar=pO2/(1 bar); "
+            f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; "
+            f"original_reason=no printed ferric ratio or determining method/apparatus; {reason}"
+        )
+        policy = resolved.policy
+        if policy is None:
+            raise ValueError("DP-010 ambient-air fO2 is missing its policy")
+        policy_flag = NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
     assumed_air = resolved.route == "dp003_ambient_air"
     if assumed_air:
         reason = (
@@ -158,16 +195,17 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             policy_flag = NoticeKind.METHOD_IMPLIED
     if policy_flag is not None:
         kind = policy_flag
-    elif resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
-        reason += "; source-calculated pO2 from observed pNa omitted as a circular condition"
-        kind = NoticeKind.INPUT_OMITTED
-    elif resolved.route.endswith("rys_pO2_provenance_unknown"):
-        reason += "; row-level pO2 provenance unknown; treated as non-independent"
-        kind = NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-    elif resolved.borrowed:
-        kind = NoticeKind.OUT_OF_CERTIFIED_BAND
-    else:
-        kind = NoticeKind.SOURCE_DISAGREEMENT
+    elif kind is None:
+        if resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
+            reason += "; source-calculated pO2 from observed pNa omitted as a circular condition"
+            kind = NoticeKind.INPUT_OMITTED
+        elif resolved.route.endswith("rys_pO2_provenance_unknown"):
+            reason += "; row-level pO2 provenance unknown; treated as non-independent"
+            kind = NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        elif resolved.borrowed:
+            kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+        else:
+            kind = NoticeKind.SOURCE_DISAGREEMENT
     return Notice(
         kind=kind,
         affected_quantities=(quantity,),
@@ -309,14 +347,23 @@ def resolve_row_fo2(
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
     # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
     # does not replace the cell's explicit oxygen control or effusion balance.
-    if not knudsen_vapour:
-        tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
-        if tier2 is not None:
-            return tier2
+    tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
+    if tier2 is not None:
+        return tier2
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
             log = _log_point(route.value)
             if log is not None:
+                if route.route == "observation_gas_composition_method_implied_pressure":
+                    dp002 = resolve("DP-002")
+                    return ResolvedFo2(
+                        log,
+                        3,
+                        route.route,
+                        False,
+                        po2_bar=10.0**log,
+                        policy=NoticePolicy(**dp002.payload["policy"]),
+                    )
                 return ResolvedFo2(
                     log, 3, route.route, False,
                     physics_rung=1 if knudsen_vapour else None,
@@ -341,7 +388,11 @@ def resolve_row_fo2(
         and experiment.ambient_pressure_evidence.evidence_class
         is AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT
     ):
-        total_pressure = experiment.pressure_environment.total_pressure_Pa.state
+        total_pressure = (
+            identity.total_pressure_Pa
+            if identity is not None and identity.total_pressure_Pa is not None
+            else experiment.pressure_environment.total_pressure_Pa.state
+        )
         pressure_pa = (
             nominal_pressure_pa(total_pressure)
             if total_pressure.is_value
@@ -352,8 +403,6 @@ def resolve_row_fo2(
             # method-implied. The DP-003 owner computes pO2=xO2·P_total in Pa;
             # the dimensionless mole fraction preserves Pa, and pO2→0 as
             # xO2→0. At the DP-002 pressure, pO2 is 21227.6 Pa.
-            from simulator.battery.default_policy import resolve
-
             policy_result = resolve("DP-003", P_total=pressure_pa)
             oxygen_pa = Decimal(str(policy_result.value))
             oxygen_bar = float(oxygen_pa / Decimal(str(PA_PER_BAR)))
@@ -432,9 +481,30 @@ def resolve_row_fo2(
             log = _log_point(route.value)
             if log is not None:
                 return ResolvedFo2(log, 3, route.route, False)
-    if _knudsen_blocks_intrinsic(experiment, observation, quantity):
+    if _is_vacuum_fO2_method(experiment):
+        proxy = _tier4(weights, temperature)
+        if proxy is not None:
+            return replace(proxy, route="fo2_vacuum_cell_proxy", borrowed=False)
         return None
-    return _tier4(weights, temperature)
+    resolved_quantity = quantity or (
+        None if identity is None else quantity_token(identity)
+    )
+    if resolved_quantity is not None:
+        oxygen_pa = Decimal("0.21") * Decimal(str(ATM_PA))
+        oxygen_bar = float(oxygen_pa / Decimal(str(PA_PER_BAR)))
+        resolved = resolve(
+            "DP-010",
+            resolved_fo2_log10_bar=math.log10(oxygen_bar),
+        )
+        return ResolvedFo2(
+            float(resolved.value),
+            4,
+            "dp010_ambient_air_unprinted_atmosphere",
+            False,
+            po2_bar=oxygen_bar,
+            policy=NoticePolicy(**resolved.payload["policy"]),
+        )
+    return None
 
 
 def _metal_saturation_declared(experiment: Experiment | None) -> bool:
@@ -806,7 +876,7 @@ def _kress_pressure_bar(
     bench: object | None,
     observation: Observation | None,
     identity: Identity | None,
-) -> tuple[float, str]:
+) -> tuple[float | None, str]:
     if identity is not None and identity.total_pressure_Pa is not None:
         state = identity.total_pressure_Pa
         if state.is_value and state.value is not None:
@@ -827,7 +897,10 @@ def _kress_pressure_bar(
             log_bar = _pascal_point_to_bar(boundary.value)
             if log_bar is not None:
                 return log_bar, boundary.route
-    return 1.0, "kress_reference_1_bar"
+    if _is_knudsen(experiment) or _is_vacuum_fO2_method(experiment):
+        return None, "pressure_term_deliberately_dropped_no_cell_total_available"
+    policy_pressure = Decimal(str(resolve("DP-001").value))
+    return float(policy_pressure) / PA_PER_BAR, "DP-001_assumed_pressure"
 
 
 def _pascal_point_to_bar(value: object) -> float | None:
@@ -886,6 +959,10 @@ def _is_knudsen(experiment: Experiment | None) -> bool:
         and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     )
+
+
+def _is_vacuum_fO2_method(experiment: Experiment | None) -> bool:
+    return _is_knudsen(experiment) or _is_vacuum_pressure_method(experiment)
 
 
 def _vapour_quantity(quantity: Quantity | None) -> bool:
@@ -1000,31 +1077,13 @@ def _effusion_closure(
     )
 
 
-def _knudsen_blocks_intrinsic(
-    experiment: Experiment | None,
-    observation: Observation | None,
-    quantity: Quantity | None,
-) -> bool:
-    """A Knudsen row that did not close does not borrow the melt's intrinsic fO2."""
-
-    if not _vapour_quantity(quantity) or not _is_knudsen(experiment):
-        return False
-    if observation is None:
-        return True
-    identity = _identity(observation)
-    if identity is not None and has_printed_fo2(observation, identity):
-        return False
-    return True
-
-
 def _tier4(
     weights: dict[str, float] | None, temperature_K: float | None
 ) -> ResolvedFo2 | None:
     if temperature_K is None or not weights:
         return None
-    # Last-rung premise: without a printed/control fO2, an oxide melt's own
-    # composition and temperature supply the existing intrinsic closure. The
-    # result is independent of the target value and is typed DP-010 downstream.
+    # This legacy headspace clamp is retained only as the explicit vacuum-cell
+    # proxy selected by resolve_row_fo2; ordinary lab melts use DP-010 v2.
     from simulator.fe_redox import intrinsic_melt_fO2
 
     log = float(intrinsic_melt_fO2(weights, temperature_K))

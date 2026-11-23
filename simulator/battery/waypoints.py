@@ -1484,6 +1484,20 @@ def pressure_boundary(
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
             WaypointAuthority.DERIVED if run_pressure.inference else WaypointAuthority.PRINTED,
             ("experiment.pressure_environment.total_pressure_Pa",)))
+    identity = getattr(observation, "identity", None)
+    identity_pressure = getattr(identity, "total_pressure_Pa", None)
+    if identity_pressure is not None and identity_pressure.is_value:
+        nominal_pressure = nominal_pressure_pa(identity_pressure)
+        if nominal_pressure is not None and nominal_pressure > 0:
+            routes.append(
+                Waypoint(
+                    "pressure_boundary",
+                    Value.point_of(nominal_pressure),
+                    "observation_identity_total_pressure_Pa",
+                    WaypointAuthority.DERIVED,
+                    (f"observation[{observation.observation_id}].identity.total_pressure_Pa",),
+                )
+            )
     speed = _value(bench.pumping_speed_m3_s)
     gas_load = next((fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"), None)
     if speed is not None and gas_load is not None:
@@ -1530,6 +1544,35 @@ def _prediction_pressure_waypoint(
                 return route
         return None
     return selected
+
+
+def _is_vacuum_pressure_method(experiment: Experiment | None) -> bool:
+    """Classify non-Knudsen methods whose stated vacuum fixes pressure."""
+
+    if experiment is None:
+        return False
+    method = experiment.method.value if experiment.method.is_value else None
+    if method is MethodToken.VACUUM_CHAMBER_PYROLYSIS:
+        return True
+    if method not in {
+        MethodToken.LANGMUIR_FREE_EVAPORATION,
+        MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    }:
+        return False
+    descriptions = []
+    note = experiment.pressure_environment.cell_internal_pressure_note
+    if note is not None and note.state.is_value:
+        descriptions.append(str(note.state.value).casefold())
+    schedule = experiment.thermal_schedule
+    if schedule is not None and schedule.method is not None and schedule.method.state.is_value:
+        descriptions.append(str(schedule.method.state.value).casefold())
+    container = experiment.sample.container
+    if container is not None and container.state.is_value:
+        descriptions.append(str(container.state.value).casefold())
+    return any(
+        "vacuum" in description or "evacuated" in description
+        for description in descriptions
+    )
 
 
 def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResult:
@@ -1861,6 +1904,55 @@ def oxygen_condition(
             routes.append(Waypoint("oxygen_condition", value, "observation_fO2_Pa_to_log_fO2",
                 WaypointAuthority.DERIVED, point_pressure.inputs))
     control = experiment.fO2_control
+    container_buffer_token: str | None = None
+    container = experiment.sample.container
+    if container is not None and container.state.is_value:
+        container_text = (
+            str(container.state.value)
+            .casefold()
+            .replace("_", " ")
+            .replace("–", "-")
+            .replace("—", "-")
+        )
+        if "graphite" in container_text:
+            container_buffer_token = "CCO"
+        elif any(
+            token in container_text
+            for token in (
+                "fe-metal",
+                "fe metal",
+                "iron metal",
+                "iron-wustite",
+                "iron wustite",
+                "iron-wüstite",
+                "iron wüstite",
+                "iw buffer",
+            )
+        ):
+            container_buffer_token = "IW"
+        elif any(
+            token in container_text
+            for token in ("nickel", "ni metal", "ni/nio", "nno buffer")
+        ):
+            container_buffer_token = "NNO"
+        elif any(
+            token in container_text
+            for token in (
+                "quartz-fayalite-magnetite",
+                "qfm buffer",
+                "fmq buffer",
+            )
+        ):
+            container_buffer_token = "QFM"
+        elif any(
+            token in container_text
+            for token in (
+                "wustite-magnetite",
+                "wüstite-magnetite",
+                "wm buffer",
+            )
+        ):
+            container_buffer_token = "WM"
     if control is not None:
         pressure = _value(control.oxygen_partial_pressure_Pa)
         if pressure is not None:
@@ -1898,13 +1990,35 @@ def oxygen_condition(
             pressure = _prediction_pressure_waypoint(
                 pressure_boundary(experiment, bench, observation), experiment.method
             )
+            method_implied_pressure = False
+            if pressure is None and experiment.ambient_pressure_evidence is not None:
+                from simulator.battery.default_policy import resolve
+
+                dp002 = resolve("DP-002")
+                pressure = Waypoint(
+                    "pressure_boundary",
+                    Value.point_of(dp002.value),
+                    "DP-002_method_implied_pressure",
+                    WaypointAuthority.DERIVED,
+                    ("default_policy.DP-002",),
+                    notice=(
+                        "DP-002 method-implied ambient total pressure="
+                        f"{dp002.value} Pa for the printed gas mixture"
+                    ),
+                )
+                method_implied_pressure = True
             if "O2" in fractions and pressure is not None:
                 # Ideal mixture: pO2=xO2*P. Units: dimensionless*Pa=Pa.
                 # At xO2=.2 and P=1e5 Pa, log10(fO2/bar)=log10(.2)=-.69897.
                 partial = _multiply(pressure.value, Value.point_of(fractions["O2"]))
                 value = _log_pressure(partial) if partial is not None else None
                 if value is not None:
-                    routes.append(Waypoint("oxygen_condition", value, "observation_gas_composition",
+                    route = (
+                        "observation_gas_composition_method_implied_pressure"
+                        if method_implied_pressure
+                        else "observation_gas_composition"
+                    )
+                    routes.append(Waypoint("oxygen_condition", value, route,
                         WaypointAuthority.DERIVED,
                         (f"observation[{observation.observation_id}].point_conditions.gas_composition", *pressure.inputs)))
             elif any(set(fractions) <= set(pair) | {"Ar", "He", "N2"} and set(pair) <= set(fractions)
@@ -1928,7 +2042,15 @@ def oxygen_condition(
                         pass
     # Buffer relations (graphite C–CO and Frost condensed buffers) are heavier
     # derivations than any printed pO2 above, so they rank last.
-    if control is not None and control.buffer is not None and control.buffer.state.is_value:
+    explicit_buffer_token = (
+        str(control.buffer.state.value)
+        if control is not None
+        and control.buffer is not None
+        and control.buffer.state.is_value
+        else None
+    )
+    buffer_token = explicit_buffer_token or container_buffer_token
+    if buffer_token is not None:
         from simulator.chemistry.graphite_c_co import is_c_co_buffer_token
         from simulator.oxygen_buffers import (
             frost_condensed_buffer_log10_fO2_bar,
@@ -1936,36 +2058,68 @@ def oxygen_condition(
         )
         from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
 
-        buffer_token = str(control.buffer.state.value)
+        inferred_container = explicit_buffer_token is None
         thermal = thermal_path(experiment, bench, observation).selected
         if is_c_co_buffer_token(buffer_token):
             p_co = _c_co_pressure_Pa(experiment, bench, observation)
-            if thermal is not None and p_co is not None:
+            total_pressure = (
+                None
+                if p_co is not None
+                else _prediction_pressure_waypoint(
+                    pressure_boundary(experiment, bench, observation), experiment.method
+                )
+            )
+            if thermal is not None and (p_co is not None or total_pressure is not None):
                 temperature = thermal.value
                 if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
                     temperature = Value.point_of(temperature.series[0][1])
-                pressure_value, pressure_inputs = p_co
+                pressure_value, pressure_inputs = (
+                    p_co if p_co is not None
+                    else (total_pressure.value, total_pressure.inputs)
+                )
                 if temperature.kind is ValueKind.POINT and pressure_value.kind is ValueKind.POINT:
                     T = temperature.point
                     # Premise: paper states graphite / C–CO buffering and prints
-                    # T and P_CO (or total P when CO is the stated gas); the
-                    # oxygen-buffer owner evaluates the stated-CO JANAF relation.
+                    # T and P_CO, or the container closes a C–CO–CO2 gas at P.
+                    # The oxygen-buffer owner evaluates either relation.
                     nominal_pa = nominal_pressure_pa(pressure_value)
                     if nominal_pa is not None:
                         P_bar = nominal_pa / BAR_PA_DECIMAL
-                        c_co_state = _stated_co_pressure_result(
-                            float(T), float(P_bar)
-                        )
-                        routes.append(Waypoint(
-                            "oxygen_condition",
-                            Value.point_of(c_co_state.log10_fO2_bar),
-                            "graphite_c_co_buffer",
-                            WaypointAuthority.DERIVED,
-                            ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
-                            notice=(
+                        if p_co is not None:
+                            c_co_state = _stated_co_pressure_result(
+                                float(T), float(P_bar)
+                            )
+                            log10_fO2_bar = c_co_state.log10_fO2_bar
+                            buffer_notice = (
                                 "implied_pCO2_bar="
                                 f"{c_co_state.p_co2_bar:.12g}; JANAF C-095"
+                            )
+                        else:
+                            from simulator.oxygen_buffers import cco_buffered_fO2
+
+                            c_co_state = cco_buffered_fO2(
+                                float(T), float(P_bar), reference_buffer=None
+                            )
+                            log10_fO2_bar = c_co_state.log10_fO2_bar
+                            buffer_notice = (
+                                "closed graphite C–CO–CO2 buffer at P_total; "
+                                f"{c_co_state.validity}"
+                            )
+                        routes.append(Waypoint(
+                            "oxygen_condition",
+                            Value.point_of(log10_fO2_bar),
+                            (
+                                "container_graphite_c_co_buffer"
+                                if inferred_container
+                                else "graphite_c_co_buffer"
                             ),
+                            WaypointAuthority.DERIVED,
+                            (
+                                ("experiment.sample.container",)
+                                if inferred_container
+                                else ("experiment.fO2_control.buffer",)
+                            ) + (*thermal.inputs, *pressure_inputs),
+                            notice=buffer_notice,
                         ))
         else:
             buffer = PUBLISHED_BUFFERS.get(buffer_token.upper())
@@ -1993,8 +2147,10 @@ def oxygen_condition(
                             P,
                         )
                         routes.append(Waypoint("oxygen_condition", Value.point_of(value),
-                            "buffer_relation", WaypointAuthority.DERIVED,
-                            ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
+                            "container_buffer_relation" if inferred_container else "buffer_relation",
+                            WaypointAuthority.DERIVED,
+                            (("experiment.sample.container",) if inferred_container else ("experiment.fO2_control.buffer",))
+                            + (*thermal.inputs, *pressure.inputs)))
     # Dalton's law gives pO2 <= P_total. A printed vacuum/total-pressure upper
     # bound is therefore a usable engine point only at its bound, with an
     # extrapolation notice. The bound is method_class calculated, never printed:
@@ -2064,10 +2220,14 @@ def oxygen_condition(
     # _log_pressure accepts would already have fired oxygen_partial_pressure_to_log_fO2,
     # so control is present here only when the buffer name is a published buffer.
     buffer_known = False
-    if control is not None and control.buffer is not None and control.buffer.state.is_value:
+    if buffer_token is not None:
+        from simulator.chemistry.graphite_c_co import is_c_co_buffer_token
         from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
 
-        buffer_known = str(control.buffer.state.value).upper() in PUBLISHED_BUFFERS
+        buffer_known = (
+            is_c_co_buffer_token(buffer_token)
+            or buffer_token.upper() in PUBLISHED_BUFFERS
+        )
     control_present = buffer_known
     oxygen_inputs = {
         "fO2_log": False,

@@ -561,34 +561,27 @@ def _mathieu_pressure_context() -> tuple[ScoreContext, tuple[Observation, ...]]:
 @pytest.mark.parametrize(
     "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
 )
-def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine) -> None:
+def test_mathieu_closed_system_unknown_pressure_uses_closed_path(engine) -> None:
     context, admitted = _mathieu_pressure_context()
     reference = admitted[0]
     experiment = context.experiments[reference.experiment_id]
-    from simulator.physical_constants import ATM_PA
-
-    assumed_bar, pressure_state, assumption_notice, invalid = (
+    pressure_bar, pressure_state, pressure_notice, invalid = (
         score_mod._resolve_score_total_pressure(
             reference.identity,
             Quantity.P_PARTIAL,
             observation=reference,
             experiment=experiment,
+            engine=engine,
         )
     )
-    assert assumed_bar == ATM_PA / 100000
-    assert assumption_notice is not None
-    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
-    assert assumption_notice.policy is not None
-    assert assumption_notice.policy.id == "DP-001"
-    assert assumption_notice.policy.status == "canonical"
+    assert pressure_bar is None
+    assert pressure_state is None
+    assert pressure_notice is None
     assert invalid is None
     prediction = replace(
         _partial_prediction(engine, reference),
-        identity=replace(
-            reference.identity,
-            total_pressure_Pa=pressure_state,
-        ),
-        notices=(assumption_notice,),
+        identity=reference.identity,
+        notices=(),
     )
 
     residual, _candidate = compile_residual(
@@ -598,9 +591,9 @@ def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine)
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
-    assert assumption_notice in residual.notices
-    assert not residual.score_eligible
-    assert "assumed_pressure" in score_mod.flagged_strata(residual.notices)
+    assert not any(
+        notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in residual.notices
+    )
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "total-pressure-independent" in notice.reason
@@ -778,7 +771,7 @@ def test_unknown_total_pressure_refusal_is_pinned_on_non_mathieu_row() -> None:
     assert outcome.fields == ("total_pressure_Pa",)
 
 
-def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> None:
+def test_vapour_pressure_resolution_waits_for_engine_partial_sum() -> None:
     experiment = F.tabulation_experiment(method=MethodToken.QUENCH_EQUILIBRATION)
     experiment = replace(
         experiment,
@@ -803,121 +796,31 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         source_id="work-1",
     )
     reference = replace(reference, point_conditions=None)
-    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
-        identity, Quantity.P_PARTIAL, experiment=experiment
+    pressure = score_mod._resolve_score_total_pressure(
+        identity,
+        Quantity.P_PARTIAL,
+        observation=reference,
+        experiment=experiment,
+        engine=Engine.INTERNAL_ANALYTICAL,
     )
-    assert assumed_bar == 1.01325
-    assert assumption_notice is not None
-    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
-    assert assumption_notice.policy is not None
-    assert assumption_notice.policy.id == "DP-001"
-    assert invalid is None
-    prediction = replace(
-        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
-        identity=replace(
-            identity, total_pressure_Pa=State.of(ATM_PA_DECIMAL)
-        ),
-        notices=(assumption_notice,),
-    )
+    assert pressure == (None, None, None, None)
 
     context = _context(F.work(), experiment, reference)
     residual, _candidate = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
-        prediction=prediction,
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
     )
 
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
-    assert assumption_notice in residual.notices
-    assert not residual.score_eligible
-    assert "assumed_pressure" in score_mod.flagged_strata(residual.notices)
-    payload = residual_to_plain(residual)
-    assert sum(
-        int(row["n_candidates"])
-        for row in headline_payloads(
-            [payload],
-            (Engine.INTERNAL_ANALYTICAL,),
-            tier="measured",
-        )
-    ) == 0
-
-    mutated_payload = dict(payload)
-    mutated_notices = [dict(notice) for notice in payload["notices"]]
-    default_notice = next(
-        notice
-        for notice in mutated_notices
-        if notice.get("policy", {}).get("id") == "DP-001"
-    )
-    default_notice.pop("kind")
-    mutated_payload["notices"] = mutated_notices
-    with pytest.raises(ValueError, match="policy-bearing notice kind"):
-        score_mod._headline_payload_admits(mutated_payload, tier="measured")
-
-    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
-    assert assumption_notice.policy == NoticePolicy(
-        id="DP-001",
-        version=1,
-        status="canonical",
-        value="101325",
-        units="Pa",
-    )
-    assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
-    assert "not printed" in assumption_notice.reason
-    assert any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-        and "total-pressure-independent" in notice.reason
+    assert not any(
+        notice.policy is not None
+        and notice.policy.id in {"DP-001", "DP-108"}
         for notice in residual.notices
     )
-
-    from simulator.battery.score import (
-        flagged_strata,
-        flagged_stratum_rows,
-        headline_rows,
-    )
-
-    assert flagged_strata(residual.notices) == (
-        NoticeKind.ASSUMED_PRESSURE.value,
-    )
-    assert [
-        (
-            row["stratum"],
-            row.get("policy_id"),
-            row.get("policy_status"),
-            row["n"],
-        )
-        for row in flagged_stratum_rows(
-            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
-        )
-    ] == [
-        (
-            score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
-            "DP-001",
-            "canonical",
-            1,
-        )
-    ]
-    serialized_strata = flagged_stratum_payloads(
-        (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
-    )
-    assert [
-        (
-            row["stratum"],
-            row.get("policy_id"),
-            row.get("policy_status"),
-            row["n"],
-        )
-        for row in serialized_strata
-    ] == [
-        (
-            score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
-            "DP-001",
-            "canonical",
-            1,
-        )
-    ]
 def _partial_prediction(engine, observation, **_kwargs):
     return EnginePrediction(
         engine=engine,

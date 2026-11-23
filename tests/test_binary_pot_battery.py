@@ -1154,7 +1154,13 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
         takes_fo2=True,
         supports_intrinsic_fo2=False,
     )
-    cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=po2,
+        physical_pressure_bar=1.0,
+    )
     assert cell.status == "ok"
     assert captured["subprocess_run_mode"] == "isothermal"
     assert captured["fO2_log"] is None
@@ -1163,6 +1169,42 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     assert cell.melt_activities == {"SiO2": 0.5}
     assert cell.gas_partial_pressures_Pa == {"Na": 1.0}
     assert handle.available is True
+
+
+def test_alphamelts_without_physical_pressure_returns_input_refusal() -> None:
+    pot = BinaryPot(
+        pot_id="fixture_pot",
+        kato_1993_table4_system="CaO-Al2O3-SiO2",
+        why="fixture",
+        composition_wt_pct={"SiO2": 50.0, "CaO": 25.0, "Al2O3": 25.0},
+    )
+    po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+    class _Backend:
+        _mode = "subprocess"
+
+        def equilibrate(self, **_kwargs):
+            raise AssertionError("AlphaMELTS must not receive an invented pressure")
+
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=po2,
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "total_pressure_required"
+    assert cell.engine_status == "input_refusal"
 
 
 def test_psat_without_fo2_on_fe_melt_keeps_green_scorer_request() -> None:

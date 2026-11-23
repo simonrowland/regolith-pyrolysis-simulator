@@ -5355,12 +5355,23 @@ def _equilibrate_cell_uncached(
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
-    if physical_pressure_bar is None:
-        physical_pressure_bar = DP_019_VACUUM_BOUNDARY_BAR
-    else:
+    if physical_pressure_bar is not None:
         physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
     if handle.name == "alphamelts":
+        if physical_pressure_bar is None:
+            return _done(
+                status="refusal",
+                refusal_reason="total_pressure_required",
+                engine_status="input_refusal",
+                engine_reason=(
+                    "alphaMELTS requires an explicit physical pressure; "
+                    "the scoring pressure resolver supplied none"
+                ),
+                melt_activities={},
+                gas_partial_pressures_Pa={},
+                liquid_fraction=None,
+            )
         from simulator.alphamelts_reference_pressure import (
             alphamelts_condensed_phase_pressure_bar,
         )

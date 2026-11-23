@@ -65,7 +65,6 @@ from simulator.source_ids import (
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
-    AmbientPressureEvidenceClass,
     AmountBasis,
     Authority,
     CellMaterial,
@@ -2535,6 +2534,13 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
+    for kind in (
+        NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO,
+        NoticeKind.FO2_VACUUM_CELL_PROXY,
+        NoticeKind.FO2_BUFFER_FROM_CONTAINER,
+    ):
+        if kind.value in kinds:
+            strata.append(kind.value)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if NoticeKind.COMPOSITION_BINARY_COMPLEMENT.value in kinds:
@@ -8671,7 +8677,8 @@ def _comparison_identity(
     identity: Identity,
     reference: Observation,
     prediction: EnginePrediction,
-) -> Identity:
+    experiment: Experiment | None = None,
+) -> tuple[Identity, Notice | None]:
     """Comparison identity with conditions used by the numeric prediction.
 
     KEMS activity series can store printed composition on the point while
@@ -8714,6 +8721,39 @@ def _comparison_identity(
     knudsen_total_pressure = _knudsen_total_pressure_details(
         prediction.notices
     )
+    quantity = quantity_token(identity)
+    pressure_notice: Notice | None = None
+    pressure_state: State[Any] | None = None
+    if quantity is not None and (
+        identity.total_pressure_Pa is None
+        or not identity.total_pressure_Pa.is_value
+    ):
+        _bar, pressure_state, pressure_notice, _invalid = (
+            _resolve_score_total_pressure(
+                identity,
+                quantity,
+                observation=reference,
+                experiment=experiment,
+                engine=prediction.engine,
+            )
+        )
+        if (
+            pressure_state is None
+            and quantity not in {Quantity.P_REFERENCE, Quantity.P_SAT}
+            and isinstance(prediction.identity, Identity)
+        ):
+            predicted_pressure = prediction.identity.total_pressure_Pa
+            if predicted_pressure is not None and predicted_pressure.is_value:
+                pressure_state = predicted_pressure
+        if pressure_notice is None:
+            pressure_notice = next(
+                (
+                    notice
+                    for notice in prediction.notices
+                    if notice.origin == "score:total_pressure"
+                ),
+                None,
+            )
     if (
         not resolved_oxygen
         and not shared_oxygen_condition
@@ -8723,8 +8763,9 @@ def _comparison_identity(
         and knudsen_total_pressure is None
         and melt_identity is identity
         and not fusion_polymorph_flag
+        and pressure_state is None
     ):
-        return identity
+        return identity, pressure_notice
     updates: dict[str, State] = {}
     if melt_identity is not identity:
         updates["species"] = melt_identity.species
@@ -8754,6 +8795,12 @@ def _comparison_identity(
             updates["species"] = replace(
                 identity.species, polymorph=State.of(solid_polymorph)
             )
+    if (
+        pressure_state is not None
+        and pressure_state.is_value
+        and (identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value)
+    ):
+        updates["total_pressure_Pa"] = pressure_state
     if identity.composition is None or not identity.composition.is_value:
         point, _notice = _printed_point_composition(reference)
         if point is not None:
@@ -8770,29 +8817,9 @@ def _comparison_identity(
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * PA_PER_BAR_DEC)
-    if pressure_independent and (
-        identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
-    ):
-        predicted_pressure = (
-            prediction.identity.total_pressure_Pa
-            if isinstance(prediction.identity, Identity)
-            else None
-        )
-        if predicted_pressure is not None and predicted_pressure.is_value:
-            updates["total_pressure_Pa"] = predicted_pressure
-        else:
-            quantity = quantity_token(identity)
-            if quantity is not None:
-                bar, _notice, invalid = total_pressure_bar_for_score(
-                    identity, quantity
-                )
-                if invalid is None and bar is not None:
-                    updates["total_pressure_Pa"] = State.of(
-                        Decimal(str(bar)) * PA_PER_BAR_DEC
-                    )
     if not updates:
-        return identity
-    return replace(identity, **updates)
+        return identity, pressure_notice
+    return replace(identity, **updates), pressure_notice
 
 
 def _selected_shared_ladder_oxygen(
@@ -9358,21 +9385,43 @@ def _original_pressure_reason(
     return "no printed total_pressure_Pa is available"
 
 
+def _closed_system_experiment(experiment: Experiment | None) -> bool:
+    if experiment is None:
+        return False
+    descriptions = []
+    container = experiment.sample.container
+    if container is not None and container.state.is_value:
+        descriptions.append(str(container.state.value).casefold())
+    note = experiment.pressure_environment.cell_internal_pressure_note
+    if note is not None and note.state.is_value:
+        descriptions.append(str(note.state.value).casefold())
+    descriptions.append(
+        str(experiment.pressure_environment.total_pressure_Pa.state.reason or "").casefold()
+    )
+    return any(
+        ("sealed" in description or "evacuated" in description or "closed" in description)
+        and any(token in description for token in ("ampoule", "capsule", "tube", "cell"))
+        for description in descriptions
+    )
+
+
 def _resolve_score_total_pressure(
     identity: Identity,
     quantity: Quantity,
     *,
     observation: Observation | None = None,
     experiment: Experiment | None = None,
+    engine: Engine | None = None,
 ) -> tuple[float | None, State[Any] | None, Notice | None, str | None]:
-    """Return the pressure used by a scorer, its identity state, and its flag."""
+    """Choose pressure from quantity and apparatus evidence, in ruling order."""
+
+    if quantity in {Quantity.P_REFERENCE, Quantity.P_SAT}:
+        return None, None, None, None
 
     pressure_pa = _score_pressure_state(identity, observation, experiment)
     pressure_bar, pressure_invalid = _score_pressure_bar(pressure_pa)
     if pressure_invalid:
         return 0.0, pressure_pa, None, "total_pressure_invalid"
-    if pressure_bar is not None:
-        return pressure_bar, pressure_pa, None, None
 
     original_reason = _original_pressure_reason(identity, observation, experiment)
     method = (
@@ -9380,33 +9429,19 @@ def _resolve_score_total_pressure(
         if experiment is not None and experiment.method.is_value
         else None
     )
-    vacuum_descriptions: list[str] = []
-    if experiment is not None:
-        if (
-            experiment.thermal_schedule is not None
-            and experiment.thermal_schedule.method is not None
-            and experiment.thermal_schedule.method.state.is_value
-        ):
-            vacuum_descriptions.append(
-                str(experiment.thermal_schedule.method.state.value).casefold()
-            )
-        internal_note = experiment.pressure_environment.cell_internal_pressure_note
-        if internal_note is not None and internal_note.state.is_value:
-            vacuum_descriptions.append(str(internal_note.state.value).casefold())
-        container = experiment.sample.container
-        if container is not None and container.state.is_value:
-            vacuum_descriptions.append(str(container.state.value).casefold())
-    stated_vacuum = any(
-        "vacuum" in description or "evacuated" in description
-        for description in vacuum_descriptions
-    )
-    vacuum_method = method is MethodToken.VACUUM_CHAMBER_PYROLYSIS or (
-        method in {
-            MethodToken.LANGMUIR_FREE_EVAPORATION,
-            MethodToken.SOLAR_FURNACE_PYROLYSIS,
-        }
-        and stated_vacuum
-    )
+    if _closed_system_experiment(experiment):
+        if pressure_bar is not None:
+            return pressure_bar, pressure_pa, None, None
+        if engine is not None and (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS:
+            return None, None, None, None
+        return None, None, None, "closed_system_engine_capability_gap"
+
+    if pressure_bar is not None:
+        return pressure_bar, pressure_pa, None, None
+
+    from simulator.battery.waypoints import _is_vacuum_pressure_method
+
+    vacuum_method = _is_vacuum_pressure_method(experiment)
     if vacuum_method:
         resolved = resolve("DP-019")
         pressure_pa = as_decimal(resolved.value)
@@ -9436,24 +9471,13 @@ def _resolve_score_total_pressure(
         )
         return None, None, notice, None
 
-    if (
-        experiment is not None
-        and experiment.ambient_pressure_evidence is not None
-        and experiment.ambient_pressure_evidence.evidence_class
-        in {
-            AmbientPressureEvidenceClass.GAS_MIXING,
-            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
-        }
-    ):
+    if experiment is not None and experiment.ambient_pressure_evidence is not None:
         # Premise: these evidence classes identify a gas-mixing furnace or an
         # explicit atmospheric setup, whose total pressure is ambient (about
         # 101325 Pa). This pressure is in Pa; a vacuum limit is outside this
         # evidence class and is handled by the vacuum branch above.
         implied_pressure = (
-            "gas-mixing furnace implies 1 atm"
-            if experiment.ambient_pressure_evidence.evidence_class
-            is AmbientPressureEvidenceClass.GAS_MIXING
-            else "atmospheric-pressure statement implies 1 atm"
+            "gas-mixing, gas-flow, vented, or atmospheric evidence implies 1 atm"
         )
         resolved = resolve("DP-002")
         pressure_state = State.of(as_decimal(resolved.value))
@@ -9469,6 +9493,17 @@ def _resolve_score_total_pressure(
         if invalid or pressure_bar is None:
             return 0.0, pressure_state, None, "total_pressure_invalid"
         return pressure_bar, pressure_state, notice, None
+
+    if quantity is Quantity.P_PARTIAL:
+        # DP-108 is resolved after the engine supplies the complete partial-pressure map.
+        return None, None, None, None
+
+    if method is None and quantity in {
+        Quantity.EVAPORATION_RATE,
+        Quantity.MASS_LOSS_RATE,
+        Quantity.WALL_DEPOSIT_AREAL_RATE,
+    }:
+        return None, None, None, "rate_quantity_requires_method_for_ambient_regime"
 
     # Premise: condensed-phase activities and Fe redox are nearly pressure
     # independent between vacuum and 1 atm. For V_m≈2.5e-5 m³/mol at 1500 K,
@@ -9490,6 +9525,29 @@ def _resolve_score_total_pressure(
     if invalid or pressure_bar is None:
         return 0.0, pressure_state, None, "total_pressure_invalid"
     return pressure_bar, pressure_state, notice, None
+
+
+def _pressure_refusal(
+    engine: Engine, quantity: Quantity, reason: str
+) -> tuple[RefusalReason, dict[str, object]]:
+    if reason == "closed_system_engine_capability_gap":
+        return RefusalReason.UNSUPPORTED, {
+            "reason": reason,
+            "engine": engine.value,
+            "quantity": quantity.value,
+            "detail": "no closed-system prediction path accepts this quantity and engine",
+        }
+    if reason == "rate_quantity_requires_method_for_ambient_regime":
+        return RefusalReason.METHOD_UNKNOWN, {
+            "reason": reason,
+            "quantity": quantity.value,
+            "detail": "the rate law cannot be formed without the method's ambient regime",
+        }
+    return RefusalReason.INVALID_IDENTITY, {
+        "reason": reason,
+        "input": "total_pressure_Pa",
+        "quantity": quantity.value,
+    }
 
 
 def _oxide_weight_fe_ratio(
@@ -9893,13 +9951,11 @@ def _predict_redox(
             quantity,
             observation=observation,
             experiment=experiment,
+            engine=engine,
         )
     )
     if pressure_invalid is not None:
-        return refused(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": "invalid_input", "input": "total_pressure_Pa"},
-        )
+        return refused(*_pressure_refusal(engine, quantity, pressure_invalid))
     if pressure_notice is not None:
         material_notices.append(pressure_notice)
 
@@ -9918,10 +9974,18 @@ def _predict_redox(
             resolve_row_fo2,
         )
 
+        fo2_observation = replace(
+            observation,
+            identity=(
+                replace(identity, total_pressure_Pa=pressure_pa)
+                if pressure_pa is not None
+                else identity
+            ),
+        )
         resolved_fo2 = resolve_row_fo2(
             experiment,
             bench,
-            observation,
+            fo2_observation,
             composition_wt=material.composition_wt,
             temperature_K=float(material.temperature),
             quantity=quantity,
@@ -10363,6 +10427,7 @@ def total_pressure_bar_for_score(
     *,
     observation: Observation | None = None,
     experiment: Experiment | None = None,
+    engine: Engine | None = None,
 ) -> tuple[float | None, Notice | None, str | None]:
     """Scoring pressure in bar, with a typed notice for every default.
 
@@ -10377,6 +10442,7 @@ def total_pressure_bar_for_score(
         quantity,
         observation=observation,
         experiment=experiment,
+        engine=engine,
     )
     return pressure_bar, notice, invalid
 
@@ -10698,10 +10764,11 @@ def _oxygen_input_request(
                     )
                 )
             return Po2Request(mode=PO2_COMMANDED, po2_bar=po2_bar)
+    fo2_observation = replace(observation, identity=identity)
     resolved = resolve_row_fo2(
         experiment,
         bench,
-        observation,
+        fo2_observation,
         composition=composition_value,
         composition_wt=composition_wt,
         temperature_K=temperature_K,
@@ -12084,12 +12151,16 @@ def _predict_element_mass_fraction_phase(
             quantity,
             observation=observation,
             experiment=experiment,
+            engine=engine,
         )
     )
     if pressure_invalid is not None:
+        pressure_reason, pressure_detail = _pressure_refusal(
+            engine, quantity, pressure_invalid
+        )
         return refused(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": pressure_invalid, "input": "total_pressure_Pa"},
+            pressure_reason,
+            pressure_detail,
             execution=ExecutionState.NOT_PROBED,
             notices=notices,
         )
@@ -12115,7 +12186,14 @@ def _predict_element_mass_fraction_phase(
             resolved = resolve_row_fo2(
                 experiment,
                 bench,
-                observation,
+                replace(
+                    observation,
+                    identity=(
+                        replace(identity, total_pressure_Pa=pressure_state)
+                        if pressure_state is not None
+                        else identity
+                    ),
+                ),
                 composition_wt=dict(weights),
                 temperature_K=float(temperature),
                 quantity=quantity,
@@ -12527,6 +12605,29 @@ def _predict_phase_row(
             name: float(Decimal(100) * amount / kept_total)
             for name, amount in kept
         }
+    pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
+        _resolve_score_total_pressure(
+            identity,
+            quantity,
+            observation=observation,
+            experiment=experiment,
+            engine=engine,
+        )
+    )
+    if pressure_invalid is not None:
+        pressure_reason, pressure_detail = _pressure_refusal(
+            engine, quantity, pressure_invalid
+        )
+        return refused(
+            pressure_reason,
+            pressure_detail,
+            execution=ExecutionState.NOT_PROBED,
+            notices=exclusion_notices,
+        )
+    if pressure_notice is not None:
+        exclusion_notices = exclusion_notices + (pressure_notice,)
+    if pressure_state is not None:
+        identity = replace(identity, total_pressure_Pa=pressure_state)
     fo2_log = _printed_fo2_log10_bar(identity)
     if fo2_log is None:
         from simulator.battery.fo2_ladder import (
@@ -12537,7 +12638,7 @@ def _predict_phase_row(
         resolved = resolve_row_fo2(
             experiment,
             bench,
-            observation,
+            replace(observation, identity=identity),
             composition_wt=wt,
             temperature_K=float(temperature),
             quantity=quantity,
@@ -12559,25 +12660,6 @@ def _predict_phase_row(
         identity = _prediction_identity_with_fo2(
             identity, oxygen_bar, preserve_existing=False
         )
-    pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
-        _resolve_score_total_pressure(
-            identity,
-            quantity,
-            observation=observation,
-            experiment=experiment,
-        )
-    )
-    if pressure_invalid is not None:
-        return refused(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": pressure_invalid, "input": "total_pressure_Pa"},
-            execution=ExecutionState.NOT_PROBED,
-            notices=exclusion_notices,
-        )
-    if pressure_notice is not None:
-        exclusion_notices = exclusion_notices + (pressure_notice,)
-    if pressure_state is not None:
-        identity = replace(identity, total_pressure_Pa=pressure_state)
     anion_pa: Decimal | None = None
     law: _CapacityLaw | None = None
     if solute is not None:
@@ -15100,17 +15182,21 @@ def _predict_with_engine(
                     quantity,
                     observation=observation,
                     experiment=experiment,
+                    engine=engine,
                 )
             )
             if pressure_invalid is not None:
+                pressure_reason, pressure_detail = _pressure_refusal(
+                    engine, quantity, pressure_invalid
+                )
                 return _input_refusal(
                     engine=engine,
                     channel=channel,
                     sources=sources,
                     identity=identity,
                     requested=requested,
-                    reason=RefusalReason.INVALID_IDENTITY,
-                    detail={"reason": pressure_invalid, "quantity": quantity.value},
+                    reason=pressure_reason,
+                    detail=pressure_detail,
                     notices=tuple(input_notices),
                 )
 
@@ -15320,6 +15406,7 @@ def _predict_with_engine(
     )
     pressure_bar: float | None = None
     knudsen_seed_pressure_bar: float | None = None
+    pressure_notice: Notice | None = None
     if derive_knudsen_total_pressure:
         # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
         # d ln(a)/dP~V_m/RT. At V_m=2e-5 m3/mol and T=1800 K,
@@ -15329,6 +15416,16 @@ def _predict_with_engine(
         # As P approaches zero, the pressure contribution approaches zero.
         # Seed at the top of the ruled interval, then update once from
         # the equilibrium partial-pressure sum below.
+        seed_policy = resolve("DP-004", regime_only=True)
+        pressure_notice = _default_policy_notice(
+            seed_policy,
+            quantity,
+            "DP-004 Knudsen regime; numerical solve seed is "
+            f"{_KNUDSEN_TOTAL_PRESSURE_SEED_BAR:g} bar and is replaced by "
+            "the predicted in-cell partial-pressure sum before scoring",
+            origin="score:total_pressure",
+        )
+        input_notices.append(pressure_notice)
         pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
         knudsen_seed_pressure_bar = pressure_bar
     else:
@@ -15338,23 +15435,32 @@ def _predict_with_engine(
                 quantity,
                 observation=observation,
                 experiment=experiment,
+                engine=engine,
             )
         )
         if pressure_invalid is not None:
+            pressure_reason, pressure_detail = _pressure_refusal(
+                engine, quantity, pressure_invalid
+            )
             return _input_refusal(
                 engine=engine,
                 channel=channel,
                 sources=sources,
                 identity=identity,
                 requested=requested,
-                reason=RefusalReason.INVALID_IDENTITY,
-                detail={"reason": pressure_invalid, "quantity": quantity.value},
+                reason=pressure_reason,
+                detail=pressure_detail,
                 notices=tuple(input_notices),
             )
         if pressure_notice is not None:
             input_notices.append(pressure_notice)
         if pressure_state is not None:
             identity = replace(identity, total_pressure_Pa=pressure_state)
+        elif (
+            quantity is Quantity.P_SAT
+            and stated_pure_substance_reservoir(identity) is not None
+        ):
+            identity = replace(identity, total_pressure_Pa=None)
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (
@@ -16054,6 +16160,17 @@ def _predict_with_engine(
                 version=engine_version,
             )
         pressure_bar = total_pressure_pa / PA_PER_BAR
+        dp004_pressure = resolve(
+            "DP-004", in_cell_total_pressure_pa=total_pressure_pa
+        )
+        pressure_notice = _default_policy_notice(
+            dp004_pressure,
+            quantity,
+            "DP-004 Knudsen total pressure from the predicted in-cell partial-pressure sum; "
+            f"numerical solve seed={knudsen_seed_pressure_bar:g} bar",
+            origin="score:total_pressure",
+        )
+        input_notices.append(pressure_notice)
         if solve_oxygen_balance_at_current_pressure is not None:
             # This callback closes over pressure_bar, so after the one-pass
             # P_total update the same balance runs with the derived pressure.
@@ -16590,6 +16707,41 @@ def _predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+    if (
+        quantity is Quantity.P_PARTIAL
+        and pressure_bar is None
+        and not _closed_system_experiment(experiment)
+        and not (
+            experiment is not None
+            and experiment.method.is_value
+            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        )
+    ):
+        total_pressure_pa = _sum_gas_partial_pressures_pa(pressures)
+        if total_pressure_pa is not None:
+            original_pressure_reason = _original_pressure_reason(
+                identity, observation, experiment
+            )
+            dp108 = resolve(
+                "DP-108", predicted_total_pressure_pa=total_pressure_pa
+            )
+            pressure_bar = float(total_pressure_pa) / PA_PER_BAR
+            pressure_state = State.of(as_decimal(dp108.value))
+            identity = replace(identity, total_pressure_Pa=pressure_state)
+            notices = union_notices(
+                notices,
+                (
+                    _default_policy_notice(
+                        dp108,
+                        quantity,
+                        "DP-108 default_total_pressure_Pa={value}; "
+                        f"original_reason={original_pressure_reason}; "
+                        "closed equilibrium contains no background gas; inert-background "
+                        "effect is below Poynting order V*dP/RT",
+                        origin="score:total_pressure",
+                    ),
+                ),
+            )
     if not math.isfinite(magnitude):
         return EnginePrediction(
             engine=engine,
@@ -19038,11 +19190,19 @@ def _compile_residual_with_lineage(
     compared_candidate = candidate.identity
     source_identity = source_reference.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
-        compared_reference = _comparison_identity(
-            compared_reference, reference, prediction
+        compared_reference, reference_pressure_notice = _comparison_identity(
+            compared_reference, reference, prediction, experiment=experiment
         )
-        compared_candidate = _comparison_identity(
-            compared_candidate, reference, prediction
+        compared_candidate, candidate_pressure_notice = _comparison_identity(
+            compared_candidate, reference, prediction, experiment=experiment
+        )
+        notices = union_notices(
+            notices,
+            tuple(
+                notice
+                for notice in (reference_pressure_notice, candidate_pressure_notice)
+                if notice is not None
+            ),
         )
         if (
             point_composition_notice is not None

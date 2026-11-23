@@ -41,6 +41,7 @@ EXPECTED_POLICY_FLAGS = {
     "alpha_assumed",
     "knob_defaulted",
     "assumed_fo2",
+    "fo2_default_ambient_air_unprinted_atmosphere",
     "method_assumed",
     "kems_calibration_by_source",
     "basis_converted",
@@ -57,6 +58,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
     assert set(policies) == {
         *(f"DP-{number:03d}" for number in range(1, 20)),
         "DP-101",
+        "DP-108",
     }
 
     required = {
@@ -82,7 +84,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
     for policy_id, entry in policies.items():
         assert required <= entry.keys()
         assert entry["id"] == policy_id
-        assert entry["version"] == 1
+        assert entry["version"] == (2 if policy_id == "DP-010" else 1)
         assert isinstance(entry["history"], list)
         if policy_id == "DP-101":
             assert entry["status"] == "rejected"
@@ -92,6 +94,13 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "superseded by DP-001/DP-019 by method"
             )
             assert entry["history"]
+        elif policy_id == "DP-010":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "physics owner"
+            assert entry["flag"] == "fo2_default_ambient_air_unprinted_atmosphere"
+        elif policy_id == "DP-108":
+            assert entry["status"] == "proposed"
+            assert entry["flag"] == "assumed_pressure"
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -102,7 +111,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
             assert flag in closed_flags
             assert NoticeKind(flag).value == flag
             seen_flags.add(flag)
-    assert seen_flags == closed_flags
+    assert seen_flags == closed_flags - {"assumed_fo2"}
 
 def test_canonical_policy_values() -> None:
     assert resolve("DP-001").value == Decimal("101325")
@@ -141,12 +150,20 @@ def test_method_implied_notice_requires_policy_metadata() -> None:
 
 
 def test_formula_results_must_come_from_the_named_owner() -> None:
-    intrinsic = resolve(
-        "DP-010", intrinsic_fo2_log10_bar=Decimal("-9.125")
+    ambient_fo2 = resolve(
+        "DP-010", resolved_fo2_log10_bar=Decimal("-0.672")
     )
-    assert intrinsic.value == Decimal("-9.125")
-    assert intrinsic.payload["policy"]["value"] == "-9.125"
-    assert intrinsic.flag is NoticeKind.ASSUMED_FO2
+    assert ambient_fo2.value == Decimal("-0.672")
+    assert ambient_fo2.payload["policy"]["value"] == "-0.672"
+    assert ambient_fo2.flag is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+    assert ambient_fo2.payload["policy_status"] == "proposed"
+
+    equilibrium_pressure = resolve(
+        "DP-108", predicted_total_pressure_pa=Decimal("250")
+    )
+    assert equilibrium_pressure.value == Decimal("250")
+    assert equilibrium_pressure.flag is NoticeKind.ASSUMED_PRESSURE
+    assert equilibrium_pressure.payload["policy_status"] == "proposed"
 
     measured_total = resolve(
         "DP-004", in_cell_total_pressure_pa=Decimal("250")
@@ -158,12 +175,57 @@ def test_formula_results_must_come_from_the_named_owner() -> None:
     assert regime_only.value == "P_total(cell) = sum of measured partial pressures"
 
     for policy_id, context in (
-        ("DP-010", {"value": Decimal("-9.125")}),
+        ("DP-010", {"value": Decimal("-0.672")}),
+        ("DP-108", {"value": Decimal("250")}),
+        ("DP-108", {"predicted_total_pressure_pa": Decimal("0")}),
         ("DP-004", {"value": Decimal("250")}),
         ("DP-004", {"measured_partial_pressures": [Decimal("100"), Decimal("150")]}),
     ):
         with pytest.raises(ValueError, match="owning|requires"):
             resolve(policy_id, **context)
+
+
+@pytest.mark.parametrize(
+    ("policy_id", "context", "quantity", "rail"),
+    (
+        (
+            "DP-010",
+            {"resolved_fo2_log10_bar": Decimal("-0.672064092852")},
+            Quantity.FE3_FE2_RATIO,
+            "redox",
+        ),
+        (
+            "DP-108",
+            {"predicted_total_pressure_pa": Decimal("250")},
+            Quantity.P_PARTIAL,
+            "vapour",
+        ),
+    ),
+)
+def test_proposed_default_flag_mutation_cannot_enter_headline(
+    policy_id: str,
+    context: dict[str, Decimal],
+    quantity: Quantity,
+    rail: str,
+) -> None:
+    resolved = resolve(policy_id, **context)
+    notice = Notice(
+        kind=resolved.flag,
+        affected_quantities=(quantity,),
+        reason=f"{policy_id} test default",
+        origin="test:default-policy-mutation",
+        policy=NoticePolicy(**resolved.payload["policy"]),
+    )
+    row = {"rail": rail, "notices": [to_plain(notice)]}
+
+    assert _headline_payload_admits(row, tier="compilation") is False
+
+    mutated_row = dict(row)
+    mutated_notices = [dict(item) for item in row["notices"]]
+    mutated_notices[0].pop("kind")
+    mutated_row["notices"] = mutated_notices
+    with pytest.raises(ValueError, match="policy-bearing notice kind"):
+        _headline_payload_admits(mutated_row, tier="compilation")
 
 
 def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
@@ -233,15 +295,15 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
 
 def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
     typed_notice = Notice(
-        kind=NoticeKind.ASSUMED_FO2,
+        kind=NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE,
         affected_quantities=(Quantity.P_SAT,),
         reason="intrinsic melt fO2 was used",
         origin="test",
         policy=NoticePolicy(
             id="DP-010",
-            version=1,
-            status="canonical",
-            value="-9",
+            version=2,
+            status="proposed",
+            value="-0.672",
             units="log10(bar)",
         ),
     )
@@ -258,7 +320,7 @@ def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
     assert [row.get("policy_id") for row in live_rows] == ["DP-010"]
 
     untyped_payload = {
-        "kind": NoticeKind.ASSUMED_FO2.value,
+        "kind": NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE.value,
         "affected_quantities": [Quantity.P_SAT.value],
         "reason": "legacy intrinsic melt fO2 notice",
         "origin": "test",

@@ -319,6 +319,12 @@ class NoticeKind(StrEnum):
     TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     METHOD_IMPLIED = "method_implied"
     ASSUMED_FO2 = "assumed_fo2"
+    FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE = (
+        "fo2_default_ambient_air_unprinted_atmosphere"
+    )
+    FO2_FROM_PRINTED_FERRIC_RATIO = "fo2_from_printed_ferric_ratio"
+    FO2_VACUUM_CELL_PROXY = "fo2_vacuum_cell_proxy"
+    FO2_BUFFER_FROM_CONTAINER = "fo2_buffer_from_container"
     EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
@@ -420,6 +426,7 @@ DEFAULT_POLICY_NOTICE_KINDS = frozenset(
         NoticeKind.ALPHA_ASSUMED,
         NoticeKind.KNOB_DEFAULTED,
         NoticeKind.ASSUMED_FO2,
+        NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE,
         NoticeKind.METHOD_ASSUMED,
         NoticeKind.KEMS_CALIBRATION_BY_SOURCE,
         NoticeKind.BASIS_CONVERTED,

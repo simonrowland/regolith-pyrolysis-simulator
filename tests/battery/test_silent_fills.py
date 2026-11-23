@@ -105,13 +105,14 @@ def _capture_cell(monkeypatch) -> dict[str, object]:
     return seen
 
 
-def _has_borrowed_intrinsic_fo2(notices) -> bool:
+def _has_ambient_air_fo2_default(notices) -> bool:
     return any(
-        notice.kind is NoticeKind.ASSUMED_FO2
+        notice.kind
+        is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
         and notice.policy is not None
         and notice.policy.id == "DP-010"
-        and "fo2_tier=4;" in notice.reason
-        and "borrowed" in notice.reason
+        and "pO2=0.21 atm" in notice.reason
+        and "log10(fO2/bar)=" in notice.reason
         for notice in notices
     )
 
@@ -218,7 +219,7 @@ def test_vapour_row_without_printed_fo2_commands_borrowed_ladder_fo2(
     assert seen["mode"] != PO2_ENGINE_DEFAULT
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
     assert prediction.refusal_detail.get("reason") != "engine_default"
-    assert _has_borrowed_intrinsic_fo2(prediction.notices)
+    assert _has_ambient_air_fo2_default(prediction.notices)
 
 
 def test_multivalent_melt_without_printed_fo2_commands_borrowed_ladder_fo2(
@@ -232,7 +233,7 @@ def test_multivalent_melt_without_printed_fo2_commands_borrowed_ladder_fo2(
     assert seen["po2_bar"] is not None
     assert seen["mode"] != PO2_ENGINE_DEFAULT
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
-    assert _has_borrowed_intrinsic_fo2(prediction.notices)
+    assert _has_ambient_air_fo2_default(prediction.notices)
 
 
 @pytest.mark.parametrize("alias", ["FeOT", "FeO*", "FeO_tot", "FeO_total"])
@@ -275,7 +276,7 @@ def test_zero_iron_does_not_hide_another_multivalent_oxide(monkeypatch) -> None:
     prediction = predict_with_engine(Engine.OPENIMCC, obs, isolated=False)
     assert seen["mode"] == PO2_COMMANDED
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
-    assert _has_borrowed_intrinsic_fo2(prediction.notices)
+    assert _has_ambient_air_fo2_default(prediction.notices)
 
 
 def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas(monkeypatch) -> None:
@@ -290,7 +291,7 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas(monkeypatch) -> 
     prediction = predict_with_engine(Engine.THERMOENGINE, obs, isolated=False)
     assert seen["mode"] == PO2_COMMANDED
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
-    assert _has_borrowed_intrinsic_fo2(prediction.notices)
+    assert _has_ambient_air_fo2_default(prediction.notices)
 
 
 def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
@@ -309,6 +310,10 @@ def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
     assert seen["pressure_bar"] == pytest.approx(1.0)
     reasons = [notice.reason for notice in prediction.notices if notice.kind is NoticeKind.INPUT_OMITTED]
     assert any("no multivalent element" in reason and "omitted" in reason for reason in reasons)
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in prediction.notices
+    )
     assert not any(notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices)
 
 
@@ -820,16 +825,92 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
     assert seen["wt"] == {"Na": 100.0}
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
-    assert seen["pressure_bar"] == pytest.approx(1.01325)
+    assert seen["pressure_bar"] is None
     reasons = [notice.reason for notice in prediction.notices]
     assert any("pure condensed substance Na (l)" in reason for reason in reasons)
     assert any("p_sat does not take oxygen" in reason and "omitted" in reason for reason in reasons)
-    assert any(
-        notice.kind is NoticeKind.ASSUMED_PRESSURE
-        and notice.policy is not None
-        and notice.policy.id == "DP-001"
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-001"
         for notice in prediction.notices
     )
+
+
+def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -> None:
+    observation, experiment = _kems_partial(cell_material=None)
+    experiment = replace(
+        experiment,
+        method=State.unknown("method is not printed"),
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=replace(
+                experiment.pressure_environment.total_pressure_Pa,
+                state=State.unknown("total pressure is not printed"),
+            ),
+        ),
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            total_pressure_Pa=State.unknown("total pressure is not printed"),
+        ),
+    )
+    partials = {"K": 125.0, "KO": 75.0}
+
+    def _open(name):
+        return types.SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fo2=False,
+            backend=object(),
+        )
+
+    def _cell(_handle, _pot, *, po2, physical_pressure_bar=None, **_kwargs):
+        assert po2.mode == PO2_COMMANDED
+        assert physical_pressure_bar is None
+        return types.SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            engine_reason=None,
+            hostname="test",
+            exit_code=0,
+            notices=[],
+            authority=None,
+            certified_band=None,
+            melt_activities={},
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa=partials,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench((CellMaterial.PT,)),
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("125")
+    assert prediction.identity.total_pressure_Pa == State.of(Decimal("200"))
+    notice = next(
+        item
+        for item in prediction.notices
+        if item.policy is not None and item.policy.id == "DP-108"
+    )
+    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert notice.policy.status == "proposed"
+    assert notice.policy.value == "200"
+    assert "closed equilibrium contains no background gas" in notice.reason
 
 
 def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
