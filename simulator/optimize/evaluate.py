@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextvars import ContextVar
 from dataclasses import dataclass, field, fields, replace
 from enum import Enum
 import hashlib
@@ -169,6 +170,7 @@ from simulator.pumping_cost import (
 )
 from simulator.reduced_real_determinism import (
     PT0NonFinitePayload,
+    control_quantization_identity,
     optimizer_engine_neighbour,
 )
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
@@ -664,8 +666,18 @@ class ScoredResult:
     failing_gates: tuple[str, ...] = ()
     run_reference: RunReference | None = field(default=None, compare=False)
     notes: tuple[str, ...] = ()
+    neighbour_hits: int = 0
+    neighbour_preset: str | None = None
 
     def __post_init__(self) -> None:
+        stamp = _NEIGHBOUR_STAMP.get()
+        if (
+            stamp is not None
+            and stamp.hits > 0
+            and self.neighbour_hits == 0
+        ):
+            object.__setattr__(self, "neighbour_hits", int(stamp.hits))
+            object.__setattr__(self, "neighbour_preset", stamp.preset)
         object.__setattr__(
             self,
             "feasibility_margins",
@@ -710,6 +722,8 @@ class ScoredResult:
                 self.failing_gates,
                 self.run_reference,
                 self.notes,
+                self.neighbour_hits,
+                self.neighbour_preset,
             ),
         )
 
@@ -753,11 +767,84 @@ class EvaluationInputError(ValueError):
     """Raised when optimizer evaluation inputs or config references are invalid."""
 
 
+class _NeighbourStamp:
+    """Hits accumulated for the evaluate() call that is on the stack.
+
+    The cache increments ``hits`` only while a coarse scope is active.
+    The variable stays set until evaluate returns, so every ScoredResult
+    built for that run, including the success return after the scope
+    exits, copies the count. It is not a module global: a later replace
+    on the same worker must not inherit the previous run.
+    """
+
+    __slots__ = ("hits", "preset")
+
+    def __init__(self) -> None:
+        self.hits = 0
+        self.preset: str | None = None
+
+
+_NEIGHBOUR_STAMP: ContextVar[_NeighbourStamp | None] = ContextVar(
+    "optimizer_neighbour_stamp",
+    default=None,
+)
+
+
+def neighbour_use_from_carrier(value: Any) -> tuple[int, str | None]:
+    """Read a neighbour stamp stored on an existing JSON payload."""
+
+    if not isinstance(value, MappingABC):
+        return 0, None
+    raw = value.get("neighbour_hits")
+    if isinstance(raw, bool) or not isinstance(raw, int) or raw <= 0:
+        return 0, None
+    preset = value.get("neighbour_preset")
+    if not isinstance(preset, str) or not preset:
+        return raw, None
+    return raw, preset
+
+
+def evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    executor: RunExecutor | None = None,
+    constraints: PhysicsConstraintSet | None = None,
+    schema: RecipeSchema | None = None,
+    worker_runtime: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext | None = None,
+) -> ScoredResult:
+    """Run one candidate and stamp neighbour use onto the result."""
+
+    stamp = _NeighbourStamp()
+    token = _NEIGHBOUR_STAMP.set(stamp)
+    try:
+        return _evaluate_impl(
+            patch,
+            feedstock_id,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            executor=executor,
+            constraints=constraints,
+            schema=schema,
+            worker_runtime=worker_runtime,
+            cost_parameters=cost_parameters,
+            conditional_context=conditional_context,
+        )
+    finally:
+        _NEIGHBOUR_STAMP.reset(token)
+
+
 class _CandidateAdmissionError(EvaluationInputError):
     """Raised when a candidate violates a pre-run admission limit."""
 
 
-def evaluate(
+def _evaluate_impl(
     patch: RecipePatch,
     feedstock_id: str,
     fidelity: str,
@@ -847,10 +934,12 @@ def evaluate(
     )
 
     try:
-        # Coarse presets may reuse a nearby engine result. fine stays exact.
-        # Battery scoring does not enter this scope.
+        # Coarse presets may reuse a nearby engine result. fine stays exact
+        # and does not write cells. Battery scoring does not enter this scope.
+        # The stamp outlives the scope so the result built below still sees it.
         with optimizer_engine_neighbour(
-            getattr(run_config, "reduced_real_cache", None)
+            getattr(run_config, "reduced_real_cache", None),
+            counter=_NEIGHBOUR_STAMP.get(),
         ):
             run_execution = _execute_run(
                 active_executor,
@@ -3438,6 +3527,9 @@ def _build_eval_inputs_impl(
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
         vapor_pressure_provider_code_fingerprint=(
             _vapor_pressure_provider_code_fingerprint(vapor_pressure_provider_id)
+        ),
+        control_quantization=control_quantization_identity(
+            run_options["reduced_real_cache"]
         ),
         **run_options["lab_overlay_scope"],
         target_spec_id=str(target_metadata["target_spec_id"]),
@@ -6679,6 +6771,11 @@ def _cache_trace_payload(
     payload: dict[str, Any] = {}
     if isinstance(trace_payload, Mapping):
         payload.update(dict(trace_payload))
+    stamp = _NEIGHBOUR_STAMP.get()
+    if stamp is not None and stamp.hits > 0:
+        payload["neighbour_hits"] = int(stamp.hits)
+        if stamp.preset:
+            payload["neighbour_preset"] = stamp.preset
 
     payload.update(
         _canonical_backend_trace_fields(
