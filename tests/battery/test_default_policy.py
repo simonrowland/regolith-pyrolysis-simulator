@@ -206,6 +206,20 @@ def test_contextual_formula_does_not_return_its_text_as_a_value() -> None:
         resolve("DP-010")
 
 
+def test_dp112_resolves_the_buffer_owner_formula_result() -> None:
+    assert load_policy_table()["DP-112"]["formula_owner"] == (
+        "simulator.chemistry.fo2_buffers.evaluate_buffer"
+    )
+    result = Decimal("27.5")
+    resolved = resolve("DP-112", formula_result=result)
+    assert resolved.value == result
+    assert resolved.flag is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    assert resolved.payload["policy_status"] == "proposed"
+    assert resolved.payload["policy"]["value"] == format(result.normalize(), "f")
+    with pytest.raises(ValueError, match="DP-112 requires the owning formula result"):
+        resolve("DP-112")
+
+
 def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
     assert load_policy_table()["DP-004"]["formula_owner"] == (
         "simulator.battery.score._sum_gas_partial_pressures_pa"
@@ -225,6 +239,7 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
             "DP-017",
             {"value": "fixture composition", "flag": "composition_from_run_siblings"},
         ),
+        ("DP-112", {"value": Decimal("1")}),
     )
     for policy_id, context in cases:
         with pytest.raises(ValueError, match="owning formula result"):

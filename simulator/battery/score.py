@@ -19387,11 +19387,57 @@ def load_score_context(
         works, experiments, observations = load_migrated_store(root)
     else:
         works, experiments, observations = load_migrated_store(root, sources=sources)
-    observations = {
-        observation_id: _resolve_score_time_buffer_identity(observation)
-        for observation_id, observation in observations.items()
-    }
     benches = load_migrated_benches(root)
+    from simulator.battery.waypoints import (
+        _prediction_pressure_waypoint,
+        pressure_boundary,
+    )
+
+    resolved_observations = {}
+    for observation_id, observation in observations.items():
+        if not any(
+            notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in observation.notices
+        ):
+            resolved_observations[observation_id] = (
+                _resolve_score_time_buffer_identity(observation)
+            )
+            continue
+        experiment = experiments.get(observation.experiment_id)
+        method = (
+            experiment.method.value
+            if experiment is not None and experiment.method.is_value
+            else None
+        )
+        pressure_pa = None
+        pressure_source = None
+        pressure_state = getattr(observation.identity, "total_pressure_Pa", None)
+        identity_pressure_pa = nominal_pressure_pa(pressure_state)
+        if identity_pressure_pa is None:
+            bench = (
+                None
+                if experiment is None or experiment.bench_id is None
+                else benches.get(experiment.bench_id)
+            )
+            if experiment is not None and bench is not None:
+                pressure = _prediction_pressure_waypoint(
+                    pressure_boundary(experiment, bench, observation),
+                    experiment.method,
+                )
+                if pressure is not None:
+                    selected_pressure_pa = nominal_pressure_pa(pressure.value)
+                    if selected_pressure_pa is not None:
+                        pressure_pa = selected_pressure_pa
+                        pressure_source = pressure.route
+        resolved_observations[observation_id] = (
+            _resolve_score_time_buffer_identity(
+                observation,
+                pressure_pa=pressure_pa,
+                pressure_source=pressure_source,
+                method=method,
+            )
+        )
+    observations = resolved_observations
     validation_observations = observations
     if sources is not None:
         referenced_ids: set[str] = set()

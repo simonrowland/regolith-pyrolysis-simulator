@@ -21,12 +21,13 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
-from simulator.battery.default_policy import _notice_policy
-from simulator.battery.enums import NoticeKind, Quantity, ValueKind
+from simulator.battery.default_policy import resolve as resolve_default_policy
+from simulator.battery.enums import MethodToken, NoticeKind, Quantity, ValueKind
 from simulator.battery.identity import Identity
 from simulator.battery.records import (
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Value,
     nominal_pressure_pa,
@@ -87,7 +88,13 @@ def log10_fo2_to_pa(
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
-def _resolve_score_time_buffer_identity(observation: Observation) -> Observation:
+def _resolve_score_time_buffer_identity(
+    observation: Observation,
+    *,
+    pressure_pa: Decimal | None = None,
+    pressure_source: str | None = None,
+    method: MethodToken | None = None,
+) -> Observation:
     """Resolve the eight numeric-source buffer markers for score-time use."""
 
     if not isinstance(observation.identity, Identity):
@@ -130,29 +137,63 @@ def _resolve_score_time_buffer_identity(observation: Observation) -> Observation
         or temperature_state is None
         or not temperature_state.is_value
     ):
-        raise ValueError(
-            f"DP-112 target {observation.observation_id} lacks a printed buffer, "
-            "numeric offset, or usable temperature"
-        )
+        return observation
     buffer, offset = printed_buffer
     temperature = temperature_state.value
-    if not temperature.is_finite() or temperature <= 0:
-        raise ValueError(
-            f"DP-112 target {observation.observation_id} has invalid temperature"
-        )
+    if (
+        not isinstance(temperature, Decimal)
+        or not temperature.is_finite()
+        or temperature <= 0
+    ):
+        return observation
 
     pressure_state = observation.identity.total_pressure_Pa
-    pressure_pa = (
-        nominal_pressure_pa(pressure_state)
-        if pressure_state is not None and pressure_state.is_value
-        else None
-    )
-    if pressure_pa is None and pressure_state is not None and pressure_state.is_value:
-        raise ValueError(
-            f"DP-112 target {observation.observation_id} has invalid pressure"
+    pressure_route = pressure_source or "pressure_boundary"
+    pressure_policy = None
+    pressure_notice = None
+    if pressure_state is not None and pressure_state.is_value:
+        resolved_pressure_pa = nominal_pressure_pa(pressure_state)
+        if resolved_pressure_pa is not None:
+            pressure_route = "identity.total_pressure_Pa"
+            if not resolved_pressure_pa.is_finite() or resolved_pressure_pa < 0:
+                return observation
+            pressure_pa = resolved_pressure_pa
+    if pressure_pa is not None:
+        if not pressure_pa.is_finite() or pressure_pa < 0:
+            return observation
+    elif method is MethodToken.AERODYNAMIC_LEVITATION_LASER_HEATING:
+        pressure_policy = resolve_default_policy("DP-002")
+        pressure_pa = pressure_policy.value
+        if not isinstance(pressure_pa, Decimal):
+            return observation
+        pressure_route = "method_policy:DP-002"
+        policy_metadata = pressure_policy.payload["policy"]
+        pressure_notice = Notice(
+            kind=pressure_policy.flag,
+            affected_quantities=(expected_quantity,),
+            reason=(
+                "DP-002 method-implied ambient total pressure for aerodynamic "
+                "levitation with flowing gas; chamber pressure is unreported"
+            ),
+            origin="score:DP-002",
+            policy=NoticePolicy(**policy_metadata),
+        )
+    else:
+        pressure_notice = Notice(
+            kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+            affected_quantities=(expected_quantity,),
+            reason=(
+                "DP-112 total pressure is unreported and no applicable pressure "
+                "policy resolves it; evaluate_buffer pressure term omitted at its "
+                "one-bar reference"
+            ),
+            origin="score:DP-112",
         )
     pressure_bar = None if pressure_pa is None else pressure_pa / BAR_PA
-    evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
+    try:
+        evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
+    except (KeyError, ValueError):
+        return observation
     log10_fO2_bar = evaluation.log10_fO2_bar + offset
     resolved_pa = log10_fo2_to_pa(log10_fO2_bar)
     band = (
@@ -161,25 +202,33 @@ def _resolve_score_time_buffer_identity(observation: Observation) -> Observation
         else format(evaluation.band_dex, "f")
     )
     pressure_text = (
-        "not supplied" if pressure_bar is None else format(pressure_bar, "f")
+        "not supplied (term omitted at one-bar reference)"
+        if pressure_bar is None
+        else format(pressure_bar, "f")
     )
+    resolved_policy = resolve_default_policy("DP-112", formula_result=resolved_pa)
     notice = Notice(
-        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        kind=resolved_policy.flag,
         affected_quantities=(expected_quantity,),
         reason=(
             f"DP-112 buffer={buffer} offset={offset} calibration="
             f"{evaluation.calibration_id} T_K={temperature} P_bar={pressure_text} "
+            f"pressure_route={pressure_route} "
             f"log10_fO2_bar={log10_fO2_bar} band_dex={band}"
         ),
         origin="score:DP-112",
         band=band,
-        policy=_notice_policy("DP-112", resolved_pa),
+        policy=NoticePolicy(**resolved_policy.payload["policy"]),
     )
     identity = replace(observation.identity, fO2_Pa=State.of(resolved_pa))
     return replace(
         observation,
         identity=identity,
-        notices=(*observation.notices, notice),
+        notices=(
+            *observation.notices,
+            *((pressure_notice,) if pressure_notice is not None else ()),
+            notice,
+        ),
     )
 
 

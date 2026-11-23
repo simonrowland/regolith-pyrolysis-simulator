@@ -19,7 +19,14 @@ import re
 
 import pytest
 
-from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
+from simulator.battery.enums import (
+    Authority,
+    Engine,
+    NoticeKind,
+    Quantity,
+    ResidualStatus,
+    ValueKind,
+)
 from simulator.battery.identity import IdentityEqualKind, identity_equal
 from simulator.battery.migrate import (
     Migrator,
@@ -37,6 +44,7 @@ from simulator.battery.oxygen_identity import (
 )
 from simulator.battery.score import (
     _headline_payload_admits,
+    compile_residual,
     flagged_strata,
     load_score_context,
     rail_for_quantity,
@@ -1611,3 +1619,207 @@ def test_load_score_context_applies_dp112_before_scoring() -> None:
         for observation in context.observations.values()
         for notice in observation.notices
     )
+
+
+def test_neuman_levitation_uses_the_method_pressure_policy() -> None:
+    context = load_score_context(
+        ROOT,
+        sources=("neuman-2026-levitation-k-isotopes",),
+    )
+    targets = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == "neuman-2026-levitation-k-isotopes"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and any(
+            notice.origin == "score:DP-112"
+            for notice in observation.notices
+        )
+    ]
+    assert len(targets) == 6
+    for observation in targets:
+        pressure_notice = next(
+            notice
+            for notice in observation.notices
+            if notice.origin == "score:DP-002"
+        )
+        assert pressure_notice.kind is NoticeKind.METHOD_IMPLIED
+        assert pressure_notice.policy is not None
+        assert pressure_notice.policy.id == "DP-002"
+        assert pressure_notice.policy.status == "canonical"
+        assert pressure_notice.policy.value == "101325"
+        dp112 = next(
+            notice for notice in observation.notices if notice.origin == "score:DP-112"
+        )
+        assert "P_bar=1.01325" in dp112.reason
+        assert "pressure_route=method_policy:DP-002" in dp112.reason
+
+
+def test_nonqualifying_dp112_markers_keep_the_row_level_path() -> None:
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    _, _, observations = load_migrated_store(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and any(
+            notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    marker = next(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+    no_offset = replace(
+        observation,
+        notices=tuple(
+            replace(notice, reason="DP-112 buffer=IW") if notice is marker else notice
+            for notice in observation.notices
+        ),
+    )
+    unusable_temperature = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.unknown("temperature is not a numeric point"),
+        ),
+    )
+    assert _resolve_score_time_buffer_identity(no_offset) is no_offset
+    assert _resolve_score_time_buffer_identity(unusable_temperature) is unusable_temperature
+
+    pressure_unknown = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            total_pressure_Pa=State.unknown("pressure was not reported"),
+        ),
+    )
+    omitted_pressure = _resolve_score_time_buffer_identity(pressure_unknown)
+    pressure_notice = next(
+        notice
+        for notice in omitted_pressure.notices
+        if notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.origin == "score:DP-112"
+    )
+    dp112_notice = next(
+        notice
+        for notice in omitted_pressure.notices
+        if notice.origin == "score:DP-112"
+        and notice.kind
+        is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+    assert "evaluate_buffer pressure term omitted at its one-bar reference" in (
+        pressure_notice.reason
+    )
+    assert "not supplied (term omitted at one-bar reference)" in dp112_notice.reason
+    printed_buffer = _printed_buffer_offset(marker.reason)
+    assert printed_buffer is not None
+    buffer, offset = printed_buffer
+    evaluation = evaluate_buffer(
+        buffer,
+        pressure_unknown.identity.temperature_K.value,
+        pressure_bar=None,
+    )
+    assert omitted_pressure.identity.fO2_Pa == State.of(
+        _log_fO2_to_pa(evaluation.log10_fO2_bar + offset)
+    )
+
+
+def test_rejected_dp112_policy_raises_for_a_real_gaillard_row(monkeypatch) -> None:
+    from simulator.battery.default_policy import load_policy_table
+
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    _, _, observations = load_migrated_store(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and any(
+            notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    monkeypatch.setitem(load_policy_table()["DP-112"], "status", "rejected")
+    with pytest.raises(ValueError, match="default policy DP-112 is rejected"):
+        _resolve_score_time_buffer_identity(observation)
+
+
+def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> None:
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    context = load_score_context(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and any(notice.origin == "score:DP-112" for notice in row.notices)
+    )
+    experiment = context.experiments[observation.experiment_id]
+    baseline_request = activity_request_for_engine(
+        experiment, observation, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert baseline_request is not None and baseline_request.payload is not None
+    assert baseline_request.readiness.status.value == "ready"
+
+    unresolved = replace(
+        observation,
+        identity=replace(observation.identity, fO2_Pa=State.of(Decimal("123.456"))),
+        notices=tuple(
+            notice for notice in observation.notices if notice.origin != "score:DP-112"
+        ),
+    )
+    resolved = _resolve_score_time_buffer_identity(
+        unresolved,
+        method=experiment.method.value if experiment.method.is_value else None,
+    )
+    mutated_request = activity_request_for_engine(
+        experiment, resolved, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert mutated_request is not None and mutated_request.payload is not None
+    assert mutated_request.payload == baseline_request.payload
+    assert resolved.identity.fO2_Pa != State.of(Decimal("123.456"))
+
+    mutated_observations = dict(context.observations)
+    mutated_observations[resolved.observation_id] = resolved
+    mutated_context = replace(context, observations=mutated_observations)
+    residual, _candidate = compile_residual(
+        resolved,
+        Engine.INTERNAL_ANALYTICAL,
+        context=mutated_context,
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert "proposed-policy" in flagged_strata(residual.notices)
+
+
+def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal() -> None:
+    from simulator.battery.score import _is_bulk_not_liquid_composition
+
+    source_id = "borisov-veksler-2021-k-fe-supplement"
+    context = load_score_context(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id and _is_bulk_not_liquid_composition(row)
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.ALPHAMELTS,
+        context=context,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason.value == "bulk_not_liquid_composition"
+    assert residual.numeric is None

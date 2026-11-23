@@ -200,6 +200,12 @@ def _resolved_value(
         )
     if policy_id == "DP-012" and "printed_value" in context:
         return context["printed_value"]
+    if policy_id == "DP-112":
+        if "formula_result" not in context:
+            raise ValueError("DP-112 requires the owning formula result")
+        return _decimal(
+            context["formula_result"], context_name="DP-112 formula_result"
+        )
     raise ValueError(
         f"{policy_id} requires a value from its owning formula result: "
         f"{entry.get('formula_owner', 'no formula owner recorded')}"
