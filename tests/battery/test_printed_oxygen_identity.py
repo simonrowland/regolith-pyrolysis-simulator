@@ -1621,6 +1621,34 @@ def test_load_score_context_applies_dp112_before_scoring() -> None:
     )
 
 
+def test_neuman_dp112_numeric_output_pin_before_pressure_policy_fix() -> None:
+    context = load_score_context(
+        ROOT,
+        sources=("neuman-2026-levitation-k-isotopes",),
+    )
+    values = sorted(
+        str(observation.identity.fO2_Pa.value)
+        for observation in context.observations.values()
+        if observation.source_id == "neuman-2026-levitation-k-isotopes"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and any(notice.origin == "score:DP-112" for notice in observation.notices)
+        and observation.identity.fO2_Pa is not None
+        and observation.identity.fO2_Pa.is_value
+    )
+
+    assert values == sorted(
+        [
+            "26.58488923637160070975759567",
+            "0.002658488923637160070975759567",
+            "0.002658488923637160070975759567",
+            "26.58488923637160070975759567",
+            "26.58488923637160070975759567",
+            "0.002658488923637160070975759567",
+        ]
+    )
+
+
 def test_neuman_levitation_uses_the_method_pressure_policy() -> None:
     context = load_score_context(
         ROOT,
