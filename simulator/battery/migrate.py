@@ -535,6 +535,10 @@ PHASE_MAP: dict[str, Phase] = {
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
+    "(l)": Phase.L,
+    "(cr)": Phase.CR,
+    "(aq)": Phase.AQ,
+    "(glass)": Phase.GLASS,
     "(g)": Phase.G,
     "(c)": Phase.CR,
 }
@@ -4323,6 +4327,55 @@ def observation_from_plain(payload: object) -> Observation:
         annotations=annotations,
         authority=payload.get("authority"),
     )
+
+
+def _load_compilation_thermo_observations(
+    root: Path | None = None,
+) -> dict[str, Observation]:
+    """Load only compilation-assessed Cp/S/H observations for the scorer census."""
+
+    root = root or REPO_ROOT
+    quantities = {Quantity.CP.value, Quantity.S.value, Quantity.H_MINUS_H298.value}
+    observations: dict[str, Observation] = {}
+    literature = root / "data" / "literature"
+    for directory in (
+        literature / "extracts-v2",
+        literature / "observations-v2",
+    ):
+        if not directory.is_dir():
+            continue
+        for path in iter_observation_store_paths(directory):
+            document = load_yaml(path)
+            if not isinstance(document, Mapping):
+                continue
+            for raw in document.get("observations") or ():
+                if not isinstance(raw, Mapping):
+                    continue
+                identity = raw.get("identity")
+                quantity = (
+                    identity.get("quantity")
+                    if isinstance(identity, Mapping)
+                    else None
+                )
+                evidence = raw.get("evidence")
+                evidence_class = (
+                    evidence.get("class")
+                    if isinstance(evidence, Mapping)
+                    else None
+                )
+                if (
+                    not isinstance(quantity, Mapping)
+                    or quantity.get("tag") != "value"
+                    or quantity.get("value") not in quantities
+                    or not isinstance(evidence_class, Mapping)
+                    or evidence_class.get("tag") != "value"
+                    or evidence_class.get("value")
+                    != EvidenceClass.COMPILATION_ASSESSED.value
+                ):
+                    continue
+                observation = observation_from_plain(raw)
+                observations[observation.observation_id] = observation
+    return observations
 
 
 def source_filter_tokens(sources: Sequence[str] | None) -> tuple[str, ...] | None:

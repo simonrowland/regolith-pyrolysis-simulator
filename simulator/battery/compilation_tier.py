@@ -23,13 +23,15 @@ import os
 import re
 import subprocess
 import tempfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, ROUND_FLOOR
 from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
+
+import yaml
 
 from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.source_declarations import B677_SOURCE_ID, SOURCE_DECLARATIONS
@@ -2710,12 +2712,311 @@ def _openimcc_standard_pressure_Pa(identity: Identity) -> Decimal | None:
     return pressure
 
 
+def _openimcc_source_declared_phase(observation: Observation) -> tuple[Phase | None, str]:
+    """Read only a phase explicitly carried by this compilation's source row."""
+
+    locator = observation.locator
+    source_path = None if locator is None else locator.source_path
+    if not source_path:
+        return None, "compilation-source-phase-unstated"
+    path = Path(source_path)
+    repository_root = Path(__file__).resolve().parents[2]
+    if not path.is_absolute():
+        path = repository_root / path
+    try:
+        metadata = path.stat()
+    except OSError:
+        return None, "compilation-source-phase-record-unavailable"
+    return _openimcc_phase_from_source_file(
+        str(path), metadata.st_mtime_ns, metadata.st_size
+    )
+
+
+@lru_cache(maxsize=2048)
+def _openimcc_phase_from_source_file(
+    source_path: str, _modified_ns: int, _size: int
+) -> tuple[Phase | None, str]:
+    """Avoid reparsing one immutable compilation record for every series cell."""
+
+    path = Path(source_path)
+    try:
+        if path.suffix.casefold() == ".json":
+            document = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            from simulator.yaml_cache import load_cached_safe_yaml
+
+            document = load_cached_safe_yaml(path.read_bytes())
+    except (OSError, ValueError, yaml.YAMLError):
+        return None, "compilation-source-phase-record-unavailable"
+    if not isinstance(document, Mapping):
+        return None, "compilation-source-phase-record-unavailable"
+
+    # Keep printed phase extraction in the migration owner; no phase is
+    # inferred from a formula, section title, or neighbouring observation.
+    from simulator.battery.migrate import compilation_phase_text, map_phase
+
+    printed = compilation_phase_text(document)
+    if printed in (None, ""):
+        table = document.get("table")
+        if isinstance(table, Mapping):
+            index_entry = table.get("index_entry")
+            printed = (
+                index_entry.get("state")
+                if isinstance(index_entry, Mapping)
+                else None
+            )
+            if printed in (None, ""):
+                printed = table.get("phase") or table.get("phase_as_published")
+    if printed in (None, ""):
+        for container_name in ("section", "series", "table"):
+            container = document.get(container_name)
+            if not isinstance(container, Mapping):
+                continue
+            printed = compilation_phase_text(container)
+            if printed in (None, ""):
+                printed = (
+                    container.get("state")
+                    or container.get("state_as_published")
+                )
+            if printed not in (None, ""):
+                break
+    if isinstance(printed, Mapping) and printed.get("tag") == "value":
+        printed = printed.get("value")
+    if printed in (None, ""):
+        return None, "compilation-source-phase-unstated"
+    state, unmapped = map_phase(printed)
+    if state.is_value and isinstance(state.value, Phase):
+        return state.value, "compilation-source-phase-stated"
+    if isinstance(printed, str) and printed.strip().lower().startswith("multi-phase table:"):
+        return None, "compilation-source-phase-ambiguous"
+    return None, "compilation-source-phase-unresolved" + (
+        "" if unmapped is None else f":{unmapped}"
+    )
+
+
+def _openimcc_species_input(
+    observation: Observation,
+) -> tuple[str | None, Phase | None, _OpenIMCCBridgeRefusal | None]:
+    """Resolve the source formula and only explicitly stated phase before a call."""
+
+    identity = observation.identity
+    if not isinstance(identity, Identity) or identity.species is None:
+        return None, None, _OpenIMCCBridgeRefusal(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "species-unknown",
+            {"engine": Engine.OPENIMCC.value},
+        )
+    species = identity.species
+    from simulator.accounting.formulas import canonicalize_formula
+
+    source_formula = species.formula
+    formula, formula_phase_text, formula_refusal = canonicalize_formula(source_formula)
+    if formula_refusal is not None or formula is None:
+        return None, None, _OpenIMCCBridgeRefusal(
+            RefusalReason.IDENTITY_UNKNOWN,
+            formula_refusal or "species-formula-unparsed",
+            {"formula": source_formula},
+        )
+    _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
+    if parse_species_formula(formula, species=species) is None:
+        return None, None, _OpenIMCCBridgeRefusal(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "species-formula-unparsed",
+            {"formula": source_formula, "canonical_formula": formula},
+        )
+
+    phase = phase_token(species)
+    if formula_phase_text is not None:
+        from simulator.battery.migrate import map_phase
+
+        formula_phase_state, _formula_phase_error = map_phase(formula_phase_text)
+        if not formula_phase_state.is_value:
+            formula_phase_state, _formula_phase_error = map_phase(
+                f"({formula_phase_text})"
+            )
+        if not formula_phase_state.is_value:
+            return None, None, _OpenIMCCBridgeRefusal(
+                RefusalReason.UNSUPPORTED,
+                "compilation-formula-phase-unresolved",
+                {"formula": source_formula, "phase_suffix": formula_phase_text},
+            )
+        formula_phase = (
+            formula_phase_state.value
+            if isinstance(formula_phase_state.value, Phase)
+            else None
+        )
+        if formula_phase is not None and phase is not None and formula_phase is not phase:
+            return None, None, _OpenIMCCBridgeRefusal(
+                RefusalReason.IDENTITY_MISMATCH,
+                "compilation-formula-phase-mismatch",
+                {
+                    "formula": source_formula,
+                    "formula_phase": formula_phase.value,
+                    "identity_phase": phase.value,
+                },
+            )
+        if formula_phase is not None and phase is None:
+            source_phase, _source_phase_reason = _openimcc_source_declared_phase(
+                observation
+            )
+            if source_phase is not None and formula_phase is not source_phase:
+                return None, None, _OpenIMCCBridgeRefusal(
+                    RefusalReason.IDENTITY_MISMATCH,
+                    "compilation-formula-phase-mismatch",
+                    {
+                        "formula": source_formula,
+                        "formula_phase": formula_phase.value,
+                        "source_phase": source_phase.value,
+                    },
+                )
+        if phase is None:
+            phase = formula_phase
+    if phase is None:
+        phase, phase_resolution = _openimcc_source_declared_phase(observation)
+        if phase is None:
+            return None, None, _OpenIMCCBridgeRefusal(
+                RefusalReason.UNSUPPORTED,
+                phase_resolution,
+                {"formula": source_formula},
+            )
+    if phase not in {Phase.G, Phase.L, Phase.CR}:
+        return None, None, _OpenIMCCBridgeRefusal(
+            RefusalReason.UNSUPPORTED,
+            "openimcc-phase-unsupported",
+            {
+                "engine": Engine.OPENIMCC.value,
+                "formula": source_formula,
+                "phase": phase.value,
+            },
+        )
+    return formula, phase, None
+
+
+def _openimcc_compilation_input_census(context) -> dict[str, object]:
+    """Count every numeric compilation Cp/S/H cell before any engine call."""
+
+    from simulator.accounting.formulas import canonicalize_formula
+    from simulator.chemistry.formula_text import fold_subscript_digits
+
+    quantities = {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    total = requestable = 0
+    cells_by_quantity: Counter[str] = Counter()
+    refused: Counter[str] = Counter()
+    classes: dict[str, dict[str, object]] = {}
+    resolved_inputs: dict[
+        tuple[object, str | None],
+        tuple[str | None, Phase | None, _OpenIMCCBridgeRefusal | None],
+    ] = {}
+
+    def tally(
+        name: str,
+        input_refusal: _OpenIMCCBridgeRefusal | None,
+        cell_count: int,
+    ) -> None:
+        row = classes.setdefault(
+            name,
+            {
+                "affected_rows": 0,
+                "requestable_after": 0,
+                "typed_refused_after": 0,
+                "refusal_reasons": Counter(),
+            },
+        )
+        row["affected_rows"] += cell_count
+        if input_refusal is None:
+            row["requestable_after"] += cell_count
+        else:
+            row["typed_refused_after"] += cell_count
+            reasons = row["refusal_reasons"]
+            assert isinstance(reasons, Counter)
+            reasons[input_refusal.code] += cell_count
+
+    for parent in context.observations.values():
+        if not is_compilation_evidence(parent):
+            continue
+        quantity = quantity_token(parent.identity)
+        if quantity not in quantities:
+            continue
+        origin = context.origins.get(parent.observation_id)
+        slots = _compilation_series_slots(parent, origin)
+        if slots is None:
+            value = parent.value.point
+            cell_count = int(value is not None and value.is_finite())
+        else:
+            cell_count = sum(
+                1 for _temperature, magnitude, _occurrence in slots
+                if magnitude.is_finite()
+            )
+        if cell_count == 0:
+            continue
+        total += cell_count
+        cells_by_quantity[quantity.value] += cell_count
+        source_path = (
+            None if parent.locator is None else parent.locator.source_path
+        )
+        species = (
+            parent.identity.species
+            if isinstance(parent.identity, Identity)
+            else None
+        )
+        input_key = (species, source_path)
+        resolved_input = resolved_inputs.get(input_key)
+        if resolved_input is None:
+            resolved_input = _openimcc_species_input(parent)
+            resolved_inputs[input_key] = resolved_input
+        formula, phase, input_refusal = resolved_input
+        if input_refusal is None:
+            assert formula is not None and phase is not None
+            requestable += cell_count
+        else:
+            refused[input_refusal.code] += cell_count
+        identity = parent.identity
+        species = identity.species if isinstance(identity, Identity) else None
+        raw_formula = "" if species is None else species.formula
+        canonical, suffix_phase, _formula_error = canonicalize_formula(raw_formula)
+        if suffix_phase is not None:
+            tally("formula_phase_suffix", input_refusal, cell_count)
+        if "·" in raw_formula:
+            tally("hydrate_dot", input_refusal, cell_count)
+        formula_text = re.sub(r"\s+", "", raw_formula.strip())
+        group_formula = formula_text
+        if suffix_phase is not None:
+            group_formula = formula_text[: -(len(suffix_phase) + 2)]
+        if (
+            canonical is not None
+            and any(token in group_formula for token in "()[]{}")
+            and canonical != fold_subscript_digits(group_formula)
+        ):
+            tally("parenthesized_group", input_refusal, cell_count)
+        phase_token_value = phase_token(species) if species is not None else None
+        if (
+            phase_token_value not in {Phase.G, Phase.L, Phase.CR}
+            or suffix_phase in {"aq", "glass"}
+        ):
+            tally("source_phase", input_refusal, cell_count)
+
+    return {
+        "numeric_cp_s_h_cells": total,
+        "cells_by_quantity": dict(sorted(cells_by_quantity.items())),
+        "requestable_after": requestable,
+        "typed_refused_after": sum(refused.values()),
+        "refusal_reasons_after": dict(sorted(refused.items())),
+        "classes": {
+            name: {
+                **{key: value for key, value in row.items() if key != "refusal_reasons"},
+                "refusal_reasons_after": dict(sorted(row["refusal_reasons"].items())),
+            }
+            for name, row in sorted(classes.items())
+        },
+    }
+
+
 def _fraction_decimal(value: Fraction) -> Decimal:
     return Decimal(value.numerator) / Decimal(value.denominator)
 
 
 def _openimcc_formation_from_species_thermo(
-    identity: Identity,
+    observation: Observation,
     quantity: Quantity,
     origin: str,
 ) -> ThermoAttempt:
@@ -2751,6 +3052,8 @@ def _openimcc_formation_from_species_thermo(
     still evaluated and flagged ``openimcc-species-thermo-extrapolated``.
     """
 
+    identity = observation.identity
+
     def refuse(
         reason: RefusalReason,
         code: str,
@@ -2769,23 +3072,16 @@ def _openimcc_formation_from_species_thermo(
             openimcc_provenance=provenance,
         )
 
-    if identity.species is None:
+    if not isinstance(identity, Identity) or identity.species is None:
         return refuse(RefusalReason.IDENTITY_UNKNOWN, "species-unknown")
-    _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    formula = identity.species.formula
-    if parse_species_formula(formula, species=identity.species) is None:
+    formula, phase, input_refusal = _openimcc_species_input(observation)
+    if input_refusal is not None:
         return refuse(
-            RefusalReason.IDENTITY_UNKNOWN,
-            "species-formula-unparsed",
-            {"formula": formula},
+            input_refusal.reason,
+            input_refusal.code,
+            input_refusal.extra,
         )
-    phase = phase_token(identity.species)
-    if phase not in {Phase.G, Phase.L, Phase.CR}:
-        return refuse(
-            RefusalReason.UNSUPPORTED,
-            "pure-phase-phase-unsupported",
-            {"engine": Engine.OPENIMCC.value, "phase": getattr(phase, "value", None)},
-        )
+    assert formula is not None and phase is not None
     if phase is Phase.CR and polymorph_token(identity.species) is None:
         return refuse(
             RefusalReason.UNSUPPORTED,
@@ -3143,7 +3439,7 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         )
 
     if quantity in FORMATION_QUANTITIES:
-        return _openimcc_formation_from_species_thermo(identity, quantity, origin)
+        return _openimcc_formation_from_species_thermo(observation, quantity, origin)
     if quantity not in PURE_STANDARD_THERMO:
         return refuse(
             RefusalReason.UNSUPPORTED,
@@ -3164,21 +3460,14 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             },
         )
 
-    _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    formula = identity.species.formula
-    if parse_species_formula(formula, species=identity.species) is None:
+    formula, phase, input_refusal = _openimcc_species_input(observation)
+    if input_refusal is not None:
         return refuse(
-            RefusalReason.IDENTITY_UNKNOWN,
-            "species-formula-unparsed",
-            {"formula": formula},
+            input_refusal.reason,
+            input_refusal.code,
+            input_refusal.extra,
         )
-    phase = phase_token(identity.species)
-    if phase not in {Phase.G, Phase.L, Phase.CR}:
-        return refuse(
-            RefusalReason.UNSUPPORTED,
-            "pure-phase-phase-unsupported",
-            {"engine": Engine.OPENIMCC.value, "phase": getattr(phase, "value", None)},
-        )
+    assert formula is not None and phase is not None
     if phase is Phase.CR and polymorph_token(identity.species) is None:
         return refuse(
             RefusalReason.UNSUPPORTED,
@@ -3212,6 +3501,7 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             polymorph=crystal_polymorph,
         )
         if isinstance(outcome, _OpenIMCCBridgeRefusal):
+            # b-1296: preserve the pinned API's typed polymorph refusal; never retry as its default crystal.
             return refuse(outcome.reason, outcome.code, outcome.extra)
         return outcome
 

@@ -748,6 +748,92 @@ def test_sibling_and_ocr_formulas_are_page_grounded() -> None:
     assert "sibling" in chlorine.source or "formula_weight" in chlorine.source
 
 
+def test_high_temperature_octa_atomic_sulfur_uses_its_298k_source_formula(
+    monkeypatch,
+) -> None:
+    high_temperature = _load("b1259-ht-0040-octa-atomic-sulfur")
+    reference = _load("b1259-298k-0069-octa-atomic-sulfur")
+
+    reference_formula = generator._resolve_formula(reference).formula
+    assert reference_formula is not None
+    assert reference["gram_formula_weight"]["as_published"] == (
+        high_temperature["gram_formula_weight"]["as_published"]
+    )
+
+    resolution = generator._resolve_formula(high_temperature)
+    assert resolution.formula == reference_formula
+    correction = resolution.consulted["row_formula_correction"]
+    assert correction["source_record_id"] == reference["record_id"]
+    assert correction["printed_page"] == high_temperature["page"]
+
+    generated = generator.generate_record(high_temperature)
+    assert generated.observations
+    assert {obs.identity.species.formula for obs in generated.observations} == {
+        reference_formula
+    }
+    from simulator.battery.migrate import to_plain
+
+    stored_path = (
+        B1259_STORE_DIR
+        / "compilations-robie-waldbaum-1968-usgs-b1259"
+        / f"{high_temperature['record_id']}.yaml"
+    )
+    stored_document = yaml.safe_load(stored_path.read_text(encoding="utf-8"))
+    generated_observations = {
+        observation.observation_id: to_plain(observation)
+        for observation in generated.observations
+    }
+    stored_observations = {
+        raw["observation_id"]: raw
+        for raw in stored_document["observations"]
+    }
+    assert stored_observations.keys() == generated_observations.keys()
+    for observation_id, generated_observation in generated_observations.items():
+        stored_observation = stored_observations[observation_id]
+        assert stored_observation["identity"] == generated_observation["identity"]
+        assert stored_observation.get("reaction") == generated_observation.get(
+            "reaction"
+        )
+        assert stored_observation.get("formation_elements") == generated_observation.get(
+            "formation_elements"
+        )
+
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+    from simulator.battery.enums import Engine
+
+    calls = []
+
+    def species_thermo(formula, phase, temperature_K, **_kwargs):
+        calls.append((formula, phase, temperature_K))
+        return {
+            "source_table_id": "source-row",
+            "source_row_id": "source-row",
+            "T_min": 1.0,
+            "T_max": 6000.0,
+            "derivatives_fit_implied": False,
+            "H_app_kJ_mol": 2.0,
+            "dfH298_J_mol": 2000.0,
+        }
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.openimcc_bridge.species_thermo", species_thermo
+    )
+    h_observation = next(
+        obs
+        for obs in generated.observations
+        if quantity_token(obs.identity) is Quantity.H_MINUS_H298
+        and obs.identity.temperature_K.value == Decimal("298.15")
+    )
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, h_observation)
+    assert attempt.refusal_reason is None
+    printed_increment = Decimal(
+        str(high_temperature["rows"][0]["H_minus_H298"]["value"])
+    )
+    assert attempt.value == printed_increment
+    assert calls and calls[0][0] == reference_formula
+    assert calls[0][1] == "g"
+
+
 def test_ocr_name_is_not_a_formula() -> None:
     generated = _generation(SILVER_HT)
     resolution = generated.report["formula_resolution"]

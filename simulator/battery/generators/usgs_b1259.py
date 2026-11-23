@@ -227,6 +227,20 @@ INTEGER_GLUE_NO_UNIQUE_SPLIT = (
 FORMULA_UNRESOLVED_REASON_PREFIX = "no page-grounded formula;"
 FORMULA_CONFLICT_REASON_PREFIX = "conflicting page-grounded formulas;"
 _TRAILING_JUNK_RE = re.compile(r"[^0-9eE.+-]+$")
+_ROW_FORMULA_CORRECTIONS = {
+    (SOURCE_ID, "b1259-ht-0040-octa-atomic-sulfur"): {
+        "name_as_published": "OCTA-ATOMIC SULFUR",
+        "formula_as_published": "S0",
+        "gram_formula_weight_as_published": "256.512",
+        "formula": "S8",
+        "source_record_id": "b1259-298k-0069-octa-atomic-sulfur",
+        "printed_page": 65,
+        "reason": (
+            "the high-temperature row names octa-atomic sulfur and gives "
+            "256.512 g/gfw, matching its 298.15 K S8 row"
+        ),
+    },
+}
 # B1259 prints these reference-state schedules in its element tables and
 # transition summary. Each entry is:
 # (printed page, PDF page, initial phase, initial polymorph, initial formula,
@@ -979,6 +993,29 @@ def _resolve_formula_local(record: Mapping[str, Any]) -> FormulaResolution:
     """Printed formula, OCR repair of that formula, or allotrope. No indexes."""
 
     consulted = _consulted_shell(record)
+    correction = _ROW_FORMULA_CORRECTIONS.get(
+        (str(record.get("source_id") or ""), str(record.get("record_id") or ""))
+    )
+    if (
+        correction is not None
+        and str(record.get("name_as_published") or "").strip()
+        == correction["name_as_published"]
+        and str(record.get("formula_as_published") or "").strip()
+        == correction["formula_as_published"]
+        and _gfw_text(record) == correction["gram_formula_weight_as_published"]
+    ):
+        consulted["row_formula_correction"] = {
+            "source_record_id": correction["source_record_id"],
+            "printed_page": correction["printed_page"],
+            "reason": correction["reason"],
+        }
+        return FormulaResolution(
+            str(correction["formula"]),
+            "page_grounded_row_correction",
+            consulted,
+            None,
+        )
+
     printed_raw = consulted["formula_as_published"]
     label = str(consulted["name_as_published"] or "")
     fw_value = _formula_weight_decimal(consulted["gram_formula_weight"])

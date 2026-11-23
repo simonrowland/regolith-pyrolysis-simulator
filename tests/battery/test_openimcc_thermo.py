@@ -7,9 +7,12 @@ Apparent G and apparent H are not the scored values. A refusal value is None.
 
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
+from pathlib import Path
 
 from simulator.battery.enums import (
     Engine,
@@ -24,6 +27,7 @@ from simulator.battery.enums import (
     SourceRelation,
 )
 from simulator.battery.identity import (
+    Identity,
     PA_PER_BAR_DEC,
     atm_to_pa,
     log10K_from_delta_fG_kJ_mol,
@@ -31,6 +35,7 @@ from simulator.battery.identity import (
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.records import (
+    Locator,
     Reaction,
     ReactionTerm,
     Species,
@@ -599,3 +604,387 @@ def test_coverage_tally_absent_is_a_missing_openimcc_residual() -> None:
     assert cp_rows[0]["typed_refused"] == 1
     assert cp_rows[0]["absent"] == 0
     assert cp_rows[0]["listed"] is True
+
+
+def _source_formula_observation(record_relative_path: str, source_id: str):
+    root = Path(__file__).resolve().parents[2]
+    path = root / record_relative_path
+    document = json.loads(path.read_text(encoding="utf-8"))
+    formula = str(document.get("formula_as_published") or document["formula"])
+    identity = Identity(
+        quantity=Quantity.CP,
+        species=Species(formula, State.unknown("source does not state phase")),
+        per=State.of(PerBasis.MOL_SPECIES),
+        temperature_K=State.of(Decimal("500")),
+    )
+    item = replace(
+        observation(
+            f"openimcc-source-{document['record_id']}",
+            f"exp-{source_id}",
+            identity,
+            Decimal("1"),
+            source_id=source_id,
+        ),
+        locator=Locator(
+            record=str(document["record_id"]), source_path=str(path)
+        ),
+    )
+    return document, formula, item
+
+
+def test_openimcc_compilation_formula_canonicalizer_uses_source_rows(monkeypatch) -> None:
+    from simulator.accounting.formulas import canonicalize_formula, parse_formula
+    from simulator.chemistry.formula_text import fold_subscript_digits
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+    from simulator.battery.migrate import map_phase
+
+    rows = (
+        (
+            "data/literature/compilations/pankratz-1984-usbm-b677/records/table-1471.json",
+            "pankratz-1984-usbm-b677",
+        ),
+        (
+            "data/literature/compilations/pankratz-1984-usbm-b677/records/table-1524.json",
+            "pankratz-1984-usbm-b677",
+        ),
+        (
+            "data/literature/compilations/pankratz-1987-usbm-b689/records/page-0147.json",
+            "pankratz-1987-usbm-b689",
+        ),
+        (
+            "data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0500.json",
+            "kelley-king-1961-usbm-b592",
+        ),
+    )
+    calls = []
+
+    def species_thermo(formula, phase, temperature_K, **_kwargs):
+        calls.append((formula, phase, temperature_K))
+        return {
+            "source_table_id": "source-table",
+            "source_row_id": "source-row",
+            "T_min": 1.0,
+            "T_max": 6000.0,
+            "derivatives_fit_implied": False,
+            "Cp_J_molK": 25.0,
+        }
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.openimcc_bridge.species_thermo", species_thermo
+    )
+    for relative_path, source_id in rows:
+        source, source_formula, item = _source_formula_observation(
+            relative_path, source_id
+        )
+        source_counts = parse_formula(fold_subscript_digits(source_formula)).elements
+        attempt = predict_thermo_attempt(Engine.OPENIMCC, item)
+        assert attempt.refusal_reason is None, (source_formula, attempt.refusal_detail)
+        sent_formula, sent_phase, _temperature = calls[-1]
+        assert sent_formula != source_formula
+        assert parse_formula(sent_formula).elements == source_counts
+        source_element_order = tuple(
+            dict.fromkeys(
+                re.findall(r"[A-Z][a-z]?", fold_subscript_digits(source_formula))
+            )
+        )
+        assert tuple(re.findall(r"[A-Z][a-z]?", sent_formula)) == source_element_order
+        stated_phase = source.get("phase_as_published") or source.get("phase")
+        if stated_phase is None:
+            suffix = source_formula[source_formula.rfind("(") + 1 : -1]
+            stated_phase = suffix
+        phase_state, _unmapped = map_phase(stated_phase)
+        if not phase_state.is_value:
+            _canonical, suffix, _refusal = canonicalize_formula(source_formula)
+            if suffix is not None:
+                phase_state, _unmapped = map_phase(suffix)
+        if phase_state.is_value:
+            assert sent_phase == phase_state.value.value
+        assert attempt.value == Decimal("25.0")
+
+
+def test_openimcc_group_formula_matches_independent_janaf_source(monkeypatch) -> None:
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    root = Path(__file__).resolve().parents[2]
+    source_path = (
+        root
+        / "data/literature/compilations/pankratz-1984-usbm-b677/records/table-0270.json"
+    )
+    source = json.loads(source_path.read_text(encoding="utf-8"))
+    janaf_path = root / "data/literature/compilations/janaf/tables/Al-084.yaml"
+    janaf = load_cached_safe_yaml(janaf_path.read_bytes())
+    calls = []
+
+    def species_thermo(formula, phase, temperature_K, **_kwargs):
+        calls.append((formula, phase, temperature_K))
+        return {
+            "source_table_id": "source-table",
+            "source_row_id": "source-row",
+            "T_min": 1.0,
+            "T_max": 6000.0,
+            "derivatives_fit_implied": False,
+            "Cp_J_molK": 25.0,
+        }
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.openimcc_bridge.species_thermo", species_thermo
+    )
+    _document, _source_formula, item = _source_formula_observation(
+        "data/literature/compilations/pankratz-1984-usbm-b677/records/table-0270.json",
+        "pankratz-1984-usbm-b677",
+    )
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, item)
+    assert attempt.refusal_reason is None, attempt.refusal_detail
+    assert calls[0][:2] == (
+        janaf["table"]["index_entry"]["formula"],
+        source["phase_as_published"].strip("()"),
+    )
+    assert attempt.value == Decimal("25.0")
+
+
+def test_openimcc_formula_canonicalizer_preserves_real_source_subscripts() -> None:
+    from simulator.accounting.formulas import canonicalize_formula
+    from simulator.chemistry.formula_text import fold_subscript_digits
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    root = Path(__file__).resolve().parents[2]
+    b677_records = root / "data/literature/compilations/pankratz-1984-usbm-b677/records"
+    b10h14 = json.loads((b677_records / "table-0906.json").read_text(encoding="utf-8"))
+    s2f10 = json.loads((b677_records / "table-0830.json").read_text(encoding="utf-8"))
+    fe_curves = json.loads(
+        (
+            root
+            / "data/literature/compilations/kelley-1960-usbm-b584/source/published-curves.json"
+        ).read_text(encoding="utf-8")
+    )
+    wo_table = load_cached_safe_yaml(
+        (
+            root
+            / "data/literature/compilations/janaf/tables/O-050.yaml"
+        ).read_bytes()
+    )
+    source_formulas = (
+        b10h14["formula_as_published"],
+        s2f10["formula_as_published"],
+        next(
+            row["formula"]
+            for row in fe_curves
+            if row.get("source_record_id") == "table-397"
+            and row.get("phase") == "c"
+        ),
+        wo_table["table"]["index_entry"]["formula_as_published"],
+    )
+    for source_formula in source_formulas:
+        canonical, phase_suffix, refusal = canonicalize_formula(source_formula)
+        assert canonicalize_formula(source_formula) == (
+            canonical,
+            phase_suffix,
+            refusal,
+        )
+        assert (canonical, phase_suffix, refusal) == (
+            fold_subscript_digits(source_formula),
+            None,
+            None,
+        )
+
+
+def test_openimcc_symbolic_hydrate_and_unstated_phase_stay_typed(
+    monkeypatch, tmp_path
+) -> None:
+    from simulator.battery.compilation_tier import predict_thermo_attempt
+
+    def no_engine_call(*_args, **_kwargs):
+        raise AssertionError("unresolved formula or phase reached OpenIMCC")
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.openimcc_bridge.species_thermo", no_engine_call
+    )
+    symbolic_hydrate = Identity(
+        quantity=Quantity.CP,
+        species=Species(
+            "H2SO4·nH2O", State.unknown("source does not state phase")
+        ),
+        per=State.of(PerBasis.MOL_SPECIES),
+        temperature_K=State.of(Decimal("500")),
+    )
+    hydrate_attempt = predict_thermo_attempt(
+        Engine.OPENIMCC,
+        observation("openimcc-symbolic-hydrate", "exp", symbolic_hydrate, Decimal("1")),
+    )
+    assert hydrate_attempt.value is None
+    assert hydrate_attempt.refusal_detail["reason"] == (
+        "species-symbolic-hydrate-unresolved"
+    )
+
+    blank_phase = replace(
+        symbolic_hydrate,
+        species=Species("FeO", State.unknown("source does not state phase")),
+    )
+    blank_attempt = predict_thermo_attempt(
+        Engine.OPENIMCC,
+        observation("openimcc-blank-phase", "exp", blank_phase, Decimal("1")),
+    )
+    assert blank_attempt.value is None
+    assert blank_attempt.refusal_detail["reason"] == (
+        "compilation-source-phase-unstated"
+    )
+
+    for phase in (Phase.GLASS, Phase.AQ):
+        unsupported = replace(blank_phase, species=Species("FeO", phase))
+        attempt = predict_thermo_attempt(
+            Engine.OPENIMCC,
+            observation(
+                f"openimcc-{phase.value}-phase", "exp", unsupported, Decimal("1")
+            ),
+        )
+        assert attempt.value is None
+        assert attempt.refusal_detail["reason"] == "openimcc-phase-unsupported"
+
+    title_path = tmp_path / "title-only.json"
+    title_path.write_text('{"title":"ideal gas"}', encoding="utf-8")
+    title_only = replace(
+        observation("openimcc-title-phase", "exp", blank_phase, Decimal("1")),
+        locator=Locator(record="title-only", source_path=str(title_path)),
+    )
+    title_attempt = predict_thermo_attempt(Engine.OPENIMCC, title_only)
+    assert title_attempt.value is None
+    assert title_attempt.refusal_detail["reason"] == (
+        "compilation-source-phase-unstated"
+    )
+
+    for printed_phase in ("(aq)", "(glass)"):
+        source_path = tmp_path / f"{printed_phase[1:-1]}.json"
+        source_path.write_text(
+            json.dumps({"phase": printed_phase}), encoding="utf-8"
+        )
+        source_row = replace(
+            observation(
+                f"openimcc-source-{printed_phase}",
+                "exp",
+                blank_phase,
+                Decimal("1"),
+            ),
+            locator=Locator(
+                record=source_path.stem, source_path=str(source_path)
+            ),
+        )
+        source_attempt = predict_thermo_attempt(Engine.OPENIMCC, source_row)
+        assert source_attempt.value is None
+        assert source_attempt.refusal_detail["reason"] == (
+            "openimcc-phase-unsupported"
+        )
+
+
+def test_openimcc_source_phase_lookup_tracks_source_path_and_revision(tmp_path) -> None:
+    from simulator.battery.compilation_tier import _openimcc_source_declared_phase
+
+    def item(path: Path, observation_id: str):
+        identity = Identity(
+            quantity=Quantity.CP,
+            species=Species("FeO", State.unknown("source does not state phase")),
+            per=State.of(PerBasis.MOL_SPECIES),
+            temperature_K=State.of(Decimal("500")),
+        )
+        return replace(
+            observation(observation_id, "exp", identity, Decimal("1")),
+            locator=Locator(record=path.stem, source_path=str(path)),
+        )
+
+    gas_path = tmp_path / "gas.json"
+    liquid_path = tmp_path / "liquid.json"
+    gas_path.write_text('{"phase":"g"}', encoding="utf-8")
+    liquid_path.write_text('{"phase":"l"}', encoding="utf-8")
+
+    assert _openimcc_source_declared_phase(item(gas_path, "gas"))[0] is Phase.G
+    assert _openimcc_source_declared_phase(item(liquid_path, "liquid"))[0] is Phase.L
+
+    gas_path.write_text('{"phase":"aq"}', encoding="utf-8")
+    assert _openimcc_source_declared_phase(item(gas_path, "gas-revised"))[0] is Phase.AQ
+
+    liquid_path.write_text(
+        '{"table":{"index_entry":{"state":"cr"}}}', encoding="utf-8"
+    )
+    assert _openimcc_source_declared_phase(item(liquid_path, "table-state"))[0] is Phase.CR
+    liquid_path.write_text('{"section":{"phase":"l"}}', encoding="utf-8")
+    assert _openimcc_source_declared_phase(item(liquid_path, "section-phase"))[0] is Phase.L
+    liquid_path.write_text('{"series":{"state":"g"}}', encoding="utf-8")
+    assert _openimcc_source_declared_phase(item(liquid_path, "series-state"))[0] is Phase.G
+
+
+def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> None:
+    from simulator.battery.compilation_tier import (
+        _openimcc_compilation_input_census,
+    )
+    from simulator.battery.migrate import _load_compilation_thermo_observations
+    from simulator.battery.score import ScoreContext
+
+    root = Path(__file__).resolve().parents[2]
+    observations = _load_compilation_thermo_observations(root)
+    context = ScoreContext(
+        works={},
+        experiments={},
+        observations=observations,
+        root=root,
+    )
+    census = _openimcc_compilation_input_census(context)
+    assert census["numeric_cp_s_h_cells"] == 328_300, census
+    assert sum(census["cells_by_quantity"].values()) == census[
+        "numeric_cp_s_h_cells"
+    ], census
+    assert (
+        census["requestable_after"] + census["typed_refused_after"]
+        == census["numeric_cp_s_h_cells"]
+    ), census
+    classes = census["classes"]
+    assert {
+        "parenthesized_group",
+        "formula_phase_suffix",
+        "hydrate_dot",
+        "source_phase",
+    } <= classes.keys(), census
+    for row in classes.values():
+        assert row["affected_rows"] == (
+            row["requestable_after"] + row["typed_refused_after"]
+        ), census
+    after_counts = {
+        "requestable_after": census["requestable_after"],
+        "typed_refused_after": census["typed_refused_after"],
+        "classes": {
+            name: {
+                key: row[key]
+                for key in (
+                    "affected_rows",
+                    "requestable_after",
+                    "typed_refused_after",
+                )
+            }
+            for name, row in classes.items()
+        },
+    }
+    assert after_counts == {
+        "requestable_after": 306_808,
+        "typed_refused_after": 21_492,
+        "classes": {
+            "formula_phase_suffix": {
+                "affected_rows": 568,
+                "requestable_after": 369,
+                "typed_refused_after": 199,
+            },
+            "hydrate_dot": {
+                "affected_rows": 1_146,
+                "requestable_after": 971,
+                "typed_refused_after": 175,
+            },
+            "parenthesized_group": {
+                "affected_rows": 3_836,
+                "requestable_after": 3_729,
+                "typed_refused_after": 107,
+            },
+            "source_phase": {
+                "affected_rows": 30_227,
+                "requestable_after": 13_922,
+                "typed_refused_after": 16_305,
+            },
+        },
+    }

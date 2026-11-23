@@ -7,11 +7,13 @@ import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
+from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -112,8 +114,8 @@ _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
 _PHASE_SUFFIX_RE = re.compile(
-    r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
-    r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
+    r"(?:\((?:c|s|l|g|aq|cr|liq|liquid|solid|gas|vapor|glass)\)|"
+    r"\[(?:c|s|l|g|aq|cr|liq|liquid|solid|gas|vapor|glass)\])$",
     re.IGNORECASE,
 )
 
@@ -251,6 +253,45 @@ def parse_formula(
 
     species_id = species or name or str(formula).strip()
     return SpeciesFormula(species=species_id, elements=totals)
+
+
+@lru_cache(maxsize=4096)
+def canonicalize_formula(formula: str) -> tuple[str | None, str | None, str | None]:
+    """Return a parser-owned formula spelling, phase suffix, or typed refusal.
+
+    Group multipliers and numeric hydrate segments are resolved using the
+    same parser as ``parse_formula``. Simple formulas keep their exact digit
+    spelling, including decimal and multi-digit subscripts. A symbolic
+    ``nH2O`` hydrate cannot be reduced to a chemical formula.
+    """
+
+    text = fold_subscript_digits(re.sub(r"\s+", "", str(formula).strip()))
+    phase_suffix = None
+    match = _PHASE_SUFFIX_RE.search(text)
+    if match is not None:
+        phase_suffix = match.group(0)[1:-1].casefold()
+        text = text[: match.start()]
+    if not text:
+        return None, phase_suffix, "species-formula-unparsed"
+    if re.search(r"·nH2O(?:$|[([{])", text, re.IGNORECASE):
+        return None, phase_suffix, "species-symbolic-hydrate-unresolved"
+    try:
+        counts = parse_formula(text).elements
+    except AccountingError:
+        return None, phase_suffix, "species-formula-unparsed"
+    if not counts:
+        return None, phase_suffix, "species-formula-unparsed"
+    if not any(char in text for char in "()[]{}·"):
+        return text, phase_suffix, None
+    element_order = tuple(dict.fromkeys(re.findall(r"[A-Z][a-z]?", text)))
+    if set(element_order) != set(counts):
+        return None, phase_suffix, "species-formula-unparsed"
+    parts = []
+    for element in element_order:
+        count = counts[element]
+        token = str(int(count)) if count.is_integer() else format(count, ".15g")
+        parts.append(element + ("" if token == "1" else token))
+    return "".join(parts), phase_suffix, None
 
 
 def atoms_parse_formula_else_janaf(
