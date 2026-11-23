@@ -7323,20 +7323,24 @@ def _printed_uncertainty_band(
             )
         standard_width = converted / k_print if k_print is not None else converted
 
-    metric_standard_width = (
-        _metric_uncertainty_width(
-            operation,
-            quantity,
-            reference,
-            standard_width,
-            converted_unit or QUANTITY_UNITS[quantity],
-        )
-        if has_ferric_fraction
-        else printed_interval_metric_width
-        / k_print
-        if k_print is not None
-        else printed_interval_metric_width
+    metric_standard_width = _metric_uncertainty_width(
+        operation,
+        quantity,
+        reference,
+        standard_width,
+        converted_unit or QUANTITY_UNITS[quantity],
     )
+    if (
+        not has_ferric_fraction
+        and metric_standard_width is None
+        and k_print is not None
+    ):
+        # The original printed interval passed the domain gate above, but
+        # dividing its linear-unit width by k can put the standard interval
+        # outside the transform's domain. Keep the admitted original interval
+        # and scale its metric width only for this otherwise-unrepresentable
+        # standard interval.
+        metric_standard_width = printed_interval_metric_width / k_print
     ticket = metric_standard_width
     exact_ticket_input = (
         k_print == k_ticket
@@ -7347,13 +7351,7 @@ def _printed_uncertainty_band(
         )
     )
     if exact_ticket_input:
-        ticket = _metric_uncertainty_width(
-            operation,
-            quantity,
-            reference,
-            converted,
-            converted_unit or QUANTITY_UNITS[quantity],
-        )
+        ticket = printed_interval_metric_width
     else:
         if ticket is not None:
             ticket *= k_ticket
