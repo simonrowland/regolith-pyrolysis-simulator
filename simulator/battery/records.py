@@ -1013,6 +1013,27 @@ class Derivation:
 
 
 @dataclass(frozen=True)
+class NoticePolicy:
+    id: str
+    version: str
+    status: str
+    value: str | int | Decimal
+    units: str
+
+    def __post_init__(self) -> None:
+        if not self.id or not self.version or not self.status or not self.units:
+            raise ValueError("NoticePolicy id, version, status, and units are required")
+        if self.status not in {"canonical", "proposed", "rejected"}:
+            raise ValueError(
+                "NoticePolicy.status must be canonical, proposed, or rejected"
+            )
+        if isinstance(self.value, bool) or not isinstance(
+            self.value, (str, int, Decimal)
+        ):
+            raise TypeError("NoticePolicy.value must be str, int, or Decimal")
+
+
+@dataclass(frozen=True)
 class Notice:
     kind: NoticeKind
     affected_quantities: tuple[Quantity, ...]
@@ -1027,6 +1048,7 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
+    policy: NoticePolicy | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1056,6 +1078,8 @@ class Notice:
             object.__setattr__(
                 self, "dropped_mass_fraction", as_decimal(self.dropped_mass_fraction)
             )
+        if self.policy is not None and not isinstance(self.policy, NoticePolicy):
+            raise TypeError("Notice.policy must be NoticePolicy or absent")
 
 
 SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"
@@ -1989,6 +2013,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
+                notice.policy,
             )
             if fingerprint in seen:
                 continue

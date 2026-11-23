@@ -140,8 +140,8 @@ def _richter_rep5_run(experiment):
 def _assert_defaulted_evaporation_alpha(prediction) -> None:
     assert prediction.value is not None, prediction.refusal_detail
     assert any(
-        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and notice.reason.startswith("knob_defaulted:evaporation_alpha:")
+        notice.kind is NoticeKind.ALPHA_ASSUMED
+        and notice.reason.startswith("alpha_assumed:evaporation_alpha:")
         and "original_reason=evaporation_coefficients_not_sourced" in notice.reason
         for notice in prediction.notices
     )
@@ -499,7 +499,6 @@ def test_richter_rep5_row_scores_with_defaulted_evaporation_coefficients(
     mass_loss_rows,
 ) -> None:
     from simulator.battery.score import (
-        FLAGGED_STRATUM_ASSUMED,
         flagged_strata,
         headline_rows,
     )
@@ -536,14 +535,14 @@ def test_richter_rep5_row_scores_with_defaulted_evaporation_coefficients(
     alpha_default_notice = next(
         notice
         for notice in scored.notices
-        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and notice.reason.startswith("knob_defaulted:evaporation_alpha:")
+        if notice.kind is NoticeKind.ALPHA_ASSUMED
+        and notice.reason.startswith("alpha_assumed:evaporation_alpha:")
     )
     assert "original_reason=evaporation_coefficients_not_sourced" in (
         alpha_default_notice.reason
     )
     assert scored.score_eligible is False
-    assert FLAGGED_STRATUM_ASSUMED in flagged_strata(scored.notices)
+    assert NoticeKind.ALPHA_ASSUMED.value in flagged_strata(scored.notices)
 
     def measured_n(residual) -> int:
         row = next(

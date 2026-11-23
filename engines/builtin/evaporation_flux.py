@@ -74,7 +74,7 @@ from simulator.physical_constants import PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
-_DEFAULT_EVAPORATION_ALPHA = {
+_DP_005_ALPHA = {
     "form": "scalar",
     "value": 1.0,
     ALPHA_AUTHORITY_STATUS_FIELD: ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -366,7 +366,7 @@ def publisher_effective_alpha(
     """Alpha the publisher will evaluate, including a permitted fallback.
 
     Order is the kernel's: the species row, else a ``*`` wildcard row,
-    else ``_DEFAULT_EVAPORATION_ALPHA`` (1). A species missing from the
+    else ``_DP_005_ALPHA`` (1). A species missing from the
     map is unmeasured only when ``*`` is missing too. Broad-proxy rows
     retain their tagged coefficient; an absent row uses the flagged
     alpha=1 ceiling (b-1195). The surface closure calls this same
@@ -383,7 +383,7 @@ def publisher_effective_alpha(
     )
     spec = alpha_by_species.get(
         species,
-        alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
+        alpha_by_species.get("*", _DP_005_ALPHA),
     )
     value, evaluation = _evaluate_alpha_control(
         species, temperature_K, spec
