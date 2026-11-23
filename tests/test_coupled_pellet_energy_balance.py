@@ -441,6 +441,68 @@ def test_the_flux_callback_is_not_called_below_the_evaporation_floor():
     assert coupled["temperature_C"] < bare["temperature_C"]
 
 
+def test_a_flux_refusal_inside_the_bracket_stays_a_flagged_temperature():
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    def refuse_evaporation(temperature_K: float) -> dict[str, float]:
+        if temperature_K >= 3500.0:
+            raise EvaporationFluxRefusal("probe_refused", {"temperature_K": temperature_K})
+        return {}
+
+    def refuse_power(temperature_K: float) -> dict[str, float]:
+        if temperature_K >= 3500.0:
+            raise PowerTemperatureRefusal("evaporative_flux_refused", "probe")
+        return {}
+
+    for rates in (refuse_evaporation, refuse_power):
+        record = _solve(species_rate_kg_hr_at_K=rates)
+        assert math.isfinite(record["temperature_C"])
+        assert any(
+            item["knob"] == "evaporative_flux_inside_bracket"
+            for item in record["notices"]
+        )
+
+
+def test_a_nonclosing_residual_returns_the_closest_bracket_temperature():
+    from simulator.thermal_budget import _bisect_power_temperature_K
+
+    temperature_K, flags = _bisect_power_temperature_K(
+        power_W=1.0e6,
+        previous_K=300.0,
+        capacity_W_per_K=1.0e-9,
+        loss_W=lambda _temperature: 0.0,
+    )
+    assert math.isfinite(temperature_K)
+    assert temperature_K == pytest.approx(1.0e7)
+    assert any(
+        item["value"] == "power_temperature_balance_did_not_close"
+        for item in flags
+    )
+
+
+def test_a_side_node_without_a_bracket_predicts_and_flags(monkeypatch):
+    import simulator.thermal_budget as thermal_budget
+
+    monkeypatch.setattr(
+        thermal_budget,
+        "_radiation_exchange_W",
+        lambda *_args, **_kwargs: 1.0e12,
+    )
+    notices: list[dict] = []
+    temperature_K = thermal_budget._side_node_temperature_K(
+        2000.0,
+        side_area_m2=1.0e-4,
+        emissivity=0.85,
+        boundary_K=300.0,
+        half_conductance_W_per_K=1.0,
+        notices=notices,
+    )
+    assert math.isfinite(temperature_K)
+    assert notices[0]["knob"] == "side_node_temperature_K"
+    assert notices[0]["value"] == "power_temperature_balance_did_not_close"
+    assert notices[0]["kind"] == "typed_unknown"
+
+
 def test_a_malformed_rate_callback_refuses():
     with pytest.raises(PowerTemperatureRefusal) as refused:
         _solve(species_rate_kg_hr_at_K=lambda _temperature: [0.1])
