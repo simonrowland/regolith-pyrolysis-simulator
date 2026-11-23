@@ -2999,22 +2999,29 @@ def _store_stiffness(law, recorder: _StiffnessRecord, jacobian) -> None:
     law.stiffness_diagnostic = diagnostic
 
 
-def _recording_radau(recorder: _StiffnessRecord, on_step=None):
+def _recording_radau(
+    recorder: _StiffnessRecord | None = None,
+    on_step=None,
+):
     """Radau that keeps each accepted step on this solve's tape.
 
-    on_step, when passed, runs after the accept is recorded and may
-    raise. The one-argument call records only. Newton misses are not
-    decided here.
+    A recorder is optional for a reduced solve that only needs the
+    accepted-step callback and does not publish a stiffness tape.
+    When passed, the recorder sees an accepted step before ``on_step``;
+    that callback may raise. Newton misses are not decided here.
     """
 
     from scipy.integrate._ivp.radau import Radau
 
     class _RecordingRadau(Radau):
         def _step_impl(self):
-            recorder.begin_step()
-            fails_before = recorder.newton_failures
+            if recorder is not None:
+                recorder.begin_step()
+                fails_before = recorder.newton_failures
+            else:
+                fails_before = 0
             accepted, message = Radau._step_impl(self)
-            if accepted:
+            if recorder is not None and accepted:
                 recorder.accept(float(self.t - self.t_old), self.y)
             if on_step is not None:
                 on_step(self, accepted, fails_before, message)
@@ -3479,27 +3486,25 @@ def _reduced_open_fixed_point(
     if not (math.isfinite(hint_Pa) and hint_Pa > downstream):
         return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
 
-    residual_down, _source_down, _outflow_down = _mixture_balance_terms(
-        law, fractions, downstream,
-    )
+    residual_down = _mixture_g(law, fractions, downstream)
     if residual_down <= 0.0:
         # The existing resolver owns the shut return and its diagnostics.
         return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
 
-    residual, source_hint, outflow_hint = _mixture_balance_terms(
-        law, fractions, hint_Pa,
-    )
+    residual = _mixture_g(law, fractions, hint_Pa)
     if residual == 0.0:
         corrected = float(hint_Pa)
+        derivative = None
     else:
         # Implicit-function premise: G(P*, n) = 0, so
         # dP*/dn_j = -(∂G/∂n_j)/(∂G/∂P). One Newton correction from the
         # preceding stage's root is P_hint - G(P_hint, n)/(dG/dP).
-        # Difference G backward on the open piece; cap h at half the
-        # distance to P_down so both pressure samples remain strictly
-        # above the pipe kink. Each G sample's Q is the production pipe
-        # law (`pipe_species_outflow_mol_s` through `_flows`), so its
-        # difference supplies dQ/dP while the flux supplies dΣs/dP.
+        # Difference the same species-level G used by root selection
+        # backward on the open piece. Cap h at half the distance to
+        # P_down so both pressure samples remain strictly above the pipe
+        # kink. Each G sample's Q is the production pipe law
+        # (`pipe_species_outflow_mol_s` through `_flows`). Divide by the
+        # actual pressure span to obtain dG/dP without a second G form.
         # Unit check: (mol/s) / (mol/(s·Pa)) = Pa.
         # Limit: constant source and locally linear Q give a linear G,
         # so this single correction lands the closed-form open root.
@@ -3514,13 +3519,9 @@ def _reduced_open_fixed_point(
             return _open_or_shut_fixed_point(
                 law, fractions, near_Pa=hint_Pa,
             )
-        _residual_lower, source_lower, outflow_lower = _mixture_balance_terms(
-            law, fractions, lower,
-        )
-        derivative = (
-            (source_hint - outflow_hint)
-            - (source_lower - outflow_lower)
-        ) / step
+        residual_lower = _mixture_g(law, fractions, lower)
+        pressure_span = float(hint_Pa) - lower
+        derivative = (residual - residual_lower) / pressure_span
         if not (math.isfinite(derivative) and derivative < 0.0):
             return _open_or_shut_fixed_point(
                 law, fractions, near_Pa=hint_Pa,
@@ -3535,6 +3536,39 @@ def _reduced_open_fixed_point(
         # The established bracket remains the publisher outside the
         # local IFT neighborhood, including multiple-root handling.
         return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+
+    if derivative is not None:
+        # G is mol/s and dG/dP is mol/(s·Pa), so |G|/|dG/dP| is a
+        # first-order pressure-error estimate in Pa. Require that estimate
+        # to meet DEFAULT_ABS_TOL_PA before the continuity helper may publish
+        # this stage root. If it misses, take one more chord correction and
+        # validate once more; a second miss returns to the established root
+        # publisher. A linear G (constant source and linear pipe flow) has
+        # zero residual after the first correction, its closed-form root.
+        corrected_residual = _mixture_g(law, fractions, corrected)
+        if (
+            not math.isfinite(corrected_residual)
+            or abs(corrected_residual) / abs(derivative) > DEFAULT_ABS_TOL_PA
+        ):
+            second = corrected - corrected_residual / derivative
+            if (
+                not math.isfinite(second)
+                or second <= downstream
+                or abs(second - float(hint_Pa)) > _KINK_BAND_PA
+            ):
+                return _open_or_shut_fixed_point(
+                    law, fractions, near_Pa=hint_Pa,
+                )
+            second_residual = _mixture_g(law, fractions, second)
+            if (
+                not math.isfinite(second_residual)
+                or abs(second_residual) / abs(derivative)
+                > DEFAULT_ABS_TOL_PA
+            ):
+                return _open_or_shut_fixed_point(
+                    law, fractions, near_Pa=hint_Pa,
+                )
+            corrected = second
 
     decision, continuous = _continuous_warm_root(
         lambda pressure: _mixture_g(law, fractions, pressure),
@@ -3839,7 +3873,7 @@ def _reduced_manifold(
     blocks = 5 if track_extent else 3
     y0 = [float(n_start[name]) for name in species]
     y0.extend(0.0 for _unused in range(count * (blocks - 1)))
-    hint = [float(root)]
+    accepted_root = [float(root)]
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
 
@@ -3880,16 +3914,17 @@ def _reduced_manifold(
 
     def rhs(_time: float, state) -> list[float]:
         law._note_rhs_flux()
-        rates, found = evaluate(state, hint[0])
-        hint[0] = found
+        rates, _found = evaluate(state, accepted_root[0])
         return rates
 
     def jacobian(time: float, state):
         # A, B, G and R do not enter the rates, so their Jacobian columns
         # are zero. Each species column differences the reduced RHS once;
         # that RHS uses one IFT correction, not the bracketed warm solve.
-        base = np.asarray(rhs(time, state), dtype=float)
-        base_hint = hint[0]
+        law._note_rhs_flux()
+        base_hint = accepted_root[0]
+        base_rates, _base_root = evaluate(state, base_hint)
+        base = np.asarray(base_rates, dtype=float)
         matrix = np.zeros((len(y0), len(y0)), dtype=float)
         fd_scale = math.sqrt(np.finfo(float).eps)
         scale = max(
@@ -3913,6 +3948,24 @@ def _reduced_manifold(
             ) / step
         return matrix
 
+    def accepted_step(solver, accepted, _fails_before, _message) -> None:
+        if not accepted:
+            return
+        raw = [max(float(solver.y[index]), 0.0) for index in range(count)]
+        total = math.fsum(raw)
+        if total <= 0.0:
+            raise _ManifoldLost()
+        evolved = {
+            name: raw[index] / total for index, name in enumerate(species)
+        }
+        law._note_rhs_flux()
+        kind, found = _reduced_open_fixed_point(
+            law, evolved, hint_Pa=accepted_root[0],
+        )
+        if kind != "open" or found is None:
+            raise _ManifoldLost()
+        accepted_root[0] = float(found)
+
     if track_extent:
         atol = (
             [atol_mol] * (3 * count)
@@ -3926,7 +3979,7 @@ def _reduced_manifold(
             rhs,
             (0.0, float(t_rem)),
             y0,
-            method="Radau",
+            method=_recording_radau(on_step=accepted_step),
             rtol=_SLOW_RTOL,
             atol=atol,
             jac=jacobian,
@@ -3971,7 +4024,7 @@ def _reduced_manifold(
     if end_fractions is None:
         return None
     end_kind, end_root = _open_or_shut_fixed_point(
-        law, end_fractions, near_Pa=hint[0],
+        law, end_fractions, near_Pa=accepted_root[0],
     )
     inventory_pressure = law.pressure_of(n_end)
     if (
@@ -6147,34 +6200,21 @@ def _mixture_partials(
     }
 
 
-def _mixture_balance_terms(
+def _mixture_g(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
     pressure: float,
-) -> tuple[float, float, float]:
+) -> float:
     # G = Σ (q_i + S_i − Q_i) along one composition. Capture is held
     # outside this walk: a capture that jumps with P is not a
     # continuous mean free path, and the bracket would fall back.
     partials = _mixture_partials(law, fractions, pressure)
     source, outflow, _binding, _piece = law._flows(partials)
     redox = law._redox_rates(partials)
-    residual = math.fsum(
+    return math.fsum(
         source[species] + redox[species] - outflow[species]
         for species in law.species
     )
-    total_source = math.fsum(
-        source[species] + redox[species] for species in law.species
-    )
-    total_outflow = math.fsum(outflow[species] for species in law.species)
-    return residual, total_source, total_outflow
-
-
-def _mixture_g(
-    law: _HeadspaceLaw,
-    fractions: Mapping[str, float],
-    pressure: float,
-) -> float:
-    return _mixture_balance_terms(law, fractions, pressure)[0]
 
 
 def _mixture_piece(
