@@ -351,7 +351,7 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
-@pytest.mark.parametrize("printed_resolution", (True, False))
+@pytest.mark.parametrize("printed_resolution", (True, False, "component"))
 def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monkeypatch, printed_resolution):
     from simulator.battery import residue, score
 
@@ -368,14 +368,15 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monke
         initial_composition=Located(State.of(composition), locator),
     ))
     rows = (*rows[:1], replace(rows[-1], value=replace(
-        Value.point_of("0.20000"), approximate=not printed_resolution,
+        Value.point_of("0.2" if printed_resolution == "component" else "0.20000"),
+        approximate=not printed_resolution,
     )))
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     monkeypatch.setattr(battery, "_openimcc_gas_channels_and_omission_notices",
-                        lambda *a: ([("FeO", ("FeO", 1, 0)), ("MgO", ("MgO", 1, 0)),
+                        lambda *a: ([("FeO", ("FeO", 1, 0)), ("Mg", ("MgO", 1, 0)),
                                      ("O2", (None, 1, -1))], ()))
     monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *a, **k:
-                        lambda n, p: {"FeO": 1.0, "MgO": 1.0, "O2": 0.0})
+                        lambda n, p: {"FeO": 1.0, "Mg": 1.0, "O2": 0.0})
     oxygen = Located(State.of(Value.point_of("0.00001")), locator)
     reference = replace(reference, point_conditions={"fO2_Pa": oxygen})
     rows = tuple(replace(row, point_conditions={"fO2_Pa": oxygen}) for row in rows)
@@ -390,12 +391,50 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monke
     feo_kg = 1e-9 * (0.0005 * 71.844) / (0.0005 * 71.844 + 0.9995 * 40.304)
     assert tail["retained_kg_by_parent"] == pytest.approx({"FeO": feo_kg}, rel=1e-10, abs=0)
     assert tail["fraction_of_measured_mass_loss"] == pytest.approx(feo_kg / 2e-10)
-    assert tail["bound_wt_pct_by_component"] == pytest.approx(
-        dict.fromkeys(("FeO", "MgO"), 100 * feo_kg / 8e-10)
-    )
-    assert tail["material_threshold"] == (pytest.approx(5e-6) if printed_resolution else 1e-6)
+    # Mg escapes as metal. Oxygen stays in the physical residue, while the
+    # oxide projection removes one MgO equivalent per Mg atom lost.
+    oxide_residue_kg = 1e-9 - 2e-10 * 40.304 / 24.305
+    bound = tail["bound_wt_pct_by_component"]["FeO"]
+    assert bound == pytest.approx(100 * feo_kg / oxide_residue_kg)
+    assert bound >= float(candidate.value.point)  # removing the FeO tail gives 0 wt% FeO
+    assert bound > 100 * feo_kg / 8e-10
+    expected_threshold = {True: 5e-6, False: 1e-6, "component": 0.05}[printed_resolution]
+    assert tail["material_threshold"] == pytest.approx(expected_threshold)
+    if printed_resolution == "component":
+        assert tail["fraction_of_measured_mass_loss"] < expected_threshold
+        assert bound > tail["component_material_threshold_wt_pct"] == 0.1
     assert candidate.provenance["atom_closure_mol"]["Fe"] == 0.0
     assert candidate.provenance["final_inventory_mol"]["FeO"] == candidate.provenance["initial_inventory_mol"]["FeO"]
+
+
+def test_knudsen_tail_uses_the_real_ledger_loader_cutoff(monkeypatch):
+    from simulator import core
+    from simulator.battery.residue import _formula_terms
+
+    monkeypatch.setattr(core, "LEDGER_LOADER_SPECIES_CUTOFF_KG", 4e-12)
+    charge_kg = {"FeO": 3e-12, "MgO": 1e-9}
+    charge = {oxide: mass / _formula_terms(oxide)[1] for oxide, mass in charge_kg.items()}
+    admitted = core.PyrolysisSimulator._positive_species_kg(charge_kg)
+    assert admitted == {"MgO": 1e-9}
+    assert core.PyrolysisSimulator._positive_species_kg(
+        {"FeO": core.LEDGER_LOADER_SPECIES_CUTOFF_KG}
+    ) == {}
+    calls = []
+
+    def pressure(inventory, _logp, _temperature):
+        calls.append(inventory)
+        return {"MgO": 1.0, "O2": 0.0}
+
+    result = integrate_knudsen_residue_inventory(
+        charge, (*_channels(), ResidueChannel("MgO", "MgO", "MgO", 1.0, "effusion")),
+        pressure, temperature_path=((0.2, 2000.0),), measured_mass_loss_fraction=0.2,
+        near_saturated=True, source_fO2_log_by_interval=(-10.0,),
+        analytical_loader_cutoff=True,
+    )
+    assert all(inventory.keys() == admitted.keys() for inventory in calls)
+    assert result.trace_tail_kg == {"FeO": pytest.approx(3e-12, rel=1e-10, abs=0)}
+    assert result.residue_mol["FeO"] == charge["FeO"]
+    assert result.atom_closure_mol["Fe"] == 0.0
 
 
 @pytest.mark.parametrize("change,reason", (

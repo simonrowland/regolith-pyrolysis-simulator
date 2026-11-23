@@ -16,7 +16,6 @@ from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
-from simulator.accounting.lots import EMPTY_KG_TOLERANCE
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     _CHROMIUM_OXYGEN_PER_CR_CANDIDATES,
@@ -53,7 +52,6 @@ _KNUDSEN_MAX_RHS_EVALUATIONS = 1024
 _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
 _KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
 TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
-_KNUDSEN_DEFAULT_CHARGE_KG = 1e-3
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
 _HASHIMOTO_GEOMETRIES = (
@@ -1328,14 +1326,16 @@ def integrate_knudsen_residue_inventory(
     active_parents = {
         k for k in parents if k in volatile_parents and inventory[k] > 0.0
     }
-    # EMPTY_KG_TOLERANCE matches the analytical core loader's 1e-12 kg
-    # provider-input cutoff. This is not physical exhaustion. If the shared
-    # loader cutoff is lowered as a general contract, adjust this treatment here.
-    parent_cutoffs = {
-        k: EMPTY_KG_TOLERANCE / _formula_terms(k)[1]
-        for k in active_parents
-        if analytical_loader_cutoff
-    }
+    parent_cutoffs = {}
+    if analytical_loader_cutoff:
+        from simulator.core import LEDGER_LOADER_SPECIES_CUTOFF_KG
+
+        # This is the provider-input cutoff; the physical tail stays retained.
+        # If the shared loader contract changes, its cutoff flows through here.
+        parent_cutoffs = {
+            k: LEDGER_LOADER_SPECIES_CUTOFF_KG / _formula_terms(k)[1]
+            for k in active_parents
+        }
     trace_tail_kg = {
         k: n * _formula_terms(k)[1]
         for k, n in inventory.items()
@@ -2625,7 +2625,9 @@ def predict_knudsen_residue_composition(
     charge_kg = 1.0
     assumed_charge = use_loader_cutoff and (measured_charge_kg is None or measured_charge_kg <= 0.0)
     if use_loader_cutoff:
-        charge_kg = _KNUDSEN_DEFAULT_CHARGE_KG if assumed_charge else measured_charge_kg
+        from simulator.diagnostic_helpers.binary_pot_battery import DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG
+
+        charge_kg = DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG if assumed_charge else measured_charge_kg
     initial = {oxide: charge_kg * weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
     anchors = {}
     for row in rows:
@@ -2685,7 +2687,7 @@ def predict_knudsen_residue_composition(
         notices.append(Notice(
             kind=NoticeKind.FALLBACK,
             affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-            reason="sample mass missing or nonpositive; assumed 1 g for the analytical loader cutoff",
+            reason=f"sample mass missing or nonpositive; assumed {charge_kg:g} kg for the analytical loader cutoff",
             origin="Knudsen residue extent",
         ))
     oxygen_sources, source_logs = [], []
@@ -2757,7 +2759,7 @@ def predict_knudsen_residue_composition(
                       near_saturated=True, source_fO2_log_by_interval=source_logs,
                       analytical_loader_cutoff=use_loader_cutoff)
         primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
-        composition = _hashimoto_project_oxide_wt_pct(primary.residue_mol)
+        composition, residue_oxide_mass_kg = _project_residue_oxide_wt_pct(primary.residue_mol)
         diagnostic = {}
         try:
             linear = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs, linear_temperature=True)
@@ -2773,42 +2775,32 @@ def predict_knudsen_residue_composition(
         initial_mass_kg = math.fsum(n * _formula_terms(s)[1] for s, n in initial.items())
         trace_tail = {}
         if primary.trace_tail_kg:
-            # The omitted flux can remove at most its remaining mass. For a
-            # trace mass m_trace the relative loss error is <= m_trace / m_loss
-            # and every oxide's absolute wt% error is <= 100*m_trace/m_residue.
-            # For gram-scale masses 1e-12 kg is about a part per billion.
-            # At 1000 micrograms it is about 1e-6; at a single microgram
-            # (1e-9 kg) it can reach 1e-3. Use this run's actual denominators.
+            # Direct removal of a tail with oxide-equivalent mass m_trace,ox
+            # changes any normalized component by at most its fraction of
+            # the full oxide inventory: Δwt%_i <= 100*m_trace,ox/sum(m_ox).
+            # Both masses are in kg. The ratio is dimensionless, and 100
+            # gives wt percentage points. One 1e-12 kg tail over roughly
+            # 4.5e-5 kg of Run VI residue gives about 2.2e-6 wt%.
+            # This covers the direct contribution, independent of any
+            # pressure-trajectory sensitivity. The relative loss bound is
+            # m_trace,ox / measured_loss_kg, about 1e-9 per tail on Run VI.
             measured_loss_kg = initial_mass_kg * target
-            residue_mass_kg = initial_mass_kg - measured_loss_kg
             tail_mass_kg = math.fsum(primary.trace_tail_kg.values())
             loss_fraction = tail_mass_kg / measured_loss_kg
-            wt_pct_bound = 100.0 * tail_mass_kg / residue_mass_kg
+            wt_pct_bound = 100.0 * tail_mass_kg / residue_oxide_mass_kg
             mass_loss_value = anchors[target_temperature][1].value
             threshold = (
                 1e-6 if mass_loss_value.approximate else
                 0.1 * float(Decimal(1).scaleb(mass_loss_value.point.as_tuple().exponent)) / target
             )
-            material = loss_fraction > threshold
             trace_tail = {
                 "retained_kg_by_parent": dict(primary.trace_tail_kg),
+                "measured_loss_kg": measured_loss_kg,
+                "residue_oxide_mass_kg": residue_oxide_mass_kg,
                 "fraction_of_measured_mass_loss": loss_fraction,
                 "bound_wt_pct_by_component": dict.fromkeys(composition, wt_pct_bound),
-                "material": material,
                 "material_threshold": threshold,
             }
-            for parent, mass_kg in primary.trace_tail_kg.items():
-                notices.append(Notice(
-                    kind=NoticeKind.ENGINE_MODEL_CAVEAT if material else NoticeKind.INPUT_OMITTED,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                    reason=TRACE_TAIL_BELOW_LOADER_CUTOFF,
-                    origin="Knudsen residue extent",
-                    original=Decimal(str(mass_kg)),
-                    dropped=(parent,),
-                    dropped_mass_fraction=Decimal(str(mass_kg / measured_loss_kg)),
-                    band=f"absolute bound for every residue component: {100.0 * mass_kg / residue_mass_kg:.17g} wt%",
-                    certification="material" if material else "immaterial",
-                ))
         formula_oxygen_atoms_mol = math.fsum(
             amount * _formula_terms(oxide)[0].get("O", 0.0)
             for oxide, amount in primary.residue_mol.items()
@@ -2833,6 +2825,36 @@ def predict_knudsen_residue_composition(
         exc.provenance = provenance
         exc.notices = tuple(notices)
         raise
+
+
+def _knudsen_trace_tail_notices(trace_tail, reference, *, oxide_wt_pct: bool):
+    """Classify the same run's tail against the scored row's printed precision."""
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    material = trace_tail["fraction_of_measured_mass_loss"] > trace_tail["material_threshold"]
+    value = reference.value
+    if oxide_wt_pct and value.point is not None and not value.approximate:
+        component = reference.identity.species.formula
+        printed_quantum = Decimal(1).scaleb(value.point.as_tuple().exponent)
+        component_threshold = float(printed_quantum) / 10.0
+        trace_tail["component_material_threshold_wt_pct"] = component_threshold
+        material |= trace_tail["bound_wt_pct_by_component"][component] > component_threshold
+    trace_tail["material"] = material
+    return tuple(
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT if material else NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=TRACE_TAIL_BELOW_LOADER_CUTOFF,
+            origin="Knudsen residue extent",
+            original=Decimal(str(mass_kg)),
+            dropped=(parent,),
+            dropped_mass_fraction=Decimal(str(mass_kg / trace_tail["measured_loss_kg"])),
+            band=f"direct contribution bound: {100.0 * mass_kg / trace_tail['residue_oxide_mass_kg']:.17g} wt%",
+            certification="material" if material else "immaterial",
+        )
+        for parent, mass_kg in trace_tail["retained_kg_by_parent"].items()
+    )
 
 
 def predict_mass_loss_fraction(
@@ -3370,7 +3392,9 @@ def _hashimoto_geometry_areas(
     }
 
 
-def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[str, float]:
+def _project_residue_oxide_wt_pct(
+    inventory_mol: Mapping[str, float],
+) -> tuple[dict[str, float], float]:
     oxide_mass_kg = {
         oxide: float(amount) * _formula_terms(oxide)[1]
         for oxide, amount in inventory_mol.items()
@@ -3384,7 +3408,11 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
     return {
         oxide: mass_kg / total_mass_kg * 100.0
         for oxide, mass_kg in oxide_mass_kg.items()
-    }
+    }, total_mass_kg
+
+
+def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[str, float]:
+    return _project_residue_oxide_wt_pct(inventory_mol)[0]
 
 
 def _self_similar_area_m2(

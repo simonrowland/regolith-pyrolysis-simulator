@@ -204,6 +204,9 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
 )
 
 _DEFAULT_PRESSURE_BAR = 1.0e-6
+# Gram-scale reference charge when an analytical Knudsen source omits mass.
+# It sets the physical scale of the loader cutoff and its trace-tail bounds.
+DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG = 1e-3
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 

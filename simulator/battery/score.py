@@ -17011,6 +17011,7 @@ def _knudsen_residue_prediction(
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
         _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         _element_retention_ratio_from_inventories,
+        _knudsen_trace_tail_notices,
         _printed_fm_definition,
         predict_knudsen_residue_composition,
         _require_element_retention_transport_inputs,
@@ -17113,12 +17114,21 @@ def _knudsen_residue_prediction(
                 "element_unavailable" if is_retention else "channel_missing",
                 reference.identity.species.formula,
             )
+        notices = result["notices"]
+        if result.get("trace_tail"):
+            # The extent cache shares the solve across residue components.
+            # Classify against this row's resolution on a row-local copy.
+            trace_tail = dict(result["trace_tail"])
+            notices += _knudsen_trace_tail_notices(
+                trace_tail, reference, oxide_wt_pct=not is_retention,
+            )
+            provenance["trace_tail"] = trace_tail
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=result["notices"], identity=reference.identity,
+            notices=notices, identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
