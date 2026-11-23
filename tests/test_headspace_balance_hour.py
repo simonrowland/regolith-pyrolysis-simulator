@@ -18,6 +18,7 @@ from types import SimpleNamespace
 import pytest
 from unittest.mock import patch
 
+import simulator.capacity_coupling as capacity_coupling
 from simulator.accounting.lots import MaterialLot
 from simulator.accounting.run_artifact import (
     CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
@@ -48,6 +49,102 @@ from tests.test_capacity_coupling import (
     _HS_V_M3,
     _SOURCE_02_KG_H,
 )
+
+
+_IFT_SPECIES = (
+    "O2", "Na", "K", "Fe", "Mg", "Si", "Ti", "Al", "Ca", "Cr",
+    "Mn", "Ni", "Co", "N2",
+)
+_IFT_T_K = 1453.15
+_IFT_V_M3 = 0.08538380762699734
+_IFT_D_M = 0.12
+_IFT_L_M = 1.0
+_IFT_DOWNSTREAM_PA = 20.0
+_IFT_OPENING_PA = 20.1386
+_IFT_COMPOSITION_TIME_S = 1347.398588
+_IFT_VAPOUR_SLOPE_S = 677.44
+
+
+def _reduced_manifold_case(*, stiff: bool, track_extent: bool = False):
+    species = _IFT_SPECIES if stiff else ("O2",)
+    masses = {name: MOLAR_MASS[name] / 1000.0 for name in species}
+    factor = GAS_CONSTANT * _IFT_T_K / _IFT_V_M3
+    opening_total = _IFT_OPENING_PA / factor
+    fractions = {name: 1.0 / len(species) for name in species}
+    target_source = opening_total / _IFT_COMPOSITION_TIME_S
+
+    def pipe_at(pressure: float) -> dict[str, float]:
+        result = capacity_coupling.pipe_species_outflow_mol_s(
+            pressure,
+            _IFT_DOWNSTREAM_PA,
+            _IFT_T_K,
+            fractions,
+            _IFT_D_M,
+            _IFT_L_M,
+            molar_mass_kg_mol=masses,
+        )
+        return {name: float(result.species_mol_s[name]) for name in species}
+
+    if stiff:
+        low, high = _IFT_DOWNSTREAM_PA, _IFT_OPENING_PA
+        for _step in range(80):
+            middle = 0.5 * (low + high)
+            if math.fsum(pipe_at(middle).values()) < target_source:
+                low = middle
+            else:
+                high = middle
+        root = 0.5 * (low + high)
+        base_rates = pipe_at(root)
+    else:
+        root = _IFT_DOWNSTREAM_PA + 6.36e-4
+        base_rates = pipe_at(root)
+
+    widths = {
+        name: base_rates[name] * factor / _IFT_VAPOUR_SLOPE_S
+        for name in species
+    }
+    reference_partials = {name: fractions[name] * root for name in species}
+    holder = {"gross_kg_hr": {}} if track_extent else None
+
+    def flux(partials):
+        result = {}
+        for name in species:
+            rate = base_rates[name]
+            delta = float(partials.get(name, 0.0)) - reference_partials[name]
+            if stiff and abs(delta) < 1.0e-3:
+                rate = max(0.0, rate * (1.0 - delta / widths[name]))
+            result[name] = rate * masses[name] * 3600.0
+        if holder is not None:
+            holder["gross_kg_hr"] = dict(result)
+        return result
+
+    opening_moles = {
+        name: fractions[name] * opening_total for name in species
+    }
+    built = capacity_coupling._build_law(
+        pre_holdup_mol=opening_moles,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=_IFT_T_K,
+        volume_m3=_IFT_V_M3,
+        dt_hr=1.0,
+        downstream_pressure_Pa=_IFT_DOWNSTREAM_PA,
+        pipe_diameter_m=_IFT_D_M,
+        pipe_length_m=_IFT_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+        extent_holder=holder,
+    )
+    assert not isinstance(built, CapacityShadowRefusal)
+    law, _opening = built
+    law._record_opening_scales(opening_moles, 3600.0)
+    if stiff:
+        fractions[species[0]] += 1.0e-7
+        fractions[species[1]] -= 1.0e-7
+    start_total = root / factor
+    start_moles = {name: fractions[name] * start_total for name in species}
+    return law, holder, fractions, start_moles, root
 
 
 def _lunar():
@@ -81,6 +178,149 @@ def _seed(sim, account: str, species_mol: dict[str, float], source: str) -> None
 
 def _names(sim, start: int) -> list[str]:
     return [transition.name for transition in sim.atom_ledger.transitions[start:]]
+
+
+def test_reduced_radau_matches_old_rk45_on_a_nonstiff_hour(monkeypatch):
+    """The IFT/Radau path matches the former warm-root/RK45 result."""
+
+    radau_law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=False,
+    )
+    radau = capacity_coupling._reduced_manifold(
+        radau_law, fractions, start, root, 3600.0, track_extent=False,
+    )
+    assert radau is not None
+
+    rk45_law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=False,
+    )
+    import scipy.integrate
+
+    solve_ivp = scipy.integrate.solve_ivp
+
+    def rk45(fun, t_span, y0, **kwargs):
+        kwargs.pop("jac", None)
+        return solve_ivp(fun, t_span, y0, method="RK45", **kwargs)
+
+    def warm_fixed_point(law_arg, mix, hint_Pa):
+        return capacity_coupling._open_or_shut_fixed_point(
+            law_arg, mix, near_Pa=hint_Pa,
+        )
+
+    with monkeypatch.context() as scoped:
+        scoped.setattr(scipy.integrate, "solve_ivp", rk45)
+        scoped.setattr(
+            capacity_coupling,
+            "_reduced_open_fixed_point",
+            warm_fixed_point,
+        )
+        legacy = capacity_coupling._reduced_manifold(
+            rk45_law, fractions, start, root, 3600.0, track_extent=False,
+        )
+    assert legacy is not None
+    mole_atol = capacity_coupling._SLOW_ATOL_PA / (
+        GAS_CONSTANT * _IFT_T_K / _IFT_V_M3
+    )
+    for name in radau[0]:
+        assert abs(radau[0][name] - legacy[0][name]) <= mole_atol
+
+
+def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
+    """The stiff hour fits the IFT RHS budget; warm Newton exceeds it."""
+
+    law, holder, fractions, start, root = _reduced_manifold_case(
+        stiff=True,
+        track_extent=True,
+    )
+    result = capacity_coupling._reduced_manifold(
+        law, fractions, start, root, 3600.0, track_extent=True,
+    )
+
+    assert result is not None
+    assert law.opening_composition_tau_s == pytest.approx(
+        _IFT_COMPOSITION_TIME_S,
+        rel=1.0e-12,
+    )
+    assert len(result[0]) == 14
+    assert holder is not None
+    assert law.flux_evaluations < capacity_coupling._MAX_FLUX_EVALUATIONS
+    assert law._rhs_flux_counts
+    assert max(law._rhs_flux_counts) <= 4
+
+    warm_law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=True,
+        track_extent=True,
+    )
+
+    def warm_fixed_point(law_arg, mix, hint_Pa):
+        return capacity_coupling._open_or_shut_fixed_point(
+            law_arg, mix, near_Pa=hint_Pa,
+        )
+
+    with monkeypatch.context() as scoped:
+        scoped.setattr(
+            capacity_coupling,
+            "_reduced_open_fixed_point",
+            warm_fixed_point,
+        )
+        warm_result = capacity_coupling._reduced_manifold(
+            warm_law, fractions, start, root, 3600.0, track_extent=True,
+        )
+    assert warm_result is not None
+    warm_samples = sorted(warm_law._rhs_flux_counts)
+    assert warm_samples
+    assert warm_samples[len(warm_samples) // 2] > 4
+
+
+def test_reduced_endpoint_pressure_miss_declines_stall_handoff(monkeypatch):
+    """A forced P* mismatch leaves the live full-system Radau path in control."""
+
+    law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=True,
+        track_extent=True,
+    )
+    state = list(start) + [0.0] * (4 * len(start))
+    end_check_started = {"value": False}
+    original_fractions = capacity_coupling._fractions_of
+    original_fixed_point = capacity_coupling._open_or_shut_fixed_point
+
+    def mark_end_check(law_arg, moles):
+        result = original_fractions(law_arg, moles)
+        end_check_started["value"] = True
+        return result
+
+    def force_pressure_miss(law_arg, mix, near_Pa=None):
+        result = original_fixed_point(law_arg, mix, near_Pa=near_Pa)
+        kind, pressure = result
+        if end_check_started["value"] and kind == "open" and pressure is not None:
+            return kind, pressure + 2.0 * DEFAULT_ABS_TOL_PA
+        return result
+
+    monkeypatch.setattr(capacity_coupling, "_fractions_of", mark_end_check)
+    monkeypatch.setattr(
+        capacity_coupling,
+        "_open_or_shut_fixed_point",
+        force_pressure_miss,
+    )
+    step = capacity_coupling._hold_fixed_point(
+        law,
+        start,
+        3600.0,
+        state,
+        0.0,
+        root,
+        "open",
+        root,
+        1.0e-3,
+        fractions,
+        track_extent=True,
+    )
+
+    # _slow_converge's Radau callback raises _QuasiSteadyStall only for a
+    # returned step; None lets the full-system solve continue and integrate B.
+    assert end_check_started["value"] is True
+    assert step is None
+    assert law._quasi_steady_declined is True
 
 
 def _geometry_o2(source_kg_hr: float, rating_Pa: float):
