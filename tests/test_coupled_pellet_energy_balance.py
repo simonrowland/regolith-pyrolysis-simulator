@@ -132,7 +132,7 @@ def _kinetic_sio_kg_hr(temperature_K: float, alpha_spec) -> dict[str, float]:
     decides the floor: the balance already skips the callback there.
     """
 
-    if temperature_K < 400.0:
+    if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
         return {}
     enthalpy_J = _sio_reaction_J_per_mol()
     exponent = (
@@ -179,8 +179,8 @@ def _two_node_sinks_W(record, rates_at) -> float:
     top_K = float(record["temperature_K"])
     boundary_K = float(record["cold_boundary_K"])
     emissivity = float(record["emissivity"])
-    top_m2 = float(record["top_area_m2"])
-    side_m2 = float(record["side_area_m2"])
+    top_m2 = math.pi * (_DIAMETER_M / 2.0) ** 2
+    half_wall_m2 = math.pi * _DIAMETER_M * _HEIGHT_M / 2.0
     half = 2.0 * _slab_conductance_W_per_K(
         float(record["conductivity_W_m_K"]),
         top_m2,
@@ -188,7 +188,7 @@ def _two_node_sinks_W(record, rates_at) -> float:
     )
     side_K = _side_node_temperature_K(
         top_K,
-        side_area_m2=side_m2,
+        side_area_m2=half_wall_m2,
         emissivity=emissivity,
         boundary_K=boundary_K,
         half_conductance_W_per_K=half,
@@ -196,7 +196,7 @@ def _two_node_sinks_W(record, rates_at) -> float:
     return (
         _radiation_exchange_W(
             top_K,
-            area_m2=top_m2,
+            area_m2=top_m2 + half_wall_m2,
             emissivity=emissivity,
             boundary_K=boundary_K,
         )
@@ -208,7 +208,7 @@ def _two_node_sinks_W(record, rates_at) -> float:
         + evaporative_enthalpy_sink_W(top_K, rates_at(top_K))
         + _radiation_exchange_W(
             side_K,
-            area_m2=side_m2,
+            area_m2=half_wall_m2,
             emissivity=emissivity,
             boundary_K=boundary_K,
         )
@@ -301,7 +301,7 @@ def test_lumped_sio_dump_is_not_a_closed_state():
         return _kinetic_sio_kg_hr(temperature_K, alpha_spec)
 
     def dump(temperature_K: float) -> dict[str, float]:
-        if temperature_K < 400.0:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             return {}
         return {"SiO": 401.0 * 1.0e-6 * 60.0}
 
@@ -349,6 +349,85 @@ def test_high_conductivity_merges_the_two_nodes_with_the_one_node_bound():
         assert one["nodes"] == "one_node"
         assert abs(two["temperature_C"] - two["temperature_side_C"]) < 0.05
         assert abs(two["temperature_C"] - one["temperature_C"]) < 0.05
+
+
+def test_node_1_radiates_the_top_and_the_upper_half_wall(monkeypatch):
+    import simulator.thermal_budget as thermal_budget
+
+    calls: list[tuple[float, float]] = []
+    real = thermal_budget._radiation_exchange_W
+
+    def spy(temperature_K, *, area_m2, emissivity, boundary_K):
+        calls.append((float(temperature_K), float(area_m2)))
+        return real(
+            temperature_K,
+            area_m2=area_m2,
+            emissivity=emissivity,
+            boundary_K=boundary_K,
+        )
+
+    monkeypatch.setattr(thermal_budget, "_radiation_exchange_W", spy)
+    top = math.pi * (_DIAMETER_M / 2.0) ** 2
+    half_wall = math.pi * _DIAMETER_M * _HEIGHT_M / 2.0
+    node_1 = top + half_wall
+    node_2 = half_wall
+    full_wall = math.pi * _DIAMETER_M * _HEIGHT_M
+    _watts, side_K, returned_node_1, returned_node_2 = (
+        thermal_budget.two_node_pellet_loss_W(
+            2300.0,
+            top_area_m2=top,
+            side_area_m2=full_wall,
+            emissivity=0.85,
+            conductivity_W_m_K=1.0,
+            height_m=_HEIGHT_M,
+            diameter_m=_DIAMETER_M,
+        )
+    )
+    direct_calls = list(calls)
+    record = _solve()
+    assert returned_node_1 == pytest.approx(node_1)
+    assert returned_node_2 == pytest.approx(node_2)
+    assert record["node_1_area_m2"] == pytest.approx(node_1)
+    assert record["node_2_area_m2"] == pytest.approx(node_2)
+    assert direct_calls
+    assert all(
+        area == pytest.approx(node_1) or area == pytest.approx(node_2)
+        for _temperature, area in direct_calls
+    )
+    assert any(area == pytest.approx(node_1) for _temperature, area in direct_calls)
+    assert any(area == pytest.approx(node_2) for _temperature, area in direct_calls)
+    assert all(
+        area != pytest.approx(full_wall) for _temperature, area in direct_calls
+    )
+    side_areas = [
+        area
+        for temperature, area in direct_calls
+        if temperature == pytest.approx(side_K)
+    ]
+    assert side_areas
+    assert all(area == pytest.approx(node_2) for area in side_areas)
+    top_areas = [
+        area
+        for temperature, area in direct_calls
+        if temperature == pytest.approx(2300.0)
+    ]
+    assert any(area == pytest.approx(node_1) for area in top_areas)
+    notice = next(
+        item for item in record["notices"] if item["knob"] == "two_node_geometry"
+    )
+    assert notice["kind"] == "typed_unknown"
+    assert notice["value"] == "top_face_plus_upper_half_wall"
+    assert "moving melt front" in notice["source"]
+
+
+def test_booked_two_node_root_is_closer_to_lumped_than_to_the_top_face():
+    booked = _solve()
+    lumped = _lumped_hot_upper()
+    top_only = _solve(area_m2=_areas()["top"], radiating_face_set=None)
+    assert top_only["nodes"] == "one_node"
+    assert abs(booked["temperature_C"] - lumped["temperature_C"]) < abs(
+        booked["temperature_C"] - top_only["temperature_C"]
+    )
 
 
 def test_the_flux_callback_is_not_called_below_the_evaporation_floor():
