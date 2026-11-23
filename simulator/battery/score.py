@@ -329,7 +329,6 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.battery.validity import (
-    _DP_011_METHOD_INFERENCE,
     GateCheck,
     GateOutcome,
     KEMS_GEOMETRY_FACTS,
@@ -635,30 +634,16 @@ _DEFAULT_POLICY_FLAG_VALUES = frozenset(
 )
 
 
-def _notice_policy(policy_id: str, value: object, units: str) -> NoticePolicy:
+def _notice_policy(
+    policy_id: str, value: object, *, sample_mass_kg: object | None = None
+) -> NoticePolicy:
     """Build policy metadata from the registry and owning formula outputs."""
 
-    if policy_id in {"DP-004", "DP-011"}:
-        # These formulas are owned by the validity scorer. The registry's
-        # resolver deliberately refuses caller-supplied formula values; retain
-        # the owner's result and take only canonical metadata from the table.
-        entry = load_policy_table()[policy_id]
-        payload = {
-            "id": entry["id"],
-            "version": entry["version"],
-            "status": entry["status"],
-            "value": str(value),
-            "units": units,
-        }
-    else:
-        context = {"printed_value": value} if policy_id == "DP-012" else {}
-        resolved = resolve(policy_id, **context)
-        payload = dict(resolved.payload["policy"])
-        if policy_id == "DP-007":
-            # DP-007's value is the mass-specific EquipmentDesigner face area;
-            # b-1284 rejects the registry's fixed 0.2 m² plant default.
-            numeric_value = as_decimal(str(value))
-            payload["value"] = _dec_token(numeric_value)
+    context = {"printed_value": value} if policy_id == "DP-012" else {}
+    if policy_id == "DP-007":
+        context["sample_mass_kg"] = sample_mass_kg
+    resolved = resolve(policy_id, **context)
+    payload = dict(resolved.payload["policy"])
     return NoticePolicy(**payload)
 
 
@@ -956,7 +941,7 @@ def _engine_lacks_quantity_capability(
         return False
     if quantity in FUSION_QUANTITIES:
         return False
-    from simulator.battery.compilation_tier import _engine_thermo_quantities
+    from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
     return quantity not in _engine_thermo_quantities(engine)
 
@@ -2140,19 +2125,12 @@ def _missing_apparatus_fact(
     allow_calibration: bool,
     allow_missing_calibration: bool = False,
     allow_missing_geometry: bool = False,
-    allow_unknown_method: bool,
 ) -> str | None:
     check = _require_gate_check(check)
     name = check.name
     detail = check.detail
     if not isinstance(detail, Mapping):
         detail = {}
-    if (
-        name == "method"
-        and not check.passed
-        and allow_unknown_method
-    ):
-        return "method_unknown"
     if name == "background_pressure_stated" and not check.passed:
         return "background_pressure"
     if name == "orifice_knudsen" and not check.passed:
@@ -2252,7 +2230,6 @@ def _unverified_apparatus_notices(
                     policy=_notice_policy(
                         str(detail["policy_id"]),
                         printed_value,
-                        str(detail["policy_units"]),
                     ),
                 )
             )
@@ -2273,29 +2250,10 @@ def _unverified_apparatus_notices(
                         f"original_reason={original_reason}; default_source={default_source}"
                     ),
                     origin=reference.observation_id,
-                    policy=_notice_policy(policy_id, value, units),
-                )
-            )
-        elif flag in {"effusion_regime_assumed", "method_assumed"}:
-            condition = str(
-                detail.get("condition") or "free_molecular_effusion_regime"
-            )
-            original_reason = str(
-                detail.get("reason")
-                or "orifice and in-cell pressure sum are not printed"
-            )
-            defaulted_notices.append(
-                Notice(
-                    kind=NoticeKind(flag),
-                    affected_quantities=(quantity,),
-                    reason=(
-                        f"{flag}: {condition}; original_reason={original_reason}"
-                    ),
-                    origin=reference.observation_id,
                     policy=_notice_policy(
-                        str(detail["policy_id"]),
-                        detail["policy_value"],
-                        str(detail["policy_units"]),
+                        policy_id,
+                        value,
+                        sample_mass_kg=detail.get("sample_mass_kg"),
                     ),
                 )
             )
@@ -2319,26 +2277,12 @@ def _unverified_apparatus_notices(
             "derived",
         }
     )
-    reference_state = identity.reference_state
-    typed_condensed_reference = (
-        reference_state is not None
-        and reference_state.is_value
-        and isinstance(reference_state.value, StandardState)
-        and phase_token(reference_state.value.endmember) in CONDENSED_PHASES
-    )
     figure_only_partial_pressure = (
         quantity is Quantity.P_PARTIAL
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
     )
-    unknown_method_activity = (
-        experiment.method.is_unknown
-        and gates.reason is RefusalReason.METHOD_UNKNOWN
-        and quantity is Quantity.ACTIVITY
-        and author_reported_activity
-        and typed_condensed_reference
-    )
-    if not unknown_method_activity and (
+    if (
         not experiment.method.is_value
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
@@ -2380,7 +2324,6 @@ def _unverified_apparatus_notices(
         or figure_only_partial_pressure
         or kems_activity
         or comparison_activity
-        or unknown_method_activity
         or calibration_flagged_partial_pressure
         or calibration_flagged_activity
     ):
@@ -2417,7 +2360,6 @@ def _unverified_apparatus_notices(
             allow_calibration=allow_calibration,
             allow_missing_calibration=kems_activity,
             allow_missing_geometry=kems_activity,
-            allow_unknown_method=unknown_method_activity,
         )
         if fact is None:
             return ()
@@ -2472,34 +2414,14 @@ def _unverified_apparatus_notices(
                 f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (f" ({calibration_reason})" if calibration_reason else "")
             )
-        elif fact == "method_unknown" and unknown_method_activity:
-            reason = (
-                "method_assumed:method_unknown; original_reason=published activity has a "
-                "typed condensed reference but its experiment method is not stated"
-            )
-        elif fact == "method_unknown":
-            reason = "method_assumed:method_unknown; original_reason=" + str(
-                detail.get("reason") or "pressure series method is not stated"
-            )
         else:
             reason = f"apparatus_unverified:{fact}"
         notices.append(
             Notice(
-                kind=(
-                    NoticeKind.METHOD_ASSUMED
-                    if fact == "method_unknown"
-                    else NoticeKind.UNVERIFIED_APPARATUS
-                ),
+                kind=NoticeKind.UNVERIFIED_APPARATUS,
                 affected_quantities=(quantity,),
                 reason=reason,
                 origin=reference.observation_id,
-                policy=(
-                    _notice_policy(
-                        "DP-011", _DP_011_METHOD_INFERENCE, "method token"
-                    )
-                    if fact == "method_unknown"
-                    else None
-                ),
             )
         )
     return tuple(notices)
@@ -8861,14 +8783,7 @@ def _comparison_identity(
     ):
         quantity = quantity_token(identity)
         if quantity is not None:
-            method = (
-                experiment.method.value
-                if experiment is not None and experiment.method.is_value
-                else None
-            )
-            bar, _notice, invalid = total_pressure_bar_for_score(
-                identity, quantity, method=method
-            )
+            bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
             if invalid is None:
                 updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * PA_PER_BAR_DEC)
     if not updates:
@@ -10246,17 +10161,41 @@ def _predict_redox(
         version=version,
     )
 
+
+def _assumption_notice(
+    quantity: Quantity, reason: str, pressure_bar: float
+) -> Notice:
+    policy_row = load_policy_table()["DP-101"]
+    if Decimal(str(pressure_bar)) != Decimal(str(policy_row["value"])):
+        raise ValueError("transitional pressure does not match rejected DP-101")
+    return Notice(
+        kind=NoticeKind(str(policy_row["flag"])),
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="score:predict_with_engine",
+        policy=NoticePolicy(
+            id=str(policy_row["id"]),
+            version=policy_row["version"],
+            status=str(policy_row["status"]),
+            value=str(policy_row["value"]),
+            units=str(policy_row["units"]),
+        ),
+    )
+
+
 def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
-    *,
-    method: MethodToken | None = None,
 ) -> tuple[float, Notice | None, str | None]:
-    """Observation pressure in bar, or a method-specific default with a notice.
+    """Observation pressure in bar, or the transitional DP-101 value.
 
     A present but non-finite or negative pressure is invalid. It is not
     replaced by this fallback.
     """
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        DP_019_VACUUM_BOUNDARY_BAR,
+    )
 
     state = identity.total_pressure_Pa
     if state is not None and state.is_value and state.value is not None:
@@ -10267,38 +10206,14 @@ def total_pressure_bar_for_score(
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
-    policy_id = (
-        "DP-019"
-        if method in {
-            MethodToken.LANGMUIR_FREE_EVAPORATION,
-            MethodToken.VACUUM_CHAMBER_PYROLYSIS,
-        }
-        else "DP-001"
+    # Keep the current engine input for t-1924c, while DP-101 marks this
+    # general missing-pressure fallback as rejected in the audit record.
+    notice = _assumption_notice(
+        quantity,
+        detail,
+        DP_019_VACUUM_BOUNDARY_BAR,
     )
-    if policy_id == "DP-019":
-        resolved = resolve("DP-019")
-        # DP-019 uses the existing high-vacuum boundary, converted as
-        # bar × Pa/bar = Pa. The gas-film resistance vanishes as that boundary
-        # tends to vacuum.
-        pressure_pa = as_decimal(str(resolved.value))
-    else:
-        resolved = resolve("DP-001")
-        # Premise: for condensed phases, Δln(a) = V_m·ΔP/(R·T). The
-        # correction is dimensionless because V_m·ΔP has units J/mol, and
-        # it vanishes as ΔP approaches zero.
-        pressure_pa = as_decimal(str(resolved.value))
-    notice = Notice(
-        kind=resolved.flag,
-        affected_quantities=(quantity,),
-        reason=(
-            f"{resolved.flag.value}:{resolved.payload['condition']}; "
-            f"original_reason={detail}"
-        ),
-        origin="score:predict_with_engine",
-        policy=NoticePolicy(**resolved.payload["policy"]),
-    )
-    pressure_bar = pressure_pa / PA_PER_BAR_DEC
-    return float(pressure_bar), notice, None
+    return float(DP_019_VACUUM_BOUNDARY_BAR), notice, None
 
 
 _IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
@@ -12802,13 +12717,25 @@ def _predict_mass_loss_with_residue(
             kind = NoticeKind.ALPHA_ASSUMED
             origin = observation.observation_id
             raw_value = flag.partition("=")[2].split(None, 1)[0].rstrip(";")
-            policy = _notice_policy("DP-005", as_decimal(raw_value), "dimensionless")
+            policy = _notice_policy("DP-005", as_decimal(raw_value))
         elif flag.startswith("knob_defaulted:"):
             kind = NoticeKind.KNOB_DEFAULTED
             origin = observation.observation_id
             raw_value = flag.partition("=")[2].split(None, 1)[0].rstrip(";")
             applied_value = as_decimal(raw_value)
-            policy = _notice_policy("DP-007", applied_value, "m2")
+            sample_mass = (
+                None if experiment is None else experiment.sample.mass_kg
+            )
+            sample_mass_kg = (
+                sample_mass.state.value.point
+                if sample_mass is not None
+                and sample_mass.state.is_value
+                and sample_mass.state.value.point is not None
+                else None
+            )
+            policy = _notice_policy(
+                "DP-007", applied_value, sample_mass_kg=sample_mass_kg
+            )
         elif flag.startswith("preheat_not_negligible:"):
             kind = NoticeKind.PREHEAT_NOT_NEGLIGIBLE
             origin = f"engine:{engine.value}"
@@ -14289,7 +14216,7 @@ def _predict_with_engine(
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     if engine is Engine.NASA_CEA_9 and quantity is not None:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity is not Quantity.FE3_FE2_RATIO
@@ -14429,7 +14356,7 @@ def _predict_with_engine(
     if wall_prediction is not None:
         return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity not in _engine_thermo_quantities(engine)
@@ -15187,15 +15114,7 @@ def _predict_with_engine(
             knudsen_seed_pressure_bar = pressure_bar
         else:
             pressure_bar, pressure_notice, pressure_invalid = (
-                total_pressure_bar_for_score(
-                    identity,
-                    quantity,
-                    method=(
-                        experiment.method.value
-                        if experiment is not None and experiment.method.is_value
-                        else None
-                    ),
-                )
+                total_pressure_bar_for_score(identity, quantity)
             )
             if pressure_invalid is not None:
                 return _input_refusal(
@@ -23796,6 +23715,24 @@ def write_headline_summary_json(
     payload["assumed_band"] = _assumed_band_summary(
         (to_plain(row) for row in residuals), context.observations
     )
+    from simulator.battery.engine_capability import (
+        capability_summary,
+        residual_record_stats,
+    )
+
+    n_records, n_scored, n_refused, scored_ids = residual_record_stats(residuals)
+    payload.update(
+        capability_summary(
+            observations=context.observations,
+            origins=context.origins,
+            experiments=context.experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored,
+            n_refused_records=n_refused,
+        )
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
@@ -23995,7 +23932,7 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
             engine_value = Engine(engine)
         except ValueError:
             return True
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         return (
             quantity in _engine_thermo_quantities(engine_value)
@@ -24208,6 +24145,18 @@ def _render_score_report_from_payloads_legacy(
             pending += 1
         elif observation.admission.status is AdmissionStatus.ADMITTED:
             admitted += 1
+    from simulator.battery.engine_capability import capability_summary
+
+    capability = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=engines,
+        scored_observation_ids=aggregate.numeric_observation_ids,
+        n_records=aggregate.count,
+        n_scored_records=aggregate.numeric_count,
+        n_refused_records=aggregate.refused_count,
+    )
     report = render_legacy_score_report_markdown(
         hostname=context.hostname,
         studio_hostname=studio_hostname,
@@ -24242,6 +24191,8 @@ def _render_score_report_from_payloads_legacy(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=capability["coverage"],
+        capability_matrix=capability["capability_matrix"],
     )
     if shard_failures:
         report = (
@@ -24992,104 +24943,12 @@ def flagged_stratum_payloads(
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
     observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
-    groups: dict[
-        tuple[str, str, str, str | None, str | None], list[Decimal]
-    ] = {}
-    counts: dict[tuple[str, str, str, str | None, str | None], int] = {}
-    engine_names = {engine.value for engine in engines}
+    census = _FlaggedStratumAccumulator(
+        engines, hulls=hulls, observations=observations
+    )
     for row in rows:
-        numeric = row.get("numeric")
-        if not isinstance(numeric, Mapping):
-            continue
-        rail = str(row.get("rail") or "")
-        if not rail:
-            continue
-        engine = str(
-            ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or _engine_from_residual_key(row.get("key"))
-        )
-        if engine_names and engine not in engine_names:
-            continue
-        notices = tuple(
-            notice
-            for notice in (row.get("notices") or ())
-            if isinstance(notice, Mapping)
-        )
-        for stratum in _flagged_payload_strata(row):
-            for policy_id, policy_status in _policies_for_stratum(
-                notices, stratum
-            ):
-                key = (stratum, rail, engine, policy_id, policy_status)
-                counts[key] = counts.get(key, 0) + 1
-                if hulls is not None:
-                    from simulator.battery.compilation_tier import reference_observation
-
-                    reference = str(row.get("reference") or "")
-                    hull_key = (
-                        f"flagged:{stratum}"
-                        if policy_id is None
-                        else (
-                            f"flagged:{stratum}:policy={policy_id}"
-                            f":status={policy_status}"
-                        )
-                    )
-                    hulls.setdefault(
-                        (hull_key, rail, engine), _ConditionHull()
-                    ).add(reference, reference_observation(observations or {}, reference))
-                dex = (
-                    numeric.get("value")
-                    if numeric.get("operation") == MetricOperation.DEX.value
-                    else None
-                )
-                if dex is None:
-                    continue
-                try:
-                    value = as_decimal(dex)
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
-                groups.setdefault(key, []).append(value)
-    return [
-        {
-            "stratum": stratum,
-            "rail": rail,
-            "engine": engine,
-            "n": counts[(stratum, rail, engine, policy_id, policy_status)],
-            "median_dex": (
-                None
-                if not groups.get(
-                    (stratum, rail, engine, policy_id, policy_status)
-                )
-                else str(
-                    _median(
-                        groups[
-                            (stratum, rail, engine, policy_id, policy_status)
-                        ]
-                    )
-                )
-            ),
-            "rms_dex": (
-                None
-                if not groups.get(
-                    (stratum, rail, engine, policy_id, policy_status)
-                )
-                else str(
-                    _rms(
-                        groups[
-                            (stratum, rail, engine, policy_id, policy_status)
-                        ]
-                    )
-                )
-            ),
-            **(
-                {"policy_id": policy_id, "policy_status": policy_status}
-                if policy_id is not None
-                else {}
-            ),
-        }
-        for stratum, rail, engine, policy_id, policy_status in sorted(
-            counts, key=_flagged_census_sort_key
-        )
-    ]
+        census.add(row)
+    return census.records()
 
 
 def _redox_source_relation_fields(relation: str) -> dict[str, str]:
@@ -25288,6 +25147,105 @@ class _ScorePayloadRowMetadata:
     tier_uncertainty: str
 
 
+class _FlaggedStratumAccumulator:
+    """One owner for flagged residual counts and dex statistics."""
+
+    def __init__(
+        self,
+        engines: Sequence[Engine],
+        *,
+        hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
+        observations: Mapping[str, Observation] | None = None,
+    ) -> None:
+        self.engine_names = {engine.value for engine in engines}
+        self.hulls = hulls
+        self.observations = observations or {}
+        self.counts: dict[
+            tuple[str, str, str, str | None, str | None], int
+        ] = defaultdict(int)
+        self.dex_values: dict[
+            tuple[str, str, str, str | None, str | None], list[Decimal]
+        ] = defaultdict(list)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            return
+        rail = str(row.get("rail") or "")
+        if not rail:
+            return
+        engine = _engine_from_payload(row)
+        if self.engine_names and engine not in self.engine_names:
+            return
+        notices = tuple(
+            notice
+            for notice in (row.get("notices") or ())
+            if isinstance(notice, Mapping)
+        )
+        for stratum in _flagged_payload_strata(row):
+            for policy_id, policy_status in _policies_for_stratum(
+                notices, stratum
+            ):
+                key = (stratum, rail, engine, policy_id, policy_status)
+                self.counts[key] += 1
+                if self.hulls is not None:
+                    from simulator.battery.compilation_tier import reference_observation
+
+                    reference = str(row.get("reference") or "")
+                    hull_key = (
+                        f"flagged:{stratum}"
+                        if policy_id is None
+                        else (
+                            f"flagged:{stratum}:policy={policy_id}"
+                            f":status={policy_status}"
+                        )
+                    )
+                    self.hulls.setdefault(
+                        (hull_key, rail, engine), _ConditionHull()
+                    ).add(
+                        reference,
+                        reference_observation(self.observations, reference),
+                    )
+                if numeric.get("operation") != MetricOperation.DEX.value:
+                    continue
+                dex = numeric.get("value")
+                if dex is None:
+                    continue
+                try:
+                    self.dex_values[key].append(as_decimal(dex))
+                except (TypeError, ValueError, ArithmeticError):
+                    continue
+
+    def records(self) -> list[dict[str, object]]:
+        rows: list[dict[str, object]] = []
+        for (
+            stratum,
+            rail,
+            engine,
+            policy_id,
+            policy_status,
+        ), n in sorted(
+            self.counts.items(),
+            key=lambda item: _flagged_census_sort_key(item[0]),
+        ):
+            values = self.dex_values.get(
+                (stratum, rail, engine, policy_id, policy_status), ()
+            )
+            row: dict[str, object] = {
+                "stratum": stratum,
+                "rail": rail,
+                "engine": engine,
+                "n": n,
+                "median_dex": None if not values else str(_median(values)),
+                "rms_dex": None if not values else str(_rms(values)),
+            }
+            if policy_id is not None:
+                row["policy_id"] = policy_id
+                row["policy_status"] = policy_status
+            rows.append(row)
+        return rows
+
+
 class _ScorePayloadAccumulator:
     """Compact report statistics collected in one pass over residual payloads."""
 
@@ -25342,9 +25300,17 @@ class _ScorePayloadAccumulator:
         self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
+        self.flagged_census = _FlaggedStratumAccumulator(
+            self.engines,
+            hulls=self.headline_hulls,
+            observations=context.observations,
+        )
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
+        self.numeric_count = 0
+        self.refused_count = 0
+        self.numeric_observation_ids: set[str] = set()
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
@@ -25637,6 +25603,14 @@ class _ScorePayloadAccumulator:
             except (TypeError, ValueError, ArithmeticError):
                 pass
         reference = metadata.reference
+        if (
+            isinstance(numeric_payload, Mapping)
+            and numeric_payload.get("value") is not None
+        ):
+            self.numeric_count += 1
+            self.numeric_observation_ids.add(str(reference))
+        if row.get("status") == ResidualStatus.REFUSED.value:
+            self.refused_count += 1
         engine = metadata.engine
         flags = metadata.flags
         flagged = bool(flags)
@@ -25718,6 +25692,7 @@ class _ScorePayloadAccumulator:
                 flagged=flagged,
                 numeric_value=numeric_value,
             )
+        self.flagged_census.add(row)
         exclusions_tuple = tuple(exclusions or ())
         if "admission_admitted" in exclusions_tuple:
             self.admission_with += 1
@@ -25855,6 +25830,9 @@ class _ScorePayloadAccumulator:
                 )
             record["decision_strata"] = strata
 
+    def flagged_records(self) -> list[dict[str, object]]:
+        return self.flagged_census.records()
+
     def condition_hull_lines(self) -> list[str]:
         return _condition_hull_lines(
             {
@@ -25885,6 +25863,20 @@ class _ScorePayloadAccumulator:
             static_refusals=self.static_refusals,
         )
         payload["assumed_band"] = self.assumed_bands.payload()
+        from simulator.battery.engine_capability import capability_summary
+
+        payload.update(
+            capability_summary(
+                observations=self.context.observations,
+                origins=self.context.origins,
+                experiments=self.context.experiments,
+                engines=self.engines,
+                scored_observation_ids=self.numeric_observation_ids,
+                n_records=self.count,
+                n_scored_records=self.numeric_count,
+                n_refused_records=self.refused_count,
+            )
+        )
         return payload
 
 
@@ -25895,6 +25887,7 @@ def write_headline_summary_from_payloads_json(
     engines: Sequence[Engine],
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
     rows = tuple(rows)
@@ -25908,6 +25901,25 @@ def write_headline_summary_from_payloads_json(
         store_stamp=store_stamp,
     )
     payload["assumed_band"] = _assumed_band_summary(rows, observations)
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored, n_refused, scored_ids = payload_record_stats(rows)
+        payload.update(
+            capability_summary(
+                observations=observations,
+                origins=origins,
+                experiments=experiments,
+                engines=engines,
+                scored_observation_ids=scored_ids,
+                n_records=n_records,
+                n_scored_records=n_scored,
+                n_refused_records=n_refused,
+            )
+        )
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25994,6 +26006,7 @@ def render_score_report_from_payloads(
     mismatch_warning: str | None = None,
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
 ) -> str:
     eligibility_census = eligibility_failure_census(
         rows,
@@ -26072,6 +26085,26 @@ def render_score_report_from_payloads(
         condition_lines: Sequence[str] | None = _condition_hull_lines(hulls)
     else:
         condition_lines = None
+    capability = None
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored_records, n_refused_records, scored_ids = payload_record_stats(
+            rows
+        )
+        capability = capability_summary(
+            observations=observations,
+            origins=origins,
+            experiments=experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored_records,
+            n_refused_records=n_refused_records,
+        )
     refusal_counts = refusal_census_payloads(measured_rows)
     admit = admission_census_payloads(rows)
     notice_counts = notice_backlog_payloads(rows)
@@ -26107,6 +26140,8 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=None if capability is None else capability["coverage"],
+        capability_matrix=None if capability is None else capability["capability_matrix"],
     )
     report = format_assumed_band_report(
         report, _assumed_band_summary(rows, observations)

@@ -121,8 +121,6 @@ _KEMS_REDUCED_QUANTITIES = frozenset(
 )
 
 _DEFAULT_POLICY_TABLE = load_policy_table()
-_DP_004_REGIME_CONDITION = str(_DEFAULT_POLICY_TABLE["DP-004"]["formula"])
-_DP_011_METHOD_INFERENCE = str(_DEFAULT_POLICY_TABLE["DP-011"]["formula"])
 _DP_012_SOURCE_REDUCED_VALUE = str(_DEFAULT_POLICY_TABLE["DP-012"]["formula"])
 
 
@@ -832,24 +830,19 @@ def underdetermined_apparatus(
             if not has_point_area and not area_value_invalid:
                 sample_mass = _finite_positive(experiment.sample.mass_kg)
                 if sample_mass is not None:
-                    # DP-007 takes the same runtime crucible face used by
-                    # design-teststand; EquipmentDesigner owns the geometry.
-                    from simulator.equipment import (
-                        DP_007_AREA_DEFAULT_SOURCE,
-                        EquipmentDesigner,
-                    )
+                    from simulator.equipment import DP_007_AREA_DEFAULT_SOURCE
 
-                    area_m2 = EquipmentDesigner().size_crucible(
-                        float(sample_mass)
-                    ).melt_surface_area_m2
+                    area_policy = resolve("DP-007", sample_mass_kg=sample_mass)
+                    area_m2 = float(area_policy.value)
                     defaulted_area = {
                         "flag": "knob_defaulted",
                         "knob": "exposed_area_m2",
                         "value": area_m2,
-                        "units": "m2",
+                        "units": area_policy.units,
                         "original_reason": "exposed_area_not_stated",
                         "default_source": DP_007_AREA_DEFAULT_SOURCE,
                         "policy_id": "DP-007",
+                        "sample_mass_kg": sample_mass,
                     }
                 else:
                     if "exposed_area_m2" not in missing:
@@ -952,43 +945,6 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
-    method_implies_effusion = (
-        method_state.is_value
-        and method_state.value is MethodToken.KNUDSEN_EFFUSION
-    )
-
-    def regime_gap_check(reason: object) -> GateCheck:
-        # A printed Knudsen-effusion method implies molecular effusion inside
-        # the cell and vacuum outside. In-cell total pressure remains the sum
-        # of partial pressures, never an assumed 1 atm. DP-004 names this
-        # unresolved regime check; a missing method uses DP-011's quantity-based
-        # equilibrium comparison for pressure rows instead.
-        flag = (
-            "effusion_regime_assumed"
-            if method_implies_effusion
-            else "method_assumed"
-        )
-        return GateCheck(
-            flag,
-            True,
-            {
-                "flag": flag,
-                "condition": (
-                    _DP_004_REGIME_CONDITION
-                    if method_implies_effusion
-                    else _DP_011_METHOD_INFERENCE
-                ),
-                "policy_id": "DP-004" if method_implies_effusion else "DP-011",
-                "policy_value": (
-                    _DP_004_REGIME_CONDITION
-                    if method_implies_effusion
-                    else _DP_011_METHOD_INFERENCE
-                ),
-                "policy_units": "Pa" if method_implies_effusion else "method token",
-                "reason": reason or "orifice and in-cell pressure sum are not printed",
-            },
-        )
-
     regime = experiment.pressure_environment.regime
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)
@@ -1119,9 +1075,6 @@ def effusion_regime_unverified(
             # A lower bound already above the limit proves the cell is outside
             # the regime, even though species coverage is incomplete.
             pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
-        elif method_implies_effusion or not diameters:
-            checks.append(regime_gap_check(pressure_detail.get("reason")))
-            return _pass(checks)
         checks.append(
             GateCheck(
                 "in_cell_partial_pressure_sum",
@@ -1148,12 +1101,6 @@ def effusion_regime_unverified(
             "(limit source: Drowart et al. 2005, p. 689; "
             f"{diameter_basis})"
         )
-        if not diameters:
-            checks.append(
-                regime_gap_check(
-                    "no printed orifice diameter; used the Drowart 10 Pa cell limit"
-                )
-            )
     if ungrounded_detail is not None:
         gate_detail = {
             **pressure_detail,

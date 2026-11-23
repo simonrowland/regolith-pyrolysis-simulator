@@ -561,7 +561,7 @@ def test_missing_or_non_self_similar_area_uses_equipment_default(
         float(experiment.sample.mass_kg.state.value.point)
     ).melt_surface_area_m2
     assert any(
-        flag.startswith(f"knob_defaulted:area={default_area:.17g} m2;")
+        flag.startswith(f"knob_defaulted:area={default_area:.17g} m²;")
         and f"original_reason={reason}" in flag
         for flag in result.engine_flags
     )
@@ -599,7 +599,7 @@ def test_defaulted_mass_loss_area_carries_dp007_policy(
     assert notice.policy.value == score_module._dec_token(
         Decimal(format(default_area, ".17g"))
     )
-    assert notice.policy.units == "m2"
+    assert notice.policy.units == "m²"
     assert NoticeKind.KNOB_DEFAULTED.value in score_module.flagged_strata(
         prediction.notices
     )

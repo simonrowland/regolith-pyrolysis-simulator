@@ -26,6 +26,7 @@ from simulator.battery.score import (
     flagged_stratum_rows,
     headline_payloads,
 )
+from simulator.equipment import EquipmentDesigner
 from simulator.state import MeltState
 from tests.battery import factories as F
 
@@ -139,8 +140,30 @@ def test_method_implied_notice_requires_policy_metadata() -> None:
 def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
     runtime_area = MeltState().melt_surface_area_m2
 
-    assert resolve("DP-007").value == Decimal(str(runtime_area))
     assert resolve("DP-008", runtime_default=runtime_area).value == runtime_area
+
+
+def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
+    sample_mass_kg = 3.38e-3
+    expected_area_m2 = EquipmentDesigner().size_crucible(
+        sample_mass_kg
+    ).melt_surface_area_m2
+    resolved = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+
+    assert resolved.value == Decimal(str(expected_area_m2))
+    assert resolved.units == "m²"
+    assert resolved.value < Decimal("0.2") / Decimal("1000")
+
+    # Mutation recipe: substitute MeltState().melt_surface_area_m2 (0.2 m²)
+    # for the size_crucible result; the gram-scale bound above must fail.
+    with pytest.raises(
+        ValueError,
+        match=(
+            "DP-007 requires sample_mass_kg: "
+            "an absolute rate needs an area or sample mass"
+        ),
+    ):
+        resolve("DP-007")
 
 
 def test_vacuum_pressure_uses_the_runtime_owner_constant() -> None:

@@ -566,7 +566,7 @@ def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine)
     assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
         reference.identity, Quantity.P_PARTIAL
     )
-    assert assumed_bar == pytest.approx(1.01325)
+    assert assumed_bar == 1e-6
     assert assumption_notice is not None
     assert invalid is None
     prediction = replace(
@@ -782,7 +782,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
         identity, Quantity.P_PARTIAL
     )
-    assert assumed_bar == pytest.approx(1.01325)
+    assert assumed_bar == 1e-6
     assert assumption_notice is not None
     assert invalid is None
     prediction = replace(
@@ -805,13 +805,13 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assert residual.numeric is not None
     assert residual.refusal is None
     assert assumption_notice in residual.notices
-    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert assumption_notice.kind is NoticeKind.METHOD_IMPLIED
     assert assumption_notice.policy == NoticePolicy(
-        id="DP-001",
+        id="DP-101",
         version=1,
-        status="canonical",
-        value="101325",
-        units="Pa",
+        status="rejected",
+        value="1e-6",
+        units="bar",
     )
     assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
     assert f"{assumed_bar:g} bar" not in assumption_notice.reason
@@ -828,9 +828,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         headline_rows,
     )
 
-    assert flagged_strata(residual.notices) == (
-        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
-    )
+    assert flagged_strata(residual.notices) == (NoticeKind.METHOD_IMPLIED.value,)
     assert [
         (
             row["stratum"],
@@ -842,7 +840,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     ] == [
-        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-001", "canonical", 1),
+        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
     ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
@@ -856,14 +854,40 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         )
         for row in serialized_strata
     ] == [
-        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-001", "canonical", 1),
+        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
     ]
+    payload = residual_to_plain(residual)
+    aggregate = score_mod._ScorePayloadAccumulator.from_rows(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert aggregate.flagged_records() == serialized_strata
+    expected_flagged_rows = (
+        "| method_implied | vapour | internal-analytical | DP-101 | rejected | 1 |",
+    )
+    legacy_report = score_mod._render_score_report_from_payloads_legacy(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        store_stamp={"revision": "unknown"},
+        _aggregate=aggregate,
+    )
+    payload_report = score_mod.render_score_report_from_payloads(
+        (payload,),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        observations=context.observations,
+        origins=context.origins,
+    )
+    assert all(row in legacy_report for row in expected_flagged_rows)
+    assert all(row in payload_report for row in expected_flagged_rows)
     clean_residual = replace(
         residual,
         notices=tuple(
             notice
             for notice in residual.notices
-            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
+            if notice.kind is not NoticeKind.METHOD_IMPLIED
         ),
     )
 
@@ -5411,111 +5435,6 @@ def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:
     )
 
 
-@pytest.mark.parametrize(
-    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
-)
-def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unknown_method_still_refuses(
-    quantity: Quantity,
-) -> None:
-    from simulator.battery.score import (
-        flagged_strata,
-    )
-
-    experiment = _unknown_method_experiment()
-    identity = replace(
-        F.activity_identity(
-            formula="CaO",
-            T_K=Decimal("1823"),
-            endmember_phase=Phase.L,
-            component_basis="CaO",
-        ),
-        quantity=quantity,
-    )
-    activity = F.observation(
-        "published-cao-activity-unknown-method",
-        experiment.experiment_id,
-        identity,
-        Decimal("0.4"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="published-activity-work",
-    )
-    residual, _candidate = _compile(
-        activity,
-        experiment,
-        _predict(Decimal("0.3"), identity),
-        review="reviewed",
-    )
-
-    if quantity is Quantity.ACTIVITY_COEFFICIENT:
-        assert residual.status is ResidualStatus.REFUSED
-        assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
-        return
-
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.score_eligible is False
-    notice = next(
-        item
-        for item in residual.notices
-        if item.kind is NoticeKind.METHOD_ASSUMED
-    )
-    assert notice.reason.startswith("method_assumed:method_unknown; original_reason=")
-    assert notice.policy is not None
-    assert notice.policy.id == "DP-011"
-    assert notice.policy.version == 1
-    assert notice.policy.value == (
-        "infer from the printed quantity: equilibrium partial/saturation pressure "
-        "→ equilibrium comparison; flux or mass-loss rate → HKL with DP-005"
-    )
-    assert flagged_strata(residual.notices) == (NoticeKind.METHOD_ASSUMED.value,)
-
-    pressure_identities = (
-        (F.psat_identity("Na"), Decimal("0.1")),
-        (_partial_identity(), Decimal("1")),
-    )
-    for index, (pressure_identity, value) in enumerate(pressure_identities):
-        pressure = F.observation(
-            f"unknown-method-pressure-{index}",
-            experiment.experiment_id,
-            pressure_identity,
-            value,
-            evidence=EvidenceClass.MEASURED_DIRECT,
-            source_id="published-pressure-work",
-        )
-        refused, _candidate = _compile(
-            pressure,
-            experiment,
-            _predict(value, pressure_identity),
-            review="reviewed",
-        )
-        assert refused.status is ResidualStatus.REFUSED
-        assert refused.refusal is not None
-        assert refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
-
-    untyped_identity = replace(
-        identity,
-        reference_state=State.not_applicable("published reference state is absent"),
-    )
-    untyped_activity = F.observation(
-        "published-cao-activity-unknown-method-untyped-reference",
-        experiment.experiment_id,
-        untyped_identity,
-        Decimal("0.4"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="published-activity-work",
-    )
-    untyped_refused, _candidate = _compile(
-        untyped_activity,
-        experiment,
-        _predict(Decimal("0.3"), untyped_identity),
-        review="reviewed",
-    )
-    assert untyped_refused.status is ResidualStatus.REFUSED
-    assert untyped_refused.refusal is not None
-    assert untyped_refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
-
-
 def test_langmuir_alpha_does_not_require_exposed_area() -> None:
     exp = replace(
         F.tabulation_experiment(),
@@ -5551,7 +5470,7 @@ def test_langmuir_absolute_rate_defaults_area_from_runtime_crucible(quantity) ->
     assert geometry.detail["policy_id"] == "DP-007"
     assert geometry.detail["knob"] == "exposed_area_m2"
     assert geometry.detail["value"] == pytest.approx(expected_area)
-    assert geometry.detail["units"] == "m2"
+    assert geometry.detail["units"] == "m²"
     identity = replace(F.psat_identity("Mg"), quantity=quantity)
     reference = F.observation(
         f"langmuir-area-default-{quantity.value}",
@@ -5571,7 +5490,7 @@ def test_langmuir_absolute_rate_defaults_area_from_runtime_crucible(quantity) ->
     assert area_notice.policy.value == score_mod._dec_token(
         Decimal(str(expected_area))
     )
-    assert area_notice.policy.units == "m2"
+    assert area_notice.policy.units == "m²"
     assert score_mod.flagged_strata(notices) == (NoticeKind.KNOB_DEFAULTED.value,)
 
 
@@ -5916,12 +5835,13 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
         (Decimal("3.14e-7"), None),
     ),
 )
-def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
+def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
     quantity: Quantity,
     orifice_area: Decimal | None,
     clausing: Decimal | None,
 ) -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_stratum_payloads,
         flagged_stratum_rows,
         flagged_strata,
@@ -5948,11 +5868,8 @@ def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
     )
 
     gates = run_validity_gates(experiment, reference)
-    assert gates.passed
-    assert any(
-        check.name == "effusion_regime_assumed"
-        for check in gates.checks
-    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, _candidate = compile_residual(
         reference,
@@ -5972,32 +5889,17 @@ def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
     apparatus_notices = [
         item
         for item in residual.notices
-        if item.kind is NoticeKind.EFFUSION_REGIME_ASSUMED
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     ]
     assert any(
-        item.reason.startswith("effusion_regime_assumed:")
+        item.reason.startswith("apparatus_unverified:in_cell_partial_pressure_sum")
         for item in apparatus_notices
     )
-    method_notice = next(
-        item
+    assert any(
+        item.reason == "apparatus_unverified:geometry_determinants"
         for item in apparatus_notices
-        if item.reason.startswith("effusion_regime_assumed:")
     )
-    assert "molecular effusion inside the cell" in method_notice.reason
-    assert "vacuum outside" in method_notice.reason
-    assert "P_total(cell) = Σ measured partials" in method_notice.reason
-    assert "Never 1 atm" in method_notice.reason
-    assert "original_reason=" in method_notice.reason
-    assert method_notice.policy is not None
-    assert method_notice.policy.id == "DP-004"
-    assert method_notice.policy.version == 1
-    assert method_notice.policy.value == (
-        "molecular effusion inside the cell; vacuum outside; "
-        "P_total(cell) = Σ measured partials. Never 1 atm"
-    )
-    assert NoticeKind.EFFUSION_REGIME_ASSUMED.value in flagged_strata(
-        residual.notices
-    )
+    assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(residual.notices)
     assert headline_rows(
         (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
     )[0]["n"] == 0
@@ -6006,7 +5908,7 @@ def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
         for row in flagged_stratum_rows(
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
-    }[NoticeKind.EFFUSION_REGIME_ASSUMED.value] == 1
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
     payload = residual_to_plain(residual)
     for tier in ("measured", "compilation"):
         assert headline_payloads(
@@ -6017,7 +5919,7 @@ def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
         for row in flagged_stratum_payloads(
             (payload,), (Engine.INTERNAL_ANALYTICAL,)
         )
-    }[NoticeKind.EFFUSION_REGIME_ASSUMED.value] == 1
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
 
     valueless = replace(
         reference,
@@ -12327,16 +12229,22 @@ def test_static_lineage_memo_matches_the_prediction_source_relation(
     monkeypatch.setattr(
         score_mod, "_score_predict_with_engine", refusal_with_other_sources
     )
-    compiled_rows = _assert_score_store_matches_compile_jsonl(
+    # Alpha is in no declared set and this row is not an implied-alpha
+    # rewrite, so the score loop does not emit it. The predict path still
+    # records the foreign coefficient source as unknown.
+    scored, _candidates = score_store(
         context,
-        reference,
         engines=(Engine.VAPOROCK,),
+        include_diagnostics=False,
     )
-
-    assert (
-        compiled_rows[Engine.VAPOROCK][0].source_relation
-        is SourceRelation.UNKNOWN
+    assert scored == ()
+    compiled_residual, _compiled_candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        comparison_ids={reference.observation_id},
     )
+    assert compiled_residual.source_relation is SourceRelation.UNKNOWN
 
 
 def _printed_unresolved_observation(
@@ -15093,7 +15001,14 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     )
     default_partial = default_path.with_name(default_path.name + ".partial")
     default_rows = score_mod.load_residuals_jsonl(default_partial)
-    assert default_written == len(fixture_residuals)
+    # Internal-analytical does not declare S. The two relabeled entropy
+    # rows are capability-matrix cells, not residuals.
+    skipped_entropy = {
+        "fixture-scaled-max-first",
+        "fixture-scaled-max-second",
+    }
+    assert default_written == len(fixture_residuals) - len(skipped_entropy)
+    assert not any(row["reference"] in skipped_entropy for row in default_rows)
     assert score_mod.load_residuals_stamp(default_partial).get("static_refusals") is None
     assert any(row["reference"] == static_id for row in default_rows)
 
@@ -21320,23 +21235,45 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
 
+    context = _context(
+        F.work("fusion-work"),
+        experiment,
+        observation,
+        review="reviewed",
+    )
     residuals, _candidates = score_store(
-        _context(
-            F.work("fusion-work"),
-            experiment,
-            observation,
-            review="reviewed",
-        ),
+        context,
         engines=(Engine.MAGEMIN,),
         rail=Rail.THERMOCHEMISTRY,
         include_diagnostics=False,
     )
-    assert len(residuals) == 1
-    residual = residuals[0]
-    assert residual.rail is Rail.THERMOCHEMISTRY
-    assert residual.execution.state is ExecutionState.UNSUPPORTED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+    # MAGEMin does not compute fusion. The pair is a capability-matrix cell.
+    # predict_with_engine above still returns engine_does_not_report_fusion.
+    assert residuals == ()
+    from simulator.battery.engine_capability import capability_summary
+
+    summary = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=(Engine.MAGEMIN,),
+        scored_observation_ids=(),
+        n_records=0,
+        n_scored_records=0,
+        n_refused_records=0,
+    )
+    matrix = summary["capability_matrix"]
+    assert matrix["uncovered_pair_total"] == 1
+    assert matrix["rows"] == [
+        {
+            "covered": False,
+            "engine": Engine.MAGEMIN.value,
+            "n_observations": 1,
+            "quantity": quantity.value,
+            "rail": Rail.THERMOCHEMISTRY.value,
+        }
+    ]
+    assert matrix["quantities_no_engine_predicts"] == []
 
 
 @pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))

@@ -2226,18 +2226,18 @@ def predict_mass_loss_fraction(
             "area_shape_not_self_similar",
         }:
             raise
-        from simulator.equipment import (
-            DP_007_AREA_DEFAULT_SOURCE,
-            EquipmentDesigner,
-        )
+        from simulator.battery.default_policy import resolve
+        from simulator.equipment import DP_007_AREA_DEFAULT_SOURCE
 
         # Use the same face area the simulator's equipment designer assigns to
-        # an unconfigured crucible. A = pi(d/2)^2, with d derived from the
-        # sample-mass volume, is in m²; multiplying an HK flux in kg m⁻² s⁻¹
+        # an unconfigured crucible. The registry resolver owns the DP-007
+        # sample-mass context. Multiplying an HK flux in kg m⁻² s⁻¹
         # by it gives kg s⁻¹. As sample mass tends to zero, d and A tend to
         # zero too, so the default contributes no finite evaporation at zero
         # inventory. This is a named design default, never a fit to the row.
-        area_m2 = EquipmentDesigner().size_crucible(sample_mass_kg).melt_surface_area_m2
+        area_m2 = float(
+            resolve("DP-007", sample_mass_kg=sample_mass_kg).value
+        )
         observed_loss = float(observation.value.point)
         final_area_m2 = _self_similar_area_m2(area_m2, 1.0 - observed_loss, 1.0)
         area_uncertainty = 0.0
@@ -2249,7 +2249,7 @@ def predict_mass_loss_fraction(
     metadata: dict[str, str] = {}
     if area_default_reason is not None:
         flags.add(
-            f"knob_defaulted:area={area_m2:.17g} m2; "
+            f"knob_defaulted:area={area_m2:.17g} m²; "
             f"original_reason={area_default_reason}; "
             f"default_source={DP_007_AREA_DEFAULT_SOURCE}"
         )
