@@ -54,10 +54,9 @@ policies:
   history: []
 - id: DP-004
   condition: Knudsen-cell (KEMS / Knudsen mass loss) row; regime check cannot run
-  formula: molecular effusion inside the cell; vacuum outside; P_total(cell) = Σ measured
-    partials. Never 1 atm
-  formula_owner: simulator.battery.score._sum_gas_partial_pressures_pa
-  units: Pa
+  value: molecular effusion inside the cell; vacuum outside; total pressure is the sum of
+    partials in the cell, NOT 1 atm
+  units: method-implied conditions
   physical_basis: the method is defined by molecular effusion
   bias: if the regime is transitional, the measured P understates P_eq (the comment
     says why)

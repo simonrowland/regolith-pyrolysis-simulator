@@ -61,6 +61,7 @@ from simulator.battery.enums import (
     StateTag,
     ValueKind,
 )
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.identity import (
     Identity,
     log10K_from_delta_fG_kJ_mol,
@@ -96,26 +97,6 @@ KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
 # from an unsourced collision diameter. Without a located diameter, use the
 # ~10 Pa ceiling alone.
 KEMS_CELL_PRESSURE_MAX_PA = Decimal("10")
-
-# These DP values are temporary single-owner copies until the controller's
-# corrected registry commit lands. Keep their ids and version on each Notice.
-DP_004_METHOD_IMPLICATION = (
-    "molecular effusion inside the cell; vacuum outside; total pressure is "
-    "the sum of partials in the cell, NOT 1 atm"
-)
-DP_004_POLICY_ID = "DP-004"
-DP_005_ALPHA = "1"
-DP_005_POLICY_ID = "DP-005"
-DP_011_POLICY_ID = "DP-011"
-DP_018_METHOD_IMPLICATION = (
-    "vacuum outside; total pressure is the sum of partials in the cell, NOT 1 atm"
-)
-DP_018_POLICY_ID = "DP-018"
-DP_100_POLICY_ID = "DP-100"
-DP_100_VALUE = (
-    "retain numeric pressure residual; measured pressure is below equilibrium pressure"
-)
-DP_POLICY_VERSION = 1
 
 EFFUSION_REGIME_PREDICTION_FLAGS = frozenset(
     {
@@ -228,13 +209,13 @@ def apparatus_prediction_notices(
             )
         )
     if flag in EFFUSION_REGIME_PREDICTION_FLAGS:
+        # Knudsen cells are built for molecular effusion; when the check cannot
+        # run, DP-004 records that method-defined regime and its cell conditions.
         # DP-018 records the Knudsen method's fixed external vacuum and
         # in-cell total pressure convention separately from the DP-004 regime.
-        implied_conditions = DP_018_METHOD_IMPLICATION
-        implied_policy = _notice_policy(
-            DP_018_POLICY_ID,
-            value=implied_conditions,
-            units="method-implied condition units",
+        implied_conditions = str(resolve_default_policy("DP-004").value)
+        implied_policy = _notice_policy_from_registry(
+            "DP-018", method_condition=implied_conditions
         )
         notices.append(
             Notice(
@@ -260,45 +241,31 @@ def _apparatus_policy(
     """Attach the DP table identity to the notice that carries its flag."""
 
     if flag == NoticeKind.METHOD_ASSUMED.value:
-        return _notice_policy(
+        return _notice_policy_from_registry(
             "DP-011",
-            value=str(detail.get("assumed_method") or "inferred_from_quantity"),
-            units="method token",
+            inferred_method=str(
+                detail.get("assumed_method") or "inferred_from_quantity"
+            ),
         )
     if flag == NoticeKind.ALPHA_ASSUMED.value:
-        return _notice_policy(
-            DP_005_POLICY_ID, value=DP_005_ALPHA, units="dimensionless"
-        )
+        return _notice_policy_from_registry("DP-005")
     if flag == NoticeKind.EFFUSION_REGIME_ASSUMED.value:
-        return _notice_policy(
-            DP_004_POLICY_ID, value=DP_004_METHOD_IMPLICATION, units="Pa"
-        )
+        return _notice_policy_from_registry("DP-004")
     if flag == NoticeKind.EFFUSION_REGIME_VIOLATED.value:
         # DP-100 is proposed because the v1 table has no entry for contrary
         # regime evidence; these rows stay in their own proposed-policy tier.
-        return _notice_policy(
-            DP_100_POLICY_ID,
-            value=DP_100_VALUE,
-            units="Pa",
-            status="proposed",
-        )
+        return _notice_policy_from_registry("DP-100")
     return None
 
 
-def _notice_policy(
-    policy_id: str,
-    *,
-    value: str,
-    units: str,
-    status: str = "canonical",
+def _notice_policy_from_registry(
+    policy_id: str, **context: object
 ) -> NoticePolicy:
-    return NoticePolicy(
-        id=policy_id,
-        version=DP_POLICY_VERSION,
-        status=status,
-        value=value,
-        units=units,
-    )
+    resolved = resolve_default_policy(policy_id, **context)
+    policy = resolved.payload["policy"]
+    if not isinstance(policy, Mapping):
+        raise ValueError(f"{policy_id} did not resolve NoticePolicy metadata")
+    return NoticePolicy(**policy)
 
 _CALIBRATION_STANDARD_FIELDS = frozenset(
     {
@@ -1055,7 +1022,7 @@ def _method_assumption_detail(
                 "original_reason": method_reason,
             }
         if alpha_value is None:
-            alpha = DP_005_ALPHA
+            alpha = str(resolve_default_policy("DP-005").value)
             alpha_assumption = {
                 "alpha": alpha,
                 "physical_basis": "Hertz-Knudsen-Langmuir maximum flux",
