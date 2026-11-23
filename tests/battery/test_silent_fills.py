@@ -45,7 +45,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EngineHandle,
     Po2Request,
     _DEFAULT_FO2_LOG,
-    DP_101_PRESSURE_BAR,
+    DP_019_VACUUM_BOUNDARY_BAR,
     _fo2_log_for_request,
     equilibrate_cell,
 )
@@ -822,16 +822,18 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
     assert seen["wt"] == {"Na": 100.0}
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
-    assert seen["pressure_bar"] == pytest.approx(DP_101_PRESSURE_BAR)
+    assert seen["pressure_bar"] == pytest.approx(DP_019_VACUUM_BOUNDARY_BAR)
     reasons = [notice.reason for notice in prediction.notices]
     assert any("pure condensed substance Na (l)" in reason for reason in reasons)
     assert any("p_sat does not take oxygen" in reason and "omitted" in reason for reason in reasons)
     assert any(
-        notice.kind is NoticeKind.ASSUMED_PRESSURE
+        notice.kind is NoticeKind.METHOD_IMPLIED
         and "observation does not carry total_pressure_Pa" in notice.reason
         and notice.policy is not None
         and notice.policy.id == "DP-101"
-        and notice.policy.value == f"{DP_101_PRESSURE_BAR:g}"
+        and notice.policy.version == 1
+        and notice.policy.status == "rejected"
+        and notice.policy.value == "1e-6"
         and notice.policy.units == "bar"
         for notice in prediction.notices
     )
@@ -845,7 +847,7 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
     )
     obs = F.observation("no-p", "exp", ident, Decimal("0.2"))
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
-    assert seen["pressure_bar"] == pytest.approx(DP_101_PRESSURE_BAR)
+    assert seen["pressure_bar"] == pytest.approx(DP_019_VACUUM_BOUNDARY_BAR)
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
     assert any(
@@ -855,11 +857,13 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
         for notice in prediction.notices
     )
     assert any(
-        notice.kind is NoticeKind.ASSUMED_PRESSURE
+        notice.kind is NoticeKind.METHOD_IMPLIED
         and "does not carry total_pressure_Pa" in notice.reason
         and notice.policy is not None
         and notice.policy.id == "DP-101"
-        and notice.policy.value == f"{DP_101_PRESSURE_BAR:g}"
+        and notice.policy.version == 1
+        and notice.policy.status == "rejected"
+        and notice.policy.value == "1e-6"
         and notice.policy.units == "bar"
         for notice in prediction.notices
     )

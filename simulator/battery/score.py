@@ -45,6 +45,7 @@ from typing import (
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.battery.default_policy import load_policy_table
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
@@ -249,7 +250,6 @@ from simulator.battery.score_report import (
     _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
     format_assumed_band_report,
-    format_default_policy_census_report,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
@@ -257,7 +257,6 @@ from simulator.battery.score_report import (
 )
 from simulator.battery.score_report_data import (
     AssumedBandReport,
-    default_policy_census,
     eligibility_failure_census,
     element_retention_report_data,
 )
@@ -330,15 +329,11 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.battery.validity import (
-    APPARATUS_PREDICTION_FLAGS,
-    APPARATUS_PREDICTION_NOTICE_KINDS,
-    APPARATUS_REGIME_NOTICE_KINDS,
     GateCheck,
     GateOutcome,
     KEMS_GEOMETRY_FACTS,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
-    apparatus_prediction_notices,
     apparatus_geometry_interval_notice,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
@@ -610,7 +605,6 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
-FLAGGED_STRATUM_METHOD_IMPLIED = NoticeKind.METHOD_IMPLIED.value
 FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
@@ -629,7 +623,6 @@ FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
-FLAGGED_STRATUM_ASSUMED_PRESSURE = NoticeKind.ASSUMED_PRESSURE.value
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -2205,43 +2198,11 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
-    evidence_class = reference.evidence.class_
-    is_source_observation = not (
-        evidence_class.is_value
-        and evidence_class.value
-        in {EvidenceClass.MODEL_DERIVED, EvidenceClass.ENGINE_PREDICTION}
-    )
-    notices: list[Notice] = []
-    if is_source_observation:
-        for check in gates.checks:
-            detail = check.detail if isinstance(check.detail, Mapping) else {}
-            prediction_notices = apparatus_prediction_notices(
-                detail.get("flag"),
-                detail,
-                check_name=check.name,
-                quantity=quantity,
-                origin=reference.observation_id,
-            )
-            notices.extend(prediction_notices)
-    has_unflagged_gate_failure = any(
-        not check.passed
-        and not (
-            isinstance(check.detail, Mapping)
-            and check.detail.get("flag") in APPARATUS_PREDICTION_FLAGS
-        )
-        for check in gates.checks
-    )
     author_reported_pressure = (
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        and (
-            (
-                evidence_class.is_value
-                and evidence_class.value in MEASURED_EVIDENCE
-            )
-            or reference.evidence.original_method_class
-            in {"measured", "measured_direct", "measured_tabulated"}
-        )
+        and reference.evidence.original_method_class
+        in {"measured", "measured_direct", "measured_tabulated"}
     )
     author_reported_activity = (
         (
@@ -2280,7 +2241,7 @@ def _unverified_apparatus_notices(
         not experiment.method.is_value
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
-        return () if has_unflagged_gate_failure else tuple(notices)
+        return ()
     kems_activity = (
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
@@ -2322,7 +2283,7 @@ def _unverified_apparatus_notices(
         or calibration_flagged_partial_pressure
         or calibration_flagged_activity
     ):
-        return () if has_unflagged_gate_failure else tuple(notices)
+        return ()
     allow_calibration = (
         author_reported_pressure
         or kems_activity
@@ -2337,8 +2298,6 @@ def _unverified_apparatus_notices(
         detail = check.detail
         if not isinstance(detail, Mapping):
             detail = {}
-        if detail.get("flag") in APPARATUS_PREDICTION_FLAGS:
-            continue
         if check.passed:
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
@@ -2363,7 +2322,8 @@ def _unverified_apparatus_notices(
             return ()
         missing[fact] = detail
     if not missing:
-        return tuple(notices)
+        return ()
+    notices: list[Notice] = []
     for fact in sorted(missing):
         detail = missing[fact]
         if fact == "in_cell_partial_pressure_sum":
@@ -2521,28 +2481,42 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
-    strata = list(_classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason, notice.policy) for notice in notices)
-    ))
+    strata = _classify_flagged_notice_facts(
+        tuple((notice.kind.value, notice.reason) for notice in notices)
+    )
     if (
-        any(notice.policy is not None and notice.policy.status == "proposed" for notice in notices)
+        _has_proposed_policy(notices)
         and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
     ):
-        strata.append(FLAGGED_STRATUM_PROPOSED_POLICY)
-    return tuple(strata)
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
+
+
+def _has_proposed_policy(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> bool:
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is not None and notice.policy.status == "proposed":
+                return True
+        elif isinstance(notice, Mapping):
+            policy = notice.get("policy")
+            if isinstance(policy, Mapping) and policy.get("status") == "proposed":
+                return True
+    return False
 
 
 def _classify_flagged_notice_facts(
-    notices: Sequence[tuple[str, object, Mapping[str, str] | None]],
+    notices: Sequence[tuple[str, object]],
 ) -> tuple[str, ...]:
     strata: list[str] = []
-    kinds = {kind for kind, _reason, _policy in notices}
+    kinds = {kind for kind, _reason in notices}
     policy_flags = kinds & _DEFAULT_POLICY_FLAG_VALUES
     if policy_flags:
         strata.extend(sorted(policy_flags))
     unverified_apparatus = tuple(
         reason
-        for kind, reason, _policy in notices
+        for kind, reason in notices
         if kind == NoticeKind.UNVERIFIED_APPARATUS.value
     )
     if any(_is_calibration_not_grounded_reason(reason) for reason in unverified_apparatus):
@@ -2552,31 +2526,6 @@ def _classify_flagged_notice_facts(
         for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    prediction_kinds = kinds & {
-        kind.value for kind in APPARATUS_PREDICTION_NOTICE_KINDS
-    }
-    if (
-        prediction_kinds
-        and FLAGGED_STRATUM_UNVERIFIED_APPARATUS not in strata
-    ):
-        strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    if NoticeKind.METHOD_ASSUMED.value in prediction_kinds:
-        strata.append(NoticeKind.METHOD_ASSUMED.value)
-    if NoticeKind.ALPHA_ASSUMED.value in prediction_kinds:
-        strata.append(NoticeKind.ALPHA_ASSUMED.value)
-    if NoticeKind.EFFUSION_REGIME_ASSUMED.value in prediction_kinds:
-        strata.append(NoticeKind.EFFUSION_REGIME_ASSUMED.value)
-    if NoticeKind.EFFUSION_REGIME_VIOLATED.value in prediction_kinds:
-        strata.append(NoticeKind.EFFUSION_REGIME_VIOLATED.value)
-        if any(
-            kind == NoticeKind.EFFUSION_REGIME_VIOLATED.value
-            and policy is not None
-            and policy.get("status") == "proposed"
-            for kind, _reason, policy in notices
-        ):
-            strata.append(FLAGGED_STRATUM_PROPOSED_POLICY)
-    if NoticeKind.METHOD_IMPLIED.value in prediction_kinds:
-        strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
@@ -2587,17 +2536,17 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
-        for kind, reason, _policy in notices
+        for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(reason) for _kind, reason, _policy in notices):
+    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
         and reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED}:")
-        for _kind, reason, _policy in notices
+        for _kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED)
     if any(
@@ -2605,24 +2554,19 @@ def _classify_flagged_notice_facts(
         and reason.startswith(
             f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
         )
-        for _kind, reason, _policy in notices
+        for _kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
     if any(
         kind == NoticeKind.FIGURE_ONLY.value
         and (reason == "figure_only" or reason.startswith("figure_only:"))
-        for kind, reason, _policy in notices
+        for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.APPROXIMATE_VALUE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
-    if (
-        NoticeKind.ASSUMED_PRESSURE.value in kinds
-        and FLAGGED_STRATUM_ASSUMED_PRESSURE not in strata
-    ):
-        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -6143,29 +6087,10 @@ def _derive_kems_partial_pressure_band(
             observation, experiment
         ):
             continue
-        gates = run_validity_gates(
-            experiment,
-            observation,
-            point_observations=point_observations_by_experiment.get(
-                observation.experiment_id, ()
-            ),
+        strata = _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment, benches
         )
-        bench = (
-            None
-            if experiment is None or experiment.bench_id is None
-            else benches.get(experiment.bench_id)
-        )
-        notices = _flagged_stratum_notices(observation, experiment, gates, bench)
-        # This band describes the source's pressure-reading precision. A
-        # separate regime flag qualifies the equilibrium-pressure assumption;
-        # it does not erase a printed instrument-precision envelope. Other
-        # flagged strata still keep a row out of the band population.
-        band_blocking_notices = tuple(
-            notice
-            for notice in notices
-            if notice.kind not in APPARATUS_PREDICTION_NOTICE_KINDS
-        )
-        if any(flagged_strata((notice,)) for notice in band_blocking_notices):
+        if strata:
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -8272,24 +8197,27 @@ def _activity_request_or_contract_refusal(
     )
 
 
-# TODO(t-1924c): replace the rejected proposal with the method-specific policy.
-_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID = "DP-101"
+# TODO(t-1924c): replace the transitional missing-pressure path with the
+# method-specific DP-001/DP-019 policy while retaining its current pressure.
 
 
 def _assumption_notice(
     quantity: Quantity, reason: str, pressure_bar: float
 ) -> Notice:
+    policy_row = load_policy_table()["DP-101"]
+    if Decimal(str(pressure_bar)) != Decimal(str(policy_row["value"])):
+        raise ValueError("transitional pressure does not match rejected DP-101")
     return Notice(
-        kind=NoticeKind.ASSUMED_PRESSURE,
+        kind=NoticeKind(str(policy_row["flag"])),
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
         policy=NoticePolicy(
-            id=_TRANSITIONAL_REJECTED_PRESSURE_POLICY_ID,
-            version="v1",
-            status="proposed",
-            value=f"{pressure_bar:g}",
-            units="bar",
+            id=str(policy_row["id"]),
+            version=policy_row["version"],
+            status=str(policy_row["status"]),
+            value=str(policy_row["value"]),
+            units=str(policy_row["units"]),
         ),
     )
 
@@ -10225,13 +10153,15 @@ def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
 ) -> tuple[float, Notice | None, str | None]:
-    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+    """Observation pressure in bar, or the transitional DP-101 value.
 
     A present but non-finite or negative pressure is invalid. It is not
-    replaced by the assumption.
+    replaced by this fallback.
     """
 
-    from simulator.diagnostic_helpers.binary_pot_battery import DP_101_PRESSURE_BAR
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        DP_019_VACUUM_BOUNDARY_BAR,
+    )
 
     state = identity.total_pressure_Pa
     if state is not None and state.is_value and state.value is not None:
@@ -10242,14 +10172,14 @@ def total_pressure_bar_for_score(
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
-    # Keep the existing finite low-pressure engine boundary visible as an
-    # assumption, not as a pressure supplied by the source.
+    # Keep the current engine input for t-1924c, while DP-101 marks this
+    # general missing-pressure fallback as rejected in the audit record.
     notice = _assumption_notice(
         quantity,
         detail,
-        DP_101_PRESSURE_BAR,
+        DP_019_VACUUM_BOUNDARY_BAR,
     )
-    return float(DP_101_PRESSURE_BAR), notice, None
+    return float(DP_019_VACUUM_BOUNDARY_BAR), notice, None
 
 
 _IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
@@ -18145,57 +18075,9 @@ def _compile_residual_with_lineage(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("identity_equal",),
         )
-    has_legacy_apparatus_flag = any(
+    apparatus_flagged = any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in flagged_notices
     )
-    has_apparatus_prediction_flag = any(
-        notice.kind in APPARATUS_PREDICTION_NOTICE_KINDS for notice in flagged_notices
-    )
-    # New prediction flags waive only their own gate failures, so an unusable
-    # composition still blocks the engine call. Legacy apparatus notices keep
-    # their existing scoring behavior for the separately owned apparatus gate.
-    apparatus_flagged = has_legacy_apparatus_flag or (
-        has_apparatus_prediction_flag
-        and all(
-            check.passed
-            or (
-                isinstance(check.detail, Mapping)
-                and check.detail.get("flag") in APPARATUS_PREDICTION_FLAGS
-            )
-            for check in gates.checks
-        )
-    )
-    unusable_composition = next(
-        (
-            check.detail
-            for check in gates.checks
-            if isinstance(check.detail, Mapping)
-            and check.detail.get("composition_scope_details")
-        ),
-        None,
-    )
-    if (
-        apparatus_flagged
-        and isinstance(identity, Identity)
-        and identity.composition is not None
-        and identity.composition.is_value
-        and unusable_composition is not None
-    ):
-        # An apparatus default cannot make a malformed composition usable.
-        # The gate already owns the typed component diagnostics; preserve them
-        # as the refusal reason instead of letting source-oxygen resolution
-        # consume a raw, nonnumeric component amount.
-        return _refused(
-            RefusalReason.INVALID_SOURCE,
-            {
-                "reason": "composition_not_usable_for_engine_prediction",
-                "composition_scope_details": list(
-                    unusable_composition["composition_scope_details"]
-                ),
-            },
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-            exclusions=("usable_composition",),
-        )
     scoring_gates = (
         replace(gates, passed=True, reason=None, primary_check=None)
         if apparatus_flagged
@@ -18538,7 +18420,6 @@ def _compile_residual_with_lineage(
         point_composition_notice is not None
         and _point_composition is not None
         and prediction.requested_composition == _point_composition
-        and prediction.value is not None
         and not oxide_identity_echo
     ):
         notices = union_notices(notices, (point_composition_notice,))
@@ -19293,7 +19174,6 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
-    band_preserving_kinds.update(APPARATUS_REGIME_NOTICE_KINDS)
     initial_charge_figure_band = (
         numeric.decision_band is not None
         and numeric.decision_band.band_basis == "row_printed"
@@ -23159,22 +23039,47 @@ def _optional_decimal(value: Decimal | None) -> str | None:
     return None if value is None else str(value)
 
 
-def _policy_ids_for_stratum(
+def _policies_for_stratum(
     notices: Iterable[Notice | Mapping[str, object]], stratum: str
-) -> tuple[str | None, ...]:
-    policy_ids: set[str] = set()
+) -> tuple[tuple[str | None, str | None], ...]:
+    policies: set[tuple[str, str]] = set()
     for notice in notices:
         if isinstance(notice, Notice):
-            if notice.kind.value != stratum or notice.policy is None:
+            policy = notice.policy
+            if policy is None:
                 continue
-            policy_ids.add(notice.policy.id)
-            continue
-        if notice.get("kind") != stratum:
+            if (
+                notice.kind.value == stratum
+                or stratum == FLAGGED_STRATUM_PROPOSED_POLICY
+                and policy.status == "proposed"
+            ):
+                policies.add((policy.id, policy.status))
             continue
         policy = notice.get("policy")
-        if isinstance(policy, Mapping) and policy.get("id") is not None:
-            policy_ids.add(str(policy["id"]))
-    return tuple(sorted(policy_ids)) or (None,)
+        if not isinstance(policy, Mapping):
+            continue
+        policy_id = policy.get("id")
+        policy_status = policy.get("status")
+        matches_stratum = notice.get("kind") == stratum
+        matches_proposed_stratum = (
+            stratum == FLAGGED_STRATUM_PROPOSED_POLICY
+            and policy_status == "proposed"
+        )
+        if matches_stratum or matches_proposed_stratum:
+            if (
+                set(policy) != {"id", "version", "status", "value", "units"}
+                or not isinstance(policy_id, str)
+                or not policy_id.startswith("DP-")
+                or policy_status not in {"canonical", "proposed", "rejected"}
+                or not isinstance(policy.get("version"), (int, str))
+                or not str(policy.get("version"))
+                or not isinstance(policy.get("units"), str)
+                or not policy.get("units")
+                or policy.get("value") is None
+            ):
+                raise ValueError("default-policy notice metadata is malformed")
+            policies.add((policy_id, str(policy_status)))
+    return tuple(sorted(policies)) or ((None, None),)
 
 
 def flagged_stratum_rows(
@@ -23184,18 +23089,25 @@ def flagged_stratum_rows(
 ) -> list[dict[str, object]]:
     """Summarize numeric flagged diagnostics without a decision band."""
 
-    groups: dict[tuple[str, str, str, str | None], list[Residual]] = {}
+    groups: dict[
+        tuple[str, str, str, str | None, str | None], list[Residual]
+    ] = {}
     for residual in residuals:
         if residual.rail is None or residual.numeric is None:
             continue
         engine = _engine_of(residual)
         for stratum in flagged_strata(residual.notices):
-            for policy_id in _policy_ids_for_stratum(residual.notices, stratum):
+            for policy_id, policy_status in _policies_for_stratum(
+                residual.notices, stratum
+            ):
                 groups.setdefault(
-                    (stratum, residual.rail.value, engine, policy_id), []
+                    (stratum, residual.rail.value, engine, policy_id, policy_status), []
                 ).append(residual)
     rows: list[dict[str, object]] = []
-    for (stratum, rail, engine, policy_id), bucket in sorted(groups.items()):
+    for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
+        groups.items(),
+        key=lambda item: _flagged_census_sort_key(item[0]),
+    ):
         dex_values = [
             residual.numeric.value
             for residual in bucket
@@ -23212,8 +23124,15 @@ def flagged_stratum_rows(
         }
         if policy_id is not None:
             row["policy_id"] = policy_id
+            row["policy_status"] = policy_status
         rows.append(row)
     return rows
+
+
+def _flagged_census_sort_key(
+    key: tuple[str, str, str, str | None, str | None],
+) -> tuple[str, ...]:
+    return tuple("" if value is None else value for value in key)
 
 
 def headline_records(
@@ -24084,7 +24003,6 @@ def _render_score_report_from_payloads_legacy(
     _aggregate: _ScorePayloadAccumulator | None = None,
     shard_failures: Sequence[Mapping[str, object]] = (),
 ) -> str:
-    policy_census = default_policy_census(rows)
     aggregate = _aggregate or _ScorePayloadAccumulator.from_rows(
         rows, context=context, engines=engines
     )
@@ -24122,7 +24040,12 @@ def _render_score_report_from_payloads_legacy(
         eligibility_census=eligibility_census,
         headline_rows=aggregate.headline_records(engines=report_engines),
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
-        flagged_rows=aggregate.flagged_records(),
+        flagged_rows=flagged_stratum_payloads(
+            rows,
+            engines,
+            hulls=aggregate.headline_hulls,
+            observations=context.observations,
+        ),
         condition_lines=aggregate.condition_hull_lines(),
         compilation_lines=aggregate.compilation_lines(engines=engines),
         refusal_counts=aggregate.refusal_counts,
@@ -24145,7 +24068,7 @@ def _render_score_report_from_payloads_legacy(
             + "\n"
         )
     report = format_assumed_band_report(report, aggregate.assumed_bands.payload())
-    return format_default_policy_census_report(report, policy_census)
+    return report
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -24468,25 +24391,16 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
                 "policy-bearing notice kind must name its default-policy flag"
             )
     notices = tuple(
-        (
-            str(notice.get("kind") or ""),
-            notice.get("reason"),
-            notice.get("policy") if isinstance(notice.get("policy"), Mapping) else None,
-        )
+        (str(notice.get("kind") or ""), notice.get("reason"))
         for notice in raw_notices
     )
-    strata = list(_classify_flagged_notice_facts(notices))
+    strata = _classify_flagged_notice_facts(notices)
     if (
-        any(
-            notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
-            and isinstance(notice.get("policy"), Mapping)
-            and notice["policy"].get("status") == "proposed"
-            for notice in raw_notices
-        )
+        _has_proposed_policy(raw_notices)
         and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
     ):
-        strata.append(FLAGGED_STRATUM_PROPOSED_POLICY)
-    return tuple(strata)
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:
@@ -24896,8 +24810,10 @@ def flagged_stratum_payloads(
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
     observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
-    groups: dict[tuple[str, str, str, str | None], list[Decimal]] = {}
-    counts: dict[tuple[str, str, str, str | None], int] = {}
+    groups: dict[
+        tuple[str, str, str, str | None, str | None], list[Decimal]
+    ] = {}
+    counts: dict[tuple[str, str, str, str | None, str | None], int] = {}
     engine_names = {engine.value for engine in engines}
     for row in rows:
         numeric = row.get("numeric")
@@ -24918,8 +24834,10 @@ def flagged_stratum_payloads(
             if isinstance(notice, Mapping)
         )
         for stratum in _flagged_payload_strata(row):
-            for policy_id in _policy_ids_for_stratum(notices, stratum):
-                key = (stratum, rail, engine, policy_id)
+            for policy_id, policy_status in _policies_for_stratum(
+                notices, stratum
+            ):
+                key = (stratum, rail, engine, policy_id, policy_status)
                 counts[key] = counts.get(key, 0) + 1
                 if hulls is not None:
                     from simulator.battery.compilation_tier import reference_observation
@@ -24928,7 +24846,10 @@ def flagged_stratum_payloads(
                     hull_key = (
                         f"flagged:{stratum}"
                         if policy_id is None
-                        else f"flagged:{stratum}:policy={policy_id}"
+                        else (
+                            f"flagged:{stratum}:policy={policy_id}"
+                            f":status={policy_status}"
+                        )
                     )
                     hulls.setdefault(
                         (hull_key, rail, engine), _ConditionHull()
@@ -24950,20 +24871,42 @@ def flagged_stratum_payloads(
             "stratum": stratum,
             "rail": rail,
             "engine": engine,
-            "n": counts[(stratum, rail, engine, policy_id)],
+            "n": counts[(stratum, rail, engine, policy_id, policy_status)],
             "median_dex": (
                 None
-                if not groups.get((stratum, rail, engine, policy_id))
-                else str(_median(groups[(stratum, rail, engine, policy_id)]))
+                if not groups.get(
+                    (stratum, rail, engine, policy_id, policy_status)
+                )
+                else str(
+                    _median(
+                        groups[
+                            (stratum, rail, engine, policy_id, policy_status)
+                        ]
+                    )
+                )
             ),
             "rms_dex": (
                 None
-                if not groups.get((stratum, rail, engine, policy_id))
-                else str(_rms(groups[(stratum, rail, engine, policy_id)]))
+                if not groups.get(
+                    (stratum, rail, engine, policy_id, policy_status)
+                )
+                else str(
+                    _rms(
+                        groups[
+                            (stratum, rail, engine, policy_id, policy_status)
+                        ]
+                    )
+                )
             ),
-            **({"policy_id": policy_id} if policy_id is not None else {}),
+            **(
+                {"policy_id": policy_id, "policy_status": policy_status}
+                if policy_id is not None
+                else {}
+            ),
         }
-        for stratum, rail, engine, policy_id in sorted(counts)
+        for stratum, rail, engine, policy_id, policy_status in sorted(
+            counts, key=_flagged_census_sort_key
+        )
     ]
 
 
@@ -25220,8 +25163,6 @@ class _ScorePayloadAccumulator:
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
-        self.flagged_counts: dict[tuple[str, str, str], int] = defaultdict(int)
-        self.flagged_values: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
@@ -25595,26 +25536,6 @@ class _ScorePayloadAccumulator:
                 flagged=flagged,
                 numeric_value=numeric_value,
             )
-        numeric = row.get("numeric")
-        rail = str(row.get("rail") or "")
-        if (
-            isinstance(numeric, Mapping)
-            and rail
-            and (not self.engine_names or engine in self.engine_names)
-        ):
-            dex = (
-                numeric.get("value")
-                if numeric.get("operation") == MetricOperation.DEX.value
-                else None
-            )
-            for stratum in flags:
-                key = (stratum, rail, engine)
-                self.flagged_counts[key] += 1
-                self.headline_hulls.setdefault(
-                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
-                ).add(reference, metadata.observation)
-                if dex is not None and numeric_value is not None:
-                    self.flagged_values[key].append(numeric_value)
         exclusions_tuple = tuple(exclusions or ())
         if "admission_admitted" in exclusions_tuple:
             self.admission_with += 1
@@ -25751,27 +25672,6 @@ class _ScorePayloadAccumulator:
                     }
                 )
             record["decision_strata"] = strata
-
-    def flagged_records(self) -> list[dict[str, object]]:
-        return [
-            {
-                "stratum": stratum,
-                "rail": rail,
-                "engine": engine,
-                "n": self.flagged_counts[(stratum, rail, engine)],
-                "median_dex": (
-                    None
-                    if not self.flagged_values.get((stratum, rail, engine))
-                    else str(_median(self.flagged_values[(stratum, rail, engine)]))
-                ),
-                "rms_dex": (
-                    None
-                    if not self.flagged_values.get((stratum, rail, engine))
-                    else str(_rms(self.flagged_values[(stratum, rail, engine)]))
-                ),
-            }
-            for stratum, rail, engine in sorted(self.flagged_counts)
-        ]
 
     def condition_hull_lines(self) -> list[str]:
         return _condition_hull_lines(
@@ -25913,7 +25813,6 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
-    policy_census = default_policy_census(rows)
     eligibility_census = eligibility_failure_census(
         rows,
         conjunct_names=SCORE_ELIGIBLE_CONJUNCTS,
@@ -26030,7 +25929,6 @@ def render_score_report_from_payloads(
     report = format_assumed_band_report(
         report, _assumed_band_summary(rows, observations)
     )
-    report = format_default_policy_census_report(report, policy_census)
     if observations is None:
         return report
     pair_context = ScoreContext({}, {}, observations, origins or {})

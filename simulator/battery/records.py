@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
@@ -1068,13 +1068,6 @@ class Notice:
             raise ValueError("Notice.reason is required")
         if not self.origin:
             raise ValueError("Notice.origin is required")
-        if self.policy is not None:
-            required_policy_fields = {"id", "version", "status", "value", "units"}
-            if not isinstance(self.policy, Mapping) or set(self.policy) != required_policy_fields:
-                raise TypeError("Notice.policy must contain id, version, status, value, and units")
-            if any(not isinstance(value, str) or not value for value in self.policy.values()):
-                raise TypeError("Notice.policy values must be nonempty strings")
-            object.__setattr__(self, "policy", dict(self.policy))
         if self.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION:
             if self.authority is not Authority.CONVENTION:
                 raise ValueError(
@@ -1084,12 +1077,14 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
-        if self.policy is not None and self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
-            raise ValueError("policy notice kind must name a default-policy flag")
-        if self.policy is not None and not self.policy.id.startswith("DP-"):
-            raise ValueError("Notice.policy.id must be a DP id")
-        if self.kind is NoticeKind.ASSUMED_PRESSURE and self.policy is None:
-            raise ValueError("assumed_pressure requires policy metadata")
+        if self.policy is not None:
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
+        if self.kind in {NoticeKind.ASSUMED_PRESSURE, NoticeKind.METHOD_IMPLIED}:
+            if self.policy is None:
+                raise ValueError(f"{self.kind.value} requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
