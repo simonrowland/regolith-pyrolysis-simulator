@@ -289,6 +289,12 @@ def expected_summary(manifest, records):
         ),
         "ambiguity_count": len(ambiguities),
         "correction_count": len(manifest["corrections"]),
+        "image_verified_correction_count": sum(
+            item["action"] == "image_verified_correction" for item in manifest["corrections"]
+        ),
+        "image_verified_locator_count": sum(
+            item["action"] == "image_verified_locator" for item in manifest["corrections"]
+        ),
     }
 
 
@@ -313,6 +319,13 @@ def test_manifest_table_census_and_phase_record_count(compilation):
         "pdf_page": 433,
         "reason": "visually blank",
     }
+
+
+def test_manifest_correction_total_mutation_is_detected(compilation):
+    manifest, records = compilation
+    mutated = copy.deepcopy(manifest)
+    mutated["summary"]["correction_count"] -= 1
+    assert mutated["summary"] != expected_summary(mutated, records)
 
 
 def test_every_numeric_token_round_trips_to_page_layout(compilation, source_layout):
@@ -388,6 +401,76 @@ def test_image_verified_corrections_and_mutation_probe(compilation):
     cell["value"] = 10900.0
     with pytest.raises(AssertionError):
         _assert_image_verified_corrections(mutated)
+
+
+def _assert_image_verified_locators(manifest, records):
+    by_id = {record["record_id"]: record for record in records}
+    locators = [
+        item
+        for item in manifest["corrections"]
+        if item.get("action") == "image_verified_locator"
+    ]
+    assert len(locators) == manifest["summary"]["image_verified_locator_count"] == 4
+    for item in locators:
+        assert item["published_page"] is not None
+        assert item["pdf_page"] is not None
+        assert item["ocr_token"] == item["printed_token"]
+        assert item["correction_provenance"] == "image_read_reconstruction"
+        assert item["printed_token"] in item["image_quote"]
+        record = by_id[item["record_id"]]
+        row, = [
+            row for row in record["rows"]
+            if row["source_text_line"] == item["source_text_line"]
+        ]
+        cell = row["cells"][item["column"]]
+        assert cell["layout_as_extracted"] == item["ocr_token"]
+        assert cell["as_published"] == item["printed_token"]
+        assert cell["value"] == item["value"]
+        assert cell["ocr_suspect"] is False
+    corrected_formula_tokens = (
+        (603, "$SrHgO \\cdot 4CO_{2} \\cdot 5H_{2}O$", "$5MgO \\cdot 4CO_{2} \\cdot 5H_{2}O$"),
+        (605, "$Hg_{2}(OH)_{2}CO_{3} \\cdot 3H_{2}O$", "$Mg_{2}(OH)_{2}CO_{3} \\cdot 3H_{2}O$"),
+    )
+    record = by_id[f"{SOURCE_ID}-0003"]
+    for line, extracted, printed in corrected_formula_tokens:
+        row, = [row for row in record["rows"] if row["source_text_line"] == line]
+        cell = row["cells"]["name_and_formula"]
+        assert cell["layout_as_extracted"] == extracted
+        assert cell["as_published"] == printed
+
+
+def test_image_verified_locators_preserve_original_tokens_and_mutation_probe(compilation):
+    manifest, records = compilation
+    _assert_image_verified_locators(manifest, records)
+    mutated_manifest = copy.deepcopy(manifest)
+    locator = next(
+        item
+        for item in mutated_manifest["corrections"]
+        if item.get("action") == "image_verified_locator"
+    )
+    del locator["pdf_page"]
+    with pytest.raises(AssertionError):
+        _assert_image_verified_locators(mutated_manifest, records)
+
+    mutated = copy.deepcopy(records)
+    target = next(record for record in mutated if record["record_id"] == f"{SOURCE_ID}-0003")
+    cell = next(row for row in target["rows"] if row["source_text_line"] == 602)["cells"][
+        "entropy_s298"
+    ]
+    del cell["layout_as_extracted"]
+    with pytest.raises(AssertionError):
+        _assert_image_verified_locators(manifest, mutated)
+
+    mutated_formula = copy.deepcopy(records)
+    target = next(
+        record for record in mutated_formula if record["record_id"] == f"{SOURCE_ID}-0003"
+    )
+    cell = next(row for row in target["rows"] if row["source_text_line"] == 603)["cells"][
+        "name_and_formula"
+    ]
+    del cell["layout_as_extracted"]
+    with pytest.raises(AssertionError):
+        _assert_image_verified_locators(manifest, mutated_formula)
 
 
 def _unsuspect_adjacent_entropy_reversals(records):
@@ -747,6 +830,20 @@ def test_corrections_ledger_covers_withheld_numeric_values(compilation):
     withheld = set()
     for item in manifest["corrections"]:
         record = by_id[item["record_id"]]
+        if item["action"] == "image_verified_locator":
+            rows = [
+                row for row in record["rows"] if row["source_text_line"] == item["source_text_line"]
+            ]
+            assert len(rows) == 1, item
+            cell = rows[0]["cells"][item["column"]]
+            assert item["pdf_page"] is not None
+            assert item["published_page"] is not None
+            assert item["ocr_token"] == item["printed_token"]
+            assert cell["layout_as_extracted"] == item["ocr_token"]
+            assert cell["as_published"] == item["printed_token"]
+            assert cell["value"] == item["value"]
+            assert cell["ocr_suspect"] is False
+            continue
         if item["action"] == "image_verified_correction":
             rows = [
                 row for row in record["rows"] if row["source_text_line"] == item["source_text_line"]

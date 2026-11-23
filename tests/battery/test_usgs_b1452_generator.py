@@ -39,11 +39,11 @@ RECORDS_DIR = COMPILATION_ROOT / "records"
 ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
-# t-1620 parses the terbium decimals; blank-FW formula-line entropies are excluded.
-B1452_RAW = 55704
+# t-1620 parses the terbium decimals; empty cells are outside the token census.
+B1452_RAW = 54101
 B1452_STORED = 15226
 B1452_REFUSED = 19642
-B1452_EXCLUDED = 20836
+B1452_EXCLUDED = 19233
 B1452_MERGED_PROPOSED = 457
 B1452_MERGED_STORED = 376
 B1452_MERGED_REFUSED = 15
@@ -453,10 +453,12 @@ def test_merged_two_dot_entropy_splits_on_grain() -> None:
 
 def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() -> None:
     generated = _generation(TABLE_298K)
-    for name, point, uncertainty, stray in (
-        ("HYDROHAGNESITE", "503.67", "1.55", "1.55"),
-        ("ARTIWITE", "232.92", "0.67", "0.67"),
-        ("ANALCIME", "234.43", "2.51", "2.51"),
+    from simulator.battery.stable_ids import _name_slug
+
+    for name, point, uncertainty, stray, page, pdf_page in (
+        ("HYDROHAGNESITE", "503.67", "1.55", "1.55", 25, 31),
+        ("ARTIWITE", "232.92", "0.67", "0.67", 25, 31),
+        ("ANALCIME", "234.43", "2.51", "2.51", 29, 35),
     ):
         observations = _observations_for(
             generated, Quantity.S, temperature="298.15", name=name
@@ -466,6 +468,21 @@ def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() 
         assert observations[0].uncertainty.kind is UncertaintyKind.PRINTED
         assert observations[0].uncertainty.verbatim == uncertainty
         assert all(row.value.point != Decimal(stray) for row in observations)
+        assert observations[0].locator is not None
+        assert observations[0].locator.published_page == page
+        assert observations[0].locator.pdf_page_index == pdf_page
+        row_observations = [
+            row
+            for row in generated.observations
+            if f":name={_name_slug(name)}" in row.observation_id
+        ]
+        assert row_observations
+        assert all(
+            row.locator is not None
+            and row.locator.published_page == page
+            and row.locator.pdf_page_index == pdf_page
+            for row in row_observations
+        )
 
     szomolnokite = _observations_for(
         generated,
@@ -1000,6 +1017,18 @@ def test_cell_accounting_mutation_drops_one_token() -> None:
     del payload["rows"][0]["cells"]["entropy"]
     mutated = generator.generate_record(payload)
     assert mutated.report["cell_accounting"]["raw_numeric_tokens"] == raw - 1
+
+
+def test_blank_cell_is_not_counted_as_an_exclusion() -> None:
+    payload = _load(TABLE_298K)
+    row = next(row for row in payload["rows"] if row["source_text_line"] == 602)
+    blank_cell = row["cells"]["reference_cp"]
+    assert blank_cell["as_published"] == ""
+    with_blank = generator.generate_record(payload).report["cell_accounting"]
+
+    del row["cells"]["reference_cp"]
+    without_cell = generator.generate_record(payload).report["cell_accounting"]
+    assert with_blank == without_cell
 
 
 def test_record_accounting_closes() -> None:

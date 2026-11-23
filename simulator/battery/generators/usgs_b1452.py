@@ -443,7 +443,10 @@ def _corrections_by_token() -> dict[tuple[str, str, str], Mapping[str, Any]]:
     for item in manifest.get("corrections") or ():
         if not isinstance(item, Mapping):
             continue
-        if item.get("action") != "image_verified_correction":
+        if item.get("action") not in {
+            "image_verified_correction",
+            "image_verified_locator",
+        }:
             continue
         record_id = str(item.get("record_id") or "")
         column = str(item.get("column") or "")
@@ -452,7 +455,7 @@ def _corrections_by_token() -> dict[tuple[str, str, str], Mapping[str, Any]]:
     return index
 
 
-def _image_correction(token: RawToken) -> Mapping[str, Any] | None:
+def _image_evidence(token: RawToken) -> Mapping[str, Any] | None:
     return _corrections_by_token().get(
         (token.record_id, token.column, token.as_published)
     ) or _corrections_by_token().get(
@@ -460,8 +463,18 @@ def _image_correction(token: RawToken) -> Mapping[str, Any] | None:
     )
 
 
+def _image_correction(token: RawToken) -> Mapping[str, Any] | None:
+    item = _image_evidence(token)
+    return item if item and item.get("action") == "image_verified_correction" else None
+
+
+def _image_locator(token: RawToken) -> Mapping[str, Any] | None:
+    item = _image_evidence(token)
+    return item if item and item.get("action") == "image_verified_locator" else None
+
+
 def _image_verified(token: RawToken) -> bool:
-    return _image_correction(token) is not None
+    return _image_correction(token) is not None or _image_locator(token) is not None
 
 
 def _column_grain_map(
@@ -492,7 +505,7 @@ def _column_grain_map(
 
 
 def _reconstruction_from_image(token: RawToken) -> dict[str, Any] | None:
-    item = _image_correction(token)
+    item = _image_correction(token) or _image_locator(token)
     if item is None:
         return None
     printed = str(item.get("printed_token") or "")
@@ -504,13 +517,20 @@ def _reconstruction_from_image(token: RawToken) -> dict[str, Any] | None:
             value = None
     if value is None:
         return None
+    if item.get("action") == "image_verified_locator":
+        evidence = (
+            f"image-verified locator for printed {printed!r} "
+            f"({item.get('evidence')})"
+        )
+    else:
+        evidence = (
+            f"image-verified correction of {token.as_published!r} to printed "
+            f"{printed!r} ({item.get('evidence')})"
+        )
     return {
         "value": value,
         "method_class": "reconstructed_from_printed_page",
-        "evidence": (
-            f"image-verified correction of {token.as_published!r} to printed "
-            f"{printed!r} ({item.get('evidence')})"
-        ),
+        "evidence": evidence,
         "as_published": token.as_published,
         "uncertainty": item.get("uncertainty"),
         "published_page": item.get("published_page"),
@@ -1366,10 +1386,20 @@ def _unit_row_locator(kind: str) -> Locator:
     )
 
 
-def _pages(record: Mapping[str, Any]) -> tuple[int | None, int | None]:
+def _pages(
+    record: Mapping[str, Any], source_text_line: int | None = None
+) -> tuple[int | None, int | None]:
     locator = record.get("source_locator") if isinstance(record.get("source_locator"), Mapping) else {}
     printed = list(locator.get("printed_pages") or ())
     pdf = list(locator.get("pdf_pages") or ())
+    if source_text_line is not None:
+        for item in _corrections_by_token().values():
+            if (
+                item.get("action") == "image_verified_locator"
+                and item.get("record_id") == record.get("record_id")
+                and item.get("source_text_line") == source_text_line
+            ):
+                return int(item["published_page"]), int(item["pdf_page"])
     return (printed[0] if printed else None), (pdf[0] if pdf else None)
 
 
@@ -1410,7 +1440,13 @@ def _observation(
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
     identity = fill_identity(quantity, species, **known)
-    published_page, pdf_page = _pages(record)
+    source_text_line = None
+    rows = record.get("rows") or ()
+    if token.row_index is not None and token.row_index < len(rows):
+        raw_line = rows[token.row_index].get("source_text_line")
+        if raw_line is not None:
+            source_text_line = int(raw_line)
+    published_page, pdf_page = _pages(record, source_text_line)
     if reconstruction is not None:
         if reconstruction.get("published_page") is not None:
             published_page = int(reconstruction["published_page"])
@@ -1589,7 +1625,11 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     if not record_id:
         raise ValueError("B1452 record is missing record_id")
     kind = _table_kind(payload)
-    tokens = list(_iter_raw_numeric_tokens(payload))
+    tokens = [
+        token
+        for token in _iter_raw_numeric_tokens(payload)
+        if token.as_published.strip()
+    ]
     grains = _column_grain_map(tokens)
     temperature_by_row = _row_temperature_tokens(tokens)
     usable_t: dict[int, Decimal] = {}

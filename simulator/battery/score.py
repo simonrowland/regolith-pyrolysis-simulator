@@ -1208,7 +1208,7 @@ def parse_species_formula(
     )
     text = fold_subscript_digits(text)
     has_explicit_decimal_subscript = re.search(
-        r"[₀₁₂₃₄₅₆₇₈₉]\.\d|_\{?\d+\.\d+", formula
+        r"\d\.\d|_\{?\d+\.\d+", formula
     ) is not None
     phase_labels = {
         "c": Phase.CR,
@@ -1269,21 +1269,30 @@ def parse_species_formula(
             return None
         text = text[: charge_annotation.start()]
 
-    if has_explicit_decimal_subscript and "·" not in text:
-        normalized_decimal = formula_composition(text)
-        if normalized_decimal is not None:
-            return normalized_decimal
-
     if "." in text and "·" not in text:
         from simulator.accounting.formulas import _is_integer_compound_adduct
+
+        is_adduct = _is_integer_compound_adduct(
+            text, require_explicit_multipliers=True
+        )
+        if has_explicit_decimal_subscript:
+            normalized_decimal = formula_composition(text)
+            is_unambiguous_adduct = is_adduct and (
+                re.match(r"^\d+", text) is not None
+                or re.search(r"\.\d+H2O$", text) is not None
+            )
+            if normalized_decimal is not None and not is_unambiguous_adduct:
+                return normalized_decimal
 
         # The raw fast path above preserves existing JANAF decimal parses.
         # For spellings it cannot parse, the accounting owner decides whether
         # an ASCII dot is an adduct or a decimal subscript.
-        if _is_integer_compound_adduct(
-            text, require_explicit_multipliers=True
-        ):
+        if is_adduct:
             return _accounting_formula_composition(text)
+    elif has_explicit_decimal_subscript:
+        normalized_decimal = formula_composition(text)
+        if normalized_decimal is not None:
+            return normalized_decimal
 
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)

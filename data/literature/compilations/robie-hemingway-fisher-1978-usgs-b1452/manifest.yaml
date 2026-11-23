@@ -457,14 +457,16 @@ summary:
   temperature_row_count: 6453
   phase_split_record_count: 206
   ocr_suspect_record_count: 578
-  ocr_suspect_numeric_cell_count: 14384
-  printed_shape_failure_count: 10062
+  ocr_suspect_numeric_cell_count: 14387
+  printed_shape_failure_count: 10065
   admitted_shape_failure_count: 0
   identity_check_disagreement_count: 1187
   image_temperature_disagreement_count: 356
   image_temperature_grid_unconfirmed_count: 115
   ambiguity_count: 1659
-  correction_count: 98
+  correction_count: 102
+  image_verified_correction_count: 16
+  image_verified_locator_count: 4
 ambiguities:
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
   kind: image_column_merge
@@ -40726,7 +40728,10 @@ corrections:
   printed_token: '503.67'
   value: 503.67
   uncertainty: '1.55'
-  action: image_verified_correction
+  published_page: 25
+  pdf_page: 31
+  correction_provenance: image_read_reconstruction
+  action: image_verified_locator
   evidence: crop-verified PDF page 31 (folio 25), entropy row
   image_quote: 'HYDROMAGNESITE 503.67 / 1.55 J/mol·K'
   source_text_line: 602
@@ -40737,7 +40742,10 @@ corrections:
   printed_token: '232.92'
   value: 232.92
   uncertainty: '0.67'
-  action: image_verified_correction
+  published_page: 25
+  pdf_page: 31
+  correction_provenance: image_read_reconstruction
+  action: image_verified_locator
   evidence: crop-verified PDF page 31 (folio 25), entropy row
   image_quote: 'ARTINITE 232.92 / 0.67 J/mol·K'
   source_text_line: 604
@@ -40748,7 +40756,10 @@ corrections:
   printed_token: '234.43'
   value: 234.43
   uncertainty: '2.51'
-  action: image_verified_correction
+  published_page: 29
+  pdf_page: 35
+  correction_provenance: image_read_reconstruction
+  action: image_verified_locator
   evidence: crop-verified PDF page 35 (folio 29), entropy row
   image_quote: 'ANALCIME 234.43 / 2.51 J/mol·K'
   source_text_line: 791
@@ -40761,7 +40772,8 @@ corrections:
   uncertainty: '0.500 kJ/mol'
   pdf_page: 32
   published_page: 26
-  action: image_verified_correction
+  correction_provenance: image_read_reconstruction
+  action: image_verified_locator
   evidence: crop-verified PDF page 32 (folio 26), szomolnokite row
   image_quote: 'SZOMOLNOKITE FeSO4·H2O; ΔHf=-1243900 J/mol; uncertainty=500 J/mol'
   source_text_line: 644
