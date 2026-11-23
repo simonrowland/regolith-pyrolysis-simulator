@@ -29,6 +29,7 @@ from simulator.core import (
     OXYGEN_RESERVOIR_NOOP_MOL,
     OXYGEN_SPECIES,
     _headspace_buffer_release_roundoff_slack_mol,
+    _nonzero_o2_lot_mol_for_accounts,
 )
 from simulator.evaporation import (
     headspace_buffer_release_stock_mol,
@@ -1807,11 +1808,12 @@ def test_buffer_release_roundoff_counts_the_reviewed_ten_postings():
 
 
 def test_buffer_release_record_counts_live_lots_through_fe_settle():
-    """The production count includes each buffer lot through the Fe settle.
+    """The live posting count changes the inventory guard's threshold.
 
     Mutation: deleting the record counter fails the production-field
     assertion; omitting the settle debit makes the count differ from the
-    transition slice and the pinned three-posting value.
+    transition slice. The injected shortfall is above stock-only slack but
+    within posting-aware slack, so a guard that drops the counter refuses.
     """
 
     sim = _sim(CampaignPhase.C4, 1500.0, 20.0)
@@ -1820,11 +1822,60 @@ def test_buffer_release_record_counts_live_lots_through_fe_settle():
     reservoir.melt_intrinsic_fO2_log = upper
     reservoir.melt_redox_capacity_mol_per_ln_fO2 = 0.0
     sim._melt_redox_source_capacity_mol_per_ln_fO2 = lambda **_kwargs: 1.0
+    sim._headspace_reducing_overhead_o2_mol = lambda **_kwargs: 0.0
     _seed(sim, FO2_BUFFER_ACCOUNT, {OXYGEN_SPECIES: 5.0}, "live counter")
     transition_at = len(sim.atom_ledger.transitions)
 
     published = {}
+    guard_budget = {}
     publish = sim._publish_headspace_buffer_release
+    settle = sim._settle_evaporative_redox_after_batch
+
+    def settle_with_guard_boundary(*args, **kwargs):
+        settle(*args, **kwargs)
+        solved = sim._headspace_capacity_result
+        assert solved is not None
+        excess = float(solved.redox_added_mol[OXYGEN_SPECIES])
+        available = float(
+            sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                OXYGEN_SPECIES, 0.0,
+            )
+            or 0.0
+        )
+        registry = sim.species_formula_registry
+        buffer_postings = sum(
+            _nonzero_o2_lot_mol_for_accounts(
+                lot,
+                registry=registry,
+                accounts={FO2_BUFFER_ACCOUNT},
+            ) is not None
+            for transition in sim.atom_ledger.transitions[transition_at:]
+            for lot in (*transition.debits, *transition.credits)
+        )
+        record = {
+            **sim._headspace_buffer_release_terms,
+            "reducing_credit_mol": 0.0,
+            "fo2_buffer_after_settle_mol": available,
+            "buffer_postings": buffer_postings,
+        }
+        full_slack = _headspace_buffer_release_roundoff_slack_mol(record)
+        stock_only_slack = _headspace_buffer_release_roundoff_slack_mol(
+            {**record, "buffer_postings": 0},
+        )
+        target_gap = 0.5 * (stock_only_slack + full_slack)
+        assert buffer_postings > 0
+        assert stock_only_slack < target_gap < full_slack
+        desired_available = excess - target_gap
+        assert desired_available >= 0.0
+        balances = sim.atom_ledger._balances.setdefault(
+            FO2_BUFFER_ACCOUNT, {},
+        )
+        balances[OXYGEN_SPECIES] = desired_available
+        guard_budget.update({
+            "target_gap": target_gap,
+            "stock_only_slack": stock_only_slack,
+            "full_slack": full_slack,
+        })
 
     def capture_release(record):
         publish(record)
@@ -1834,6 +1885,7 @@ def test_buffer_release_record_counts_live_lots_through_fe_settle():
         )
 
     sim._publish_headspace_buffer_release = capture_release
+    sim._settle_evaporative_redox_after_batch = settle_with_guard_boundary
     _step(
         sim,
         lambda _partials: {"Na2": 1.0e-8, "CrO3": 1.0e-2, "SiO": 1.0e-6},
@@ -1868,6 +1920,16 @@ def test_buffer_release_record_counts_live_lots_through_fe_settle():
     assert len(actual_buffer_lots) == 3
     assert record["buffer_postings"] == len(actual_buffer_lots)
     assert record["buffer_postings"] == 3
+    actual_gap = (
+        record["excess_integrated"]
+        - record["fo2_buffer_after_settle_mol"]
+    )
+    stock_only_slack = _headspace_buffer_release_roundoff_slack_mol(
+        {**record, "buffer_postings": 0},
+    )
+    assert actual_gap == pytest.approx(guard_budget["target_gap"], abs=1.0e-15)
+    assert stock_only_slack < actual_gap
+    assert actual_gap <= _headspace_buffer_release_roundoff_slack_mol(record)
 
 
 def test_reducing_only_roundoff_does_not_refuse_empty_buffer():

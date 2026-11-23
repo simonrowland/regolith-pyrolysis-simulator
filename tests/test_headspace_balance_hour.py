@@ -323,6 +323,92 @@ def test_reduced_endpoint_pressure_miss_declines_stall_handoff(monkeypatch):
     assert law._quasi_steady_declined is True
 
 
+def test_reduced_ift_falls_back_when_corrected_root_residual_is_too_large(
+    monkeypatch,
+):
+    law = SimpleNamespace(downstream_pa=20.0)
+    root = 20.00108
+    fallbacks = []
+    accepted = []
+
+    def residual(_law, _fractions, pressure):
+        offset = float(pressure) - root
+        return -offset - 900.0 * offset * offset
+
+    def fallback(law_arg, fractions, near_Pa=None):
+        fallbacks.append(near_Pa)
+        return "open", root
+
+    def accept(_value_at, _piece_at, _anchor, _downstream, candidate):
+        accepted.append(candidate)
+        return "accept", candidate
+
+    monkeypatch.setattr(capacity_coupling, "_mixture_g", residual)
+    monkeypatch.setattr(
+        capacity_coupling,
+        "_mixture_piece",
+        lambda *_args: ("open",),
+    )
+    monkeypatch.setattr(
+        capacity_coupling,
+        "_continuous_warm_root",
+        accept,
+    )
+    monkeypatch.setattr(
+        capacity_coupling,
+        "_open_or_shut_fixed_point",
+        fallback,
+    )
+
+    result = capacity_coupling._reduced_open_fixed_point(
+        law, {"O2": 1.0}, hint_Pa=20.001,
+    )
+
+    assert result == ("open", root)
+    assert fallbacks == [20.001]
+    assert accepted == []
+
+
+def test_reduced_rhs_reuses_one_root_anchor_across_trial_states(monkeypatch):
+    """Repeated RHS calls at one state ignore an intervening trial state."""
+
+    law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=True,
+    )
+    root_hints = []
+    rates = {}
+    original_root = capacity_coupling._reduced_open_fixed_point
+
+    def record_root(law_arg, mix, hint_Pa):
+        root_hints.append(hint_Pa)
+        return original_root(law_arg, mix, hint_Pa)
+
+    def inspect_rhs(fun, _t_span, y0, **_kwargs):
+        rates["first"] = fun(0.0, y0)
+        trial = list(y0)
+        trial[0] *= 1.0 + 1.0e-4
+        fun(0.5, trial)
+        rates["repeat"] = fun(0.0, y0)
+        return SimpleNamespace(success=False)
+
+    import scipy.integrate
+
+    monkeypatch.setattr(scipy.integrate, "solve_ivp", inspect_rhs)
+    monkeypatch.setattr(
+        capacity_coupling,
+        "_reduced_open_fixed_point",
+        record_root,
+    )
+    result = capacity_coupling._reduced_manifold(
+        law, fractions, start, root, 3600.0, track_extent=False,
+    )
+
+    assert result is None
+    assert rates["first"] == rates["repeat"]
+    assert len(root_hints) == 3
+    assert root_hints == [root, root, root]
+
+
 def _geometry_o2(source_kg_hr: float, rating_Pa: float):
     # Same pipe the live hour passes: diameter, length, and the
     # inventory temperature and volume the chunk-2 O2 root used.
