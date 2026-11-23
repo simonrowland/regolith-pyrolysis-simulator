@@ -200,6 +200,23 @@ def test_evaporation_enthalpy_budget_cro2_uses_single_reaction_not_fail_loud():
     )
     assert result["evaporation_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
     assert "CrO2(g)" in result["sources"]["oxide_vapor_reaction:CrO2"]
+    # Only SiO becomes a temperature chord. CrO2 keeps this coefficient.
+    at_temperature = evaporation_enthalpy_budget(
+        {"CrO2": 1.0},
+        vapor_pressures={
+            "oxide_vapors": {
+                "CrO2": {
+                    "parent_oxide": "Cr2O3",
+                    "molar_mass_g_mol": molar_mass,
+                    "stoich_oxide_per_vapor": 0.904761167748687,
+                }
+            }
+        },
+        temperature_K=2000.0,
+    )
+    assert at_temperature["evaporation_thermal_kWh"] == pytest.approx(
+        result["evaporation_thermal_kWh"]
+    )
 
 
 @pytest.mark.parametrize(

@@ -23,6 +23,10 @@ from engines.builtin.evaporation_flux import (
 from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.physical_constants import GAS_CONSTANT_6SIG
+from simulator.reference_data.janaf import (
+    TABLES_DIR,
+    load_table_document,
+)
 from simulator.state import MOLAR_MASS
 from simulator.thermal_budget import (
     COLD_BOUNDARY_K,
@@ -46,9 +50,9 @@ _HEIGHT_M = 0.010
 _SPOT_M = 0.020
 _MASS_KG = 0.00338
 _STEADY_S = 1.0e12
-# NIST-JANAF Chase 1998, independent of the coefficient table:
-# ΔfH°[SiO2, α-quartz] = -910.94 kJ/mol, ΔfH°[SiO(g)] = -100.42 kJ/mol.
-# SiO2 -> SiO(g) + 1/2 O2 = -100.42 - (-910.94).
+# Rounded 298.15 K quartz arithmetic kept for a budget call that omits
+# temperature. The printed cells are read below; they are not these two
+# numbers. -100.42 - (-910.94) = 810.52.
 _JANAF_SIO_KJ_PER_MOL = -100.42 - (-910.94)
 # heat-balance-audit.md at this seat's power-model fold: about 2019 °C,
 # P_eq(SiO) = 4382 Pa, chamber 1300 Pa. The van't Hoff below is that
@@ -61,6 +65,41 @@ _RELATIVE_CLOSURE = 1.0e-6
 
 def _sio_molar_mass_kg() -> float:
     return float(MOLAR_MASS["SiO"]) / 1000.0
+
+
+def _printed_formation_kj(table_id: str, temperature_K: str) -> float:
+    """The table's signed ΔfH° cell. ``value`` is the repaired token."""
+
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    for item in table["values"]:
+        temperature = item.get("temperature") or {}
+        if str(temperature.get("as_published")) != temperature_K:
+            continue
+        cell = item.get("formation_enthalpy") or {}
+        return float(cell["value"])
+    raise AssertionError(f"{table_id} has no ΔfH° at {temperature_K} K")
+
+
+def _printed_sio_reaction_kj(
+    temperature_K: str,
+    reactant_table: str,
+    reactant_temperature_K: str,
+) -> float:
+    """Stoichiometric sum of printed cells. Not the production interpolator."""
+
+    return (
+        _printed_formation_kj("O-012", temperature_K)
+        + 0.5 * _printed_formation_kj("O-029", temperature_K)
+        - _printed_formation_kj(reactant_table, reactant_temperature_K)
+    )
+
+
+def _sio_mole_budget(temperature_K: float) -> tuple[float, dict]:
+    budget = evaporation_enthalpy_budget(
+        {"SiO": _sio_molar_mass_kg()},
+        temperature_K=temperature_K,
+    )
+    return float(budget["evaporation_thermal_kWh"]) * 3600.0, budget
 
 
 def _sio_reaction_J_per_mol() -> float:
@@ -250,18 +289,78 @@ def test_sio_enthalpy_matches_janaf_and_the_audit_watt_sanity():
     assert _sio_reaction_J_per_mol() / 1000.0 == pytest.approx(
         _JANAF_SIO_KJ_PER_MOL
     )
+    quartz_298 = _printed_sio_reaction_kj("298.15", "O-037", "298.15")
+    liquid_298 = _printed_sio_reaction_kj("298.15", "O-038", "298.15")
+    assert quartz_298 != pytest.approx(_JANAF_SIO_KJ_PER_MOL)
+    assert _sio_mole_budget(298.15)[0] == pytest.approx(liquid_298)
+    assert _sio_mole_budget(298.15)[0] != pytest.approx(quartz_298)
     # 30.2 mg/min is the audit's 9.25 W example. 401 mg/min is the
-    # one-minute dump, 122.8 W. Both are the JANAF product above.
+    # one-minute dump, 122.8 W. Both use the omitted-temperature coefficient.
     small = _watts_for_mg_per_min(30.2)
     dump = _watts_for_mg_per_min(401.0)
     assert small == pytest.approx(9.25, abs=0.05)
     assert dump == pytest.approx(122.8, abs=0.5)
     kg_small = 30.2 * 1.0e-6 * 60.0
+    anchor = evaporation_enthalpy_budget(
+        {"SiO": kg_small},
+        temperature_K=_ANCHOR_K,
+    )
     assert evaporative_enthalpy_sink_W(
         _ANCHOR_K,
         {"SiO": kg_small},
-    ) == pytest.approx(small, rel=1.0e-9)
+    ) == pytest.approx(float(anchor["evaporation_thermal_kWh"]) * 1000.0)
+    assert float(anchor["evaporation_thermal_kWh"]) * 1000.0 != pytest.approx(
+        small
+    )
+    low = _printed_sio_reaction_kj("2200", "O-038", "2200")
+    high = _printed_sio_reaction_kj("2300", "O-038", "2300")
+    chord = low + (high - low) * (_ANCHOR_K - 2200.0) / 100.0
+    assert _sio_mole_budget(_ANCHOR_K)[0] == pytest.approx(chord)
+    assert "sio_enthalpy" not in anchor["sources"]["oxide_vapor_reaction:SiO"]
+    assert "SiO2->SiO(g)" in anchor["sources"]["oxide_vapor_reaction:SiO"]
     assert COLD_BOUNDARY_K == pytest.approx(300.0)
+
+
+def test_sio_enthalpy_flags_an_unprinted_node_and_the_end_of_the_liquid_table():
+    hole_kj, hole = _sio_mole_budget(1700.0)
+    assert hole_kj == pytest.approx(
+        _printed_formation_kj("O-012", "1700")
+        + 0.5 * _printed_formation_kj("O-029", "1700")
+        - _printed_formation_kj("O-038", "1600")
+    )
+    assert hole["sio_enthalpy_notice"]["kind"] == "typed_unknown"
+    assert hole["sio_enthalpy_notice"]["knob"] == (
+        "sio_enthalpy_unprinted_grid_node"
+    )
+    assert hole["sio_enthalpy_notice"]["value"] == "nearer_printed_liquid_row"
+    above_kj, above = _sio_mole_budget(5000.0)
+    assert above_kj == pytest.approx(
+        _printed_formation_kj("O-012", "5000")
+        + 0.5 * _printed_formation_kj("O-029", "5000")
+        - _printed_formation_kj("O-038", "4500")
+    )
+    assert above["sio_enthalpy_notice"]["knob"] == (
+        "sio_enthalpy_above_liquid_table"
+    )
+    assert above["sio_enthalpy_notice"]["value"] == (
+        "held_at_last_printed_liquid_row"
+    )
+    notices: list[dict] = []
+    evaporative_enthalpy_sink_W(
+        5000.0,
+        {"SiO": _sio_molar_mass_kg()},
+        notices=notices,
+    )
+    assert [item["knob"] for item in notices] == [
+        "sio_enthalpy_above_liquid_table"
+    ]
+    quiet: list[dict] = []
+    evaporative_enthalpy_sink_W(
+        _ANCHOR_K,
+        {"SiO": _sio_molar_mass_kg()},
+        notices=quiet,
+    )
+    assert quiet == []
 
 
 def test_coupled_root_closes_and_a_dropped_sink_does_not():
