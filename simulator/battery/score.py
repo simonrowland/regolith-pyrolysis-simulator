@@ -1220,7 +1220,7 @@ def parse_species_formula(
 ) -> tuple[tuple[str, float], ...] | None:
     """Parse explicit stoichiometry; None → unmatched, never string equality.
 
-    The baseline ``formula_composition`` result is returned unchanged. Its
+    The fast-path ``formula_composition`` result is returned unchanged. Its
     source-derived extension accepts element symbols with numeric counts,
     nested ``()[]{}`` groups, hydrate/adduct segments (including fractional or
     decimal multipliers), TeX math wrappers / ``\\text{}``, and TeX or Unicode

@@ -469,7 +469,7 @@ def wustite_formula_migration():
     return migrator.result
 
 
-def test_every_censused_fe_1_minus_x_source_row_parses(
+def test_every_migrated_fe_1_minus_x_source_row_parses(
     wustite_formula_migration,
 ) -> None:
     rows_by_source = {source: [] for source in (_DARKEN_GURRY, _SAITO)}
