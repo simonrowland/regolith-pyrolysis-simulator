@@ -885,7 +885,7 @@ def test_phase_row_uses_assembled_liquid_siblings_only_for_other_phase() -> None
     assert resolved.notice.policy is not None
     assert resolved.notice.policy.id == "DP-017"
     assert resolved.notice.policy.value.startswith(
-        "printed_oxides/mass_percent:"
+        f"{composition.basis}/{composition.amount_basis.value}:"
     )
     assert "original_reason=identity_incomplete:missing_input:composition" in (
         resolved.notice.reason
