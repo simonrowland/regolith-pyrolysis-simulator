@@ -1977,18 +1977,34 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
 
 
-def test_melts_fe_redox_uses_printed_ferric_ratio_fo2_when_unprinted(monkeypatch):
-    row4 = _without_printed_fo2(_borisov_row4())
-    from simulator.battery.fo2_ladder import resolve_row_fo2
-
-    resolved_fo2 = resolve_row_fo2(
-        None,
-        None,
-        row4,
-        quantity=Quantity.FE3_FE2_RATIO,
+def test_internal_analytical_redox_prediction_is_independent_of_measured_target():
+    location = Locator(page=2, record="Fe3+/Fe2+ cell")
+    row = _without_printed_fo2(_borisov_row4())
+    row = replace(
+        row, locator=location,
+        identity=replace(row.identity, total_pressure_Pa=State.of(Decimal("100000"))),
     )
-    assert resolved_fo2 is not None
-    assert resolved_fo2.route.startswith("kress_inverse:")
+
+    def predict(ratio, ferric_location):
+        candidate = replace(
+            row, value=Value.point_of(ratio),
+            point_conditions={"Fe3_over_Fe2": Located(State.of(ratio), ferric_location)},
+        )
+        return predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
+
+    predictions = [predict(ratio, location) for ratio in (Decimal("0.25"), Decimal("1.0"))]
+    assert predictions[0].value is not None
+    assert predictions[0].value == predictions[1].value
+    for prediction in predictions:
+        assert any(n.policy and n.policy.id == "DP-010" for n in prediction.notices)
+
+    independent = predict(Decimal("0.25"), Locator(page=3, record="independent assay"))
+    assert independent.value is not None
+    assert any(n.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO for n in independent.notices)
+
+
+def test_melts_fe_redox_uses_dp010_without_independent_oxygen(monkeypatch):
+    row4 = _without_printed_fo2(_borisov_row4())
     calls = _patch_melts_cell(
         monkeypatch,
         lambda _handle: _ok_cell(
@@ -2001,16 +2017,11 @@ def test_melts_fe_redox_uses_printed_ferric_ratio_fo2_when_unprinted(monkeypatch
     assert alphamelts.identity is not None
     assert alphamelts.identity.fO2_Pa is not None
     assert alphamelts.identity.fO2_Pa.is_value
-    assert alphamelts.identity.fO2_Pa.value == log10_fo2_to_pa(
-        Decimal(str(resolved_fo2.log10_fO2_bar))
-    )
-    ferric_notice = next(
-        notice
+    assert any(notice.policy and notice.policy.id == "DP-010" for notice in alphamelts.notices)
+    assert not any(
+        notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
         for notice in alphamelts.notices
-        if notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
     )
-    assert "Kress-Carmichael inverse at row T and P" in ferric_notice.reason
-    assert "log10(fO2/bar)=" in ferric_notice.reason
     assert len(calls) == 1
 
     thermoengine = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)

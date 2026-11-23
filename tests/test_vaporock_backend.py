@@ -3243,6 +3243,7 @@ def test_nan_on_present_oxide_is_not_converted_to_proven_empty_zero():
         composition_wt_pct={"SiO2": 50.0, "Na2O": 3.0},
     )
 
+    assert backend._last_invalid_pressure_components == {"Na"}
     assert "Na" not in pressures
     assert pressures["SiO"] == 10.0 ** -6.0 * 1e5
     assert pressures["Cr"] == 0.0
@@ -3285,6 +3286,10 @@ def test_serialize_attaches_inventory_mask_only_when_finite_values_exist():
         _HEALTHY_MASKED_GASES
     )
     assert "empty_speciation_cause" not in healthy_extra
+
+    mixed_log, _ = _serialize_log10_bar_pressures({"K(g)": -3.0, "O2(g)": float("nan")})
+    assert mixed_log["K(g)"] == -3.0
+    assert math.isnan(mixed_log["O2(g)"])
 
     failed = {f"sp{i}(g)": float("nan") for i in range(30)}
     for name in _HEALTHY_MASKED_GASES:

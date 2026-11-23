@@ -935,27 +935,8 @@ def test_non_sodium_antoine_notices_name_the_actual_quantity(quantity) -> None:
         assert notice.affected_quantities == (quantity,)
 
 
-@pytest.mark.parametrize(
-    ("engine", "method", "invalid_components"),
-    (
-        (Engine.OPENIMCC, None, ()),
-        (Engine.OPENIMCC, MethodToken.TABULATION, ()),
-        (Engine.OPENIMCC, None, ("O2",)),
-        (Engine.OPENIMCC, None, ("K",)),
-        (Engine.VAPOROCK, None, ("O2",)),
-    ),
-    ids=(
-        "complete-methodless", "tabulation", "invalid-oxygen-channel",
-        "invalid-target-channel", "pressure-consuming",
-    ),
-)
-def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(
-    monkeypatch, engine, method, invalid_components,
-) -> None:
-    observation, experiment = _kems_partial(
-        cell_material=None,
-        fO2_Pa=Decimal("1000") if engine is Engine.VAPOROCK else None,
-    )
+def _partial_without_total_pressure(method, *, fO2_Pa):
+    observation, experiment = _kems_partial(cell_material=None, fO2_Pa=fO2_Pa)
     experiment = replace(
         experiment,
         method=State.unknown("method is not printed") if method is None else State.of(method),
@@ -977,6 +958,198 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(
         ),
         point_conditions=point_conditions,
     )
+    return observation, experiment
+
+
+@pytest.mark.parametrize("method", (None, MethodToken.TABULATION, MethodToken.KNUDSEN_EFFUSION))
+def test_internal_partial_with_printed_oxygen_runs_without_total_pressure(monkeypatch, method):
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.state import MeltState
+
+    class Core:
+        def __init__(self):
+            self.melt = MeltState()
+            self._last_vapor_pressure_diagnostic = {}
+
+        def _new_atom_ledger(self):
+            return object()
+
+        def _load_ledger_account(self, *_args, **_kwargs):
+            pass
+
+        def _build_chemistry_kernel(self):
+            return None
+
+        def _refresh_vapor_pressures_from_kernel(self, equilibrium, *, observation_pO2_bar):
+            assert observation_pO2_bar == 0.01
+            assert self.melt.p_total_mbar == 0.0  # reset state, no supplied boundary
+            equilibrium.vapor_pressures_Pa = {"K": 125.0, "KO": 75.0}
+
+    monkeypatch.setattr(battery, "_new_internal_analytical_core", Core)
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    row, experiment = _partial_without_total_pressure(method, fO2_Pa=Decimal("1000"))
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=experiment, isolated=False,
+    )
+
+    assert prediction.value == Decimal("125"), prediction.refusal_detail
+    assert prediction.identity.fO2_Pa == State.of(Decimal("1000"))
+    policies = {n.policy.id for n in prediction.notices if n.policy}
+    if method is None:
+        assert policies == {"DP-108"}
+        assert prediction.identity.total_pressure_Pa == State.of(Decimal("200"))
+    else:
+        assert "DP-001" not in policies and "DP-108" not in policies
+        assert prediction.identity.total_pressure_Pa.is_unknown
+
+
+def test_internal_oxide_reference_without_defined_pressure_keeps_pressure_guard(monkeypatch):
+    identity = F.pref_identity()
+    identity = replace(
+        identity,
+        reference_state=State.of(replace(identity.reference_state.value, reference_pressure_bar=None)),
+    )
+    opened = _no_engine(monkeypatch)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, F.observation("pref", "exp", identity, Decimal("1")),
+        isolated=False,
+    )
+    assert opened == []
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == "internal_analytical_missing_total_pressure"
+
+
+@pytest.mark.parametrize("oxygen_log", (float("nan"), -math.inf, -5.0), ids=("nan", "unproven-zero", "complete"))
+def test_dp108_checks_vaporock_channels_from_the_warm_payload(monkeypatch, oxygen_log):
+    from simulator.melt_backend.vaporock import VapoRockBackend, _serialize_log10_bar_pressures
+
+    backend = VapoRockBackend()
+    backend._available = True
+    log10_bar, sidecar = _serialize_log10_bar_pressures(
+        {"K(g)": -3.0, "O2(g)": oxygen_log, "Na(g)": -math.inf}
+    )
+    backend._warm_pool = types.SimpleNamespace(
+        submit=lambda *_args, **_kwargs: types.SimpleNamespace(
+            result=lambda: {"log10_bar": log10_bar, **sidecar}
+        )
+    )
+    handle = EngineHandle("vaporock", backend, True, None, True, False)
+    # The warm worker here is a raw-output fixture and has no lifecycle to close.
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    row, experiment = _partial_without_total_pressure(None, fO2_Pa=Decimal("1000"))
+    prediction = predict_with_engine(
+        Engine.VAPOROCK, row, experiment=experiment, handles={"vaporock": handle},
+        isolated=False,
+    )
+    if math.isfinite(oxygen_log):
+        assert prediction.value == Decimal("100")
+        assert prediction.identity.total_pressure_Pa == State.of(Decimal("101"))
+        return
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "partial_pressure_sum_incomplete_gas_map",
+        "policy": "DP-108",
+        "invalid_components": ["O2"],
+        "target_partial_pressure_Pa": 100.0,
+    }
+    assert prediction.identity.total_pressure_Pa.is_unknown
+
+
+@pytest.mark.parametrize("commanded", (True, False), ids=("commanded", "effusion"))
+@pytest.mark.parametrize("channel", ("nonfinite", "reported-omission", "missing", "proven-zero", "complete"))
+def test_dp108_checks_openimcc_channels_from_the_gas_evaluator(monkeypatch, channel, commanded):
+    import openimcc
+    from openimcc import gas
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend import openimcc_bridge
+
+    class Gas(dict):
+        domain_flags = {}
+        provenance_class = {}
+        omitted_channels = {"O2": "missing from active table"} if channel == "reported-omission" else {}
+
+    raw = Gas(K=0.001)
+    if channel in {"nonfinite", "proven-zero", "complete"}:
+        raw["O2"] = {"nonfinite": math.nan, "proven-zero": 0.0, "complete": 1e-5}[channel]
+    monkeypatch.setattr(gas, "_default_reactions", lambda *_args: ((("K", ()), ("O2", ())), {}))
+    calls = []
+
+    def gas_at_commanded_oxygen(*_args, **_kwargs):
+        calls.append("commanded")
+        return raw
+
+    def gas_at_solved_oxygen(*_args, **_kwargs):
+        calls.append("effusion")
+        return 1e-5, raw, {
+            "residual": 0.0, "bracket_log10_bar": (-9.0, -3.0),
+            "dominant_O_carriers": ("O2",), "dominant_metal_carriers": ("K",),
+        }
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", gas_at_commanded_oxygen)
+    monkeypatch.setattr(openimcc_bridge, "evaluate_gas_oxygen_balance", gas_at_solved_oxygen)
+    row, experiment = _partial_without_total_pressure(
+        None, fO2_Pa=Decimal("1000") if commanded else None,
+    )
+    handle = battery.open_battery_engine("openimcc")
+    if not handle.available or handle.backend._gas is None:
+        battery.close_battery_engine_handle(handle)
+        pytest.skip("OpenIMCC melt and gas packs required for the producer path")
+    try:
+        prediction = predict_with_engine(
+            Engine.OPENIMCC, row, experiment=experiment, handles={"openimcc": handle},
+            isolated=False,
+        )
+    finally:
+        battery.close_battery_engine_handle(handle)
+
+    assert calls == ["commanded" if commanded else "effusion"]
+    assert prediction.value == Decimal("100"), prediction.refusal_detail
+    if channel in {"proven-zero", "complete"}:
+        expected_total = Decimal("100") if channel == "proven-zero" else Decimal("101")
+        assert prediction.identity.total_pressure_Pa == State.of(expected_total)
+        assert any(n.policy and n.policy.id == "DP-108" for n in prediction.notices)
+        return
+    assert prediction.identity.total_pressure_Pa.is_unknown
+    assert all(not n.policy or n.policy.id != "DP-108" for n in prediction.notices)
+    assert any(
+        n.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and "partial_pressure_sum_incomplete_gas_map: ['O2']" in n.reason
+        for n in prediction.notices
+    )
+
+
+@pytest.mark.parametrize("point_charge", (False, True), ids=("identity-charge", "point-charge"))
+@pytest.mark.parametrize(
+    ("engine", "method", "invalid_components"),
+    (
+        (Engine.OPENIMCC, None, ()),
+        (Engine.OPENIMCC, MethodToken.TABULATION, ()),
+        (Engine.OPENIMCC, None, ("O2",)),
+        (Engine.OPENIMCC, None, ("K",)),
+        (Engine.VAPOROCK, None, ("O2",)),
+    ),
+    ids=(
+        "complete-methodless", "tabulation", "invalid-oxygen-channel",
+        "invalid-target-channel", "pressure-consuming",
+    ),
+)
+def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(
+    monkeypatch, engine, method, invalid_components, point_charge,
+) -> None:
+    observation, experiment = _partial_without_total_pressure(
+        method, fO2_Pa=Decimal("1000") if engine is Engine.VAPOROCK else None,
+    )
+    if point_charge:
+        point_conditions = {
+            **observation.point_conditions,
+            "composition": F.located(observation.identity.composition.value),
+        }
+        observation = replace(
+            observation,
+            identity=replace(observation.identity, composition=State.unknown("on the point")),
+            point_conditions=point_conditions,
+        )
     partials = {
         name: pressure
         for name, pressure in {"K": 125.0, "KO": 75.0}.items()
