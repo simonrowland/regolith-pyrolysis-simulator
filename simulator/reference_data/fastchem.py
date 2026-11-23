@@ -19,6 +19,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
+from simulator.chemistry.formula_text import hill_element_order
 from simulator.reference_data.nasa_glenn import ELEMENT_SYMBOLS
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -608,13 +609,7 @@ def _format_count(count: Decimal | int) -> str:
 
 
 def hill_formula(counts: dict[str, int], charge: int) -> str:
-    if "C" in counts:
-        ordered = ["C"]
-        if "H" in counts:
-            ordered.append("H")
-        ordered.extend(sorted(element for element in counts if element not in {"C", "H"}))
-    else:
-        ordered = sorted(counts)
+    ordered = hill_element_order(counts)
     parts: list[str] = []
     for element in ordered:
         number = counts[element]

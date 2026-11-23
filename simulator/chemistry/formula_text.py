@@ -14,6 +14,7 @@ SUPERSCRIPT or MODIFIER LETTER SMALL / MODIFIER LETTER CAPITAL.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 import re
 import unicodedata
 
@@ -83,3 +84,16 @@ def fold_subscript_digits(text: str) -> str:
     Every other character stays, including spaces and braces.
     """
     return text.translate(_SUBSCRIPT_DIGIT_FOLD)
+
+
+def hill_element_order(elements: Iterable[str]) -> tuple[str, ...]:
+    """Return symbols in Hill order: C, H, then alphabetically; otherwise alphabetical."""
+
+    present = set(elements)
+    if "C" not in present:
+        return tuple(sorted(present))
+    ordered = ["C"]
+    if "H" in present:
+        ordered.append("H")
+    ordered.extend(sorted(present - {"C", "H"}))
+    return tuple(ordered)
