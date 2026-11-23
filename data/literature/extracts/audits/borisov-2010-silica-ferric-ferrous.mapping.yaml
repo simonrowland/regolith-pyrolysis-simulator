@@ -1,0 +1,137 @@
+schema_version: literature_extract_mapping_audit.v1
+source_id: borisov-2010-silica-ferric-ferrous
+tables:
+- table: '1'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 546
+    table: '1'
+  printed_data_rows: 7
+  columns_as_printed:
+  - Sample
+  - SiO2
+  - Al2O3
+  - Fe2O3
+  - MgO
+  - CaO
+  - Total
+  - x
+  mapped_fields:
+  - values.rows[].composition_as_printed
+  - values.rows[].point_conditions.composition.state.value.components
+  - values.rows[].composition_total_wt_pct_as_printed
+  - values.rows[].silica_formula_x_as_printed
+  row_binding: >-
+    Table 1 identifies these as initial mixtures and notes the compositions are
+    calculated averages from similar experimental glasses. Table 2 and Table 4
+    use the matching series names. No individual analysed-glass compositions
+    are printed, so no such composition is inferred.
+  explicit_unreported_cells: >-
+    Table 1 has no P2O5 column. It is absent from the printed composition maps;
+    the dash for DAFL x is retained as the printed dash, not converted to zero.
+- table: '2'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 546
+    table: '2'
+  printed_data_rows: 6
+  columns_as_printed:
+  - T °C
+  - h
+  - Samples produced simultaneously in the same series
+  mapped_fields:
+  - values.rows[].T_C
+  - values.rows[].duration_h_as_printed
+  - values.rows[].temperature_run_id_as_printed
+  - values.rows[].atmosphere_as_printed
+  row_binding: >-
+    Run suffixes bind the sample names in Table 4 to the corresponding Table 2
+    series row. Table 2 uses DA for the iron-rich base samples called DAF in
+    Table 4 and Table 1. Its note states all series were synthesized in air.
+  atmosphere_locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 546
+    table: '2'
+    row: note
+  explicit_unreported_cells: >-
+    No numeric oxygen fugacity is printed for these runs. The extract records
+    air as printed and does not calculate an fO2.
+- table: '4'
+  locator:
+    page: 4-5
+    pdf_page_index: 3-4
+    published_page: 548-549
+    table: '4'
+  printed_data_rows: 22
+  extracted_run_rows: 22
+  columns_as_printed:
+  - Sample no.
+  - Fe3+ magnetic component fit parameters
+  - Fe3+ magnetic / Fe3+ total
+  - Fe3+/Fe2+
+  mapped_fields:
+  - values.rows[].run_id_as_printed
+  - values.rows[].Fe3_over_Fe2
+  - values.rows[].vmax_mm_s_as_printed
+  row_binding: >-
+    Twenty-two distinct oxidized-glass samples have a final-column ratio. For
+    DAFL-9 and DAFL-10, the full-range ±19 mm/s fit is retained; the other
+    printed fit variants for those samples are method comparisons, not new runs.
+    For DAF-2, DAS20F-2, DAS40F-2, and DAS60F-2, the first ratio includes the
+    magnetic ferric component; the lower values printed under “magnetic ferric
+    was ignored” are alternate fits, not separate experiments.
+  uncertainty: >-
+    The ratio column has no printed uncertainties. Parenthetical numbers in
+    Tables 4 and 4—Extended are fit-parameter uncertainties and are not applied
+    to the Fe3+/Fe2+ ratios.
+  cross_source_count_check: >-
+    Aithala et al. supplementary Table S-5 summarizes 21 fitted experiments in
+    six series. Its listed series counts total 21 and omit the one printed
+    DAS90F-5 ratio row. DAS90F-5 is retained because the source paper prints
+    its ratio and Table 2 gives its run conditions.
+render_check:
+  method: >-
+    Table 1, Table 2, and Table 4 were crop-checked against 600 dpi renders.
+    Table 4 spans printed pages 548 and 549 (physical indices 3 and 4).
+  dpi: 600
+  verified_cells:
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: SiO2, value: '47.9'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: Fe2O3, value: '5.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: CaO, value: '17.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: SiO2, value: '63.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: MgO, value: '5.3'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: Al2O3, value: '6.5'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: Fe2O3, value: '1.1'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1398', column: T °C, value: '1398'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1424', column: samples, value: DAFL-9}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: h, value: '70'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: DA-1 to DAS80F-1}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1540', column: samples, value: DAFL-10}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: DAS90F-5}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAFL-9, column: Fe3+/Fe2+, value: '3.44'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAFL-10, column: Fe3+/Fe2+, value: '2.45'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAF-1, column: Fe3+/Fe2+, value: '2.08'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS20F-2, column: Fe3+/Fe2+, value: '2.56'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS60F-2, column: Fe3+/Fe2+, value: '2.68'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAF-5, column: Fe3+/Fe2+, value: '1.58'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS40F-5, column: Fe3+/Fe2+, value: '1.41'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS80F-5, column: Fe3+/Fe2+, value: '1.38'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS90F-5, column: Fe3+/Fe2+, value: '1.53'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAF-6, column: Fe3+/Fe2+, value: '2.39'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS20F-6, column: Fe3+/Fe2+, value: '2.11'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS40F-6, column: Fe3+/Fe2+, value: '2.01'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS60F-6, column: Fe3+/Fe2+, value: '2.00'}
+  - {page: 5, pdf_page_index: 4, table: '4', row: DAS80F-6, column: Fe3+/Fe2+, value: '2.15'}
+fidelity_samples:
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[0].Fe3_over_Fe2
+  value: '3.44'
+  locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAFL-9, column: Fe3+/Fe2+}
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[1].Fe3_over_Fe2
+  value: '2.45'
+  locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAFL-10, column: Fe3+/Fe2+}
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[16].Fe3_over_Fe2
+  value: '1.53'
+  locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS90F-5, column: Fe3+/Fe2+}

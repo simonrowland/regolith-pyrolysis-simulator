@@ -1,0 +1,660 @@
+schema_version: literature_extract.v1
+source_id: borisov-2010-silica-ferric-ferrous
+source:
+  citation: >-
+    Borisov, A. and McCammon, C. (2010). The effect of silica on ferric/ferrous
+    ratio in silicate melts: An experimental study using Mössbauer spectroscopy.
+    American Mineralogist, 95, 545–555.
+  doi: 10.2138/am.2010.3217
+  year: 2010
+  corpus_asset: raw/borisov-2010-silica-ferric-ferrous/borisov-2010-silica-ferric-ferrous.pdf
+  sha256: dbdc64f63ffc49ae299c16afc8c65a36c0db8b2a5c495521d5b758713ad52717
+source_files:
+  corpus_repo: regolith-corpus
+  files:
+  - asset_id: pdf:borisov-2010-silica-ferric-ferrous
+    role: pdf
+    path: raw/borisov-2010-silica-ferric-ferrous/borisov-2010-silica-ferric-ferrous.pdf
+    sha256:
+      tag: value
+      value: dbdc64f63ffc49ae299c16afc8c65a36c0db8b2a5c495521d5b758713ad52717
+extraction:
+  method: >-
+    Manual transcription of Tables 1, 2, and 4 from the supplied PDF. The full
+    PDF was rendered for table-cell verification. Each Table 4 ratio is paired
+    with the Table 2 run temperature and the Table 1 initial-mixture composition
+    by its printed sample-series name. No values are calculated or digitized
+    from figures.
+  date: '2026-11-23'
+  worker: w1123t1964
+  audit_files:
+  - data/literature/extracts/audits/borisov-2010-silica-ferric-ferrous.mapping.yaml
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[0].Fe3_over_Fe2
+  value: '3.44'
+  locator:
+    page: 5
+    published_page: 549
+    pdf_page_index: 4
+    table: '4'
+    record: DAFL-9
+    column: Fe3+/Fe2+
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[1].Fe3_over_Fe2
+  value: '2.45'
+  locator:
+    page: 5
+    published_page: 549
+    pdf_page_index: 4
+    table: '4'
+    record: DAFL-10
+    column: Fe3+/Fe2+
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[16].Fe3_over_Fe2
+  value: '1.53'
+  locator:
+    page: 5
+    published_page: 549
+    pdf_page_index: 4
+    table: '4'
+    record: DAS90F-5
+    column: Fe3+/Fe2+
+- path: species.Fe.observations[borisov_2010_table4_redox_series].values.rows[0].point_conditions.composition.state.value.components
+  value:
+    SiO2: '50.3'
+    Al2O3: '15.6'
+    Fe2O3: '1.1'
+    MgO: '10.1'
+    CaO: '22.9'
+  locator:
+    page: 2
+    published_page: 546
+    pdf_page_index: 1
+    table: '1'
+    record: DAFL
+    column: initial-mixture oxides
+experiments:
+- experiment_id: borisov_2010_air_loop_runs
+  method: quench_equilibration
+  method_as_printed: loop technique in a one atmosphere vertical tube furnace
+  atmosphere_as_printed: air
+  atmosphere_quote_as_printed: All experiments were conducted in air.
+  atmosphere_locator:
+    published_page: 546
+    pdf_page_index: 1
+    section: Experimental Methods
+  locator:
+    published_page: 546
+    pdf_page_index: 1
+    section: Experimental Methods
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Initial mixtures are printed in Table 1; composition values are retained by run in the observation rows.
+      locator:
+        published_page: 546
+        pdf_page_index: 1
+        table: '1'
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Samples were quenched by quickly withdrawing the sample holder from the furnace.
+      locator:
+        published_page: 546
+        pdf_page_index: 1
+        section: Experimental Methods
+species:
+  Fe:
+    observations:
+    - observation_id: borisov_2010_table4_redox_series
+      type: composition_series
+      experiment: borisov_2010_air_loop_runs
+      locator:
+        published_page: 548-549
+        pdf_page_index: 3-4
+        table: '4'
+        note: >-
+          Twenty-two distinct oxidized-glass samples have a printed Fe3+/Fe2+
+          value. Table 4 continues onto printed page 549. The separate fit
+          variants for a sample are not separate runs; the first full-range fit
+          is retained where the paper prints multiple fit variants.
+      phase: quenched silicate glass
+      regime: quench_equilibration
+      units: dimensionless Fe3+/Fe2+ ratio; temperature in °C; compositions in wt% oxides
+      derivation:
+        relation: >-
+          Fe3+/Fe2+ ratio reported from the fitted ferric and ferrous Mössbauer
+          spectral components.
+        output_unit: dimensionless ratio
+        method:
+          state:
+            tag: value
+            value: >-
+              Extended Voigt-based fits of the 57Fe Mössbauer spectra used
+              ferrous, ferric paramagnetic, and ferric magnetic distributions.
+          locator:
+            published_page: 547-549
+            pdf_page_index: 2-4
+            section: Results and Discussion
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 547-549
+            pdf_page_index: 2-4
+            table: '4'
+            note: Numeric spectra for all table rows are not published.
+      uncertainty_as_published: >-
+        None printed for Fe3+/Fe2+. Parenthetical uncertainties apply to fit
+        parameters, not to the ratio.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        value_status: printed
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        method_as_printed: >-
+          57Fe Mössbauer spectroscopy; extended Voigt-based fitting with
+          ferrous, ferric paramagnetic, and ferric magnetic distributions.
+        table_rows: 22
+        composition_maps:
+          DAF: &daf_composition
+            SiO2: '47.9'
+            Al2O3: '15.1'
+            Fe2O3: '5.2'
+            MgO: '9.7'
+            CaO: '22.1'
+          DAS20F: &das20f_composition
+            SiO2: '53.2'
+            Al2O3: '13.4'
+            Fe2O3: '5.1'
+            MgO: '8.7'
+            CaO: '19.6'
+          DAS40F: &das40f_composition
+            SiO2: '58.5'
+            Al2O3: '11.7'
+            Fe2O3: '5.2'
+            MgO: '7.5'
+            CaO: '17.1'
+          DAS60F: &das60f_composition
+            SiO2: '63.7'
+            Al2O3: '10'
+            Fe2O3: '5.1'
+            MgO: '6.5'
+            CaO: '14.7'
+          DAS80F: &das80f_composition
+            SiO2: '69.1'
+            Al2O3: '8.3'
+            Fe2O3: '5.1'
+            MgO: '5.3'
+            CaO: '12.1'
+          DAS90F: &das90f_composition
+            SiO2: '74.7'
+            Al2O3: '6.5'
+            Fe2O3: '5.0'
+            MgO: '4.2'
+            CaO: '9.6'
+          DAFL: &dafl_composition
+            SiO2: '50.3'
+            Al2O3: '15.6'
+            Fe2O3: '1.1'
+            MgO: '10.1'
+            CaO: '22.9'
+        composition_totals_as_printed:
+          DAF: '100.0'
+          DAS20F: '100.0'
+          DAS40F: '100.0'
+          DAS60F: '100.0'
+          DAS80F: '100.0'
+          DAS90F: '100.0'
+          DAFL: '100.0'
+        silica_formula_x_as_printed:
+          DAF: '0'
+          DAS20F: '11'
+          DAS40F: '21'
+          DAS60F: '32'
+          DAS80F: '43'
+          DAS90F: '54'
+          DAFL: '–'
+        column_method_class:
+          Fe3_over_Fe2: measured_reduced
+          T_C: measured_direct
+          duration_h_as_printed: measured_direct
+          point_conditions.composition: quoted_unattributed
+          atmosphere_as_printed: quoted_unattributed
+        rows:
+        - run_id_as_printed: DAFL-9
+          sample_series_as_printed: DAFL
+          composition_as_printed: DAFL
+          temperature_run_id_as_printed: DAFL-9
+          T_C: '1424'
+          duration_h_as_printed: '42'
+          atmosphere_as_printed: air
+          value: '3.44'
+          Fe3_over_Fe2: '3.44'
+          vmax_mm_s_as_printed: '19'
+          composition_locator:
+            published_page: 546
+            pdf_page_index: 1
+            table: '1'
+            record: DAFL
+            column: initial-mixture oxides
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '–'
+          composition_role:
+            value: initial_charge_only
+            locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAFL}
+            quote: Table 1 labels this as an initial-mixture composition.
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAFL-9, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1424'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1424', column: T °C}}
+            duration_h: {state: {tag: value, value: '42'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1424', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *dafl_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAFL, column: initial-mixture oxides}}
+        - run_id_as_printed: DAFL-10
+          sample_series_as_printed: DAFL
+          composition_as_printed: DAFL
+          temperature_run_id_as_printed: DAFL-10
+          T_C: '1540'
+          duration_h_as_printed: '21'
+          atmosphere_as_printed: air
+          value: '2.45'
+          Fe3_over_Fe2: '2.45'
+          vmax_mm_s_as_printed: '19'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAFL, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAFL}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '–'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAFL-10, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1540'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1540', column: T °C}}
+            duration_h: {state: {tag: value, value: '21'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1540', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *dafl_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAFL, column: initial-mixture oxides}}
+        - run_id_as_printed: DAF-1
+          sample_series_as_printed: DAF
+          composition_as_printed: DAF
+          temperature_run_id_as_printed: DA-1
+          T_C: '1500'
+          duration_h_as_printed: '20'
+          atmosphere_as_printed: air
+          value: '2.08'
+          Fe3_over_Fe2: '2.08'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '0'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAF-1, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1500'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: T °C}}
+            duration_h: {state: {tag: value, value: '20'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *daf_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS20F-1
+          sample_series_as_printed: DAS20F
+          composition_as_printed: DAS20F
+          temperature_run_id_as_printed: DA-1
+          T_C: '1500'
+          duration_h_as_printed: '20'
+          atmosphere_as_printed: air
+          value: '1.82'
+          Fe3_over_Fe2: '1.82'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '11'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS20F-1, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1500'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: T °C}}
+            duration_h: {state: {tag: value, value: '20'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das20f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS40F-1
+          sample_series_as_printed: DAS40F
+          composition_as_printed: DAS40F
+          temperature_run_id_as_printed: DA-1
+          T_C: '1500'
+          duration_h_as_printed: '20'
+          atmosphere_as_printed: air
+          value: '1.65'
+          Fe3_over_Fe2: '1.65'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '21'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS40F-1, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1500'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: T °C}}
+            duration_h: {state: {tag: value, value: '20'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das40f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS60F-1
+          sample_series_as_printed: DAS60F
+          composition_as_printed: DAS60F
+          temperature_run_id_as_printed: DA-1
+          T_C: '1500'
+          duration_h_as_printed: '20'
+          atmosphere_as_printed: air
+          value: '1.73'
+          Fe3_over_Fe2: '1.73'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '32'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS60F-1, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1500'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: T °C}}
+            duration_h: {state: {tag: value, value: '20'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das60f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS80F-1
+          sample_series_as_printed: DAS80F
+          composition_as_printed: DAS80F
+          temperature_run_id_as_printed: DA-1
+          T_C: '1500'
+          duration_h_as_printed: '20'
+          atmosphere_as_printed: air
+          value: '1.78'
+          Fe3_over_Fe2: '1.78'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '43'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS80F-1, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1500'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: T °C}}
+            duration_h: {state: {tag: value, value: '20'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1500', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das80f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAF-2
+          sample_series_as_printed: DAF
+          composition_as_printed: DAF
+          temperature_run_id_as_printed: DA-2
+          T_C: '1398'
+          duration_h_as_printed: '88'
+          atmosphere_as_printed: air
+          value: '2.94'
+          Fe3_over_Fe2: '2.94'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '0'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAF-2, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1398'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: T °C}}
+            duration_h: {state: {tag: value, value: '88'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *daf_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS20F-2
+          sample_series_as_printed: DAS20F
+          composition_as_printed: DAS20F
+          temperature_run_id_as_printed: DA-2
+          T_C: '1398'
+          duration_h_as_printed: '88'
+          atmosphere_as_printed: air
+          value: '2.56'
+          Fe3_over_Fe2: '2.56'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '11'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS20F-2, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1398'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: T °C}}
+            duration_h: {state: {tag: value, value: '88'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das20f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS40F-2
+          sample_series_as_printed: DAS40F
+          composition_as_printed: DAS40F
+          temperature_run_id_as_printed: DA-2
+          T_C: '1398'
+          duration_h_as_printed: '88'
+          atmosphere_as_printed: air
+          value: '2.29'
+          Fe3_over_Fe2: '2.29'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '21'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS40F-2, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1398'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: T °C}}
+            duration_h: {state: {tag: value, value: '88'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das40f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS60F-2
+          sample_series_as_printed: DAS60F
+          composition_as_printed: DAS60F
+          temperature_run_id_as_printed: DA-2
+          T_C: '1398'
+          duration_h_as_printed: '88'
+          atmosphere_as_printed: air
+          value: '2.68'
+          Fe3_over_Fe2: '2.68'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '32'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS60F-2, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1398'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: T °C}}
+            duration_h: {state: {tag: value, value: '88'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1398', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das60f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAF-5
+          sample_series_as_printed: DAF
+          composition_as_printed: DAF
+          temperature_run_id_as_printed: DA-5
+          T_C: '1571'
+          duration_h_as_printed: '23'
+          atmosphere_as_printed: air
+          value: '1.58'
+          Fe3_over_Fe2: '1.58'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '0'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAF-5, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1571'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: T °C}}
+            duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *daf_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS20F-5
+          sample_series_as_printed: DAS20F
+          composition_as_printed: DAS20F
+          temperature_run_id_as_printed: DA-5
+          T_C: '1571'
+          duration_h_as_printed: '23'
+          atmosphere_as_printed: air
+          value: '1.44'
+          Fe3_over_Fe2: '1.44'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '11'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS20F-5, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1571'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: T °C}}
+            duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das20f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS40F-5
+          sample_series_as_printed: DAS40F
+          composition_as_printed: DAS40F
+          temperature_run_id_as_printed: DA-5
+          T_C: '1571'
+          duration_h_as_printed: '23'
+          atmosphere_as_printed: air
+          value: '1.41'
+          Fe3_over_Fe2: '1.41'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '21'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS40F-5, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1571'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: T °C}}
+            duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das40f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS60F-5
+          sample_series_as_printed: DAS60F
+          composition_as_printed: DAS60F
+          temperature_run_id_as_printed: DA-5
+          T_C: '1571'
+          duration_h_as_printed: '23'
+          atmosphere_as_printed: air
+          value: '1.36'
+          Fe3_over_Fe2: '1.36'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '32'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS60F-5, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1571'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: T °C}}
+            duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das60f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS80F-5
+          sample_series_as_printed: DAS80F
+          composition_as_printed: DAS80F
+          temperature_run_id_as_printed: DA-5
+          T_C: '1571'
+          duration_h_as_printed: '23'
+          atmosphere_as_printed: air
+          value: '1.38'
+          Fe3_over_Fe2: '1.38'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '43'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS80F-5, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1571'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: T °C}}
+            duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das80f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS90F-5
+          sample_series_as_printed: DAS90F
+          composition_as_printed: DAS90F
+          temperature_run_id_as_printed: DA-5
+          T_C: '1571'
+          duration_h_as_printed: '23'
+          atmosphere_as_printed: air
+          value: '1.53'
+          Fe3_over_Fe2: '1.53'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS90F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS90F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '54'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS90F-5, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1571'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: T °C}}
+            duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1571', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das90f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS90F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAF-6
+          sample_series_as_printed: DAF
+          composition_as_printed: DAF
+          temperature_run_id_as_printed: DA-6
+          T_C: '1450'
+          duration_h_as_printed: '70'
+          atmosphere_as_printed: air
+          value: '2.39'
+          Fe3_over_Fe2: '2.39'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '0'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAF-6, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1450'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: T °C}}
+            duration_h: {state: {tag: value, value: '70'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *daf_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAF, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS20F-6
+          sample_series_as_printed: DAS20F
+          composition_as_printed: DAS20F
+          temperature_run_id_as_printed: DA-6
+          T_C: '1450'
+          duration_h_as_printed: '70'
+          atmosphere_as_printed: air
+          value: '2.11'
+          Fe3_over_Fe2: '2.11'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '11'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS20F-6, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1450'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: T °C}}
+            duration_h: {state: {tag: value, value: '70'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das20f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS20F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS40F-6
+          sample_series_as_printed: DAS40F
+          composition_as_printed: DAS40F
+          temperature_run_id_as_printed: DA-6
+          T_C: '1450'
+          duration_h_as_printed: '70'
+          atmosphere_as_printed: air
+          value: '2.01'
+          Fe3_over_Fe2: '2.01'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '21'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS40F-6, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1450'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: T °C}}
+            duration_h: {state: {tag: value, value: '70'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das40f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS40F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS60F-6
+          sample_series_as_printed: DAS60F
+          composition_as_printed: DAS60F
+          temperature_run_id_as_printed: DA-6
+          T_C: '1450'
+          duration_h_as_printed: '70'
+          atmosphere_as_printed: air
+          value: '2.00'
+          Fe3_over_Fe2: '2.00'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '32'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS60F-6, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1450'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: T °C}}
+            duration_h: {state: {tag: value, value: '70'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das60f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS60F, column: initial-mixture oxides}}
+        - run_id_as_printed: DAS80F-6
+          sample_series_as_printed: DAS80F
+          composition_as_printed: DAS80F
+          temperature_run_id_as_printed: DA-6
+          T_C: '1450'
+          duration_h_as_printed: '70'
+          atmosphere_as_printed: air
+          value: '2.15'
+          Fe3_over_Fe2: '2.15'
+          composition_locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F, column: initial-mixture oxides}
+          composition_role: {value: initial_charge_only, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F}, quote: Table 1 labels this as an initial-mixture composition.}
+          composition_total_wt_pct_as_printed: '100.0'
+          silica_formula_x_as_printed: '43'
+          locator: {published_page: 549, pdf_page_index: 4, table: '4', record: DAS80F-6, column: Fe3+/Fe2+}
+          point_conditions:
+            T_C: {state: {tag: value, value: '1450'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: T °C}}
+            duration_h: {state: {tag: value, value: '70'}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: '1450', column: h}}
+            atmosphere_as_printed: {state: {tag: value, value: air}, locator: {published_page: 546, pdf_page_index: 1, table: '2', record: note, column: atmosphere}}
+            composition: {state: {tag: value, value: {amount_basis: mass_percent, components: *das80f_composition}}, locator: {published_page: 546, pdf_page_index: 1, table: '1', record: DAS80F, column: initial-mixture oxides}}
