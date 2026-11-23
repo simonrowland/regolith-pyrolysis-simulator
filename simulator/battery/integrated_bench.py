@@ -28,8 +28,6 @@ from simulator.engine_cache import (
     cached_engine_call,
     record_engine_open,
 )
-from simulator.lab_geometry import parse_lab_geometry
-from simulator.lab_schedule import normalize_lab_schedule
 from simulator.process_timestep import resolve_process_timestep
 from simulator.runner import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -38,10 +36,7 @@ from simulator.runner import (
     RunnerError,
     _load_vacuum_preset_run_spec,
 )
-from simulator.thermal_budget import (
-    FURNACE_POWER_DRIVER_KEY,
-    _power_trace_curve_s,
-)
+from simulator.thermal_budget import FURNACE_POWER_DRIVER_KEY
 from simulator.yaml_cache import load_cached_safe_yaml
 
 SIMULATOR_ENGINE = "simulator"
@@ -313,18 +308,6 @@ _WALL_AUTHORITY_KEYS = (
     "extrapolation_notices_by_species",
     "wall_deposit_sticking_authority",
 )
-_POWER_DRIVER_FIELDS = (
-    "mass_kg",
-    "exposed_area_m2",
-    "emissivity",
-    "pellet_diameter_m",
-    "pellet_height_m",
-    "focal_spot_diameter_m",
-    "radiating_face_set",
-    "solar_absorptance",
-    "window_transmittance",
-    "conductivity_W_m_K",
-)
 
 
 class IntegratedBenchContractError(ValueError):
@@ -470,23 +453,6 @@ def consumed_chamber_pressure_dt_s(run: PyrolysisRun) -> float:
     return resolve_process_timestep(run.process_dt_s).dt_s
 
 
-def _num(value: Any, field: str) -> float:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise IntegratedBenchContractError(
-            f"{field} is not a number",
-            kind="not_a_measurement",
-            reason="non_numeric",
-        )
-    number = float(value)
-    if not math.isfinite(number):
-        raise IntegratedBenchContractError(
-            f"{field} is not finite",
-            kind="not_a_measurement",
-            reason="non_numeric",
-        )
-    return number
-
-
 def _finite(value: Any) -> bool:
     return (
         not isinstance(value, bool)
@@ -517,166 +483,56 @@ def _role(field: str, raw: Mapping[str, Any], index: int, count: int) -> str:
     return "printed_input"
 
 
-def _project_points(
-    raw_points: Sequence[Any],
-    normalized_points: Sequence[Mapping[str, Any]],
-    *,
-    field: str,
-) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
-    if len(raw_points) != len(normalized_points):
+def _point_lineage(raw_points: Sequence[Any], field: str) -> list[dict[str, str]]:
+    """Label each raw knot. The watt curve and the numbers stay with the runner."""
+
+    if isinstance(raw_points, (str, bytes)) or not isinstance(raw_points, Sequence):
         raise IntegratedBenchContractError(
-            f"{field} lost a knot during schedule normalization",
-            kind="missing_capability",
-            reason="schedule_projection",
+            f"{field} is not a knot list",
+            kind="not_a_measurement",
+            reason="non_numeric",
         )
-    values: list[dict[str, Any]] = []
     lineage: list[dict[str, str]] = []
     count = len(raw_points)
-    for index, (raw, normalized) in enumerate(zip(raw_points, normalized_points)):
+    for index, raw in enumerate(raw_points):
         if not isinstance(raw, Mapping):
             raise IntegratedBenchContractError(
                 f"{field}[{index}] is not a knot",
                 kind="not_a_measurement",
                 reason="non_numeric",
             )
-        values.append({
-            "t_h": _num(normalized["t_h"], f"{field}[{index}].t_h"),
-            "value": _num(normalized["value"], f"{field}[{index}].value"),
-            "unit": str(normalized["unit"]),
-        })
         lineage.append({
             "input_role": _role(field, raw, index, count),
             "source_class": str(raw.get("source_class") or ""),
         })
-    return values, lineage
+    return lineage
 
 
-def _gas_field(
-    raw: Mapping[str, Any],
-    *names: str,
-) -> dict[str, Any]:
-    projected: dict[str, Any] = {}
-    for name in names:
-        value = raw.get(name)
-        if _finite(value):
-            projected[name] = _num(value, name)
-        elif isinstance(value, str) and value.strip() and " " not in value:
-            projected[name] = value.strip()
-    return projected
+def _schedule_lineage(raw_schedule: Mapping[str, Any]) -> dict[str, Any]:
+    """Lineage only. The canonical schedule, including power_W, is the runner's.
 
-
-def _project_power_driver(raw_schedule: Mapping[str, Any]) -> dict[str, Any] | None:
-    """Pack the loader's power payload, not the comparison trace around it.
-
-    ``melt_temperature_from_furnace_power`` reads the watt curve and the
-    named driver fields. Uncertainty columns on the trace are not read.
+    ``_resolved_power_schedule`` already reduced the trace. This walk does
+    not parse the curve again and does not rebuild an input allowlist.
     """
 
-    driver = raw_schedule.get(FURNACE_POWER_DRIVER_KEY)
-    if not isinstance(driver, Mapping):
-        return None
-    trace = driver.get("trace")
-    if not isinstance(trace, Mapping):
-        raise IntegratedBenchContractError(
-            "furnace power driver is missing its trace",
-            kind="missing_capability",
-            reason="furnace_power_driver_malformed",
-        )
-    try:
-        curve = _power_trace_curve_s(trace)
-    except Exception as exc:
-        raise IntegratedBenchContractError(
-            f"furnace power trace is not a driver curve: {exc}",
-            kind="missing_capability",
-            reason="furnace_power_driver_malformed",
-        ) from exc
-    projected: dict[str, Any] = {
-        "power_W": [
-            {"t_s": float(time_s), "power_W": float(watts)}
-            for time_s, watts in curve
-        ],
-    }
-    for name in _POWER_DRIVER_FIELDS:
-        value = driver.get(name)
-        if value is None:
-            projected[name] = None
-        elif name == "radiating_face_set":
-            projected[name] = str(value)
-        else:
-            projected[name] = _num(value, f"furnace_power_driver.{name}")
-    return projected
-
-
-def _project_schedule(
-    raw_schedule: Mapping[str, Any],
-    raw_geometry: Mapping[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    geometry = parse_lab_geometry(raw_geometry, allow_temperature_profiles=True)
-    profiles = tuple(
-        surface.temperature_profile
-        for surface in geometry.surfaces
-        if surface.temperature_profile
-    )
-    normalized = normalize_lab_schedule(
-        raw_schedule,
-        required_surface_profiles=profiles,
-    )
-    melt, melt_lineage = _project_points(
+    melt_lineage = _point_lineage(
         raw_schedule["melt_temperature_C"],
-        normalized["melt_temperature_C"],
-        field="melt_temperature_C",
+        "melt_temperature_C",
     )
-    pressure, pressure_lineage = _project_points(
+    pressure_lineage = _point_lineage(
         raw_schedule["chamber_pressure_mbar"],
-        normalized["chamber_pressure_mbar"],
-        field="chamber_pressure_mbar",
+        "chamber_pressure_mbar",
     )
-    surfaces: dict[str, Any] = {}
     surface_lineage: dict[str, Any] = {}
     raw_surfaces = raw_schedule.get("surface_temperature_C") or {}
-    for surface_id, normalized_points in normalized["surface_temperature_C"].items():
-        raw_points = raw_surfaces[surface_id]
-        values, roles = _project_points(
-            raw_points,
-            normalized_points,
-            field=f"surface_temperature_C.{surface_id}",
-        )
-        surfaces[str(surface_id)] = values
-        surface_lineage[str(surface_id)] = roles
-    gas = normalized["gas_boundary"]
-    windows = normalized["window_semantics"]
-    schedule = {
-        "duration_h": _num(normalized["duration_h"], "duration_h"),
-        "interpolation": str(normalized["interpolation"]),
-        "furnace_ceiling_C": _num(
-            normalized["furnace_ceiling_C"], "furnace_ceiling_C"
-        ),
-        "melt_temperature_C": melt,
-        "chamber_pressure_mbar": pressure,
-        "surface_temperature_C": surfaces,
-        "window_semantics": {
-            "preheat_h": _num(windows["preheat_h"], "preheat_h"),
-            "measured_window_start_h": _num(
-                windows["measured_window_start_h"], "measured_window_start_h"
-            ),
-            "measured_window_end_h": _num(
-                windows["measured_window_end_h"], "measured_window_end_h"
-            ),
-            "cooldown_h": _num(windows["cooldown_h"], "cooldown_h"),
-            "deposit_sample_basis": str(windows["deposit_sample_basis"]),
-        },
-        "gas_boundary": {
-            "background_gas": _gas_field(
-                gas["background_gas"], "species", "mole_fraction"
-            ),
-            "imposed_flow": _gas_field(gas["imposed_flow"], "value", "unit"),
-            "pressure_control": _gas_field(
-                gas["pressure_control"], "mode", "pressure_driver"
-            ),
-        },
-    }
+    if isinstance(raw_surfaces, Mapping):
+        for surface_id, raw_points in raw_surfaces.items():
+            surface_lineage[str(surface_id)] = _point_lineage(
+                raw_points,
+                f"surface_temperature_C.{surface_id}",
+            )
     robinot_schedule = str(raw_schedule.get("id") or "") == "robinot_2026_schedule"
-    lineage = {
+    lineage: dict[str, Any] = {
         "duration_h": (
             {
                 "input_role": "outcome_conditioned",
@@ -699,26 +555,12 @@ def _project_schedule(
     }
     if robinot_schedule:
         lineage["chamber_pressure_history"] = "assumed_constant_between_knots"
-    power = _project_power_driver(raw_schedule)
-    if power is not None:
-        schedule[FURNACE_POWER_DRIVER_KEY] = power
+    driver = raw_schedule.get(FURNACE_POWER_DRIVER_KEY)
+    if isinstance(driver, Mapping):
         lineage[FURNACE_POWER_DRIVER_KEY] = "measured_driver"
-    cover = raw_schedule.get("pO2_cover")
-    if isinstance(cover, Mapping):
-        schedule["pO2_cover"] = {
-            "enabled": bool(cover.get("enabled", False)),
-            "setpoint_mbar": _num(cover["setpoint_mbar"], "pO2_cover.setpoint_mbar"),
-            "p_total_mbar": _num(cover["p_total_mbar"], "pO2_cover.p_total_mbar"),
-            "effective_pO2_achieved_mbar": _num(
-                cover["effective_pO2_achieved_mbar"],
-                "pO2_cover.effective_pO2_achieved_mbar",
-            ),
-            "limited_by_total_pressure": bool(
-                cover.get("limited_by_total_pressure", False)
-            ),
-        }
+    if isinstance(raw_schedule.get("pO2_cover"), Mapping):
         lineage["pO2_cover"] = "assumption"
-    return schedule, lineage
+    return lineage
 
 
 def _mitigation_token(spec: Any, leg: str) -> str:
@@ -849,10 +691,7 @@ def build_deck_request(
             kind="no_deck",
             reason="no_usable_composition",
         ) from exc
-    _, schedule_lineage = _project_schedule(
-        run.lab_schedule,
-        run.setpoints_patch["lab_geometry"],
-    )
+    schedule_lineage = _schedule_lineage(run.lab_schedule)
     cache_request = cache_key_document(resolved)
     assert_cache_request_has_no_measurement(cache_request)
     if spec.feedstock_id == "lunar_eac_1a":
