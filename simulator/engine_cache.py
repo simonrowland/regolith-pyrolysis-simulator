@@ -359,7 +359,8 @@ ENGINE_CHEMISTRY_VERSION = {
     "thermoengine": 4,
     # Deck cache for integrated-bench runs. Not a melt engine and not a
     # SCORE_ENGINE_SET member. Owned by simulator/battery/integrated_bench.py.
-    "simulator": 1,
+    # v2 invalidates v1 keys that omitted feedstock sections and quoted area.
+    "simulator": 2,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -382,6 +383,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
 # simulator v1: 2026-11-22 integrated_bench.py deck cache - bump when the runner projection, schedule interpretation, process timestep, session-config resolution, feedstocks, setpoints, vapor, species, materials, foulant, or nested melt-engine chemistry changes a cached number
+# simulator v2: 2026-11-23 deck key uses the inventory feedstock masses, the area reader, the power-driver curve, and the resolved process timestep - v1 entries are not reused
 
 
 @dataclass(frozen=True)
@@ -648,8 +650,8 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-18",
     },
     "simulator": {
-        "identity": "source-sha256:4a5c3ef66f8921ebf9a59bbdeff8f119c72fe358ad5affe751f5a99efa6cbbbf",
-        "date": "2026-11-22",
+        "identity": "source-sha256:077449d3f059f6aa591738558b7d6da6ac2b54b6a6fb19ed99bfa35749300054",
+        "date": "2026-11-23",
     },
 }
 

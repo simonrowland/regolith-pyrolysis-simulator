@@ -14,14 +14,16 @@ and the preset digest are provenance and stay out of the cache key.
 from __future__ import annotations
 
 import hashlib
-import inspect
 import math
-import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from simulator.condensation import (
+    LabGeometryError,
+    read_gram_lab_exposed_melt_area,
+)
 from simulator.engine_cache import (
     EngineCacheValue,
     cached_engine_call,
@@ -29,9 +31,15 @@ from simulator.engine_cache import (
 )
 from simulator.lab_geometry import parse_lab_geometry
 from simulator.lab_schedule import normalize_lab_schedule
+from simulator.process_timestep import resolve_process_timestep
 from simulator.runner import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    PyrolysisRun,
     _load_vacuum_preset_run_spec,
+)
+from simulator.thermal_budget import (
+    FURNACE_POWER_DRIVER_KEY,
+    _power_trace_curve_s,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -100,16 +108,37 @@ FORBIDDEN_REQUEST_KEYS = frozenset({
     "trial_id",
 })
 
-_PROCESS_DT_CALL = re.compile(
-    r"apply_process_chamber_pressure\(\s*self\s*,\s*dt_s\s*=\s*"
-    r"([0-9]+(?:\.[0-9]+)?)\s*\)"
-)
 _SUCCESS_STATUS = "ok"
-_HOUR_FIELDS = ("hour", "O2_source_side_potential_kg_cumulative")
+_HOUR_NUMERIC = (
+    "O2_source_side_potential_kg_cumulative",
+    "P_total_bar",
+    "pO2_bar",
+)
 _FINAL_FIELDS = (
     "pump_outlet_by_species_kg",
     "wall_deposit_by_species_kg",
     "deposit_by_surface_species_kg",
+)
+_RUN_DIAGNOSTICS = (
+    "degraded_path_engagement",
+    "melt_redox_gate_floor_fallback_engagement",
+    "condensation_refusals_by_species",
+)
+_WALL_AUTHORITY_KEYS = (
+    "extrapolation_notices_by_species",
+    "wall_deposit_sticking_authority",
+)
+_POWER_DRIVER_FIELDS = (
+    "mass_kg",
+    "exposed_area_m2",
+    "emissivity",
+    "pellet_diameter_m",
+    "pellet_height_m",
+    "focal_spot_diameter_m",
+    "radiating_face_set",
+    "solar_absorptance",
+    "window_transmittance",
+    "conductivity_W_m_K",
 )
 
 
@@ -141,31 +170,22 @@ class DeckRequest:
     """Numeric solve inputs, plus lineage that does not enter the cache key.
 
     ``cache_request`` is what ``cached_engine_call`` packs. ``lineage`` names
-    the role of each boundary (printed, conditional covariate, or assumption)
-    so a later score can flag it after lookup. The same numbers stay one
-    cache entry.
+    the role of each boundary so a later score can flag it after lookup.
+    ``run`` is the runner object the solve calls. It is not packed.
+    ``requested_steps`` is the step count ``drive_session`` executes.
     """
 
     cache_request: dict[str, Any]
     lineage: dict[str, Any]
     preset_digest: str
-
-
-@dataclass(frozen=True)
-class BenchResidual:
-    """A residual shape for the headline gate. This car does not construct one."""
-
-    used_default: bool
-    flag: str | None
-    value: float
+    run: PyrolysisRun
+    requested_steps: int
 
 
 @dataclass(frozen=True)
 class BenchScorePass:
-    """One scoring pass over explicit decks. Residuals stay empty in this car."""
+    """One scoring pass over explicit decks. This car emits no residuals."""
 
-    residuals: tuple[BenchResidual, ...]
-    defaults_applied: tuple[Any, ...]
     dispositions: tuple[ObservationDisposition, ...]
     requests: tuple[DeckRequest, ...]
     projections: tuple[Any, ...]
@@ -252,26 +272,16 @@ def bound_observation_ids() -> tuple[str, ...]:
     )
 
 
-def process_timestep_s() -> float:
-    """Return the timestep the chamber-pressure step actually receives.
+def consumed_chamber_pressure_dt_s(run: PyrolysisRun) -> float:
+    """Seconds ``apply_process_chamber_pressure`` receives for this run.
 
-    The literal lives on ``PyrolysisSimulator._apply_teststand_chamber_pressure``.
-    ``teststand._HOUR_S`` is an O2-counter conversion, not this step.
+    Session start sets ``simulator.process_timestep`` from
+    ``resolve_process_timestep(run.process_dt_s)``. The one-hour branch
+    passes that same ``dt_s`` as the literal 3600. A shorter step passes
+    ``process_timestep.dt_s``. Both are this value.
     """
 
-    from simulator.core import PyrolysisSimulator
-
-    source = inspect.getsource(
-        PyrolysisSimulator._apply_teststand_chamber_pressure
-    )
-    matches = _PROCESS_DT_CALL.findall(source)
-    if len(matches) != 1:
-        raise IntegratedBenchContractError(
-            "process timestep call site is not one literal",
-            kind="missing_capability",
-            reason="process_timestep_unresolved",
-        )
-    return float(matches[0])
+    return resolve_process_timestep(run.process_dt_s).dt_s
 
 
 def _num(value: Any, field: str) -> float:
@@ -369,6 +379,48 @@ def _gas_field(
     return projected
 
 
+def _project_power_driver(raw_schedule: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Pack the loader's power payload, not the comparison trace around it.
+
+    ``melt_temperature_from_furnace_power`` reads the watt curve and the
+    named driver fields. Uncertainty columns on the trace are not read.
+    """
+
+    driver = raw_schedule.get(FURNACE_POWER_DRIVER_KEY)
+    if not isinstance(driver, Mapping):
+        return None
+    trace = driver.get("trace")
+    if not isinstance(trace, Mapping):
+        raise IntegratedBenchContractError(
+            "furnace power driver is missing its trace",
+            kind="missing_capability",
+            reason="furnace_power_driver_malformed",
+        )
+    try:
+        curve = _power_trace_curve_s(trace)
+    except Exception as exc:
+        raise IntegratedBenchContractError(
+            f"furnace power trace is not a driver curve: {exc}",
+            kind="missing_capability",
+            reason="furnace_power_driver_malformed",
+        ) from exc
+    projected: dict[str, Any] = {
+        "power_W": [
+            {"t_s": float(time_s), "power_W": float(watts)}
+            for time_s, watts in curve
+        ],
+    }
+    for name in _POWER_DRIVER_FIELDS:
+        value = driver.get(name)
+        if value is None:
+            projected[name] = None
+        elif name == "radiating_face_set":
+            projected[name] = str(value)
+        else:
+            projected[name] = _num(value, f"furnace_power_driver.{name}")
+    return projected
+
+
 def _project_schedule(
     raw_schedule: Mapping[str, Any],
     raw_geometry: Mapping[str, Any],
@@ -437,8 +489,16 @@ def _project_schedule(
             ),
         },
     }
+    robinot_schedule = str(raw_schedule.get("id") or "") == "robinot_2026_schedule"
     lineage = {
-        "duration_h": "conditional_covariate",
+        "duration_h": (
+            {
+                "input_role": "outcome_conditioned",
+                "reason": "stop_selected_when_o2_production_ceased",
+            }
+            if robinot_schedule
+            else "conditional_covariate"
+        ),
         "interpolation": "assumption",
         "furnace_ceiling_C": "conditional_covariate",
         "melt_temperature_C": melt_lineage,
@@ -451,6 +511,12 @@ def _project_schedule(
             "pressure_control": "assumption",
         },
     }
+    if robinot_schedule:
+        lineage["chamber_pressure_history"] = "assumed_constant_between_knots"
+    power = _project_power_driver(raw_schedule)
+    if power is not None:
+        schedule[FURNACE_POWER_DRIVER_KEY] = power
+        lineage[FURNACE_POWER_DRIVER_KEY] = "measured_driver"
     cover = raw_schedule.get("pO2_cover")
     if isinstance(cover, Mapping):
         schedule["pO2_cover"] = {
@@ -484,12 +550,22 @@ def _project_geometry(
         if _finite(sample.get(key)):
             projected_sample[key] = _num(sample[key], f"sample.{key}")
             sample_lineage[key] = "printed_input"
-    # A null exposed area is omitted. This car does not fill it.
-    if _finite(sample.get("exposed_melt_area_m2")):
-        projected_sample["exposed_melt_area_m2"] = _num(
-            sample["exposed_melt_area_m2"], "sample.exposed_melt_area_m2"
+    # The runner's area reader. Quoted numerics stay admitted. A null
+    # gram-lab face is a refusal, not a filled default.
+    try:
+        area = read_gram_lab_exposed_melt_area(raw_geometry)
+    except LabGeometryError as exc:
+        raise IntegratedBenchContractError(
+            str(exc),
+            kind="missing_capability",
+            reason=str(exc.code),
+        ) from exc
+    if area is not None:
+        projected_sample["exposed_melt_area_m2"] = float(area)
+        source = str(sample.get("exposed_melt_area_source_class") or "")
+        sample_lineage["exposed_melt_area_m2"] = (
+            "deck_declared_assumption" if "assumption" in source else "printed_input"
         )
-        sample_lineage["exposed_melt_area_m2"] = "printed_input"
     surfaces = []
     surface_lineage = []
     for surface in raw_geometry.get("surfaces") or ():
@@ -544,7 +620,13 @@ def _project_geometry(
     return geometry, lineage
 
 
-def _oxide_vector(feedstocks: Mapping[str, Any], feedstock_id: str) -> dict[str, float]:
+def _resolved_feedstock_kg(
+    feedstocks: Mapping[str, Any],
+    feedstock_id: str,
+    mass_kg: float,
+) -> dict[str, float]:
+    """The inventory's prediction-driving masses, not a second formula."""
+
     try:
         entry = feedstocks[feedstock_id]
     except KeyError as exc:
@@ -553,17 +635,38 @@ def _oxide_vector(feedstocks: Mapping[str, Any], feedstock_id: str) -> dict[str,
             kind="no_deck",
             reason="no_usable_composition",
         ) from exc
-    raw = entry.get("composition_wt_pct") if isinstance(entry, Mapping) else None
+    if not isinstance(entry, Mapping):
+        raise IntegratedBenchContractError(
+            f"feedstock {feedstock_id!r} has no usable composition",
+            kind="no_deck",
+            reason="no_usable_composition",
+        )
+    raw = entry.get("composition_wt_pct")
     if not isinstance(raw, Mapping) or not raw:
         raise IntegratedBenchContractError(
             f"feedstock {feedstock_id!r} has no usable oxide vector",
             kind="no_deck",
             reason="no_usable_composition",
         )
-    oxides: dict[str, float] = {}
-    for name, value in raw.items():
-        oxides[str(name)] = _num(value, f"composition_wt_pct.{name}")
-    return dict(sorted(oxides.items()))
+    from simulator.core import PyrolysisSimulator
+
+    try:
+        masses = PyrolysisSimulator.resolved_prediction_driving_feedstock_kg(
+            entry, mass_kg
+        )
+    except (TypeError, ValueError) as exc:
+        raise IntegratedBenchContractError(
+            f"feedstock {feedstock_id!r} is not a usable composition: {exc}",
+            kind="no_deck",
+            reason="no_usable_composition",
+        ) from exc
+    if not masses:
+        raise IntegratedBenchContractError(
+            f"feedstock {feedstock_id!r} resolved to no component mass",
+            kind="no_deck",
+            reason="no_usable_composition",
+        )
+    return {str(name): float(kg) for name, kg in sorted(masses.items())}
 
 
 def _mitigation_token(spec: Any, leg: str) -> str:
@@ -672,13 +775,16 @@ def build_deck_request(
         lab_schedule=spec.lab_schedule,
         track="pyrolysis",
         feedstocks_path=feedstocks_path,
+        process_dt_s=spec.process_dt_s,
     )
     config = run._session_config()
     schedule, schedule_lineage = _project_schedule(
         spec.lab_schedule, spec.lab_geometry
     )
     geometry, geometry_lineage = _project_geometry(spec.lab_geometry)
-    oxides = _oxide_vector(config.feedstocks, spec.feedstock_id)
+    component_kg = _resolved_feedstock_kg(
+        config.feedstocks, spec.feedstock_id, float(config.mass_kg)
+    )
     additives = {
         str(name): _num(amount, f"additives_kg.{name}")
         for name, amount in sorted(dict(config.additives_kg).items())
@@ -686,7 +792,7 @@ def build_deck_request(
     cache_request = {
         "feedstock": {
             "id": spec.feedstock_id,
-            "composition_wt_pct": oxides,
+            "resolved_component_kg": component_kg,
         },
         "session": {
             "campaign": str(config.campaign),
@@ -705,7 +811,7 @@ def build_deck_request(
             "high_t_melt_activity": str(config.high_t_melt_activity),
             "until_campaign_complete": bool(config.until_campaign_complete),
             "imcc_activity_shadow": bool(config.imcc_activity_shadow),
-            "effective_dt_s": process_timestep_s(),
+            "effective_dt_s": consumed_chamber_pressure_dt_s(run),
             "leg": str(leg),
             "mitigation": _mitigation_token(spec, leg),
             "mre_target_species": str(run.mre_target_species),
@@ -716,8 +822,19 @@ def build_deck_request(
         "geometry": geometry,
     }
     assert_cache_request_has_no_measurement(cache_request)
+    if spec.feedstock_id == "lunar_eac_1a":
+        feedstock_lineage: dict[str, Any] = {
+            "input_role": "proxy",
+            "reason": "eac_1a_proxy_for_robinot_charge",
+            "registered_id": "lunar_eac_1a",
+        }
+    else:
+        feedstock_lineage = {
+            "input_role": "printed_input",
+            "registered_id": spec.feedstock_id,
+        }
     lineage = {
-        "feedstock": "printed_input",
+        "feedstock": feedstock_lineage,
         "schedule": schedule_lineage,
         "geometry": geometry_lineage,
     }
@@ -726,18 +843,54 @@ def build_deck_request(
         cache_request=cache_request,
         lineage=lineage,
         preset_digest=digest,
+        run=run,
+        requested_steps=int(run.hours),
     )
 
 
-def _token_notices(value: Any) -> list[str]:
-    if not isinstance(value, list):
-        return []
-    notices = []
-    for item in value:
-        if isinstance(item, str) and item and " " not in item and len(item) <= 64:
-            if item not in FORBIDDEN_REQUEST_KEYS:
-                notices.append(item)
-    return notices
+def _copy_diagnostic(value: Any) -> Any:
+    """Keep a runner diagnostic. Measurement-target keys stay out."""
+
+    if isinstance(value, Mapping):
+        return {
+            str(key): _copy_diagnostic(item)
+            for key, item in value.items()
+            if str(key) not in FORBIDDEN_REQUEST_KEYS
+        }
+    if isinstance(value, list):
+        return [_copy_diagnostic(item) for item in value]
+    if isinstance(value, bool) or value is None:
+        return value
+    if _finite(value):
+        return float(value)
+    if isinstance(value, str):
+        return value
+    return None
+
+
+def _project_hour_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    projected: dict[str, Any] = {"hour": float(row["hour"])}
+    for key in _HOUR_NUMERIC:
+        if _finite(row.get(key)):
+            projected[key] = float(row[key])
+    species = row.get("vapor_species_kg_hr")
+    if isinstance(species, Mapping):
+        projected["vapor_species_kg_hr"] = _project_numeric_tree(species)
+    refusals = row.get("condensation_refusals_by_species")
+    if isinstance(refusals, Mapping):
+        projected["condensation_refusals_by_species"] = _copy_diagnostic(refusals)
+    batch = row.get("vapour_batch_summary")
+    if isinstance(batch, Mapping):
+        metadata = batch.get("metadata")
+        if isinstance(metadata, Mapping):
+            kept = {
+                key: _copy_diagnostic(metadata[key])
+                for key in _WALL_AUTHORITY_KEYS
+                if key in metadata
+            }
+            if kept:
+                projected["vapour_batch_summary"] = {"metadata": kept}
+    return projected
 
 
 def _project_numeric_tree(value: Mapping[str, Any], depth: int = 0) -> dict[str, Any]:
@@ -754,100 +907,164 @@ def _project_numeric_tree(value: Mapping[str, Any], depth: int = 0) -> dict[str,
     return dict(sorted(projected.items()))
 
 
-def project_whole_run(document: Mapping[str, Any] | Any) -> tuple[dict[str, Any], bool]:
-    """Project one finished run. A scalar or a failed run is not cacheable."""
+def _expected_hours(requested_steps: int) -> list[float]:
+    return [float(step) for step in range(1, requested_steps + 1)]
 
+
+def _row_hours(rows: list[dict[str, Any]]) -> list[float] | None:
+    """Hour numbers in order, or None when a row is not a finite hour."""
+
+    hours: list[float] = []
+    for row in rows:
+        if row.get("status") == "malformed_row" or not _finite(row.get("hour")):
+            return None
+        hours.append(float(row["hour"]))
+    return hours
+
+
+def project_whole_run(
+    document: Mapping[str, Any] | Any,
+    *,
+    requested_steps: int,
+) -> tuple[dict[str, Any], bool]:
+    """Project one finished run against the step count the deck executed.
+
+    ``ok`` is cacheable only when that count is present in order, a final
+    state is present, and no row was malformed. A document that claimed
+    success and failed one of those checks is persisted as ``partial``
+    with a typed reason. Runner diagnostics are copied on that path too.
+    Omitting ``requested_steps`` cannot certify success.
+    """
+
+    if (
+        isinstance(requested_steps, bool)
+        or not isinstance(requested_steps, int)
+        or requested_steps < 1
+    ):
+        raise IntegratedBenchContractError(
+            "requested_steps must be the positive step count that was executed",
+            kind="no_deck",
+            reason="incomplete_steps",
+        )
     if not isinstance(document, Mapping):
         return {"status": "missing", "per_hour_summary": [], "final": {}}, False
+
     rows = document.get("per_hour_summary")
-    final = document.get("final")
     projected_rows: list[dict[str, Any]] = []
+    malformed = False
     if isinstance(rows, list):
         for row in rows:
             if not isinstance(row, Mapping) or not _finite(row.get("hour")):
+                projected_rows.append({"status": "malformed_row"})
+                malformed = True
                 continue
-            projected: dict[str, Any] = {
-                "hour": float(row["hour"]),
-            }
-            for key in _HOUR_FIELDS[1:]:
-                if _finite(row.get(key)):
-                    projected[key] = float(row[key])
-            species = row.get("vapor_species_kg_hr")
-            if isinstance(species, Mapping):
-                projected["vapor_species_kg_hr"] = _project_numeric_tree(species)
-            projected_rows.append(projected)
+            projected_rows.append(_project_hour_row(row))
+    elif rows is not None:
+        projected_rows.append({"status": "malformed_row"})
+        malformed = True
+
+    final = document.get("final")
     projected_final: dict[str, Any] = {}
     if isinstance(final, Mapping):
         for key in _FINAL_FIELDS:
             value = final.get(key)
             if isinstance(value, Mapping):
                 projected_final[key] = _project_numeric_tree(value)
+
     status = document.get("status")
+    status_text = str(status) if isinstance(status, str) else "missing"
+    reason: str | None = None
+    if status_text == _SUCCESS_STATUS:
+        actual = _row_hours(projected_rows)
+        if malformed or actual is None:
+            status_text = "partial"
+            reason = "malformed_row"
+        elif not isinstance(final, Mapping):
+            status_text = "partial"
+            reason = "missing_final_state"
+        elif actual != _expected_hours(requested_steps):
+            status_text = "partial"
+            reason = "incomplete_steps"
+
     hot: dict[str, Any] = {
-        "status": str(status) if isinstance(status, str) else "missing",
+        "status": status_text,
         "per_hour_summary": projected_rows,
         "final": projected_final,
     }
-    notices = _token_notices(document.get("notices"))
-    if notices:
-        hot["notices"] = notices
-    cacheable = (
-        hot["status"] == _SUCCESS_STATUS
-        and bool(projected_rows)
-        and isinstance(final, Mapping)
-    )
+    if reason is not None:
+        hot["reason"] = reason
+    for key in _RUN_DIAGNOSTICS:
+        if key in document:
+            hot[key] = _copy_diagnostic(document.get(key))
+    cacheable = reason is None and status_text == _SUCCESS_STATUS
     return hot, cacheable
+
+
+def _validated_ok_document(result: Any, requested_steps: int) -> bool:
+    """True when a returned ``ok`` document is the complete executed run."""
+
+    if not isinstance(result, Mapping) or result.get("status") != _SUCCESS_STATUS:
+        return False
+    if result.get("reason"):
+        return False
+    rows = result.get("per_hour_summary")
+    if not isinstance(rows, list):
+        return False
+    actual = _row_hours([row for row in rows if isinstance(row, Mapping)])
+    if actual is None or len(rows) != len(actual):
+        return False
+    return (
+        actual == _expected_hours(requested_steps)
+        and isinstance(result.get("final"), Mapping)
+    )
 
 
 def run_cached_deck(
     deck: DeckRequest,
-    solve: Callable[[Mapping[str, Any]], Mapping[str, Any]],
+    solve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
 ) -> Any:
-    """Solve once per packed request. Partial and failed runs are not stored."""
+    """Solve once per packed request. Only a complete ``ok`` run is stored.
 
+    The default solve is the deck's own ``PyrolysisRun.run``. A test may
+    pass a stub. A cache hit is returned only when it is still that
+    complete ``ok`` document.
+    """
+
+    def _execute(_request: Mapping[str, Any]) -> Any:
+        return deck.run.run()
+
+    solver = solve if solve is not None else _execute
     cold = {
         "preset_digest": deck.preset_digest,
     }
 
     def _solve() -> EngineCacheValue:
-        document = solve(deck.cache_request)
-        hot, cacheable = project_whole_run(document)
+        document = solver(deck.cache_request)
+        hot, cacheable = project_whole_run(
+            document,
+            requested_steps=deck.requested_steps,
+        )
         identity = record_engine_open(SIMULATOR_ENGINE)
         if isinstance(identity, str):
             cold["runtime_identity"] = identity
         return EngineCacheValue(hot=hot, cold=dict(cold), cacheable=cacheable)
 
     record_engine_open(SIMULATOR_ENGINE)
-    return cached_engine_call(SIMULATOR_ENGINE, deck.cache_request, _solve)
-
-
-def clean_headline(
-    residuals: Sequence[BenchResidual],
-) -> tuple[BenchResidual, ...]:
-    """Drop every defaulted residual from the clean headline.
-
-    A default with no flag is a contract error. Removing the flag fails
-    the caller. This car's pass has no residuals and no defaults.
-    """
-
-    clean: list[BenchResidual] = []
-    for residual in residuals:
-        if residual.used_default:
-            if not residual.flag:
-                raise IntegratedBenchContractError(
-                    "a residual that used a default has no d-460 flag",
-                    kind="unflagged_default",
-                    reason="missing_flag",
-                )
-            continue
-        clean.append(residual)
-    return tuple(clean)
+    result = cached_engine_call(SIMULATOR_ENGINE, deck.cache_request, _solve)
+    if isinstance(result, Mapping) and result.get("status") == _SUCCESS_STATUS:
+        if not _validated_ok_document(result, deck.requested_steps):
+            raise IntegratedBenchContractError(
+                "a cache hit returned a document that is not a complete ok run",
+                kind="no_deck",
+                reason="cache_hit_not_ok",
+            )
+    return result
 
 
 def score_bound_decks(
     observation_ids: Sequence[str],
     *,
-    solve: Callable[[Mapping[str, Any]], Mapping[str, Any]],
+    solve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
     repo_root: Path | None = None,
 ) -> BenchScorePass:
     """Group bound rows by trial and call the deck once. No residuals."""
@@ -882,17 +1099,8 @@ def score_bound_decks(
         )
         requests.append(deck)
         projections.append(run_cached_deck(deck, solve))
-    result = BenchScorePass(
-        residuals=(),
-        defaults_applied=(),
+    return BenchScorePass(
         dispositions=dispositions,
         requests=tuple(requests),
         projections=tuple(projections),
     )
-    if result.defaults_applied or result.residuals:
-        raise IntegratedBenchContractError(
-            "integrated-bench car A emitted a residual or a default",
-            kind="unflagged_default",
-            reason="scorecard_delta",
-        )
-    return result
