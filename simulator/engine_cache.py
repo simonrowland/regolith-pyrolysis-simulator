@@ -459,7 +459,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
+    "openimcc": 4,
     "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 4,
@@ -481,6 +481,9 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# openimcc v2: 2026-11-17 OpenIMCC 9c327c2: binary-pot oxygen balance and residue, Knudsen, mass-loss and Hashimoto runtimes consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
+# openimcc v3: 2026-11-19 OpenIMCC 979adb2 and species_thermo scoring (d-446)
+# openimcc v4: 2026-11-22 OpenIMCC bae51f7: JANAF crystal fallback, S/Sr metastable caps and R&H As/Sb/Sn/Te/Ce
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
@@ -661,7 +664,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
 }
 
-OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
+OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2bec587e444805a7bd6ec091308c00c88840357191d2e3d27dfee37fc99581af"
 
 _TABLE = "engine_outputs"
 _SPECIES_TABLE = "engine_output_species"
