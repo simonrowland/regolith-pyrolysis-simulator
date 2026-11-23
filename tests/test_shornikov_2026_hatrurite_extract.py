@@ -36,7 +36,7 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
 
     assert len(records) == 134
     assert len(result.experiments) == 1
-    assert len(result.queue) == 2
+    assert not any("phase" in (item.axes or ()) for item in result.queue)
     sample_composition = next(iter(result.experiments.values())).sample.initial_composition
     assert sample_composition is not None and sample_composition.state.is_value
     assert dict(sample_composition.state.value.components) == {
@@ -44,10 +44,26 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
         "SiO2": Decimal("0.25"),
     }
     assert sample_composition.locator.published_page == 298
-    assert sorted((tuple(item.axes), item.why) for item in result.queue) == [
-        (("phase",), "missing phase"),
-        (("phase",), "missing phase"),
+    assert all(
+        record.identity.species.phase.is_value
+        and record.identity.species.phase.value.value == "g"
+        for record in records
+        if record.identity.quantity.value is Quantity.P_PARTIAL
+    )
+    inferred_activity = [
+        record
+        for record in records
+        if record.identity.quantity.value is Quantity.ACTIVITY
     ]
+    assert all(
+        any(notice.kind.value == "phase_inferred" for notice in record.notices)
+        for record in inferred_activity
+    )
+    assert all(
+        record.identity.species.phase.is_value
+        and record.identity.species.phase.value.value == "unspecified"
+        for record in inferred_activity
+    )
     assert not result.registry_issues
     assert not result.validation.hard_issues
     assert not validator.validate_extract_document(
@@ -150,7 +166,24 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             and record.identity.reservoir.value.formula == "Ca3SiO5"
             and record.identity.reservoir.value.phase.value == "cr"
             for record in migrated
-        )
+        ), [
+            (
+                record.observation_id,
+                record.identity.species.phase,
+                record.identity.composition,
+                record.identity.reservoir,
+            )
+            for record in migrated
+            if not (
+                record.identity.species.phase.is_value
+                and record.identity.species.phase.value.value == "g"
+                and record.identity.composition.is_value
+                and record.identity.reservoir is not None
+                and record.identity.reservoir.is_value
+                and record.identity.reservoir.value.formula == "Ca3SiO5"
+                and record.identity.reservoir.value.phase.value == "cr"
+            )
+        ]
         if formula == "CaSiO3":
             for record in migrated:
                 reaction = record.identity.reaction
@@ -208,8 +241,9 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
         assert all(
             record.identity.composition.is_value
             and record.identity.temperature_K.is_value
-            and record.identity.species.phase.is_unknown
-            and record.identity.species.phase.reason
+            and record.identity.species.phase.is_value
+            and record.identity.species.phase.value.value == "unspecified"
+            and any(notice.kind.value == "phase_inferred" for notice in record.notices)
             and record.identity.species.formula == formula
             and record.identity.reference_state.is_value
             and record.identity.reference_state.value.endmember.phase.is_unknown

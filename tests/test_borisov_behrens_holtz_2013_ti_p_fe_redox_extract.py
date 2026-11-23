@@ -236,11 +236,7 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     records = list(result.observations.values())
     assert len(records) == 62
     assert not result.registry_issues
-    assert len(result.queue) == 6
-    assert all(
-        item.axes == ["method"] and item.why == "source does not state method"
-        for item in result.queue
-    )
+    assert not any(item.axes == ["method"] for item in result.queue)
 
     source_formula = {
         item["observation_id"]: formula

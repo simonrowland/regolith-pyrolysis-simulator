@@ -1415,9 +1415,10 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     )
 
 
-def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migration(
+def test_plante_k_partial_pressure_rows_stay_out_of_clean_band_after_phase_inference(
     tmp_path: Path,
 ) -> None:
+    from simulator.battery.enums import NoticeKind
     from simulator.battery.score import derive_kems_partial_pressure_band, score_store
     from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 
@@ -1428,8 +1429,7 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
         migrated.experiments,
         benches=migrated.benches,
     )
-    assert expected is not None
-    assert expected.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+    assert expected is None
 
     context = ScoreContext(
         works=migrated.works,
@@ -1465,22 +1465,13 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
     )
     scored = [row for row in residuals if row.reference in references]
     assert len(scored) == 162
-    missing_or_changed = [
-        (
-            row.reference,
-            None
-            if row.numeric is None or row.numeric.decision_band is None
-            else row.numeric.decision_band.value,
-        )
+    assert all(
+        row.numeric is not None
+        and row.numeric.decision_band is None
+        and row.status is ResidualStatus.NO_BAND
+        and any(notice.kind is NoticeKind.PHASE_INFERRED for notice in row.notices)
         for row in scored
-        if (
-            row.numeric is None
-            or row.numeric.decision_band is None
-            or row.numeric.decision_band.value.quantize(Decimal("0.000001"))
-            != expected.value.quantize(Decimal("0.000001"))
-        )
-    ]
-    assert not missing_or_changed, missing_or_changed[:5]
+    )
 
 
 @pytest.mark.parametrize(
@@ -1497,10 +1488,10 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
         ),
     ),
 )
-def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
+def test_kems_partial_pressure_band_ignores_flagged_plante_rows(
     tmp_path: Path, source_name: str, expected_rail: Rail
 ) -> None:
-    """The source-wide KEMS pressure band survives cell-note parse refusals."""
+    """A phase-inferred source cannot contribute to the clean KEMS band."""
     from simulator.battery.enums import Quantity
     from simulator.battery.score import (
         _printed_uncertainty_band,
@@ -1531,8 +1522,10 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
     band = derive_kems_partial_pressure_band(
         observations, experiments, benches=benches
     )
-    assert band is not None
-    assert band.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+    target_band = derive_kems_partial_pressure_band(
+        target.observations, target.experiments, benches=target.benches
+    )
+    assert band == target_band
     reference_value = point_magnitude(target_reference.value)
     assert reference_value is not None
     printed = _printed_uncertainty_band(
@@ -1543,6 +1536,8 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
         method=experiments[target_reference.experiment_id].method.value,
     )
     assert printed.refusal is not None
+    if band is None:
+        return
     numeric, reason, detail = populate_numeric(
         quantity=Quantity.P_PARTIAL,
         candidate=reference_value,
@@ -1556,7 +1551,7 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
     assert numeric.decision_band == band
 
 
-def test_plante_kems_pressure_envelope_reports_unstated_confidence(
+def test_plante_kems_pressure_envelope_does_not_enter_clean_band_when_phase_inferred(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.enums import NoticeKind, Quantity
@@ -1581,15 +1576,8 @@ def test_plante_kems_pressure_envelope_reports_unstated_confidence(
     band = derive_kems_partial_pressure_band(
         observations, experiments, benches=plante.benches
     )
-    assert band is not None
-    assert band.value == Decimal("0.1461280356782380259259551535")
-    assert "source-printed" in band.rule
-    assert "log10(1.40)" in band.rule
-    assert "page-280 1500 K sentence" in band.rule
-    assert "upper multiplicative edge" in band.rule
-    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
-    assert "+/-40% relative band" in band.rule
-    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
+    assert band is None
+    assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in observation.notices)
 
     printed = _printed_uncertainty_band(
         Quantity.P_PARTIAL,
@@ -9220,7 +9208,12 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
 
 def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None:
     from simulator.battery.records import ResidualRefusal
-    from simulator.battery.score import dumps_residual_line
+    from simulator.battery.records import NoticePolicy
+    from simulator.battery.score import (
+        _flagged_payload_strata,
+        dumps_residual_line,
+        flagged_strata,
+    )
 
     work = F.work()
     experiment = F.tabulation_experiment(work_id=work.work_id)
@@ -9235,10 +9228,35 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
         )
         for name in ("a", "b", "flagged", "refused")
     )
-    context = _context(work, experiment, *observations)
     engine = Engine.INTERNAL_ANALYTICAL
     unit = "dimensionless"
     band = DecisionBand(Decimal("20"), unit, "fixture band")
+
+    flagged_notice = Notice(
+        NoticeKind.PHASE_INFERRED,
+        (Quantity.P_SAT,),
+        "phase_inferred: value=unspecified; original_reason=source does not state phase",
+        "engine:fixture",
+        policy=NoticePolicy("DP-016", "v1", "canonical", "unspecified", None),
+    )
+    flagged_species = observations[2].identity.species
+    assert flagged_species is not None
+    observations = (
+        observations[0],
+        observations[1],
+        replace(
+            observations[2],
+            identity=replace(
+                observations[2].identity,
+                species=replace(flagged_species, phase=State.of(Phase.UNSPECIFIED)),
+            ),
+            notices=(flagged_notice,),
+        ),
+        observations[3],
+    )
+    assert observations[2].identity.species.phase == State.of(Phase.UNSPECIFIED)
+    assert observations[2].notices == (flagged_notice,)
+    context = _context(work, experiment, *observations)
 
     def measured(index: int, value: str) -> Residual:
         return F.residual(
@@ -9250,12 +9268,40 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
             numeric=ResidualNumeric(MetricOperation.DEX, unit, Decimal(value), band),
         )
 
-    flagged_notice = Notice(
-        NoticeKind.OUT_OF_CERTIFIED_BAND,
+    proposed_method_notice = Notice(
+        NoticeKind.METHOD_UNSTATED,
         (Quantity.P_SAT,),
-        "fixture outside certified domain",
+        "method_unstated: default=unspecified; original_reason=source does not state method",
         "engine:fixture",
+        policy=NoticePolicy("DP-102", "v1", "proposed", "unspecified", None),
     )
+    assert flagged_strata((proposed_method_notice,)) == (
+        NoticeKind.METHOD_UNSTATED.value,
+        "proposed-policy",
+    )
+    serialized_proposed = json.loads(
+        dumps_residual_line(
+            replace(measured(2, "10"), notices=(proposed_method_notice,))
+        )
+    )
+    assert _flagged_payload_strata(serialized_proposed) == (
+        NoticeKind.METHOD_UNSTATED.value,
+        "proposed-policy",
+    )
+
+    assert flagged_strata((flagged_notice,)) == (NoticeKind.PHASE_INFERRED.value,)
+    serialized_flagged = json.loads(
+        dumps_residual_line(
+            replace(measured(2, "10"), notices=(flagged_notice,))
+        )
+    )
+    assert serialized_flagged["notices"][0]["policy"] == {
+        "id": "DP-016",
+        "version": "v1",
+        "status": "canonical",
+        "value": "unspecified",
+        "units": None,
+    }
     residuals = (
         measured(0, "3"),
         measured(1, "4"),
@@ -9296,6 +9342,27 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     assert metric["unit"] == "dex"
     assert metric["certified"]["n"] == 2
     assert metric["flagged"]["n"] == 1
+
+    # Mutation check: removing the default flag moves this residual into the
+    # clean headline. The expected 2/1 certified/flagged counts above then fail.
+    unflagged_residuals = (
+        *residuals[:2],
+        replace(residuals[2], notices=()),
+        residuals[3],
+    )
+    unflagged_row = next(
+        candidate
+        for candidate in measured_engine_rail_records(
+            tuple(json.loads(dumps_residual_line(item)) for item in unflagged_residuals),
+            context=context,
+            engines=(engine,),
+        )
+        if candidate["rail"] == Rail.VAPOUR.value
+        and candidate["source_relation"] == SourceRelation.INDEPENDENT.value
+        and candidate["candidates"]
+    )
+    assert unflagged_row["certified_numeric"] == 3
+    assert unflagged_row["flagged_numeric"] == 0
     from scripts.battery_score import _measured_report
 
     report = _measured_report(
@@ -19833,6 +19900,8 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
 
     from simulator.battery.identity import quantity_token
     from simulator.battery.score import compile_residual
+    from simulator.battery.enums import NoticeKind, Phase
+    from simulator.battery.records import State
     from tests.battery.test_migrate import _migrate_real_extract
 
     result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
@@ -19877,9 +19946,11 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
         extract_review={"kems-051-allibert-1981": "reviewed"},
     )
     for observation in rows:
-        assert observation.identity.species.phase.is_unknown
-        assert "bulk_composition_in_two_phase_region" in (
-            observation.identity.species.phase.reason or ""
+        assert observation.identity.species.phase == State.of(Phase.UNSPECIFIED)
+        assert any(
+            notice.kind is NoticeKind.PHASE_INFERRED
+            and "bulk_composition_in_two_phase_region" in notice.reason
+            for notice in observation.notices
         )
         for engine in (Engine.OPENIMCC,):
             residual, _candidate = compile_residual(

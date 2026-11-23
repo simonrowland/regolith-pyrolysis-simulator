@@ -139,7 +139,9 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
         assert row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert row.derivation is not None
         assert row.derivation.has_located_unprinted_raw_inputs
-        assert row.identity.species.phase.is_unknown
+        assert row.identity.species.phase.is_value
+        assert row.identity.species.phase.value.value == "l"
+        assert any(notice.kind.value == "phase_inferred" for notice in row.notices)
         assert row.identity.temperature_K.value == Decimal("1673.15")
         assert row.identity.composition.is_value
         assert row.identity.composition.value == wt_pct_to_mole_fraction(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import yaml
 
-from simulator.battery.enums import PerBasis, ValueKind
+from simulator.battery.enums import MethodToken, NoticeKind, PerBasis, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
 
 
@@ -128,6 +128,12 @@ def test_isolated_migration_preserves_both_quoted_temperature_identities() -> No
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in observations
     )
-    assert len(result.queue) == 2
-    assert all(entry.axes == ["method"] for entry in result.queue)
-    assert all(entry.why == "source does not state method" for entry in result.queue)
+    assert not any(entry.axes == ["method"] for entry in result.queue)
+    assert all(
+        result.experiments[row.experiment_id].method.value is MethodToken.UNSPECIFIED
+        for row in result.observations.values()
+    )
+    assert all(
+        any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
+        for row in result.observations.values()
+    )

@@ -611,6 +611,12 @@ FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION = (
 )
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
+FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
+FLAGGED_STRATUM_D460_MIGRATION = (
+    NoticeKind.METHOD_UNSTATED.value,
+    NoticeKind.METHOD_INFERRED.value,
+    NoticeKind.PHASE_INFERRED.value,
+)
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
@@ -2473,18 +2479,25 @@ def _cell_apparatus_inference_notices(
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     return _classify_flagged_notice_facts(
-        tuple((notice.kind.value, notice.reason) for notice in notices)
+        tuple(
+            (
+                notice.kind.value,
+                notice.reason,
+                notice.policy.status if notice.policy is not None else None,
+            )
+            for notice in notices
+        )
     )
 
 
 def _classify_flagged_notice_facts(
-    notices: Sequence[tuple[str, object]],
+    notices: Sequence[tuple[str, object, str | None]],
 ) -> tuple[str, ...]:
     strata: list[str] = []
-    kinds = {kind for kind, _reason in notices}
+    kinds = {kind for kind, _reason, _policy_status in notices}
     unverified_apparatus = tuple(
         reason
-        for kind, reason in notices
+        for kind, reason, _policy_status in notices
         if kind == NoticeKind.UNVERIFIED_APPARATUS.value
     )
     if any(_is_calibration_not_grounded_reason(reason) for reason in unverified_apparatus):
@@ -2504,17 +2517,20 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
-        for kind, reason in notices
+        for kind, reason, _policy_status in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
+    if any(
+        _is_fusion_conversion_reason(reason)
+        for _kind, reason, _policy_status in notices
+    ):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
         and reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED}:")
-        for _kind, reason in notices
+        for _kind, reason, _policy_status in notices
     ):
         strata.append(FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED)
     if any(
@@ -2522,13 +2538,16 @@ def _classify_flagged_notice_facts(
         and reason.startswith(
             f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
         )
-        for _kind, reason in notices
+        for _kind, reason, _policy_status in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
+    strata.extend(kind for kind in FLAGGED_STRATUM_D460_MIGRATION if kind in kinds)
+    if any(policy_status == "proposed" for _kind, _reason, policy_status in notices):
+        strata.append(FLAGGED_STRATUM_PROPOSED_POLICY)
     if any(
         kind == NoticeKind.FIGURE_ONLY.value
         and (reason == "figure_only" or reason.startswith("figure_only:"))
-        for kind, reason in notices
+        for kind, reason, _policy_status in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.APPROXIMATE_VALUE.value in kinds:
@@ -24250,7 +24269,16 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
-        (str(notice.get("kind") or ""), notice.get("reason"))
+        (
+            str(notice.get("kind") or ""),
+            notice.get("reason"),
+            (
+                str(notice["policy"].get("status"))
+                if isinstance(notice.get("policy"), Mapping)
+                and notice["policy"].get("status") is not None
+                else None
+            ),
+        )
         for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )

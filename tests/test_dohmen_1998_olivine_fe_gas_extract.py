@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import FO2Channel, Phase, ValueKind
+from simulator.battery.enums import FO2Channel, NoticeKind, Phase, ValueKind
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,13 +98,23 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
         "dohmen_1998_table1_v929_product",
         "dohmen_1998_table1_v937_product",
     }
-    unknown_phase_ids = {
+    unspecified_phase_ids = {
         local_id
         for full_id, row in result.observations.items()
-        if row.identity.species.phase.is_unknown
+        if row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.UNSPECIFIED
         for local_id in (full_id.split("::", 1)[1],)
     }
-    assert unknown_phase_ids == {"dohmen_1998_table1_v937_product"}
+    assert unspecified_phase_ids == {"dohmen_1998_table1_v937_product"}
+    assert any(
+        notice.kind is NoticeKind.PHASE_INFERRED
+        for notice in result.observations[
+            next(
+                full_id for full_id in result.observations
+                if full_id.endswith("dohmen_1998_table1_v937_product")
+            )
+        ].notices
+    )
     source_rows = {
         row["observation_id"]: row
         for row in _document()["species"]["Fe"]["observations"]
@@ -120,7 +130,8 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
     for full_id, row in result.observations.items():
         local_id = full_id.split("::", 1)[1]
         if local_id == "dohmen_1998_table1_v937_product":
-            assert row.identity.species.phase.is_unknown
+            assert row.identity.species.phase.is_value
+            assert row.identity.species.phase.value is Phase.UNSPECIFIED
         else:
             assert row.identity.species.phase.is_value
             assert row.identity.species.phase.value is Phase.CR

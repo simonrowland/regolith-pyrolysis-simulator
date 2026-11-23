@@ -387,8 +387,11 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert result.validation.hard_issues == ()
     assert not result.registry_issues
     assert len(result.observations) == 167
-    # Mutation: restoring unknown reference states restores one queue item per row.
-    assert len(result.queue) == 167
+    assert not any(
+        axis in {"method", "phase"}
+        for item in result.queue
+        for axis in (item.axes or ())
+    )
 
     observations = result.observations
     assert set(observations) == {
@@ -479,17 +482,19 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     experiment = result.experiments[experiment_ids.pop()]
     assert experiment.method.is_value
     assert experiment.method.value is MethodToken.QUENCH_EQUILIBRATION
+    assert not any(entry.axes == ["method"] for entry in result.queue)
     assert all(
         row.derivation is not None
         and row.derivation.method is not None
         and row.derivation.method.state.is_value
         and row.derivation.method.state.value == method_text
         and row.derivation.method.locator.published_page == 2633
+        and not any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            for notice in row.notices
+        )
         for row in observations.values()
     )
-    assert Counter(entry.why for entry in result.queue) == Counter({
-        "source does not state method": 167,
-    })
 
     for panel, row_number, activity, *tail in TABLE1A_ROWS:
         composition_values = tail[:6]

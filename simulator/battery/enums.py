@@ -321,6 +321,9 @@ class NoticeKind(StrEnum):
     # A nonblocking limitation of an engine model or how it is applied. The
     # reason carries detail; it adds no stratum and does not change authority.
     ENGINE_MODEL_CAVEAT = "engine_model_caveat"
+    METHOD_UNSTATED = "method_unstated"
+    METHOD_INFERRED = "method_inferred"
+    PHASE_INFERRED = "phase_inferred"
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
@@ -422,6 +425,7 @@ class Phase(StrEnum):
     AQ = "aq"
     GLASS = "glass"
     SUPERCOOLED_L = "supercooled_l"
+    UNSPECIFIED = "unspecified"
 
 
 class QuenchState(StrEnum):
@@ -567,6 +571,8 @@ class AmountBasis(StrEnum):
 
 
 class MethodToken(StrEnum):
+    UNSPECIFIED = "unspecified"
+    CALORIMETRY = "calorimetry"
     KNUDSEN_EFFUSION = "knudsen_effusion"
     STATIC_EQUILIBRIUM = "static_equilibrium"
     LANGMUIR_FREE_EVAPORATION = "langmuir_free_evaporation"
@@ -586,6 +592,7 @@ class MethodToken(StrEnum):
     MOSSBAUER_SPECTROSCOPY = "mossbauer_spectroscopy"
     XANES_SPECTROSCOPY = "xanes_spectroscopy"
     WET_CHEMICAL_ANALYSIS = "wet_chemical_analysis"
+    ELECTRON_MICROPROBE = "electron_microprobe"
     PISTON_CYLINDER = "piston_cylinder"
     TABULATION = "tabulation"
     ENGINE_EVALUATION = "engine_evaluation"
