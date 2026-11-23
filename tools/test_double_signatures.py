@@ -118,8 +118,18 @@ def _local_method(
     cls = _callable_definition(constructor, at, parents, ast.Module(body=[], type_ignores=[]))
     if isinstance(cls, ast.ClassDef):
         method = next((item for item in cls.body if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == node.attr), None)
-        return method, True
+        return method, _method_has_receiver(method)
     return None, False
+
+
+def _method_has_receiver(method: ast.AST | None) -> bool:
+    if not isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return False
+    for decorator in method.decorator_list:
+        name = _dotted(decorator.func) if isinstance(decorator, ast.Call) else _dotted(decorator)
+        if name in {"classmethod", "staticmethod"}:
+            return False
+    return True
 
 
 def _within_direct_scope(node: ast.AST, scope: ast.AST, parents: dict[ast.AST, ast.AST]) -> bool:
@@ -226,7 +236,9 @@ def _production_signature(
         base = _dotted(target.elts[0])
         if isinstance(target.elts[0], ast.Name):
             constructor = _assigned_constructor(target.elts[0].id, call, parents)
-            if constructor is not None:
+            if constructor is not None and _is_class_constructor(
+                constructor, call, parents, modules, objects
+            ):
                 base = _dotted(constructor)
                 bound_target = True
         if not base:
@@ -252,7 +264,7 @@ def _production_signature(
         if callable(value):
             try:
                 signature = inspect.signature(value)
-                if bound_target:
+                if bound_target and inspect.isfunction(value):
                     parameters = list(signature.parameters.values())
                     if parameters:
                         signature = signature.replace(parameters=parameters[1:])
@@ -336,6 +348,15 @@ def _compatible(production: inspect.Signature, double: inspect.Signature) -> boo
         shape(frozenset({name}), 0)
     for positional_count in range(len(positional_or_keyword) + 1):
         shape(frozenset(), positional_count)
+    if any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in production_params) and any(
+        p.kind is inspect.Parameter.VAR_KEYWORD for p in production_params
+    ):
+        double_positional = [
+            p for p in double_params
+            if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
+        ]
+        for index, param in enumerate(double_positional):
+            shapes.append(([object() for _ in range(index + 1)], {param.name: object()}))
     # Required positional-only parameters cannot be omitted; make sure the
     # constructed minimal call still supplies them positionally.
     for args, kwargs in shapes:
@@ -345,6 +366,33 @@ def _compatible(production: inspect.Signature, double: inspect.Signature) -> boo
         except TypeError:
             return False
     return True
+
+
+def _is_class_constructor(
+    constructor: ast.AST,
+    at: ast.AST,
+    parents: dict[ast.AST, ast.AST],
+    modules: dict[str, str],
+    objects: dict[str, str],
+) -> bool:
+    tree = ast.Module(body=[], type_ignores=[])
+    local = _callable_definition(constructor, at, parents, tree)
+    if isinstance(local, ast.ClassDef):
+        return True
+    dotted = _dotted(constructor)
+    if not dotted:
+        return False
+    dotted = _resolve_alias(dotted, modules, objects)
+    parts = dotted.split(".")
+    for split in range(len(parts) - 1, 0, -1):
+        try:
+            value = importlib.import_module(".".join(parts[:split]))
+            for attribute in parts[split:]:
+                value = getattr(value, attribute)
+        except Exception:
+            continue
+        return inspect.isclass(value)
+    return False
 
 
 def scan_tests(root: Path) -> Census:
@@ -380,8 +428,20 @@ def scan_tests(root: Path) -> Census:
                 continue
             resolved += 1
             if not _compatible(production, double):
-                violations.append(f"{path}:{site.line}: production {production}; double {double}")
+                relative = path.relative_to(root).as_posix()
+                test_name = _test_name(site.call, parents)
+                target = ast.unparse(site.target)
+                violations.append(f"{relative}::{test_name}::{target}")
     return Census(scanned, resolved, tuple(skipped), tuple(violations))
+
+
+def _test_name(node: ast.AST, parents: dict[ast.AST, ast.AST]) -> str:
+    scope = parents.get(node)
+    while scope is not None:
+        if isinstance(scope, (ast.FunctionDef, ast.AsyncFunctionDef)) and scope.name.startswith("test_"):
+            return scope.name
+        scope = parents.get(scope)
+    return "<module>"
 
 
 def main(argv: list[str] | None = None) -> int:

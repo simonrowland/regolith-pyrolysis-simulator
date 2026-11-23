@@ -1440,7 +1440,7 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
 
     def counted(
         inventory,
-        temperature_K,
+        T_K,
         mode,
         *args,
         lambda_imposed=None,
@@ -1497,14 +1497,14 @@ def test_candidate_redox_pack_keeps_the_raw_valence_amounts(
 
     def counted(
         inventory,
-        temperature_K,
+        T_K,
         mode,
         *args,
         lambda_imposed=None,
         redox_pack_path=None,
         **kwargs,
     ):
-        calls.append((inventory, temperature_K, mode, lambda_imposed, redox_pack_path))
+        calls.append((inventory, T_K, mode, lambda_imposed, redox_pack_path))
         return expected
 
     monkeypatch.setattr(engine_cache, "cached_engine_call", cached_call)

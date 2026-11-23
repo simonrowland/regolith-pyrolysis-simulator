@@ -22,6 +22,7 @@ def test_all_patch_doubles_accept_production_signatures() -> None:
         ("value=42", "value", False),
         ("value=42", "value=42, **kwargs", True),
         ("first, second=2, *, flag=False", "first, second=2, *, flag=False", True),
+        ("*args, **kwargs", "value=None, *args, **kwargs", False),
     ],
 )
 def test_compatibility_covers_keyword_names_and_optional_omissions(
@@ -77,6 +78,22 @@ def test_scan_binds_methods_on_directly_constructed_receivers(tmp_path: Path) ->
     assert "test_narrow_method.py" in census.violations[0]
 
 
+def test_scan_preserves_pytest_importorskip_module_alias(tmp_path: Path) -> None:
+    (tmp_path / "test_importorskip_alias.py").write_text(
+        "import pytest\n"
+        "openimcc = pytest.importorskip('collections')\n"
+        "def replacement(iterable=(), /, **kwargs): return None\n"
+        "def test_alias(monkeypatch):\n"
+        "    monkeypatch.setattr(openimcc, 'Counter', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == 1
+    assert census.resolved == 1
+    assert not census.skipped
+    assert not census.violations
+
+
 def test_scan_resolves_a_bound_method_double(tmp_path: Path) -> None:
     (tmp_path / "test_bound_method.py").write_text(
         "import time\n"
@@ -92,3 +109,38 @@ def test_scan_resolves_a_bound_method_double(tmp_path: Path) -> None:
     assert census.resolved == 1
     assert not census.skipped
     assert not census.violations
+
+
+def test_scan_keeps_bound_classmethod_parameters(tmp_path: Path) -> None:
+    (tmp_path / "test_bound_classmethod.py").write_text(
+        "from collections import UserDict\n"
+        "def replacement(value=None): return None\n"
+        "def test_bound_fromkeys(monkeypatch):\n"
+        "    mapping = UserDict()\n"
+        "    monkeypatch.setattr(mapping, 'fromkeys', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == 1
+    assert census.resolved == 1
+    assert len(census.violations) == 1
+    assert census.violations[0].startswith(
+        "test_bound_classmethod.py::test_bound_fromkeys::"
+    )
+
+
+def test_local_method_receiver_detection_respects_descriptors() -> None:
+    from tools.test_double_signatures import _method_has_receiver
+
+    source = ast.parse(
+        "class Example:\n"
+        "    def bound(self, value): pass\n"
+        "    @classmethod\n"
+        "    def class_bound(cls, value): pass\n"
+        "    @staticmethod\n"
+        "    def static(value): pass\n"
+    )
+    methods = source.body[0].body
+    assert _method_has_receiver(methods[0])
+    assert not _method_has_receiver(methods[1])
+    assert not _method_has_receiver(methods[2])
