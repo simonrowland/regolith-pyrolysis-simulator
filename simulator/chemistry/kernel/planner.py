@@ -670,14 +670,17 @@ class ChemistryKernel:
         from simulator.engine_pool import EngineWorkerTimeout
         from simulator.reduced_real_determinism import (
             failed_provider_attempt_is_environment,
+            gate_curve_bounds_are_usable,
             gate_curve_provider_diagnostic_reasons,
             gate_curve_provider_has_terminal_input,
+            gate_curve_provider_timeout_reason,
         )
 
         attempts = []
         order = self._registry.gate_provider_order
         primary_result = None
         for provider in order:
+            is_primary = primary_result is None
             try:
                 result = self._dispatch_through_provider(
                     ChemistryIntent.GATE_LIQUID_FRACTION, provider,
@@ -697,13 +700,31 @@ class ChemistryKernel:
             if primary_result is None:
                 primary_result = result
             diagnostic = dict(result.diagnostic or {})
-            if result.status == 'ok':
+            # Keep the primary result when it already has usable bounds. A
+            # primary timeout is recovered by the whole-dispatch retry, so
+            # neither skipped continuation needs a step-down notice.
+            if (
+                is_primary
+                and gate_curve_provider_timeout_reason(diagnostic) is not None
+            ):
+                break
+            if gate_curve_bounds_are_usable(
+                diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+            ):
                 break
             reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
             attempt_record = {
                 'provider': provider.capability_profile().provider_id,
                 'status': result.status,
-                'reason': '; '.join(reasons) or '; '.join(result.warnings) or result.status,
+                'reason': (
+                    '; '.join(reasons)
+                    or '; '.join(result.warnings)
+                    or (
+                        'no_usable_liquidus_bounds'
+                        if result.status == 'ok'
+                        else result.status
+                    )
+                ),
                 'diagnostic': diagnostic,
             }
             # The payload keeps the timeout. Digests drop attempts with this flag.
@@ -714,16 +735,23 @@ class ChemistryKernel:
             if gate_curve_provider_has_terminal_input(reasons):
                 break
         if attempts:
-            # Exhausting the alternate must preserve d-298/d-299's original
-            # primary failure classification, including timeout retries.
-            if result.status != 'ok':
+            # Preserve the primary failure only when no provider produced a
+            # usable curve; a flagged AlphaMELTS curve is still the step-down.
+            if not gate_curve_bounds_are_usable(
+                diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+            ):
                 result = primary_result
                 diagnostic = dict(result.diagnostic or {})
             diagnostic['gate_provider_step_down'] = {
                 'requested_provider_order': [p.capability_profile().provider_id for p in order],
                 'failed_providers': attempts,
-                'realized_provider': (provider.capability_profile().provider_id
-                                      if result.status == 'ok' else None),
+                'realized_provider': (
+                    provider.capability_profile().provider_id
+                    if gate_curve_bounds_are_usable(
+                        diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+                    )
+                    else None
+                ),
             }
             result = replace(result, diagnostic=diagnostic)
         return result

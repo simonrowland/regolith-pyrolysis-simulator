@@ -4889,6 +4889,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         curve: Mapping[str, Any],
     ) -> dict[str, Any]:
+        from simulator.reduced_real_determinism import gate_curve_bounds_are_usable
+
         field = 'solidus_T_C'
         try:
             solidus_T_C = float(curve[field])
@@ -4906,7 +4908,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             malformed_bounds.append('solidus_T_C')
         if not math.isfinite(liquidus_T_C):
             malformed_bounds.append('liquidus_T_C')
-        if not malformed_bounds and not solidus_T_C < liquidus_T_C:
+        if not malformed_bounds and not gate_curve_bounds_are_usable(
+            solidus_T_C, liquidus_T_C,
+        ):
             malformed_bounds.extend(('solidus_T_C', 'liquidus_T_C'))
         if malformed_bounds:
             self._refuse_malformed_melt_redox_liquidus_curve(

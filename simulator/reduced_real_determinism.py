@@ -2819,6 +2819,23 @@ def gate_curve_provider_diagnostic_reasons(
     return tuple(reasons)
 
 
+def gate_curve_bounds_are_usable(
+    solidus_T_C: Any,
+    liquidus_T_C: Any,
+) -> bool:
+    """Whether gate bounds are finite and strictly ordered."""
+    try:
+        solidus = float(solidus_T_C)
+        liquidus = float(liquidus_T_C)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return (
+        math.isfinite(solidus)
+        and math.isfinite(liquidus)
+        and solidus < liquidus
+    )
+
+
 def gate_curve_provider_timeout_reason(
     diagnostic: Mapping[str, Any] | None,
 ) -> str | None:

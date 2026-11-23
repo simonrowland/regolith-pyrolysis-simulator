@@ -413,19 +413,16 @@ def test_projected_out_of_domain_bounds_skip_alpha_continuation(
     monkeypatch.setattr(magemin, 'dispatch', primary)
     monkeypatch.setattr(alpha, 'dispatch', alternate)
 
-    result = sim._dispatch_only(
-        ChemistryIntent.GATE_LIQUID_FRACTION,
-        control_inputs={},
-        fO2_log=-2,
-    )
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
 
     primary.assert_called_once()
     alternate.assert_not_called()
-    assert result.status == 'out_of_domain'
-    assert result.diagnostic['solidus_T_C'] == 1000
-    assert result.diagnostic['liquidus_T_C'] == 1400
-    assert result.diagnostic['backend_status_reason'] == 'composition_projected'
-    assert 'gate_provider_step_down' not in result.diagnostic
+    assert curve['source'] == (
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
+    )
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1400)
+    assert curve['composition_projected_notice']['authority'] == 'extrapolated'
+    assert 'gate_provider_step_down' not in curve
 
 
 def test_flagged_alpha_bounds_are_published_as_the_step_down_curve(

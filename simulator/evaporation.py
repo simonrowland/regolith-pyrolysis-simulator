@@ -4318,6 +4318,7 @@ class EvaporationMixin:
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_outcome_token,
+            gate_curve_bounds_are_usable,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
@@ -4401,6 +4402,17 @@ class EvaporationMixin:
             status,
             diagnostic,
         )
+        step_down = diagnostic.get('gate_provider_step_down')
+        if (
+            isinstance(step_down, Mapping)
+            and step_down.get('realized_provider')
+            and gate_curve_bounds_are_usable(
+                diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+            )
+        ):
+            # The planner's step-down provider owns these bounds even when
+            # its status is flagged; publish the curve with its step-down notice.
+            status_outcome = GateCurveProviderOutcome.PRODUCED
         record_gate_curve_provider_outcome(self, status_outcome)
         if (
             status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
@@ -4713,11 +4725,9 @@ class EvaporationMixin:
         source: str,
         reasons: list[str],
     ) -> dict[str, Any] | None:
-        if (
-            solidus_T_C is None
-            or liquidus_T_C is None
-            or not solidus_T_C < liquidus_T_C
-        ):
+        from simulator.reduced_real_determinism import gate_curve_bounds_are_usable
+
+        if not gate_curve_bounds_are_usable(solidus_T_C, liquidus_T_C):
             reasons.append(f'{source} invalid bounds')
             return None
         return {
@@ -4740,7 +4750,10 @@ class EvaporationMixin:
         repair_notices: list[dict[str, Any]] | None = None,
         reasons: list[str] | None = None,
     ) -> dict[str, Any] | None:
-        from simulator.reduced_real_determinism import record_repair_notice
+        from simulator.reduced_real_determinism import (
+            gate_curve_bounds_are_usable,
+            record_repair_notice,
+        )
 
         points: list[tuple[float, float]] = []
         for point in path:
@@ -4784,11 +4797,7 @@ class EvaporationMixin:
             solidus_T_C = min(T for T, _ in points)
         if liquidus_T_C is None and points:
             liquidus_T_C = max(T for T, _ in points)
-        if (
-            solidus_T_C is None
-            or liquidus_T_C is None
-            or not solidus_T_C < liquidus_T_C
-        ):
+        if not gate_curve_bounds_are_usable(solidus_T_C, liquidus_T_C):
             return None
         dedup: dict[float, float] = {}
         for temperature_C, liquid_fraction in sorted(points):
