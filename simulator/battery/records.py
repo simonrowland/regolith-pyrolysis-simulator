@@ -517,7 +517,13 @@ class Locator:
         return type(index) is int and index >= 0
 
     def has_published_page(self) -> bool:
-        """A printed folio, separate from the physical PDF page address."""
+        """A printed folio, separate from the physical PDF page.
+
+        Article identifiers may start their numeric group with zero
+        (E02S13). A bare scan filename (4.pdf) or a bare viewer counter
+        (4 of 21) is not a printed folio. A running header such as
+        Page 3 of 6 is.
+        """
         page = self.published_page
         if type(page) is int:
             return page > 0
@@ -527,7 +533,7 @@ class Locator:
         if not text:
             return False
         if re.fullmatch(
-            r"(?i)(?:page\s+)?(?:[a-z]{1,8}-?)?[1-9]\d*(?:[a-z]{1,8}\d*)?(?:[-–](?:[a-z]{1,8}-?)?[1-9]\d*(?:[a-z]{1,8}\d*)?)?(?:\s+of\s+[1-9]\d*)?(?:\.pdf)?",
+            r"(?i)(?:page\s+[1-9]\d*(?:\s+of\s+[1-9]\d*)?|(?:[a-z]{1,8}-?)?0*[1-9]\d*(?:[a-z]{1,8}\d*)?(?:[-–](?:[a-z]{1,8}-?)?0*[1-9]\d*(?:[a-z]{1,8}\d*)?)?)",
             text,
         ):
             return True
