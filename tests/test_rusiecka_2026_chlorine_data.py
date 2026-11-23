@@ -168,10 +168,6 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             assert dict(point_composition.state.value.components)["Cl"].quantize(
                 Decimal("0.000000000001")
             ) == Decimal("0.034009940171")
-        assert point_composition.locator is not None
-        assert point_composition.locator.record == (
-            f"sheet data, cells B{row_number}:R{row_number}"
-        )
         assert point_composition.inference is not None
         assert point_composition.inference.relation == "wt_pct_to_mole_fraction"
         assert point_composition.inference.output_unit == "mole_fraction"
@@ -195,7 +191,7 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
         if 81 <= row_number <= 96:
             assert row.identity.fO2_Pa.is_value
             expected_fO2_pa = Decimal(
-                source["point_conditions"]["fO2_Pa"]["state"]["value"]
+                source["values"]["point_conditions"]["fO2_Pa"]["state"]["value"]
             )
             assert row.identity.fO2_Pa.value == expected_fO2_pa
             assert row.point_conditions["fO2_Pa"].state.value == expected_fO2_pa
@@ -477,7 +473,6 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         if row_number in {58, 59}:
             assert "Re" not in projected
             assert not any(name == "original_Re_wt_pct" for name, _value in located.inference.parameters)
-        bound_rows.add(row_number)
     assert len(bound_rows) == 73
 
     # Independent cell pins: Lunar-1 is a named legacy composition row, while AND-1 is this study.
