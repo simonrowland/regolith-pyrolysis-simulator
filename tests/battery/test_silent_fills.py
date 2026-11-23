@@ -311,7 +311,7 @@ def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
     assert seen["pressure_bar"] == pytest.approx(1.0)
     reasons = [notice.reason for notice in prediction.notices if notice.kind is NoticeKind.INPUT_OMITTED]
     assert any("no multivalent element" in reason and "omitted" in reason for reason in reasons)
-    assert not any(notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices)
+    assert not any(notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in prediction.notices)
 
 
 def test_printed_oxygen_is_commanded(monkeypatch) -> None:
@@ -881,7 +881,7 @@ def test_printed_total_pressure_is_passed_without_an_assumption(monkeypatch) -> 
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
     assert seen["pressure_bar"] == pytest.approx(2500 / 1.0e5)
     assert not any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices
+        notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in prediction.notices
     )
 
 
