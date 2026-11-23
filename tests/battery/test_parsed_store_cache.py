@@ -1,9 +1,12 @@
 """Contract tests for the one prologue pickle.
 
 The key is the migrated-store content digest, every declared data input,
-the simulator and engines Python trees, the VapoRock package, and, when
-pure phase is on, the ThermoEngine tree and the MAGEMin binary. A warm
-prologue must not call validate_corpus again. A torn pickle rebuilds.
+the simulator and engines Python trees, and the VapoRock package. When
+pure phase is on or the engine set contains vaporock, it also covers the
+ThermoEngine package, the dylibs ``setup_thermoengine_dylib_path``
+resolves, and ``DYLD_LIBRARY_PATH``. The MAGEMin binary is included only
+when pure phase is on. A warm prologue must not call validate_corpus
+again. A torn pickle rebuilds.
 """
 
 from __future__ import annotations
@@ -160,7 +163,9 @@ def test_prologue_key_changes_for_every_declared_input_and_a_python_file(
     # The installed package is not the tmp copy. Pin it so this test's
     # mutations are the declared inputs and the Python files.
     monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
-    # Vaporock engines hash the dylibs. This test mutates repo data only.
+    # Vaporock engines hash the installed ThermoEngine tree and dylibs.
+    # This test mutates the tmp data inputs only.
+    monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-py-stub")
     monkeypatch.setattr(cache_mod, "_thermoengine_dylib_token", lambda: "dylib-stub")
     root = _layout(tmp_path / "copy")
     base = _key(root)
@@ -208,10 +213,14 @@ def test_directory_token_and_installed_packages_change_the_key(
 
     monkeypatch.setattr(cache_mod, "_thermoengine_token", counted)
     monkeypatch.setattr(cache_mod, "_magemin_binary_token", counted)
-    assert _key(root, invoke_pure_phase=False) == _key(root, invoke_pure_phase=False)
+    assert _key(root, engines=("openimcc",), invoke_pure_phase=False) == _key(
+        root, engines=("openimcc",), invoke_pure_phase=False
+    )
     assert calls["n"] == 0
+    _key(root, engines=("vaporock",), invoke_pure_phase=False)
+    assert calls["n"] == 1
     pure = _key(root, invoke_pure_phase=True)
-    assert calls["n"] == 2
+    assert calls["n"] == 3
     monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "other-binary")
     assert _key(root, invoke_pure_phase=True) != pure
 
@@ -238,6 +247,7 @@ def test_native_artifact_bytes_change_the_key(
 
     monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
     monkeypatch.setattr(cache_mod, "_python_tree_token", lambda _root: "code-stub")
+    real_thermo_token = cache_mod._thermoengine_token
     monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-py-stub")
     monkeypatch.setattr(
         "simulator.engine_local_config.config_path",
@@ -281,7 +291,37 @@ def test_native_artifact_bytes_change_the_key(
     quiet = _key(root, engines=("openimcc",), invoke_pure_phase=False)
     (dylib_dir / phase_name).write_bytes(b"native-d")
     binary.write_bytes(b"magemin-d")
+    monkeypatch.setenv("DYLD_LIBRARY_PATH", "/other/libphaseobjc")
     assert _key(root, engines=("openimcc",), invoke_pure_phase=False) == quiet
+
+    monkeypatch.setenv("DYLD_LIBRARY_PATH", "")
+    before_dyld = _key(root, engines=("vaporock",), invoke_pure_phase=False)
+    monkeypatch.setenv("DYLD_LIBRARY_PATH", "/other/libphaseobjc")
+    assert _key(root, engines=("vaporock",), invoke_pure_phase=False) != before_dyld
+
+    import importlib.util
+    from types import SimpleNamespace
+
+    package_dir = tmp_path / "thermoengine-pkg"
+    package_dir.mkdir()
+    marker = package_dir / "marker.py"
+    marker.write_text("a = 1\n", encoding="utf-8")
+    real_find_spec = importlib.util.find_spec
+
+    def find_spec(name: str, package: str | None = None):
+        if name == "thermoengine":
+            return SimpleNamespace(
+                submodule_search_locations=[str(package_dir)],
+                origin=None,
+            )
+        return real_find_spec(name, package)
+
+    monkeypatch.setenv("DYLD_LIBRARY_PATH", "")
+    monkeypatch.setattr(cache_mod, "_thermoengine_token", real_thermo_token)
+    monkeypatch.setattr(importlib.util, "find_spec", find_spec)
+    packaged = _key(root, engines=("vaporock",), invoke_pure_phase=False)
+    marker.write_text("a = 2\n", encoding="utf-8")
+    assert _key(root, engines=("vaporock",), invoke_pure_phase=False) != packaged
 
 
 def test_runtime_token_names_the_interpreter_and_pyyaml() -> None:

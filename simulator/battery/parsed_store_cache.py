@@ -196,23 +196,26 @@ def prologue_key(
     # VapoRock's package and JANAF-vapor-data-full.csv live outside this
     # repo. compilation_tier._vaporock_gas_attempt loads both.
     add("vaporock", _vaporock_token())
-    # ``vaporock.equil`` constructs ThermoEngine, and pure-phase NASA-9
-    # rows load the same dylibs. Both go through
-    # ``setup_thermoengine_dylib_path``. Engines here are ``.value`` strings.
+    # ``vaporock.equil`` imports the thermoengine package and dlopens its
+    # dylibs. Pure-phase NASA-9 rows load the same artifacts. Engines
+    # here are ``.value`` strings.
     if invoke_pure_phase or "vaporock" in engines:
         add("thermoengine-dylibs", _thermoengine_dylib_token())
+        add("thermoengine", _thermoengine_token())
+        # thermoengine/equilibrate.py find_library('phaseobjc') searches
+        # DYLD_LIBRARY_PATH before the fallback directory. The string is
+        # the input that selects which file that search loads.
+        add("dyld-library-path", os.environ.get("DYLD_LIBRARY_PATH") or "")
     if invoke_pure_phase:
-        # Live pure-phase calls also read the ThermoEngine Python tree
-        # (every file, not only .py) and the MAGEMin binary. The env
+        # Live pure-phase calls also read the MAGEMin binary. The env
         # string is part of the key even when the path is missing, so two
         # different missing binaries do not share a row. Concurrency knobs
         # (REGOLITH_MAGEMIN_MAX_CONCURRENCY, REGOLITH_MAGEMIN_SLOTS) are not
         # hashed: they do not change the bytes the body writes.
-        add("thermoengine", _thermoengine_token())
         add("magemin", _magemin_binary_token())
         add("magemin-env", os.environ.get("REGOLITH_MAGEMIN_BINARY") or "")
     else:
-        # False never calls MAGEMin or the ThermoEngine Python tree.
+        # False never calls MAGEMin.
         add("pure", "off")
     add("runtime", runtime_token())
     args = canonical_material(
