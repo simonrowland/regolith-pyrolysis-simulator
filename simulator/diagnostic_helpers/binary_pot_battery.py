@@ -1704,16 +1704,9 @@ def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
                 if species_scope is not None:
                     row.setdefault("affected_species", species_scope)
                 notices.append(row)
-            authority = current.get("authority")
-            calphad_weight = (
-                authority.get("calphad_weight")
-                if isinstance(authority, Mapping)
-                else None
-            )
             pending.extend(
                 (child, species_scope, quantity_scope)
-                for key, child in current.items()
-                if not (key == "gamma_FeO" and calphad_weight == 0)
+                for child in current.values()
             )
         elif isinstance(current, (list, tuple)):
             pending.extend(

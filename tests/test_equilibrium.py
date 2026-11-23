@@ -24,6 +24,8 @@ from simulator.evaporation import (
 from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     LiquidFeODomain,
+    calphad_ferrous_feo_activity_diagnostic,
+    holzheid_authority_notice,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.silent_zero import (
@@ -900,3 +902,65 @@ def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
     assert {
         key: value for key, value in zero.items() if key != "notices"
     } == zero_plain
+
+
+def test_native_fe_saturation_carries_contributing_holzheid_authority():
+    temperature_K = 1605.0 + 273.15
+    options = {
+        "T_K": temperature_K,
+        "pressure_bar": 1e-6,
+        "fO2_log": -12.0,
+    }
+    diagnostic = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_FEO_MELT_WT, **options
+    )
+    notice = diagnostic["gamma_FeO"]["holzheid"]["notice"]
+    assert diagnostic["authority"]["calphad_weight"] > 0.0
+    assert holzheid_authority_notice(diagnostic, consumed=True) == notice
+
+    host = SimpleNamespace(
+        _feot_equivalent_wt_pct=PyrolysisSimulator._feot_equivalent_wt_pct
+    )
+    native_state = PyrolysisSimulator._native_fe_saturation_state(
+        host,
+        _FEO_MELT_WT,
+        fe3_over_sigma_fe=0.1,
+        **options,
+    )
+    assert native_state["notices"] == [notice]
+
+    split = {
+        "status": "ok",
+        "fe3_over_sigma_fe": 0.1,
+        "fe2o3_over_feo_molar": 0.0,
+        "fe2o3_equiv_wt_pct": 0.0,
+        "feo_equiv_wt_pct": 0.0,
+        "source": "test",
+        "authoritative": True,
+        "extrapolation": False,
+        "high_uncertainty": False,
+    }
+    combined_host = SimpleNamespace(
+        _compute_native_fe_saturation_extent=lambda **_kwargs: {
+            "native_fe_state": native_state,
+            "native_fe_frac": 0.1,
+        },
+        _last_native_fe_partition_diagnostic={},
+        _last_native_fe_saturation_event={},
+    )
+    combined = PyrolysisSimulator._fe_redox_split_payload(
+        combined_host,
+        {},
+        split,
+        comp=_FEO_MELT_WT,
+        **options,
+    )
+    assert combined["authoritative"] is False
+    assert combined["extrapolation"] is True
+
+    zero_weight = dict(diagnostic)
+    zero_weight["authority"] = {"calphad_weight": 0.0}
+    assert holzheid_authority_notice(zero_weight, consumed=True) is None
+    capped = dict(diagnostic)
+    capped["a_FeO_authoritative_clamped_to_pure_feo_ceiling"] = True
+    assert holzheid_authority_notice(capped, consumed=True) is None

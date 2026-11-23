@@ -1508,6 +1508,35 @@ def calphad_ferrous_feo_activity_diagnostic(
     )
 
 
+def holzheid_authority_notice(
+    activity: Mapping[str, object] | None,
+    *,
+    consumed: bool,
+    additionally_capped: bool = False,
+) -> dict[str, object] | None:
+    """Return the Holzheid flag when its uncapped activity affects a result."""
+    if activity is None:
+        return None
+    authority = activity.get('authority')
+    weight = (
+        authority.get('calphad_weight')
+        if isinstance(authority, Mapping)
+        else None
+    )
+    if (
+        not consumed
+        or additionally_capped
+        or not isinstance(weight, (int, float))
+        or not weight > 0.0
+        or activity.get('a_FeO_authoritative_clamped_to_pure_feo_ceiling') is True
+    ):
+        return None
+    gamma = activity.get('gamma_FeO')
+    holzheid = gamma.get('holzheid') if isinstance(gamma, Mapping) else None
+    notice = holzheid.get('notice') if isinstance(holzheid, Mapping) else None
+    return dict(notice) if isinstance(notice, Mapping) else None
+
+
 def kress91_split(
     *,
     fO2_log: float,

@@ -2996,6 +2996,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 calphad_ferrous_feo_activity_diagnostic,
+                holzheid_authority_notice,
             )
 
             feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
@@ -3953,16 +3954,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     else:
                         provenance["activity_basis"] = fe_activity_basis
                         provenance["degraded_activity_basis"] = None
-                    calphad_authority = (
-                        feo_activity_diagnostic.get("authority")
-                        if isinstance(feo_activity_diagnostic, Mapping)
-                        else None
-                    )
-                    calphad_weight = (
-                        calphad_authority.get("calphad_weight")
-                        if isinstance(calphad_authority, Mapping)
-                        else None
-                    )
                     pressure_activity_is_capped = (
                         pressure_rail == "condensed_raoult_psat"
                         and metal_activity_root > 1.0
@@ -3970,36 +3961,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     calphad_activity_consumed = (
                         fe_activity_basis == "kress91_ferrous"
                     )
-                    feo_activity_is_capped = (
-                        isinstance(feo_activity_diagnostic, Mapping)
-                        and feo_activity_diagnostic.get(
-                            "a_FeO_authoritative_clamped_to_pure_feo_ceiling"
-                        ) is True
+                    holzheid_notice = holzheid_authority_notice(
+                        feo_activity_diagnostic,
+                        consumed=calphad_activity_consumed,
+                        additionally_capped=pressure_activity_is_capped,
                     )
-                    effective_calphad_weight = (
-                        calphad_weight
-                        if isinstance(calphad_weight, (int, float))
-                        and calphad_activity_consumed
-                        and not feo_activity_is_capped
-                        and not pressure_activity_is_capped
-                        else 0.0
-                    )
-                    holzheid_notice = None
-                    gamma_record = (
-                        feo_activity_diagnostic.get("gamma_FeO")
-                        if isinstance(feo_activity_diagnostic, Mapping)
-                        else None
-                    )
-                    if isinstance(gamma_record, Mapping):
-                        holzheid_record = gamma_record.get("holzheid")
-                        if isinstance(holzheid_record, Mapping):
-                            candidate_notice = holzheid_record.get("notice")
-                            if isinstance(candidate_notice, Mapping):
-                                holzheid_notice = candidate_notice
-                    if (
-                        effective_calphad_weight > 0.0
-                        and holzheid_notice is not None
-                    ):
+                    if holzheid_notice is not None:
                         scoped_notice = dict(holzheid_notice)
                         scoped_notice["affected_species"] = [species]
                         scoped_notice["affected_quantities"] = ["p_partial"]

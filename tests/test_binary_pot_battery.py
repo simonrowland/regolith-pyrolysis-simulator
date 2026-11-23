@@ -37,6 +37,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_VALUE_IS_FLOOR,
     _FLOOR_INVERSION_REASON,
     _internal_analytical_vapor_pressure_adapter,
+    _nested_notice_flags,
     BinaryPot,
     BatteryGrid,
     EngineHandle,
@@ -467,6 +468,22 @@ def test_cell_score_authority_keeps_applicable_extrapolation_independent_of_orde
         (AUTHORITY_EXTRAPOLATED, AUTHORITY_EXTRAPOLATED, "bridge"),
         (AUTHORITY_EXTRAPOLATED, AUTHORITY_EXTRAPOLATED, "bridge"),
     ]
+
+
+def test_nested_notice_walker_obeys_empty_quantity_scope():
+    result = {
+        "affected_quantities": [],
+        "authority": {"calphad_weight": 0.7},
+        "gamma_FeO": {
+            "holzheid": {
+                "notice": {
+                    "kind": "out_of_certified_band",
+                    "authority_level": AUTHORITY_EXTRAPOLATED,
+                }
+            }
+        },
+    }
+    assert _nested_notice_flags(result) == []
 
 
 def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
