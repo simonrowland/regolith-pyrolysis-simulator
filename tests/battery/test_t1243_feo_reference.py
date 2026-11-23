@@ -62,6 +62,7 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     EnginePrediction,
     Execution,
+    FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
     FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
     FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
@@ -85,6 +86,8 @@ _ANCHORS = (
 )
 _WINDOW = "1649.15-1766.15 K"
 _EXTRAPOLATED = "D&G iron-boundary line extrapolated"
+_DARKEN_GURRY = "darken-gurry-1946-iron-oxygen-ii"
+_SAITO = "saito-2021-fexo-cao-silica-activity"
 _HOLZHEID = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
 _DISTIN = "distin-1971-ferrous-silicate-melts"
 _BANYA_1980 = "banya-chiba-hikosaka-1980-feto-binary-solid-iron"
@@ -341,6 +344,35 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
     assert fusion_comparison_reference(other, engine=Engine.INTERNAL_ANALYTICAL) is other
 
 
+def test_fe_1_minus_x_identity_uses_existing_d420_wustite_conversion() -> None:
+    temperature = Decimal("1673.15")
+    reference = _wustite_row(temperature)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, formula="Fe(1-x)O"),
+        ),
+    )
+
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert converted.value.point == reference.value.point * _independent_factor(
+        temperature
+    )
+    assert converted.identity.species.formula == "Fe(1-x)O"
+    assert any(
+        notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+        and "original_reason=species_formula=Fe(1-x)O" in notice.reason
+        for notice in converted.notices
+    )
+    assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+        converted.notices
+    )
+
+
 def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
     temperature = Decimal("1673.15")
     work = F.work()
@@ -395,6 +427,7 @@ def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
     assert residual.score_eligible is False
     assert "not_flagged_stratum" in residual.exclusions
     assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     )
 
@@ -425,6 +458,41 @@ def migration():
         migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
     migrator.finalize()
     return migrator.result
+
+
+@pytest.fixture(scope="module")
+def wustite_formula_migration():
+    migrator = Migrator(root=ROOT)
+    for name in (_DARKEN_GURRY, _SAITO):
+        migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator.finalize()
+    return migrator.result
+
+
+def test_every_censused_fe_1_minus_x_source_row_parses(
+    wustite_formula_migration,
+) -> None:
+    rows_by_source = {source: [] for source in (_DARKEN_GURRY, _SAITO)}
+    for observation in wustite_formula_migration.observations.values():
+        identity = observation.identity
+        species = getattr(identity, "species", None)
+        if (
+            observation.source_id in rows_by_source
+            and species is not None
+            and species.formula == "Fe(1-x)O"
+        ):
+            rows_by_source[observation.source_id].append(observation)
+
+    assert {source: len(rows) for source, rows in rows_by_source.items()} == {
+        _DARKEN_GURRY: 89,
+        _SAITO: 84,
+    }
+    for rows in rows_by_source.values():
+        for observation in rows:
+            species = observation.identity.species
+            assert score_module.parse_species_formula(
+                species.formula, species=species
+            ) == (("Fe", 1.0), ("O", 1.0))
 
 
 @pytest.fixture(scope="module")
@@ -1305,6 +1373,14 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
         )
         assert converted.identity.species.formula == "FeO"
         assert converted.identity.reference_state.value.endmember.formula == "FeO"
+        assert any(
+            notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+            and "original_reason=printed species formula Fe_tO" in notice.reason
+            for notice in converted.notices
+        )
+        assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+            converted.notices
+        )
         conversion = next(
             notice
             for notice in converted.notices
@@ -1368,6 +1444,32 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
                 and "FeO(R.S.)" in notice.reason
                 for notice in converted.notices
             ), source_id
+
+
+def test_banya_total_iron_flag_excludes_measured_headline(banya_migration) -> None:
+    reference = next(
+        observation
+        for observation in banya_migration.observations.values()
+        if observation.observation_id.endswith("bch80_t2_c_a_1_activity")
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(banya_migration),
+        comparison_ids={reference.observation_id},
+        predict=_predict,
+    )
+
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+        residual.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+        for notice in residual.notices
+    )
 
 
 def test_banya_source_relation_pins_reject_the_old_dg_janaf_conversion(

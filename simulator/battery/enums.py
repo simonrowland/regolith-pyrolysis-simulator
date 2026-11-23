@@ -315,6 +315,7 @@ class NoticeKind(StrEnum):
         "composition_oxide_from_element_mass_percent"
     )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
+    WUSTITE_REFERENCE_CONVERSION = "wustite_reference_conversion"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     SOURCE_DISAGREEMENT = "source_disagreement"

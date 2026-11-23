@@ -624,6 +624,7 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_IRON_OXIDE_CONVENTION = "iron-oxide-convention"
 
 
 @dataclass(frozen=True)
@@ -1159,6 +1160,37 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
     return species is not None and phase_token(species) is phase
 
 
+def _normalize_ascii_adduct_dots(text: str) -> str:
+    normalized: list[str] = []
+    segment_start = 0
+    index = 0
+    while index < len(text):
+        if text[index] == "·":
+            normalized.append(text[index])
+            segment_start = index + 1
+            index += 1
+            continue
+        if text[index] == ".":
+            prefix = text[segment_start:index]
+            suffix = text[index + 1 :]
+            starts_with_multiplier = re.match(
+                r"(?:\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", suffix
+            )
+            starts_with_water = suffix.startswith(("H2O", "H₂O"))
+            decimal_multiplier = prefix.isdigit() and suffix[:1].isdigit()
+            if (
+                (starts_with_multiplier is not None or starts_with_water)
+                and not decimal_multiplier
+            ):
+                normalized.append("·")
+                segment_start = index + 1
+                index += 1
+                continue
+        normalized.append(text[index])
+        index += 1
+    return "".join(normalized)
+
+
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
@@ -1166,19 +1198,20 @@ def parse_species_formula(
 
     The baseline ``formula_composition`` result is returned unchanged. Its
     source-derived extension accepts element symbols with numeric counts,
-    nested ``()[]{}`` groups, hydrate segments (including fractional or
-    decimal water multipliers) separated by a middle dot, TeX math wrappers /
-    ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
-    phase or polymorph labels require a matching existing species axis, as in
-    ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
-    accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
-    before the fallback. Mineral names, variable compositions, and unverified
-    charge or phase labels remain unmatched.
+    nested ``()[]{}`` groups, hydrate/adduct segments (including fractional or
+    decimal multipliers), TeX math wrappers / ``\\text{}``, and TeX or Unicode
+    subscripts. Newly normalized terminal phase or polymorph labels require a
+    matching existing species axis, as in ``$AsCl_3(g)$`` and ``$Fe(α)$``. A
+    terminal bracket phase label that the accounting parser would strip, as in
+    ``Fe2O3[s]``, uses that same axis before the fallback. The d-420 iron-oxide
+    conventions are normalized without assigning a numerical vacancy value;
+    other names, variable compositions, and unverified charge or phase labels
+    remain unmatched.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(formula)
+    established = formula_composition(_normalize_ascii_adduct_dots(formula))
     if established is not None:
         return established
 
@@ -1188,14 +1221,14 @@ def parse_species_formula(
     if "$" in text:
         return None
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
-    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    text = (
+        text.replace(r"\cdot", "·")
+        .replace(r"\bullet", "·")
+        .replace("•", "·")
+        .replace("⋅", "·")
+    )
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = fold_subscript_digits(text)
-    # formula_composition reads the ASCII-dot water-adduct separator as a
-    # decimal count. Refuse that normalized form first; raw fast-path results
-    # and explicit middle-dot hydrates stay unchanged.
-    if "·" not in text and re.search(r"\.\d+H2O", text):
-        return None
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1230,6 +1263,12 @@ def parse_species_formula(
         if annotated_phase is not None:
             text = text[: annotation.start()]
 
+    melt_suffix = re.search(r"_melt$", text, re.IGNORECASE)
+    if melt_suffix is not None:
+        if not _species_axis_matches_phase(species, Phase.L):
+            return None
+        text = text[: melt_suffix.start()]
+
     # Accounting strips these terminal brackets with no species axis. Bare
     # [c] is not in that suffix list and stays unmatched.
     bracket = re.search(r"\[([^\[\]]*)\]$", text)
@@ -1242,6 +1281,17 @@ def parse_species_formula(
                     return None
                 text = text[: bracket.start()]
 
+    # NASA Glenn's E±n suffix carries ionic charge, not another element.
+    # Its charge must agree with the typed species before the suffix is dropped.
+    electron_charge = re.search(r"E([+-])(\d+)$", text)
+    if electron_charge is not None:
+        annotated_charge = int(electron_charge.group(2))
+        if electron_charge.group(1) == "-":
+            annotated_charge = -annotated_charge
+        if species is None or charge_value(species) != annotated_charge:
+            return None
+        text = text[: electron_charge.start()]
+
     charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
     if charge_annotation is not None:
         signs = next(group for group in charge_annotation.groups() if group is not None)
@@ -1251,6 +1301,19 @@ def parse_species_formula(
         if species is None or charge_value(species) != annotated_charge:
             return None
         text = text[: charge_annotation.start()]
+
+    # d-420 treats wüstite's symbolic vacancy fraction as a reference-state
+    # convention, not a measured x to invent. Fe_tO is total iron reported on
+    # an FeO basis; the downstream comparison and typed flags own those bases.
+    if text in {"Fe(1-x)O", "Fe_tO"}:
+        return (("Fe", 1.0), ("O", 1.0))
+
+    # ASCII periods separate formula-unit adducts when another formula follows
+    # (for example 3Al2O3.2SiO2). A terminal period plus digits is instead a
+    # leading-zero decimal subscript, as in Fe.9470. Decimal hydrate multipliers
+    # remain one number for the segment parser.
+    text = _normalize_ascii_adduct_dots(text)
+    text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
 
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)
@@ -2393,6 +2456,7 @@ def _flagged_stratum_notices(
     return union_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
         _cell_apparatus_inference_notices(reference, experiment, bench),
+        (() if (notice := _total_iron_formula_notice(reference)) is None else (notice,)),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
         (
             ()
@@ -2482,6 +2546,11 @@ def _classify_flagged_notice_facts(
 ) -> tuple[str, ...]:
     strata: list[str] = []
     kinds = {kind for kind, _reason in notices}
+    if (
+        NoticeKind.TOTAL_IRON_REPORTED_AS_FEO.value in kinds
+        or NoticeKind.WUSTITE_REFERENCE_CONVERSION.value in kinds
+    ):
+        strata.append(FLAGGED_STRATUM_IRON_OXIDE_CONVENTION)
     unverified_apparatus = tuple(
         reason
         for kind, reason in notices
@@ -4267,6 +4336,8 @@ def _banya_feto_activity_comparison(
         origin=reference.observation_id,
     )
     notices: tuple[Notice, ...] = (conversion_notice, assumption_notice)
+    if (total_iron_notice := _total_iron_formula_notice(reference)) is not None:
+        notices += (total_iron_notice,)
     row_band = _printed_uncertainty_band(
         quantity,
         reference.uncertainty,
@@ -4286,6 +4357,25 @@ def _banya_feto_activity_comparison(
         identity=replace(identity, reference_state=State.of(stoichiometric)),
         value=replace(reference.value, point=converted),
         notices=union_notices(reference.notices, notices),
+    )
+
+
+def _total_iron_formula_notice(reference: Observation) -> Notice | None:
+    identity = reference.identity
+    if not isinstance(identity, Identity) or identity.species.formula != "Fe_tO":
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return None
+    return Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason=(
+            "total_iron_basis: default=Fe_tO interpreted as total Fe on an "
+            "FeO basis; original_reason=printed species formula Fe_tO; "
+            "d-420 basis convention"
+        ),
+        origin=reference.observation_id,
     )
 
 
@@ -4671,7 +4761,7 @@ def _iron_saturated_feo_comparison(
     species_formulas = (
         {_FEO_STOICHIOMETRIC_FORMULA, "Fe_tO"}
         if banya_source_relation
-        else {_FEO_STOICHIOMETRIC_FORMULA}
+        else {_FEO_STOICHIOMETRIC_FORMULA, _FEO_WUSTITE_FORMULA}
     )
     standard_formulas = (
         {_FEO_WUSTITE_FORMULA, "Fe_tO"}
@@ -4701,6 +4791,26 @@ def _iron_saturated_feo_comparison(
 
         if engine.value not in MELT_ACTIVITY_ENGINES:
             return None
+    convention_notices = [
+        Notice(
+            kind=NoticeKind.WUSTITE_REFERENCE_CONVERSION,
+            affected_quantities=(quantity,),
+            reason=(
+                "wustite_reference_conversion: default=Fe(1-x)O reference "
+                "mapped through the existing d-420 iron-saturated path; "
+                f"original_reason=species_formula={identity.species.formula}, "
+                f"standard_formula={standard_state.endmember.formula}, "
+                f"source={reference.source_id}"
+            ),
+            origin=reference.observation_id,
+        )
+    ]
+    if (notice := _total_iron_formula_notice(reference)) is not None:
+        convention_notices.append(notice)
+    reference = replace(
+        reference,
+        notices=union_notices(reference.notices, convention_notices),
+    )
     temperature_K = temperature_of(identity)
     if temperature_K is None:
         if engine is None:
