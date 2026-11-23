@@ -23,6 +23,7 @@ ROBINOT_PRESSURE_MBAR = pytest.approx(13.0)
 ROBINOT_FLOW_NL_MIN = pytest.approx(0.3)
 ROBINOT_SAMPLE_MASS_G = pytest.approx(3.38)
 ROBINOT_DURATION_H = pytest.approx(1.0)
+ROBINOT_RUN_DURATION_H = pytest.approx(59.0 / 60.0)
 ROBINOT_PEAK_TEMPERATURE_C = pytest.approx(1800.0)
 ROBINOT_O2_RELEASED_MG = pytest.approx(35.0)
 ROBINOT_GLASSY_LUMP_G = pytest.approx(1.82)
@@ -403,8 +404,8 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
 
     assert preset["lab_geometry"]["sample"]["mass_g"] == ROBINOT_SAMPLE_MASS_G
     assert "sample_mass_g" not in preset["lab_geometry"]["sample"]["named_missing_fields"]
-    assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_DURATION_H
-    assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_DURATION_H
+    assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_RUN_DURATION_H
+    assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_RUN_DURATION_H
     assert preset["pair"]["faithful"]["kinetics_caveat"] == "none"
     assert preset["pair"]["remediation"]["kinetics_caveat"] in KINETICS_CAVEATS
     assert preset["comparison_contract"]["model_evidence_class"] == "builtin_process_model"
