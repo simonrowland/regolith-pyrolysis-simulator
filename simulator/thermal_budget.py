@@ -36,6 +36,9 @@ from typing import Any
 
 from engines.antoine import _read_antoine_coefficients
 from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+from simulator.reference_data.janaf import (
+    formation_enthalpy_kj_per_mol_admitted,
+)
 from simulator.diagnostic_helpers.timeseries_concordance import (
     _interpolate,
     _normalise_curve,
@@ -194,12 +197,15 @@ _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
         "nasa-cea-thermo:cea_CrO_gibbs ΔfH298=+186.581318 kJ/mol + 1/2 NIST-JANAF "
         "Cr2O3(s) ΔfH298=-1139.70; 1/2Cr2O3->CrO(g)+1/4O2 => +756.431318",
     ),
-    # NIST-JANAF Chase 1998: ΔfH°[SiO2, α-quartz]=-910.94, ΔfH°[SiO(g)]=-100.42;
-    # SiO2 -> SiO(g) + 1/2 O2 = -100.42 - (-910.94) = +810.52 kJ/mol SiO.
+    # Omitted-temperature SiO coefficient. The printed 298.15 K quartz
+    # cells are O-037 -910.857 and O-012 -100.416, difference 810.441.
+    # 810.52 is the rounded -100.42 - (-910.94) kept for a call that does
+    # not pass temperature_K. A temperature uses _sio_reaction_enthalpy_kj_per_mol.
     "SiO": EnthalpyCoefficient(
         810.52,
-        "NIST-JANAF Chase 1998: SiO2(quartz) ΔfH=-910.94 + SiO(g) ΔfH=-100.42 "
-        "=> SiO2->SiO(g)+1/2 O2 = +810.52 kJ/mol SiO",
+        "NIST-JANAF Chase 1998 rounded 298.15 K quartz path, used only when "
+        "temperature_K is omitted: -100.42 - (-910.94) = +810.52 kJ/mol SiO. "
+        "SiO2->SiO(g)+1/2 O2",
     ),
     # CrO2(g) forms from Cr2O3 by OXIDATION (Cr3+ -> Cr4+), not dissociation:
     #   1/2 Cr2O3 + 1/4 O2 -> CrO2(g), ΔH = ΔfH[CrO2(g)] - 1/2 ΔfH[Cr2O3].
@@ -293,6 +299,91 @@ _OXIDE_VAPOR_SPECIES: frozenset[str] = frozenset(
 )
 
 
+def _sio_reaction_enthalpy_kj_per_mol(
+    temperature_K: float,
+) -> tuple[float, dict[str, Any] | None]:
+    """ΔH_r(T) for SiO2 -> SiO(g) + 1/2 O2, in kJ per mole of SiO.
+
+    Kirchhoff path, from the JANAF formation-enthalpy owner. O2(g) is the
+    elemental reference: every printed O-029 ΔfH° cell from 0 K through
+    6000 K is 0, so the half-mole term is zero inside that table.
+
+        ΔH_r(T) = ΔfH°(SiO,g,T) + 1/2 ΔfH°(O2,g,T) - ΔfH°(SiO2,T)
+
+    The reactant is SiO2(l), table O-038, when that table admits T. On
+    this corpus O-038 prints ΔfH° from 0 K through 4500 K, so a trial
+    from the 400 K floor up to 4500 K is the liquid. The 1700 K liquid
+    cell is unprinted: its sign is undetermined across the transition
+    marker. A temperature in (1600, 1800) K uses the nearer printed
+    liquid row, the lower row on a tie, and is flagged. Above 4500 K
+    the reactant is the 4500 K printed cell. That is the last printed
+    row, not a Cp extension, and it is flagged. Below the liquid table
+    the reactant is quartz O-037, flagged, and not a liquid extrapolation.
+
+    At 298.15 K the printed quartz cell is -910.857 kJ/mol and the
+    printed SiO(g) cell is -100.416 kJ/mol, so the quartz reaction is
+    810.441 kJ/mol. The omitted-temperature coefficient 810.52 is the
+    rounded -100.42 - (-910.94). It is not this printed difference, and
+    it is not the liquid reaction.
+    """
+
+    reactant, reactant_admission = formation_enthalpy_kj_per_mol_admitted(
+        "O-038",
+        temperature_K,
+    )
+    reactant_table = "O-038"
+    notice = None
+    if reactant_admission == "below_table":
+        reactant, _quartz_admission = formation_enthalpy_kj_per_mol_admitted(
+            "O-037",
+            temperature_K,
+        )
+        reactant_table = "O-037"
+        notice = {
+            "kind": TYPED_UNKNOWN,
+            "knob": "sio_enthalpy_reactant_not_liquid",
+            "value": "sio_reactant_quartz_below_liquid_table",
+            "unit": "1",
+            "source": (
+                "SiO2(l) O-038 does not print this temperature. "
+                "The reactant is quartz O-037, not a Cp extension of the liquid."
+            ),
+        }
+    elif reactant_admission == "above_table":
+        notice = {
+            "kind": TYPED_UNKNOWN,
+            "knob": "sio_enthalpy_above_liquid_table",
+            "value": "held_at_last_printed_liquid_row",
+            "unit": "1",
+            "source": (
+                "SiO2(l) O-038 ends at its last printed ΔfH° row. "
+                "The reactant is that cell, not a Cp extension."
+            ),
+        }
+    elif reactant_admission == "unprinted_grid_node":
+        notice = {
+            "kind": TYPED_UNKNOWN,
+            "knob": "sio_enthalpy_unprinted_grid_node",
+            "value": "nearer_printed_liquid_row",
+            "unit": "1",
+            "source": (
+                "SiO2(l) O-038 has no signed ΔfH° on a grid node inside "
+                "this bracket. The reactant is the nearer printed row, "
+                "the lower row when the two are equally far."
+            ),
+        }
+    sio, _sio_admission = formation_enthalpy_kj_per_mol_admitted(
+        "O-012",
+        temperature_K,
+    )
+    oxygen, _oxygen_admission = formation_enthalpy_kj_per_mol_admitted(
+        "O-029",
+        temperature_K,
+    )
+    delta_h = sio + (oxygen / 2) - reactant
+    return float(delta_h), notice
+
+
 def evaporation_enthalpy_budget(
     species_kg_hr: Mapping[str, float],
     *,
@@ -315,6 +406,7 @@ def evaporation_enthalpy_budget(
     latent_by_species: dict[str, float] = {}
     dissociation_by_species: dict[str, float] = {}
     sources: dict[str, str] = {}
+    sio_enthalpy_notice = None
 
     for species, raw_kg_hr in sorted(species_kg_hr.items()):
         kg_hr = _non_negative(float(raw_kg_hr), f"species_kg_hr[{species!r}]")
@@ -350,6 +442,27 @@ def evaporation_enthalpy_budget(
             # + partial O2 (1:1 in the oxide-forming cation), NOT metal latent +
             # full oxide->element dissociation.  Booked as the reaction sink with
             # zero metal-latent, per mol of oxide vapor produced.
+            # SiO at a stated temperature is the JANAF chord at that T.
+            # The 810.52 coefficient remains the omitted-temperature call.
+            if species == "SiO" and temperature_K is not None:
+                kj_per_mol, sio_enthalpy_notice = (
+                    _sio_reaction_enthalpy_kj_per_mol(float(temperature_K))
+                )
+                reaction_kWh = product_mol * kj_per_mol / KJ_PER_KWH
+                latent_by_species[species] = 0.0
+                dissociation_by_species[species] = reaction_kWh
+                source = (
+                    "JANAF Kirchhoff SiO2->SiO(g)+1/2 O2 at "
+                    f"{float(temperature_K)} K = {kj_per_mol} kJ/mol SiO"
+                )
+                if sio_enthalpy_notice is not None:
+                    source = (
+                        source
+                        + f"; {sio_enthalpy_notice['knob']}"
+                        + f"={sio_enthalpy_notice['value']}"
+                    )
+                sources[f"oxide_vapor_reaction:{species}"] = source
+                continue
             reaction_coeff = _required_enthalpy(
                 _OXIDE_VAPOR_REACTION_KJ_PER_MOL,
                 species,
@@ -394,7 +507,7 @@ def evaporation_enthalpy_budget(
     latent_kWh = sum(latent_by_species.values())
     dissociation_kWh = sum(dissociation_by_species.values())
     evaporation_thermal_kWh = latent_kWh + dissociation_kWh
-    return {
+    result = {
         "schema": "evaporation_enthalpy_budget.v0",
         "status": "diagnostic_ledger_neutral",
         "evaporation_thermal_kWh": evaporation_thermal_kWh,
@@ -412,6 +525,9 @@ def evaporation_enthalpy_budget(
         "dissociation_by_species_kWh": dissociation_by_species,
         "sources": sources,
     }
+    if sio_enthalpy_notice is not None:
+        result["sio_enthalpy_notice"] = sio_enthalpy_notice
+    return result
 
 
 def thermal_budget_decomposition(
@@ -1781,6 +1897,7 @@ def evaporative_enthalpy_sink_W(
     species_kg_hr: Mapping[str, float],
     *,
     vapor_pressures: Mapping[str, Any] | None = None,
+    notices: list[dict[str, Any]] | None = None,
 ) -> float:
     """Watts of vaporization enthalpy at the trial temperature.
 
@@ -1793,10 +1910,11 @@ def evaporative_enthalpy_sink_W(
 
     ``species_kg_hr`` is the booked rate at this T. This function does
     not own a flux law. dH_i is whatever ``evaporation_enthalpy_budget``
-    already charges: oxide vapors (SiO, and the CEA oxide set) use the
-    single cited reaction, and the O2 coproduct of
-    SiO2 → SiO(g) + 1/2 O2 sits inside that SiO enthalpy (NIST-JANAF
-    Chase 1998, +810.52 kJ/mol SiO), not as a second latent. Metals use
+    already charges: oxide vapors other than SiO use the single cited
+    298 K reaction. SiO at this temperature is the JANAF chord
+    ΔfH°(SiO,g) + 1/2 ΔfH°(O2) - ΔfH°(SiO2,l). The O2 coproduct sits
+    inside that enthalpy, not as a second latent. The omitted-temperature
+    coefficient remains the rounded quartz value 810.52 kJ/mol. Metals use
     the 298 K liquid→gas latent plus the 298 K oxide-dissociation
     reversal. Analytical channels use the NASA polynomial at
     ``temperature_K``. The sensible Kirchhoff correction on the 298 K
@@ -1807,9 +1925,11 @@ def evaporative_enthalpy_sink_W(
 
     Units: kg/h in, watts out. A zero rate contributes nothing.
 
-    Sanity: 30.2 mg/min of SiO is 1.812×10⁻³ kg/h. Divided by the SiO
-    molar mass and multiplied by 810.52 kJ/mol that is 9.25 W.
-    401 mg/min is 122.8 W.
+    Sanity of the omitted-temperature coefficient, not of this function:
+    30.2 mg/min of SiO is 1.812×10⁻³ kg/h. Divided by the SiO molar mass
+    and multiplied by 810.52 kJ/mol that is 9.25 W. 401 mg/min is 122.8 W.
+    This function passes its temperature, so the SiO watts are the JANAF
+    chord at that T.
     """
 
     if not species_kg_hr:
@@ -1824,6 +1944,9 @@ def evaporative_enthalpy_sink_W(
         vapor_pressures=vapor_pressures,
         temperature_K=temperature_K,
     )
+    notice = budget.get("sio_enthalpy_notice")
+    if notice is not None and notices is not None:
+        notices.append(dict(notice))
     watts = float(budget["evaporation_thermal_kWh"]) * 1000.0
     if not math.isfinite(watts) or watts < 0.0:
         raise PowerTemperatureRefusal(
@@ -2606,6 +2729,7 @@ def solve_power_driven_melt_temperature_C(
         evaporative_sink_W = evaporative_enthalpy_sink_W(
             root_K,
             _species_rates_kg_hr(root_K, species_rate_kg_hr_at_K),
+            notices=notices,
         )
     sensitivity = None
     if other_loss is not None:
