@@ -320,7 +320,7 @@ def test_primary_timeout_retries_without_alpha_continuation(
     assert 'gate_provider_step_down' not in record
     assert 'alphamelts_reference_pressure' not in record
     attempt = record['provider_attempt']
-    assert attempt['provider'] == 'magemin'
+    assert attempt['provider'] == 'magemin-shadow'
     assert attempt['disposition'] == 'environment'
     assert 'engine_worker_timeout' in attempt['reason']
 
@@ -605,7 +605,7 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
     ]
     assert recovered_record['curve']['environment_retries']['provider_attempt'][
         'provider'
-    ] == 'magemin'
+    ] == 'magemin-shadow'
     assert _stripped_gate_bytes(clean_record['curve']) == _stripped_gate_bytes(
         recovered_record['curve'],
     )
@@ -638,7 +638,7 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
     assert abandoned['disposition'] == 'environment'
     assert 'alphamelts_reference_pressure' not in abandoned
     assert 'gate_provider_step_down' not in abandoned
-    assert abandoned['provider_attempt']['provider'] == 'magemin'
+    assert abandoned['provider_attempt']['provider'] == 'magemin-shadow'
     assert 'engine_worker_timeout' in abandoned['provider_attempt']['reason']
     assert recovered_projected_curve['alphamelts_reference_pressure'][
         'physical_overhead_pressure_bar'

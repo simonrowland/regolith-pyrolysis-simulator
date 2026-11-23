@@ -525,7 +525,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                     assert 'gate_provider_step_down' not in (
                         curve['environment_retries']
                     )
-                    assert attempt['provider'] == 'magemin'
+                    assert attempt['provider'] == 'magemin-shadow'
                     assert attempt['disposition'] == 'environment'
                     assert 'engine_worker_timeout' in attempt['reason']
                     attempt_diagnostic = attempt['diagnostic']
