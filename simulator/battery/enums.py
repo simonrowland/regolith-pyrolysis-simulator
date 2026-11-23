@@ -410,8 +410,6 @@ class NoticeKind(StrEnum):
     BASIS_CONVERTED = "basis_converted"
     INTERVAL_OBSERVATION = "interval_observation"
     PHASE_INFERRED = "phase_inferred"
-    COMPOSITION_FROM_RUN_SIBLINGS = "composition_from_run_siblings"
-    COMPOSITION_FROM_ANALYSED_PHASE = "composition_from_analysed_phase"
 
 
 DEFAULT_POLICY_NOTICE_KINDS = frozenset(
