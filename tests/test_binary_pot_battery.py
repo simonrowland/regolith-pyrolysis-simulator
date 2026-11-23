@@ -507,6 +507,30 @@ def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> Non
     assert notice["reason"]
     assert notice["authority"] == AUTHORITY_EXTRAPOLATED
     assert notice["band"]
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import cell_notices
+
+    for formula, engine_key in (("Na2O(g)", "Na2O_gas"), ("SiO2(g)", "SiO2_gas")):
+        scoped_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            extrapolated,
+            species=formula,
+        )
+        assert any(
+            row.kind.value == "out_of_certified_band"
+            and f":{engine_key}:" in row.reason
+            for row in scoped_notices
+        )
+        assert (
+            cell_score_authority(
+                extrapolated,
+                refused=False,
+                quantity=Quantity.P_PARTIAL.value,
+                species=formula,
+            )
+            == AUTHORITY_EXTRAPOLATED
+        )
 
     in_band = equilibrate_cell(
         handle,

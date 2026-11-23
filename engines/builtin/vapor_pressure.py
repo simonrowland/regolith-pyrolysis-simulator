@@ -3953,6 +3953,50 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     else:
                         provenance["activity_basis"] = fe_activity_basis
                         provenance["degraded_activity_basis"] = None
+                    calphad_authority = (
+                        feo_activity_diagnostic.get("authority")
+                        if isinstance(feo_activity_diagnostic, Mapping)
+                        else None
+                    )
+                    calphad_weight = (
+                        calphad_authority.get("calphad_weight")
+                        if isinstance(calphad_authority, Mapping)
+                        else None
+                    )
+                    pressure_activity_is_capped = (
+                        pressure_rail == "condensed_raoult_psat"
+                        and metal_activity_root > 1.0
+                    )
+                    calphad_activity_consumed = (
+                        fe_activity_basis == "kress91_ferrous"
+                    )
+                    effective_calphad_weight = (
+                        calphad_weight
+                        if isinstance(calphad_weight, (int, float))
+                        and calphad_activity_consumed
+                        and not pressure_activity_is_capped
+                        else 0.0
+                    )
+                    holzheid_notice = None
+                    gamma_record = (
+                        feo_activity_diagnostic.get("gamma_FeO")
+                        if isinstance(feo_activity_diagnostic, Mapping)
+                        else None
+                    )
+                    if isinstance(gamma_record, Mapping):
+                        holzheid_record = gamma_record.get("holzheid")
+                        if isinstance(holzheid_record, Mapping):
+                            candidate_notice = holzheid_record.get("notice")
+                            if isinstance(candidate_notice, Mapping):
+                                holzheid_notice = candidate_notice
+                    if (
+                        effective_calphad_weight > 0.0
+                        and holzheid_notice is not None
+                    ):
+                        scoped_notice = dict(holzheid_notice)
+                        scoped_notice["affected_species"] = [species]
+                        scoped_notice["affected_quantities"] = ["p_partial"]
+                        provenance["notice"] = scoped_notice
                 vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:
                     vapor_pressure_provenance[species].update(

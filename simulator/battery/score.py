@@ -295,6 +295,7 @@ from simulator.battery.oxygen_balance import (
 from simulator.battery.composition import (
     SLAG_METAL_CHARGE_BASIS,
     canonical_element_symbol,
+    canonical_species_key,
     chloride_component_symbol,
     composition_wt_pct,
     element_mass_fraction_redox,
@@ -1316,14 +1317,6 @@ def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bo
     return element != "O" and count == 1
 
 
-# Inverse of simulator.melt_backend.vaporock._GAS_NAMESPACE_SUFFIX.
-# The vapour adapter appends this exact suffix when a gas formula collides
-# with a melt oxide (SiO2(g) -> SiO2_gas). The scorer does not import the
-# vapour backend to read a four-character suffix. The emitter constant stays
-# in the adapter.
-_GAS_PHASE_SUFFIX = "_gas"
-
-
 def match_reported_species(
     formula: str,
     reported: Mapping[str, float],
@@ -1368,6 +1361,7 @@ def _match_reported_species_with_notices(
     target = parse_species_formula(formula, species=species)
     if target is None:
         return None, ()
+    target_key = canonical_species_key(formula)
     if oxide_activity and _is_raw_element_label(formula, species=species):
         return None, ()
     oxide_activities: Mapping[str, float] = {}
@@ -1385,19 +1379,22 @@ def _match_reported_species_with_notices(
             )
         )
     for name, value in reported.items():
-        if oxide_activity and _is_raw_element_label(str(name), species=species):
+        text = str(name)
+        if oxide_activity and _is_raw_element_label(text, species=species):
             continue
-        parsed = parse_species_formula(str(name), species=species)
+        parsed = parse_species_formula(text, species=species)
         if parsed == target:
-            return (str(name), float(value)), repair_notices
+            return (text, float(value)), repair_notices
     if not oxide_activity:
-        suffix = _GAS_PHASE_SUFFIX
         for name, value in reported.items():
             text = str(name)
-            if len(text) <= len(suffix) or not text.endswith(suffix):
+            stem = canonical_species_key(text)
+            if stem == text:
                 continue
-            stem = text[: -len(suffix)]
-            if parse_species_formula(stem, species=species) == target:
+            if (
+                canonical_species_key(stem) == target_key
+                and parse_species_formula(stem, species=species) == target
+            ):
                 return (text, float(value)), ()
         return None, ()
 
@@ -7761,6 +7758,7 @@ def cell_notices(
         AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
         _FLOOR_INVERSION_REASON,
+        _scope_matches,
     )
 
     notices: list[Notice] = []
@@ -7769,17 +7767,9 @@ def cell_notices(
         if not isinstance(row, Mapping):
             continue
         affected_quantities = row.get("affected_quantities")
-        if (
-            isinstance(affected_quantities, (list, tuple, set, frozenset))
-            and affected_quantities
-            and quantity.value not in affected_quantities
-        ):
-            continue
         affected_species = row.get("affected_species")
-        if (
-            isinstance(affected_species, (list, tuple, set, frozenset))
-            and affected_species
-            and (species is None or species not in affected_species)
+        if not _scope_matches(affected_quantities, quantity.value) or not _scope_matches(
+            affected_species, species, species=True
         ):
             continue
         kind = str(row.get("kind") or "")

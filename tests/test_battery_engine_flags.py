@@ -24,7 +24,7 @@ from simulator.battery.enums import (
     Phase,
     Quantity,
 )
-from simulator.battery.records import Composition, Species
+from simulator.battery.records import Composition, Species, State
 from simulator.battery.score import (
     candidate_observation,
     cell_notices,
@@ -306,7 +306,7 @@ def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
     handle = open_battery_engine("internal-analytical")
     try:
         outputs = {}
-        for fO2_log in (-12.0, -6.17939589339):
+        for fO2_log in (-12.0, -8.0, -6.17939589339):
             core = handle.backend._core
             core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
             core.melt.melt_fO2_log = fO2_log
@@ -372,6 +372,28 @@ def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
         mutated_diagnostic = mutated_result.diagnostics[
             "vapor_pressure_diagnostic"
         ]["a_FeO_calphad"]
+        core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+        core.melt.melt_fO2_log = -8.0
+        with patch.object(
+            fe_redox,
+            "holzheid_stoich_feo_gamma_band",
+            changed_gamma_band,
+        ):
+            mutated_eight_result = handle.backend.equilibrate(
+                temperature_C=1605.0,
+                composition_kg={"FeO": 0.2, "Na2O": 0.2, "SiO2": 0.6},
+                composition_mol={
+                    "FeO": 2.7838093647,
+                    "Na2O": 3.2269234585,
+                    "SiO2": 9.9861857763,
+                },
+                fO2_log=-8.0,
+                pressure_bar=1e-6,
+                po2_request=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=1.0e-8,
+                ),
+            )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
             close_battery_engine_handle,
@@ -399,6 +421,11 @@ def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
     assert reducing_result.vapor_pressures_Pa["Fe"] == pytest.approx(
         16.38797577954487
     )
+    reducing_provenance = reducing_result.diagnostics[
+        "vapor_pressure_diagnostic"
+    ]["vapor_pressure_numerator_provenance"]["Fe"]
+    assert reducing_provenance["activity_factor"] == 1.0
+    assert reducing_provenance["raw_metal_activity_root"] > 1.0
     assert not any(
         notice.reason == reason
         for notice in cell_notices(
@@ -446,6 +473,37 @@ def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
         )
     )
 
+    dependent_diag, dependent_cell, dependent_result = outputs[-8.0]
+    dependent_provenance = dependent_result.diagnostics[
+        "vapor_pressure_diagnostic"
+    ]["vapor_pressure_numerator_provenance"]["Fe"]
+    dependent_flags = [
+        row for row in dependent_cell.notices if row.get("reason") == reason
+    ]
+    assert dependent_diag["authority"]["calphad_weight"] == pytest.approx(
+        0.8206041066095899
+    )
+    assert dependent_provenance["activity_basis"] == "kress91_ferrous"
+    assert dependent_provenance["activity_factor"] < 1.0
+    assert dependent_flags
+    assert dependent_flags[0]["affected_species"] == ["Fe"]
+    assert dependent_flags[0]["affected_quantities"] == ["p_partial"]
+    assert dependent_result.vapor_pressures_Pa["Fe"] == pytest.approx(
+        3.238872664559105
+    )
+    assert mutated_eight_result.vapor_pressures_Pa["Fe"] == pytest.approx(
+        1.835371971238782
+    )
+    assert {
+        key: value
+        for key, value in dependent_result.vapor_pressures_Pa.items()
+        if key != "Fe"
+    } == {
+        key: value
+        for key, value in mutated_eight_result.vapor_pressures_Pa.items()
+        if key != "Fe"
+    }
+
     composition = Composition(
         basis="ordered_complete_mole_inventory",
         components=(
@@ -489,6 +547,82 @@ def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
     assert mutated_fe_prediction.authority is not Authority.EXTRAPOLATED
     assert not any(notice.reason == reason for notice in fe_prediction.notices)
     assert not any(notice.reason == reason for notice in mutated_fe_prediction.notices)
+
+    dependent_fe_identity = replace(
+        fe_identity, fO2_Pa=State.of(Decimal("1e-3"))
+    )
+    dependent_fe_observation = F.observation(
+        "fe-pressure-holzheid-dependent",
+        "holzheid-scope",
+        dependent_fe_identity,
+        Decimal("0.4"),
+    )
+    with _without_engine_cache():
+        dependent_prediction = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL,
+            dependent_fe_observation,
+            isolated=False,
+        )
+        with patch.object(
+            fe_redox,
+            "holzheid_stoich_feo_gamma_band",
+            changed_gamma_band,
+        ):
+            mutated_dependent_prediction = predict_with_engine(
+                Engine.INTERNAL_ANALYTICAL,
+                dependent_fe_observation,
+                isolated=False,
+            )
+    assert dependent_prediction.value == Decimal("3.736980566273724")
+    assert mutated_dependent_prediction.value == Decimal("2.1176347756593503")
+    assert any(notice.reason == reason for notice in dependent_prediction.notices)
+    assert any(
+        notice.reason == reason for notice in mutated_dependent_prediction.notices
+    )
+    assert dependent_prediction.authority is Authority.EXTRAPOLATED
+    assert mutated_dependent_prediction.authority is Authority.EXTRAPOLATED
+
+
+def test_scoped_pressure_notices_match_canonical_gas_species_keys() -> None:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.6")),
+            ("Na2O", Decimal("0.4")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    for formula, engine_key, expected in (
+        ("Na2O(g)", "Na2O_gas", Decimal("2235784.686743086")),
+        ("SiO2(g)", "SiO2_gas", Decimal("1526204.8526738302")),
+        ("Na", "Na", None),
+    ):
+        identity = replace(
+            F.activity_identity(
+                formula=formula,
+                T_K=Decimal("4500"),
+                component_basis=formula.removesuffix("(g)"),
+                composition=composition,
+                fO2_Pa=Decimal("1e-5"),
+            ),
+            quantity=Quantity.P_PARTIAL,
+            species=Species(formula, Phase.G),
+        )
+        prediction = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(
+                f"gas-flag-{formula}", "gas-flag", identity, Decimal("1")
+            ),
+            isolated=False,
+        )
+        if expected is not None:
+            assert prediction.value == expected
+        assert prediction.authority is Authority.EXTRAPOLATED
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and f":{engine_key}:" in notice.reason
+            for notice in prediction.notices
+        )
 
 
 def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:

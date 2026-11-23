@@ -60,6 +60,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
 )
 from simulator.battery.enums import NoticeKind
+from simulator.battery.composition import canonical_species_key
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerRemoteError,
@@ -1587,6 +1588,21 @@ def _plain_data(value: Any) -> Any:
     return value
 
 
+def _scope_matches(scope: Any, selected: str | None, *, species: bool = False) -> bool:
+    """Match one typed-result scope; an explicit empty scope matches nothing."""
+
+    if scope is None:
+        return True
+    values = scope if isinstance(scope, (list, tuple, set, frozenset)) else (scope,)
+    if not values:
+        return False
+    if selected is None:
+        return True
+    normalize = canonical_species_key if species else str
+    selected_key = normalize(selected)
+    return any(normalize(value) == selected_key for value in values)
+
+
 def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
     """Collect typed notices nested under diagnostic ``notice`` fields."""
 
@@ -1598,10 +1614,7 @@ def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
             species_scope = current.get("affected_species", inherited_species)
             quantity_scope = current.get("affected_quantities", inherited_quantities)
             nested_notice = current.get("notice")
-            has_scored_quantity_scope = not (
-                isinstance(quantity_scope, (list, tuple, set, frozenset))
-                and not quantity_scope
-            )
+            has_scored_quantity_scope = _scope_matches(quantity_scope, None)
             if (
                 isinstance(nested_notice, Mapping)
                 and nested_notice.get("kind")
@@ -1734,26 +1747,24 @@ def cell_score_authority(
     if refused:
         return "refused"
     authority = getattr(cell, "authority", None)
-    if authority and (authority != "bridge" or quantity is None):
-        return str(authority)
+    scoped_authority = False
     for row in getattr(cell, "notices", None) or []:
         if not isinstance(row, Mapping) or not row.get("authority"):
             continue
         affected_quantities = row.get("affected_quantities")
-        if (
-            isinstance(affected_quantities, (list, tuple, set, frozenset))
-            and affected_quantities
-            and (quantity is None or quantity not in affected_quantities)
-        ):
-            continue
         affected_species = row.get("affected_species")
-        if (
-            isinstance(affected_species, (list, tuple, set, frozenset))
-            and affected_species
-            and (species is None or species not in affected_species)
+        scoped_authority = scoped_authority or (
+            affected_quantities is not None or affected_species is not None
+        )
+        if not _scope_matches(affected_quantities, quantity) or not _scope_matches(
+            affected_species, species, species=True
         ):
             continue
         return str(row["authority"])
+    if authority and (quantity is None or authority != AUTHORITY_EXTRAPOLATED):
+        return str(authority)
+    if authority == AUTHORITY_EXTRAPOLATED and scoped_authority:
+        return "bridge"
     return str(authority or "bridge")
 
 
@@ -3903,7 +3914,7 @@ def _internal_analytical_vapor_pressure_adapter(
         "authoritative_for_requested_vapor_pressure": authority_is_authoritative,
         "authority": (
             AUTHORITY_EXTRAPOLATED
-            if any(not flag.get("affected_species") for flag in core_flags)
+            if core_flags
             else "bridge" if authority_is_authoritative else authority_status
         ),
         "vapor_pressure_diagnostic": core_diagnostic,
