@@ -453,11 +453,27 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
         _lookup_cached,
         neighbour_scored_result_reusable,
     )
-    from tests.test_optimizer_evaluate import PROFILE, _execution
+    from tests.test_optimizer_evaluate import (
+        _execution,
+        _knudsen_gate_profile,
+        _snapshot,
+        _trace,
+    )
 
     _use_cache(monkeypatch, tmp_path)
     quantum = ControlQuantization.from_name("coarse").t_k_quantum
     nearby = _request(1700.0 + quantum * 0.2)
+    profile = _knudsen_gate_profile()
+    knudsen_snapshots = (
+        _snapshot(
+            knudsen_regime_summary={
+                "status": "ok",
+                "knudsen_regime": "viscous",
+                "knudsen_number": 0.001,
+            }
+        ),
+    )
+    knudsen_trace = _trace(snapshots=knudsen_snapshots)
     with optimizer_engine_neighbour({"control_quantization": "coarse"}):
         _call(_request(1700.0), {"answer": "base"})
     original_run_options = evaluate_module._run_options
@@ -487,16 +503,16 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
                 return {"answer": "solved"}
 
             engine_cache.cached_engine_call("openimcc", self.request, solve)
-            return _execution()
+            return _execution(trace=knudsen_trace, snapshots=knudsen_snapshots)
 
-    patch = RecipePatch({("campaigns", "C0", "temp_range_C"): [20.0, 950.0]})
+    patch = RecipePatch({})
     install("coarse")
     coarse_executor = _CallingExecutor(nearby)
     coarse = evaluate(
         patch,
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=coarse_executor,
     )
     assert coarse.feasible
@@ -504,9 +520,13 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
     assert coarse_executor.solved == 0
     assert coarse.neighbour_hits >= 1
     assert coarse.neighbour_preset == "coarse"
+    knudsen_margin = coarse.feasibility_margins["knudsen_viscous"]
+    assert knudsen_margin.feasible
+    assert knudsen_margin.observed == pytest.approx(0.001)
+    assert "global_pipe" in knudsen_margin.detail
     assert coarse.eval_spec is not None
     assert coarse.eval_spec.control_quantization == "coarse"
-    assert coarse.eval_spec.profile_id == PROFILE["profile_id"]
+    assert coarse.eval_spec.profile_id == profile["profile_id"]
     trace = coarse.run_reference.trace
     assert trace["neighbour_hits"] == coarse.neighbour_hits
     assert trace["neighbour_preset"] == "coarse"
@@ -542,7 +562,7 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
         patch,
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
+        profile=profile,
         executor=fine_executor,
     )
     assert fine.feasible
@@ -569,7 +589,7 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
     store = _ReplayStore(coarse)
     missed = _lookup_cached(
         Candidate("fine-replay", patch),
-        PROFILE,
+        profile,
         "lunar_mare_low_ti",
         "fast",
         RecipeSchema(),
@@ -581,7 +601,7 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
     install("coarse")
     replayed = _lookup_cached(
         Candidate("coarse-replay", patch),
-        PROFILE,
+        profile,
         "lunar_mare_low_ti",
         "fast",
         RecipeSchema(),
