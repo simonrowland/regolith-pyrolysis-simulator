@@ -3468,6 +3468,88 @@ def _open_or_shut_fixed_point(
         law._counting_pstar = False
 
 
+def _reduced_open_fixed_point(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    hint_Pa: float,
+) -> tuple[str | None, float | None]:
+    """Advance P* once on the continuous open branch; bracket on a miss."""
+
+    downstream = law.downstream_pa
+    if not (math.isfinite(hint_Pa) and hint_Pa > downstream):
+        return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+
+    residual_down, _source_down, _outflow_down = _mixture_balance_terms(
+        law, fractions, downstream,
+    )
+    if residual_down <= 0.0:
+        # The existing resolver owns the shut return and its diagnostics.
+        return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+
+    residual, source_hint, outflow_hint = _mixture_balance_terms(
+        law, fractions, hint_Pa,
+    )
+    if residual == 0.0:
+        corrected = float(hint_Pa)
+    else:
+        # Implicit-function premise: G(P*, n) = 0, so
+        # dP*/dn_j = -(∂G/∂n_j)/(∂G/∂P). One Newton correction from the
+        # preceding stage's root is P_hint - G(P_hint, n)/(dG/dP).
+        # Difference G backward on the open piece; cap h at half the
+        # distance to P_down so both pressure samples remain strictly
+        # above the pipe kink. Each G sample's Q is the production pipe
+        # law (`pipe_species_outflow_mol_s` through `_flows`), so its
+        # difference supplies dQ/dP while the flux supplies dΣs/dP.
+        # Unit check: (mol/s) / (mol/(s·Pa)) = Pa.
+        # Limit: constant source and locally linear Q give a linear G,
+        # so this single correction lands the closed-form open root.
+        step = max(abs(float(hint_Pa)) * 1.0e-6, 1.0e-9)
+        step = min(
+            step,
+            0.25 * _KINK_BAND_PA,
+            0.5 * (float(hint_Pa) - downstream),
+        )
+        lower = float(hint_Pa) - step
+        if not (step > 0.0 and lower > downstream):
+            return _open_or_shut_fixed_point(
+                law, fractions, near_Pa=hint_Pa,
+            )
+        _residual_lower, source_lower, outflow_lower = _mixture_balance_terms(
+            law, fractions, lower,
+        )
+        derivative = (
+            (source_hint - outflow_hint)
+            - (source_lower - outflow_lower)
+        ) / step
+        if not (math.isfinite(derivative) and derivative < 0.0):
+            return _open_or_shut_fixed_point(
+                law, fractions, near_Pa=hint_Pa,
+            )
+        corrected = float(hint_Pa) - residual / derivative
+
+    if (
+        not math.isfinite(corrected)
+        or corrected <= downstream
+        or abs(corrected - float(hint_Pa)) > _KINK_BAND_PA
+    ):
+        # The established bracket remains the publisher outside the
+        # local IFT neighborhood, including multiple-root handling.
+        return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+
+    decision, continuous = _continuous_warm_root(
+        lambda pressure: _mixture_g(law, fractions, pressure),
+        lambda pressure: _mixture_piece(law, fractions, pressure),
+        float(hint_Pa),
+        downstream,
+        corrected,
+    )
+    if decision == "accept" and continuous is not None:
+        return "open", float(continuous)
+    # Reuse the bracket publisher for a replacement attractor, a
+    # multiple-root refusal, or a window with no continuous warm root.
+    return _open_or_shut_fixed_point(law, fractions, near_Pa=hint_Pa)
+
+
 def _quasi_steady_tau(jacobian, state) -> float | None:
     """tau = 1/|λ|_max. Unset when the spectrum is not a relaxation."""
 
@@ -3767,7 +3849,9 @@ def _reduced_manifold(
         if total <= 0.0:
             return [0.0] * (blocks * count)
         evolved = {name: raw[index] / total for index, name in enumerate(species)}
-        kind, found = _open_or_shut_fixed_point(law, evolved, near_Pa=hint[0])
+        kind, found = _reduced_open_fixed_point(
+            law, evolved, hint_Pa=hint[0],
+        )
         if kind != "open" or found is None:
             raise _ManifoldLost()
         hint[0] = float(found)
@@ -6011,21 +6095,34 @@ def _mixture_partials(
     }
 
 
-def _mixture_g(
+def _mixture_balance_terms(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
     pressure: float,
-) -> float:
+) -> tuple[float, float, float]:
     # G = Σ (q_i + S_i − Q_i) along one composition. Capture is held
     # outside this walk: a capture that jumps with P is not a
     # continuous mean free path, and the bracket would fall back.
     partials = _mixture_partials(law, fractions, pressure)
     source, outflow, _binding, _piece = law._flows(partials)
     redox = law._redox_rates(partials)
-    return math.fsum(
+    residual = math.fsum(
         source[species] + redox[species] - outflow[species]
         for species in law.species
     )
+    total_source = math.fsum(
+        source[species] + redox[species] for species in law.species
+    )
+    total_outflow = math.fsum(outflow[species] for species in law.species)
+    return residual, total_source, total_outflow
+
+
+def _mixture_g(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+) -> float:
+    return _mixture_balance_terms(law, fractions, pressure)[0]
 
 
 def _mixture_piece(
