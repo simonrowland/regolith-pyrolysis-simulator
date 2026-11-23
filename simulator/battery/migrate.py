@@ -4954,7 +4954,7 @@ def convert_pressure_to_pa(
         return None, "missing pressure unit"
     unit = str(units).strip()
     lowered = _normalize_printed_unit(unit).lower().replace(" ", "")
-    if lowered in {"pa", "pascal", "pascals"}:
+    if lowered == "pa":
         return amount, "identity:Pa"
     if lowered in {"kpa"}:
         # Premise: 1 kPa = 1000 Pa exactly (SI).
