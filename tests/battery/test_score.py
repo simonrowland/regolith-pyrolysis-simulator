@@ -4067,15 +4067,42 @@ def test_species_formula_parser_accepts_published_typography() -> None:
     ) == (("Cl", 1.0), ("H", 1.0))
 
 
-def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
-    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
-        assert parse_species_formula(formula) is None
+def test_species_formula_parser_accepts_formula_owner_ascii_dot_adducts() -> None:
+    from simulator.accounting.formulas import parse_formula
+
+    for formula, owner_formula in (
+        ("3Al2O3.2SiO2", "3Al2O3.2SiO2"),
+        ("CaAl2Si2O7(OH)2.H2O", "CaAl2Si2O7(OH)2.H2O"),
+        ("CaCO3.H2O", "CaCO3.H2O"),
+        ("FeSO4.H2O", "FeSO4.H2O"),
+        ("Hg2(OH)2CO3.3H2O", "Hg2(OH)2CO3.3H2O"),
+        ("NaAlSi2O6.H2O", "NaAlSi2O6.H2O"),
+        ("SrHgO.4CO2.5H2O", "SrHgO.4CO2.5H2O"),
+        ("Al₂O₃.3H₂O", "Al2O3.3H2O"),
+        ("$Al_2O_3.3H_2O$", "Al2O3.3H2O"),
+        ("CoSO₄.7H₂O", "CoSO4.7H2O"),
+    ):
+        expected = tuple(
+            sorted(
+                (str(element), float(count))
+                for element, count in parse_formula(owner_formula).elements.items()
+            )
+        )
+        assert parse_species_formula(formula) == expected
 
     for formula in ("Fe0.947O", "Al2O3.3H2O"):
         assert parse_species_formula(formula) == score_mod.formula_composition(formula)
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_keeps_adjacent_parenthesized_groups() -> None:
+    assert parse_species_formula("(CO)(C)") == (("C", 2.0), ("O", 1.0))
+
+
+def test_species_formula_parser_rejects_unmultiplied_dot_fragment() -> None:
+    assert parse_species_formula("CaAl.SiCK") is None
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:

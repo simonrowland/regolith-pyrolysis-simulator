@@ -1191,11 +1191,6 @@ def parse_species_formula(
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = fold_subscript_digits(text)
-    # formula_composition reads the ASCII-dot water-adduct separator as a
-    # decimal count. Refuse that normalized form first; raw fast-path results
-    # and explicit middle-dot hydrates stay unchanged.
-    if "·" not in text and re.search(r"\.\d+H2O", text):
-        return None
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1211,8 +1206,11 @@ def parse_species_formula(
     }
     annotation = re.search(r"\(([^()]*)\)$", text)
     if annotation is not None:
-        label = annotation.group(1).strip().lower()
-        annotated_phase = phase_labels.get(label)
+        raw_label = annotation.group(1).strip()
+        label = raw_label.lower()
+        # An uppercase element symbol in a terminal group is formula syntax,
+        # not the lowercase ``(c)`` phase annotation.
+        annotated_phase = None if raw_label == "C" else phase_labels.get(label)
         if annotated_phase is not None:
             if not _species_axis_matches_phase(species, annotated_phase):
                 return None
@@ -1251,6 +1249,23 @@ def parse_species_formula(
         if species is None or charge_value(species) != annotated_charge:
             return None
         text = text[: charge_annotation.start()]
+
+    if "." in text and "·" not in text:
+        from simulator.accounting.formulas import (
+            _is_integer_compound_adduct,
+            parse_formula,
+        )
+
+        # The raw fast path above preserves existing JANAF decimal parses.
+        # For spellings it cannot parse, the accounting owner decides whether
+        # an ASCII dot is an adduct or a decimal subscript.
+        if _is_integer_compound_adduct(
+            text, require_explicit_multipliers=True
+        ):
+            elements = parse_formula(text, species=text).elements
+            return tuple(
+                sorted((str(symbol), float(count)) for symbol, count in elements.items())
+            )
 
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)

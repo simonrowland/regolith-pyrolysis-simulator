@@ -622,7 +622,9 @@ def _distinct_integer_elements(text: str) -> int | None:
     return len(elements)
 
 
-def _is_integer_compound_adduct(text: str) -> bool:
+def _is_integer_compound_adduct(
+    text: str, *, require_explicit_multipliers: bool = False
+) -> bool:
     """True when every ASCII dot separates multi-element integer formulas.
 
     Split on '.' and strip one leading integer multiplier from each part
@@ -632,10 +634,13 @@ def _is_integer_compound_adduct(text: str) -> bool:
     ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
     ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
     ``Mg1.5SiO4``, and ``Fe2.3O4`` stay one species because a part is a
-    single element. ``FeO1.5`` stays one species because the part after
-    the dot has no element. ``SiO1.5C0.5`` stays one species because it
-    has a single-element part and an elementless part. An empty piece
-    from a leading, trailing, or doubled dot is not an adduct.
+    single element. ``FeO1.5`` stays one species because the part after the
+    dot has no element. ``SiO1.5C0.5`` stays one species because it has a
+    single-element part and an elementless part. An empty piece from a
+    leading, trailing, or doubled dot is not an adduct. The scoring adapter
+    can require explicit multipliers after the first part (with bare ``H2O``
+    allowed for a hydrate) to avoid interpreting unmultiplied extraction
+    fragments as adducts.
     """
 
     if not text or "." not in text or "·" in text:
@@ -644,6 +649,13 @@ def _is_integer_compound_adduct(text: str) -> bool:
     if any(part == "" for part in parts):
         return False
     for index, part in enumerate(parts):
+        if (
+            require_explicit_multipliers
+            and index > 0
+            and not _NUMBER_RE.match(part)
+            and part != "H2O"
+        ):
+            return False
         body = part if index == 0 else _strip_one_leading_integer(part)
         count = _distinct_integer_elements(body)
         if count is None or count < 2:
