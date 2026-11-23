@@ -2,7 +2,7 @@
 
 from collections import Counter, defaultdict
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 import re
 
@@ -176,10 +176,44 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
             observation = mass_loss_observation(source, sample)
             point = observation["values"]["points"][0]
             assert point["sample"] == sample
+            initial = point["initial_mass_mg_as_printed"]
+            final = point["final_mass_mg_as_printed"]
+            printed_percent = point["mass_loss_wt_pct_as_printed"]
             assert [
-                point["T_C"], point["time_min"], point["initial_mass_mg_as_printed"],
-                point["final_mass_mg_as_printed"], point["mass_loss_wt_pct"],
+                point["T_C"], point["time_min"], initial["value"],
+                final["value"], printed_percent["value"],
             ] == expected
+            assert observation["units"] == "fraction"
+            assert printed_percent["units"] == "wt%"
+            assert printed_percent["locator"]["column"] == "% evaporated"
+            for cell, column in (
+                (initial, "Initial wt. (mg)"),
+                (final, "Final wt. (mg)"),
+                (printed_percent, "% evaporated"),
+            ):
+                assert cell["units"] in {"mg", "wt%"}
+                assert cell["locator"]["page"] == 6
+                assert cell["locator"]["published_page"] == 484
+                assert cell["locator"]["pdf_page_index"] == 5
+                assert cell["locator"]["table"] == "2"
+                assert cell["locator"]["row"] == sample
+                assert cell["locator"]["column"] == column
+            recomputed = (Decimal(initial["value"]) - Decimal(final["value"])) / Decimal(initial["value"])
+            assert Decimal(point["mass_loss_fraction"]) == recomputed
+            if sample == "SC1":
+                assert abs(recomputed * 100 - Decimal(printed_percent["value"])) == Decimal(
+                    "0.06027223230490018148820327"
+                )
+            else:
+                assert (recomputed * 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) == Decimal(
+                    printed_percent["value"]
+                )
+            assert point["derivation"]["relation"] == (
+                "(initial_mass_mg_as_printed - final_mass_mg_as_printed) "
+                "/ initial_mass_mg_as_printed"
+            )
+            assert point["derivation"]["inputs"]["initial_mass_mg_as_printed"]["value"] == initial["value"]
+            assert point["derivation"]["inputs"]["final_mass_mg_as_printed"]["value"] == final["value"]
             assert point["locator"]["page"] == 6
             assert point["locator"]["pdf_page_index"] == 5
             assert point["locator"]["table"] == "2"
@@ -199,12 +233,13 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
     with pytest.raises(AssertionError):
         assert_mass_loss_grid_matches_render(extract, changed_render)
     changed_extract = deepcopy(extract)
-    mass_loss_observation(changed_extract, "SC2")["values"]["points"][0]["mass_loss_wt_pct"] = "999"
+    mass_loss_observation(changed_extract, "SC1")["values"]["points"][0]["mass_loss_fraction"] = "0.5729"
     with pytest.raises(AssertionError):
         assert_mass_loss_grid_matches_render(changed_extract, printed_rows)
 
     sc1 = mass_loss_observation(extract, "SC1")["values"]["points"][0]
-    assert "Table 1 prints 57.35; values disagree; the source does not reconcile them" in sc1["locator"]["note"]
+    assert "Table 2 prints 57.29 wt%; mass ratio from the printed masses is 57.35027223230490018148820327 wt%" in sc1["locator"]["note"]
+    assert "Table 1 reports 57.35 wt%; the source does not reconcile the Table 2 discrepancy" in sc1["locator"]["note"]
     assert sc1["locator"]["note"].endswith("physical PDF page 4, published page 482, Table 1, row SC1.")
 
     rendered = cells_by_label(TABLE4_RENDER)
@@ -224,6 +259,16 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
 
 
 def test_migrated_species_temperature_and_point_conditions() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    mass_loss_fraction_by_sample = {
+        point["sample"]: (
+            Decimal(point["initial_mass_mg_as_printed"]["value"])
+            - Decimal(point["final_mass_mg_as_printed"]["value"])
+        ) / Decimal(point["initial_mass_mg_as_printed"]["value"])
+        for observation in extract["species"]["SiO2"]["observations"]
+        if observation["values"].get("quantity") == "mass_loss_fraction"
+        for point in observation["values"]["points"]
+    }
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -242,6 +287,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     }
     actual_by_quantity: dict[Quantity, Counter[str]] = defaultdict(Counter)
     actual_by_sample: dict[tuple[Quantity, str], Counter[str]] = defaultdict(Counter)
+    migrated_mass_loss_samples: set[str] = set()
     temperature_c = {
         "SC1": "1800", "SC2": "1800", "SC3": "1800", "SC4": "1800",
         "SC5": "1800", "SC6": "2000", "SC7": "2000", "SC8": "2000",
@@ -280,6 +326,9 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         if quantity is Quantity.MASS_LOSS_FRACTION:
             assert formula == "unknown"
             assert row.identity.species.phase.value == "l"
+            assert row.value.kind is ValueKind.POINT
+            assert row.value.point == mass_loss_fraction_by_sample[sample]
+            migrated_mass_loss_samples.add(sample)
             assert conditions["printed_composition"].state.value == {
                 "MgO": "24.8",
                 "Al2O3": "2.46",
@@ -291,6 +340,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
 
     for quantity, expected in expected_by_quantity.items():
         assert actual_by_quantity[quantity] == Counter(expected)
+    assert migrated_mass_loss_samples == set(mass_loss_fraction_by_sample)
     component_formulas = ("MgO", "Al2O3", "SiO2", "CaO", "TiO2", "FeO")
     trace_formulas = "La Ce Pr Nd Sm Eu Gd Tb Dy Ho Er Tm Yb Lu".split()
     for sample in TABLE1_SAMPLES:
