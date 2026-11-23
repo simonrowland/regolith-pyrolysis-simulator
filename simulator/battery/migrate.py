@@ -88,6 +88,7 @@ from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.uncertainty_conventions import (
     UncertaintyConventionConflict,
     printed_uncertainty_convention,
+    standard_uncertainty_width,
 )
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
@@ -31328,7 +31329,9 @@ class Migrator:
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
                 if numeric_extra_unc is not None:
                     if extra_unc_k is not None:
-                        numeric_extra_unc /= Decimal(extra_unc_k)
+                        numeric_extra_unc = standard_uncertainty_width(
+                            numeric_extra_unc, Decimal(extra_unc_k)
+                        )
                     unc = replace(
                         unc,
                         value=_log_width_in_dex(

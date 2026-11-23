@@ -7366,7 +7366,9 @@ def _printed_uncertainty_band(
         # outside the transform's domain. Keep the admitted original interval
         # and scale its metric width only for this otherwise-unrepresentable
         # standard interval.
-        metric_standard_width = printed_interval_metric_width / k_print
+        metric_standard_width = standard_uncertainty_width(
+            printed_interval_metric_width, k_print
+        )
     ticket = metric_standard_width
     exact_ticket_input = (
         k_print == k_ticket

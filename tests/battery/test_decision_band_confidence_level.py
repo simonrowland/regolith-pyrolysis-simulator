@@ -1,6 +1,6 @@
 """Pin that q6 conversion follows the source-stated confidence level."""
 
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import yaml
@@ -112,10 +112,14 @@ def test_assumed_and_explicit_two_sigma_use_the_same_transformed_band() -> None:
     assert assumed.two_sigma_band.value == explicit.band.value
     assert assumed.two_sigma_band.unit == explicit.band.unit == "dimensionless"
     half_width_pa = width_pa / Decimal(2)
-    expected_dex = max(
-        abs((reference_pa + half_width_pa).ln() - reference_pa.ln()),
-        abs((reference_pa - half_width_pa).ln() - reference_pa.ln()),
-    ) / Decimal(10).ln()
+    # 60 digits leave ample guard digits for the endpoint ratios near 1;
+    # taking ln(endpoint/reference) directly avoids subtracting rounded logs.
+    with localcontext() as context:
+        context.prec = 60
+        expected_dex = max(
+            abs(((reference_pa + half_width_pa) / reference_pa).ln()),
+            abs(((reference_pa - half_width_pa) / reference_pa).ln()),
+        ) / Decimal(10).ln()
     expected_band = expected_dex * Decimal("1.959963984540054")
     assert abs(assumed.two_sigma_band.value - expected_band) < Decimal("1e-27")
 

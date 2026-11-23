@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -233,7 +234,34 @@ def test_unstated_plus_minus_defaults_to_one_sigma_with_two_sigma_alternative() 
     assert resolved.notice is not None
     assert resolved.notice.reason == "uncertainty_confidence_level_assumed_1sigma"
     assert resolved.two_sigma_band is not None
-    assert resolved.two_sigma_band.value == Decimal("0.1")
+    # Printed half-width / k = 0.1 / 2 = 0.05 kJ/mol; the alternative
+    # band tickets that standard width with the normal-95 transform.
+    assert resolved.two_sigma_band.value == (
+        Decimal("0.05") * NORMAL_95_TICKET_MULTIPLIER
+    )
+
+
+def test_coverage_normalization_callers_use_the_shared_owner() -> None:
+    root = Path(__file__).resolve().parents[2]
+    for relative_path, target in (
+        ("simulator/battery/score.py", "metric_standard_width"),
+        ("simulator/battery/migrate.py", "numeric_extra_unc"),
+    ):
+        tree = ast.parse((root / relative_path).read_text(encoding="utf-8"))
+        normalized_assignments = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(name, ast.Name) and name.id == target
+                for target_node in node.targets
+                for name in ast.walk(target_node)
+            )
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
+            and node.value.func.id == "standard_uncertainty_width"
+        ]
+        assert len(normalized_assignments) == 1, relative_path
 
 
 def test_printed_confidence_text_precedes_default_and_method_override() -> None:
