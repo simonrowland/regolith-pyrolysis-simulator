@@ -505,9 +505,9 @@ def test_unsourced_alpha_uses_the_builtin_runtime_default(
     source = deepcopy(fig3_source)
     for block in source["species"].values():
         block["context"] = []
-    monkeypatch.setitem(evaporation_flux._DEFAULT_EVAPORATION_ALPHA, "value", 0.37)
+    monkeypatch.setitem(evaporation_flux._DP_005_ALPHA, "value", 0.37)
     monkeypatch.setitem(
-        evaporation_flux._DEFAULT_EVAPORATION_ALPHA,
+        evaporation_flux._DP_005_ALPHA,
         "source",
         "test mutation of the built-in HKL default",
     )
@@ -517,9 +517,9 @@ def test_unsourced_alpha_uses_the_builtin_runtime_default(
         source_document=source, observation=row,
     )
 
-    assert "knob_defaulted:evaporation_alpha:Mg=0.37" in result.engine_flags
+    assert "alpha_assumed:evaporation_alpha:Mg=0.37" in result.engine_flags
     assert any(
-        flag.startswith("knob_defaulted:evaporation_alpha:")
+        flag.startswith("alpha_assumed:evaporation_alpha:")
         and "test mutation of the built-in HKL default" in flag
         for flag in result.engine_flags
     )
@@ -575,13 +575,15 @@ def test_missing_or_non_self_similar_area_uses_equipment_default(
 def test_full_prediction_uses_defaulted_unsourced_channel(
     r11_inputs, prescribed_pressure_engine,
 ):
+    from simulator.battery.enums import NoticeKind
+
     row, experiment = r11_inputs
     prescribed_pressure_engine["unsourced_ca"] = True
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
     assert prediction.value is not None, prediction.refusal_detail
     assert any(
-        notice.reason.startswith("knob_defaulted:evaporation_alpha:Ca=")
-        and notice.kind.value == "unverified_apparatus"
+        notice.reason.startswith("alpha_assumed:evaporation_alpha:Ca=")
+        and notice.kind is NoticeKind.ALPHA_ASSUMED
         for notice in prediction.notices
     )
 

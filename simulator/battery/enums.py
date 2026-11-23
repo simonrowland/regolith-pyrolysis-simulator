@@ -330,6 +330,13 @@ class NoticeKind(StrEnum):
     PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"
     SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE = "source_value_outside_physical_range"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
+    # d-460 policy flags stay typed independently so each policy is reported
+    # in its own flagged stratum and can be counted by policy id.
+    EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
+    ALPHA_ASSUMED = "alpha_assumed"
+    KNOB_DEFAULTED = "knob_defaulted"
+    KEMS_CALIBRATION_BY_SOURCE = "kems_calibration_by_source"
+    METHOD_ASSUMED = "method_assumed"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     # t-1593: a named material's cited bulk analysis varies by lot

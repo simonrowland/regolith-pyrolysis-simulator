@@ -216,6 +216,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -602,8 +603,13 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
-FLAGGED_STRATUM_ASSUMED = "assumed"
-FLAGGED_STRATUM_METHOD_IMPLIED = "method-implied"
+_POLICY_FLAG_STRATA = (
+    NoticeKind.EFFUSION_REGIME_ASSUMED,
+    NoticeKind.ALPHA_ASSUMED,
+    NoticeKind.KNOB_DEFAULTED,
+    NoticeKind.KEMS_CALIBRATION_BY_SOURCE,
+    NoticeKind.METHOD_ASSUMED,
+)
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
@@ -2202,7 +2208,7 @@ def _unverified_apparatus_notices(
             calibration_status = detail.get("calibration_record_status")
             defaulted_notices.append(
                 Notice(
-                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    kind=NoticeKind.KEMS_CALIBRATION_BY_SOURCE,
                     affected_quantities=(quantity,),
                     reason=(
                         "kems_calibration_by_source: "
@@ -2214,7 +2220,7 @@ def _unverified_apparatus_notices(
                     origin=reference.observation_id,
                 )
             )
-        elif flag in {"assumed", "method_implied"}:
+        elif flag in {"effusion_regime_assumed", "method_assumed"}:
             condition = str(
                 detail.get("condition") or "free_molecular_effusion_regime"
             )
@@ -2224,7 +2230,7 @@ def _unverified_apparatus_notices(
             )
             defaulted_notices.append(
                 Notice(
-                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    kind=NoticeKind(flag),
                     affected_quantities=(quantity,),
                     reason=(
                         f"{flag}: {condition}; original_reason={original_reason}"
@@ -2407,18 +2413,22 @@ def _unverified_apparatus_notices(
             )
         elif fact == "method_unknown" and unknown_method_activity:
             reason = (
-                "assumed:method_unknown; original_reason=published activity has a "
+                "method_assumed:method_unknown; original_reason=published activity has a "
                 "typed condensed reference but its experiment method is not stated"
             )
         elif fact == "method_unknown":
-            reason = "assumed:method_unknown; original_reason=" + str(
+            reason = "method_assumed:method_unknown; original_reason=" + str(
                 detail.get("reason") or "pressure series method is not stated"
             )
         else:
             reason = f"apparatus_unverified:{fact}"
         notices.append(
             Notice(
-                kind=NoticeKind.UNVERIFIED_APPARATUS,
+                kind=(
+                    NoticeKind.METHOD_ASSUMED
+                    if fact == "method_unknown"
+                    else NoticeKind.UNVERIFIED_APPARATUS
+                ),
                 affected_quantities=(quantity,),
                 reason=reason,
                 origin=reference.observation_id,
@@ -2537,17 +2547,7 @@ def _classify_flagged_notice_facts(
         for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    if any(
-        isinstance(reason, str)
-        and reason.startswith(("assumed:", "knob_defaulted:"))
-        for reason in unverified_apparatus
-    ):
-        strata.append(FLAGGED_STRATUM_ASSUMED)
-    if any(
-        isinstance(reason, str) and reason.startswith("method_implied:")
-        for reason in unverified_apparatus
-    ):
-        strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
+    strata.extend(flag.value for flag in _POLICY_FLAG_STRATA if flag.value in kinds)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
@@ -12681,25 +12681,37 @@ def _predict_mass_loss_with_residue(
             identity=identity,
         )
 
-    notices = tuple(
-        Notice(
-            kind=(NoticeKind.UNVERIFIED_APPARATUS if flag.startswith("knob_defaulted:")
-                  else NoticeKind.OUT_OF_CERTIFIED_BAND if (
-                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-                or flag.startswith("alpha_extrapolated:")
-            ) else NoticeKind.FALLBACK),
-            affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
-            reason=flag,
-            origin=(
-                observation.observation_id
-                if flag.startswith("knob_defaulted:")
-                else f"engine:{engine.value}"
-            ),
+    notices_list: list[Notice] = []
+    for flag in result.engine_flags:
+        if flag.startswith("alpha_assumed:"):
+            kind = NoticeKind.ALPHA_ASSUMED
+            origin = observation.observation_id
+        elif flag.startswith("knob_defaulted:"):
+            kind = NoticeKind.KNOB_DEFAULTED
+            origin = observation.observation_id
+        elif (
+            "paper-demonstrated-window" in flag
+            or flag == "openimcc_extrapolated"
+            or flag.startswith("alpha_extrapolated:")
+        ):
+            kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+            origin = f"engine:{engine.value}"
+        elif flag.startswith(("mass_loss_",)):
+            kind = NoticeKind.FALLBACK
+            origin = f"engine:{engine.value}"
+        else:
+            continue
+        notices_list.append(
+            Notice(
+                kind=kind,
+                affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+                reason=flag,
+                origin=origin,
+            )
         )
-        for flag in result.engine_flags
-        if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-        or flag.startswith(("alpha_extrapolated:", "mass_loss_", "knob_defaulted:"))
-    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    notices = tuple(notices_list) + omission_notices(
+        result.engine_metadata.get("below_threshold_omissions")
+    )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,

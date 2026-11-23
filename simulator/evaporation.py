@@ -1020,7 +1020,7 @@ def refuse_viscous_p_bulk_out_of_domain(
 
 
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
-# (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
+# (_DP_005_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 def _diagnostic_names_composition_projected(

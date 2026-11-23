@@ -882,9 +882,14 @@ def effusion_regime_unverified(
     def regime_gap_check(reason: object) -> GateCheck:
         # A printed Knudsen-effusion method implies molecular effusion inside
         # the cell and vacuum outside. In-cell total pressure remains the sum
-        # of partial pressures, never an assumed 1 atm; without the method the
-        # existing Drowart-limit fallback assumes free-molecular effusion.
-        flag = "method_implied" if method_implies_effusion else "assumed"
+        # of partial pressures, never an assumed 1 atm. DP-004 names this
+        # unresolved regime check; a missing method uses DP-011's quantity-based
+        # equilibrium comparison for pressure rows instead.
+        flag = (
+            "effusion_regime_assumed"
+            if method_implies_effusion
+            else "method_assumed"
+        )
         return GateCheck(
             flag,
             True,
@@ -894,7 +899,7 @@ def effusion_regime_unverified(
                     "molecular_effusion_inside_cell; vacuum_outside; "
                     "total_pressure=sum_of_partial_pressures"
                     if method_implies_effusion
-                    else "free_molecular_effusion_regime"
+                    else "equilibrium_comparison_from_printed_pressure_quantity"
                 ),
                 "reason": reason or "orifice and in-cell pressure sum are not printed",
             },
@@ -1643,6 +1648,9 @@ class KnudsenEffusionPressure:
     notice: Notice | None
 
 
+_DP_006_CLAUSING_FACTOR = Decimal("1")
+
+
 def _orifice_area_m2(diameter_m: Decimal) -> Decimal:
     """pi d^2 / 4. pi matches the float Hertz-Knudsen helper."""
 
@@ -1655,14 +1663,13 @@ def _constant_clausing(
 ) -> Decimal:
     """Point Clausing factor, or the thin-orifice default when C is absent.
 
-    C = 1 is the thin-orifice limit. Real C is below one, so this default
-    underestimates pressure reduced from a mass-loss rate. The same value
-    also lives in
-    simulator/diagnostic_helpers/extract_reproduction.py as a float on the
-    engine-reproduction path. That copy is not Located geometry and is not
-    this reduction. Channel length alone does not determine C without a
-    short-orifice correction, so the reported length does not change this
-    stated default.
+    DP-006 uses C = 1, the thin-orifice limit. Real C is below one, so this
+    default underestimates pressure reduced from a mass-loss rate. The same
+    A float copy also appears in
+    simulator/diagnostic_helpers/extract_reproduction.py for the separate
+    engine-reproduction path; that path does not reduce Located geometry here.
+    Channel length alone does not determine C without a short-orifice
+    correction, so the reported length does not change this stated default.
     """
 
     if isinstance(clausing_factor, Decimal):
@@ -1679,7 +1686,7 @@ def _constant_clausing(
         if not _clausing_value_ok(clausing):
             raise ValueError("clausing_factor must be a point in (0, 1]")
         return clausing
-    return Decimal("1")
+    return _DP_006_CLAUSING_FACTOR
 
 
 def knudsen_effusion_pressure_from_mass_rate(
@@ -1751,7 +1758,7 @@ def knudsen_effusion_pressure_from_mass_rate(
     clausing = _constant_clausing(clausing_factor)
     clausing_notice = (
         Notice(
-            kind=NoticeKind.UNVERIFIED_APPARATUS,
+            kind=NoticeKind.KNOB_DEFAULTED,
             affected_quantities=(quantity,),
             reason=(
                 f"knob_defaulted:clausing_factor={clausing}; "

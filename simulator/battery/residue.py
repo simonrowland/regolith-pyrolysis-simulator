@@ -16,7 +16,7 @@ from typing import Any
 
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
-    _DEFAULT_EVAPORATION_ALPHA,
+    _DP_005_ALPHA,
 )
 from simulator.accounting.formulas import parse_formula
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
@@ -2343,7 +2343,7 @@ def predict_mass_loss_fraction(
     )
     unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
                       if parent and str(species) not in fits)
-    default_alpha = float(_DEFAULT_EVAPORATION_ALPHA["value"])
+    default_alpha = float(_DP_005_ALPHA["value"])
 
     bounds_by_channel = {species: 0.0 for species in unsourced}
     preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
@@ -2419,9 +2419,9 @@ def predict_mass_loss_fraction(
                 # alpha=0 is the zero-flux limit; the stated upper bound is
                 # therefore conservative without fitting the measured loss.
                 alpha = default_alpha
-                provenance = str(_DEFAULT_EVAPORATION_ALPHA["source"])
+                provenance = str(_DP_005_ALPHA["source"])
                 flags.add(
-                    f"knob_defaulted:evaporation_alpha:{species}={alpha:.17g}; "
+                    f"alpha_assumed:evaporation_alpha:{species}={alpha:.17g}; "
                     "original_reason=evaporation_coefficients_not_sourced; "
                     f"default_source={provenance}"
                 )
