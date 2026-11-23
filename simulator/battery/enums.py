@@ -316,10 +316,11 @@ class NoticeKind(StrEnum):
     )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
-    TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     ASSUMED_PRESSURE = "assumed_pressure"
+    TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     METHOD_IMPLIED = "method_implied"
     ASSUMED_FO2 = "assumed_fo2"
+    EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
     # reason carries detail; it adds no stratum and does not change authority.

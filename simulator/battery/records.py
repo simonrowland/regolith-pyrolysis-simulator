@@ -1013,6 +1013,24 @@ class Derivation:
 
 
 @dataclass(frozen=True)
+class NoticePolicy:
+    id: str
+    version: str
+    status: str
+    value: str
+    units: str
+
+    def __post_init__(self) -> None:
+        if any(
+            not isinstance(value, str) or not value.strip()
+            for value in (self.id, self.version, self.value, self.units)
+        ):
+            raise ValueError("notice policy requires id, version, value, and units")
+        if self.status not in {"canonical", "proposed", "rejected"}:
+            raise ValueError("notice policy status is not recognized")
+
+
+@dataclass(frozen=True)
 class Notice:
     kind: NoticeKind
     affected_quantities: tuple[Quantity, ...]
@@ -1027,7 +1045,7 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
-    policy: Mapping[str, str] | None = None
+    policy: NoticePolicy | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1051,25 +1069,21 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        if self.kind in {
+            NoticeKind.ASSUMED_PRESSURE,
+            NoticeKind.ASSUMED_FO2,
+            NoticeKind.METHOD_IMPLIED,
+            NoticeKind.EFFUSION_REGIME_ASSUMED,
+        } and self.policy is None:
+            raise ValueError(f"{self.kind.value} requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
             object.__setattr__(
                 self, "dropped_mass_fraction", as_decimal(self.dropped_mass_fraction)
             )
-        if self.policy is not None:
-            policy_keys = ("id", "version", "status", "value", "units")
-            if not isinstance(self.policy, Mapping) or set(self.policy) != set(policy_keys):
-                raise ValueError(
-                    "Notice.policy must contain id, version, status, value, and units"
-                )
-            policy = {key: self.policy[key] for key in policy_keys}
-            if any(
-                not isinstance(value, str) or not value.strip()
-                for value in policy.values()
-            ):
-                raise ValueError("Notice.policy values must be nonempty strings")
-            object.__setattr__(self, "policy", policy)
+        if self.policy is not None and not isinstance(self.policy, NoticePolicy):
+            raise TypeError("Notice.policy must be a NoticePolicy")
 
 
 SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"
@@ -1897,8 +1911,10 @@ class Observation:
 
 @dataclass(frozen=True)
 class CandidateRequest:
+    """Requested engine comparison; quantity is None when identity is unknown."""
+
     experiment_id: str
-    quantity: Quantity
+    quantity: Quantity | None
     engine: Engine
     channel: str
 
@@ -2003,6 +2019,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
+                notice.policy,
             )
             if fingerprint in seen:
                 continue

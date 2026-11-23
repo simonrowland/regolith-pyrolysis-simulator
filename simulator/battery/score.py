@@ -217,6 +217,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -626,6 +627,7 @@ FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_ASSUMED_PRESSURE = "assumed_pressure"
 FLAGGED_STRATUM_ASSUMED_FO2 = "assumed_fo2"
 FLAGGED_STRATUM_METHOD_IMPLIED = "method_implied"
+FLAGGED_STRATUM_EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
 FLAGGED_STRATUM_PROPOSED_POLICY = "PROPOSED-POLICY"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
@@ -885,7 +887,9 @@ def _static_refusal_summary_key(
         or refusal.detail.get("reason") not in _STATIC_REFUSAL_DETAILS
     ):
         return None
-    rail = residual.rail or rail_for_quantity(request.quantity)
+    rail = residual.rail
+    if rail is None and request.quantity is not None:
+        rail = rail_for_quantity(request.quantity)
     return (
         request.engine.value,
         "unassigned" if rail is None else rail.value,
@@ -2484,7 +2488,7 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
     if any(
-        notice.policy is not None and notice.policy.get("status") == "proposed"
+        notice.policy is not None and notice.policy.status == "proposed"
         for notice in notices
     ):
         strata = (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
@@ -2549,18 +2553,20 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
+    if NoticeKind.ASSUMED_PRESSURE.value in kinds:
+        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
-    if NoticeKind.ASSUMED_PRESSURE.value in kinds:
-        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.ASSUMED_FO2.value in kinds:
         strata.append(FLAGGED_STRATUM_ASSUMED_FO2)
     if NoticeKind.METHOD_IMPLIED.value in kinds:
         strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
+    if NoticeKind.EFFUSION_REGIME_ASSUMED.value in kinds:
+        strata.append(FLAGGED_STRATUM_EFFUSION_REGIME_ASSUMED)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
@@ -8188,13 +8194,15 @@ def _activity_request_or_contract_refusal(
 def _assumed_pressure_notice(
     quantity: Quantity,
     reason: str,
-    policy: Mapping[str, str],
+    policy: NoticePolicy,
+    *,
+    kind: NoticeKind = NoticeKind.ASSUMED_PRESSURE,
 ) -> Notice:
     return Notice(
-        kind=NoticeKind.ASSUMED_PRESSURE,
+        kind=kind,
         affected_quantities=(quantity,),
         reason=reason,
-        origin="score:predict_with_engine",
+        origin="score:total_pressure",
         policy=policy,
     )
 
@@ -9341,34 +9349,79 @@ def _resolve_score_total_pressure(
         if experiment is not None and experiment.method.is_value
         else None
     )
-    if method in {
-        MethodToken.KNUDSEN_EFFUSION,
-        MethodToken.VACUUM_CHAMBER_PYROLYSIS,
-    }:
+    vacuum_descriptions: list[str] = []
+    if experiment is not None:
+        if (
+            experiment.thermal_schedule is not None
+            and experiment.thermal_schedule.method is not None
+            and experiment.thermal_schedule.method.state.is_value
+        ):
+            vacuum_descriptions.append(
+                str(experiment.thermal_schedule.method.state.value).casefold()
+            )
+        internal_note = experiment.pressure_environment.cell_internal_pressure_note
+        if internal_note is not None and internal_note.state.is_value:
+            vacuum_descriptions.append(str(internal_note.state.value).casefold())
+        container = experiment.sample.container
+        if container is not None and container.state.is_value:
+            vacuum_descriptions.append(str(container.state.value).casefold())
+    stated_vacuum = any(
+        "vacuum" in description or "evacuated" in description
+        for description in vacuum_descriptions
+    )
+    vacuum_method = method is MethodToken.VACUUM_CHAMBER_PYROLYSIS or (
+        method in {
+            MethodToken.LANGMUIR_FREE_EVAPORATION,
+            MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        }
+        and stated_vacuum
+    )
+    if vacuum_method:
         from simulator.diagnostic_helpers.binary_pot_battery import (
-            _DEFAULT_PRESSURE_BAR as _DP_100_KNUDSEN_PRESSURE_BAR,
+            DP_019_PRESSURE_BAR,
         )
 
-        pressure_bar = float(_DP_100_KNUDSEN_PRESSURE_BAR)
-        pressure_pa = State.of(
-            Decimal(str(_DP_100_KNUDSEN_PRESSURE_BAR)) * PA_PER_BAR_DEC
-        )
+        pressure_bar = float(DP_019_PRESSURE_BAR)
+        pressure_pa = State.of(Decimal(str(DP_019_PRESSURE_BAR)) * PA_PER_BAR_DEC)
         notice = _assumed_pressure_notice(
             quantity,
             "default_total_pressure_Pa="
-            f"{pressure_pa.value}; "
-            f"original_reason={original_reason}; "
-            "Knudsen total pressure is the sum of partial pressures, not the "
-            "external vacuum; the scoring row has no recorded total-pressure "
-            "state from which to apply that sum; "
-            "the existing d-456 apparatus pressure is used pending policy review",
-            policy={
-                "id": "DP-100",
-                "version": "v1",
-                "status": "proposed",
-                "value": str(_DP_100_KNUDSEN_PRESSURE_BAR),
-                "units": "bar",
-            },
+            f"{pressure_pa.value}; original_reason={original_reason}; "
+            "vacuum-chamber method fixes high vacuum; engine requires finite pressure",
+            NoticePolicy(
+                id="DP-019",
+                version="v1",
+                status="canonical",
+                value=str(pressure_pa.value),
+                units="Pa",
+            ),
+            kind=NoticeKind.METHOD_IMPLIED,
+        )
+        return pressure_bar, pressure_pa, notice, None
+
+    if method is MethodToken.KNUDSEN_EFFUSION:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            DP_019_PRESSURE_BAR,
+        )
+
+        pressure_bar = float(DP_019_PRESSURE_BAR)
+        pressure_pa = State.of(Decimal(str(DP_019_PRESSURE_BAR)) * PA_PER_BAR_DEC)
+        notice = Notice(
+            kind=NoticeKind.EFFUSION_REGIME_ASSUMED,
+            affected_quantities=(quantity,),
+            reason=(
+                "Knudsen method implies molecular effusion inside and vacuum outside; "
+                f"original_reason={original_reason}; total cell pressure is "
+                "the sum of measured partial pressures"
+            ),
+            origin="score:total_pressure",
+            policy=NoticePolicy(
+                id="DP-004",
+                version="v1",
+                status="canonical",
+                value="P_total(cell) = sum of measured partial pressures",
+                units="Pa",
+            ),
         )
         return pressure_bar, pressure_pa, notice, None
 
@@ -9389,24 +9442,19 @@ def _resolve_score_total_pressure(
         )
         pressure_pa = State.of(_DP_002_TOTAL_PRESSURE_PA)
         pressure_bar = float(_DP_002_TOTAL_PRESSURE_PA / PA_PER_BAR_DEC)
-        notice = Notice(
-            kind=NoticeKind.METHOD_IMPLIED,
-            affected_quantities=(quantity,),
-            reason=(
-                "default_total_pressure_Pa="
-                f"{_DP_002_TOTAL_PRESSURE_PA}; "
-                f"original_reason={original_reason}; "
-                f"{implied_pressure}"
+        notice = _assumed_pressure_notice(
+            quantity,
+            "default_total_pressure_Pa="
+            f"{_DP_002_TOTAL_PRESSURE_PA}; original_reason={original_reason}; "
+            f"{implied_pressure}",
+            NoticePolicy(
+                id="DP-002",
+                version="v1",
+                status="canonical",
+                value=str(_DP_002_TOTAL_PRESSURE_PA),
+                units="Pa",
             ),
-            origin="score:total_pressure",
-            authority=Authority.DERIVED_FROM_APPARATUS,
-            policy={
-                "id": "DP-002",
-                "version": "v1",
-                "status": "canonical",
-                "value": str(_DP_002_TOTAL_PRESSURE_PA),
-                "units": "Pa",
-            },
+            kind=NoticeKind.METHOD_IMPLIED,
         )
         return pressure_bar, pressure_pa, notice, None
 
@@ -9424,13 +9472,13 @@ def _resolve_score_total_pressure(
         f"{_DP_001_TOTAL_PRESSURE_PA}; "
         f"original_reason={original_reason}; "
         "method does not fix total pressure",
-        policy={
-            "id": "DP-001",
-            "version": "v1",
-            "status": "canonical",
-            "value": str(_DP_001_TOTAL_PRESSURE_PA),
-            "units": "Pa",
-        },
+        NoticePolicy(
+            id="DP-001",
+            version="v1",
+            status="canonical",
+            value=str(_DP_001_TOTAL_PRESSURE_PA),
+            units="Pa",
+        ),
     )
     return pressure_bar, pressure_pa, notice, None
 
@@ -11500,22 +11548,6 @@ def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
     return None
 
 
-def _printed_total_pressure_bar(
-    identity: Identity, observation: Observation
-) -> Decimal | None:
-    state = identity.total_pressure_Pa
-    if state is not None and state.is_value and state.value is not None:
-        pa = nominal_pressure_pa(state)
-    else:
-        located = (observation.point_conditions or {}).get("total_pressure_Pa")
-        if located is None or located.inference is not None or not located.state.is_value:
-            return None
-        pa = nominal_pressure_pa(located)
-    if pa is None or not pa.is_finite() or pa <= 0:
-        return None
-    return pa / PA_PER_BAR_DEC
-
-
 def _printed_fo2_log10_bar(identity: Identity) -> float | None:
     state = identity.fO2_Pa
     if state is None or not state.is_value or state.value is None:
@@ -11971,6 +12003,8 @@ def _predict_element_mass_fraction_phase(
     quantity: Quantity | None,
     role: PhaseRole,
     handles: Mapping[str, object] | None,
+    experiment: Experiment | None,
+    bench: Bench | None,
     refused: Callable[..., EnginePrediction],
 ) -> EnginePrediction:
     """Score one printed element. The engine sees FeO_T or the ferric split.
@@ -12034,14 +12068,23 @@ def _predict_element_mass_fraction_phase(
             execution=ExecutionState.NOT_PROBED,
             notices=notices,
         )
-    pressure_bar = _printed_total_pressure_bar(identity, observation)
-    if pressure_bar is None:
+    pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
+        _resolve_score_total_pressure(
+            identity,
+            quantity,
+            observation=observation,
+            experiment=experiment,
+        )
+    )
+    if pressure_invalid is not None:
         return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": pressure_invalid, "input": "total_pressure_Pa"},
             execution=ExecutionState.NOT_PROBED,
             notices=notices,
         )
+    if pressure_notice is not None:
+        notices = notices + (pressure_notice,)
 
     redox_mode: str | None = None
     fo2_log: float | None = None
@@ -12051,15 +12094,37 @@ def _predict_element_mass_fraction_phase(
         weights = decision.ferric_split_wt_percent or ()
         redox_mode = REDOX_MODE_NOT_AN_INPUT
     elif decision.redox_kind == "conditions":
+        weights = _feo_t_wt_percent(decision)
         fo2_log = _printed_fo2_log10_bar(identity)
         if fo2_log is None:
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "fO2_Pa"},
-                execution=ExecutionState.NOT_PROBED,
-                notices=notices,
+            from simulator.battery.fo2_ladder import (
+                fo2_tier_notice,
+                resolve_row_fo2,
             )
-        weights = _feo_t_wt_percent(decision)
+
+            resolved = resolve_row_fo2(
+                experiment,
+                bench,
+                observation,
+                composition_wt=dict(weights),
+                temperature_K=float(temperature),
+                quantity=quantity,
+            )
+            if resolved is None:
+                return refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "fO2_Pa"},
+                    execution=ExecutionState.NOT_PROBED,
+                    notices=notices,
+                )
+            fo2_log = resolved.log10_fO2_bar
+            notices = notices + (fo2_tier_notice(quantity, resolved),)
+            oxygen_bar = resolved.po2_bar
+            if oxygen_bar is None:
+                oxygen_bar = 10.0**fo2_log
+            identity = _prediction_identity_with_fo2(
+                identity, oxygen_bar, preserve_existing=False
+            )
     else:
         from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
 
@@ -12073,6 +12138,8 @@ def _predict_element_mass_fraction_phase(
             notices=notices,
         )
     try:
+        if pressure_state is not None:
+            identity = replace(identity, total_pressure_Pa=pressure_state)
         result = _equilibrate_phase_assemblage(
             engine,
             temperature_C=float(temperature - Decimal("273.15")),
@@ -12230,6 +12297,7 @@ def _predict_phase_row(
     phase_siblings: Mapping[str, Decimal] | None = None,
     phase_sibling_refusal: str | None = None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """One printed component, or one printed L_X, from an assemblage."""
 
@@ -12305,6 +12373,8 @@ def _predict_phase_row(
             quantity=quantity,
             role=role,
             handles=handles,
+            experiment=experiment,
+            bench=bench,
             refused=refused,
         )
     identity, gate_refusal, gate_detail, rewrite = _gate_input_composition(
@@ -12449,20 +12519,55 @@ def _predict_phase_row(
         }
     fo2_log = _printed_fo2_log10_bar(identity)
     if fo2_log is None:
+        from simulator.battery.fo2_ladder import (
+            fo2_tier_notice,
+            resolve_row_fo2,
+        )
+
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            observation,
+            composition_wt=wt,
+            temperature_K=float(temperature),
+            quantity=quantity,
+        )
+        if resolved is None:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "fO2_Pa"},
+                execution=ExecutionState.NOT_PROBED,
+                notices=exclusion_notices,
+            )
+        fo2_log = resolved.log10_fO2_bar
+        exclusion_notices = exclusion_notices + (
+            fo2_tier_notice(quantity, resolved),
+        )
+        oxygen_bar = resolved.po2_bar
+        if oxygen_bar is None:
+            oxygen_bar = 10.0**fo2_log
+        identity = _prediction_identity_with_fo2(
+            identity, oxygen_bar, preserve_existing=False
+        )
+    pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
+        _resolve_score_total_pressure(
+            identity,
+            quantity,
+            observation=observation,
+            experiment=experiment,
+        )
+    )
+    if pressure_invalid is not None:
         return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "fO2_Pa"},
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": pressure_invalid, "input": "total_pressure_Pa"},
             execution=ExecutionState.NOT_PROBED,
             notices=exclusion_notices,
         )
-    pressure_bar = _printed_total_pressure_bar(identity, observation)
-    if pressure_bar is None:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
-            execution=ExecutionState.NOT_PROBED,
-            notices=exclusion_notices,
-        )
+    if pressure_notice is not None:
+        exclusion_notices = exclusion_notices + (pressure_notice,)
+    if pressure_state is not None:
+        identity = replace(identity, total_pressure_Pa=pressure_state)
     anion_pa: Decimal | None = None
     law: _CapacityLaw | None = None
     if solute is not None:
@@ -14417,6 +14522,7 @@ def _predict_with_engine(
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
             experiment=experiment,
+            bench=bench,
         )
     if quantity is Quantity.VALENCE_RATIO:
         return _predict_named_fe_valence(
@@ -17805,7 +17911,7 @@ def _refused_residual(
             if candidate is not None
             else CandidateRequest(
                 reference.experiment_id,
-                quantity or Quantity.P_SAT,
+                quantity,
                 engine,
                 ENGINE_CHANNELS[engine],
             ),
@@ -23206,6 +23312,36 @@ def _optional_decimal(value: Decimal | None) -> str | None:
     return None if value is None else str(value)
 
 
+def _policy_ids_for_stratum(
+    notices: Iterable[Notice | Mapping[str, object]], stratum: str
+) -> tuple[tuple[str, str] | None, ...]:
+    policies: set[tuple[str, str]] = set()
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is None:
+                continue
+            if stratum == FLAGGED_STRATUM_PROPOSED_POLICY:
+                if notice.policy.status != "proposed":
+                    continue
+            elif notice.kind.value != stratum:
+                continue
+            policies.add((notice.policy.id, notice.policy.status))
+            continue
+        policy = notice.get("policy")
+        if (
+            isinstance(policy, Mapping)
+            and policy.get("id") is not None
+            and policy.get("status") is not None
+            and (
+                policy.get("status") == "proposed"
+                if stratum == FLAGGED_STRATUM_PROPOSED_POLICY
+                else notice.get("kind") == stratum
+            )
+        ):
+            policies.add((str(policy["id"]), str(policy["status"])))
+    return tuple(sorted(policies)) or (None,)
+
+
 def flagged_stratum_rows(
     residuals: Sequence[Residual],
     *,
@@ -23213,33 +23349,37 @@ def flagged_stratum_rows(
 ) -> list[dict[str, object]]:
     """Summarize numeric flagged diagnostics without a decision band."""
 
-    groups: dict[tuple[str, str, str], list[Residual]] = {}
+    groups: dict[
+        tuple[str, str, str, tuple[str, str] | None], list[Residual]
+    ] = {}
     for residual in residuals:
         if residual.rail is None or residual.numeric is None:
             continue
         engine = _engine_of(residual)
         for stratum in flagged_strata(residual.notices):
-            groups.setdefault((stratum, residual.rail.value, engine), []).append(residual)
+            for policy in _policy_ids_for_stratum(residual.notices, stratum):
+                groups.setdefault(
+                    (stratum, residual.rail.value, engine, policy), []
+                ).append(residual)
     rows: list[dict[str, object]] = []
-    for (stratum, rail, engine), bucket in sorted(groups.items()):
+    for (stratum, rail, engine, policy), bucket in sorted(groups.items()):
         dex_values = [
             residual.numeric.value
             for residual in bucket
             if residual.numeric is not None
             and residual.numeric.operation is MetricOperation.DEX
         ]
-        rows.append(
-            {
-                "stratum": stratum,
-                "rail": rail,
-                "engine": engine,
-                "n": len(bucket),
-                "median_dex": (
-                    None if not dex_values else str(_median(dex_values))
-                ),
-                "rms_dex": None if not dex_values else str(_rms(dex_values)),
-            }
-        )
+        row: dict[str, object] = {
+            "stratum": stratum,
+            "rail": rail,
+            "engine": engine,
+            "n": len(bucket),
+            "median_dex": None if not dex_values else str(_median(dex_values)),
+            "rms_dex": None if not dex_values else str(_rms(dex_values)),
+        }
+        if policy is not None:
+            row["policy_id"], row["policy_status"] = policy
+        rows.append(row)
     return rows
 
 
@@ -24905,8 +25045,10 @@ def flagged_stratum_payloads(
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
     observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
-    groups: dict[tuple[str, str, str], list[Decimal]] = {}
-    counts: dict[tuple[str, str, str], int] = {}
+    groups: dict[
+        tuple[str, str, str, tuple[str, str] | None], list[Decimal]
+    ] = {}
+    counts: dict[tuple[str, str, str, tuple[str, str] | None], int] = {}
     engine_names = {engine.value for engine in engines}
     for row in rows:
         numeric = row.get("numeric")
@@ -24921,42 +25063,62 @@ def flagged_stratum_payloads(
         )
         if engine_names and engine not in engine_names:
             continue
+        notices = tuple(
+            notice
+            for notice in (row.get("notices") or ())
+            if isinstance(notice, Mapping)
+        )
         for stratum in _flagged_payload_strata(row):
-            key = (stratum, rail, engine)
-            counts[key] = counts.get(key, 0) + 1
-            if hulls is not None:
-                from simulator.battery.compilation_tier import reference_observation
+            for policy in _policy_ids_for_stratum(notices, stratum):
+                key = (stratum, rail, engine, policy)
+                counts[key] = counts.get(key, 0) + 1
+                if hulls is not None:
+                    from simulator.battery.compilation_tier import reference_observation
 
-                reference = str(row.get("reference") or "")
-                hulls.setdefault(
-                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
-                ).add(reference, reference_observation(observations or {}, reference))
-            dex = numeric.get("value") if numeric.get("operation") == MetricOperation.DEX.value else None
-            if dex is None:
-                continue
-            try:
-                value = as_decimal(dex)
-            except (TypeError, ValueError, ArithmeticError):
-                continue
-            groups.setdefault(key, []).append(value)
+                    reference = str(row.get("reference") or "")
+                    hull_key = (
+                        f"flagged:{stratum}"
+                        if policy is None
+                        else f"flagged:{stratum}:policy={policy[0]}:{policy[1]}"
+                    )
+                    hulls.setdefault(
+                        (hull_key, rail, engine), _ConditionHull()
+                    ).add(reference, reference_observation(observations or {}, reference))
+                dex = (
+                    numeric.get("value")
+                    if numeric.get("operation") == MetricOperation.DEX.value
+                    else None
+                )
+                if dex is None:
+                    continue
+                try:
+                    value = as_decimal(dex)
+                except (TypeError, ValueError, ArithmeticError):
+                    continue
+                groups.setdefault(key, []).append(value)
     return [
         {
             "stratum": stratum,
             "rail": rail,
             "engine": engine,
-            "n": counts[(stratum, rail, engine)],
+            "n": counts[(stratum, rail, engine, policy)],
             "median_dex": (
                 None
-                if not groups.get((stratum, rail, engine))
-                else str(_median(groups[(stratum, rail, engine)]))
+                if not groups.get((stratum, rail, engine, policy))
+                else str(_median(groups[(stratum, rail, engine, policy)]))
             ),
             "rms_dex": (
                 None
-                if not groups.get((stratum, rail, engine))
-                else str(_rms(groups[(stratum, rail, engine)]))
+                if not groups.get((stratum, rail, engine, policy))
+                else str(_rms(groups[(stratum, rail, engine, policy)]))
+            ),
+            **(
+                {"policy_id": policy[0], "policy_status": policy[1]}
+                if policy is not None
+                else {}
             ),
         }
-        for stratum, rail, engine in sorted(counts)
+        for stratum, rail, engine, policy in sorted(counts)
     ]
 
 

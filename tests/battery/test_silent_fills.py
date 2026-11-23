@@ -828,7 +828,7 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
     assert any(
         notice.kind is NoticeKind.ASSUMED_PRESSURE
         and notice.policy is not None
-        and notice.policy["id"] == "DP-001"
+        and notice.policy.id == "DP-001"
         for notice in prediction.notices
     )
 
@@ -854,7 +854,7 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
         notice.kind is NoticeKind.ASSUMED_PRESSURE
         and "original_reason=no total_pressure_Pa mapped from source" in notice.reason
         and notice.policy is not None
-        and notice.policy["id"] == "DP-001"
+        and notice.policy.id == "DP-001"
         for notice in prediction.notices
     )
 

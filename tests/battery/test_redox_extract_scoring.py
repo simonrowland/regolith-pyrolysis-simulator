@@ -340,7 +340,7 @@ def test_openimcc_redox_without_printed_fo2_uses_intrinsic_ladder_default():
     assert any(
         notice.kind is NoticeKind.ASSUMED_FO2
         and notice.policy is not None
-        and notice.policy["id"] == "DP-010"
+        and notice.policy.id == "DP-010"
         for notice in prediction.notices
     )
 
@@ -1043,7 +1043,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert any(
         notice.kind is NoticeKind.ASSUMED_FO2
         and notice.policy is not None
-        and notice.policy["id"] == "DP-010"
+        and notice.policy.id == "DP-010"
         for notice in missing_prediction.notices
     )
 
@@ -1990,7 +1990,7 @@ def test_melts_fe_redox_uses_shared_intrinsic_fo2_when_unprinted(monkeypatch):
     assert any(
         notice.kind is NoticeKind.ASSUMED_FO2
         and notice.policy is not None
-        and notice.policy["id"] == "DP-010"
+        and notice.policy.id == "DP-010"
         for notice in alphamelts.notices
     )
     assert len(calls) == 1

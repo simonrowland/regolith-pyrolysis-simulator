@@ -35,6 +35,7 @@ from decimal import Decimal
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
+    AmbientPressureEvidenceClass,
     Fo2Mode,
     MethodToken,
     Phase,
@@ -54,6 +55,7 @@ from simulator.battery.records import (
     Composition,
     Experiment,
     Notice,
+    NoticePolicy,
     Observation,
     Value,
     nominal_pressure_pa,
@@ -66,7 +68,7 @@ from simulator.battery.waypoints import (
     oxygen_condition,
 )
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import ATM_PA_DECIMAL, PA_PER_BAR
 
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
@@ -83,6 +85,7 @@ _VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
 _BLANK_CARRIER = frozenset({"", "none", "n/a", "na", "absent", "unknown", "null"})
 _TEMPERATURE_UNSET = object()
+DP_003_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
 
 @dataclass(frozen=True)
@@ -130,15 +133,31 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             "default=intrinsic_melt_fO2; original_reason=no printed fO2; "
             f"{reason}; borrowed"
         )
-        policy = {
-            "id": "DP-010",
-            "version": "v1",
-            "status": "canonical",
-            "value": str(resolved.log10_fO2_bar),
-            "units": "log10(bar)",
-        }
+        policy = NoticePolicy(
+            id="DP-010",
+            version="v1",
+            status="canonical",
+            value=str(resolved.log10_fO2_bar),
+            units="log10(bar)",
+        )
+    assumed_air = resolved.route == "dp003_ambient_air"
+    if assumed_air:
+        reason = (
+            "default_fO2_from_air=0.2095*P_total; "
+            f"{reason}"
+        )
+        if resolved.po2_bar is not None:
+            policy = NoticePolicy(
+                id="DP-003",
+                version="v1",
+                status="canonical",
+                value=str(Decimal(str(resolved.po2_bar)) * Decimal("100000")),
+                units="Pa",
+            )
     if assumed_intrinsic:
         kind = NoticeKind.ASSUMED_FO2
+    elif assumed_air:
+        kind = NoticeKind.METHOD_IMPLIED
     elif resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
         reason += "; source-calculated pO2 from observed pNa omitted as a circular condition"
         kind = NoticeKind.INPUT_OMITTED
@@ -316,6 +335,32 @@ def resolve_row_fo2(
                 physics_rung=1,
             )
         return atmosphere
+    if (
+        experiment is not None
+        and experiment.ambient_pressure_evidence is not None
+        and experiment.ambient_pressure_evidence.evidence_class
+        is AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT
+    ):
+        total_pressure = experiment.pressure_environment.total_pressure_Pa.state
+        pressure_pa = (
+            nominal_pressure_pa(total_pressure)
+            if total_pressure.is_value
+            else ATM_PA_DECIMAL
+        )
+        if pressure_pa is not None and pressure_pa.is_finite() and pressure_pa > 0:
+            # Premise: dry air has the ruled oxygen mole fraction 0.2095 and
+            # the air method fixes the missing pressure to one atmosphere.
+            # Algebra: pO2 = xO2·P_total; units are 1·Pa=Pa. At 1 atm this is
+            # 21227.5875 Pa (0.212275875 bar). As xO2→0, pO2→0.
+            oxygen_pa = DP_003_AIR_O2_MOLE_FRACTION * pressure_pa
+            oxygen_bar = float(oxygen_pa / Decimal("100000"))
+            return ResolvedFo2(
+                math.log10(oxygen_bar),
+                3,
+                "dp003_ambient_air",
+                False,
+                po2_bar=oxygen_bar,
+            )
     if knudsen_vapour and source_oxygen_bar is not None:
         try:
             bar = float(source_oxygen_bar)

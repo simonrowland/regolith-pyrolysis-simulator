@@ -67,6 +67,7 @@ from simulator.battery.score import (
     _phase_mole_sibling_amounts,
     _residual_engine_observable,
     compile_residual,
+    composition_wt_pct,
     compute_metric,
     metric_operation_for_identity,
     no_headline_rail_reason,
@@ -76,6 +77,7 @@ from simulator.battery.score import (
     refusal_census,
     residual_to_plain,
     score_store,
+    total_pressure_bar_for_score,
 )
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery import factories as F
@@ -858,6 +860,225 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
         )
         assert call["composition_kg"] == expected_kg
         assert set(call["composition_kg"]) == {"SiO2", "MgO"}
+
+
+def _pressureless_tabulation_experiment(temperature_K: Decimal):
+    experiment = F.tabulation_experiment(T_K=temperature_K)
+    pressure = experiment.pressure_environment.total_pressure_Pa
+    assert pressure is not None
+    environment = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=replace(
+            pressure, state=State.unknown("total pressure is not printed")
+        ),
+    )
+    return replace(experiment, pressure_environment=environment)
+
+
+def test_missing_pressure_and_fo2_phase_rows_reach_each_melts_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    calls: list[dict[str, object]] = []
+
+    def hook(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        handles=None,
+        redox_mode=None,
+    ):
+        calls.append(
+            {
+                "engine": engine,
+                "temperature_C": temperature_C,
+                "composition_kg": dict(composition_kg),
+                "fO2_log": fO2_log,
+                "pressure_bar": pressure_bar,
+            }
+        )
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 10.0, "FeO": 5.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.7")),
+            ("FeO", Decimal("0.2")),
+            ("Fe2O3", Decimal("0.1")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _phase_identity(
+            "SiO2",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.MELT,
+            fO2_Pa=None,
+            total_pressure_Pa=None,
+        ),
+        composition=State.of(composition),
+    )
+    observation = F.observation(
+        "unstated-pressure-and-fo2-phase",
+        "unstated-pressure-and-fo2-experiment",
+        identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    experiment = _pressureless_tabulation_experiment(identity.temperature_K.value)
+    resolved_fo2 = resolve_row_fo2(
+        experiment,
+        None,
+        observation,
+        composition_wt=composition_wt_pct(composition),
+        temperature_K=float(identity.temperature_K.value),
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert resolved_fo2 is not None
+    pressure_bar, pressure_notice, invalid = total_pressure_bar_for_score(
+        identity,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        observation=observation,
+        experiment=experiment,
+    )
+    assert invalid is None
+    assert pressure_notice is not None
+
+    for engine in (Engine.ALPHAMELTS, Engine.MAGEMIN, Engine.THERMOENGINE):
+        prediction = predict_with_engine(engine, observation, experiment=experiment)
+        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.value == Decimal("10")
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-001"
+            for notice in prediction.notices
+        )
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in prediction.notices
+        )
+
+    assert [call["engine"] for call in calls] == [
+        Engine.ALPHAMELTS,
+        Engine.MAGEMIN,
+        Engine.THERMOENGINE,
+    ]
+    for call in calls:
+        assert call["pressure_bar"] == pressure_bar
+        assert call["fO2_log"] == resolved_fo2.log10_fO2_bar
+
+
+def test_missing_pressure_and_fo2_element_rows_reach_each_melts_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict[str, object]] = []
+
+    def hook(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        handles=None,
+        redox_mode=None,
+    ):
+        calls.append(
+            {
+                "engine": engine,
+                "composition_kg": dict(composition_kg),
+                "fO2_log": fO2_log,
+                "pressure_bar": pressure_bar,
+            }
+        )
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"FeO": 5.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    identity = _phase_identity(
+        "FeO",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="element_wt_percent",
+        fO2_Pa=None,
+        total_pressure_Pa=None,
+    )
+    observation = F.observation(
+        "unstated-pressure-and-fo2-element-phase",
+        "unstated-pressure-and-fo2-element-experiment",
+        identity,
+        Decimal("24.57"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+        derivation=Derivation(
+            relation="oxygen_excess",
+            inputs=("printed_elemental_analysis",),
+            parameters=(),
+            output_unit="wt%",
+        ),
+    )
+    element_analysis = Composition(
+        basis="element_wt_percent",
+        components=(
+            ("Fe", Decimal("24.57")),
+            ("Si", Decimal("24.72")),
+            ("Mg", Decimal("10.69")),
+            ("O", Decimal("40.02")),
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "element_wt_percent": F.located(element_analysis),
+        },
+    )
+    experiment = _pressureless_tabulation_experiment(identity.temperature_K.value)
+    pressure_bar, pressure_notice, invalid = total_pressure_bar_for_score(
+        identity,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        observation=observation,
+        experiment=experiment,
+    )
+    assert invalid is None
+    assert pressure_notice is not None
+
+    for engine in (Engine.ALPHAMELTS, Engine.MAGEMIN, Engine.THERMOENGINE):
+        prediction = predict_with_engine(engine, observation, experiment=experiment)
+        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.value == Decimal("5")
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-001"
+            for notice in prediction.notices
+        )
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in prediction.notices
+        )
+
+    assert [call["engine"] for call in calls] == [
+        Engine.ALPHAMELTS,
+        Engine.MAGEMIN,
+        Engine.THERMOENGINE,
+    ]
+    for call in calls:
+        assert call["pressure_bar"] == pressure_bar
+        assert isinstance(call["fO2_log"], float)
 
 
 def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(

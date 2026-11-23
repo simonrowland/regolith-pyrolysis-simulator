@@ -10,14 +10,26 @@ from simulator.battery.enums import (
     Quantity,
 )
 from simulator.battery.identity import PA_PER_BAR_DEC
-from simulator.battery.records import AmbientPressureEvidence, State
+from simulator.battery.records import AmbientPressureEvidence, NoticePolicy, State
+from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.score import (
     flagged_strata,
     _resolve_score_total_pressure,
     total_pressure_bar_for_score,
 )
-from simulator.diagnostic_helpers.binary_pot_battery import _DEFAULT_PRESSURE_BAR
+from simulator.diagnostic_helpers.binary_pot_battery import DP_019_PRESSURE_BAR
 from tests.battery import factories as F
+
+
+def _without_run_pressure(experiment):
+    environment = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=replace(
+            experiment.pressure_environment.total_pressure_Pa,
+            state=State.unknown("total pressure is not printed"),
+        ),
+    )
+    return replace(experiment, pressure_environment=environment)
 
 
 def test_unknown_score_pressure_uses_dp001_atmosphere_and_typed_flag() -> None:
@@ -33,13 +45,9 @@ def test_unknown_score_pressure_uses_dp001_atmosphere_and_typed_flag() -> None:
     assert pressure_bar == 1.01325
     assert notice is not None
     assert notice.kind is NoticeKind.ASSUMED_PRESSURE
-    assert notice.policy == {
-        "id": "DP-001",
-        "version": "v1",
-        "status": "canonical",
-        "value": "101325",
-        "units": "Pa",
-    }
+    assert notice.policy == NoticePolicy(
+        "DP-001", "v1", "canonical", "101325", "Pa"
+    )
     assert invalid is None
 
 
@@ -66,7 +74,13 @@ def test_redox_pressure_numeric_pin_and_generic_default_after_move() -> None:
         identity,
         total_pressure_Pa=State.unknown("not printed"),
     )
-    missing_observation = replace(observation, identity=missing_identity)
+    missing_point_conditions = dict(observation.point_conditions or {})
+    missing_point_conditions.pop("total_pressure_Pa", None)
+    missing_observation = replace(
+        observation,
+        identity=missing_identity,
+        point_conditions=missing_point_conditions,
+    )
 
     missing = _resolve_score_total_pressure(
         missing_identity,
@@ -78,12 +92,13 @@ def test_redox_pressure_numeric_pin_and_generic_default_after_move() -> None:
     assert missing[1] == State.of(Decimal("101325"))
     assert missing[2] is not None
     assert missing[2].kind is NoticeKind.ASSUMED_PRESSURE
-    assert missing[2].policy["id"] == "DP-001"
+    assert missing[2].policy is not None
+    assert missing[2].policy.id == "DP-001"
     assert missing[3] is None
 
 
-def test_knudsen_pressure_fallback_is_proposed_and_separate() -> None:
-    experiment = F.kems_experiment()
+def test_knudsen_pressure_uses_dp004_and_its_own_flag() -> None:
+    experiment = _without_run_pressure(F.kems_experiment())
     identity = replace(
         F.pref_identity(),
         total_pressure_Pa=State.unknown("in-cell total pressure is unprinted"),
@@ -96,18 +111,18 @@ def test_knudsen_pressure_fallback_is_proposed_and_separate() -> None:
     )
 
     assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-    assert pressure_bar == _DEFAULT_PRESSURE_BAR
-    assert state == State.of(Decimal(str(_DEFAULT_PRESSURE_BAR)) * PA_PER_BAR_DEC)
+    assert pressure_bar == DP_019_PRESSURE_BAR
+    assert state == State.of(Decimal(str(DP_019_PRESSURE_BAR)) * PA_PER_BAR_DEC)
     assert notice is not None
-    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
-    assert notice.policy == {
-        "id": "DP-100",
-        "version": "v1",
-        "status": "proposed",
-        "value": str(_DEFAULT_PRESSURE_BAR),
-        "units": "bar",
-    }
-    assert "PROPOSED-POLICY" in flagged_strata((notice,))
+    assert notice.kind is NoticeKind.EFFUSION_REGIME_ASSUMED
+    assert notice.policy == NoticePolicy(
+        "DP-004",
+        "v1",
+        "canonical",
+        "P_total(cell) = sum of measured partial pressures",
+        "Pa",
+    )
+    assert "effusion_regime_assumed" in flagged_strata((notice,))
     assert invalid is None
 
 
@@ -120,7 +135,7 @@ def test_method_fixed_ambient_pressure_uses_dp002() -> None:
         ),
     ):
         experiment = replace(
-            F.tabulation_experiment(),
+            _without_run_pressure(F.tabulation_experiment()),
             ambient_pressure_evidence=AmbientPressureEvidence(
                 evidence_class=evidence_class,
                 quote=quote,
@@ -142,15 +157,61 @@ def test_method_fixed_ambient_pressure_uses_dp002() -> None:
         assert state == State.of(Decimal("101325"))
         assert notice is not None
         assert notice.kind is NoticeKind.METHOD_IMPLIED
-        assert notice.policy == {
-            "id": "DP-002",
-            "version": "v1",
-            "status": "canonical",
-            "value": "101325",
-            "units": "Pa",
-        }
+        assert notice.policy == NoticePolicy(
+            "DP-002", "v1", "canonical", "101325", "Pa"
+        )
         assert "method_implied" in flagged_strata((notice,))
         assert invalid is None
+
+
+def test_vacuum_method_uses_dp019_method_implied_pressure() -> None:
+    experiment = _without_run_pressure(
+        F.tabulation_experiment(method=MethodToken.VACUUM_CHAMBER_PYROLYSIS)
+    )
+    identity = replace(
+        F.pref_identity(),
+        total_pressure_Pa=State.unknown("not printed under vacuum"),
+    )
+
+    pressure_bar, state, notice, invalid = _resolve_score_total_pressure(
+        identity, Quantity.ACTIVITY, experiment=experiment
+    )
+
+    assert pressure_bar == DP_019_PRESSURE_BAR
+    assert state == State.of(Decimal("0.1"))
+    assert notice is not None
+    assert notice.kind is NoticeKind.METHOD_IMPLIED
+    assert notice.policy == NoticePolicy(
+        "DP-019", "v1", "canonical", "0.100000", "Pa"
+    )
+    assert invalid is None
+
+
+def test_air_default_in_oxygen_ladder_uses_dp003() -> None:
+    experiment = replace(
+        _without_run_pressure(F.tabulation_experiment()),
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            evidence_class=AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            quote="in air",
+            locator=F.loc(page=1, paragraph="Experimental setup"),
+        ),
+    )
+
+    resolved = resolve_row_fo2(
+        experiment, None, None, temperature_K=1200.0, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+
+    assert notice.kind is NoticeKind.METHOD_IMPLIED
+    assert notice.policy is not None
+    assert notice.policy.id == "DP-003"
+    assert notice.policy.status == "canonical"
+    assert (
+        abs(Decimal(notice.policy.value) - Decimal("21227.5875"))
+        < Decimal("1e-8")
+    )
+    assert notice.policy.units == "Pa"
 
 
 def test_policy_metadata_round_trips_as_a_structured_notice_field() -> None:
@@ -162,13 +223,7 @@ def test_policy_metadata_round_trips_as_a_structured_notice_field() -> None:
         affected_quantities=(Quantity.ACTIVITY,),
         reason="default_total_pressure_Pa=101325; original_reason=not printed",
         origin="test:pressure",
-        policy={
-            "id": "DP-001",
-            "version": "v1",
-            "status": "canonical",
-            "value": "101325",
-            "units": "Pa",
-        },
+        policy=NoticePolicy("DP-001", "v1", "canonical", "101325", "Pa"),
     )
 
     assert _notice_from_plain(to_plain(notice)) == notice
