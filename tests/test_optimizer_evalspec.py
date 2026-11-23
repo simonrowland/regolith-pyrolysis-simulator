@@ -733,7 +733,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-6]
+    old_args = args[:16] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -753,7 +753,7 @@ def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> No
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-6]
+    old_args = args[:18] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -773,7 +773,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-6]
+    old_args = args[:16] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -796,7 +796,7 @@ def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default(
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-6]
+    old_args = args[:18] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -814,7 +814,7 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-6]
+        old_args = new_args[:-7]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False
