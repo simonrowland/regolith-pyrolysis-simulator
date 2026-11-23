@@ -1267,6 +1267,7 @@ def _openimcc_compilation_input_census(context) -> dict[str, object]:
 
 
 @pytest.mark.nightly
+@pytest.mark.cpu_budget(2600)
 def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> None:
     from simulator.battery.score import ScoreContext
 
