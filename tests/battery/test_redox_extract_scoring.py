@@ -2022,7 +2022,14 @@ def test_melts_fe_redox_commissioning_notice_is_the_only_extrapolated_flag(monke
         if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     ]
     assert len(extrapolated) == 1
-    assert len(prediction.notices) == 1
+    ambient = [
+        notice
+        for notice in prediction.notices
+        if "assumed_ambient_pressure" in notice.reason
+    ]
+    assert len(ambient) == 1
+    assert ambient[0].kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+    assert len(prediction.notices) == 2
 
 
 def test_melts_fe_redox_timeout_is_attempted_unavailable(monkeypatch):

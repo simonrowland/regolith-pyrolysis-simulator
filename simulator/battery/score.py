@@ -73,6 +73,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    FO2Channel,
     Fo2Mode,
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
@@ -624,6 +625,7 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_ASSUMED_AMBIENT_PRESSURE = "assumed_ambient_pressure"
 
 
 @dataclass(frozen=True)
@@ -844,6 +846,33 @@ def _canonicalize_feo_activity_prediction(
 
 def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
+
+
+_CELL_MATERIAL_VAPOUR_FORMULAS = frozenset({"Mo", "MoO", "MoO2", "MoO3"})
+_DOPANT_VAPOUR_OUTSIDE_MODEL_FORMULAS = frozenset(
+    {"Ga", "In", "GaO", "Ga2O", "InO", "In2O"}
+)
+
+
+def _openimcc_unmodelled_vapour_reason(
+    quantity: Quantity | None, formula: str
+) -> str | None:
+    """Typed outcome for an OpenIMCC vapour the gas tables do not emit.
+
+    ``None`` keeps the generic ``outside_supported_species`` detail. A melt
+    activity, including Ga or In dissolved in the liquid, is not this outcome.
+    """
+
+    if quantity not in _VAPOUR_EQUILIBRIUM:
+        return None
+    token = str(formula or "").strip()
+    if token.endswith("(g)"):
+        token = token[:-3]
+    if token in _CELL_MATERIAL_VAPOUR_FORMULAS:
+        return "cell_material_vapour"
+    if token in _DOPANT_VAPOUR_OUTSIDE_MODEL_FORMULAS:
+        return "dopant_vapour_outside_model"
+    return None
 
 
 _STATIC_REFUSAL_DETAILS = frozenset(
@@ -2545,6 +2574,12 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
+    if any(
+        isinstance(reason, str)
+        and FLAGGED_STRATUM_ASSUMED_AMBIENT_PRESSURE in reason
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_ASSUMED_AMBIENT_PRESSURE)
     return tuple(strata)
 
 
@@ -9227,11 +9262,157 @@ def _printed_fe_redox_fo2_log(
     return fo2_log
 
 
+_AMBIENT_METHOD_PHRASES = (
+    "gas-mixing",
+    "gas mixing",
+    "gas-mixture",
+    "gas mixture",
+    "one-atmosphere",
+    "one atmosphere",
+    "1-atm",
+    "1 bar total-pressure",
+)
+_HIGH_PRESSURE_PHRASES = (
+    "piston-cylinder",
+    "piston cylinder",
+    "sealed capsule",
+    "diamond anvil",
+    "multi-anvil",
+)
+# The migrator writes this when no pressure key was present. The list of
+# keys includes P_GPa. That list is not a statement that the run was high pressure.
+_PRESSURE_KEY_LIST_BOILERPLATE = "no pressure field under keys"
+# data/literature/extracts/borisov-2018-compilation.yaml citation. The
+# compilation rows do not repeat the sentence on each observation.
+_BORISOV_ONE_ATM_SOURCE = "borisov-2018-compilation"
+_BORISOV_ONE_ATM_EVIDENCE = (
+    "source citation: Borisov, Behrens & Holtz (2018), a new model for 1 atm data"
+)
+
+
+def _text_mentions_high_pressure(text: str) -> bool:
+    folded = text.casefold()
+    if any(phrase in folded for phrase in _HIGH_PRESSURE_PHRASES):
+        return True
+    return re.search(r"(?<![a-z_])(?:gpa|kbar)\b", folded) is not None
+
+
+def _text_mentions_ambient_method(text: str) -> bool:
+    folded = text.casefold()
+    return any(phrase in folded for phrase in _AMBIENT_METHOD_PHRASES)
+
+
+def _redox_method_evidence_texts(
+    observation: Observation,
+    identity: Identity,
+    experiment: Experiment | None,
+) -> tuple[str, ...]:
+    """Texts the ambient-pressure decision is allowed to read."""
+
+    texts: list[str] = []
+    pressure = identity.total_pressure_Pa
+    if pressure is not None and pressure.reason:
+        texts.append(pressure.reason)
+    texts.extend(notice.reason for notice in observation.notices if notice.reason)
+    if experiment is None:
+        return tuple(texts)
+    if experiment.method.reason:
+        texts.append(experiment.method.reason)
+    located = experiment.conditions.get("total_pressure_Pa")
+    note = None if located is None or located.locator is None else located.locator.note
+    if note:
+        texts.append(note)
+    environment = experiment.pressure_environment.total_pressure_Pa.state
+    if (
+        environment.reason
+        and _PRESSURE_KEY_LIST_BOILERPLATE not in environment.reason
+    ):
+        texts.append(environment.reason)
+    return tuple(texts)
+
+
+def _redox_ambient_pressure_evidence(
+    observation: Observation,
+    identity: Identity,
+    experiment: Experiment | None,
+) -> str | None:
+    """Quote that permits 101325 Pa, or None when the typed refusal stays.
+
+    A present pressure is never replaced; callers use this only when the
+    identity and the printed point omit total pressure. High-pressure and
+    capsule statements block the default. An fO2 reference-state sentence
+    that mentions a 1 atm alternative is not method evidence.
+    """
+
+    texts = tuple(
+        text
+        for text in _redox_method_evidence_texts(observation, identity, experiment)
+        if _PRESSURE_KEY_LIST_BOILERPLATE not in text
+    )
+    if (
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.PISTON_CYLINDER
+    ):
+        return None
+    if any(_text_mentions_high_pressure(text) for text in texts):
+        return None
+    if experiment is not None and experiment.ambient_pressure_evidence is not None:
+        evidence = experiment.ambient_pressure_evidence
+        return (
+            "ambient_pressure_evidence "
+            f"class={evidence.evidence_class.value}: {evidence.quote}"
+        )
+    control = None if experiment is None else experiment.fO2_control
+    if (
+        control is not None
+        and control.channel.is_value
+        and control.channel.value is FO2Channel.GAS_MIX
+    ):
+        return "fO2_control.channel=gas_mix"
+    for text in texts:
+        if _text_mentions_ambient_method(text):
+            return text
+    if observation.source_id == _BORISOV_ONE_ATM_SOURCE:
+        return _BORISOV_ONE_ATM_EVIDENCE
+    return None
+
+
+def _assumed_ambient_pressure_notice(identity: Identity, evidence: str) -> Notice:
+    quantity = quantity_token(identity) or Quantity.FE3_FE2_RATIO
+    pressure = identity.total_pressure_Pa
+    original = "" if pressure is None or not pressure.reason else pressure.reason
+    reason = (
+        f"{FLAGGED_STRATUM_ASSUMED_AMBIENT_PRESSURE}: "
+        "total_pressure_Pa=101325 Pa; "
+        f"evidence: {evidence}"
+    )
+    if original:
+        reason = f"{reason}; original_reason: {original}"
+    return Notice(
+        kind=NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="simulator.battery.score:_fe_redox_pressure",
+    )
+
+
 def _fe_redox_pressure(
-    observation: Observation, identity: Identity
-) -> tuple[float, State[Any]] | _FeRedoxRefusal:
+    observation: Observation,
+    identity: Identity,
+    experiment: Experiment | None = None,
+) -> tuple[float, State[Any], Notice | None] | _FeRedoxRefusal:
+    """Pressure for every Fe-redox engine, with one ambient default.
+
+    A printed identity or point pressure is used as stored. When neither is
+    a value, a gas-mixing or 1-atm furnace statement supplies 101325 Pa and
+    an ``assumed_ambient_pressure`` notice. Anything else stays a typed
+    missing-pressure refusal. The notice is not written back onto the extract.
+    """
+
     pressure_pa = identity.total_pressure_Pa
     point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
+    assumed: Notice | None = None
     if (
         (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
         and point_pressure is not None
@@ -9249,22 +9430,25 @@ def _fe_redox_pressure(
                 {"reason": "invalid_input", "input": "total_pressure_Pa"},
             )
         pressure_bar = float(pressure_amount) / PA_PER_BAR
-    elif observation.source_id == "borisov-2018-compilation":
-        # The cited compilation is explicitly a 1-atm dataset.
-        pressure_bar = 1.01325
-        pressure_pa = State.of(ATM_PA_DECIMAL)
     else:
-        return _FeRedoxRefusal(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
+        evidence = _redox_ambient_pressure_evidence(
+            observation, identity, experiment
         )
+        if evidence is None:
+            return _FeRedoxRefusal(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "total_pressure_Pa"},
+            )
+        pressure_bar = float(ATM_PA_DECIMAL) / PA_PER_BAR
+        pressure_pa = State.of(ATM_PA_DECIMAL)
+        assumed = _assumed_ambient_pressure_notice(identity, evidence)
     if pressure_bar < 0.0 or not math.isfinite(pressure_bar):
         return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
             {"reason": "invalid_input", "input": "total_pressure_Pa"},
         )
     assert pressure_pa is not None
-    return pressure_bar, pressure_pa
+    return pressure_bar, pressure_pa, assumed
 
 
 def _oxide_weight_fe_ratio(
@@ -9813,11 +9997,30 @@ def _predict_redox(
             if candidate_fields is not None
             else Quantity.FE3_FE2_RATIO,
         )
-        prediction_identity = replace(
-            identity,
-            composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
-        )
+        # evaluate_redox does not take total pressure. The redox identity
+        # still requires it. A resolved pressure, including the ambient
+        # default, is written on the prediction only. A missing pressure
+        # leaves the comparison's typed identity_unknown refusal.
+        pressure = _fe_redox_pressure(observation, identity, experiment)
+        pressure_notices: tuple[Notice, ...] = ()
+        if isinstance(pressure, _FeRedoxRefusal):
+            if pressure.reason is not RefusalReason.IDENTITY_INCOMPLETE:
+                return refused(pressure.reason, pressure.detail)
+            prediction_identity = replace(
+                identity,
+                composition=material.composition_state,
+                fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            )
+        else:
+            _pressure_bar, pressure_pa, pressure_notice = pressure
+            if pressure_notice is not None:
+                pressure_notices = (pressure_notice,)
+            prediction_identity = replace(
+                identity,
+                composition=material.composition_state,
+                fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+                total_pressure_Pa=pressure_pa,
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -9828,7 +10031,7 @@ def _predict_redox(
             value=as_decimal(str(prediction_value)),
             unit="dimensionless",
             authority=authority,
-            notices=tuple(material_notices) + notices,
+            notices=tuple(material_notices) + notices + pressure_notices,
             coefficient_sources=(
                 f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
             ),
@@ -9842,10 +10045,12 @@ def _predict_redox(
             ),
         )
 
-    pressure = _fe_redox_pressure(observation, identity)
+    pressure = _fe_redox_pressure(observation, identity, experiment)
     if isinstance(pressure, _FeRedoxRefusal):
         return refused(pressure.reason, pressure.detail)
-    pressure_bar, pressure_pa = pressure
+    pressure_bar, pressure_pa, pressure_notice = pressure
+    if pressure_notice is not None:
+        material_notices.append(pressure_notice)
 
     if not melts:
         assert kress_basis is not None
@@ -15593,6 +15798,10 @@ def _predict_with_engine(
                 "imcc_sp_extension_required",
             )
         )
+        openimcc_outside_species_detail = (
+            _openimcc_unmodelled_vapour_reason(quantity, formula)
+            or RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+        )
         if typed in {REFUSAL_ENGINE_CRASH, "subprocess_died"} or getattr(cell, "exit_signal", None):
             return EnginePrediction(
                 engine=engine,
@@ -15654,7 +15863,7 @@ def _predict_with_engine(
                 "refusal_reason": typed,
                 "engine_reason": engine_side_reason,
                 **(
-                    {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
+                    {"reason": openimcc_outside_species_detail}
                     if openimcc_outside_species
                     else {}
                 ),
@@ -16227,7 +16436,10 @@ def _predict_with_engine(
         refusal_reason = RefusalReason.UNSUPPORTED
         if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-            detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+            detail["reason"] = (
+                _openimcc_unmodelled_vapour_reason(quantity, compared)
+                or RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+            )
             detail["engine"] = "openimcc gas tables"
         return EnginePrediction(
             engine=engine,
