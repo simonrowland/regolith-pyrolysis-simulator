@@ -15,6 +15,7 @@ import pytest
 from simulator.config import load_config_bundle
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
+import simulator.lab_schedule as lab_schedule
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.lab_schedule import (
     LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
@@ -4102,6 +4103,28 @@ def test_lab_schedule_pressure_mutations_reject_invalid_values(
     with pytest.raises(LabScheduleValidationError) as error:
         normalize_lab_schedule(schedule)
     assert str(error.value) == expected_reason
+
+
+def test_normalize_lab_schedule_uses_pressure_floor_owner(monkeypatch) -> None:
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=((0.0, 1.0), (1.0, 1.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    observed: list[float] = []
+
+    def floor_notice(value: float) -> tuple[str, str]:
+        observed.append(value)
+        return "test_pressure_floor", "forced notice"
+
+    monkeypatch.setattr(lab_schedule, "_pressure_floor_notice_mbar", floor_notice)
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="test_pressure_floor: forced notice",
+    ):
+        normalize_lab_schedule(schedule)
+    assert observed == [1.0]
 
 
 def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:

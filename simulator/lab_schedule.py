@@ -41,6 +41,16 @@ class LabScheduleValidationError(ValueError):
     """Raised when a declared lab schedule cannot be honored at runtime."""
 
 
+def _pressure_floor_notice_mbar(value: float) -> tuple[str, str] | None:
+    pressure_mbar = float(value)
+    if pressure_mbar < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
+        return (
+            "lab_schedule_pressure_below_implemented_floor",
+            f"{pressure_mbar:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar",
+        )
+    return None
+
+
 def normalize_lab_schedule(
     raw: Any,
     *,
@@ -95,7 +105,6 @@ def normalize_lab_schedule(
         for point in chamber_pressure_mbar
         if float(point["value"]) < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
     )
-
     gas_boundary = _normalize_gas_boundary(schedule.get("gas_boundary"))
     surface_temperature_C = _normalize_surface_temperatures(
         schedule.get("surface_temperature_C", {}),
