@@ -1082,6 +1082,21 @@ def test_condensed_basis_ellingham_pressure_uses_raoult_psat(
     )
 
 
+def test_condensed_metal_cap_mutation_moves_cap_status_with_value(monkeypatch):
+    from simulator.chemistry import ellingham_thermo
+
+    capped_value, cap_bound = ellingham_thermo.cap_condensed_metal_activity(1.5)
+    assert (capped_value, cap_bound) == (1.0, True)
+
+    monkeypatch.setattr(
+        ellingham_thermo, "CONDENSED_METAL_ACTIVITY_CAP", 2.0
+    )
+    mutated_value, mutated_cap_bound = ellingham_thermo.cap_condensed_metal_activity(
+        1.5
+    )
+    assert (mutated_value, mutated_cap_bound) == (1.5, False)
+
+
 def test_neutral_total_pressure_does_not_change_vapor_equilibrium_peq(
     vapor_pressure_data,
 ):

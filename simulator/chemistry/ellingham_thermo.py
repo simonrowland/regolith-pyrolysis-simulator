@@ -44,6 +44,13 @@ ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG = (
 ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 ELLINGHAM_METAL_PHASE_GAS = "gas"
 ELLINGHAM_METAL_PHASE_CONDENSED = "condensed"
+CONDENSED_METAL_ACTIVITY_CAP = 1.0
+
+
+def cap_condensed_metal_activity(activity: float) -> tuple[float, bool]:
+    """Return the condensed-metal activity cap and whether it bound."""
+    cap = CONDENSED_METAL_ACTIVITY_CAP
+    return min(activity, cap), activity > cap
 
 # Mg rail boundary, distinct from the 1366 K JANAF coefficient splice below.
 # NIST Chemistry WebBook SRD 69 (Mg, CAS 7439-95-4; Honig and Kramer 1969)
