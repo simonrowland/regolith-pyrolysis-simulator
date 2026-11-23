@@ -485,7 +485,9 @@ def _series_point_locator(
 
 def _normalise_observation_points(
     points: Sequence[Mapping[str, Any]],
-) -> list[tuple[float, float, Mapping[str, Any], Any]]:
+    *,
+    allow_missing_uncertainty: bool = False,
+) -> list[tuple[float, float, Mapping[str, Any] | None, Any]]:
     normalised = []
     for index, point in enumerate(points):
         if not isinstance(point, Mapping):
@@ -497,13 +499,23 @@ def _normalise_observation_points(
             raise ValueError(f"observation_points[{index}].time_min must be finite")
         if not math.isfinite(expected_value):
             raise ValueError(f"observation_points[{index}].expected_value must be finite")
-        if not isinstance(uncertainty, Mapping):
+        if uncertainty is None and not allow_missing_uncertainty:
             raise ValueError(
                 f"observation_points[{index}] requires cited expected_uncertainty"
             )
-        _validated_uncertainty(uncertainty)
+        if uncertainty is not None and not isinstance(uncertainty, Mapping):
+            raise ValueError(
+                f"observation_points[{index}] requires cited expected_uncertainty"
+            )
+        if uncertainty is not None:
+            _validated_uncertainty(uncertainty)
         normalised.append(
-            (time_min, expected_value, dict(uncertainty), point.get("source_locator"))
+            (
+                time_min,
+                expected_value,
+                dict(uncertainty) if uncertainty is not None else None,
+                point.get("source_locator"),
+            )
         )
     normalised.sort(key=lambda row: row[0])
     if len({time_min for time_min, _, _, _ in normalised}) != len(normalised):
@@ -633,9 +645,13 @@ def compare_values(
         if actual_value is not None and expected_value is not None
         else None
     )
-    if expected_value is not None and expected_uncertainty is None:
+    if (
+        expected_value is not None
+        and expected_uncertainty is None
+        and not assumed_input
+    ):
         raise ValueError("numeric observations require cited uncertainty")
-    if expected_value is not None:
+    if expected_value is not None and expected_uncertainty is not None:
         _validated_uncertainty(expected_uncertainty)
     if status_override is not None:
         if status_override not in COMPARISON_STATUSES:

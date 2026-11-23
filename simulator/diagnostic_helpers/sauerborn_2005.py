@@ -156,13 +156,25 @@ def compare_sauerborn_o2_partial_pressure_time_series(
     normalized_observations = [
         {
             "time_min": float(point["time_s"]) / 60.0,
-            "expected_value": point["expected_value_mbar"],
-            "expected_uncertainty": point.get("expected_uncertainty"),
-            "source_locator": point.get("source_locator"),
+            "expected_value": point["value_mbar"],
+            "expected_uncertainty": None,
+            "source_locator": {
+                "point_type": point["point_type"],
+                "time_half_width_s": point["time_half_width_s"],
+                "digitization_bounds_mbar": {
+                    "lower": point["value_lower_mbar"],
+                    "upper": point["value_upper_mbar"],
+                },
+            },
         }
         for point in observation_points
     ]
-    observations = _normalise_observation_points(normalized_observations)
+    observations = _normalise_observation_points(
+        normalized_observations,
+        allow_missing_uncertainty=True,
+    )
+    # p. 62 gives no per-point instrument uncertainty, so report residuals
+    # without grading them as matches or mismatches.
     records, _ = _compare_pointwise_observations(
         observations,
         samples,
@@ -178,5 +190,6 @@ def compare_sauerborn_o2_partial_pressure_time_series(
         recipe=recipe,
         observation=observation,
         runtime=runtime,
+        assumed_input=True,
     )
     return records
