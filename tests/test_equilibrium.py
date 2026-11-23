@@ -513,10 +513,16 @@ def _gate_host(curve, *, pinned=True):
 
     host = SimpleNamespace(
         melt=SimpleNamespace(hour=1),
+        _liquid_fraction_provider='test-non-magemin',
         _resolved_melt_redox_gate_authority=_resolve,
         _melt_redox_gate_authority_tick_verdict_identity=(
             _IN_BAND_MAGEMIN_IDENTITY
         ),
+    )
+    host._freeze_gate_curve_uses_magemin_domain_identity = (
+        PyrolysisSimulator._freeze_gate_curve_uses_magemin_domain_identity.__get__(
+            host
+        )
     )
     if pinned:
         host._melt_redox_gate_authority_tick_hour = 1
@@ -629,7 +635,13 @@ def _established_record_host(record):
 
     host = SimpleNamespace(
         melt=SimpleNamespace(hour=1),
+        _liquid_fraction_provider='test-non-magemin',
         _melt_redox_liquidus_gate_record=lambda **_kwargs: record,
+    )
+    host._freeze_gate_curve_uses_magemin_domain_identity = (
+        PyrolysisSimulator._freeze_gate_curve_uses_magemin_domain_identity.__get__(
+            host
+        )
     )
     host._melt_redox_liquidus_gate_curve = (
         PyrolysisSimulator._melt_redox_liquidus_gate_curve.__get__(host)
@@ -645,6 +657,9 @@ def _established_record_host(record):
     )
     host._melt_redox_gate_verdict_matches_current = (
         PyrolysisSimulator._melt_redox_gate_verdict_matches_current.__get__(host)
+    )
+    host._melt_redox_gate_current_hour_pin = (
+        PyrolysisSimulator._melt_redox_gate_current_hour_pin.__get__(host)
     )
     host._resolved_melt_redox_gate_authority = (
         PyrolysisSimulator._resolved_melt_redox_gate_authority.__get__(host)

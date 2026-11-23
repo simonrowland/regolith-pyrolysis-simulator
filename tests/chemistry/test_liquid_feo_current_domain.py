@@ -382,3 +382,53 @@ def test_timeout_then_magemin_retry_keeps_extrapolated_feo_qualification(
     assert identity_notices[0]['certified_band'] == {
         'sio2_wt_pct': [30.0, 80.0],
     }
+
+    last_good = sim._freeze_gate_last_good_curve
+    assert last_good['magemin_domain_identity'].silica_verdict == (
+        'extrapolated'
+    )
+    assert last_good['curve']['gate_provider_step_down'][
+        'magemin_sourced'
+    ] is True
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    double_timeout_calls = []
+
+    def double_timeout(**_kwargs):
+        double_timeout_calls.append(None)
+        raise EngineWorkerTimeout('MAGEMin worker', 0.01, phase='job')
+
+    monkeypatch.setattr(backend, '_call_magemin', double_timeout)
+    held_record = sim._freeze_gate_curve_record()
+    assert len(double_timeout_calls) >= 2
+    held_curve = held_record['curve']
+    assert held_curve['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    assert held_curve['gate_provider_step_down']['magemin_sourced'] is True
+    assert held_curve['gate_provider_step_down']['realized_provider'] == (
+        'magemin-shadow'
+    )
+
+    sim._clear_melt_redox_gate_authority_for_completed_hour(
+        int(sim.melt.hour)
+    )
+    held_authority = sim._establish_melt_redox_gate_authority_for_current_hour()
+    assert held_authority['gate_provider_step_down']['magemin_sourced'] is True
+    held_activity = sim._native_fe_saturation_state(
+        composition,
+        fe3_over_sigma_fe=0.1,
+        T_K=temperature_K,
+        pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=float(sim._current_melt_redox_fO2_log()),
+    )
+    assert held_activity['native_fe_activity'] == activity['native_fe_activity']
+    held_identity_notices = [
+        notice for notice in held_activity.get('notices', ())
+        if notice.get('kind') == 'magemin_domain_identity'
+    ]
+    assert len(held_identity_notices) == 1
+    assert held_identity_notices[0]['authority'] == 'extrapolated'
+    assert held_identity_notices[0]['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }

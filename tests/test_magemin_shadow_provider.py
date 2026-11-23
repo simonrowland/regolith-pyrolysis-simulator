@@ -846,6 +846,126 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
 
 
 @pytest.mark.parametrize(
+    ('intent', 'composition_wt_pct', 'expected_status', 'expected_authority'),
+    (
+        (
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            {'SiO2': 79.9, 'MgO': 19.6, 'MnO': 0.5},
+            'out_of_domain',
+            'extrapolated',
+        ),
+        (
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            {'SiO2': 29.999, 'MgO': 60.001, 'Fe2O3': 10.0},
+            'unavailable',
+            'extrapolated',
+        ),
+        (
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 5.0},
+            'unavailable',
+            'extrapolated',
+        ),
+    ),
+    ids=('mno-projected-bulk', 'unfolded-ferric-bulk', 'high-silica-bulk'),
+)
+def test_real_projection_domain_verdict_survives_unavailable_result(
+    monkeypatch,
+    intent,
+    composition_wt_pct,
+    expected_status,
+    expected_authority,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    formula_registry = {}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    backend = MAGEMinBackend()
+    backend._available = False
+    backend._bridge = None
+    monkeypatch.setattr(backend, 'initialize', lambda _config: True)
+    provider = MAGEMinShadowProvider(backend=backend)
+    request = IntentRequest(
+        intent=intent,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == expected_status
+    assert result.diagnostic['authority'] == expected_authority
+    assert result.diagnostic['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+
+
+def test_real_request_domain_verdict_survives_failed_backend_result(
+    monkeypatch,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.base import EquilibriumResult
+
+    formula_registry = {}
+    composition_wt_pct = {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 5.0}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    backend = MAGEMinBackend()
+    backend._available = False
+    backend._bridge = None
+    monkeypatch.setattr(backend, 'initialize', lambda _config: True)
+    provider = MAGEMinShadowProvider(backend=backend)
+    monkeypatch.setattr(
+        provider,
+        '_run_backend',
+        lambda *_args, **_kwargs: EquilibriumResult(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            status='not_converged',
+            diagnostics={
+                'backend_status': 'not_converged',
+                'backend_status_reason': 'engine_crash',
+            },
+        ),
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'not_converged'
+    assert result.diagnostic['authority'] == 'extrapolated'
+    assert result.diagnostic['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+
+
+@pytest.mark.parametrize(
     ('composition_wt_pct', 'expected_authority', 'expected_band'),
     (
         (

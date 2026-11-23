@@ -1607,7 +1607,7 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fO2_log=sim._compute_intrinsic_melt_fO2(),
         fe_redox_policy="intrinsic",
     )
-    assert magemin_key['gate_curve_codec_version'] == 2
+    assert magemin_key['gate_curve_codec_version'] == 3
     magemin_request_key = {
         name: value for name, value in magemin_key.items()
         if name != 'gate_curve_codec_version'
@@ -4483,13 +4483,13 @@ def test_pt1_domain_gate_prediction_replays_with_qualification(
     )
 
 
-def test_pt0_gate_curve_decoder_refuses_markerless_rows(
+def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / 'markerless-gate-curve.db'
     store = PT0DeterminismStore('capture', db_path=db_path)
     key = _freeze_gate_key()
-    assert key['gate_curve_codec_version'] == 2
+    assert key['gate_curve_codec_version'] == 3
     assert rrd._curve_payload({
         'source': 'gate_liquid_fraction',
         'solidus_T_C': 950.0,
@@ -4502,6 +4502,11 @@ def test_pt0_gate_curve_decoder_refuses_markerless_rows(
             'solidus_T_C': 1200.0,
             'liquidus_T_C': 1200.000001,
             'path': [],
+            'is_liquidus_floor': True,
+            'gate_provider_step_down': {
+                'failed_providers': [],
+                'realized_provider': 'magemin-shadow',
+            },
         },
     }
     markerless_disclosure = {
@@ -4514,9 +4519,11 @@ def test_pt0_gate_curve_decoder_refuses_markerless_rows(
         'certification_route': [],
         'evaluation_count': 1,
     }
+    old_key = dict(key)
+    old_key['gate_curve_codec_version'] = 2
     store._store(
         'freeze_gate_curve',
-        key,
+        old_key,
         markerless_payload,
         law_disclosures=[markerless_disclosure],
     )
@@ -4536,6 +4543,11 @@ def test_pt0_gate_curve_decoder_refuses_markerless_rows(
             'liquidus_T_C': 1200.000001,
             'path': [],
             'is_liquidus_floor': True,
+            'gate_provider_step_down': {
+                'failed_providers': [],
+                'realized_provider': 'magemin-shadow',
+                'magemin_sourced': True,
+            },
         },
     }
     store._store(
@@ -4560,9 +4572,61 @@ def test_pt0_gate_curve_decoder_refuses_markerless_rows(
     assert payload == valid_payload
     assert replay.hits == 1
     assert len(accepted) == 1
-    assert accepted[0]['key'] == alternate_key
+    assert rrd.canonical_json_bytes(accepted[0]['key']) == (
+        rrd.canonical_json_bytes(alternate_key)
+    )
     assert replay._accepted_hit_disclosures == []
-    assert replay.replay_sequence[-1]['key'] == alternate_key
+    assert rrd.canonical_json_bytes(replay.replay_sequence[-1]['key']) == (
+        rrd.canonical_json_bytes(alternate_key)
+    )
+
+
+def test_pt1_old_equilibrium_notice_row_misses_and_recapture_is_stable(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / 'old-equilibrium-notice-row.db'
+    capture = PT0DeterminismStore('capture', db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    notices = [{
+        'kind': 'liquidus_unknown',
+        'authority': 'unknown',
+        'source': 'none:liquidus_gate_not_established',
+    }]
+    result.diagnostics = {
+        'a_FeO_calphad': {
+            'a_FeO_authoritative': 0.5,
+            'notices': notices,
+        },
+    }
+    new_key = capture._equilibrium_key(sim)
+    assert new_key['equilibrium_payload_codec_version'] == 2
+    old_key = copy.deepcopy(new_key)
+    old_key.pop('equilibrium_payload_codec_version')
+    old_payload = rrd.canonical_replay_output_projection(
+        'equilibrium_post_record', sim, result,
+    )
+    old_payload['equilibrium_result']['diagnostics'][
+        'a_FeO_calphad'
+    ]['notices'] = notices
+    capture._store('equilibrium_post_record', old_key, old_payload)
+
+    replay = PT0DeterminismStore('replay', db_path=db_path)
+    with pytest.raises(PT0CacheMiss):
+        replay._lookup(
+            'equilibrium_post_record',
+            replay._equilibrium_key(sim),
+            sim=sim,
+        )
+    assert replay.hits == 0
+
+    capture.capture_equilibrium(sim, result)
+    result.diagnostics['a_FeO_calphad']['notices'] = [{
+        'kind': 'liquidus_unknown',
+        'authority': 'unknown',
+        'source': 'none:second-read-state',
+    }]
+    capture.capture_equilibrium(sim, result)
+    assert len(capture._entries) == 2
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(

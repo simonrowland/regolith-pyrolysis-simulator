@@ -2438,10 +2438,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # Apply the gate before availability so out-of-domain bulks receive
         # the same typed answer whether or not the binary is installed.
         if not self._available or self._bridge is None:
-            diagnostics = {
+            diagnostics = dict(result_diagnostics)
+            diagnostics.update({
                 'backend_status': 'unavailable',
                 'backend_failure_disposition': 'environment',
-            }
+            })
             unavailable_reason = (
                 'missing_binary'
                 if self._binary_path is None

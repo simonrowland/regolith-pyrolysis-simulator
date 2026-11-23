@@ -113,7 +113,8 @@ GATE_CURVE_NOTICE_KEYS = (
     'gate_provider_step_down', 'alphamelts_reference_pressure',
 )
 GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
-PT0_GATE_CURVE_CODEC_VERSION = 2
+PT0_GATE_CURVE_CODEC_VERSION = 3
+PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION = 2
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -3597,6 +3598,10 @@ def canonical_replay_key(
         )
     if artifact == "freeze_gate_curve":
         key["gate_curve_codec_version"] = PT0_GATE_CURVE_CODEC_VERSION
+    elif artifact == "equilibrium_post_record":
+        key["equilibrium_payload_codec_version"] = (
+            PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
+        )
     return key
 
 
@@ -3675,16 +3680,22 @@ def canonical_physics_bucket_key_from_replay_key(
     if stage0_inventory is not None:
         bucket_sulfur["inventory"] = stage0_inventory
     replay_scope = replay_scope_dependency_vector(key)
+    physics_bucket = {
+        "namespace_id": str(key.get("namespace_id")),
+        "composition_mol_fraction": _json_ready(
+            key.get("composition_mol_fraction", [])
+        ),
+        "controls": bucket_controls,
+        "sulfur": bucket_sulfur,
+    }
+    equilibrium_codec = key.get("equilibrium_payload_codec_version")
+    if equilibrium_codec is not None:
+        physics_bucket["equilibrium_payload_codec_version"] = (
+            equilibrium_codec
+        )
 
     return {
-        "physics_bucket": {
-            "namespace_id": str(key.get("namespace_id")),
-            "composition_mol_fraction": _json_ready(
-                key.get("composition_mol_fraction", [])
-            ),
-            "controls": bucket_controls,
-            "sulfur": bucket_sulfur,
-        },
+        "physics_bucket": physics_bucket,
         "replay_scope": replay_scope,
     }
 

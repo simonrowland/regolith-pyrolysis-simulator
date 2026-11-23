@@ -5208,48 +5208,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> _MeltRedoxGateAuthority:
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
-            pinned_hour = getattr(
-                self,
-                '_melt_redox_gate_authority_tick_hour',
-                None,
+            has_pin, pinned_authority = (
+                self._melt_redox_gate_current_hour_pin()
             )
-            pinned_authority = getattr(
-                self,
-                '_melt_redox_gate_authority_this_tick',
-                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
-            )
-            if (
-                pinned_hour == int(self.melt.hour)
-                and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-            ):
-                current_verdict, _ = (
-                    self._melt_redox_gate_current_pin_verdict()
-                )
-                pinned_verdict = getattr(
-                    self,
-                    '_melt_redox_gate_authority_tick_verdict_identity',
-                    None,
-                )
-                verdict_matches = self._melt_redox_gate_pin_verdicts_match(
-                    current_verdict,
-                    pinned_verdict,
-                )
+            if has_pin:
                 if isinstance(pinned_authority, Mapping):
-                    if (
-                        pinned_authority.get('disposition')
-                        in {'live', 'memo-hit'}
-                        and isinstance(pinned_authority.get('curve'), Mapping)
-                        and verdict_matches
-                    ):
-                        return pinned_authority['curve']
-                elif verdict_matches:
-                    return pinned_authority
-                self._melt_redox_gate_authority_this_tick = (
-                    _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-                )
-                self._melt_redox_gate_authority_tick_hour = None
-                self._melt_redox_gate_authority_tick_verdict_identity = None
-            return self._melt_redox_liquidus_gate_curve(
+                    return pinned_authority['curve']
+                return pinned_authority
+            return self._establish_melt_redox_gate_authority_for_current_hour(
                 **redox_state_kwargs,
             )
         if gate_authority is None:
@@ -5274,21 +5240,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
             )
             if gate_authority is pinned_authority:
-                if (
-                    getattr(
-                        self,
-                        '_melt_redox_gate_authority_tick_hour',
-                        None,
-                    )
-                    == int(self.melt.hour)
-                    and self._melt_redox_gate_verdict_matches_current()
-                ):
+                has_pin, _ = self._melt_redox_gate_current_hour_pin()
+                if has_pin:
                     return gate_authority['curve']
-                self._melt_redox_gate_authority_this_tick = (
-                    _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-                )
-                self._melt_redox_gate_authority_tick_hour = None
-                self._melt_redox_gate_authority_tick_verdict_identity = None
                 return self._establish_melt_redox_gate_authority_for_current_hour(
                     **redox_state_kwargs,
                 )
@@ -5355,27 +5309,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and identity.projection_threshold_verdict == 'clear',
         )
 
-    def _melt_redox_gate_verdict_matches_current(self) -> bool:
-        current_verdict, _ = (
-            self._melt_redox_gate_current_pin_verdict()
-        )
-        pinned_verdict = getattr(
-            self,
-            '_melt_redox_gate_authority_tick_verdict_identity',
-            None,
-        )
-        return self._melt_redox_gate_pin_verdicts_match(
-            current_verdict,
-            pinned_verdict,
-        )
-
-    def _establish_melt_redox_gate_authority_for_current_hour(
+    def _melt_redox_gate_current_hour_pin(
         self,
-        *,
-        redox_state: RedoxState | None = None,
-    ) -> _MeltRedoxGateAuthority:
-        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
-        current_hour = int(self.melt.hour)
+    ) -> tuple[bool, _MeltRedoxGateAuthority]:
+        """Return a matching same-hour authority or invalidate the stale pin."""
         pinned_hour = getattr(
             self,
             '_melt_redox_gate_authority_tick_hour',
@@ -5387,36 +5324,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
         )
         if (
-            pinned_hour == current_hour
-            and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+            pinned_hour != int(self.melt.hour)
+            or pinned_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ):
-            current_verdict, _ = (
-                self._melt_redox_gate_current_pin_verdict()
+            return False, None
+
+        current_verdict, _ = self._melt_redox_gate_current_pin_verdict()
+        pinned_verdict = getattr(
+            self,
+            '_melt_redox_gate_authority_tick_verdict_identity',
+            None,
+        )
+        verdict_matches = self._melt_redox_gate_pin_verdicts_match(
+            current_verdict,
+            pinned_verdict,
+        )
+        if isinstance(pinned_authority, Mapping):
+            authority_is_reusable = (
+                pinned_authority.get('disposition') in {'live', 'memo-hit'}
+                and isinstance(pinned_authority.get('curve'), Mapping)
             )
-            pinned_verdict = getattr(
-                self,
-                '_melt_redox_gate_authority_tick_verdict_identity',
-                None,
-            )
-            verdict_matches = self._melt_redox_gate_pin_verdicts_match(
-                current_verdict,
-                pinned_verdict,
-            )
+        else:
+            authority_is_reusable = True
+        if verdict_matches and authority_is_reusable:
+            return True, pinned_authority
+
+        self._melt_redox_gate_authority_this_tick = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        )
+        self._melt_redox_gate_authority_tick_hour = None
+        self._melt_redox_gate_authority_tick_verdict_identity = None
+        return False, None
+
+    def _melt_redox_gate_verdict_matches_current(self) -> bool:
+        return self._melt_redox_gate_current_hour_pin()[0]
+
+    def _establish_melt_redox_gate_authority_for_current_hour(
+        self,
+        *,
+        redox_state: RedoxState | None = None,
+    ) -> _MeltRedoxGateAuthority:
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+        current_hour = int(self.melt.hour)
+        has_pin, pinned_authority = self._melt_redox_gate_current_hour_pin()
+        if has_pin:
             if isinstance(pinned_authority, Mapping):
-                if (
-                    pinned_authority.get('disposition')
-                    in {'live', 'memo-hit'}
-                    and isinstance(pinned_authority.get('curve'), Mapping)
-                    and verdict_matches
-                ):
-                    return pinned_authority['curve']
-            elif verdict_matches:
-                return pinned_authority
-            self._melt_redox_gate_authority_this_tick = (
-                _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-            )
-            self._melt_redox_gate_authority_tick_hour = None
-            self._melt_redox_gate_authority_tick_verdict_identity = None
+                return pinned_authority['curve']
+            return pinned_authority
         authority = self._melt_redox_liquidus_gate_record(
             **redox_state_kwargs,
         )
@@ -5524,18 +5478,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
-        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
-        authority = self._melt_redox_liquidus_gate_record(
-            **redox_state_kwargs,
+        return self._resolved_melt_redox_gate_authority(
+            redox_state=redox_state,
         )
-        if (
-            isinstance(authority, Mapping)
-            and isinstance(authority.get('curve'), Mapping)
-        ):
-            return authority['curve']
-        if isinstance(authority, _MeltRedoxLiquidusFloorFallback):
-            return authority
-        return authority
 
     def _melt_redox_liquidus_gate_record(
         self,
