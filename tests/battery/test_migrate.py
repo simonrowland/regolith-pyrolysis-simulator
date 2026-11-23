@@ -21751,7 +21751,7 @@ def test_width_unit_disagreement_is_typed_in_migration_and_scoring() -> None:
         assert migrated.value is None
         assert migrated.basis.startswith("uncertainty_convention_conflict:")
         scored = _printed_uncertainty_band(
-            Quantity.VALENCE_RATIO, uncertainty_for(width_mapping), Decimal("0.7")
+            Quantity.YIELD_FRACTION, uncertainty_for(width_mapping), Decimal("0.7")
         )
         assert scored.band is None
         assert scored.refusal["reason"] == "uncertainty_convention_conflict"
@@ -21761,12 +21761,12 @@ def test_legacy_width_scoring_uses_shared_absolute_and_relative_basis() -> None:
     from simulator.battery.score import _printed_uncertainty_band
 
     absolute = _printed_uncertainty_band(
-        Quantity.VALENCE_RATIO,
+        Quantity.YIELD_FRACTION,
         uncertainty_for({"sigma": "3%", "units": "%", "basis": "absolute"}),
         Decimal("0.7"),
     )
     relative = _printed_uncertainty_band(
-        Quantity.VALENCE_RATIO,
+        Quantity.YIELD_FRACTION,
         uncertainty_for({"sigma": "3%", "units": "%", "basis": "relative"}),
         Decimal("0.7"),
     )

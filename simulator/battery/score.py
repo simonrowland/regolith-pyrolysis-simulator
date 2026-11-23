@@ -6234,15 +6234,16 @@ def _printed_uncertainty_source(
     shape = "scalar"
     if isinstance(value, tuple):
         shape = "range"
-    if value is None and isinstance(raw, Mapping):
-        value, mapped_unit = _mapping_uncertainty_value(
+    if isinstance(raw, Mapping):
+        mapped_value, mapped_unit = _mapping_uncertainty_value(
             raw, exact_fields=exact_fields
         )
+        if value is None:
+            value = mapped_value
         inline_unit = mapped_unit if mapped_unit != "range" else None
         if mapped_unit == "range":
             shape = "range"
-        elif mapped_unit is not None:
-            unit = unit or mapped_unit
+        unit = _mapping_uncertainty_unit(raw) or inline_unit or unit
     elif value is None and isinstance(raw, str):
         match = _UNCERTAINTY_RANGE_RE.search(raw) or _UNCERTAINTY_PAIR_RE.search(raw)
         if match is not None:
@@ -7099,6 +7100,8 @@ def _printed_uncertainty_band(
     source_unit = (
         "dex"
         if log10_activity_width
+        else mapped_unit
+        if resolved_basis in {"dimensionless", "relative"} and mapped_unit
         else _uncertainty_unit(
             quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
         )
@@ -7142,6 +7145,12 @@ def _printed_uncertainty_band(
         and QUANTITY_UNITS[quantity] == "dimensionless"
     ):
         converted_unit = "dimensionless"
+    elif (
+        resolved_basis == "relative"
+        and converted_unit == "dimensionless"
+        and QUANTITY_UNITS[quantity] == "dimensionless"
+    ):
+        converted_unit = "fraction"
     if native_width:
         effective_convention = None
     else:
