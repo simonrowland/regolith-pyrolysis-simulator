@@ -25,6 +25,7 @@ from simulator.battery.enums import (
     AmbientPressureEvidenceClass,
     Authority,
     Engine,
+    FO2Channel,
     NoticeKind,
     PhaseRole,
     Quantity,
@@ -44,6 +45,8 @@ from simulator.battery.migrate import (
 from simulator.battery.records import (
     AmbientPressureEvidence,
     Composition,
+    Derivation,
+    FO2Control,
     Located,
     Locator,
     Value,
@@ -1732,7 +1735,7 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
         ),
         (
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
-            "Experiments were conducted in air.",
+            "Samples were equilibrated in air.",
             'experiment "in air"',
         ),
     )
@@ -1773,7 +1776,7 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
     ) == "Air"
     atmospheric_air = AmbientPressureEvidence(
         AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
-        "The experiment was conducted in air.",
+        "The sample was equilibrated in air.",
         locator,
     )
     assert _air_composition_quote(
@@ -2046,6 +2049,11 @@ def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
     assert lsi_oxide_rows, "expected a real Borisov–Veksler Lsi SiO2 row"
     lfe = next(iter(lfe_oxide_rows))
     lsi = next(iter(lsi_oxide_rows))
+    non_pair_target = replace(
+        lfe,
+        identity=replace(lfe.identity, phase_role=State.of(PhaseRole.METAL)),
+    )
+    assert _liquid_pair_target(non_pair_target) is None
     recorded: dict[str, float] = {}
     # BV's persisted excluded-data rows do not carry a starting composition.
     # Supply a test-only engine input so this case reaches the post-engine
@@ -2313,6 +2321,54 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     )
     assert experiment_log == Decimal("-12")
 
+    typed_control_experiment = replace(
+        located_experiment,
+        conditions={
+            **located_experiment.conditions,
+            "fO2_Pa": Located(
+                State.of(Decimal("1E-3")), locator=Locator(note="generic copy")
+            ),
+        },
+        fO2_control=FO2Control(
+            channel=State.of(FO2Channel.COMMANDED),
+            oxygen_partial_pressure_Pa=Located(
+                State.of(Value.point_of("1E-7")),
+                locator=Locator(note="typed run command"),
+            ),
+        ),
+    )
+    _typed_identity, typed_log, typed_notices = score._resolve_row_fo2(
+        experiment_identity,
+        observation,
+        typed_control_experiment,
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert typed_log == Decimal("-12")
+    assert typed_notices == ()
+
+    derived_oxygen = Located(
+        State.of(Decimal("1E-7")),
+        locator=Locator(note="derived point condition"),
+        inference=Derivation("derived test oxygen", (), (), "Pa"),
+    )
+    derived_observation = replace(
+        observation,
+        identity=replace(observation.identity, fO2_Pa=derived_oxygen.state),
+        point_conditions={**(observation.point_conditions or {}), "fO2_Pa": derived_oxygen},
+    )
+    _derived_identity, derived_log, derived_notices = score._resolve_row_fo2(
+        derived_observation.identity,
+        derived_observation,
+        context.experiments[observation.experiment_id],
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert derived_log == Decimal("-9")
+    assert any(item.policy is not None and item.policy.id == "DP-010" for item in derived_notices)
+
     monkeypatch.setattr(score, "_equilibrate_phase_assemblage", one_liquid)
     predict_with_engine(
         Engine.ALPHAMELTS,
@@ -2323,7 +2379,7 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
 
     air_evidence = AmbientPressureEvidence(
         AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
-        "in air",
+        "The sample was equilibrated in air.",
         Locator(note="test-only in-air evidence"),
     )
     air_identity = replace(
@@ -2347,7 +2403,7 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     air_notice = next(item for item in air_notices if item.policy is not None)
     assert air_notice.policy.id == "DP-003"
     assert "physics_rung=3" in air_notice.reason
-    assert "quote='in air'" in air_notice.reason
+    assert "quote='The sample was equilibrated in air.'" in air_notice.reason
 
     argon_evidence = replace(
         air_evidence,
@@ -2369,6 +2425,25 @@ def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
     assert argon_notice.policy.id == "DP-010"
     assert "atmospheric pressure under flowing argon" in argon_notice.reason
     assert "original_missing_evidence=" in argon_notice.reason
+
+    for counterexample in (
+        "Air was displaced with flowing argon before equilibration.",
+        "The furnace was equilibrated under argon, then quenched in air.",
+    ):
+        counterexample_experiment = replace(
+            air_experiment,
+            ambient_pressure_evidence=replace(air_evidence, quote=counterexample),
+        )
+        _identity, _log, notices = score._resolve_row_fo2(
+            air_identity,
+            air_observation,
+            counterexample_experiment,
+            {"SiO2": 100.0},
+            Decimal("1673.15"),
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        )
+        assert any(item.policy is not None and item.policy.id == "DP-010" for item in notices)
+        assert not any(item.policy is not None and item.policy.id == "DP-003" for item in notices)
 
     # Mutation restoring the previous hard refusal is rejected by the same
     # engine-boundary prediction assertion above.
@@ -2563,7 +2638,7 @@ def test_redox_path_uses_the_shared_oxygen_rungs_for_a_real_row(
         experiment,
         ambient_pressure_evidence=AmbientPressureEvidence(
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
-            "in air",
+            "The sample was equilibrated in air.",
             Locator(note="test-only redox in-air evidence"),
         ),
     )

@@ -134,17 +134,25 @@ def _air_composition_quote(
     else:
         return None
     source_quote = quote
-    normalized_quote = " ".join(quote.split())
-    match = re.search(
-        r"\b(?:ambient\s+air|in\s+air|air)\b",
+    normalized_quote = " ".join(quote.casefold().replace("-", " ").split())
+    # A source quote establishes the dry-air rung only when it places the
+    # sample in air during equilibration. Air displaced before the run and an
+    # air quench after an inert run are not atmosphere evidence for DP-003.
+    equilibration_air = re.search(
+        r"\bequilibrat\w*(?:\s+\w+){0,5}\s+(?:in|under)\s+(?:ambient\s+)?air\b",
         normalized_quote,
-        re.IGNORECASE,
     )
-    if match is not None and not re.search(
-        r"\b(?:not|no|without)\s+(?:in\s+)?$",
-        normalized_quote[: match.start()],
-        re.IGNORECASE,
-    ):
+    air_during_equilibration = re.search(
+        r"\bair\b.{0,60}\b(?:during|throughout)\s+equilibrat\w*",
+        normalized_quote,
+    )
+    if (
+        equilibration_air is not None
+        and not re.search(
+            r"\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\b",
+            equilibration_air.group(0),
+        )
+    ) or air_during_equilibration is not None:
         return source_quote
     return None
 

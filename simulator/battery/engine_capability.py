@@ -65,7 +65,7 @@ _SHARED_ATTEMPT = frozenset(
         Quantity.TRANSITION_TEMPERATURE,
     }
 )
-_CELL_BASE = _ACTIVITY | PHASE_ROW_QUANTITIES | _SHARED_ATTEMPT
+_CELL_BASE = _ACTIVITY | _SHARED_ATTEMPT
 
 # NASA's predict path returns before the cell dispatch unless the quantity
 # is Fe3+/Fe2+ or in the thermo set plus saturation pressure.
@@ -104,9 +104,15 @@ _RESIDUE_QUANTITIES = frozenset(
 )
 ENGINE_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.VAPOROCK: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
-    Engine.ALPHAMELTS: _cell_quantities(vapour=True, thermo=frozenset()),
-    Engine.THERMOENGINE: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
-    Engine.MAGEMIN: _cell_quantities(vapour=False, thermo=PURE_PHASE_QUANTITIES),
+    Engine.ALPHAMELTS: _cell_quantities(
+        vapour=True, thermo=frozenset()
+    ) | PHASE_ROW_QUANTITIES,
+    Engine.THERMOENGINE: _cell_quantities(
+        vapour=True, thermo=PURE_PHASE_QUANTITIES
+    ) | PHASE_ROW_QUANTITIES,
+    Engine.MAGEMIN: _cell_quantities(
+        vapour=False, thermo=PURE_PHASE_QUANTITIES
+    ) | PHASE_ROW_QUANTITIES,
     Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=frozenset()),
     Engine.INTERNAL_ANALYTICAL: _cell_quantities(
         vapour=True, thermo=ELLINGHAM_QUANTITIES | FUSION_QUANTITIES
@@ -124,6 +130,22 @@ def engine_covers_quantity(engine: Engine, quantity: Quantity) -> bool:
     """Whether this engine's declared adapter set includes the quantity."""
 
     return quantity in engine_quantities(engine)
+
+
+def engine_covers_scoring_route(engine: Engine, quantity: Quantity) -> bool:
+    """Whether the production scorer dispatches this quantity to the engine."""
+
+    if quantity not in PHASE_ROW_QUANTITIES:
+        return engine_covers_quantity(engine, quantity)
+    from simulator.battery.score import (
+        _adapter_models_dissolved_solute,
+        _capacity_solute,
+    )
+
+    solute = _capacity_solute(quantity)
+    if solute is not None:
+        return _adapter_models_dissolved_solute(engine, solute)
+    return engine_covers_quantity(engine, quantity)
 
 
 def engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
@@ -200,7 +222,10 @@ def capability_summary(
         )
         rail = rail_for_quantity(quantity, species_formula=formula)
         rail_token = NO_HEADLINE_RAIL if rail is None else rail.value
-        if any(engine_covers_quantity(engine, quantity) for engine in engine_list):
+        if any(
+            engine_covers_scoring_route(engine, quantity)
+            for engine in engine_list
+        ):
             callable_ids.add(observation.observation_id)
         if not any_declared_engine_covers(quantity):
             uncovered[(quantity.value, rail_token)] += 1
@@ -237,7 +262,7 @@ def capability_summary(
         )
         experiment = context.experiments.get(observation.experiment_id)
         for engine in offered:
-            if engine_covers_quantity(engine, quantity):
+            if engine_covers_scoring_route(engine, quantity):
                 continue
             if _residue_adapter_binds(observation, engine, experiment, quantity):
                 continue

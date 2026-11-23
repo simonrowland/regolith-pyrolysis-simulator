@@ -79,6 +79,26 @@ def test_capability_table_names_the_score_engines() -> None:
     assert set(ENGINE_QUANTITIES) == set(SCORE_ENGINE_SET)
 
 
+def test_capability_census_uses_the_dispatched_phase_route() -> None:
+    from simulator.battery.engine_capability import engine_covers_scoring_route
+
+    assert engine_covers_scoring_route(
+        Engine.ALPHAMELTS, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert engine_covers_scoring_route(
+        Engine.MAGEMIN, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert not engine_covers_scoring_route(
+        Engine.VAPOROCK, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert not engine_covers_scoring_route(
+        Engine.INTERNAL_ANALYTICAL, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert not engine_covers_scoring_route(
+        Engine.ALPHAMELTS, Quantity.SULFIDE_CAPACITY
+    )
+
+
 def test_predict_time_capability_ladder_matches_the_pin() -> None:
     """Phase basis changes only equilibrium phase composition.
 

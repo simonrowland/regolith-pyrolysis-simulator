@@ -9628,6 +9628,7 @@ def _predict_redox(
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """Predict Fe redox or a pinned OpenIMCC Cr/Ti valence couple.
 
@@ -9720,6 +9721,7 @@ def _predict_redox(
         material.composition_wt,
         material.temperature,
         quantity,
+        bench,
     )
     material_notices.extend(fo2_notice)
     handle: object | None = None
@@ -9897,8 +9899,18 @@ def _predict_redox(
 
     pressure = _fe_redox_pressure(observation, identity)
     if isinstance(pressure, _FeRedoxRefusal):
-        return refused(pressure.reason, pressure.detail)
-    pressure_bar, pressure_pa = pressure
+        identity, pressure_bar_decimal, pressure_notices = _condensed_pressure_for_score(
+            identity,
+            observation,
+            experiment,
+            bench,
+            quantity_token(identity) or Quantity.FE3_FE2_RATIO,
+        )
+        pressure_bar = float(pressure_bar_decimal)
+        pressure_pa = identity.total_pressure_Pa
+        material_notices.extend(pressure_notices)
+    else:
+        pressure_bar, pressure_pa = pressure
 
     if not melts:
         assert kress_basis is not None
@@ -11380,6 +11392,47 @@ def _printed_total_pressure_bar(
     return pa / PA_PER_BAR_DEC
 
 
+def _condensed_pressure_for_score(
+    identity: Identity,
+    observation: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+    quantity: Quantity,
+) -> tuple[Identity, Decimal | None, tuple[Notice, ...]]:
+    pressure_bar = _printed_total_pressure_bar(identity, observation)
+    if pressure_bar is not None:
+        return identity, pressure_bar, ()
+    if experiment is not None:
+        from simulator.battery.waypoints import pressure_boundary
+
+        waypoint = pressure_boundary(experiment, bench, observation).selected
+        if waypoint is not None and waypoint.value.kind is ValueKind.POINT:
+            pressure_pa = as_decimal(waypoint.value.point)
+            if pressure_pa.is_finite() and pressure_pa > 0:
+                return (
+                    replace(identity, total_pressure_Pa=State.of(pressure_pa)),
+                    pressure_pa / PA_PER_BAR_DEC,
+                    (),
+                )
+    resolved = resolve_default_policy("DP-001")
+    pressure_pa = as_decimal(resolved.value)
+    policy_notice = Notice(
+        kind=resolved.flag,
+        affected_quantities=(quantity,),
+        reason=(
+            "DP-001 default 101325 Pa: total pressure is unprinted and the "
+            "method does not establish it"
+        ),
+        origin="score:DP-001",
+        policy=NoticePolicy(**resolved.payload["policy"]),
+    )
+    return (
+        replace(identity, total_pressure_Pa=State.of(pressure_pa)),
+        pressure_pa / PA_PER_BAR_DEC,
+        (policy_notice,),
+    )
+
+
 def _printed_fo2_log10_bar(identity: Identity) -> float | None:
     state = identity.fO2_Pa
     if state is None or not state.is_value or state.value is None:
@@ -11400,6 +11453,8 @@ def _liquid_pair_target(observation: Observation) -> tuple[str, str] | None:
     if (
         not isinstance(identity, Identity)
         or quantity_token(identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        or _phase_role_value(identity, "phase_role")
+        not in {PhaseRole.MELT, PhaseRole.GLASS}
     ):
         return None
     provenance = observation.provenance or {}
@@ -11460,6 +11515,46 @@ def _reported_liquid_phase_count(result: EquilibriumResult) -> int:
     return int(bool(result.liquid_composition_wt_pct))
 
 
+def _liquid_pair_refusal(
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    observation: Observation,
+    result: EquilibriumResult,
+    quantity: Quantity | None,
+    notices: tuple[Notice, ...],
+) -> EnginePrediction | None:
+    pair = _liquid_pair_target(observation)
+    if pair is None or _reported_liquid_phase_count(result) > 1:
+        return None
+    target_phase, conjugate_phase = pair
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence="phase_assemblage",
+        ),
+        authority=Authority.REFUSED,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY,
+        refusal_detail={
+            "reason": RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY.value,
+            "engine": engine.value,
+            "quantity": quantity.value if quantity is not None else "",
+            "target_phase": target_phase,
+            "conjugate_phase": conjugate_phase,
+            "detail": (
+                "single-liquid engine result cannot predict one member of "
+                "the source-reported coexisting liquid pair"
+            ),
+        },
+        identity=observation.identity,
+    )
+
+
 def _resolve_row_fo2(
     identity: Identity,
     observation: Observation,
@@ -11467,11 +11562,12 @@ def _resolve_row_fo2(
     composition_wt: Mapping[str, float],
     temperature_K: Decimal,
     quantity: Quantity | None,
+    bench: Bench | None = None,
 ) -> tuple[Identity, Decimal | None, tuple[Notice, ...]]:
     """Resolve printed fO2, then DP-112, DP-003, and DP-010 in order."""
 
     derived_condition = _derived_fo2_condition(observation)
-    if not derived_condition:
+    if not derived_condition and _has_printed_fo2(observation, identity):
         printed_log = _printed_condition_decimal(observation, "fO2_log")
         if printed_log is not None and printed_log.is_finite():
             return (
@@ -11483,19 +11579,36 @@ def _resolve_row_fo2(
         if fo2_log is not None:
             return identity, Decimal(str(fo2_log)), ()
 
-    printed_pressure = printed_source_pressure(observation)
-    if printed_pressure is None and experiment is not None:
-        point_conditions = dict(observation.point_conditions or {})
-        point_conditions.update(
-            {
-                key: experiment.conditions[key]
-                for key in ("fO2_Pa", "oxygen_partial_pressure_Pa")
-                if key in experiment.conditions
-            }
+    if experiment is not None:
+        from simulator.battery.waypoints import oxygen_condition
+
+        oxygen = oxygen_condition(experiment, bench, observation)
+        typed_run_routes = {
+            "oxygen_partial_pressure_to_log_fO2",
+            "oxygen_sweep_partial_pressure",
+            "oxygen_sweep_component_partial_pressure",
+        }
+        waypoint = next(
+            (route for route in oxygen.routes if route.route in typed_run_routes),
+            oxygen.selected,
         )
-        printed_pressure = printed_source_pressure(
-            replace(observation, point_conditions=point_conditions)
-        )
+        if waypoint is not None and waypoint.authority.value == "derived":
+            try:
+                run_oxygen_log = as_decimal(waypoint.value.point)
+            except (AttributeError, TypeError, ValueError, ArithmeticError):
+                run_oxygen_log = None
+            if run_oxygen_log is not None and run_oxygen_log.is_finite():
+                return (
+                    replace(identity, fO2_Pa=State.of(log10_fo2_to_pa(run_oxygen_log))),
+                    run_oxygen_log,
+                    (),
+                )
+
+    printed_pressure = (
+        printed_source_pressure(observation)
+        if _has_printed_fo2(observation, identity)
+        else None
+    )
     if printed_pressure is not None:
         printed_log_decimal = printed_pressure.log10() - PA_PER_BAR_DEC.log10()
         if printed_log_decimal.is_finite():
@@ -12061,6 +12174,7 @@ def _predict_element_mass_fraction_phase(
     quantity: Quantity | None,
     role: PhaseRole,
     experiment: Experiment | None,
+    bench: Bench | None,
     handles: Mapping[str, object] | None,
     refused: Callable[..., EnginePrediction],
 ) -> EnginePrediction:
@@ -12125,14 +12239,11 @@ def _predict_element_mass_fraction_phase(
             execution=ExecutionState.NOT_PROBED,
             notices=notices,
         )
-    pressure_bar = _printed_total_pressure_bar(identity, observation)
-    if pressure_bar is None:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
-            execution=ExecutionState.NOT_PROBED,
-            notices=notices,
-        )
+    identity, pressure_bar, pressure_notices = _condensed_pressure_for_score(
+        identity, observation, experiment, bench, quantity
+    )
+    notices = (*notices, *pressure_notices)
+    assert pressure_bar is not None
 
     redox_mode: str | None = None
     fo2_log: float | None = None
@@ -12150,6 +12261,7 @@ def _predict_element_mass_fraction_phase(
             {name: amount for name, amount in weights},
             temperature,
             quantity,
+            bench,
         )
         notices = (*notices, *oxygen_notices)
         if resolved_log is None:
@@ -12215,6 +12327,11 @@ def _predict_element_mass_fraction_phase(
             },
             notices=notices,
         )
+    pair_refusal = _liquid_pair_refusal(
+        engine, channel, sources, observation, result, quantity, notices
+    )
+    if pair_refusal is not None:
+        return pair_refusal
     phase_map, phase_issue = _select_phase_composition(result, role)
     if phase_map is None:
         return refused(
@@ -12331,6 +12448,7 @@ def _predict_phase_row(
     phase_siblings: Mapping[str, Decimal] | None = None,
     phase_sibling_refusal: str | None = None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """One printed component, or one printed L_X, from an assemblage."""
 
@@ -12371,16 +12489,19 @@ def _predict_phase_row(
                 ),
             },
         )
-    if solute is None and engine not in MELTS_ENGINES:
-        return refused(
-            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
-            {
-                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
-                "engine": engine.value,
-                "quantity": quantity.value if quantity is not None else "",
-                "detail": "engine does not report an equilibrium phase assemblage",
-            },
-        )
+    if solute is None:
+        from simulator.battery.engine_capability import engine_covers_quantity
+
+        if not engine_covers_quantity(engine, quantity):
+            return refused(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+                {
+                    "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                    "engine": engine.value,
+                    "quantity": quantity.value if quantity is not None else "",
+                    "detail": "engine does not report an equilibrium phase assemblage",
+                },
+            )
 
     role = _phase_role_value(identity, "phase_role")
     if role is None:
@@ -12407,6 +12528,7 @@ def _predict_phase_row(
             quantity=quantity,
             role=role,
             experiment=experiment,
+            bench=bench,
             handles=handles,
             refused=refused,
         )
@@ -12557,6 +12679,7 @@ def _predict_phase_row(
         wt,
         temperature,
         quantity,
+        bench,
     )
     exclusion_notices = exclusion_notices + fo2_notices
     if fo2_log is None:
@@ -12566,14 +12689,11 @@ def _predict_phase_row(
             execution=ExecutionState.NOT_PROBED,
             notices=exclusion_notices,
         )
-    pressure_bar = _printed_total_pressure_bar(identity, observation)
-    if pressure_bar is None:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
-            execution=ExecutionState.NOT_PROBED,
-            notices=exclusion_notices,
-        )
+    identity, pressure_bar, pressure_notices = _condensed_pressure_for_score(
+        identity, observation, experiment, bench, quantity
+    )
+    exclusion_notices = (*exclusion_notices, *pressure_notices)
+    assert pressure_bar is not None
     anion_pa: Decimal | None = None
     law: _CapacityLaw | None = None
     if solute is not None:
@@ -12644,28 +12764,11 @@ def _predict_phase_row(
             notices=exclusion_notices,
         )
 
-    liquid_pair = _liquid_pair_target(observation)
-    if liquid_pair is not None and _reported_liquid_phase_count(result) <= 1:
-        target_phase, conjugate_phase = liquid_pair
-        return refused(
-            RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY,
-            {
-                "reason": (
-                    RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY.value
-                ),
-                "engine": engine.value,
-                "quantity": quantity.value if quantity is not None else "",
-                "target_phase": target_phase,
-                "conjugate_phase": conjugate_phase,
-                "detail": (
-                    "single-liquid engine result cannot predict one member of "
-                    "the source-reported coexisting liquid pair"
-                ),
-            },
-            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
-            call_evidence="phase_assemblage",
-            notices=exclusion_notices,
-        )
+    pair_refusal = _liquid_pair_refusal(
+        engine, channel, sources, observation, result, quantity, exclusion_notices
+    )
+    if pair_refusal is not None:
+        return pair_refusal
 
     liquid_fraction = _engine_liquid_fraction(result)
     provenance = _composition_provenance(identity)
@@ -14525,6 +14628,7 @@ def _predict_with_engine(
             handles=handles,
             isolated=isolated,
             experiment=experiment,
+            bench=bench,
         )
     phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
@@ -14548,6 +14652,7 @@ def _predict_with_engine(
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
             experiment=experiment,
+            bench=bench,
         )
     if quantity is Quantity.VALENCE_RATIO:
         return _predict_named_fe_valence(

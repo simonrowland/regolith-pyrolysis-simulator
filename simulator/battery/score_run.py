@@ -471,7 +471,7 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
-    from simulator.battery.engine_capability import engine_covers_quantity
+    from simulator.battery.engine_capability import engine_covers_scoring_route
     from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
@@ -593,7 +593,9 @@ def _score_store_with_decisions(
                         if (
                             predict is None
                             and offered_quantity is not None
-                            and not engine_covers_quantity(engine, offered_quantity)
+                            and not engine_covers_scoring_route(
+                                engine, offered_quantity
+                            )
                             and not _residue_adapter_binds(
                                 point, engine, experiment, quantity
                             )
