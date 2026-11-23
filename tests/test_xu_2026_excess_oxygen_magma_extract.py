@@ -22,10 +22,15 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.composition import (
+    _formula_molar_mass,
     _element_wt_percent_stoichiometric_oxide_projection,
 )
 from simulator.battery.identity import celsius_to_kelvin
-from simulator.battery.migrate import wt_pct_to_mole_fraction
+from simulator.battery.input_provenance import (
+    PRINTED_STARTING_BULK,
+    composition_with_provenance,
+)
+from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.factories import migrate_one_extract
 from tests.battery.literature_extract_grids import (
     assert_observation_grid_matches,
@@ -247,6 +252,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     starting_context = contexts["xu_2026_table1_starting_composition_context"]
     starting_values = starting_context["values"]
     assert starting_context["locator"]["table"] == "1"
+    assert starting_context["locator"]["row"] == "MORB starting comp."
     assert starting_context["locator"]["page"] == 3
     assert starting_context["locator"]["pdf_page_index"] == 2
     assert starting_values["composition_role"] == "initial bulk"
@@ -358,7 +364,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     first_run_si = next(
         row for row in table1 if row["observation_id"] == "xu_2026_table1_lvp_1_si"
     )
-    assert first_run_page == first_run_si["page"] == "3"
+    assert first_run_page == int(first_run_si["page"]) == 3
     assert first_run_si["component_amount_as_published"] == "23.40"
     table1_context = contexts["xu_2026_table1_run_product_context_lvp_1"]
     assert table1_context["experiment"] == "xu_2026_lvp_1"
@@ -436,12 +442,13 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         experiment = migrator.result.experiments[observation.experiment_id]
         initial_composition = experiment.sample.initial_composition
         assert initial_composition is not None and initial_composition.state.is_value
-        assert composition == initial_composition.state.value
+        assert composition == composition_with_provenance(
+            initial_composition.state.value, PRINTED_STARTING_BULK
+        )
         assert initial_composition.locator is not None
         assert initial_composition.locator.page == 3
         assert initial_composition.locator.pdf_page_index == 2
         assert initial_composition.locator.table == "1"
-        assert initial_composition.locator.row == "MORB starting comp."
         assert initial_composition.inference is not None
         assert (
             initial_composition.inference.relation
@@ -537,8 +544,20 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert valence_basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
     assert valence_basis.value_form is ValenceValueForm.FRACTION
     assert fe.uncertainty.kind is UncertaintyKind.PRINTED
-    assert Decimal(str(fe.uncertainty.verbatim["sigma"])) == Decimal("0.03")
+    assert fe.uncertainty.verbatim["sigma"] == "3"
+    assert fe.uncertainty.verbatim["printed_units"] == "%"
+    assert fe.uncertainty.value == Decimal("0.03")
+    assert fe.uncertainty.basis == "fraction"
     assert fe.uncertainty.verbatim["confidence_level"] == "not_stated"
+    fe_band = _printed_uncertainty_band(
+        fe.identity.quantity.value,
+        fe.uncertainty,
+        fe.value.point,
+        source_observation=fe,
+    )
+    assert fe_band.refusal is None
+    assert fe_band.band is not None
+    assert fe_band.band.value == Decimal("0.01322826573375514821563818833")
     fe_source = next(
         row
         for row in document["species"]["Fe"]["observations"]
@@ -556,6 +575,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert fe_point["value_as_published"] == "70(3)%"
     assert fe_point["sigma"] == "3"
     assert fe_point["unit"] == "%"
+    assert fe_point["locator"]["row"] == "Fe3+ area"
     assert fe_source["locator"]["page"] == 22
     assert fe_source["locator"]["pdf_page_index"] == 21
     assert fe_point["locator"]["page"] == 22
@@ -571,10 +591,12 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert fe.derivation.raw_inputs.locator.pdf_page_index == 19
     assert fe.derivation.raw_inputs.locator.page == 20
     assert not fe.derivation.inputs
-    assert fe.derivation.locator is not None
-    assert fe.derivation.locator.pdf_page_index == 4
-    assert fe.derivation.locator.page == 5
-    assert fe.derivation.locator.section == "Mössbauer spectroscopic analysis"
+    assert fe_source["derivation"]["locator"]["pdf_page_index"] == 4
+    assert fe_source["derivation"]["locator"]["page"] == 5
+    assert (
+        fe_source["derivation"]["locator"]["section"]
+        == "Mössbauer spectroscopic analysis"
+    )
     supplement_pdf = _supplement_pdf(tmp_path)
     assert (
         _pdf_page_with_proof(
@@ -614,7 +636,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
             supplement_pdf,
             "Fe3+/ΣFe was determined from relative areas to be 0.70",
         )
-        == fe.derivation.locator.page
+        == fe_source["derivation"]["locator"]["page"]
     )
     assert (
         _pdf_page_with_proof(
@@ -654,17 +676,27 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         {"Fe": fe_total * fe.value.point},
         valence_by_element={"Fe": 3},
     )
-    oxide_weights = dict(base_projection.projected_component_mass)
-    oxide_weights.update(dict(fe2_projection.projected_component_mass))
-    oxide_weights.update(dict(fe3_projection.projected_component_mass))
-    expected_starting_composition = wt_pct_to_mole_fraction(oxide_weights)
-    first_experiment = migrator.result.experiments[
-        f"{SOURCE_ID}::experiment::xu_2026_lvp_1"
-    ]
+    oxide_weights = dict(base_projection.projected_component_mass_g_per_100g)
+    oxide_weights.update(dict(fe2_projection.projected_component_mass_g_per_100g))
+    oxide_weights.update(dict(fe3_projection.projected_component_mass_g_per_100g))
+    component_moles = {
+        formula: mass / _formula_molar_mass(formula)
+        for formula, mass in oxide_weights.items()
+    }
+    mole_total = sum(component_moles.values(), Decimal(0))
+    expected_starting_components = {
+        formula: moles / mole_total for formula, moles in component_moles.items()
+    }
+    first_experiment_id = observations[first_run_si["observation_id"]].experiment_id
+    first_experiment = migrator.result.experiments[first_experiment_id]
     initial = first_experiment.sample.initial_composition
     assert initial is not None and initial.state.is_value
-    assert dict(initial.state.value.components) == dict(
-        expected_starting_composition.components
+    actual_starting_components = dict(initial.state.value.components)
+    assert actual_starting_components.keys() == expected_starting_components.keys()
+    assert all(
+        abs(actual_starting_components[formula] - expected_starting_components[formula])
+        <= Decimal("1e-24")
+        for formula in expected_starting_components
     )
     assert "all-Fe3" in starting_values["iron_valence_note"]
 
