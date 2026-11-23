@@ -1832,7 +1832,7 @@ def _tonne_sky_loss_W(
 ROBINOT_PYROMETER_POLICY = {
     "ruling": "d-464",
     "wavelength_um": 5.0,
-    "prediction_face_set": "hot_upper",
+    "prediction_face_set": FACE_HOT_UPPER,
     "spot_flag": "pyrometer_spot_unprinted",
     "eps_lambda": {
         "id": "DP-110",
