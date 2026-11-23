@@ -1734,6 +1734,53 @@ species:
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
         composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        composition_role: &costa_2015_fo93fa7_initial_charge_role
+          value: initial_charge_only
+          quote: An analysis of the starting material is given below.
+          locator:
+            source_path: text/kems-007-costa-2015/pdftotext-layout.txt
+            page: 2
+            pdf_page_index: 1
+            section: 'Experimental: Starting Material and Characterization'
+            note: The Methods section calls the measured Fo93Fa7 sample the starting material.
+        initial_charge_context: &costa_2015_fo93fa7_initial_charge_context
+          measurement_state_composition:
+            state: {tag: unknown, reason: not_published}
+            locator:
+              source_path: text/kems-007-costa-2015/pdftotext-layout.txt
+              page: 2
+              pdf_page_index: 1
+              section: 'Experimental: Starting Material and Characterization'
+              note: >-
+                The paper says samples were characterized before and after KEMS, but does not link a
+                post-vaporization composition to each pressure measurement.
+          run_order_index:
+            state: {tag: unknown, reason: not_published}
+            locator:
+              source_path: text/kems-007-costa-2015/pdftotext-layout.txt
+              page: 2
+              pdf_page_index: 1
+              section: 'Experimental: Starting Material and Characterization'
+              note: No row-specific run order on one charge is printed.
+          depletion_evidence:
+            state: {tag: unknown, reason: not_published}
+            note: unreported
+            locator:
+              source_path: text/kems-007-costa-2015/pdftotext-layout.txt
+              page: 3
+              pdf_page_index: 2
+              section: 'Experimental: Impurities in Starting Material'
+              note: >-
+                The TGA trace is for preliminary heat treatment, not per-run KEMS charge loss; the paper
+                gives no per-run mass loss, conversion, or fractional loss.
+          vaporization_congruence:
+            state: {tag: unknown, reason: not_published}
+            locator:
+              source_path: text/kems-007-costa-2015/pdftotext-layout.txt
+              page: 2
+              pdf_page_index: 1
+              section: 'Experimental: Starting Material and Characterization'
+              note: No congruent or incongruent vaporization statement is reported.
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -2003,6 +2050,8 @@ species:
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
         composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        composition_role: *costa_2015_fo93fa7_initial_charge_role
+        initial_charge_context: *costa_2015_fo93fa7_initial_charge_context
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -2750,6 +2799,8 @@ species:
       units: dimensionless
       values:
         composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        composition_role: *costa_2015_fo93fa7_initial_charge_role
+        initial_charge_context: *costa_2015_fo93fa7_initial_charge_context
         quantity: evaporation_coefficient_alpha
         method_class: measured_direct
         admission_status: admitted
@@ -3703,6 +3754,8 @@ species:
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
         composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        composition_role: *costa_2015_fo93fa7_initial_charge_role
+        initial_charge_context: *costa_2015_fo93fa7_initial_charge_context
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -3972,6 +4025,8 @@ species:
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
         composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        composition_role: *costa_2015_fo93fa7_initial_charge_role
+        initial_charge_context: *costa_2015_fo93fa7_initial_charge_context
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted

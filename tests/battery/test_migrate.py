@@ -132,6 +132,18 @@ from simulator.battery.migrate import (
 from simulator.battery.stable_ids import series_point_id, series_row_extra
 from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
+DEMARIA_12022_MASS_PERCENT = {
+    "SiO2": Decimal("42.3"),
+    "Al2O3": Decimal("8.2"),
+    "FeO": Decimal("21.6"),
+    "MgO": Decimal("11.9"),
+    "CaO": Decimal("9.0"),
+    "Na2O": Decimal("0.23"),
+    "K2O": Decimal("0.061"),
+    "TiO2": Decimal("4.9"),
+    "MnO": Decimal("0.31"),
+}
+
 
 _FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
@@ -3141,6 +3153,7 @@ def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
     for observation in mapped:
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
+        assert composition.value.proxy_flag == "initial_charge_only"
         assert composition.value.basis == "normalized_mole_fraction_from_published_Fo93Fa7"
         assert composition.value.amount_basis.value == "mole_fraction"
         assert dict(composition.value.components) == expected
@@ -3156,8 +3169,34 @@ def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
         located_composition = conditions["composition"]
         assert located_composition.state.is_value
         assert located_composition.state.value == composition.value
+        assert located_composition.state.value.proxy_flag == "initial_charge_only"
         assert located_composition.locator.page == 1
         assert located_composition.locator.pdf_page_index == 0
+
+    source_row = next(
+        row
+        for row in _extract_observations("kems-007-costa-2015.yaml")
+        if row.get("observation_id") == "costa_2015_fe_partial_pressure_mo_digitized"
+    )
+    role = source_row["values"]["composition_role"]
+    assert role["value"] == "initial_charge_only"
+    assert role["quote"] == "An analysis of the starting material is given below."
+    assert role["locator"]["page"] == 2
+    assert role["locator"]["pdf_page_index"] == 1
+    direct_source_rows = [
+        row
+        for row in _extract_observations("kems-007-costa-2015.yaml")
+        if row.get("values", {}).get("composition_role", {}).get("value")
+        == "initial_charge_only"
+    ]
+    assert len(direct_source_rows) == 5
+    for row in direct_source_rows:
+        context = row["values"]["initial_charge_context"]
+        assert context["measurement_state_composition"]["state"] == {
+            "tag": "unknown",
+            "reason": "not_published",
+        }
+        assert context["depletion_evidence"]["note"] == "unreported"
 
     first_digitized_point = next(
         observation
@@ -13654,6 +13693,63 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
         assert condition.locator.pdf_page_index == 2
         assert obs.locator is not None and obs.locator.table == "1"
 
+    initial_charge_rows = [
+        obs
+        for obs in rows
+        if obs.identity.composition is not None
+        and obs.identity.composition.is_value
+        and obs.identity.composition.value.proxy_flag == "initial_charge_only"
+    ]
+    assert len(initial_charge_rows) == 16
+    expected_initial_composition = wt_pct_to_mole_fraction(
+        DEMARIA_12022_MASS_PERCENT
+    )
+    for obs in initial_charge_rows:
+        composition = obs.point_conditions["composition"]
+        assert composition.state.is_value
+        assert composition.state.value == obs.identity.composition.value
+        assert dict(obs.identity.composition.value.components) == dict(
+            expected_initial_composition.components
+        )
+        assert composition.locator.published_page == 1254
+        assert composition.locator.pdf_page_index == 1
+        assert composition.locator.table == "2"
+    na_extract = next(
+        row
+        for row in _extract_observations("kems-023-demaria-1973.yaml")
+        if row.get("observation_id") == "demaria_1973_na_psat_table1_quoted_demaria_1971"
+    )
+    assert (
+        na_extract["values"]["series"][0]["composition_role"]["quote"]
+        == "The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971)."
+    )
+    linked_source_rows = []
+    for row in _extract_observations("kems-023-demaria-1973.yaml"):
+        source_values = row.get("values", {})
+        series = source_values.get("series") or source_values.get("points") or []
+        if any(
+            (point.get("sample") == "12022" or point.get("run") == "12022")
+            and point.get("composition_role", {}).get("value")
+            == "initial_charge_only"
+            for point in series
+        ):
+            linked_source_rows.append(row)
+    assert len(linked_source_rows) == 7
+    for row in linked_source_rows:
+        points = row["values"].get("series") or row["values"].get("points") or []
+        context = next(
+            point["initial_charge_context"]
+            for point in points
+            if (point.get("sample") == "12022" or point.get("run") == "12022")
+            and point.get("composition_role", {}).get("value")
+            == "initial_charge_only"
+        )
+        assert context["measurement_state_composition"]["state"] == {
+            "tag": "unknown",
+            "reason": "not_published",
+        }
+        assert context["depletion_evidence"]["note"] == "unreported"
+
 
 def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
@@ -13681,29 +13777,84 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
         assert polymorph.reason == "source does not state polymorph"
 
 
-def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
+def test_demaria_1971_smales_composition_links_only_12022_vapour_rows(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
-    rows = {
-        obs.observation_id.split("::", 1)[1]: obs
+    rows = [
+        obs
         for obs in result.observations.values()
         if obs.source_id == "kems-022-demaria-1971"
-    }
-    for prefix in (
-        "demaria_1971_na_psat_figure1_sample_12022_digitized",
-        "demaria_1971_na_psat_figure1_sample_12065_digitized",
-    ):
-        related = [obs for key, obs in rows.items() if key.startswith(prefix)]
-        assert related
-        assert all(obs.identity.composition is not None for obs in related)
-        assert all(obs.identity.composition.is_unknown for obs in related)
-        assert all(
-            obs.identity.composition.reason == "no composition mapped from source"
-            for obs in related
-        )
+    ]
+    linked = [
+        obs
+        for obs in rows
+        if obs.identity.composition is not None
+        and obs.identity.composition.is_value
+        and obs.identity.composition.value.proxy_flag == "initial_charge_only"
+    ]
+    expected_counts = Counter(
+        {
+            "demaria_1971_o2_psat_table1_alkali_range": 2,
+            "demaria_1971_mn_psat_table2_sample_12022": 3,
+            "demaria_1971_cr_psat_table2_sample_12022": 2,
+            "demaria_1971_mg_psat_table3_lunar_basalt": 3,
+            "demaria_1971_al2o_psat_table4": 9,
+            "demaria_1971_o_atomic_psat_table5": 7,
+            "demaria_1971_na_psat_figure1_sample_12022_digitized": 6,
+            "demaria_1971_k_psat_figure2_digitized": 2,
+        }
+    )
+    actual_counts = Counter()
+    for obs in linked:
+        child_id = obs.observation_id.split("::", 1)[1]
+        for observation_id in expected_counts:
+            if child_id.startswith(observation_id):
+                actual_counts[observation_id] += 1
+                break
+    assert actual_counts == expected_counts
+    assert len(linked) == 34
+    for obs in linked:
+        temperature = obs.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        assert obs.point_conditions is not None
+        temperature_condition = obs.point_conditions["temperature_K"]
+        assert temperature_condition.state.is_value
+        assert temperature_condition.state.value == temperature.value
+        composition_condition = obs.point_conditions["composition"]
+        assert composition_condition.state.is_value
+        assert composition_condition.state.value == obs.identity.composition.value
+
+    unknown_12065 = [
+        obs
+        for obs in rows
+        if "demaria_1971_na_psat_figure1_sample_12065_digitized"
+        in obs.observation_id
+    ]
+    assert unknown_12065
+    assert all(
+        obs.identity.composition is not None and obs.identity.composition.is_unknown
+        for obs in unknown_12065
+    )
 
     extract_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    linked_source_rows = [
+        row
+        for row in extract_rows
+        if row.get("observation_id") in expected_counts
+    ]
+    assert len(linked_source_rows) == 8
+    for row in linked_source_rows:
+        source_values = row["values"]
+        points = source_values.get("points") or source_values.get("series") or []
+        contexts = [source_values.get("initial_charge_context")]
+        contexts.extend(point.get("initial_charge_context") for point in points)
+        context = next(context for context in contexts if context is not None)
+        assert context["measurement_state_composition"]["state"] == {
+            "tag": "unknown",
+            "reason": "not_published",
+        }
+        assert context["depletion_evidence"]["note"] == "unreported"
     sample_12022 = next(
         row
         for row in extract_rows
@@ -13715,10 +13866,30 @@ def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
         "Na2O": 0.36,
         "K2O": 0.068,
     }
-    assert "reported elsewhere (SMALES, 1971)" in values["composition_source_gap"]
+    assert "reported elsewhere (Smales, 1971)" in values["composition_source_note"]
     assert "composition_from_sample_catalog" not in values
     assert "sample_oxide_composition_wt_pct" not in values
     assert "printed_composition" not in values
+    source_composition = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id") == "demaria_1971_o2_psat_table1_alkali_range"
+    )["values"]["points"][0]["point_conditions"]["composition"]
+    source_components = dict(source_composition["state"]["value"]["components"])
+    assert source_components["SiO2"] == "42.3"
+    assert source_components["Al2O3"] == "8.2"
+    assert source_components["FeO"] == "21.6"
+    expected_initial_composition = wt_pct_to_mole_fraction(
+        DEMARIA_12022_MASS_PERCENT
+    )
+    for obs in linked:
+        assert dict(obs.identity.composition.value.components) == dict(
+            expected_initial_composition.components
+        )
+    assert source_composition["locator"]["table"] == "2"
+    assert source_composition["locator"]["page"] == 2
+    assert source_composition["locator"]["pdf_page_index"] == 1
+    assert source_composition["locator"]["published_page"] == 1254
     sample_12065 = next(
         row
         for row in extract_rows
