@@ -200,13 +200,18 @@ table_tool:
   reason: No MinerU table blocks or tables index were present to convert or compare.
   comparison_output: Not generated; the full render audit above covers the stored cells.
 migration:
-  status: isolated_migration_complete_identity_binding_conflict
+  status: isolated_migration_complete_d460_composition_unbound
   required_mutation: The authored focused test changes FUN1-10 final_weight_g, recomputes the fraction, and pins the changed migrated value; the pytest mutation is not run under owner hold.
   code_path_checked:
     - simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
     - simulator/battery/migrate.py::_MASS_LOSS_YIELD_FIELDS
     - simulator/battery/migrate.py::_item_mass_loss_field
-  finding: The existing mass-loss reader consumes values.mass_loss_fraction. Printed grams and their arithmetic derivation are retained on every row. The extract also binds each row to its printed initial-charge composition and initial_mass basis.
+    - simulator/battery/identity.py::profile_for
+    - simulator/battery/score.py::_score_identity_equal
+    - simulator/battery/score.py::_predict_mass_loss_with_residue
+    - simulator/battery/residue.py::predict_mass_loss_fraction
+    - simulator/battery/residue.py::_initial_oxide_wt_percent
+  finding: The existing mass-loss reader consumes values.mass_loss_fraction. Printed grams and their arithmetic derivation are retained on every row. The extract binds each row to its experiment's printed initial-charge composition and initial_mass basis, but migration leaves identity.composition unknown under the Car 1 ruling.
   scope_rule: No simulator or migrator code changed.
   isolated_migration: Direct in-memory Migrator run; 120 observations, 24 mass_loss_fraction and 96 residue_component_composition, 0 hard issues, 0 unavailable values, 0 registry issues, 0 quantity-unknown observations. Species phase is unknown for all 120 observations; Car 1 does not assign a single phase to this integrated mass-loss quantity, and the existing composition rows are unchanged. This was not a simulator run or store regeneration.
   uncertainty_counts:
@@ -218,13 +223,21 @@ migration:
     FUN1-3: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
     FUN1-10: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
     FUN2-10: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
-  identity_binding_conflict: >-
-    Printed starting compositions are linked through sample.printed_composition and each mass-loss observation's
-    point_conditions.printed_composition, but the isolated Migrator still leaves identity.composition unknown
-    without composition_role initial_charge_only (the existing path is
-    simulator/battery/migrate.py::_declared_composition_role). Car 1's design explicitly prohibits composition_role. The
-    generic identity-binding rule requires printed composition to reach identity; no existing extraction-only
-    path found satisfies both requirements. No migrator/schema change was made; controller ruling is needed.
+  identity_composition_d460_finding: >-
+    The printed FUN1/FUN2 starting compositions are linked through sample.printed_composition and each mass-loss
+    observation's point_conditions.printed_composition, but the isolated Migrator leaves identity.composition
+    unknown. The controller ruled to keep composition_role absent: initial_charge_only marks a proxy for an evolving
+    measurement state, while these rows describe integrated loss from their true starting charge. This is an approved
+    d-460 finding; a separate migrator task will bind sample.printed_composition to identity composition generically,
+    without a role or proxy flag. No schema or migrator change was made in Car 1.
+  current_prediction_first_refusal: >-
+    Static code-path inspection (no simulator run under owner hold):
+    simulator/battery/score.py::_predict_mass_loss_with_residue calls
+    simulator/battery/residue.py::predict_mass_loss_fraction, whose first composition lookup is
+    simulator/battery/residue.py::_initial_oxide_wt_percent. That helper reads experiment.sample.initial_composition,
+    while these experiments store the printed map under sample.printed_composition, so the current prediction path
+    raises initial_composition_not_stated; the score wrapper maps *_not_stated to IDENTITY_INCOMPLETE / NOT_PROBED.
+    The printed map is therefore present in the extract but is not bound to the field this predictor currently consumes.
   identity_pressure: >-
     Car 1 design section 4 directs this case: retain the printed one-sided ceiling in point_conditions and leave
     identity.total_pressure_Pa unknown. The existing simulator/battery/migrate.py::_point_pressure_for_identity
@@ -234,9 +247,11 @@ engine_readiness:
   rows: 24
   ready_for_extent_anchor: 24
   direct_mass_loss_profile_ready: 0
+  prediction_code_path: "simulator/battery/score.py::_predict_mass_loss_with_residue -> simulator/battery/residue.py::predict_mass_loss_fraction -> simulator/battery/residue.py::_initial_oxide_wt_percent"
+  prediction_first_refusal: initial_composition_not_stated, mapped to IDENTITY_INCOMPLETE / NOT_PROBED; see migration.current_prediction_first_refusal.
   experiment_links: FUN1 and FUN2 remain separate; each row points to its experiment's starting composition and has its own printed temperature and pressure bound. The identity composition gap is recorded above.
   missing_or_deferred_inputs:
-    identity.composition: Printed starting compositions are present and linked to each run, but not promoted to identity because Car 1 forbids composition_role; see identity_binding_conflict.
+    identity.composition: Printed starting compositions are present and linked to each run, but identity remains unknown per the controller ruling; the generic binding is assigned to a separate migrator task. This also leaves the current mass-loss predictor's initial_composition input unstated.
     identity.total_pressure_Pa: The printed one-sided ceiling remains in point_conditions; the design directs identity pressure to remain unknown for a bound.
     identity.fO2_Pa: No absolute fO2 value or oxygen-buffer condition is printed; every row carries a located unknown.
     identity.sample_mass_kg: The observation profile requires it, but Car 1 forbids sample.mass_kg; the initial and final grams remain in the mass-loss values and are not converted to kilograms.

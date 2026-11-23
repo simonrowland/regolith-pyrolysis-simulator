@@ -481,6 +481,10 @@ def test_table1_mass_loss_rows_migrate_as_separate_fun_experiments() -> None:
         observation = mass_loss[observation_id]
         assert observation.identity.species.formula == "unknown"
         assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        # Car 1 keeps the starting charge in sample.printed_composition without
+        # declaring it as a proxy via composition_role; generic identity binding
+        # is deferred to the separate migrator task.
+        assert observation.identity.composition.is_unknown
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(expected_fraction)
