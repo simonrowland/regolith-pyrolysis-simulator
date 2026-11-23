@@ -5438,3 +5438,103 @@ def test_frozen_composition_stays_off_outside_the_gate():
     # Measured gap on this hour is about 1.4e-2 Pa. 1e-3 Pa still
     # sits above the inside-gate Radau band and below that gap.
     assert gap > 1.0e-3
+
+
+def test_frozen_gate_is_the_square_of_the_mole_error_budget():
+    """The gate is the one cut whose square is the 1e-6 mole-error budget.
+
+    The inside hour is at 8e-4 and the outside hour is at 0.2. Any
+    gate in that open interval keeps both of them green. 1e-3 is the
+    only value in the interval whose square is 1e-6. Mutation: moving
+    _FROZEN_COMPOSITION_MAX_DT_OVER_TAU anywhere else in (8e-4, 0.2)
+    fails this equality. The neighbours of 1e-3 do not square to 1e-6.
+    """
+
+    gate = capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    assert 8.0e-4 < gate < 0.2
+    assert gate * gate == 1.0e-6
+
+
+def test_y_dependent_source_inside_the_gate_follows_the_ode():
+    """A composition-dependent source inside the gate is not frozen.
+
+    Equal molar mass, so the pipe outflow does not depend on y and
+    P* stays put while the species partials move. The independent
+    ODE is y = 1/2 + (y0 − 1/2) exp(−2 t/τ). The pin is 1e-6 Pa,
+    tighter than the frozen exponential's error and looser than
+    Radau's 1e-7 Pa species tolerance.
+
+    Mutation: deleting the species end check publishes
+    frozen_composition and misses the ODE. Returning None from that
+    check admits the fast root on the total pressure and publishes
+    the equilibrium split, which misses the ODE by pascals.
+    """
+
+    temperature_K = _FROZEN_T_K
+    downstream_pa = _FROZEN_DOWNSTREAM_PA
+    mass = 0.032
+    masses = {"A": mass, "B": mass}
+    root_pa = downstream_pa + _FROZEN_OFFSET_PA
+    y0 = 0.9
+    fractions = {"A": y0, "B": 1.0 - y0}
+    n_star = _moles_at_pressure(root_pa, fractions, temperature_K)
+    s_total = _pipe_mol_s_at(
+        root_pa, n_star, temperature_K, masses, downstream_pa,
+    )
+    other = _moles_at_pressure(
+        root_pa, {"A": 0.2, "B": 0.8}, temperature_K,
+    )
+    other_flow = _pipe_mol_s_at(
+        root_pa, other, temperature_K, masses, downstream_pa,
+    )
+    assert s_total > 0.0
+    assert other_flow == pytest.approx(s_total, rel=1.0e-12)
+    tau = math.fsum(n_star.values()) / s_total
+    ratio = 9.9e-4
+    assert ratio < capacity_coupling._FROZEN_COMPOSITION_MAX_DT_OVER_TAU
+    dt_s = tau * ratio
+    decay = math.exp(-ratio)
+    y_frozen = y0 * decay + (1.0 - y0) * (1.0 - decay)
+    y_ode = 0.5 + (y0 - 0.5) * math.exp(-2.0 * ratio)
+    frozen_pa = y_frozen * root_pa
+    ode_pa = y_ode * root_pa
+    assert abs(frozen_pa - ode_pa) > 1.0e-6
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        total = math.fsum(float(partials.get(name, 0.0)) for name in masses)
+        y_a = 0.0 if total <= 0.0 else float(partials.get("A", 0.0)) / total
+        # s_A = S (1 − y_A), s_B = S y_A. kg/h = (mol/s) · (kg/mol) · 3600.
+        return {
+            "A": s_total * (1.0 - y_a) * mass * 3600.0,
+            "B": s_total * y_a * mass * 3600.0,
+        }
+
+    holder: dict = {}
+
+    def storing(partials, rates=flux, store=holder):
+        gross = rates(partials)
+        store["gross_kg_hr"] = dict(gross)
+        return gross
+
+    result = _as_result(solve_capacity_shadow(
+        pre_holdup_mol=n_star,
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=storing,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        extent_holder=holder,
+    ))
+    assert holder["_balance_terms"]["path"] != "frozen_composition"
+    assert _frozen_notices(result) == []
+    assert result.partial_pressures_Pa["A"] == pytest.approx(ode_pa, abs=1.0e-6)
+    assert abs(result.partial_pressures_Pa["A"] - frozen_pa) > 1.0e-6

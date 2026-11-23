@@ -5307,7 +5307,10 @@ def _frozen_composition_hour(
     G_i = gross_i dt and R_i = S_i dt, split across the same two
     intervals. Re-solve P* at the end fractions. A move past
     1e-6 Pa means s(y) left the frozen root, and this hour is
-    not the shortcut.
+    not the shortcut. A fixed P* is not a species check. s_i(y_end)
+    is read at that same P*. The mole error of a linear drift is
+    |Δs_i| t_rem / 2, compared with the Radau per-species tolerance.
+    A larger bound is the reduced ODE or Radau, not this shortcut.
 
     Unit check: mol/s · s = mol, and Pa·m³ / (J/(mol·K)·K) = mol.
     dt/tau is dimensionless.
@@ -5459,6 +5462,66 @@ def _frozen_composition_hour(
         return None
     if not math.isfinite(composition_time) or composition_time <= 0.0:
         return None
+    # Species bound. Σ s can stay fixed while s_i(y) moves, and then
+    # P* does not move. The total-pressure re-solve above cannot see
+    # that error.
+    #
+    # Premise: on the manifold Q(P*) = Σ s. The frozen hour holds
+    # s_i at the opening composition. The source error is
+    # δs_i(t) = s_i(y(t)) − s_i(y_start). While dt/τ ≪ 1 the
+    # integrating factor of the composition mode is about 1, so the
+    # mole error is ∫ δs_i dt. A linear drift from 0 to
+    # Δs_i = s_i(y_end) − s_i(y_start) over t_rem integrates to
+    # Δs_i · t_rem / 2. The fast sliver flushes total moles at the
+    # frozen opening source and does not add a composition error.
+    # s_i(y_end) is evaluated at this opening P*, the pressure the
+    # frozen integral used, not at the end re-solve.
+    #
+    # Algebra: n_err,i = |Δs_i| · t_rem / 2,
+    # bound_Pa = n_err,i · R · T / V.
+    # When |∂s/∂y| is order s and |Δy| is order t/τ, |Δs| is order
+    # s·(t/τ) and n_err is order n·(t/τ)^2 / 2. At dt/τ = 9.9e-4
+    # and an 18 Pa partial that is about 7.8e-6 Pa.
+    #
+    # Unit check: (mol/s)·s = mol, and mol·R·T/V = Pa.
+    # Limit: Δs_i = 0 leaves the bound at 0, so a source that does
+    # not depend on composition stays on this shortcut. An a-priori
+    # (dt/τ)^2 · P* bound would not: (8e-4)^2 · 20 Pa is about
+    # 1.3e-5 Pa, above the species tolerance, and the constant-s
+    # hour inside the gate has to stay frozen.
+    #
+    # The tolerance is Radau's per-species test, in pressure:
+    # _SLOW_ATOL_PA + _SLOW_RTOL · |P_i|. The local test is
+    # rtol·|n_i| + atol_i with atol_i = _SLOW_ATOL_PA · V / (R T).
+    # A total-pressure comparison is not that test. _SLOW_ATOL_PA
+    # is one tenth of the 1e-6 Pa floor.
+    #
+    # A bound past that tolerance is not this shortcut. Returning
+    # None would mark fast_root, and the mixture admission accepts a
+    # total-pressure gap inside 1e-6 Pa with no composition check.
+    # A y-dependent source on the manifold has that gap, so the fast
+    # root would publish the equilibrium split. The bound is the
+    # reduced ODE or Radau. _slow_converge integrates
+    # dn_i/dt = q_i + S_i − Q_i and does not call this hour.
+    try:
+        with _DiagnosticLawSample(law):
+            end_inflow, _end_redox, _end_gross = _manifold_rates(
+                law,
+                end_fractions,
+                float(root),
+                counted=False,
+            )
+    except _BalanceRefused as refused:
+        _refuse_unless_work_or_roots(refused)
+        return None
+    for name in law.species:
+        delta_s = abs(float(end_inflow[name]) - float(inflow[name]))
+        mole_err = delta_s * t_rem / 2.0
+        bound_pa = mole_err * pa_per_mol
+        partial_pa = abs(float(end_fractions[name]) * float(root))
+        tol = _SLOW_ATOL_PA + _SLOW_RTOL * partial_pa
+        if not math.isfinite(bound_pa) or bound_pa > tol:
+            return _slow_converge(law, n0, dt_s)
     law._remember_species_notices((
         {
             "species": "headspace",
