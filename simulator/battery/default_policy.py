@@ -13,7 +13,12 @@ from typing import Mapping
 
 import yaml
 
-from simulator.battery.enums import DEFAULT_POLICY_NOTICE_KINDS, NoticeKind, Phase
+from simulator.battery.enums import (
+    DEFAULT_POLICY_NOTICE_KINDS,
+    MethodToken,
+    NoticeKind,
+    Phase,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -149,6 +154,14 @@ def _resolved_value(
             return Phase(inferred_phase).value
         except ValueError as exc:
             raise ValueError("DP-016 inferred_phase is not a phase token") from exc
+    if policy_id == "DP-107":
+        inferred_method = context.get("inferred_method")
+        if not isinstance(inferred_method, str):
+            raise ValueError("DP-107 requires the owning inferred_method result")
+        try:
+            return MethodToken(inferred_method).value
+        except ValueError as exc:
+            raise ValueError("DP-107 inferred_method is not a method token") from exc
     if policy_id == "DP-007":
         from simulator.state import MeltState
 
@@ -283,7 +296,7 @@ def append_proposal(
     policy_id = next(
         (
             f"DP-{number:03d}"
-            for number in range(100, 200)
+            for number in range(108, 200)
             if f"DP-{number:03d}" not in existing_ids
         ),
         None,

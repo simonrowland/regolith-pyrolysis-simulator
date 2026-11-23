@@ -11,14 +11,14 @@ from simulator.battery.default_policy import append_proposal, load_policy_table,
 from simulator.battery.enums import (
     DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
     ResidualStatus,
 )
-from simulator.battery.records import Notice, NoticePolicy
 from simulator.battery.migrate import to_plain
-from simulator.battery.records import union_notices
+from simulator.battery.records import Notice, NoticePolicy, union_notices
 from simulator.battery.score import (
     _headline_payload_admits,
     _flagged_payload_strata,
@@ -46,6 +46,7 @@ EXPECTED_POLICY_FLAGS = {
     "composition_from_run_siblings",
     "composition_from_analysed_phase",
     "method_unstated",
+    "method_inferred",
 }
 
 
@@ -54,8 +55,9 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
     assert load_policy_table() is policies
     assert set(policies) == {
         *(f"DP-{number:03d}" for number in range(1, 20)),
-        "DP-100",
         "DP-101",
+        "DP-106",
+        "DP-107",
     }
 
     required = {
@@ -91,11 +93,18 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "superseded by DP-001/DP-019 by method"
             )
             assert entry["history"]
-        elif policy_id == "DP-100":
+        elif policy_id == "DP-106":
             assert entry["status"] == "proposed"
             assert entry["proposed_by"] == "w1122cvmq"
             assert entry["value"] == "unspecified"
             assert entry["flag"] == "method_unstated"
+        elif policy_id == "DP-107":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1123cvmq2"
+            assert entry["formula_owner"] == (
+                "simulator.battery.migrate._method_inference_from_evidence"
+            )
+            assert entry["flag"] == "method_inferred"
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -157,6 +166,20 @@ def test_phase_policy_uses_only_the_migrators_closed_phase_result() -> None:
         resolve("DP-016")
     with pytest.raises(ValueError, match="not a phase token"):
         resolve("DP-016", inferred_phase="unknown-phase")
+
+
+def test_method_inferred_policy_uses_only_the_migrators_closed_method_result() -> None:
+    for method in MethodToken:
+        resolved = resolve("DP-107", inferred_method=method.value)
+        policy = NoticePolicy(**resolved.payload["policy"])
+        assert resolved.value == method.value
+        assert resolved.flag is NoticeKind.METHOD_INFERRED
+        assert policy.value == method.value
+
+    with pytest.raises(ValueError, match="owning inferred_method result"):
+        resolve("DP-107")
+    with pytest.raises(ValueError, match="not a method token"):
+        resolve("DP-107", inferred_method="unknown-method")
 
 
 def test_method_implied_notice_requires_policy_metadata() -> None:
@@ -304,7 +327,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture row and source"],
     )
-    assert policy_id == "DP-100"
+    assert policy_id == "DP-108"
     resolved = resolve(policy_id)
     assert resolved.payload["policy_status"] == "proposed"
     assert resolved.payload["policy_id"] == policy_id
@@ -409,6 +432,50 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         flagged_stratum_payloads([flagless_row], [Engine.INTERNAL_ANALYTICAL])
 
 
+def test_method_inferred_payload_without_policy_is_rejected_by_headline_census() -> None:
+    policy = resolve(
+        "DP-107", inferred_method=MethodToken.ELECTRON_MICROPROBE.value
+    )
+    notice = Notice(
+        kind=NoticeKind.METHOD_INFERRED,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="method_inferred: value=electron_microprobe",
+        origin="method-inferred-fixture",
+        policy=NoticePolicy(**policy.payload["policy"]),
+    )
+    row = {
+        "reference": "method-inferred-fixture",
+        "rail": "vapour",
+        "candidate_request": {"engine": Engine.INTERNAL_ANALYTICAL.value},
+        "status": "no_band",
+        "numeric": {"operation": "dex", "value": "0.25"},
+        "exclusions": [],
+        "notices": [to_plain(notice)],
+    }
+    row["notices"][0]["policy"] = None
+
+    with pytest.raises(
+        ValueError, match="method_inferred notice requires policy metadata"
+    ):
+        _headline_payload_admits(row, tier="all-numeric")
+    with pytest.raises(
+        ValueError, match="method_inferred notice requires policy metadata"
+    ):
+        flagged_stratum_payloads([row], [Engine.INTERNAL_ANALYTICAL])
+
+    typed_notice_without_policy = replace(notice, policy=None)
+    residual = F.residual(
+        "method-inferred-without-policy",
+        "method-inferred-fixture",
+        status=ResidualStatus.MATCH,
+        notices=(typed_notice_without_policy,),
+    )
+    with pytest.raises(
+        ValueError, match="method_inferred notice requires policy metadata"
+    ):
+        flagged_stratum_rows((residual,), engines=(Engine.NASA_CEA_9,))
+
+
 def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
     tmp_path, monkeypatch
 ) -> None:
@@ -432,16 +499,16 @@ def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
         proposed_by="test-dispatch",
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture"],
-    ) == "DP-100"
+    ) == "DP-108"
     assert append_proposal(
         proposal,
         proposed_by="test-dispatch",
         proposed_at="2026-11-23T00:00:00+00:00",
         evidence=["fixture"],
-    ) == "DP-102"
+    ) == "DP-109"
     with pytest.raises(ValueError, match="already exists"):
         append_proposal(
-            {**proposal, "id": "DP-100"},
+            {**proposal, "id": "DP-108"},
             proposed_by="test-dispatch",
             proposed_at="2026-11-23T00:00:00+00:00",
             evidence=["fixture"],

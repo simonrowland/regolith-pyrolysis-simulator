@@ -1634,6 +1634,7 @@ def test_plante_kems_pressure_envelope_does_not_enter_clean_band_when_phase_infe
     from simulator.battery.enums import NoticeKind, Quantity
     from simulator.battery.score import (
         _printed_uncertainty_band,
+        _printed_pressure_uncertainty_dex,
         derive_kems_partial_pressure_band,
         point_magnitude,
     )
@@ -1655,6 +1656,32 @@ def test_plante_kems_pressure_envelope_does_not_enter_clean_band_when_phase_infe
     )
     assert band is None
     assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in observation.notices)
+    expected_width = Decimal("0.1461280356782380259259551535")
+    assert _printed_pressure_uncertainty_dex(observation) == expected_width
+
+    phase_cleared_observations = {
+        observation_id: replace(
+            row,
+            notices=tuple(
+                notice
+                for notice in row.notices
+                if notice.kind is not NoticeKind.PHASE_INFERRED
+            ),
+        )
+        for observation_id, row in observations.items()
+    }
+    printed_band = derive_kems_partial_pressure_band(
+        phase_cleared_observations,
+        experiments,
+        benches=plante.benches,
+    )
+    assert printed_band is not None
+    assert printed_band.value == expected_width
+    assert "Plante width log10(1.40)" in printed_band.rule
+    assert "printed page-280 1500 K sentence" in printed_band.rule
+    assert "[1/1.40, 1.40] (-28.6%..+40%)" in printed_band.rule
+    assert "not a symmetric +/-40% relative band" in printed_band.rule
+    assert "single 1500 K figure is applied across the tabulated T range" in printed_band.rule
 
     printed = _printed_uncertainty_band(
         Quantity.P_PARTIAL,
@@ -9288,6 +9315,7 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     from simulator.battery.records import ResidualRefusal
     from simulator.battery.records import NoticePolicy
     from simulator.battery.score import (
+        _headline_payload_admits,
         _flagged_payload_strata,
         dumps_residual_line,
         flagged_strata,
@@ -9354,7 +9382,7 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
             numeric=ResidualNumeric(MetricOperation.DEX, unit, Decimal(value), band),
         )
 
-    method_entry = load_policy_table()["DP-100"]
+    method_entry = load_policy_table()["DP-106"]
     proposed_method_policy = {
         "id": method_entry["id"],
         "version": method_entry["version"],
@@ -9382,6 +9410,11 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
         NoticeKind.METHOD_UNSTATED.value,
         "proposed-policy",
     )
+    assert not _headline_payload_admits(serialized_proposed, tier="all-numeric")
+    method_notice_removed = json.loads(
+        dumps_residual_line(replace(measured(2, "10"), notices=()))
+    )
+    assert _headline_payload_admits(method_notice_removed, tier="all-numeric")
 
     assert flagged_strata((flagged_notice,)) == (NoticeKind.PHASE_INFERRED.value,)
     serialized_flagged = json.loads(

@@ -10,7 +10,13 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
-from simulator.battery.enums import EvidenceClass, IdentityEqualKind, Quantity
+from simulator.battery.enums import (
+    EvidenceClass,
+    IdentityEqualKind,
+    MethodToken,
+    NoticeKind,
+    Quantity,
+)
 from simulator.battery.identity import identity_equal
 from tests.battery.factories import migrate_one_extract
 
@@ -233,6 +239,17 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             key=lambda record: record.identity.temperature_K.value,
         )
         assert len(migrated) == len(source_points) == 15
+        assert all(
+            result.experiments[record.experiment_id].method.is_value
+            and result.experiments[record.experiment_id].method.value
+            is MethodToken.KNUDSEN_EFFUSION
+            for record in migrated
+        )
+        assert all(
+            notice.kind is not NoticeKind.METHOD_INFERRED
+            for record in migrated
+            for notice in record.notices
+        )
         reference = migrated[0].identity.reference_state.value
         assert reference.convention.value == "raoultian_pure_endmember"
         assert reference.endmember.formula == formula

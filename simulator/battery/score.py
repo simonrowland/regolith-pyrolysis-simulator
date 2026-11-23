@@ -23056,6 +23056,10 @@ def _policies_for_stratum(
         if isinstance(notice, Notice):
             policy = notice.policy
             if policy is None:
+                if notice.kind is NoticeKind.METHOD_INFERRED:
+                    raise ValueError(
+                        "method_inferred notice requires policy metadata"
+                    )
                 continue
             if (
                 notice.kind.value == stratum
@@ -24392,6 +24396,11 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         if isinstance(notice, Mapping)
     )
     for notice in raw_notices:
+        if (
+            notice.get("kind") == NoticeKind.METHOD_INFERRED.value
+            and notice.get("policy") is None
+        ):
+            raise ValueError("method_inferred notice requires policy metadata")
         if (
             notice.get("policy") is not None
             and notice.get("kind") not in _DEFAULT_POLICY_FLAG_VALUES

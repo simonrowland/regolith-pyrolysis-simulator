@@ -76,7 +76,7 @@ def test_unstated_method_is_a_flagged_unspecified_token_not_a_queue_entry(
     assert "default=unspecified" in method_notice.reason
     assert "original_reason=source does not state method" in method_notice.reason
     assert method_notice.policy is not None
-    method_policy = resolve("DP-100")
+    method_policy = resolve("DP-106")
     assert method_notice.policy == NoticePolicy(**method_policy.payload["policy"])
     assert "policy_id" not in method_notice.reason
     assert "policy_version" not in method_notice.reason
@@ -95,6 +95,7 @@ def test_unstated_method_is_a_flagged_unspecified_token_not_a_queue_entry(
     assert flagged_strata(observation.notices) == (
         NoticeKind.METHOD_UNSTATED.value,
         NoticeKind.PHASE_INFERRED.value,
+        "proposed-policy",
     )
     assert not any(
         "method" in entry.axes and entry.observation_id == observation.observation_id
@@ -127,8 +128,13 @@ def test_printed_electron_microprobe_regime_is_inferred_and_flagged(
     assert len(inferred) == 1
     assert "electron microprobe analysis" in inferred[0].reason
     assert "original_reason=" in inferred[0].reason
+    inferred_policy = resolve(
+        "DP-107", inferred_method=MethodToken.ELECTRON_MICROPROBE.value
+    )
+    assert inferred[0].policy == NoticePolicy(**inferred_policy.payload["policy"])
     assert flagged_strata(observation.notices) == (
         NoticeKind.METHOD_INFERRED.value,
+        "proposed-policy",
     )
     assert not any(
         "method" in entry.axes and entry.observation_id == observation.observation_id
@@ -148,13 +154,15 @@ def test_calorimetry_table_method_is_inferred_and_flagged(tmp_path: Path) -> Non
 
     assert experiment.method.is_value
     assert experiment.method.value is MethodToken.CALORIMETRY
-    assert any(
-        notice.kind is NoticeKind.METHOD_INFERRED
-        for notice in observation.notices
+    method_notice = next(
+        notice for notice in observation.notices
+        if notice.kind is NoticeKind.METHOD_INFERRED
     )
+    inferred_policy = resolve("DP-107", inferred_method=MethodToken.CALORIMETRY.value)
+    assert method_notice.policy == NoticePolicy(**inferred_policy.payload["policy"])
 
 
-def test_knudsen_cell_in_source_citation_infers_method(tmp_path: Path) -> None:
+def test_knudsen_cell_in_source_citation_does_not_infer_method(tmp_path: Path) -> None:
     extract = _scalar_fixture_extract()
     extract["source"]["citation"] = "Knudsen cell measurements of oxide vapours"
     raw = extract["species"]["Na"]["observations"][0]
@@ -174,12 +182,51 @@ def test_knudsen_cell_in_source_citation_infers_method(tmp_path: Path) -> None:
     assert len(observations) == 2
     assert all(
         result.experiments[observation.experiment_id].method.value
-        is MethodToken.KNUDSEN_EFFUSION
+        is MethodToken.UNSPECIFIED
         for observation in observations
     )
     assert all(
-        any(notice.kind is NoticeKind.METHOD_INFERRED for notice in observation.notices)
+        any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in observation.notices)
         for observation in observations
+    )
+    assert all(
+        next(
+            notice for notice in observation.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+        ).policy == NoticePolicy(**resolve("DP-106").payload["policy"])
+        for observation in observations
+    )
+    assert not any(
+        notice.kind is NoticeKind.METHOD_INFERRED
+        for observation in observations
+        for notice in observation.notices
+    )
+
+
+def test_pending_cacl2_method_stays_unspecified_when_citation_names_two_methods(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "pending-cacl2-kems-or-transpiration.yaml"
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if "anchor_CaCl2_pure_Psat" in row.observation_id
+    )
+    experiment = result.experiments[observation.experiment_id]
+
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.UNSPECIFIED
+    method_notice = next(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.METHOD_UNSTATED
+    )
+    assert method_notice.policy == NoticePolicy(**resolve("DP-106").payload["policy"])
+    assert not any(
+        entry.observation_id == observation.observation_id and "method" in entry.axes
+        for entry in result.queue
     )
 
 
@@ -393,7 +440,7 @@ def test_added_phase_spellings_have_single_closed_phases() -> None:
     assert phase_for_sample_form("condensed") is None
 
 
-def test_willenborg_activity_uses_liquid_phase_only_with_melt_evidence(
+def test_willenborg_activity_assemblages_do_not_fix_liquid_phase(
     tmp_path: Path,
 ) -> None:
     name = "willenborg-2006-alkali-removal-thermodynamics.yaml"
@@ -426,18 +473,33 @@ def test_willenborg_activity_uses_liquid_phase_only_with_melt_evidence(
         )
         for row in original_rows
     ]
-    assert all(row.identity.species.phase.value is Phase.L for row in original_rows), (
-        phase_facts
-    )
+    assert all(
+        row.identity.species.phase.value is Phase.UNSPECIFIED for row in original_rows
+    ), phase_facts
     assert all(
         any(notice.kind is NoticeKind.PHASE_INFERRED for notice in row.notices)
         for row in original_rows
     )
+    phase_policy = resolve("DP-016", inferred_phase=Phase.UNSPECIFIED.value)
+    assert all(
+        next(
+            notice for notice in row.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        ).policy == NoticePolicy(**phase_policy.payload["policy"])
+        for row in original_rows
+    )
 
     mutated = deepcopy(extract)
-    for row in mutated["species"]["Na2O"]["observations"]:
-        if row["observation_id"] == "willenborg_2006_alsi8na1_na2o_activity_1400":
-            row["note"] = "The analyzed sample includes mullite and cristobalite."
+    rows_by_id = {
+        row["observation_id"]: row
+        for row in mutated["species"]["Na2O"]["observations"]
+    }
+    rows_by_id[
+        "willenborg_2006_alsi8na1_na2o_activity_1400"
+    ]["note"] = "The analyzed sample was partly molten."
+    rows_by_id[
+        "willenborg_2006_alsi8mg8na1_na2o_activity_1400"
+    ]["note"] = "The analyzed sample contains mullite and cristobalite."
     changed = _migrate_real_extract(
         tmp_path / "mutated", name, extract_doc=mutated
     )
@@ -456,9 +518,7 @@ def test_willenborg_activity_uses_liquid_phase_only_with_melt_evidence(
             "willenborg_2006_alsi8mg8na1_na2o_activity_1400",
         )
     }
-    assert changed_by_id[
-        "willenborg_2006_alsi8na1_na2o_activity_1400"
-    ].identity.species.phase.value is Phase.UNSPECIFIED
-    assert changed_by_id[
-        "willenborg_2006_alsi8mg8na1_na2o_activity_1400"
-    ].identity.species.phase.value is Phase.L
+    assert all(
+        row.identity.species.phase.value is Phase.UNSPECIFIED
+        for row in changed_by_id.values()
+    )

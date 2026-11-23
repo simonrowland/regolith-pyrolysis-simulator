@@ -10718,10 +10718,17 @@ def _phase_inference_from_evidence(
             return Phase.L, f"source labels the liquid side of {phase_raw!r}: {source_text}"
         if re.search(r"\b(?:crystal|solid)\s+side\b|\bbelow\s+(?:the\s+)?(?:melting|liquidus)", lowered):
             return Phase.CR, f"source labels the crystal side of {phase_raw!r}: {source_text}"
-    # A component activity described in a melt names the liquid matrix phase;
-    # the phase stays liquid even when source text says the bulk sample is only partly molten.
-    if quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT} and re.search(
-        r"\b(?:melts?|molten|liquid|slags?)\b", lowered
+    partial_melt_or_crystal_assemblage = (
+        re.search(r"\b(?:partly|partially)\s+molten\b", lowered)
+        or re.search(
+            r"\b(?:mullite\b.*\bcristobalite|cristobalite\b.*\bmullite)\b",
+            lowered,
+        )
+    )
+    if (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and not partial_melt_or_crystal_assemblage
+        and re.search(r"\b(?:melts?|molten|liquid|slags?)\b", lowered)
     ):
         return Phase.L, f"source describes the activity sample as a melt: {source_text}"
     if (
@@ -13684,6 +13691,7 @@ def _method_inference_notice(
     quantity: Quantity | None,
     origin: str,
 ) -> Notice:
+    policy_resolution = resolve_default_policy("DP-107", inferred_method=method.value)
     return Notice(
         kind=NoticeKind.METHOD_INFERRED,
         affected_quantities=(() if quantity is None else (quantity,)),
@@ -13692,6 +13700,7 @@ def _method_inference_notice(
             f"original_reason={original_reason}"
         ),
         origin=origin,
+        policy=NoticePolicy(**policy_resolution.payload["policy"]),
     )
 
 
@@ -25751,6 +25760,105 @@ class Migrator:
                     )
         return known, tuple(provenance)
 
+    def _resolve_method_for_observation(
+        self,
+        *,
+        observation_id: str,
+        experiment_id: str,
+        method: State[MethodToken],
+        method_raw: object,
+        evidence_candidates: tuple[object, ...],
+        quantity: Quantity | None,
+        work_id: str,
+        locator: Locator,
+        source_key: str,
+        queue_if_unresolved: bool,
+    ) -> tuple[State[MethodToken], Notice | None]:
+        experiment = self.result.experiments.get(experiment_id)
+        if experiment is None:
+            return method, None
+
+        if (
+            method.is_unknown
+            and method_raw in (None, "")
+            and experiment.method.is_value
+            and experiment.method.value is not MethodToken.UNSPECIFIED
+        ):
+            method = experiment.method
+
+        method_notice: Notice | None = None
+        method_was_unspecified = (
+            method.is_value and method.value is MethodToken.UNSPECIFIED
+        )
+        if method.is_unknown:
+            method_evidence = _method_inference_from_evidence(
+                method_raw,
+                *evidence_candidates,
+                experiment.method.reason
+                if experiment.method.is_unknown
+                else None,
+            )
+            if method_evidence is not None:
+                method_token, evidence = method_evidence
+                original_reason = (
+                    method.reason or "source does not state method"
+                )
+                self._inferred_method_evidence_by_experiment[experiment_id] = (
+                    method_token,
+                    evidence,
+                    original_reason,
+                )
+                method = State.of(method_token)
+            elif _is_unstated_method_reason(method.reason):
+                method_was_unspecified = True
+            elif queue_if_unresolved:
+                self.result.add_queue(
+                    work_id,
+                    locator,
+                    ["method"],
+                    method.reason or "unknown method",
+                    source=source_key,
+                    observation_id=observation_id,
+                )
+        if method_was_unspecified:
+            original_reason = method.reason or "source does not state method"
+            policy_resolution = resolve_default_policy("DP-106")
+            method = State.of(MethodToken(str(policy_resolution.value)))
+            method_notice = Notice(
+                kind=policy_resolution.flag,
+                affected_quantities=(() if quantity is None else (quantity,)),
+                reason=(
+                    f"method_unstated: default={method.value.value}; "
+                    f"original_reason={original_reason}"
+                ),
+                origin=observation_id,
+                policy=NoticePolicy(**policy_resolution.payload["policy"]),
+            )
+        elif method.is_value:
+            inferred = self._inferred_method_evidence_by_experiment.get(
+                experiment_id
+            )
+            if inferred is not None and inferred[0] is method.value:
+                method_notice = _method_inference_notice(
+                    inferred[0],
+                    inferred[1],
+                    inferred[2],
+                    quantity,
+                    observation_id,
+                )
+
+        if method.is_value and (
+            experiment.method.is_unknown
+            or (
+                experiment.method.is_value
+                and experiment.method.value is MethodToken.UNSPECIFIED
+            )
+        ):
+            self.result.experiments[experiment_id] = replace(
+                experiment, method=method
+            )
+        return method, method_notice
+
     def _add_observation(
         self,
         observation: Observation,
@@ -25814,71 +25922,8 @@ class Migrator:
                 source=source_key,
                 observation_id=observation.observation_id,
             )
-        method_default_reason: str | None = None
-        method_default_policy = None
-        method_inference_notice: Notice | None = None
-        if experiment is not None and experiment.method.is_unknown:
-            work = self.result.works.get(experiment.work_id or "")
-            original_reason = (
-                experiment.method.reason or "source does not state method"
-            )
-            inference = _method_inference_from_evidence(
-                experiment.method.reason,
-                work.citation if work is not None else None,
-            )
-            if inference is not None:
-                method, evidence = inference
-                self._inferred_method_evidence_by_experiment[
-                    observation.experiment_id
-                ] = (method, evidence, original_reason)
-                experiment = replace(experiment, method=State.of(method))
-                self.result.experiments[observation.experiment_id] = experiment
-                quantity = (
-                    identity.quantity.value
-                    if isinstance(identity, Identity) and identity.quantity.is_value
-                    else None
-                )
-                method_inference_notice = _method_inference_notice(
-                    method,
-                    evidence,
-                    original_reason,
-                    quantity if isinstance(quantity, Quantity) else None,
-                    observation.observation_id,
-                )
-            elif _is_unstated_method_reason(experiment.method.reason):
-                # No technique is reported, so "unspecified" asserts no
-                # apparatus condition; DP-100 records that physical basis.
-                method_default_reason = (
-                    experiment.method.reason or "source does not state method"
-                )
-                method_default_policy = resolve_default_policy("DP-100")
-                method_token = MethodToken(str(method_default_policy.value))
-                experiment = replace(
-                    experiment,
-                    method=State.of(method_token),
-                )
-                self.result.experiments[observation.experiment_id] = experiment
-        elif experiment is not None and experiment.method.is_value:
-            inferred = self._inferred_method_evidence_by_experiment.get(
-                observation.experiment_id
-            )
-            if inferred is not None and inferred[0] is experiment.method.value:
-                method_inference_notice = _method_inference_notice(
-                    inferred[0],
-                    inferred[1],
-                    inferred[2],
-                    identity.quantity.value
-                    if isinstance(identity, Identity)
-                    and identity.quantity.is_value
-                    else None,
-                    observation.observation_id,
-                )
-            if experiment.method.value is MethodToken.UNSPECIFIED:
-                method_default_reason = "source does not state method"
         if (
             experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.UNSPECIFIED
             and not any(
                 notice.kind
                 in {NoticeKind.METHOD_UNSTATED, NoticeKind.METHOD_INFERRED}
@@ -25890,28 +25935,22 @@ class Migrator:
                 if isinstance(identity, Identity) and identity.quantity.is_value
                 else None
             )
-            if method_default_policy is None:
-                method_default_policy = resolve_default_policy("DP-100")
-            method_token = MethodToken(str(method_default_policy.value))
-            observation_notices.append(
-                Notice(
-                    kind=method_default_policy.flag,
-                    affected_quantities=(
-                        (quantity,) if isinstance(quantity, Quantity) else ()
-                    ),
-                    reason=(
-                        f"method_unstated: default={method_token.value}; "
-                        f"original_reason={method_default_reason or 'source does not state method'}"
-                    ),
-                    origin=observation.observation_id,
-                    policy=NoticePolicy(**method_default_policy.payload["policy"]),
-                )
+            _method, method_notice = self._resolve_method_for_observation(
+                observation_id=observation.observation_id,
+                experiment_id=observation.experiment_id,
+                method=experiment.method,
+                method_raw=None,
+                evidence_candidates=(),
+                quantity=quantity if isinstance(quantity, Quantity) else None,
+                work_id=experiment.work_id
+                or observation.experiment_id.split("::", 1)[0],
+                locator=observation.locator,
+                source_key=source_key,
+                queue_if_unresolved=False,
             )
-        if method_inference_notice is not None and not any(
-            notice.kind is NoticeKind.METHOD_INFERRED
-            for notice in observation_notices
-        ):
-            observation_notices.append(method_inference_notice)
+            if method_notice is not None:
+                observation_notices.append(method_notice)
+            experiment = self.result.experiments.get(observation.experiment_id)
         if identity is not observation.identity or tuple(observation_notices) != observation.notices:
             observation = replace(
                 observation,
@@ -27445,20 +27484,6 @@ class Migrator:
                 transition_temperature_K=transition_temperature_K,
                 liquidus_temperature_K=liquidus_temperature_K,
             )
-            if (
-                phase_inference is None
-                and source_id == "willenborg-2006-alkali-removal-thermodynamics"
-                and raw_obs_id == "willenborg_2006_alsi8mg8na1_na2o_activity_1400"
-                and q_token is Quantity.ACTIVITY
-            ):
-                # Published p. 2597 ties this Figure 9 activity to
-                # depolymerization of the liquid network. A component activity
-                # in that matrix is liquid even when crystals coexist.
-                phase_inference = (
-                    Phase.L,
-                    "Willenborg et al. (2006), physical p. 5, Figure 9 discussion: "
-                    "magnesia depolymerizes the liquid network",
-                )
             if phase_inference is None and phase_resolution_evidence is not None:
                 phase_inference = (
                     phase.value if phase.is_value else Phase.UNSPECIFIED,
@@ -28541,85 +28566,29 @@ class Migrator:
         if "regime" not in obs:
             method_raw = values.get("method")
         method = map_method(method_raw)
-        experiment = self.result.experiments.get(experiment_id)
-        method_flag_notice: Notice | None = None
         quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
-        if (
-            method.is_unknown
-            and method_raw in (None, "")
-            and experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is not MethodToken.UNSPECIFIED
-        ):
-            method = experiment.method
-            inferred = self._inferred_method_evidence_by_experiment.get(experiment_id)
-            if inferred is not None and inferred[0] is method.value:
-                method_flag_notice = _method_inference_notice(
-                    inferred[0],
-                    inferred[1],
-                    inferred[2],
-                    quantity_for_notice,
-                    obs_id,
-                )
-        if method.is_unknown:
-            work_record = self.result.works.get(work.work_id)
-            method_inference = _method_inference_from_evidence(
-                method_raw,
+        method, _ = self._resolve_method_for_observation(
+            observation_id=obs_id,
+            experiment_id=experiment_id,
+            method=method,
+            method_raw=method_raw,
+            evidence_candidates=(
                 obs.get("method_as_printed"),
                 values.get("method_as_printed"),
                 values.get("method_text"),
                 values.get("table_type"),
                 obs.get("note"),
                 values.get("note"),
-                experiment.method.reason
-                if experiment is not None and experiment.method.is_unknown
-                else None,
-                work_record.citation if work_record is not None else None,
-            )
-            if method_inference is not None:
-                method_token, method_evidence = method_inference
-                original_method_reason = (
-                    method.reason or "source does not state method"
-                )
-                self._inferred_method_evidence_by_experiment[experiment_id] = (
-                    method_token,
-                    method_evidence,
-                    original_method_reason,
-                )
-                method = State.of(method_token)
-                method_flag_notice = _method_inference_notice(
-                    method_token,
-                    method_evidence,
-                    original_method_reason,
-                    quantity_for_notice,
-                    obs_id,
-                )
-            elif not _is_unstated_method_reason(method.reason):
-                self.result.add_queue(
-                    work.work_id,
-                    locator,
-                    ["method"],
-                    method.reason or "unknown method",
-                    source=source_key,
-                    observation_id=obs_id,
-                )
-        if (
-            experiment is not None
-            and method.is_value
-            and (
-                experiment.method.is_unknown
-                or (
-                    experiment.method.is_value
-                    and experiment.method.value is MethodToken.UNSPECIFIED
-                )
-            )
-        ):
-            experiment = replace(experiment, method=method)
-            self.result.experiments[experiment_id] = experiment
-        migration_axis_notices = tuple(
-            notice
-            for notice in (phase_flag_notice, method_flag_notice)
-            if notice is not None
+            ),
+            quantity=quantity_for_notice,
+            work_id=work.work_id,
+            locator=locator,
+            source_key=source_key,
+            queue_if_unresolved=True,
+        )
+        experiment = self.result.experiments.get(experiment_id)
+        migration_axis_notices = (
+            () if phase_flag_notice is None else (phase_flag_notice,)
         )
         effective_method = (
             method

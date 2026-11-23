@@ -5880,7 +5880,7 @@ def test_langmuir_printed_derived_from_is_flagged_verbatim(tmp_path: Path) -> No
     _assert_printed_lineage_flagged(result, printed, "derived_from")
 
 
-def test_g02_kems_citation_infers_effusion_when_row_method_is_absent(
+def test_g02_kems_citation_does_not_infer_effusion_when_row_method_is_absent(
     tmp_path: Path,
 ) -> None:
     root = _write_min_tree(tmp_path)
@@ -5913,8 +5913,14 @@ def test_g02_kems_citation_infers_effusion_when_row_method_is_absent(
     obs = result.observations["kems_no_method"]
     exp = result.experiments[obs.experiment_id]
     assert exp.method.is_value
-    assert exp.method.value is MethodToken.KNUDSEN_EFFUSION
-    assert any(notice.kind is NoticeKind.METHOD_INFERRED for notice in obs.notices)
+    assert exp.method.value is MethodToken.UNSPECIFIED
+    method_notice = next(
+        notice for notice in obs.notices
+        if notice.kind is NoticeKind.METHOD_UNSTATED
+    )
+    assert method_notice.policy is not None
+    assert method_notice.policy.id == "DP-106"
+    assert not any(notice.kind is NoticeKind.METHOD_INFERRED for notice in obs.notices)
     assert obs.evidence.class_.is_unknown
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
 

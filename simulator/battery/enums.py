@@ -428,6 +428,7 @@ DEFAULT_POLICY_NOTICE_KINDS = frozenset(
         NoticeKind.INTERVAL_OBSERVATION,
         NoticeKind.PHASE_INFERRED,
         NoticeKind.METHOD_UNSTATED,
+        NoticeKind.METHOD_INFERRED,
         NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
         NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
     }
