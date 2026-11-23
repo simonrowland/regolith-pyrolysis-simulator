@@ -9,7 +9,8 @@ import pytest
 import yaml
 from openpyxl import load_workbook
 
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import Engine, ExecutionState, NoticeKind, RefusalReason
+from simulator.battery.score import predict_with_engine
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -242,3 +243,34 @@ def test_context_preserves_unlabelled_and_formula_cells(migrated_extract) -> Non
         for row in formula["formula_rows_as_published"]
         for cell in row["cells"]
     )
+
+
+def test_included_sio2_row_has_no_bulk_so_magemin_is_not_called(
+    migrated_extract, monkeypatch
+) -> None:
+    """The included W-1 SiO2 row is a scored phase point, not an engine bulk.
+
+    A usable composition here would be wrong: this test fails on purpose if
+    migration starts supplying one. The engine must not be asked to predict
+    the analysis that would have been its input.
+    """
+
+    _document, result = migrated_extract
+    observation = result.observations[
+        f"{SOURCE_ID}::borisov_2021_included_row_4_sio2"
+    ]
+    composition = observation.identity.composition
+    assert composition is None or not composition.is_value
+
+    def equilibrate(*_args, **_kwargs):
+        raise AssertionError("MAGEMin must not be called without a bulk")
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        equilibrate,
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["input"] == "composition"
+    assert prediction.refusal_detail["reason"] == "missing_input"
