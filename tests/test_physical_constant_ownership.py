@@ -40,6 +40,9 @@ def test_codata_leaf_bits() -> None:
     assert GAS_CONSTANT == 8.31446261815324
     assert PA_PER_BAR == 1e5
     assert STANDARD_ATMOSPHERE_PA == 101325.0
+
+
+def test_planck_second_radiation_constant_uses_ruling_spelling() -> None:
     assert PLANCK_SECOND_RADIATION_CONSTANT_UM_K == 14388.0
 
 

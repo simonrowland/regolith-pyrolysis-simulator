@@ -242,6 +242,10 @@ def test_truncated_three_step_run_writes_outputs_when_pyrometer_is_unavailable(
     assert written["records"] == records
     assert "typed_unavailable" in report
     assert "missing_reported_pyrometer_observation" in report
+    assert "True upper-surface peak (C)" in report
+    assert "Residual range (C)" in report
+    assert "DP-110" in report and "DP-111" in report
+    assert "sapphire at 5 um can be well below 1" in report
     assert "A_bead = 4π(3V/(4π))^(2/3)" in report
     progress_lines = [
         line for line in capsys.readouterr().out.splitlines()

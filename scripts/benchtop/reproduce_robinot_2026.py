@@ -62,6 +62,7 @@ from simulator.thermal_budget import (
     FACE_FULL_SIDE,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
+    ROBINOT_PYROMETER_POLICY,
     declared_benchtop_lengths_m,
     furnace_power_trace_time_bounds_s,
     measured_furnace_power_trace,
@@ -816,16 +817,17 @@ def _pyrometer_record(
             "source_ref": observation.get("source_ref"),
             "citation_id": observation.get("citation_id"),
             "source_class": observation.get("source_class"),
-            "t_h": observation.get("t_h"),
         }
     )
-    if comparison["temperature_C"] is None:
+    if comparison["true_peak_temperature_C"] is None:
         return {
             "t": None,
             "observable": "robinot_pyrometer_peak_temperature_C",
             "published": published_temperature_C,
             "simulated": None,
+            "true_peak_temperature_C": None,
             "residual": None,
+            "residual_band_C": None,
             "flags": [
                 "power_temperature_prediction_unavailable",
                 *(
@@ -843,39 +845,55 @@ def _pyrometer_record(
             "mode": mode,
             "units": "degC",
         }
-    simulated = float(comparison["temperature_C"])
+    pyrometer_assumptions = {
+        "ruling": ROBINOT_PYROMETER_POLICY["ruling"],
+        "wavelength_um": ROBINOT_PYROMETER_POLICY["wavelength_um"],
+        "eps_lambda": dict(ROBINOT_PYROMETER_POLICY["eps_lambda"]),
+        "tau_path": dict(ROBINOT_PYROMETER_POLICY["tau_path"]),
+    }
     if observation is None:
         return {
             "t": None,
-            "prediction_time_min": comparison["time_min"],
+            "prediction_time_min": comparison["prediction_time_min"],
             "observable": "robinot_pyrometer_peak_temperature_C",
             "published": None,
-            "simulated": simulated,
-            "residual": None,
-            "flags": ["comparison_observation_unavailable", unavailable_reason],
+            "simulated": comparison["brightness_temperature_C"],
+            "true_peak_temperature_C": comparison["true_peak_temperature_C"],
+            "residual": comparison["residual_C"],
+            "residual_band_C": comparison["residual_band_C"],
+            "simulated_brightness_band_C": comparison["brightness_band_C"],
+            "flags": [
+                "comparison_observation_unavailable",
+                unavailable_reason,
+                *comparison["flags"],
+            ],
             "comparison_status": "typed_unavailable",
             "unavailable_reason": unavailable_reason,
             "mode": mode,
             "units": "degC",
             "source_locator": None,
+            "pyrometer_assumptions": pyrometer_assumptions,
         }
     return {
         "t": None,
-        "prediction_time_min": comparison["time_min"],
-        "observation_time_h": observation.get("t_h"),
+        "prediction_time_min": comparison["prediction_time_min"],
         "observable": "robinot_pyrometer_peak_temperature_C",
         "published": published_temperature_C,
-        "simulated": simulated,
+        "simulated": comparison["brightness_temperature_C"],
+        "true_peak_temperature_C": comparison["true_peak_temperature_C"],
         "residual": comparison["residual_C"],
+        "residual_band_C": comparison["residual_band_C"],
+        "simulated_brightness_band_C": comparison["brightness_band_C"],
         "comparison_status": "available",
         "published_qualifier": observation.get("qualifier"),
         "source_locator": source_locator,
         "flags": [
             "approximate_peak_observation",
-            "prediction_not_scored_as_observed_temperature",
+            *comparison["flags"],
         ],
         "mode": mode,
         "units": "degC",
+        "pyrometer_assumptions": pyrometer_assumptions,
     }
 
 
@@ -1512,20 +1530,33 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
     lines.extend(["", "## Melt-temperature prediction and pyrometer observation", ""])
     lines.extend(
         [
-            "| Mode | Predicted peak (C) | Pyrometer observation (C) | Qualifier | "
+            "| Mode | True upper-surface peak (C) | Predicted brightness (C) | "
+            "Pyrometer reading (C) | Qualifier | Residual (C) | Residual range (C) | "
             "Comparison status | Source locator | Flags |",
-            "|---|---:|---:|---|---|---|---|",
+            "|---|---:|---:|---:|---|---:|---:|---|---|---|",
         ]
     )
     for record in summary["records"]:
         if record.get("observable") == "robinot_pyrometer_peak_temperature_C":
+            residual_band = record.get("residual_band_C")
             lines.append(
-                "| {mode} | {predicted} | {observed} | {qualifier} | {status} | "
+                "| {mode} | {true_peak} | {predicted} | {observed} | "
+                "{qualifier} | {residual} | {residual_band} | {status} | "
                 "{locator} | {flags} |".format(
                     mode=record["mode"],
+                    true_peak=format_value(record.get("true_peak_temperature_C")),
                     predicted=format_value(record.get("simulated")),
                     observed=format_value(record.get("published")),
                     qualifier=record.get("published_qualifier") or "-",
+                    residual=format_value(record.get("residual")),
+                    residual_band=(
+                        "-"
+                        if not isinstance(residual_band, Mapping)
+                        else "{minimum} to {maximum}".format(
+                            minimum=format_value(residual_band.get("min")),
+                            maximum=format_value(residual_band.get("max")),
+                        )
+                    ),
                     status=record.get("comparison_status", "typed_unavailable"),
                     locator=(
                         "-"
@@ -1535,6 +1566,27 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
                     flags=", ".join(record.get("flags") or ()),
                 )
             )
+    emissivity_policy = ROBINOT_PYROMETER_POLICY["eps_lambda"]
+    path_policy = ROBINOT_PYROMETER_POLICY["tau_path"]
+    lines.extend(
+        [
+            "",
+            "Residuals compare {wavelength} um Planck brightness. Defaults "
+            "and bands follow ruling {ruling}: DP-110 "
+            "epsilon {eps} (band {eps_min}–{eps_max}); DP-111 path "
+            "transmission {tau} (numeric band {tau_min}–{tau_max}). {note}".format(
+                ruling=ROBINOT_PYROMETER_POLICY["ruling"],
+                wavelength=format_value(ROBINOT_PYROMETER_POLICY["wavelength_um"]),
+                eps=format_value(emissivity_policy["value"]),
+                eps_min=format_value(emissivity_policy["band"][0]),
+                eps_max=format_value(emissivity_policy["band"][1]),
+                tau=format_value(path_policy["value"]),
+                tau_min=format_value(path_policy["band"][0]),
+                tau_max=format_value(path_policy["band"][1]),
+                note=path_policy["band_note"],
+            ),
+        ]
+    )
     lines.extend(["", "## Notices and flags", ""])
     notices = summary["notices_and_flags"]
     if not notices:

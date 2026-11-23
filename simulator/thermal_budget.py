@@ -1825,6 +1825,39 @@ def _tonne_sky_loss_W(
     return STEFAN_BOLTZMANN * emissivity * area_m2 * temperature_K ** 4
 
 
+# Explicit d-464 proposals for the Robinot comparator. Keep these ids fixed;
+# do not delegate proposal numbering to append_proposal. This car predates the
+# policy registry: move this block to data/battery/default_policy.yaml when it
+# rebases onto coverage foundation 054a78a2a.
+ROBINOT_PYROMETER_POLICY = {
+    "ruling": "d-464",
+    "wavelength_um": 5.0,
+    "prediction_face_set": "hot_upper",
+    "spot_flag": "pyrometer_spot_unprinted",
+    "eps_lambda": {
+        "id": "DP-110",
+        "status": "proposed",
+        "value": 0.95,
+        "band": (0.90, 0.98),
+        "flag": "eps_lambda_assumed",
+    },
+    "tau_path": {
+        "id": "DP-111",
+        "status": "proposed",
+        "value": 1.0,
+        "band": (0.93, 1.0),
+        "flag": "tau_path_assumed",
+        "band_note": (
+            "The window is unprinted (outcome 4). The 1800 C reading is "
+            "through a port, not the borosilicate sphere wall, which softens "
+            "near 820 C. The numeric band spans CaF2 at about 0.93 to a clean "
+            "or absent window at 1.0; sapphire at 5 um can be well below 1, "
+            "with a thickness-dependent transmission that is unbounded here."
+        ),
+    },
+}
+
+
 def robinot_pyrometer_brightness_temperature_C(
     true_temperature_C: float,
     *,
@@ -1839,13 +1872,14 @@ def robinot_pyrometer_brightness_temperature_C(
     ``1 / (exp(x_b) - 1) = tau * eps / (exp(x) - 1)``. Inverting gives
     ``T_b = c2 / (lambda * log(1 + (exp(x) - 1) / (tau * eps)))``.
     The exponent and logarithm arguments are dimensionless; c2 is in
-    um K and lambda is in um, so the result is kelvin before converting
-    to Celsius. Unit checks are tau * eps = 1 -> T_b = T, true 1859 C
+    um K (c2 = 14388 um K) and lambda is 5.0 um, so the result is kelvin
+    before converting to Celsius. Unit checks are tau * eps = 1 -> T_b = T,
+    true 1859 C
     at eps 0.95 -> about 1800 C, and true 2026 C at eps 0.95 -> about
     1960 C; tests pin those three checks.
     """
 
-    wavelength_um = 5.0
+    wavelength_um = float(ROBINOT_PYROMETER_POLICY["wavelength_um"])
     true_temperature_K = true_temperature_C + CELSIUS_TO_KELVIN_OFFSET
     x = PLANCK_SECOND_RADIATION_CONSTANT_UM_K / (
         wavelength_um * true_temperature_K
@@ -1863,30 +1897,72 @@ def robinot_pyrometer_comparison(
     *,
     published_reading_C: float | None,
 ) -> dict[str, Any]:
-    """Select and compare the Robinot run's peak temperature record."""
+    """Score the hot-upper peak as the Robinot pyrometer's brightness T."""
 
     predictions = [
         record
         for record in temperature_records
         if record.get("temperature_C") is not None
+        and record.get("face_set")
+        == ROBINOT_PYROMETER_POLICY["prediction_face_set"]
     ]
     if not predictions:
         return {
-            "temperature_C": None,
-            "time_min": None,
+            "true_peak_temperature_C": None,
+            "prediction_time_min": None,
+            "brightness_temperature_C": None,
+            "brightness_band_C": None,
             "residual_C": None,
+            "residual_band_C": None,
+            "flags": [],
         }
     peak = max(predictions, key=lambda item: float(item["temperature_C"]))
-    temperature_C = float(peak["temperature_C"])
+    true_peak_temperature_C = float(peak["temperature_C"])
+    emissivity_policy = ROBINOT_PYROMETER_POLICY["eps_lambda"]
+    path_policy = ROBINOT_PYROMETER_POLICY["tau_path"]
+    brightness_temperature_C = robinot_pyrometer_brightness_temperature_C(
+        true_peak_temperature_C,
+        emissivity=float(emissivity_policy["value"]),
+        path_transmittance=float(path_policy["value"]),
+    )
+    brightness_band_C = [
+        robinot_pyrometer_brightness_temperature_C(
+            true_peak_temperature_C,
+            emissivity=float(band_emissivity),
+            path_transmittance=float(band_transmittance),
+        )
+        for band_emissivity in emissivity_policy["band"]
+        for band_transmittance in path_policy["band"]
+    ]
+    brightness_band = {
+        "min": min(brightness_band_C),
+        "max": max(brightness_band_C),
+    }
     residual_C = (
         None
         if published_reading_C is None
-        else temperature_C - float(published_reading_C)
+        else brightness_temperature_C - float(published_reading_C)
+    )
+    residual_band = (
+        None
+        if published_reading_C is None
+        else {
+            "min": brightness_band["min"] - float(published_reading_C),
+            "max": brightness_band["max"] - float(published_reading_C),
+        }
     )
     return {
-        "temperature_C": temperature_C,
-        "time_min": peak.get("time_min"),
+        "true_peak_temperature_C": true_peak_temperature_C,
+        "prediction_time_min": peak.get("time_min"),
+        "brightness_temperature_C": brightness_temperature_C,
+        "brightness_band_C": brightness_band,
         "residual_C": residual_C,
+        "residual_band_C": residual_band,
+        "flags": [
+            str(emissivity_policy["flag"]),
+            str(path_policy["flag"]),
+            str(ROBINOT_PYROMETER_POLICY["spot_flag"]),
+        ],
     }
 
 
