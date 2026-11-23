@@ -3,7 +3,12 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, Quantity, ValueKind
+from simulator.battery.enums import (
+    AdmissionStatus,
+    MethodToken,
+    Quantity,
+    ValueKind,
+)
 from tests.battery.factories import migrate_one_extract
 
 
@@ -25,6 +30,18 @@ def test_ivanova_2018_residue_series_migrates_and_pins_table_1_values():
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 32
+    experiment_id = document["experiments"][0]["experiment_id"]
+    experiment = next(
+        experiment
+        for experiment in migrator.result.experiments.values()
+        if experiment.experiment_id.endswith(f"::experiment::{experiment_id}")
+    )
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.VACUUM_CHAMBER_PYROLYSIS
+    assert (
+        document["species"]["CaO"]["observations"][0]["regime"]
+        == MethodToken.VACUUM_CHAMBER_PYROLYSIS.value
+    )
     for observation in migrator.result.observations.values():
         assert observation.identity.quantity.is_value
         assert (
