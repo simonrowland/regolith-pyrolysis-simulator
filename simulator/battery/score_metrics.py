@@ -112,6 +112,8 @@ def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
 def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     """Select an identity-aware metric when the quantity's form requires it."""
     quantity = quantity_token(identity)
+    if quantity is Quantity.FUGACITY and identity.species is not None and identity.species.formula == "O2":
+        return MetricOperation.DEX
     if quantity is Quantity.VALENCE_RATIO:
         basis = identity.valence_basis
         if basis is None or not basis.is_value:

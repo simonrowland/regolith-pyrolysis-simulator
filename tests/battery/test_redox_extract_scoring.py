@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    FO2Channel,
     MetricOperation,
     NoticeKind,
     Phase,
@@ -41,9 +42,10 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import Composition, Derivation, Located, Locator, State, Value
+from simulator.battery.records import Composition, Derivation, FO2Control, Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
 from simulator.physical_constants import BAR_PA_DECIMAL
+from tests.battery import factories as F
 from tests.battery.factories import migrate_one_extract
 
 
@@ -451,8 +453,8 @@ def test_openimcc_missing_fo2_without_iron_reaches_iron_refusal_after_ladder():
 def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
 
-    ``b1a7c34db`` ``predict_with_engine(OPENIMCC, row4)`` returns this
-    Decimal from ``openimcc.evaluate_redox`` on the printed mole-fraction
+    ``predict_with_engine(OPENIMCC, row4)`` returns this Decimal from
+    ``openimcc.evaluate_redox`` on the printed mole-fraction
     composition. The row is not a mass-percent stand-in. OpenIMCC must
     not open or equilibrate a cell. The pack digest is the digest on the
     result the scorer just stamped, not a host-specific literal.
@@ -486,7 +488,8 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     prediction = predict_with_engine(Engine.OPENIMCC, row4)
 
     assert prediction.refusal_reason is None
-    assert prediction.value == Decimal("1.6414352204105178")
+    assert prediction.value == Decimal("1.649268615118404")
+    assert any(n.kind is NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL for n in prediction.notices)
     assert prediction.unit == "dimensionless"
     assert prediction.authority is Authority.BRIDGE
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
@@ -822,15 +825,15 @@ def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
     assert (len(overlap_admitted), len(held_admitted)) == (0, 0)
     assert Decimal(str(score_module._rms(overlap_all))).quantize(
         Decimal("0.00001")
-    ) == Decimal("0.11250")
+    ) == Decimal("1.07265")
     assert Decimal(str(score_module._rms(held_all))).quantize(
         Decimal("0.00001")
-    ) == Decimal("0.10885")
+    ) == Decimal("0.25823")
     assert abs(
-        score_module._median(overlap_all) - Decimal("-0.034867523522288196")
+        score_module._median(overlap_all) - Decimal("1.1235402005424862")
     ) < Decimal("0.00001")
     assert abs(
-        score_module._median(held_all) - Decimal("-0.016561640746814852")
+        score_module._median(held_all) - Decimal("-0.012202239917381504")
     ) < Decimal("0.00001")
 
 
@@ -946,13 +949,15 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     # numeric supplementary predictions carry the missing-pressure flag.
     assert f"{extract.stem}::borisov_2018_table2_row_155" not in rows_by_id
 
-    # Hand evaluation of Kress & Carmichael 1991 at row 4's printed T and log fO2,
-    # with 1 atm from the cited compilation: Fe2O3/FeO=0.9191803065, hence
-    # Fe3+/Fe2+=2*0.9191803065=1.838361. The factor two converts oxide formula
-    # units to Fe cations.
+    # The stored oxygen locator has only a table and row. The scorer uses
+    # the flagged ambient fallback until the actual column is located.
     prediction4 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row4)
-    assert prediction4.value is not None
-    assert abs(prediction4.value - Decimal("1.838360613")) < Decimal("1e-9")
+    assert prediction4.value == Decimal("1.8449565575523237")
+    assert any(n.kind is NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL for n in prediction4.notices)
+    assert prediction4.identity.fO2_Pa.value == Decimal("21278.25")
+    independent_oxygen = _with_borisov_column_locators(row4)
+    explicit_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, independent_oxygen)
+    assert abs(explicit_prediction.value - Decimal("1.838360613")) < Decimal("1e-9")
     printed_log = row4.point_conditions["fO2_log"].state.value
     if isinstance(printed_log, Value):
         printed_log = printed_log.point
@@ -960,11 +965,11 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     canonical_fo2 = log10_fo2_to_pa(printed_log)
     assert prediction4.identity is not None
     assert prediction4.identity.fO2_Pa is not None
-    assert prediction4.identity.fO2_Pa.value == canonical_fo2
-    assert prediction4.identity.fO2_Pa.value == row4.identity.fO2_Pa.value
+    assert explicit_prediction.identity.fO2_Pa.value == canonical_fo2
+    assert explicit_prediction.identity.fO2_Pa.value == row4.identity.fO2_Pa.value
     float_reconstruction = Decimal(str(100000.0 * 10.0 ** float(printed_log)))
     if canonical_fo2 != float_reconstruction:
-        assert prediction4.identity.fO2_Pa.value != float_reconstruction
+        assert explicit_prediction.identity.fO2_Pa.value != float_reconstruction
     table1_row1 = rows_by_id[f"{extract.stem}::borisov_2018_table1_row_1"]
     assert table1_row1.identity.composition.is_unknown
     assert "TiO2 and P2O5" in table1_row1.identity.composition.reason
@@ -1044,13 +1049,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing_fo2)
     assert missing_prediction.value is not None
     assert missing_prediction.refusal_reason is None
-    ferric_notice = next(
-        notice
-        for notice in missing_prediction.notices
-        if notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
-    )
-    assert "Kress-Carmichael inverse at row T and P" in ferric_notice.reason
-    assert ferric_notice.reason.count("log10(fO2/bar)=") == 1
+    assert any(n.policy and n.policy.id == "DP-010" for n in missing_prediction.notices)
 
     unsupported = predict_with_engine(Engine.MAGEMIN, row4)
     assert unsupported.value is None
@@ -1090,12 +1089,12 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     )
     assert Decimal(
         measured_unknown["metrics"][0]["all_numeric"]["rms"]
-    ).quantize(Decimal("0.00001")) == Decimal("0.11088")
+    ).quantize(Decimal("0.00001")) == Decimal("0.81546")
     assert len(residuals) == 435
 
     conflicting_fo2 = replace(
-        row4,
-        identity=replace(row4.identity, fO2_Pa=State.of(Decimal("1000"))),
+        independent_oxygen,
+        identity=replace(independent_oxygen.identity, fO2_Pa=State.of(Decimal("1000"))),
     )
     mismatch_context = replace(
         context,
@@ -1524,7 +1523,7 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
         )
     elif axis == "fO2_Pa":
         reference = replace(
-            reference,
+            _with_borisov_column_locators(reference),
             identity=replace(
                 reference.identity,
                 fO2_Pa=State.of(Decimal("1000")),
@@ -1726,6 +1725,17 @@ def _borisov_row4():
     )
 
 
+def _with_borisov_column_locators(row):
+    oxygen = row.point_conditions["fO2_log"]
+    return replace(
+        row,
+        locator=replace(row.locator, note="column=Fe3+/Fe2+"),
+        point_conditions={**row.point_conditions, "fO2_log": replace(
+            oxygen, locator=replace(oxygen.locator, note="column=log(fO2)"),
+        )},
+    )
+
+
 def _without_printed_fo2(observation):
     conditions = dict(observation.point_conditions or {})
     conditions.pop("fO2_log", None)
@@ -1812,8 +1822,6 @@ def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
         )
 
     calls = _patch_melts_cell(monkeypatch, cell_for)
-    printed = score_module._printed_fe_redox_fo2_log(row4, row4.identity)
-    assert printed is not None
     for engine in (Engine.THERMOENGINE, Engine.ALPHAMELTS):
         prediction = predict_with_engine(engine, row4, isolated=False)
         assert prediction.value == expected
@@ -1825,7 +1833,7 @@ def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
         assert call["qualification"] is False
         assert call["physical_pressure_bar"] == pytest.approx(1.01325)
         assert call["po2"].mode == "commanded"
-        assert call["po2"].po2_bar == pytest.approx(10 ** float(printed))
+        assert call["po2"].po2_bar == pytest.approx(0.2127825)
 
 
 def test_melts_fe_redox_uses_ferric_fraction_only_without_weights(monkeypatch):
@@ -1979,7 +1987,7 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
 
 
 @pytest.mark.parametrize("control", (
-    "ferric", "annotated-ferric", "pressure-operand", "projected-pressure",
+    "ferric", "annotated-ferric", "pressure-operand", "projected-pressure", "pressure-input",
     "oxygen-log", "projected-buffer", "projected-offset", "same-row-assay",
 ))
 def test_internal_analytical_redox_prediction_is_independent_of_measured_target(control):
@@ -1994,7 +2002,7 @@ def test_internal_analytical_redox_prediction_is_independent_of_measured_target(
         candidate = replace(
             row, value=Value.point_of(ratio), point_conditions={},
         )
-        if control in {"pressure-operand", "projected-pressure"}:
+        if control in {"pressure-operand", "projected-pressure", "pressure-input"}:
             projected = control == "projected-pressure"
             field = "P_total_bar" if projected else "total_pressure_Pa"
             operand = Located(
@@ -2008,7 +2016,10 @@ def test_internal_analytical_redox_prediction_is_independent_of_measured_target(
                 )),
                 point_conditions={field: operand},
                 derivation=Derivation(
-                    "redox conversion", (), ((f"original_{field}", operand),), "1",
+                    "redox conversion",
+                    (f"point_conditions.{field}",) if control == "pressure-input" else (),
+                    () if control == "pressure-input" else ((f"original_{field}", operand),),
+                    "1",
                 ),
             )
         elif control in {"projected-buffer", "projected-offset"}:
@@ -2049,13 +2060,14 @@ def test_internal_analytical_redox_prediction_is_independent_of_measured_target(
             for p in predictions
         )
         return
-    assert predictions[0].value is not None
-    assert predictions[0].value == predictions[1].value
-    if control in {"pressure-operand", "projected-pressure"}:
-        assert predictions[0].value == Decimal("1.8449565575523237")
-        assert all(any(n.policy and n.policy.id == "DP-001" for n in p.notices) for p in predictions)
-    else:
-        assert predictions[0].value == Decimal("1.8449575445556925")
+    if control in {"pressure-operand", "projected-pressure", "pressure-input"}:
+        assert [p.value for p in predictions] == [
+            Decimal("1.8265268104016068"), Decimal("1.7724056001021946"),
+        ]
+        assert all([n.policy.id if n.policy else n.kind.value for n in p.notices] == ["DP-010"]
+                   for p in predictions)
+        return
+    assert [p.value for p in predictions] == [Decimal("1.8449575445556925")] * 2
     for prediction in predictions:
         assert any(n.policy and n.policy.id == "DP-010" for n in prediction.notices)
 
@@ -2072,6 +2084,137 @@ def test_internal_analytical_redox_requires_target_independent_material():
     assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {"reason": "missing_input", "input": "composition"}
+    assert any(
+        n.kind is NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY
+        and n.reason == "composition: derived_from_target"
+        for n in prediction.notices
+    )
+
+
+@pytest.mark.parametrize(("target", "source", "kind"), (
+    (Locator(page=2, table="2", record="4", note="column=R"),
+     Locator(page=2, table="2", record="4"), NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL),
+    (Locator(page=2, table="2", record="4", note="column=R"),
+     Locator(page=2, record="4", note="column=R"), NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY),
+    (Locator(page=2, table="2", record="4", note="column=R"),
+     Locator(pdf_page_index=1, table="2", note="row=4; column=R; transcribed"),
+     NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY),
+    (Locator(table="Supplementary Table 2", record="spreadsheet row 1"),
+     Locator(table="Supplementary Table 2", record="spreadsheet row 1", note="transcribed"),
+     NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL),
+))
+def test_redox_excludes_copied_oxygen_across_locator_forms(target, source, kind):
+    row = _without_printed_fo2(_borisov_row4())
+    row = replace(row, locator=target, derivation=None, identity=replace(
+        row.identity, total_pressure_Pa=State.of(BAR_PA_DECIMAL),
+    ))
+    for value in (Decimal(".25"), Decimal("1")):
+        candidate = replace(row, value=Value.point_of(value), point_conditions={
+            "fO2_log": Located(State.of(value), source),
+        })
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
+        assert prediction.value == Decimal("1.8449575445556925")
+        notice = next(n for n in prediction.notices if n.kind is kind)
+        assert notice.reason.startswith("fO2_log:")
+        assert notice.source == repr(source) and notice.destination == repr(target)
+
+
+@pytest.mark.parametrize("corrected", (False, True))
+def test_redox_temperature_selection_keeps_actual_run_controls(corrected):
+    row = _without_printed_fo2(_borisov_row4())
+    for celsius in (Decimal("1200"), Decimal("1400")):
+        operand = Located(State.of(celsius), Locator(page=3, record="temperature operand"))
+        conditions = {"temperature_C": operand}
+        if corrected:
+            conditions["T_C"] = Located(State.of(Decimal("1300")), Locator(page=4, record="run temperature"))
+            conditions["temperature_K"] = Located(
+                State.of(score_module.condition_identity_value("temperature_C", celsius)),
+                operand.locator,
+            )
+        candidate = replace(
+            row, point_conditions=conditions,
+            identity=replace(row.identity, temperature_K=None, total_pressure_Pa=State.of(BAR_PA_DECIMAL)),
+            derivation=Derivation("temperature correction", (), (("original_temperature_C", operand),), "1"),
+        )
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
+        expected = {
+            Decimal("1200"): ("1473.15", "7.11493348008402"),
+            Decimal("1300"): ("1573.15", "4.239439070820317"),
+            Decimal("1400"): ("1673.15", "2.7219025137820543"),
+        }
+        kelvin, ratio = expected[Decimal("1300") if corrected else celsius]
+        assert prediction.identity.temperature_K == State.of(Decimal(kelvin))
+        assert prediction.value == Decimal(ratio)
+
+
+def test_redox_pressure_correction_keeps_the_run_identity():
+    row = _without_printed_fo2(_borisov_row4())
+    operand = Located(State.of(Decimal("25000000")), Locator(page=3, record="original pressure"))
+    row = replace(
+        row,
+        identity=replace(row.identity, total_pressure_Pa=State.of(Decimal("100000000"))),
+        point_conditions={"total_pressure_Pa": operand},
+        derivation=Derivation("pressure correction", (), (("original_total_pressure_Pa", operand),), "1"),
+    )
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row, isolated=False)
+
+    assert prediction.value == Decimal("1.7724056001021946")
+    assert [n.policy.id for n in prediction.notices if n.policy] == ["DP-010"]
+
+
+def test_redox_excludes_its_analytes_and_keeps_independent_emf():
+    row = _without_printed_fo2(_borisov_row4())
+    locator = Locator(page=3, table="2", record="run 1")
+    row = replace(
+        row, locator=replace(locator, note="column=Fe3+/Fe2+"),
+        identity=replace(row.identity, total_pressure_Pa=State.of(BAR_PA_DECIMAL)),
+    )
+    for amount in (Decimal(".25"), Decimal("1")):
+        conditions = {
+            "FeO_wt_pct": Located(State.of(Decimal("10")), replace(locator, note="column=FeO")),
+            "Fe2O3_wt_pct": Located(State.of(amount), replace(locator, note="column=Fe2O3")),
+        }
+        candidate = replace(
+            row, point_conditions=conditions, value=Value.point_of(amount),
+            derivation=Derivation("oxide ratio", tuple(f"point_conditions.{key}" for key in conditions), (), "1"),
+        )
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
+        assert prediction.value == Decimal("1.8449575445556925")
+        assert {n.reason for n in prediction.notices if n.kind is NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY} == {
+            "FeO_wt_pct: analyte_operand", "Fe2O3_wt_pct: analyte_operand",
+        }
+        candidate = replace(candidate, point_conditions={
+            **conditions, "fO2_log": Located(State.of(Decimal(".25")), replace(locator, note="column=EMF fO2")),
+        })
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
+        assert prediction.value == Decimal("2.7971189723222234")
+        assert all(not n.reason.startswith("fO2_log:") for n in prediction.notices)
+
+
+def test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline():
+    experiment = F.tabulation_experiment()
+    location = Locator(page=3, table="2", record="run 1", note="column=O2 setpoint")
+    control = Located(State.of(Value.point_of(Decimal("10"))), location)
+    experiment = replace(experiment, fO2_control=FO2Control(
+        State.of(FO2Channel.COMMANDED), oxygen_partial_pressure_Pa=control,
+    ))
+    identity = replace(
+        F.psat_identity("O2"), quantity=State.of(Quantity.FUGACITY),
+        reservoir=None, total_pressure_Pa=None,
+    )
+    row = replace(F.observation("oxygen-setpoint", experiment.experiment_id, identity, Decimal("9")),
+                  locator=location)
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row, experiment=experiment, isolated=False)
+
+    assert prediction.value == Decimal("10")
+    assert score_module.flagged_strata(prediction.notices) == ("target_is_imposed_control",)
+    context = ScoreContext({}, {experiment.experiment_id: experiment}, {row.observation_id: row})
+    residual, candidate = score_module.compile_residual(row, Engine.INTERNAL_ANALYTICAL, context=context)
+    assert candidate is not None
+    assert residual.numeric is not None, residual.refusal
+    assert not score_module._headline_payload_admits(residual_to_plain(residual), tier="all_numeric")
 
 
 def test_melts_fe_redox_uses_dp010_without_independent_oxygen(monkeypatch):

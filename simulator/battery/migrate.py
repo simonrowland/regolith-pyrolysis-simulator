@@ -18202,6 +18202,20 @@ def _series_selection_from_items(
     )
 
 
+_TEMPERATURE_FIELDS = (
+    ("T_K", "K"),
+    ("T_K_as_published", "K"),
+    ("T_fus_K", "K"),
+    ("temperature_K", "K"),
+    ("melting_temperature_K", "K"),
+    ("Tmax_K", "K"),
+    ("T_C", "C"),
+    ("temperature_C", "C"),
+    ("temp_C", "C"),
+    ("Tmax_C", "C"),
+)
+
+
 def select_declared_source(
     declared: Quantity | State[Quantity] | str | None,
     units: str | None,
@@ -18221,18 +18235,7 @@ def select_declared_source(
 
     if declared == AXIS_TEMPERATURE_K:
         found_temperatures: list[tuple[str, object, Decimal, str]] = []
-        for key, unit in (
-            ("T_K", "K"),
-            ("T_K_as_published", "K"),
-            ("T_fus_K", "K"),
-            ("temperature_K", "K"),
-            ("melting_temperature_K", "K"),
-            ("Tmax_K", "K"),
-            ("T_C", "C"),
-            ("temperature_C", "C"),
-            ("temp_C", "C"),
-            ("Tmax_C", "C"),
-        ):
+        for key, unit in _TEMPERATURE_FIELDS:
             if key not in payload:
                 continue
             raw = payload.get(key)
@@ -21137,7 +21140,7 @@ def _relative_buffer_for_field(name: str) -> str | None:
 
 def condition_identity_axis(name: str) -> str | None:
     """Identity axis that can be filled by a located source condition."""
-    if name in {"T_C", "T_K", "temperature_K"}:
+    if name in {"T", "temperature"} or any(name == field for field, _ in _TEMPERATURE_FIELDS):
         return "temperature_K"
     if name in {"composition", "printed_composition"}:
         return "composition"
@@ -21154,6 +21157,29 @@ def condition_identity_axis(name: str) -> str | None:
     ):
         return "fO2_Pa"
     return None
+
+
+def condition_identity_value(name: str, value: object) -> object:
+    """Compare a control operand in the same units as its identity axis."""
+    axis = condition_identity_axis(name)
+    if axis == "temperature_K":
+        return select_declared_source(AXIS_TEMPERATURE_K, None, {name: _temperature_number(value)}).amount
+    if axis == "total_pressure_Pa":
+        unit = dict(_PRESSURE_TOTAL_KEYS)[name]
+        return convert_pressure_to_pa(_temperature_number(value), unit)[0]
+    return value
+
+
+def located_run_temperature(conditions: Mapping[str, Located]) -> State[Decimal] | None:
+    """Apply the migration temperature selection to retained run controls."""
+    payload = {
+        key: value
+        for key, condition in conditions.items()
+        if condition.state.is_value and condition_identity_axis(key) == "temperature_K"
+        and (value := _temperature_number(condition.state.value)) is not None
+    }
+    selection = select_declared_source(AXIS_TEMPERATURE_K, None, payload)
+    return State.of(selection.amount) if selection.amount is not None else None
 
 
 def _has_relative_buffer_marker(text: str) -> bool:

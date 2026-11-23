@@ -54,6 +54,7 @@ from simulator.battery.redox_fields import (
     KRESS_FE2O3_WT_PCT_FIELD,
     KRESS_FEO_WT_PCT_FIELD,
 )
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
     Composition,
@@ -1024,6 +1025,27 @@ def _gas_ratio_fo2(
     if not math.isfinite(log):
         return None
     return ResolvedFo2(log, 3, "experiment_gas_ratio", False)
+
+
+def imposed_oxygen_pressure_pa(
+    experiment: Experiment, bench: object | None, observation: Observation,
+) -> Decimal | None:
+    """Evaluate the named apparatus control without using the measured target."""
+    control = experiment.fO2_control
+    pressure = control.oxygen_partial_pressure_Pa if control is not None else None
+    if pressure is not None and pressure.state.is_value:
+        point = pressure.state.value.point
+        if point is not None and point.is_finite() and point > 0:
+            return point
+    result = _oxygen_result(experiment, bench, observation, None)
+    if result is not None:
+        for route in result.routes:
+            if route.route in _TIER3_ATMOSPHERE_ROUTES and isinstance(route.value, Value):
+                if (point := route.value.point) is not None and point.is_finite():
+                    return log10_fo2_to_pa(point)
+    temperature = _temperature_K(_identity(observation), None)
+    gas = _gas_ratio_fo2(experiment, temperature)
+    return None if gas is None else log10_fo2_to_pa(Decimal(str(gas.log10_fO2_bar)))
 
 
 def _is_knudsen(experiment: Experiment | None) -> bool:

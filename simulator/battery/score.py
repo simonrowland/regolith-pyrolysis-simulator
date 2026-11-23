@@ -186,6 +186,8 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     condition_identity_axis,
+    condition_identity_value,
+    located_run_temperature,
     path_matches_source_tokens,
     _phase_for_sample_description,
     _phase_for_recorded_vapour_sample,
@@ -204,6 +206,7 @@ from simulator.battery.migrate import (
 from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     independent_redox_conditions,
+    imposed_oxygen_target,
 )
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -1489,7 +1492,9 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         return Rail.THERMOCHEMISTRY
     if quantity in {Quantity.WALL_DEPOSIT_MASS, Quantity.WALL_DEPOSIT_AREAL_RATE}:
         return Rail.WALL_DEPOSITION
-    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO} or (
+        quantity is Quantity.FUGACITY and species_formula == "O2"
+    ):
         return Rail.REDOX
     if quantity in {
         Quantity.YIELD_FRACTION,
@@ -2543,6 +2548,7 @@ def _classify_flagged_notice_facts(
         NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO,
         NoticeKind.FO2_VACUUM_CELL_PROXY,
         NoticeKind.FO2_BUFFER_FROM_CONTAINER,
+        NoticeKind.TARGET_IS_IMPOSED_CONTROL,
     ):
         if kind.value in kinds:
             strata.append(kind.value)
@@ -8707,6 +8713,9 @@ def _comparison_identity(
     Oxygen selection never supplies total pressure.
     """
 
+    if any(n.kind is NoticeKind.TARGET_IS_IMPOSED_CONTROL for n in prediction.notices):
+        return identity, None
+
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
@@ -8724,6 +8733,16 @@ def _comparison_identity(
         Quantity.FE3_FE2_RATIO,
         Quantity.VALENCE_RATIO,
     }
+    excluded_axes = {
+        condition_identity_axis(field)
+        for notice in prediction.notices
+        if notice.kind in {
+            NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL,
+            NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH,
+            NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY,
+        }
+        for field in notice.dropped or ()
+    } if redox else set()
     fusion_polymorph_flag = (
         quantity_token(identity) in FUSION_QUANTITIES
         and any(
@@ -8741,7 +8760,7 @@ def _comparison_identity(
     quantity = quantity_token(identity)
     pressure_notice: Notice | None = None
     pressure_state: State[Any] | None = None
-    if quantity is not None and (
+    if "total_pressure_Pa" not in excluded_axes and quantity is not None and (
         identity.total_pressure_Pa is None
         or not identity.total_pressure_Pa.is_value
     ):
@@ -8787,14 +8806,15 @@ def _comparison_identity(
     if melt_identity is not identity:
         updates["species"] = melt_identity.species
     if redox and isinstance(prediction.identity, Identity):
-        # Redox predictions consume the row's printed composition and oxygen
-        # condition; compare both sides at those exact point conditions.
-        # fO2_Pa on both identities is log10_fo2_to_pa of that printed log.
-        # Exact equality is the check; this does not rebuild or relax it.
-        for field_name in ("composition", "fO2_Pa", "total_pressure_Pa"):
+        # The predictor already chose a control for excluded source axes.
+        # Compare at that point and retain exact checks on independent inputs.
+        for field_name in ("composition", "fO2_Pa", "total_pressure_Pa", "temperature_K"):
             actual = getattr(identity, field_name)
             used = getattr(prediction.identity, field_name)
-            if (actual is None or not actual.is_value) and used is not None and used.is_value:
+            if used is not None and used.is_value and (
+                field_name in excluded_axes
+                or (field_name != "temperature_K" and (actual is None or not actual.is_value))
+            ):
                 updates[field_name] = used
     if (
         knudsen_total_pressure is not None
@@ -8818,7 +8838,7 @@ def _comparison_identity(
         and (identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value)
     ):
         updates["total_pressure_Pa"] = pressure_state
-    if identity.composition is None or not identity.composition.is_value:
+    if "composition" not in excluded_axes and (identity.composition is None or not identity.composition.is_value):
         point, _notice = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
@@ -9977,6 +9997,23 @@ def _predict_distin_closed_feo_activity(
     )
 
 
+def _redox_input_view(
+    observation: Observation, quantity: Quantity,
+    experiment: Experiment | None,
+) -> tuple[Observation, tuple[Notice, ...]]:
+    return independent_redox_conditions(
+        observation,
+        quantity=quantity,
+        ferric_target=quantity is Quantity.FE3_FE2_RATIO
+        or (quantity is Quantity.VALENCE_RATIO
+            and _fe_valence_named_form(observation.identity) in {"ratio", "fraction"}),
+        condition_identity_axis=condition_identity_axis,
+        condition_identity_value=condition_identity_value,
+        temperature_selection=located_run_temperature,
+        experiment=experiment,
+    )
+
+
 def _predict_redox(
     engine: Engine,
     observation: Observation,
@@ -10059,12 +10096,8 @@ def _predict_redox(
         return refused(circular[0], circular[1])
 
     quantity = quantity_token(identity) or Quantity.FE3_FE2_RATIO
-    observation = independent_redox_conditions(
-        observation,
-        ferric_target=quantity is Quantity.FE3_FE2_RATIO
-        or _fe_valence_named_form(identity) in {"ratio", "fraction"},
-        condition_identity_axis=condition_identity_axis,
-    )
+    observation, exclusion_notices = _redox_input_view(observation, quantity, experiment)
+    material_notices.extend(exclusion_notices)
     identity = observation.identity
     material = _fe_redox_material(observation, identity, experiment)
     if isinstance(material, _FeRedoxRefusal):
@@ -10094,6 +10127,7 @@ def _predict_redox(
             return refused(kress_basis.reason, kress_basis.detail)
 
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    resolved_po2_bar = None
     if fo2_log is None:
         from simulator.battery.fo2_ladder import (
             fo2_tier_notice,
@@ -10115,6 +10149,7 @@ def _predict_redox(
         )
         if resolved_fo2 is not None:
             fo2_log = Decimal(str(resolved_fo2.log10_fO2_bar))
+            resolved_po2_bar = resolved_fo2.po2_bar
             material_notices.append(fo2_tier_notice(quantity, resolved_fo2))
         else:
             oxygen_gap = _unsupported_oxygen_gap(
@@ -10153,6 +10188,13 @@ def _predict_redox(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "printed_fO2"},
         )
+
+    prediction_oxygen = (
+        State.of(Decimal(str(resolved_po2_bar)) * PA_PER_BAR_DEC)
+        if resolved_po2_bar is not None
+        else State.of(log10_fo2_to_pa(fo2_log)) if fo2_log is not None
+        else None
+    )
 
     if engine is Engine.OPENIMCC:
         assert fo2_log is not None
@@ -10269,7 +10311,7 @@ def _predict_redox(
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            fO2_Pa=prediction_oxygen,
             total_pressure_Pa=pressure_pa,
         )
         return EnginePrediction(
@@ -10382,7 +10424,7 @@ def _predict_redox(
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            fO2_Pa=prediction_oxygen,
             total_pressure_Pa=pressure_pa,
         )
         return EnginePrediction(
@@ -10445,7 +10487,7 @@ def _predict_redox(
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            fO2_Pa=prediction_oxygen,
             total_pressure_Pa=pressure_pa,
         )
     else:
@@ -14745,6 +14787,29 @@ def _predict_with_engine(
         return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if quantity is not None and experiment is not None and imposed_oxygen_target(
+        observation, experiment, quantity,
+    ):
+        from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
+
+        input_view, exclusion_notices = _redox_input_view(observation, quantity, experiment)
+        value = imposed_oxygen_pressure_pa(experiment, bench, input_view)
+        if value is not None:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.PRODUCED, call_evidence="experiment.fO2_control"),
+                value=value,
+                unit="Pa",
+                authority=Authority.DERIVED_FROM_APPARATUS,
+                notices=(*exclusion_notices, Notice(
+                    kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
+                    affected_quantities=(quantity,),
+                    reason="scored oxygen is the run setpoint",
+                    origin=observation.observation_id,
+                ),),
+                identity=identity,
+            )
     if engine is Engine.NASA_CEA_9 and quantity is not None:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
