@@ -38,7 +38,7 @@ def test_every_shipped_vacuum_pyrolysis_preset_loads() -> None:
         runner_module._load_preset_run_spec(preset_path, "faithful")
 
 
-def test_robinot_faithful_loaded_steps_bracket_power_trace_before_area_guard() -> None:
+def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> None:
     preset_path = (
         REPO_ROOT
         / "data"
@@ -50,7 +50,21 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_before_area_guard() -
 
     assert preset.process_dt_s == 60.0
     assert preset.step_count == 59
+    sample = preset.lab_geometry["sample"]
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        0.00013273228961416876
+    )
+    assert sample["exposed_melt_area_basis"] == (
+        "assumed_pellet_top_face_from_reported_diameter"
+    )
+    assert preset.provenance["notice"]["kind"] == "knob_defaulted"
+    assert preset.provenance["notice"]["policy_class"] == "DP-007"
+    assert preset.provenance["notice"]["original_reason"] == (
+        "exposed_melt_area_not_printed"
+    )
     driver = preset.lab_schedule[runner_module.FURNACE_POWER_DRIVER_KEY]
+    assert driver["exposed_area_m2"] is None
+    assert driver["radiating_face_set"] == "hot_upper"
     trace = driver["trace"]
     fields = trace["point_fields"]
     last_time_s = float(trace["points"][-1][fields.index("time_min")]) * 60.0
@@ -72,10 +86,24 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_before_area_guard() -
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
     )
-    # Robinot does not report an exposed melt area. The faithful step reaches
-    # that existing guard only after sampling the power trace at its 60 s end.
-    with pytest.raises(LabGeometryError, match="exposed_melt_area_not_printed"):
-        run._start_session().advance()
+    session = run._start_session()
+    first_step = session.advance()
+
+    assert first_step.per_hour_summary["t_s"] == 60.0
+    notice = run._lab_area_bridge()["notice"]
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(
+        0.00013273228961416876
+    )
+    assert session.simulator.campaign_mgr._power_temperature_for_step[
+        "time_s"
+    ] == 60.0
+    assert notice["kind"] == "knob_defaulted"
+    assert notice["knob"] == "exposed_melt_area_m2"
+    assert notice["value"] == pytest.approx(0.00013273228961416876)
+    assert notice["unit"] == "m2"
+    assert notice["policy_class"] == "DP-007"
+    assert notice["basis"] == "assumed_pellet_top_face_from_reported_diameter"
+    assert notice["original_reason"] == "exposed_melt_area_not_printed"
 
 
 def _assert_subhour_preset_refuses(preset_path: Path) -> None:
@@ -348,7 +376,7 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
 
 
 def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
-    for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
+    for name in ("sesko_2024.yaml",):
         preset = _vacuum_preset(name)
         assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
             None,

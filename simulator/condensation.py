@@ -1785,10 +1785,32 @@ def gram_lab_exposed_melt_area_bridge(
         return {}
     if area is None:
         return {}
-    return {
+    bridge = {
         'effective_exposed_area_m2': area,
         'area_basis': LAB_EXPOSED_MELT_AREA_BASIS,
     }
+    sample = (
+        lab_geometry.get('sample')
+        if isinstance(lab_geometry, Mapping)
+        else None
+    )
+    notice = (
+        sample.get('exposed_melt_area_notice')
+        if isinstance(sample, Mapping)
+        else None
+    )
+    if notice is not None:
+        if not isinstance(notice, Mapping):
+            raise LabGeometryError(
+                'exposed_melt_area_notice_malformed',
+                'lab_geometry.sample.exposed_melt_area_notice must be a mapping',
+            )
+        bridge['notice'] = {
+            **dict(notice),
+            'value': area,
+            'unit': 'm2',
+        }
+    return bridge
 
 
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:
