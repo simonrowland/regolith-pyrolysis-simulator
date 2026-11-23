@@ -61,12 +61,16 @@ Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
 :class:`LedgerTransition` with these accounts on its debit/credit
 sides; the provider must declare every account the proposal touches
 (``validate_proposal_accounts`` enforces this with
-:class:`AccountFilterViolation`). The cleaned-melt is the debit; the
-condensation_train is credited with the condensed fraction (in mol if
-the species disproportionates, in kg otherwise -- the kernel's
-proposal layer is mol-native, so the provider converts); uncondensed
-vapor is credited to overhead gas. Stoichiometric O2 is posted by
-``_stoich_o2_is_overhead`` and ``_stoich_o2_debit_account``.
+:class:`AccountFilterViolation`). The forward posting debits the
+cleaned melt and credits uncondensed vapour to overhead gas. A
+negative rate is the same legs with debit and credit swapped:
+overhead loses the vapour and the melt gains the parent oxide
+(d-468). The condensation train is credited with the condensed
+fraction of a forward parcel only (in mol if the species
+disproportionates, in kg otherwise -- the kernel's proposal layer is
+mol-native, so the provider converts). Stoichiometric O2 is posted by
+``_stoich_o2_is_overhead`` and ``_stoich_o2_debit_account``, using the
+stoich sign. The swap reverses that leg against the same account.
 """
 
 from __future__ import annotations
@@ -164,6 +168,118 @@ def evaporation_parent_debit_is_withheld(
         available_kg,
         floor_kg,
     )
+
+
+def evaporation_net_direction(rate_kg_hr: float) -> str:
+    """``evaporate``, ``recondense``, or ``none``.
+
+    Positive mass leaves the melt. Negative mass is vapour returning
+    to the melt. Zero is not a parcel. The lot builder posts the
+    positive magnitudes once, then swaps debit and credit for the
+    reverse. Callers do not grow a second leg table.
+    """
+
+    rate = float(rate_kg_hr)
+    if not math.isfinite(rate) or rate == 0.0:
+        return "none"
+    if rate > 0.0:
+        return "evaporate"
+    return "recondense"
+
+
+def evaporation_remaining_is_unphysical(
+    rate_kg_hr: float,
+    remaining_kg_hr: float,
+    *,
+    tol_kg_hr: float = _NUMERICAL_FLOOR_KG,
+) -> bool:
+    """The condensation remainder is not a share of this parcel.
+
+    Forward: remaining is in ``[-tol, rate + tol]``. The vapour that
+    stays overhead cannot exceed the vapour just credited, and a
+    negative remainder is not a condenser result.
+    Reverse: the condenser takes nothing. Remaining equals the rate,
+    both negative, within ``tol``. A share would post the vapour twice.
+    Unit check: both arguments are kg/h. Limit: a non-finite value is
+    unphysical. A zero rate is not a parcel; a remainder beside zero
+    is unphysical.
+    """
+
+    rate = float(rate_kg_hr)
+    remaining = float(remaining_kg_hr)
+    if not math.isfinite(rate) or not math.isfinite(remaining):
+        return True
+    if rate > 0.0:
+        return remaining < -tol_kg_hr or remaining > rate + tol_kg_hr
+    if rate < 0.0:
+        return abs(remaining - rate) > tol_kg_hr
+    return abs(remaining) > tol_kg_hr
+
+
+def evaporation_parcel_is_withheld(
+    oxide_kg_signed: float,
+    available_kg: float,
+    *,
+    post_subfloor_coupled_legs: bool = False,
+    floor_kg: float = _NUMERICAL_FLOOR_KG,
+) -> bool:
+    """True when this signed parent leg must not be posted.
+
+    A positive leg is the forward debit and uses
+    ``evaporation_parent_debit_is_withheld``. A negative leg creates
+    the parent oxide. The melt does not have to hold it already.
+    The headspace hour posts that credit even below the floor: the
+    floor is not a second gas state (d-455). Off that hour, a credit
+    at or below the floor is withheld with the forward debit.
+    """
+
+    oxide = float(oxide_kg_signed)
+    if oxide < 0.0:
+        if post_subfloor_coupled_legs:
+            return False
+        return abs(oxide) <= floor_kg
+    return evaporation_parent_debit_is_withheld(
+        oxide,
+        available_kg,
+        post_subfloor_coupled_legs=post_subfloor_coupled_legs,
+        floor_kg=floor_kg,
+    )
+
+
+def nonnegative_evaporation_view(flux):
+    """The condenser view of a flux. The same object when nothing returns.
+
+    Condensation rejects a negative species rate. Recondensation is
+    posted by the transition, not by the train. Returning the caller's
+    object when every rate is nonnegative keeps the dilute path on
+    that object.
+    """
+
+    rates = getattr(flux, "species_kg_hr", None) or {}
+    if not any(float(rate) < 0.0 for rate in rates.values()):
+        return flux
+    from simulator.state import EvaporationFlux
+
+    positive = {
+        str(species): float(rate)
+        for species, rate in rates.items()
+        if float(rate) >= 0.0
+    }
+    view = EvaporationFlux(
+        species_kg_hr=positive,
+        alpha_authority_status_by_species={
+            str(species): status
+            for species, status in dict(
+                getattr(flux, "alpha_authority_status_by_species", {}) or {}
+            ).items()
+            if str(species) in positive
+        },
+        carrier_authority_by_species=dict(
+            getattr(flux, "carrier_authority_by_species", {}) or {}
+        ),
+    )
+    view.update_totals()
+    return view
 
 
 def coupled_evaporation_legs_kg(
@@ -330,13 +446,15 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
         # Negative dt_hr or species the caller flagged should never reach
         # here; if they do, surface as 'ok' with no transition (matches
-        # legacy short-circuit returns).
-        oxide_removed = rate_kg_hr * dt_hr * oxide_per_product_kg
-        product_kg = rate_kg_hr * dt_hr
-        O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
-
-        if evaporation_parent_debit_is_withheld(
-            oxide_removed,
+        # legacy short-circuit returns). The signed oxide is the stock
+        # test. The lot builder below uses the positive magnitude, then
+        # one swap turns a recondensation into a vapour debit and a
+        # parent credit. The stoich sign of O2, not the rate sign, picks
+        # the coproduct account.
+        direction = evaporation_net_direction(rate_kg_hr)
+        oxide_signed = rate_kg_hr * dt_hr * oxide_per_product_kg
+        if evaporation_parcel_is_withheld(
+            oxide_signed,
             available_kg,
             post_subfloor_coupled_legs=post_subfloor_coupled_legs,
         ):
@@ -359,12 +477,8 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # already raises AccountingError on the same conditions before
         # dispatch; this is defence in depth that returns an
         # ``unsupported`` IntentResult if a future caller bypasses the
-        # pre-validation.
-        if (
-            not math.isfinite(remaining_kg_hr)
-            or remaining_kg_hr < -1e-12
-            or remaining_kg_hr > rate_kg_hr + 1e-12
-        ):
+        # pre-validation. The predicate is the owner of both signs.
+        if evaporation_remaining_is_unphysical(rate_kg_hr, remaining_kg_hr):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
@@ -376,20 +490,30 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                     ),
                 },
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * dt_hr
-        if remaining_kg > product_kg + 1e-12:
-            return IntentResult(
-                intent=ChemistryIntent.EVAPORATION_TRANSITION,
-                status="unsupported",
-                control_audit=control_audit,
-                diagnostic={
-                    "reason": (
-                        f"condensation route for {species!r} exceeds "
-                        "credited vapor"
-                    ),
-                },
-            )
-        condensed_kg = max(0.0, product_kg - remaining_kg)
+        magnitude_kg_hr = abs(rate_kg_hr)
+        oxide_removed = magnitude_kg_hr * dt_hr * oxide_per_product_kg
+        product_kg = magnitude_kg_hr * dt_hr
+        O2_kg = magnitude_kg_hr * dt_hr * O2_per_product_kg
+        if direction == "recondense":
+            # The whole vapour returns. Condensed is zero, so the swap
+            # debits overhead for that vapour and does not credit the train.
+            remaining_kg = product_kg
+            condensed_kg = 0.0
+        else:
+            remaining_kg = max(0.0, remaining_kg_hr) * dt_hr
+            if remaining_kg > product_kg + 1e-12:
+                return IntentResult(
+                    intent=ChemistryIntent.EVAPORATION_TRANSITION,
+                    status="unsupported",
+                    control_audit=control_audit,
+                    diagnostic={
+                        "reason": (
+                            f"condensation route for {species!r} exceeds "
+                            "credited vapor"
+                        ),
+                    },
+                )
+            condensed_kg = max(0.0, product_kg - remaining_kg)
 
         # Disproportionation branch: if sp_data declares a per-mol-vapor
         # product map, the condensation train is credited in mol with
@@ -499,6 +623,12 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 abs(O2_kg) / o2_formula.molar_mass_kg_per_mol()
             )
 
+        # One swap. The legs above are the forward posting at the
+        # positive magnitude. Recondensation debits the vapour from
+        # overhead and credits the parent oxide to the melt, and the
+        # O2 coproduct reverses against the account that received it.
+        if direction == "recondense":
+            debits, credits = credits, debits
         if not debits and not credits:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
@@ -513,15 +643,21 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # at commit time -- this is the provider's own bookkeeping
         # surface, matched against the kernel's authoritative count).
         # Mirrors _validate_evaporation_stoich_atoms which the legacy
-        # caller runs against the same numbers.
+        # caller runs against the same numbers. The swap negates a
+        # zero proof, which stays zero.
         atom_proof: dict[str, float] = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
+        )
+        reason = (
+            f"recondense_{species}"
+            if direction == "recondense"
+            else f"evaporate_{species}"
         )
 
         proposal = LedgerTransitionProposal(
             debits=debits,
             credits=credits,
-            reason=f"evaporate_{species}",
+            reason=reason,
             atom_balance_proof=atom_proof,
         )
 

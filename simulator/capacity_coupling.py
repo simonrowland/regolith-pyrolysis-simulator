@@ -814,7 +814,7 @@ def solve_capacity_shadow(
     for iteration in range(1, max_iterations + 1):
         try:
             final_flux = {
-                str(species): max(0.0, float(rate))
+                str(species): float(rate)
                 for species, rate in flux_kg_hr_at_partials(partials).items()
             }
         except EvaporationFluxRefusal:
@@ -1888,11 +1888,11 @@ class _HeadspaceLaw:
             if name not in self.masses or name not in self.redox_mol_s:
                 raise _BalanceRefused(f"missing_molar_mass:{name}")
             number = _as_finite(rate, f"evaporation_flux_not_finite:{name}")
-            # Chunk 4 removes the one-sided clamp. Until then every
-            # vapour rate, including overhead O2, publishes max(0, rate).
-            # The overhead has no vapour sink: the oxidative debit is
-            # the fO2 buffer's, and it is not in this flux.
-            out[str(name)] = max(0.0, number)
+            # Signed net flux (d-468). Positive vapour leaves the melt.
+            # Negative vapour recondenses. The oxidative debit stays on
+            # the fO2 buffer and is not in this map. A clip here is a
+            # kink in the reduced residual.
+            out[str(name)] = number
         # The callback just wrote the gross it projected, in kg/h.
         # kg/s = (kg/h) / 3600. 3600 is exact in binary64. A caller
         # with no holder leaves the snapshot empty, and the fast
@@ -1910,7 +1910,7 @@ class _HeadspaceLaw:
                         rate,
                         f"evaporation_extent_not_finite:{label}",
                     )
-                    gross_kg_s[label] = max(0.0, number) / 3600.0
+                    gross_kg_s[label] = number / 3600.0
         self._last_gross_kg_s = gross_kg_s
         self._remember_flux_partials(partials)
         return out
@@ -1922,7 +1922,7 @@ class _HeadspaceLaw:
         counted: bool = True,
     ) -> dict[str, float]:
         # kg/h / (kg/mol) / (s/h) = mol/s. 3600 is exact in binary64.
-        # Limit: a non-positive vapour rate contributes no moles.
+        # Limit: a negative vapour rate removes moles. Zero adds none.
         flux = self._flux_kg_hr(partials, counted=counted)
         return {
             species: flux.get(species, 0.0) / self.masses[species] / 3600.0

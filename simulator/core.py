@@ -3342,10 +3342,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         transition: LedgerTransition,
     ) -> Dict[str, float]:
-        prefix = 'evaporate_'
-        if not transition.name.startswith(prefix):
+        # The ledger name is the proposal reason. Recondensation is the
+        # same oxygen formula with the swapped lots (d-468). A buffer
+        # credit is still not a term: the forward elemental carriers
+        # stay on metal_loss, and a reverse oxidative carrier's buffer
+        # credit does not move this scalar.
+        if transition.name.startswith('evaporate_'):
+            vapor_species = transition.name[len('evaporate_'):]
+        elif transition.name.startswith('recondense_'):
+            vapor_species = transition.name[len('recondense_'):]
+        else:
             return {}
-        vapor_species = transition.name[len(prefix):]
         vapor_formula = resolve_species_formula(
             vapor_species,
             self.species_formula_registry,
@@ -8682,7 +8689,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and math.isfinite(float(delta))
             }
             rates = {
-                species: max(0.0, float(rate)) * liquid_fraction_factor
+                species: float(rate) * liquid_fraction_factor
                 for species, rate in dict(
                     (result.diagnostic or {}).get(
                         'evaporation_flux_kg_hr', {}
@@ -8882,7 +8889,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 label = str(species)
                 if label == OXYGEN_SPECIES:
                     continue
-                rate = max(0.0, float(gross.get(label, 0.0) or 0.0))
+                raw_rate = float(gross.get(label, 0.0) or 0.0)
+                if raw_rate < 0.0:
+                    # Recondensation. The parent is created, so the stock
+                    # gate does not apply, and the condenser takes no share.
+                    # q is the signed gross. Capture stays on the forward path.
+                    source[label] = raw_rate
+                    continue
+                rate = raw_rate
                 row = stoich.get(label)
                 parent = ''
                 oxide_per = 0.0
@@ -8968,17 +8982,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Overhead oxygen is the coproduct the projector still
             # carries, plus the condensation return. The oxidative
             # debit is the fO2 buffer's and is not in this sum.
-            # Algebra: n = max(0, n_projector + n_returned),
-            # kg/h = n * M.
+            # Algebra: n = n_projector + n_returned, kg/h = n * M.
             # Unit check: mol/h * kg/mol = kg/h.
             # Limit: no coproduct and no return publishes a zero rate.
-            # The overhead has no vapour sink.
+            # A reductive reverse whose forward oxygen was overhead is
+            # a negative term, so the residual stays smooth through
+            # saturation. Oxidative oxygen stays on the buffer.
             o2_mol_hr = (
                 float(overhead.get(OXYGEN_SPECIES, 0.0) or 0.0)
                 + returned_o2_mol_hr
             )
             source[OXYGEN_SPECIES] = (
-                max(0.0, o2_mol_hr) * OXYGEN_MOLAR_MASS_KG_PER_MOL
+                o2_mol_hr * OXYGEN_MOLAR_MASS_KG_PER_MOL
             )
             return source
 
@@ -9645,6 +9660,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 species: float(rate)
                 for species, rate in gross_at_root.items()
                 if float(rate) > rate_floor_kg_hr
+                or float(rate) < -rate_floor_kg_hr
             }
             live.alpha_authority_status_by_species = {
                 species: status
@@ -9724,11 +9740,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux.species_kg_hr = {}
             source_kg = {}
             extents = {
-                str(species): max(0.0, float(kilograms))
+                str(species): float(kilograms)
                 for species, kilograms in dict(
                     getattr(solved, "vapour_extent_kg", {}) or {}
                 ).items()
                 if str(species) != OXYGEN_SPECIES
+                and math.isfinite(float(kilograms))
             }
             remaining_kg = headspace_integral_added_kg(
                 solved.partial_pressures_Pa,
@@ -9739,7 +9756,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 volume_m3=self._headspace_volume_m3(),
             )
             for species in sorted(set(extents) | set(remaining_kg)):
-                extent = max(0.0, float(extents.get(species, 0.0) or 0.0))
+                raw_extent = float(extents.get(species, 0.0) or 0.0)
+                if raw_extent < 0.0:
+                    # Integral of a negative gross. The condenser takes
+                    # no share, so the headspace remainder equals the
+                    # extent. The parent is credited (d-468, d-455).
+                    source_kg[str(species)] = raw_extent
+                    evap_flux.species_kg_hr[str(species)] = raw_extent
+                    post_subfloor_species.append(str(species))
+                    continue
+                extent = raw_extent
                 remaining = max(
                     0.0,
                     float(remaining_kg.get(species, 0.0) or 0.0),
@@ -9806,16 +9832,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux.update_totals()
         self._ledger_committed_evap_flux_this_tick = evap_flux
         overhead_flux = evap_flux
+        has_recondensation = any(
+            float(rate) < 0.0 for rate in evap_flux.species_kg_hr.values()
+        )
         if (
             evap_flux.total_kg_hr > 0.0
+            or has_recondensation
             or bool(evap_flux.carrier_authority_by_species)
         ):
-            self._configure_condensation_operating_conditions(
-                evap_flux,
-                inventory_partials_Pa=(
-                    None if solved is None else solved.partial_pressures_Pa
-                ),
+            from engines.builtin.evaporation_transition import (
+                nonnegative_evaporation_view,
             )
+
+            condensable = nonnegative_evaporation_view(evap_flux)
+            if (
+                condensable.species_kg_hr
+                or bool(condensable.carrier_authority_by_species)
+            ):
+                self._configure_condensation_operating_conditions(
+                    condensable,
+                    inventory_partials_Pa=(
+                        None if solved is None else solved.partial_pressures_Pa
+                    ),
+                )
             self._apply_lab_surface_temperatures(
                 sample_time_h=float(sample_time_h)
             )
@@ -17847,7 +17886,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux.species_kg_hr = {
             species: rate * scale
             for species, rate in evap_flux.species_kg_hr.items()
-            if rate * scale > 1.0e-15
+            if rate * scale > 1.0e-15 or rate * scale < -1.0e-15
         }
         evap_flux.update_totals()
         # Same scale on the supply map, without the 1e-15 debit floor.
@@ -18846,12 +18885,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     for species, rate in (
                         capacity_result.evaporation_flux_kg_hr.items()
                     )
-                    if float(rate) > 1.0e-12
+                    if float(rate) > 1.0e-12 or float(rate) < -1.0e-12
                 }
                 live_rates = {
                     species: float(rate)
                     for species, rate in live_effective_flux.species_kg_hr.items()
-                    if float(rate) > 1.0e-12
+                    if float(rate) > 1.0e-12 or float(rate) < -1.0e-12
                 }
                 assert set(live_rates) == set(solved_rates)
                 assert all(
@@ -18868,7 +18907,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     for species, rate in (
                         solved_rates.items()
                     )
-                    if float(rate) > 1.0e-12
+                    if float(rate) > 1.0e-12 or float(rate) < -1.0e-12
                 }
                 evap_flux.alpha_authority_status_by_species = {
                     species: status
@@ -18909,6 +18948,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         species: rate * joint_scale
                         for species, rate in evap_flux.species_kg_hr.items()
                         if rate * joint_scale > 1.0e-15
+                        or rate * joint_scale < -1.0e-15
                     }
                     evap_flux.update_totals()
                     self._scale_wall_supply_computed(joint_scale)
@@ -18929,11 +18969,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Send evaporated species through the 8-stage train.
             # Each stage collects species based on its temperature.
             self._ledger_committed_evap_flux_this_tick = evap_flux
+            has_recondensation = any(
+                float(rate) < 0.0
+                for rate in evap_flux.species_kg_hr.values()
+            )
             if (
                 evap_flux.total_kg_hr > 0
+                or has_recondensation
                 or bool(evap_flux.carrier_authority_by_species)
             ):
-                self._configure_condensation_operating_conditions(evap_flux)
+                from engines.builtin.evaporation_transition import (
+                    nonnegative_evaporation_view,
+                )
+
+                condensable = nonnegative_evaporation_view(evap_flux)
+                if (
+                    condensable.species_kg_hr
+                    or bool(condensable.carrier_authority_by_species)
+                ):
+                    self._configure_condensation_operating_conditions(
+                        condensable
+                    )
                 self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
                 overhead_flux = self._route_to_condensation(evap_flux)
                 evap_flux = self._ledger_committed_evap_flux_this_tick

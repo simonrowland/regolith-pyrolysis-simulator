@@ -445,7 +445,7 @@ def species_drive_bulk_Pa(
     hkl_upper_bound: bool,
     surface_oxygen_bound: bool,
 ) -> float:
-    """Pa backpressure in ``J = k * max(0, P_eq - P_bulk)``.
+    """Pa backpressure in ``J = (P_eq - P_bulk) / R_total``.
 
     The only bulk decision for a melt-surface flux. Both publisher
     sites (the gas-transport scan and the emitted flux) and the
@@ -691,11 +691,29 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
 ) -> SeriesEvaporationFlux:
-    """Series-resistance evaporation source in kg/(m^2*s).
+    """Series-resistance net flux in kg/(m^2*s). Hertz-Knudsen.
 
-    The sole driving pressure is ``max(0, P_eq_pa - P_bulk_pa)``. External
-    pressure regime and stirring terms only add or remove resistances; they
-    never inflate the intrinsic Hertz-Knudsen alpha.
+    The interface coefficient ``k_HK = sqrt(M / (2*pi*R*T))`` is
+    kg/(m^2*Pa*s). ``R_interface``, ``R_gas`` and ``R_melt`` are m/s
+    and do not depend on the sign of the drive, so the series law is
+    linear through saturation (d-468):
+
+        J = (P_eq - P_bulk) / (R_interface + R_gas + R_melt)
+          = (P_eq - P_bulk) * k_total
+
+    Unit check: Pa * kg/(m^2*Pa*s) = kg/(m^2*s). Positive J is vapour
+    leaving the melt. Negative J is vapour recondensing onto the melt.
+    A ``max(0, .)`` clip puts a kink on J and on the headspace
+    residual, which Radau cannot cross.
+
+    d-455: the numerical posting floor must not change the physical gas
+    state. This function returns the signed flux, including a flux
+    the ledger later withholds. The floor is not part of the law.
+
+    External pressure regime and stirring terms only add or remove
+    resistances; they never inflate the intrinsic Hertz-Knudsen alpha.
+    ``P_eq <= 0`` is a missing equilibrium pressure, not saturation,
+    and returns zero.
     """
 
     from simulator.condensation import (
@@ -759,31 +777,15 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             transport_length_m=max(0.0, diameter_m),
         )
 
-    delta_p_pa = max(0.0, P_eq - P_bulk)
+    # Signed drive. Resistances below do not depend on this sign, so
+    # J(P_eq + d) = -J(P_eq - d) when R is the same on both sides.
+    delta_p_pa = P_eq - P_bulk
     # Owner is ``hertz_knudsen_k_kg_s_m2_pa``. The surface root divides
     # that same coefficient by M. A local sqrt would let the two drift.
     from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 
     k_hk_kg_s_m2_pa = hertz_knudsen_k_kg_s_m2_pa(T_surface, M_kg_mol)
     r_interface = 1.0 / (alpha_intrinsic * k_hk_kg_s_m2_pa)
-    if delta_p_pa <= 0.0:
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-            r_interface=r_interface,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=(
-                melt_surface_renewal_base_kg_s_m2_pa
-            ),
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
-        )
 
     base_k_melt = _finite_float(melt_surface_renewal_base_kg_s_m2_pa, 0.0)
     if melt_resistance_enabled:
@@ -931,7 +933,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         alpha_effective = 0.0
 
     return SeriesEvaporationFlux(
-        flux_kg_s_m2=max(0.0, flux_kg_s_m2),
+        flux_kg_s_m2=flux_kg_s_m2,
         alpha_intrinsic=alpha_intrinsic,
         alpha_effective=max(0.0, min(alpha_intrinsic, alpha_effective)),
         k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
@@ -1659,13 +1661,15 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     ),
                     surface_oxygen_bound=surface_oxygen_bound,
                 )
-                if P_eq_Pa <= P_bulk_Pa:
-                    continue
                 delta_p_Pa = P_eq_Pa - P_bulk_Pa
+                if delta_p_Pa == 0.0:
+                    continue
                 stoich = stoich_by_species.get(species) or {}
                 if float(stoich.get("oxide_per_product_kg") or 0.0) <= 0.0:
                     continue
-                if species in available_oxide_kg:
+                # Parent stock gates evaporation only. Recondensation
+                # creates the oxide and does not need a holding.
+                if delta_p_Pa > 0.0 and species in available_oxide_kg:
                     available_parent_kg = float(
                         available_oxide_kg.get(species, 0.0) or 0.0
                     )
@@ -1680,7 +1684,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 hkl_upper_bound_rate_kg_hr = (
                     alpha
                     * hertz_knudsen_k_kg_s_m2_pa(T_K, M_kg_mol)
-                    * delta_p_Pa
+                    * abs(delta_p_Pa)
                     * melt_surface_area_m2
                     * 3600.0
                 )
@@ -1873,12 +1877,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     P_eq_Pa - P_bulk_Pa
                 )
 
-            delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
-            if delta_p_Pa <= 0:
-                # P_eq <= P_bulk. Net flux is the computed zero of
-                # J = k * max(0, P_eq - P_bulk), not an absent rate.
-                zero_net_flux_kg_hr[str(species)] = 0.0
-                continue
+            delta_p_Pa = P_eq_Pa - P_bulk_Pa
             decision = publisher_effective_alpha(
                 species,
                 T_K,
@@ -1901,7 +1900,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             available_parent_kg = float(available_oxide_kg.get(species, 0.0) or 0.0)
             if (
-                domain_refusal is not None
+                delta_p_Pa > 0.0
+                and domain_refusal is not None
                 and species in available_oxide_kg
                 and available_parent_kg <= 1.0e-12
             ):
@@ -1981,13 +1981,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 )
             )
             series_flux_diagnostics[species] = series_diagnostic
-            if J_kg_s_m2 <= 0:
+            # Exact zero stays the zero-net bucket. A negative flux is
+            # recondensation and is published with its sign. The floor
+            # compares the magnitude: a smaller nonzero rate, either
+            # sign, stays below threshold.
+            if J_kg_s_m2 == 0.0:
                 zero_net_flux_kg_hr[str(species)] = 0.0
                 continue
 
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * 3600.0
 
-            if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
+            if abs(rate_kg_hr) > _NONTRIVIAL_FLUX_KG_HR:
                 if alpha_authority_status is not None:
                     alpha_authority_status_by_species[species] = (
                         alpha_authority_status

@@ -399,11 +399,22 @@ def test_anti_exploit_stir_bounds_and_defensive_clamps():
             )
 
 
-@pytest.mark.parametrize("p_bulk", [_K_BASE["P_eq_pa"], _K_BASE["P_eq_pa"] * 2.0])
-def test_double_count_guard_zeroes_nonpositive_driving_pressure(p_bulk):
-    result = _evap(P_bulk_pa=p_bulk)
+def test_saturation_flux_is_antisymmetric():
+    """J(P_eq) is 0 and J(P_eq + d) = -J(P_eq - d).
 
-    assert result.flux_kg_s_m2 == 0.0
+    The old pin required every non-positive drive to publish zero.
+    That clip is the kink d-468 removes. Resistances do not depend
+    on the sign, so the supersaturated flux is the negation of the
+    vacuum flux at the same |P_eq - P_bulk|.
+    """
+
+    at_eq = _evap(P_bulk_pa=_K_BASE["P_eq_pa"])
+    assert at_eq.flux_kg_s_m2 == 0.0
+    dilute = _evap(P_bulk_pa=0.0)
+    rich = _evap(P_bulk_pa=2.0 * _K_BASE["P_eq_pa"])
+    assert rich.flux_kg_s_m2 == pytest.approx(-dilute.flux_kg_s_m2, rel=1e-12)
+    assert rich.r_interface == pytest.approx(dilute.r_interface, rel=0, abs=0)
+    assert rich.r_gas == pytest.approx(dilute.r_gas, rel=0, abs=0)
 
 
 def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():

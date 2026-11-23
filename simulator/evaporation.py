@@ -490,10 +490,35 @@ def _project_evaporation_overhead_source_mol_hr(
     # Algebra: n_O2 = fsum(rate * O2_per_product_kg / M_O2).
     # Unit check: (kg/h) / (kg/mol) = mol/h.
     # Limit: no positive rate leaves the oxygen term absent.
+    # A negative rate contributes with the same stoich and the
+    # opposite sign when the forward coproduct was overhead.
     o2_contributions: list[float] = []
     for species in sorted(rates_kg_hr, key=str):
         raw_rate = rates_kg_hr[species]
-        rate_kg_hr = max(0.0, float(raw_rate))
+        signed_rate = float(raw_rate)
+        if signed_rate < 0.0:
+            # The account is the forward stoich, probed at +1 kg/h so
+            # this hour's sign does not move the oxygen. The contribution
+            # itself keeps the rate's sign. An oxidative carrier stays
+            # on the buffer and out of this sum.
+            formula = resolve_species_formula(species, registry)
+            source_mol_hr[species] = (
+                source_mol_hr.get(species, 0.0)
+                + signed_rate / formula.molar_mass_kg_per_mol()
+            )
+            stoich = dict(stoich_by_species.get(species) or {})
+            o2_per = float(stoich.get('O2_per_product_kg') or 0.0)
+            probe_o2 = o2_per if o2_per > 0.0 else 0.0
+            if _stoich_o2_is_overhead(
+                probe_o2,
+                str(stoich.get('oxygen_destination') or ''),
+                float(formula.elements.get('O', 0.0) or 0.0),
+            ):
+                o2_contributions.append(
+                    signed_rate * o2_per / o2_molar_mass
+                )
+            continue
+        rate_kg_hr = max(0.0, signed_rate)
         if rate_kg_hr <= 0.0:
             continue
         formula = resolve_species_formula(
@@ -609,11 +634,13 @@ def project_publisher_vapour_rates(
     double-count. Only the published bucket can enter the debit, and
     only above the floor, which is the pre-existing melt-debit rule.
 
-    ``zero_net_evaporation_flux`` is a computed drive of zero
-    (``P_eq <= P_bulk``, or a series flux of zero). Those species enter
+    ``zero_net_evaporation_flux`` is an exact computed drive of zero
+    (``P_eq <= 0``, or a series flux of zero). Those species enter
     the supply at 0 and stay out of the debit. A positive number in
     that bucket is not a rate. A species already stored from a
     published or below-threshold bucket is left as that rate.
+    A published negative rate is recondensation. It stays in the debit
+    and out of the wall supply.
     """
 
     payload = diagnostic if isinstance(diagnostic, Mapping) else {}
@@ -635,7 +662,12 @@ def project_publisher_vapour_rates(
     def _store(species: str, gated: float, *, debit_eligible: bool) -> None:
         if math.isfinite(gated) and gated >= 0.0:
             supply[species] = gated
-        if debit_eligible and gated > _vapour_debit_floor_kg_hr():
+        floor = _vapour_debit_floor_kg_hr()
+        # Positive debit is the melt loss. A negative rate past the
+        # same floor is recondensation and is not a wall supply.
+        if debit_eligible and math.isfinite(gated) and (
+            gated > floor or gated < -floor
+        ):
             debit[species] = gated
 
     def _cap_fe(species: str, gated: float, *, record: bool) -> float:
@@ -5528,7 +5560,7 @@ class EvaporationMixin:
     ) -> dict[str, float]:
         resolved_stoich = dict(stoich_by_species)
         for species, raw_rate in rates_kg_hr.items():
-            if float(raw_rate) <= 0.0 or resolved_stoich.get(species):
+            if resolved_stoich.get(species) or float(raw_rate) == 0.0:
                 continue
             sp_data = dict(
                 (self.vapor_pressures.get('metals', {}) or {}).get(species, {})
@@ -5836,7 +5868,7 @@ class EvaporationMixin:
                 for species, status in (
                     evap_flux.alpha_authority_status_by_species.items()
                 )
-                if float(effective_rates.get(species, 0.0)) > _vapour_debit_floor_kg_hr()
+                if abs(float(effective_rates.get(species, 0.0))) > _vapour_debit_floor_kg_hr()
             },
             # Canonical serialized answers are treated as immutable evidence;
             # depletion changes rates only and can safely share the records.
@@ -5871,6 +5903,10 @@ class EvaporationMixin:
             value = float(rate)
             if math.isfinite(value) and value >= 0.0:
                 supply_out[str(species)] = value
+
+        # Recondensation is not a parent draw. Stash the signed rate
+        # and return it with the debit map. The supply stays nonnegative.
+        recondense: dict[str, float] = {}
 
         if dt_hr <= 0.0 or not raw_rates_kg_hr:
             kept = {
@@ -5909,6 +5945,9 @@ class EvaporationMixin:
                 float(raw_rates_kg_hr.get(species, 0.0))
                 * phase_scalar
             )
+            if raw_rate_kg_hr < 0.0:
+                recondense[str(species)] = raw_rate_kg_hr
+                continue
             if raw_rate_kg_hr <= 1e-12:
                 # Debit floor. The computed rate is still the supply.
                 _note(species, raw_rate_kg_hr if raw_rate_kg_hr > 0.0 else 0.0)
@@ -6028,6 +6067,7 @@ class EvaporationMixin:
         if available_o2_kg <= 1e-12 and (o2_draws or subfloor_oxidative):
             _drop_oxidative_supply(o2_draws)
             _drop_oxidative_supply(subfloor_oxidative)
+            effective_rates.update(recondense)
             return effective_rates
 
         total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
@@ -6069,6 +6109,7 @@ class EvaporationMixin:
         remaining_o2_kg = float(available_o2_kg) - allowed_o2_draw_kg
         if subfloor_oxidative and subfloor_mass_kg > remaining_o2_kg:
             _drop_oxidative_supply(subfloor_oxidative)
+        effective_rates.update(recondense)
         return effective_rates
 
     def _commit_headspace_vapour_booking(
@@ -6187,6 +6228,54 @@ class EvaporationMixin:
             wall_deposit_account_fractions_by_species=new_accounts,
         )
 
+    def _commit_recondensation(
+        self,
+        rates_kg_hr: Mapping[str, float],
+        *,
+        phase_scalar: float,
+        post_subfloor_species: Collection[str] = (),
+    ) -> dict[str, float]:
+        """Post reverse parcels and return the rates the ledger accepted.
+
+        The transition owner swaps the forward legs. This method does
+        not build a second debit table. Capture is not applied: the
+        condenser does not take a returning vapour. Redox is applied
+        after every parcel, in species-name order.
+        """
+
+        committed: dict[str, float] = {}
+        transitions = {}
+        metals = self.vapor_pressures.get("metals", {}) or {}
+        oxides = self.vapor_pressures.get("oxide_vapors", {}) or {}
+        subfloor = {str(species) for species in post_subfloor_species}
+        scale = 1.0 if phase_scalar is None else float(phase_scalar)
+        for species in sorted(rates_kg_hr, key=str):
+            rate = float(rates_kg_hr[species]) * scale
+            if rate >= 0.0:
+                continue
+            sp_data = dict(metals.get(species) or oxides.get(species) or {})
+            if not sp_data:
+                continue
+            _credited, transition = self._credit_evaporation_transition(
+                str(species),
+                rate,
+                rate,
+                sp_data,
+                apply_evaporative_redox_source_terms=False,
+                return_transition=True,
+                post_subfloor_coupled_legs=str(species) in subfloor,
+            )
+            if transition is None:
+                continue
+            committed[str(species)] = rate
+            transitions[str(species)] = transition
+        for species in sorted(transitions):
+            self._apply_evaporative_redox_source_terms(
+                transitions[species],
+                exchange_direction="redox_source:evaporative_loss",
+            )
+        return committed
+
     def _route_to_condensation(
         self,
         evap_flux: EvaporationFlux,
@@ -6251,6 +6340,50 @@ class EvaporationMixin:
         exact legacy single-step end-state parity. The shadow comparator was
         removed at flip time, so that exact parity is currently unestablished.
         """
+        from engines.builtin.evaporation_transition import (
+            nonnegative_evaporation_view,
+        )
+
+        recondense_kg_hr = {
+            str(species): float(rate)
+            for species, rate in evap_flux.species_kg_hr.items()
+            if float(rate) < 0.0
+        }
+        carrier_authority = dict(
+            getattr(evap_flux, "carrier_authority_by_species", {}) or {}
+        )
+        if recondense_kg_hr:
+            # The condenser view drops the reverse rates. The dilute path
+            # does not enter here, so that hour keeps its flux object.
+            evap_flux = nonnegative_evaporation_view(evap_flux)
+        if recondense_kg_hr and not evap_flux.species_kg_hr:
+            phase_scalar = self._record_phase_context_diagnostic(
+                'condensation_feed', scalar_liquid_fraction=1.0)
+            committed_species_kg_hr = self._commit_recondensation(
+                recondense_kg_hr,
+                phase_scalar=phase_scalar,
+                post_subfloor_species=post_subfloor_species,
+            )
+            committed_flux = EvaporationFlux(
+                species_kg_hr=committed_species_kg_hr,
+                carrier_authority_by_species=carrier_authority,
+            )
+            committed_flux.update_totals()
+            phase_scale = 1.0 if phase_scalar is None else float(phase_scalar)
+            publish_wall_supply_on_flux(
+                committed_flux,
+                getattr(self, "_wall_supply_computed_kg_hr", None),
+                debit_kg_hr={},
+                phase_scale=phase_scale,
+            )
+            self._ledger_committed_evap_flux_this_tick = committed_flux
+            residual_flux = EvaporationFlux(
+                species_kg_hr={},
+                carrier_authority_by_species=carrier_authority,
+            )
+            residual_flux.update_totals()
+            return residual_flux
+
         phase_scalar = self._record_phase_context_diagnostic(
             'condensation_feed', scalar_liquid_fraction=1.0)
         if not getattr(self.condensation_model, '_knudsen_policy_configured', False):
@@ -6473,6 +6606,14 @@ class EvaporationMixin:
 
         self._apply_organic_tar_wall_deposit()
         self._sync_oxygen_kg_counters()
+        if recondense_kg_hr:
+            # After the forward carriers, in species-name order. The
+            # redox clamp is sequential; this order is the reverse half.
+            committed_species_kg_hr.update(self._commit_recondensation(
+                recondense_kg_hr,
+                phase_scalar=phase_scalar,
+                post_subfloor_species=post_subfloor_species,
+            ))
 
         committed_flux = EvaporationFlux(
             species_kg_hr=committed_species_kg_hr,
@@ -6577,9 +6718,10 @@ class EvaporationMixin:
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
         from engines.builtin.evaporation_transition import (
-            evaporation_parent_debit_is_withheld,
+            evaporation_parcel_is_withheld,
+            evaporation_remaining_is_unphysical,
         )
-        if evaporation_parent_debit_is_withheld(
+        if evaporation_parcel_is_withheld(
             rate_kg_hr * stoich['oxide_per_product_kg'],
             available_kg,
             post_subfloor_coupled_legs=post_subfloor_coupled_legs,
@@ -6587,10 +6729,7 @@ class EvaporationMixin:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
             species, 0.0)
-        if (
-            remaining_kg_hr < -1e-12
-            or remaining_kg_hr > rate_kg_hr + 1e-12
-        ):
+        if evaporation_remaining_is_unphysical(rate_kg_hr, remaining_kg_hr):
             raise AccountingError(
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
@@ -7049,7 +7188,8 @@ class EvaporationMixin:
             return (0.0, None) if return_transition else 0.0
 
         from engines.builtin.evaporation_transition import (
-            evaporation_parent_debit_is_withheld,
+            evaporation_parcel_is_withheld,
+            evaporation_remaining_is_unphysical,
         )
 
         parent_oxide = stoich['parent_oxide']
@@ -7059,7 +7199,7 @@ class EvaporationMixin:
 
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(parent_oxide, 0.0)
-        if evaporation_parent_debit_is_withheld(
+        if evaporation_parcel_is_withheld(
             oxide_removed,
             available_kg,
             post_subfloor_coupled_legs=post_subfloor_coupled_legs,
@@ -7069,17 +7209,22 @@ class EvaporationMixin:
         # Mirror the legacy validation: the AccountingError surface is
         # owned by the caller, not the provider. The provider receives
         # already-validated inputs (this matches the EVAPORATION_FLUX
-        # flip pattern in _calculate_evaporation).
-        if remaining_kg_hr < -1e-12 or remaining_kg_hr > rate_kg_hr + 1e-12:
+        # flip pattern in _calculate_evaporation). The predicate is the
+        # same one the provider applies. The second check is the forward
+        # mass comparison and does not run on a reverse parcel: remaining
+        # there equals the rate, and max(0, remaining) would be zero
+        # against a negative product.
+        if evaporation_remaining_is_unphysical(rate_kg_hr, remaining_kg_hr):
             raise AccountingError(
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
-        if remaining_kg > product_kg + 1e-12:
-            raise AccountingError(
-                f"condensation route for {species!r} exceeds credited vapor"
-            )
+        if rate_kg_hr > 0.0:
+            remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+            if remaining_kg > product_kg + 1e-12:
+                raise AccountingError(
+                    f"condensation route for {species!r} exceeds credited vapor"
+                )
 
         # F-B1: split dispatch / commit so post-commit redox scalar
         # bookkeeping can derive strictly from the applied LedgerTransition.

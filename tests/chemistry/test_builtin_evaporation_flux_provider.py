@@ -824,9 +824,11 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
 
 @pytest.mark.xdist_group("serial")
 def test_provider_publishes_zero_net_flux_without_debiting_it():
-    """P_eq <= P_bulk is a computed 0. A missing molar mass stays omitted.
+    """P_eq <= 0 is a computed 0. A supersaturated carrier recondenses.
 
-    The debit map does not gain the zero. A positive sibling is unchanged.
+    A missing molar mass stays omitted. The debit map does not gain the
+    zero. A positive sibling is unchanged. SiO above its equilibrium
+    partial is a negative published rate (d-468), not a zero-net entry.
     """
 
     zero_only = _w3_result_with_controls(
@@ -878,8 +880,8 @@ def test_provider_publishes_zero_net_flux_without_debiting_it():
         },
     )
     assert mixed.status == 'ok'
-    assert 'SiO' not in mixed.diagnostic['evaporation_flux_kg_hr']
-    assert mixed.diagnostic['zero_net_evaporation_flux']['SiO'] == 0.0
+    assert mixed.diagnostic['evaporation_flux_kg_hr']['SiO'] < 0.0
+    assert 'SiO' not in mixed.diagnostic.get('zero_net_evaporation_flux', {})
     assert mixed.diagnostic['evaporation_flux_kg_hr']['Na'] == pytest.approx(
         baseline.diagnostic['evaporation_flux_kg_hr']['Na'],
         rel=0,
@@ -1597,7 +1599,7 @@ def test_evaporation_caller_keeps_flagged_alpha_prediction(
         ({"vapour_batch_flux_pressures_Pa": {"Na": 0.0}}, None),
         ({"melt_surface_area_m2": 0.0}, None),
         ({"available_oxide_kg": {"Na": 0.0}}, None),
-        ({"overhead_partials_Pa": {"Na": 200.0}}, None),
+        ({"overhead_partials_Pa": {"Na": 200.0}}, ("Na", "recondense")),
         (
             {
                 "vapour_batch_flux_pressures_Pa": {"Na": 3.0},
@@ -1609,7 +1611,7 @@ def test_evaporation_caller_keeps_flagged_alpha_prediction(
         ({"alpha": {"Na": 0.0}}, None),
         ({"alpha": 1.0e-20}, None),
         ({"pipe_diameter_m": 0.0}, None),
-        ({"hkl_upper_bound_transport_species": ("Na",)}, "Na"),
+        ({"hkl_upper_bound_transport_species": ("Na",)}, ("Na", "evaporate")),
     ),
     ids=(
         "empty_batch_map",
@@ -1643,7 +1645,13 @@ def test_transitional_domain_preserves_proven_zero_and_explicit_hkl_paths(
     if expected_flux_species is None:
         assert flux == {}
     else:
-        assert flux[expected_flux_species] > 0.0
+        name, direction = expected_flux_species
+        # P_eq is 100 Pa. A 200 Pa bulk is the reverse rate (d-468).
+        # The HKL upper bound still evaporates: its drive bulk is 0.
+        if direction == "recondense":
+            assert flux[name] < 0.0
+        else:
+            assert flux[name] > 0.0
 
 
 @pytest.mark.xdist_group("serial")

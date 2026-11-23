@@ -975,8 +975,8 @@ class EvaporationFlux:
     the gas-side Sherwood resistance, while axial stirring is diagnostic-only.
     """
     species_kg_hr: Dict[str, float] = field(default_factory=dict)
-    # Mass evaporation rate per species (kg/hr)
-    # Positive = leaving the melt
+    # Mass rate per species (kg/hr). Positive leaves the melt.
+    # Negative is vapour returning to the melt (d-468).
     alpha_authority_status_by_species: Dict[str, str] = field(
         default_factory=dict
     )
