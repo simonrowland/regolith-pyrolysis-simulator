@@ -195,16 +195,6 @@ def test_initial_charge_role_reader_normalizes_extract_whitespace(monkeypatch) -
         **values["composition_role"],
         "value": " initial_charge_only ",
     }
-    values["points"] = [
-        {
-            **point,
-            "composition_role": {
-                **point["composition_role"],
-                "value": " initial_charge_only ",
-            },
-        }
-        for point in values["points"]
-    ]
     obs = replace(obs, values=values)
     monkeypatch.setattr(
         er,

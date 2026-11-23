@@ -174,10 +174,16 @@ def test_figure_only_exception_requires_parsed_digitized_points() -> None:
     )
 
     model_marked = replace(
-        coefficient_only, values={**values, "evidence_class": "model_derived"}
+        obs, values={**obs.values, "evidence_class": "model"}
     )
     assert observation_admission_reason(model_marked) == (
         "model_output_not_measurement"
+    )
+    unknown_marker = replace(
+        obs, values={**obs.values, "evidence_class": "model_derived"}
+    )
+    assert observation_admission_reason(unknown_marker) == (
+        "unknown_evidence_marker:evidence_class=model_derived"
     )
 
 
@@ -195,9 +201,19 @@ def test_demaria_k_reservoir_reason_selects_melt_standard_state() -> None:
     assert _pressure_standard_state_kind(obs) == "melt"
 
 
-def test_demaria_k_composition_points_report_scorer_only_closure_gap(
+def test_demaria_k_composition_points_use_scorer_effusion_closure(
     monkeypatch,
 ) -> None:
+    from simulator.battery.enums import Engine, ExecutionState, NoticeKind, Quantity
+    from simulator.battery.records import Execution, Notice
+    from simulator.battery.score import (
+        ENGINE_CHANNELS,
+        OXYGEN_BALANCE_NOTICE_PREFIX,
+        EnginePrediction,
+    )
+
+    import simulator.battery.score as score
+
     obs = _adopted_observation(
         "kems-022-demaria-1971",
         "K",
@@ -212,11 +228,34 @@ def test_demaria_k_composition_points_report_scorer_only_closure_gap(
     ]
     assert len(composition_points) == 2
 
-    melt_calls: list[tuple[object, ...]] = []
+    closure_calls: list[tuple[object, object]] = []
 
-    def refuse_numeric_po2(*args, **kwargs):
-        melt_calls.append(args)
-        raise AssertionError("Knudsen closure must not be replaced by numeric pO2")
+    def closure_stub(engine, observation, **kwargs):
+        assert engine is Engine.INTERNAL_ANALYTICAL
+        experiment = kwargs["experiment"]
+        closure_calls.append((observation, experiment))
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.PRODUCED),
+            notices=(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(Quantity.P_PARTIAL,),
+                    reason=OXYGEN_BALANCE_NOTICE_PREFIX
+                    + '{"pO2_bar":5e-09}',
+                    origin=f"engine:{engine.value}",
+                ),
+            ),
+        )
+
+    melt_calls: list[tuple[str, float, float, dict[str, float]]] = []
+
+    def melt_stub(species, temperature_K, pO2_bar, _vp_data, *, account_mol):
+        melt_calls.append(
+            (str(species), float(temperature_K), float(pO2_bar), dict(account_mol))
+        )
+        return 1.0, None, {"provider_status": "ok"}
 
     runtimes: list[dict[str, object]] = []
     compare_point = extract_reproduction._compare_point
@@ -225,16 +264,32 @@ def test_demaria_k_composition_points_report_scorer_only_closure_gap(
         runtimes.append(dict(kwargs["runtime"]))
         return compare_point(**kwargs)
 
-    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", refuse_numeric_po2)
+    monkeypatch.setattr(score, "predict_with_engine", closure_stub)
+    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", melt_stub)
     monkeypatch.setattr(extract_reproduction, "_compare_point", capture_runtime)
 
     evaluation = evaluate_observation(obs, vapor_pressure_data={})
 
-    scorer_gap = (
-        "typed-refusal:diagnostic_effusion_closure_via_scorer_only; "
-        "owner=simulator/battery/score.py::_borrow_internal_analytical_effusion"
-    )
     assert len(evaluation.records) == 10
-    assert sum(runtime.get("skip_reason") == scorer_gap for runtime in runtimes) == 2
-    assert scorer_gap in evaluation.skip_reasons
-    assert not melt_calls
+    assert len(closure_calls) == 2
+    assert all(
+        observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.P_PARTIAL
+        and observation.identity.composition.is_value
+        and len(observation.identity.composition.value.components) == 9
+        and observation.identity.composition.value.proxy_flag == "initial_charge_only"
+        and experiment.experiment_id.endswith("::experiment::demaria-1971-k-figure2")
+        for observation, experiment in closure_calls
+    )
+    assert len(melt_calls) == 2
+    assert {call[1] for call in melt_calls} == {1366.12, 1314.06}
+    assert {call[2] for call in melt_calls} == {5e-9}
+    assert all(len(call[3]) == 9 for call in melt_calls)
+    assert sum(record.status == "assumed-input" for record in evaluation.records) == 2
+    assert sum(record.actual_value is None for record in evaluation.records) == 8
+    assert all(
+        runtime.get("oxygen_closure", {}).get("owner")
+        == "simulator/battery/score.py::_borrow_internal_analytical_effusion"
+        for runtime in runtimes
+        if runtime.get("temperature_K") in {1366.12, 1314.06}
+    )

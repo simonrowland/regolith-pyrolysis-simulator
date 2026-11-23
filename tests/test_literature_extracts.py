@@ -16307,3 +16307,16 @@ def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures()
             assert condition.state.is_value
             assert condition.locator is not None
             assert condition.locator.table is not None
+
+
+def test_demaria_1971_figure_2_locator_uses_physical_pdf_page_index() -> None:
+    source = EXTRACTS / "kems-022-demaria-1971.yaml"
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    observation = next(
+        row
+        for row in extract["species"]["K"]["observations"]
+        if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
+    )
+
+    assert observation["locator"]["published_page"] == 1370
+    assert observation["locator"]["pdf_page_index"] == 3
