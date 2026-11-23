@@ -1858,6 +1858,38 @@ def robinot_pyrometer_brightness_temperature_C(
     return brightness_temperature_K - CELSIUS_TO_KELVIN_OFFSET
 
 
+def robinot_pyrometer_comparison(
+    temperature_records: Sequence[Mapping[str, Any]],
+    *,
+    published_reading_C: float | None,
+) -> dict[str, Any]:
+    """Select and compare the Robinot run's peak temperature record."""
+
+    predictions = [
+        record
+        for record in temperature_records
+        if record.get("temperature_C") is not None
+    ]
+    if not predictions:
+        return {
+            "temperature_C": None,
+            "time_min": None,
+            "residual_C": None,
+        }
+    peak = max(predictions, key=lambda item: float(item["temperature_C"]))
+    temperature_C = float(peak["temperature_C"])
+    residual_C = (
+        None
+        if published_reading_C is None
+        else temperature_C - float(published_reading_C)
+    )
+    return {
+        "temperature_C": temperature_C,
+        "time_min": peak.get("time_min"),
+        "residual_C": residual_C,
+    }
+
+
 def _optional_positive_length(
     value: float | None,
     *,

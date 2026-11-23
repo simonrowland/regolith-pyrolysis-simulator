@@ -66,6 +66,7 @@ from simulator.thermal_budget import (
     furnace_power_trace_time_bounds_s,
     measured_furnace_power_trace,
     reported_temperature_observations,
+    robinot_pyrometer_comparison,
 )
 
 
@@ -800,11 +801,13 @@ def _pyrometer_record(
     unavailable_reason: str | None,
     mode: str,
 ) -> dict[str, Any]:
-    predictions = [
-        record
-        for record in run_data["power_temperature_records"]
-        if record.get("temperature_C") is not None
-    ]
+    published_temperature_C = (
+        None if observation is None else float(observation["value"])
+    )
+    comparison = robinot_pyrometer_comparison(
+        run_data["power_temperature_records"],
+        published_reading_C=published_temperature_C,
+    )
     source_locator = (
         None
         if observation is None
@@ -816,13 +819,11 @@ def _pyrometer_record(
             "t_h": observation.get("t_h"),
         }
     )
-    if not predictions:
+    if comparison["temperature_C"] is None:
         return {
             "t": None,
             "observable": "robinot_pyrometer_peak_temperature_C",
-            "published": (
-                None if observation is None else float(observation["value"])
-            ),
+            "published": published_temperature_C,
             "simulated": None,
             "residual": None,
             "flags": [
@@ -842,12 +843,11 @@ def _pyrometer_record(
             "mode": mode,
             "units": "degC",
         }
-    peak = max(predictions, key=lambda item: float(item["temperature_C"]))
-    simulated = float(peak["temperature_C"])
+    simulated = float(comparison["temperature_C"])
     if observation is None:
         return {
             "t": None,
-            "prediction_time_min": peak.get("time_min"),
+            "prediction_time_min": comparison["time_min"],
             "observable": "robinot_pyrometer_peak_temperature_C",
             "published": None,
             "simulated": simulated,
@@ -859,15 +859,14 @@ def _pyrometer_record(
             "units": "degC",
             "source_locator": None,
         }
-    published_temperature_C = float(observation["value"])
     return {
         "t": None,
-        "prediction_time_min": peak.get("time_min"),
+        "prediction_time_min": comparison["time_min"],
         "observation_time_h": observation.get("t_h"),
         "observable": "robinot_pyrometer_peak_temperature_C",
         "published": published_temperature_C,
         "simulated": simulated,
-        "residual": simulated - published_temperature_C,
+        "residual": comparison["residual_C"],
         "comparison_status": "available",
         "published_qualifier": observation.get("qualifier"),
         "source_locator": source_locator,
