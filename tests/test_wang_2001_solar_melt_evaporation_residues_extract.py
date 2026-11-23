@@ -109,12 +109,21 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         row for row in table1
         if row["values"]["analytical_method"] == "electron microprobe"
     )
-    assert len(electron_probe["values"]["series"]) == 96
+    assert len(electron_probe["values"]["series"]) == 16
     assert electron_probe["uncertainty"]["confidence_level"] == "one_sigma"
     assert electron_probe["uncertainty"]["locator"]["page"] == 5
     assert electron_probe["uncertainty"]["locator"]["published_page"] == 483
     assert electron_probe["uncertainty"]["locator"]["pdf_page_index"] == 4
-    zero_width_cells = set()
+    zero_widths = {
+        (cell["sample"], cell["formula"]): cell["sigma"]
+        for cell in electron_probe["uncertainty"]["zero_width_cells"]
+    }
+    assert zero_widths == {
+        ("SC4", "SiO2"): "0.0", ("SC14", "SiO2"): "0.0",
+        ("SC1", "SiO2"): "0.0", ("SC7", "SiO2"): "0.0",
+        ("SC2", "SiO2"): "0.0", ("SC16", "SiO2"): "0.0",
+        ("SC4", "FeO"): "0.0", ("SC9", "MgO"): "0.000",
+    }
     for label, expected_cells in rendered.items():
         group, formula = label.split(".", maxsplit=1)
         if group == "REE":
@@ -143,28 +152,21 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
             assert point[value_field] == expected_value, (label, sample)
             if group == "EM":
                 assert expected_error is not None
-                assert point["sigma"] == expected_error, (label, sample)
-                assert point["value_as_published"] == f"{expected_value} ± {expected_error}", (label, sample)
+                assert point.get("standard_errors", {}).get(
+                    formula, zero_widths.get((sample, formula))
+                ) == expected_error, (label, sample)
                 page = 4 if TABLE1_SAMPLES.index(sample) < 8 else 5
                 assert point["locator"]["page"] == page, (label, sample)
                 assert point["locator"]["published_page"] == page + 478, (label, sample)
                 assert point["locator"]["pdf_page_index"] == page - 1, (label, sample)
                 assert point["locator"]["table"] == "1", (label, sample)
                 assert point["locator"]["row"] == sample, (label, sample)
-                assert point["locator"]["column"] == formula, (label, sample)
-                if expected_error in {"0.0", "0.000"}:
-                    zero_width_cells.add((sample, formula))
             elif error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
             else:
                 assert point.get("standard_errors", {}).get(formula) == expected_error, (label, sample)
-                if expected_error is None:
+                if group == "IM":
                     assert "sigma" not in point, (label, sample)
-    assert zero_width_cells == {
-        ("SC4", "SiO2"), ("SC14", "SiO2"), ("SC1", "SiO2"),
-        ("SC7", "SiO2"), ("SC2", "SiO2"), ("SC16", "SiO2"),
-        ("SC4", "FeO"), ("SC9", "MgO"),
-    }
 
 
 def test_rendered_table_grids_and_cell_mutations() -> None:
@@ -182,7 +184,11 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
     with pytest.raises(AssertionError):
         assert_table1_grid_matches_render(changed_extract, rendered)
     changed_extract = deepcopy(extract)
-    changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["sigma"] = "9.9"
+    changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["standard_errors"]["MgO"] = "9.9"
+    with pytest.raises(AssertionError):
+        assert_table1_grid_matches_render(changed_extract, rendered)
+    changed_extract = deepcopy(extract)
+    changed_extract["species"]["SiO2"]["observations"][0]["uncertainty"]["zero_width_cells"][0]["sigma"] = "9.9"
     with pytest.raises(AssertionError):
         assert_table1_grid_matches_render(changed_extract, rendered)
     changed_extract = deepcopy(extract)
@@ -388,6 +394,19 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         for name in required_conditions:
             assert name in conditions and conditions[name].locator is not None, (quantity, sample, formula, name)
         assert all(condition.locator is not None for condition in conditions.values())
+        if (
+            row.observation_id.startswith(electron_probe_prefix)
+            and sample == "SC12"
+            and formula == "MgO"
+        ):
+            assert conditions["printed_composition"].state.value == {
+                "MgO": "24.4",
+                "Al2O3": "2.73",
+                "SiO2": "35.1",
+                "CaO": "2.24",
+                "TiO2": "0.097",
+                "FeO": "35.5",
+            }
         pressure = conditions["total_pressure_Pa"]
         assert pressure.state.is_value
         assert pressure.state.value.kind is ValueKind.POINT

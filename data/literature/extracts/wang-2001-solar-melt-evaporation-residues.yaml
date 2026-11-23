@@ -37,10 +37,10 @@ notes:
 - Table 1 reports ΣLn2O3 as the total of all rare-earth oxides. The aggregate does not have a single species formula;
   the individual La–Lu ppm values are typed.
 - >
-  The electron-microprobe oxide grid has 16 samples × 6 oxide cells = 96 cells. Each printed value and its 1σ width
-  is stored on a separate cell row so the existing residue-series migrator carries that cell's width. The footnote
-  identifies these as standard errors from replicate analyses. Eight cells print a zero width and remain explicit
-  as sigma strings.
+  The electron-microprobe oxide grid has 16 bead rows × 6 oxide cells = 96 cells. Each row retains the six oxide
+  values and its printed nonzero widths in `standard_errors`. Eight printed zero widths are listed in the
+  observation-level `uncertainty.zero_width_cells` metadata, outside the row payload used by stable IDs. The footnote
+  identifies all 96 widths as one-sigma standard errors from replicate analyses.
 - >
   Locator audit: sample columns SC12, SC11, SC5, SC13, SC8, SC4, SC14, and SC1 use physical PDF page 4
   (index 3, published page 482); SC7, SC2, SC16, SC6, SC3, SC15, SC10, and SC9 use page 5 (index 4, published
@@ -54,7 +54,7 @@ notes:
   cells. The extent comparator does not require a per-bead exposed-area value (not reported in section 2.2, page 3).
   Scoring is deferred to Car 3, outside this change; this car scores 0/96 cells.
 fidelity_samples:
-- path: species.SiO2.observations[wang_2001_table1_electron_microprobe_residue_compositions].values.series[95].FeO_wt_pct
+- path: species.SiO2.observations[wang_2001_table1_electron_microprobe_residue_compositions].values.series[15].FeO_wt_pct
   value: '0.003'
   locator:
     page: 5
@@ -103,6 +103,31 @@ species:
           pdf_page_index: 4
           table: '1'
           note: Table 1 footnote on replicate-analysis standard errors.
+        zero_width_cells:
+        - sample: SC4
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC14
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC1
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC7
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC2
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC16
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC4
+          formula: FeO
+          sigma: '0.0'
+        - sample: SC9
+          formula: MgO
+          sigma: '0.000'
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
@@ -119,10 +144,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC12
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc12_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -158,8 +182,8 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
@@ -180,93 +204,18 @@ species:
                 section: 2.2. Evaporation Procedure
                 note: About 10^-6 torr in the main furnace chamber; converted to pascals.
           MgO_wt_pct: '24.4'
-          sigma: '0.3'
-          value_as_published: 24.4 ± 0.3
-        - sample: SC12
-          T_C: '1400'
-          t_min: '0'
-          VF_wt_pct: '0.38'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC12
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc12_table1_conditions
+          standard_errors:
+            MgO: '0.3'
+            Al2O3: '0.08'
+            SiO2: '0.2'
+            CaO: '0.08'
+            TiO2: '0.004'
+            FeO: '0.3'
           Al2O3_wt_pct: '2.73'
-          sigma: '0.08'
-          value_as_published: 2.73 ± 0.08
-        - sample: SC12
-          T_C: '1400'
-          t_min: '0'
-          VF_wt_pct: '0.38'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC12
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc12_table1_conditions
           SiO2_wt_pct: '35.1'
-          sigma: '0.2'
-          value_as_published: 35.1 ± 0.2
-        - sample: SC12
-          T_C: '1400'
-          t_min: '0'
-          VF_wt_pct: '0.38'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC12
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc12_table1_conditions
           CaO_wt_pct: '2.24'
-          sigma: '0.08'
-          value_as_published: 2.24 ± 0.08
-        - sample: SC12
-          T_C: '1400'
-          t_min: '0'
-          VF_wt_pct: '0.38'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC12
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc12_table1_conditions
           TiO2_wt_pct: '0.097'
-          sigma: '0.004'
-          value_as_published: 0.097 ± 0.004
-        - sample: SC12
-          T_C: '1400'
-          t_min: '0'
-          VF_wt_pct: '0.38'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC12
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc12_table1_conditions
           FeO_wt_pct: '35.5'
-          sigma: '0.3'
-          value_as_published: 35.5 ± 0.3
         - sample: SC11
           T_C: '1500'
           t_min: '0'
@@ -277,10 +226,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC11
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc11_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -316,115 +264,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC11
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '25.3'
-          sigma: '0.4'
-          value_as_published: 25.3 ± 0.4
-        - sample: SC11
-          T_C: '1500'
-          t_min: '0'
-          VF_wt_pct: '3.43'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC11
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc11_table1_conditions
+          standard_errors:
+            MgO: '0.4'
+            Al2O3: '0.07'
+            SiO2: '0.2'
+            CaO: '0.06'
+            TiO2: '0.003'
+            FeO: '0.4'
           Al2O3_wt_pct: '2.64'
-          sigma: '0.07'
-          value_as_published: 2.64 ± 0.07
-        - sample: SC11
-          T_C: '1500'
-          t_min: '0'
-          VF_wt_pct: '3.43'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC11
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc11_table1_conditions
           SiO2_wt_pct: '34.8'
-          sigma: '0.2'
-          value_as_published: 34.8 ± 0.2
-        - sample: SC11
-          T_C: '1500'
-          t_min: '0'
-          VF_wt_pct: '3.43'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC11
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc11_table1_conditions
           CaO_wt_pct: '2.08'
-          sigma: '0.06'
-          value_as_published: 2.08 ± 0.06
-        - sample: SC11
-          T_C: '1500'
-          t_min: '0'
-          VF_wt_pct: '3.43'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC11
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc11_table1_conditions
           TiO2_wt_pct: '0.097'
-          sigma: '0.003'
-          value_as_published: 0.097 ± 0.003
-        - sample: SC11
-          T_C: '1500'
-          t_min: '0'
-          VF_wt_pct: '3.43'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC11
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc11_table1_conditions
           FeO_wt_pct: '35.2'
-          sigma: '0.4'
-          value_as_published: 35.2 ± 0.4
         - sample: SC5
           T_C: '1800'
           t_min: '0'
@@ -435,10 +296,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC5
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc5_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -474,115 +334,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC5
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '26.1'
-          sigma: '0.5'
-          value_as_published: 26.1 ± 0.5
-        - sample: SC5
-          T_C: '1800'
-          t_min: '0'
-          VF_wt_pct: '7.58'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC5
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc5_table1_conditions
+          standard_errors:
+            MgO: '0.5'
+            Al2O3: '0.09'
+            SiO2: '0.1'
+            CaO: '0.08'
+            TiO2: '0.004'
+            FeO: '0.4'
           Al2O3_wt_pct: '2.90'
-          sigma: '0.09'
-          value_as_published: 2.90 ± 0.09
-        - sample: SC5
-          T_C: '1800'
-          t_min: '0'
-          VF_wt_pct: '7.58'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC5
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc5_table1_conditions
           SiO2_wt_pct: '36.2'
-          sigma: '0.1'
-          value_as_published: 36.2 ± 0.1
-        - sample: SC5
-          T_C: '1800'
-          t_min: '0'
-          VF_wt_pct: '7.58'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC5
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc5_table1_conditions
           CaO_wt_pct: '2.27'
-          sigma: '0.08'
-          value_as_published: 2.27 ± 0.08
-        - sample: SC5
-          T_C: '1800'
-          t_min: '0'
-          VF_wt_pct: '7.58'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC5
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc5_table1_conditions
           TiO2_wt_pct: '0.106'
-          sigma: '0.004'
-          value_as_published: 0.106 ± 0.004
-        - sample: SC5
-          T_C: '1800'
-          t_min: '0'
-          VF_wt_pct: '7.58'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC5
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc5_table1_conditions
           FeO_wt_pct: '32.4'
-          sigma: '0.4'
-          value_as_published: 32.4 ± 0.4
         - sample: SC13
           T_C: '1800'
           t_min: '7'
@@ -593,10 +366,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC13
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc13_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -632,115 +404,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC13
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '29.7'
-          sigma: '0.2'
-          value_as_published: 29.7 ± 0.2
-        - sample: SC13
-          T_C: '1800'
-          t_min: '7'
-          VF_wt_pct: '21.80'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC13
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc13_table1_conditions
+          standard_errors:
+            MgO: '0.2'
+            Al2O3: '0.04'
+            SiO2: '0.1'
+            CaO: '0.03'
+            TiO2: '0.002'
+            FeO: '0.2'
           Al2O3_wt_pct: '3.61'
-          sigma: '0.04'
-          value_as_published: 3.61 ± 0.04
-        - sample: SC13
-          T_C: '1800'
-          t_min: '7'
-          VF_wt_pct: '21.80'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC13
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc13_table1_conditions
           SiO2_wt_pct: '40.5'
-          sigma: '0.1'
-          value_as_published: 40.5 ± 0.1
-        - sample: SC13
-          T_C: '1800'
-          t_min: '7'
-          VF_wt_pct: '21.80'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC13
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc13_table1_conditions
           CaO_wt_pct: '2.58'
-          sigma: '0.03'
-          value_as_published: 2.58 ± 0.03
-        - sample: SC13
-          T_C: '1800'
-          t_min: '7'
-          VF_wt_pct: '21.80'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC13
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc13_table1_conditions
           TiO2_wt_pct: '0.141'
-          sigma: '0.002'
-          value_as_published: 0.141 ± 0.002
-        - sample: SC13
-          T_C: '1800'
-          t_min: '7'
-          VF_wt_pct: '21.80'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC13
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc13_table1_conditions
           FeO_wt_pct: '23.5'
-          sigma: '0.2'
-          value_as_published: 23.5 ± 0.2
         - sample: SC8
           T_C: '2000'
           t_min: '0'
@@ -751,10 +436,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC8
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc8_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -790,115 +474,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC8
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '32.6'
-          sigma: '0.1'
-          value_as_published: 32.6 ± 0.1
-        - sample: SC8
-          T_C: '2000'
-          t_min: '0'
-          VF_wt_pct: '32.15'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC8
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc8_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.02'
+            SiO2: '0.1'
+            CaO: '0.01'
+            TiO2: '0.001'
+            FeO: '0.2'
           Al2O3_wt_pct: '3.34'
-          sigma: '0.02'
-          value_as_published: 3.34 ± 0.02
-        - sample: SC8
-          T_C: '2000'
-          t_min: '0'
-          VF_wt_pct: '32.15'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC8
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc8_table1_conditions
           SiO2_wt_pct: '40.6'
-          sigma: '0.1'
-          value_as_published: 40.6 ± 0.1
-        - sample: SC8
-          T_C: '2000'
-          t_min: '0'
-          VF_wt_pct: '32.15'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC8
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc8_table1_conditions
           CaO_wt_pct: '2.70'
-          sigma: '0.01'
-          value_as_published: 2.70 ± 0.01
-        - sample: SC8
-          T_C: '2000'
-          t_min: '0'
-          VF_wt_pct: '32.15'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC8
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc8_table1_conditions
           TiO2_wt_pct: '0.150'
-          sigma: '0.001'
-          value_as_published: 0.150 ± 0.001
-        - sample: SC8
-          T_C: '2000'
-          t_min: '0'
-          VF_wt_pct: '32.15'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC8
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc8_table1_conditions
           FeO_wt_pct: '20.6'
-          sigma: '0.2'
-          value_as_published: 20.6 ± 0.2
         - sample: SC4
           T_C: '1800'
           t_min: '15'
@@ -909,10 +506,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC4
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc4_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -948,115 +544,26 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC4
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '35.2'
-          sigma: '0.1'
-          value_as_published: 35.2 ± 0.1
-        - sample: SC4
-          T_C: '1800'
-          t_min: '15'
-          VF_wt_pct: '36.68'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC4
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc4_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.02'
+            CaO: '0.01'
+            TiO2: '0.001'
           Al2O3_wt_pct: '4.00'
-          sigma: '0.02'
-          value_as_published: 4.00 ± 0.02
-        - sample: SC4
-          T_C: '1800'
-          t_min: '15'
-          VF_wt_pct: '36.68'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC4
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc4_table1_conditions
           SiO2_wt_pct: '44.9'
-          sigma: '0.0'
-          value_as_published: 44.9 ± 0.0
-        - sample: SC4
-          T_C: '1800'
-          t_min: '15'
-          VF_wt_pct: '36.68'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC4
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc4_table1_conditions
           CaO_wt_pct: '3.09'
-          sigma: '0.01'
-          value_as_published: 3.09 ± 0.01
-        - sample: SC4
-          T_C: '1800'
-          t_min: '15'
-          VF_wt_pct: '36.68'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC4
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc4_table1_conditions
           TiO2_wt_pct: '0.173'
-          sigma: '0.001'
-          value_as_published: 0.173 ± 0.001
-        - sample: SC4
-          T_C: '1800'
-          t_min: '15'
-          VF_wt_pct: '36.68'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC4
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc4_table1_conditions
           FeO_wt_pct: '12.6'
-          sigma: '0.0'
-          value_as_published: 12.6 ± 0.0
         - sample: SC14
           T_C: '1800'
           t_min: '40'
@@ -1067,10 +574,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC14
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc14_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -1106,115 +612,27 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC14
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '42.7'
-          sigma: '0.1'
-          value_as_published: 42.7 ± 0.1
-        - sample: SC14
-          T_C: '1800'
-          t_min: '40'
-          VF_wt_pct: '52.54'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC14
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc14_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.02'
+            CaO: '0.01'
+            TiO2: '0.002'
+            FeO: '0.003'
           Al2O3_wt_pct: '5.60'
-          sigma: '0.02'
-          value_as_published: 5.60 ± 0.02
-        - sample: SC14
-          T_C: '1800'
-          t_min: '40'
-          VF_wt_pct: '52.54'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC14
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc14_table1_conditions
           SiO2_wt_pct: '46.7'
-          sigma: '0.0'
-          value_as_published: 46.7 ± 0.0
-        - sample: SC14
-          T_C: '1800'
-          t_min: '40'
-          VF_wt_pct: '52.54'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC14
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc14_table1_conditions
           CaO_wt_pct: '4.00'
-          sigma: '0.01'
-          value_as_published: 4.00 ± 0.01
-        - sample: SC14
-          T_C: '1800'
-          t_min: '40'
-          VF_wt_pct: '52.54'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC14
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc14_table1_conditions
           TiO2_wt_pct: '0.218'
-          sigma: '0.002'
-          value_as_published: 0.218 ± 0.002
-        - sample: SC14
-          T_C: '1800'
-          t_min: '40'
-          VF_wt_pct: '52.54'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC14
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc14_table1_conditions
           FeO_wt_pct: '0.808'
-          sigma: '0.003'
-          value_as_published: 0.808 ± 0.003
         - sample: SC1
           T_C: '1800'
           t_min: '60'
@@ -1225,10 +643,9 @@ species:
             pdf_page_index: 3
             table: '1'
             row: SC1
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc1_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -1264,115 +681,27 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 4
                 published_page: 482
                 pdf_page_index: 3
                 table: '1'
                 row: SC1
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '43.2'
-          sigma: '0.1'
-          value_as_published: 43.2 ± 0.1
-        - sample: SC1
-          T_C: '1800'
-          t_min: '60'
-          VF_wt_pct: '57.35'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC1
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc1_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.04'
+            CaO: '0.03'
+            TiO2: '0.002'
+            FeO: '0.002'
           Al2O3_wt_pct: '6.75'
-          sigma: '0.04'
-          value_as_published: 6.75 ± 0.04
-        - sample: SC1
-          T_C: '1800'
-          t_min: '60'
-          VF_wt_pct: '57.35'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC1
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc1_table1_conditions
           SiO2_wt_pct: '45.0'
-          sigma: '0.0'
-          value_as_published: 45.0 ± 0.0
-        - sample: SC1
-          T_C: '1800'
-          t_min: '60'
-          VF_wt_pct: '57.35'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC1
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc1_table1_conditions
           CaO_wt_pct: '4.79'
-          sigma: '0.03'
-          value_as_published: 4.79 ± 0.03
-        - sample: SC1
-          T_C: '1800'
-          t_min: '60'
-          VF_wt_pct: '57.35'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC1
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc1_table1_conditions
           TiO2_wt_pct: '0.252'
-          sigma: '0.002'
-          value_as_published: 0.252 ± 0.002
-        - sample: SC1
-          T_C: '1800'
-          t_min: '60'
-          VF_wt_pct: '57.35'
-          locator:
-            page: 4
-            published_page: 482
-            pdf_page_index: 3
-            table: '1'
-            row: SC1
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc1_table1_conditions
           FeO_wt_pct: '0.069'
-          sigma: '0.002'
-          value_as_published: 0.069 ± 0.002
         - sample: SC7
           T_C: '2000'
           t_min: '5'
@@ -1383,10 +712,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC7
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc7_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -1422,115 +750,27 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC7
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '44.9'
-          sigma: '0.1'
-          value_as_published: 44.9 ± 0.1
-        - sample: SC7
-          T_C: '2000'
-          t_min: '5'
-          VF_wt_pct: '60.38'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC7
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc7_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.05'
+            CaO: '0.02'
+            TiO2: '0.002'
+            FeO: '0.002'
           Al2O3_wt_pct: '6.69'
-          sigma: '0.05'
-          value_as_published: 6.69 ± 0.05
-        - sample: SC7
-          T_C: '2000'
-          t_min: '5'
-          VF_wt_pct: '60.38'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC7
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc7_table1_conditions
           SiO2_wt_pct: '43.0'
-          sigma: '0.0'
-          value_as_published: 43.0 ± 0.0
-        - sample: SC7
-          T_C: '2000'
-          t_min: '5'
-          VF_wt_pct: '60.38'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC7
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc7_table1_conditions
           CaO_wt_pct: '4.88'
-          sigma: '0.02'
-          value_as_published: 4.88 ± 0.02
-        - sample: SC7
-          T_C: '2000'
-          t_min: '5'
-          VF_wt_pct: '60.38'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC7
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc7_table1_conditions
           TiO2_wt_pct: '0.260'
-          sigma: '0.002'
-          value_as_published: 0.260 ± 0.002
-        - sample: SC7
-          T_C: '2000'
-          t_min: '5'
-          VF_wt_pct: '60.38'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC7
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc7_table1_conditions
           FeO_wt_pct: '0.284'
-          sigma: '0.002'
-          value_as_published: 0.284 ± 0.002
         - sample: SC2
           T_C: '1800'
           t_min: '180'
@@ -1541,10 +781,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC2
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc2_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -1580,115 +819,27 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC2
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '43.0'
-          sigma: '0.1'
-          value_as_published: 43.0 ± 0.1
-        - sample: SC2
-          T_C: '1800'
-          t_min: '180'
-          VF_wt_pct: '69.17'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC2
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc2_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.07'
+            CaO: '0.03'
+            TiO2: '0.002'
+            FeO: '0.002'
           Al2O3_wt_pct: '8.49'
-          sigma: '0.07'
-          value_as_published: 8.49 ± 0.07
-        - sample: SC2
-          T_C: '1800'
-          t_min: '180'
-          VF_wt_pct: '69.17'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC2
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc2_table1_conditions
           SiO2_wt_pct: '41.9'
-          sigma: '0.0'
-          value_as_published: 41.9 ± 0.0
-        - sample: SC2
-          T_C: '1800'
-          t_min: '180'
-          VF_wt_pct: '69.17'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC2
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc2_table1_conditions
           CaO_wt_pct: '6.29'
-          sigma: '0.03'
-          value_as_published: 6.29 ± 0.03
-        - sample: SC2
-          T_C: '1800'
-          t_min: '180'
-          VF_wt_pct: '69.17'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC2
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc2_table1_conditions
           TiO2_wt_pct: '0.311'
-          sigma: '0.002'
-          value_as_published: 0.311 ± 0.002
-        - sample: SC2
-          T_C: '1800'
-          t_min: '180'
-          VF_wt_pct: '69.17'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC2
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc2_table1_conditions
           FeO_wt_pct: '0.012'
-          sigma: '0.002'
-          value_as_published: 0.012 ± 0.002
         - sample: SC16
           T_C: '1800'
           t_min: '120'
@@ -1699,10 +850,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC16
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc16_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -1738,115 +888,27 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC16
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '42.7'
-          sigma: '0.1'
-          value_as_published: 42.7 ± 0.1
-        - sample: SC16
-          T_C: '1800'
-          t_min: '120'
-          VF_wt_pct: '72.06'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC16
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc16_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.05'
+            CaO: '0.03'
+            TiO2: '0.002'
+            FeO: '0.001'
           Al2O3_wt_pct: '8.65'
-          sigma: '0.05'
-          value_as_published: 8.65 ± 0.05
-        - sample: SC16
-          T_C: '1800'
-          t_min: '120'
-          VF_wt_pct: '72.06'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC16
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc16_table1_conditions
           SiO2_wt_pct: '41.7'
-          sigma: '0.0'
-          value_as_published: 41.7 ± 0.0
-        - sample: SC16
-          T_C: '1800'
-          t_min: '120'
-          VF_wt_pct: '72.06'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC16
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc16_table1_conditions
           CaO_wt_pct: '6.59'
-          sigma: '0.03'
-          value_as_published: 6.59 ± 0.03
-        - sample: SC16
-          T_C: '1800'
-          t_min: '120'
-          VF_wt_pct: '72.06'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC16
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc16_table1_conditions
           TiO2_wt_pct: '0.325'
-          sigma: '0.002'
-          value_as_published: 0.325 ± 0.002
-        - sample: SC16
-          T_C: '1800'
-          t_min: '120'
-          VF_wt_pct: '72.06'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC16
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc16_table1_conditions
           FeO_wt_pct: '0.007'
-          sigma: '0.001'
-          value_as_published: 0.007 ± 0.001
         - sample: SC6
           T_C: '2000'
           t_min: '15'
@@ -1857,10 +919,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC6
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc6_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -1896,115 +957,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC6
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '37.2'
-          sigma: '0.1'
-          value_as_published: 37.2 ± 0.1
-        - sample: SC6
-          T_C: '2000'
-          t_min: '15'
-          VF_wt_pct: '82.91'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC6
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc6_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.1'
+            SiO2: '0.1'
+            CaO: '0.1'
+            TiO2: '0.004'
+            FeO: '0.002'
           Al2O3_wt_pct: '13.8'
-          sigma: '0.1'
-          value_as_published: 13.8 ± 0.1
-        - sample: SC6
-          T_C: '2000'
-          t_min: '15'
-          VF_wt_pct: '82.91'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC6
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc6_table1_conditions
           SiO2_wt_pct: '37.3'
-          sigma: '0.1'
-          value_as_published: 37.3 ± 0.1
-        - sample: SC6
-          T_C: '2000'
-          t_min: '15'
-          VF_wt_pct: '82.91'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC6
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc6_table1_conditions
           CaO_wt_pct: '11.2'
-          sigma: '0.1'
-          value_as_published: 11.2 ± 0.1
-        - sample: SC6
-          T_C: '2000'
-          t_min: '15'
-          VF_wt_pct: '82.91'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC6
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc6_table1_conditions
           TiO2_wt_pct: '0.506'
-          sigma: '0.004'
-          value_as_published: 0.506 ± 0.004
-        - sample: SC6
-          T_C: '2000'
-          t_min: '15'
-          VF_wt_pct: '82.91'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC6
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc6_table1_conditions
           FeO_wt_pct: '0.015'
-          sigma: '0.002'
-          value_as_published: 0.015 ± 0.002
         - sample: SC3
           T_C: '1800'
           t_min: '300'
@@ -2015,10 +989,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC3
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc3_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -2054,115 +1027,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC3
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '30.8'
-          sigma: '0.2'
-          value_as_published: 30.8 ± 0.2
-        - sample: SC3
-          T_C: '1800'
-          t_min: '300'
-          VF_wt_pct: '86.34'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC3
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc3_table1_conditions
+          standard_errors:
+            MgO: '0.2'
+            Al2O3: '0.2'
+            SiO2: '0.1'
+            CaO: '0.1'
+            TiO2: '0.006'
+            FeO: '0.002'
           Al2O3_wt_pct: '17.4'
-          sigma: '0.2'
-          value_as_published: 17.4 ± 0.2
-        - sample: SC3
-          T_C: '1800'
-          t_min: '300'
-          VF_wt_pct: '86.34'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC3
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc3_table1_conditions
           SiO2_wt_pct: '36.7'
-          sigma: '0.1'
-          value_as_published: 36.7 ± 0.1
-        - sample: SC3
-          T_C: '1800'
-          t_min: '300'
-          VF_wt_pct: '86.34'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC3
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc3_table1_conditions
           CaO_wt_pct: '14.5'
-          sigma: '0.1'
-          value_as_published: 14.5 ± 0.1
-        - sample: SC3
-          T_C: '1800'
-          t_min: '300'
-          VF_wt_pct: '86.34'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC3
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc3_table1_conditions
           TiO2_wt_pct: '0.597'
-          sigma: '0.006'
-          value_as_published: 0.597 ± 0.006
-        - sample: SC3
-          T_C: '1800'
-          t_min: '300'
-          VF_wt_pct: '86.34'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC3
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc3_table1_conditions
           FeO_wt_pct: '0.007'
-          sigma: '0.002'
-          value_as_published: 0.007 ± 0.002
         - sample: SC15
           T_C: '1800'
           t_min: '220'
@@ -2173,10 +1059,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC15
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc15_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -2212,115 +1097,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC15
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '26.7'
-          sigma: '0.2'
-          value_as_published: 26.7 ± 0.2
-        - sample: SC15
-          T_C: '1800'
-          t_min: '220'
-          VF_wt_pct: '88.59'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC15
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc15_table1_conditions
+          standard_errors:
+            MgO: '0.2'
+            Al2O3: '0.2'
+            SiO2: '0.1'
+            CaO: '0.2'
+            TiO2: '0.004'
+            FeO: '0.002'
           Al2O3_wt_pct: '20.2'
-          sigma: '0.2'
-          value_as_published: 20.2 ± 0.2
-        - sample: SC15
-          T_C: '1800'
-          t_min: '220'
-          VF_wt_pct: '88.59'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC15
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc15_table1_conditions
           SiO2_wt_pct: '35.4'
-          sigma: '0.1'
-          value_as_published: 35.4 ± 0.1
-        - sample: SC15
-          T_C: '1800'
-          t_min: '220'
-          VF_wt_pct: '88.59'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC15
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc15_table1_conditions
           CaO_wt_pct: '17.0'
-          sigma: '0.2'
-          value_as_published: 17.0 ± 0.2
-        - sample: SC15
-          T_C: '1800'
-          t_min: '220'
-          VF_wt_pct: '88.59'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC15
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc15_table1_conditions
           TiO2_wt_pct: '0.681'
-          sigma: '0.004'
-          value_as_published: 0.681 ± 0.004
-        - sample: SC15
-          T_C: '1800'
-          t_min: '220'
-          VF_wt_pct: '88.59'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC15
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc15_table1_conditions
           FeO_wt_pct: '0.005'
-          sigma: '0.002'
-          value_as_published: 0.005 ± 0.002
         - sample: SC10
           T_C: '2000'
           t_min: '20'
@@ -2331,10 +1129,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC10
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc10_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -2370,115 +1167,28 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC10
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '26.0'
-          sigma: '0.1'
-          value_as_published: 26.0 ± 0.1
-        - sample: SC10
-          T_C: '2000'
-          t_min: '20'
-          VF_wt_pct: '89.61'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC10
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc10_table1_conditions
+          standard_errors:
+            MgO: '0.1'
+            Al2O3: '0.2'
+            SiO2: '0.1'
+            CaO: '0.2'
+            TiO2: '0.004'
+            FeO: '0.002'
           Al2O3_wt_pct: '22.3'
-          sigma: '0.2'
-          value_as_published: 22.3 ± 0.2
-        - sample: SC10
-          T_C: '2000'
-          t_min: '20'
-          VF_wt_pct: '89.61'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC10
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc10_table1_conditions
           SiO2_wt_pct: '32.2'
-          sigma: '0.1'
-          value_as_published: 32.2 ± 0.1
-        - sample: SC10
-          T_C: '2000'
-          t_min: '20'
-          VF_wt_pct: '89.61'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC10
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc10_table1_conditions
           CaO_wt_pct: '18.7'
-          sigma: '0.2'
-          value_as_published: 18.7 ± 0.2
-        - sample: SC10
-          T_C: '2000'
-          t_min: '20'
-          VF_wt_pct: '89.61'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC10
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc10_table1_conditions
           TiO2_wt_pct: '0.779'
-          sigma: '0.004'
-          value_as_published: 0.779 ± 0.004
-        - sample: SC10
-          T_C: '2000'
-          t_min: '20'
-          VF_wt_pct: '89.61'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC10
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc10_table1_conditions
           FeO_wt_pct: '0.013'
-          sigma: '0.002'
-          value_as_published: 0.013 ± 0.002
         - sample: SC9
           T_C: '2000'
           t_min: '25'
@@ -2489,10 +1199,9 @@ species:
             pdf_page_index: 4
             table: '1'
             row: SC9
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: MgO
-          point_conditions: &wang_sc9_table1_conditions
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+          point_conditions:
             temperature_K:
               state:
                 tag: value
@@ -2528,115 +1237,27 @@ species:
             composition:
               state:
                 tag: unknown
-                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it does not print one
-                  complete normalized melt composition for each residue.
+                reason: The source prints major oxides and separately reported trace and rare-earth analyses; it
+                  does not print one complete normalized melt composition for each residue.
               locator:
                 page: 5
                 published_page: 483
                 pdf_page_index: 4
                 table: '1'
                 row: SC9
-            total_pressure_Pa:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '0.00013332236842105'
-                  approximate: true
-              locator:
-                page: 3
-                published_page: 481
-                pdf_page_index: 2
-                section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+            total_pressure_Pa: *wang_total_pressure
           MgO_wt_pct: '0.001'
-          sigma: '0.000'
-          value_as_published: 0.001 ± 0.000
-        - sample: SC9
-          T_C: '2000'
-          t_min: '25'
-          VF_wt_pct: '95.36'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC9
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: Al2O3
-          point_conditions: *wang_sc9_table1_conditions
           Al2O3_wt_pct: '53.0'
-          sigma: '0.1'
-          value_as_published: 53.0 ± 0.1
-        - sample: SC9
-          T_C: '2000'
-          t_min: '25'
-          VF_wt_pct: '95.36'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC9
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: SiO2
-          point_conditions: *wang_sc9_table1_conditions
+          standard_errors:
+            Al2O3: '0.1'
+            SiO2: '0.01'
+            CaO: '0.1'
+            TiO2: '0.01'
+            FeO: '0.002'
           SiO2_wt_pct: '4.33'
-          sigma: '0.01'
-          value_as_published: 4.33 ± 0.01
-        - sample: SC9
-          T_C: '2000'
-          t_min: '25'
-          VF_wt_pct: '95.36'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC9
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: CaO
-          point_conditions: *wang_sc9_table1_conditions
           CaO_wt_pct: '41.1'
-          sigma: '0.1'
-          value_as_published: 41.1 ± 0.1
-        - sample: SC9
-          T_C: '2000'
-          t_min: '25'
-          VF_wt_pct: '95.36'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC9
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: TiO2
-          point_conditions: *wang_sc9_table1_conditions
           TiO2_wt_pct: '1.57'
-          sigma: '0.01'
-          value_as_published: 1.57 ± 0.01
-        - sample: SC9
-          T_C: '2000'
-          t_min: '25'
-          VF_wt_pct: '95.36'
-          locator:
-            page: 5
-            published_page: 483
-            pdf_page_index: 4
-            table: '1'
-            row: SC9
-            note: Table 1 measured residue composition; run temperature and duration are joined to this printed sample ID from Table
-              2.
-            column: FeO
-          point_conditions: *wang_sc9_table1_conditions
           FeO_wt_pct: '0.003'
-          sigma: '0.002'
-          value_as_published: 0.003 ± 0.002
     - observation_id: wang_2001_table1_ion_microprobe_residue_compositions
       type: composition_series
       locator:
