@@ -34,6 +34,7 @@ from simulator.battery.migrate import (
     _experiment_from_plain,
     _point_condition_from_plain,
     _with_target_print,
+    convert_pressure_to_pa,
     experiment_from_plain,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -1875,6 +1876,18 @@ def test_printed_cell_table_annotation_on_one_locator_does_not_distinguish_row()
         PrintedCell(with_table, "400", "Pa"),
         PrintedCell(row_only, "400", "pascals"),
     ) == "ambiguous"
+
+
+@pytest.mark.parametrize(("spelling", "expected"), [
+    ("pascals", "1"),
+    ("bars", "100000"),
+    ("MPa", "1000000"),
+    ("kilobar", "100000000"),
+    ("kPa", "1000"),
+    ("GPa", "1000000000"),
+])
+def test_pressure_unit_conversion_pin(spelling, expected):
+    assert convert_pressure_to_pa("1", spelling)[0] == Decimal(expected)
 
 
 def _without_printed_fo2(observation):
