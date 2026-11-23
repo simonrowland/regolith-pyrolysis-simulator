@@ -328,3 +328,158 @@ def test_injected_predictor_still_scores_an_uncovered_quantity() -> None:
     assert calls == [Engine.MAGEMIN]
     assert len(residuals) == 1
     assert residuals[0].numeric is not None
+
+
+def test_bound_knudsen_residue_is_emitted_and_not_counted_uncovered(monkeypatch) -> None:
+    """A bound residue residual is not an uncovered matrix cell."""
+
+    from dataclasses import replace
+    from decimal import Decimal
+
+    from simulator.battery.engine_capability import capability_summary
+    from simulator.battery.enums import ExecutionState, ResidualStatus, SourceRelation
+    from simulator.battery.records import Execution, Residual
+    from simulator.battery.score import EnginePrediction, ScoreContext, score_store
+    from tests.battery import factories as F
+
+    experiment = F.kems_experiment()
+    observation = F.observation(
+        "knudsen-residue",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na"),
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="independent-experiment",
+    )
+    context = ScoreContext(
+        {"work-1": F.work()},
+        {experiment.experiment_id: experiment},
+        {observation.observation_id: observation},
+    )
+
+    def fake_prediction(_context, _reference, engine, _cache):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+        )
+
+    def fake_compile(reference, _engine, **_kwargs):
+        return (
+            Residual(
+                key=f"k::{reference.observation_id}",
+                reference=reference.observation_id,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                rail=None,
+                status=ResidualStatus.REFUSED,
+                source_relation=SourceRelation.UNKNOWN,
+                score_eligible=False,
+                exclusions=(),
+                notices=(),
+            ),
+            None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._knudsen_residue_prediction", fake_prediction
+    )
+    monkeypatch.setattr(
+        "simulator.battery.score._compile_residual_with_lineage", fake_compile
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.MAGEMIN,),
+        include_diagnostics=False,
+    )
+    assert [residual.reference for residual in residuals] == ["knudsen-residue"]
+    matrix = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=(Engine.MAGEMIN,),
+        scored_observation_ids=(),
+        n_records=1,
+        n_scored_records=0,
+        n_refused_records=1,
+    )["capability_matrix"]
+    assert matrix["uncovered_pair_total"] == 0
+    assert Quantity.RESIDUE_COMPONENT_COMPOSITION.value not in {
+        row["quantity"] for row in matrix["quantities_no_engine_predicts"]
+    }
+    assert matrix["quantities_no_engine_predicts"] == []
+
+
+def test_skipped_diagnostic_and_duplicate_are_counted_outside_the_census() -> None:
+    """Uncovered diagnostic and duplicate refs stay visible off the candidate matrix."""
+
+    from dataclasses import replace
+    from decimal import Decimal
+
+    from simulator.battery.engine_capability import capability_summary
+    from simulator.battery.enums import QuotedTargetKind
+    from simulator.battery.records import QuotedFrom
+    from simulator.battery.score import ScoreContext
+    from tests.battery import factories as F
+
+    diagnostic_experiment = F.tabulation_experiment(experiment_id="diag-exp")
+    diagnostic = F.observation(
+        "diag-fugacity",
+        diagnostic_experiment.experiment_id,
+        replace(F.psat_identity("Cl2"), quantity=Quantity.FUGACITY),
+        Decimal("1"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    thermo = F.observation(
+        "diag-dfg",
+        diagnostic_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    primary = F.tabulation_experiment(experiment_id="primary-exp")
+    quoted = replace(
+        F.tabulation_experiment(experiment_id="quoted-exp"),
+        quoted_from=QuotedFrom(QuotedTargetKind.EXPERIMENT, primary.experiment_id),
+    )
+    duplicate = F.observation(
+        "dup-fugacity",
+        quoted.experiment_id,
+        replace(F.psat_identity("Na"), quantity=Quantity.FUGACITY),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="independent-experiment",
+    )
+    context = ScoreContext(
+        {"work-1": F.work()},
+        {
+            diagnostic_experiment.experiment_id: diagnostic_experiment,
+            primary.experiment_id: primary,
+            quoted.experiment_id: quoted,
+        },
+        {
+            diagnostic.observation_id: diagnostic,
+            thermo.observation_id: thermo,
+            duplicate.observation_id: duplicate,
+        },
+    )
+    matrix = capability_summary(
+        observations=context.observations,
+        origins={},
+        experiments=context.experiments,
+        engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
+        scored_observation_ids=(),
+        n_records=0,
+        n_scored_records=0,
+        n_refused_records=0,
+    )["capability_matrix"]
+    assert matrix["rows"] == []
+    assert matrix["uncovered_pair_total"] == 0
+    assert matrix["quantities_no_engine_predicts"] == []
+    # Two fugacity refs, two engines. The compilation delta_fG row is
+    # offered only to an engine that declares it, so it is not in this count.
+    assert matrix["n_outside_census_not_emitted"] == 4
