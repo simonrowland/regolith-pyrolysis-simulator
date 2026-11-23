@@ -4734,6 +4734,9 @@ class _IsolatedCellWorker:
             self.engine, normalize_engine_settings(self.engine, self.engine_settings),
         )
         result = cached_engine_call(self.engine, request, solve)
+        # EquilibrateCell.from_hot/as_payload keeps only cell fields. A mask
+        # flag set on the cached refusal has to be copied back after that.
+        mask_hit = result.get("mask_hit") if isinstance(result, Mapping) else None
         if isinstance(result, list) or (isinstance(result, Mapping) and ("refusal_cell" in result or "cell" in result)):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
@@ -4751,6 +4754,8 @@ class _IsolatedCellWorker:
             cpu_s=time.process_time() - started_cpu,
             hostname=_hostname(),
         )
+        if mask_hit is not None:
+            result["mask_hit"] = mask_hit
         return result
 
 
