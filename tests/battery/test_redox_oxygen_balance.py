@@ -410,6 +410,8 @@ def test_q_positive_demand_is_the_valence_mean_and_moves_the_root() -> None:
     redox = _balance(q=q)
     stoichiometric = _balance(q=0.0)
     assert redox.parent_oxygen_demand_at_root["Fe"] == expected_oxygen
+    assert redox.pO2_bar.hex() == "0x1.45f6bce8ef4d2p-21"
+    assert stoichiometric.pO2_bar.hex() == "0x1.18e83802627cap-21"
     assert not math.isclose(
         redox.pO2_bar, stoichiometric.pO2_bar, rel_tol=1.0e-4, abs_tol=0.0
     )

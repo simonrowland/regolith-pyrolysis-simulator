@@ -393,13 +393,15 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         shift = 0.8 / steps
         values["FeO"] += shift
         values["MgO"] -= shift
-        return (
-            values,
-            (0.1,),
-            (),
-            None,
-            {"Fe": 0.0, "O": 0.0},
-            _no_pO2_balance_floor(),
+        return residue._HashimotoGeometryIntegration(
+            composition_wt_pct=values,
+            pO2_steps=(0.1,),
+            exhaustion_notices=(),
+            refusal=None,
+            atom_closure={"Fe": 0.0, "O": 0.0},
+            inventory_mol=dict(inventory),
+            evaporated_mol={},
+            pO2_balance_floor=_no_pO2_balance_floor(),
         )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
@@ -647,13 +649,15 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
         shift = 0.8 / steps
         values["FeO"] += shift
         values["MgO"] -= shift
-        return (
-            values,
-            (0.1,),
-            (),
-            None,
-            {"Fe": 0.0, "O": 0.0},
-            _no_pO2_balance_floor(),
+        return residue._HashimotoGeometryIntegration(
+            composition_wt_pct=values,
+            pO2_steps=(0.1,),
+            exhaustion_notices=(),
+            refusal=None,
+            atom_closure={"Fe": 0.0, "O": 0.0},
+            inventory_mol=dict(inventory),
+            evaporated_mol={},
+            pO2_balance_floor=_no_pO2_balance_floor(),
         )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
@@ -800,13 +804,15 @@ def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
         shift = steps / 1000.0
         values["FeO"] += shift
         values["MgO"] -= shift
-        return (
-            values,
-            (0.1,),
-            (),
-            None,
-            {"Fe": 0.0, "O": 0.0},
-            _no_pO2_balance_floor(),
+        return residue._HashimotoGeometryIntegration(
+            composition_wt_pct=values,
+            pO2_steps=(0.1,),
+            exhaustion_notices=(),
+            refusal=None,
+            atom_closure={"Fe": 0.0, "O": 0.0},
+            inventory_mol=dict(inventory),
+            evaporated_mol={},
+            pO2_balance_floor=_no_pO2_balance_floor(),
         )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", never_converges)
@@ -972,13 +978,15 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
             refusal = exc
         else:
             refusal = None
-        return (
-            residue._hashimoto_project_oxide_wt_pct(inventory),
-            (),
-            (),
-            refusal,
-            {},
-            _no_pO2_balance_floor(),
+        return residue._HashimotoGeometryIntegration(
+            composition_wt_pct=residue._hashimoto_project_oxide_wt_pct(inventory),
+            pO2_steps=(),
+            exhaustion_notices=(),
+            refusal=refusal,
+            atom_closure={},
+            inventory_mol=dict(inventory),
+            evaporated_mol={},
+            pO2_balance_floor=_no_pO2_balance_floor(),
         )
 
     monkeypatch.setattr(
