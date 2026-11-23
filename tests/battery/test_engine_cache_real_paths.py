@@ -2867,6 +2867,7 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_without_cache(
         total_pressure_Pa=100_000.0,
         engine_metadata={},
         engine_flags=set(),
+        starting_inventory={"Na2O": 1.0},
         missing_channels_reason="residue_pressure_channels_missing",
         caller="Hashimoto cache diagnostics",
         floor_inversion_diagnostics=floor_diagnostics,

@@ -624,6 +624,7 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_RESIDUE_REDOX = "residue-redox"
 
 
 @dataclass(frozen=True)
@@ -2480,6 +2481,11 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
 def _classify_flagged_notice_facts(
     notices: Sequence[tuple[str, object]],
 ) -> tuple[str, ...]:
+    from simulator.vacuum_oxygen_balance import (
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
     strata: list[str] = []
     kinds = {kind for kind, _reason in notices}
     unverified_apparatus = tuple(
@@ -2507,6 +2513,12 @@ def _classify_flagged_notice_facts(
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
+    if any(
+        reason == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK
+        or reason == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_RESIDUE_REDOX)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
@@ -2546,6 +2558,38 @@ def _classify_flagged_notice_facts(
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     return tuple(strata)
+
+
+def _residue_redox_flag_notices(
+    flags: Sequence[str],
+    *,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Notice, ...]:
+    """Translate the residue engine's redox flags into scored evidence."""
+
+    from simulator.vacuum_oxygen_balance import (
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
+    notices = []
+    for flag in flags:
+        if flag == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK:
+            kind = NoticeKind.FALLBACK
+        elif flag == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE:
+            kind = NoticeKind.ENGINE_MODEL_CAVEAT
+        else:
+            continue
+        notices.append(
+            Notice(
+                kind=kind,
+                affected_quantities=(quantity,),
+                reason=flag,
+                origin=origin,
+            )
+        )
+    return tuple(notices)
 
 
 def _is_calibration_not_grounded_reason(reason: object) -> bool:
@@ -12646,6 +12690,11 @@ def _predict_mass_loss_with_residue(
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    notices += _residue_redox_flag_notices(
+        result.engine_flags,
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        origin=f"engine:{engine.value}",
+    )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
@@ -16742,6 +16791,13 @@ def _hashimoto_residue_prediction(
                 band="1973-2273 K; engine tip 191960ce8",
             )
         ]
+        notices.extend(
+            _residue_redox_flag_notices(
+                tuple(primary_provenance.get("engine_flags") or ()),
+                quantity=reported_quantity,
+                origin=f"engine:{engine.value}",
+            )
+        )
         notices.extend(
             _hashimoto_engine_floor_inversion_notices(
                 engine,

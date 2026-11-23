@@ -11,6 +11,8 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 OxygenBalanceBracketBoundary = Literal["lower", "upper"]
+RESIDUE_PRESSURE_LAW_REDOX_ACTIVE = "residue_pressure_law_redox_active"
+RESIDUE_FE_SPECIATION_KRESS91_FALLBACK = "residue_fe_speciation_kress91_fallback"
 _OXYGEN_GAS_ALPHA = 1.0
 _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "

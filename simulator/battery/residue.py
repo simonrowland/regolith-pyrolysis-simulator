@@ -68,6 +68,16 @@ class ResidueInventoryRefusal(ValueError):
         self.detail = detail or reason
 
 
+def _residue_oxygen_balance_failure(exc: ValueError) -> ResidueInventoryRefusal:
+    detail = str(exc)
+    reason = (
+        "residue_pressure_law_exponent_mismatch"
+        if detail.startswith("pressure law exponent mismatch for ")
+        else "residue_oxygen_balance_failed"
+    )
+    return ResidueInventoryRefusal(reason, detail)
+
+
 class ResidueEngineNonconvergence(RuntimeError):
     """An engine failed to converge at a valid residue composition."""
 
@@ -427,6 +437,7 @@ class _HashimotoRunSetup:
     catalog_matches: Mapping[str, tuple[str, Mapping[str, Any]]]
     alpha_specs: Mapping[str, Any]
     pressure_model: Any
+    engine_flags: set[str]
     engine_floor_inversion_diagnostics: dict[str, dict[str, object]]
 
 
@@ -521,10 +532,16 @@ def _engine_fe_speciation(
     mappings: list[Mapping[str, object]] = []
     diagnostics = getattr(response, "diagnostics", None)
     if isinstance(diagnostics, Mapping):
-        mappings.append(diagnostics)
+        vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
+        if isinstance(vapor_diagnostic, Mapping):
+            mappings.append(vapor_diagnostic)
+            kress_split = vapor_diagnostic.get("kress91_split")
+            if isinstance(kress_split, Mapping):
+                mappings.append(kress_split)
         nested = diagnostics.get("fe_redox_split")
         if isinstance(nested, Mapping):
             mappings.append(nested)
+        mappings.append(diagnostics)
     split = getattr(response, "fe_redox_split", None)
     if isinstance(split, Mapping):
         mappings.append(split)
@@ -532,12 +549,17 @@ def _engine_fe_speciation(
     activity = None
     for mapping in mappings:
         if q is None:
-            for key in ("fe3_over_sum_fe", "fe3"):
+            for key in ("fe3_over_sum_fe", "fe3_over_sigma_fe", "fe3"):
                 q = _mapping_float(mapping, key)
                 if q is not None:
                     break
         if activity is None:
-            for key in ("a_FeO", "a_FeO_authoritative", "x_feo"):
+            for key in (
+                "a_FeO_calphad",
+                "a_FeO",
+                "a_FeO_authoritative",
+                "x_feo",
+            ):
                 activity = _mapping_float(mapping, key)
                 if activity is not None:
                     break
@@ -613,6 +635,10 @@ def _record_fe_speciation_source(
 ) -> None:
     """Record each speciation source once per pressure model, not per root probe."""
 
+    from simulator.vacuum_oxygen_balance import (
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+    )
+
     if not source:
         return
     seen = getattr(model, "fe_speciation_sources", None)
@@ -623,7 +649,7 @@ def _record_fe_speciation_source(
         return
     seen.add(source)
     if source == "kress91_fallback":
-        engine_flags.add("residue_fe_speciation_kress91_fallback")
+        engine_flags.add(RESIDUE_FE_SPECIATION_KRESS91_FALLBACK)
     elif source == "kress91_unavailable_stoichiometric_feo":
         engine_flags.add("residue_fe_speciation_unavailable_stoichiometric_feo")
 
@@ -958,13 +984,7 @@ def _residue_oxygen_balance(
     except ResidueInventoryRefusal:
         raise
     except ValueError as exc:
-        # The shared root still emits ValueError for this contract violation.
-        # Preserve its distinction without changing that owner's acceptance.
-        if str(exc).startswith("pressure law exponent mismatch for "):
-            raise ResidueInventoryRefusal(
-                "residue_pressure_law_exponent_mismatch", str(exc)
-            ) from exc
-        raise
+        raise _residue_oxygen_balance_failure(exc) from exc
 
 
 def integrate_residue_inventory(
@@ -1065,13 +1085,9 @@ def integrate_residue_inventory(
                 for species, amount in inventory.items()
                 if amount > 0.0
             }
-            return pressure_model(engine_inventory, float(log10_pO2_bar))
-
-        # The solver reads this on the callable it is given. Dropping it would
-        # demote a fixed-activity stoichiometry error to a diagnostic.
-        pressure_at.declares_fixed_activities = bool(
-            getattr(pressure_model, "declares_fixed_activities", False)
-        )
+            pressures = pressure_model(engine_inventory, float(log10_pO2_bar))
+            _inherit_residue_pressure_contract(pressure_at, pressure_model)
+            return pressures
 
         def accepted_pressure_evaluation(log10_pO2_bar: float) -> None:
             accepted_callback = getattr(
@@ -1104,9 +1120,7 @@ def integrate_residue_inventory(
                     pO2_steps.append(None)
                     bracket_boundary_steps.append(None)
                     continue
-                raise ResidueInventoryRefusal(
-                    "residue_oxygen_balance_failed", str(exc)
-                ) from exc
+                raise _residue_oxygen_balance_failure(exc) from exc
             pO2_steps.append(balance.pO2_bar)
             bracket_boundary_steps.append(balance.bracket_boundary)
             pressures = balance.pressures_Pa
@@ -1350,11 +1364,9 @@ def integrate_knudsen_residue_inventory(
                 current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
 
             def pressure_at(p):
-                return pressure_model(active, p, current_temperature)
-
-            pressure_at.declares_fixed_activities = bool(
-                getattr(pressure_model, "declares_fixed_activities", False)
-            )
+                pressures = pressure_model(active, p, current_temperature)
+                _inherit_residue_pressure_contract(pressure_at, pressure_model)
+                return pressures
 
             if logp is None:
                 try:
@@ -1362,7 +1374,7 @@ def integrate_knudsen_residue_inventory(
                 except ResidueInventoryRefusal:
                     raise
                 except ValueError as exc:
-                    raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
+                    raise _residue_oxygen_balance_failure(exc) from exc
                 pressures = balance.pressures_Pa
                 pO2_steps.append(balance.pO2_bar)
                 for diagnostic in balance.pressure_law_diagnostics:
@@ -1581,19 +1593,16 @@ def _append_redox_pressure_notices(
 
     from simulator.battery.enums import NoticeKind, Quantity
     from simulator.battery.records import Notice
+    from simulator.vacuum_oxygen_balance import (
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+    )
 
     for diagnostic in diagnostics:
         notices.append(
             Notice(
                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason=(
-                    "residue_pressure_law_redox_active "
-                    f"species={diagnostic.species} "
-                    f"declared={diagnostic.declared!r} "
-                    f"observed={diagnostic.observed!r} "
-                    f"expected={diagnostic.expected!r}"
-                ),
+                reason=diagnostic.reason,
                 origin="congruent vapour oxygen balance",
             )
         )
@@ -1607,7 +1616,7 @@ def _append_redox_pressure_notices(
             Notice(
                 kind=NoticeKind.FALLBACK,
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason="residue_fe_speciation_kress91_fallback",
+                reason=RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
                 origin="simulator.fe_redox:kress91_split",
             )
         )
@@ -1622,6 +1631,20 @@ def _append_redox_pressure_notices(
         )
 
 
+def _inherit_residue_pressure_contract(target: object, source: object) -> None:
+    """Forward explicit pressure-law declarations through callback wrappers."""
+
+    for name in (
+        "declares_fixed_activities",
+        "declares_redox_active",
+        "engine_flags",
+    ):
+        if hasattr(source, name):
+            setattr(target, name, getattr(source, name))
+        elif hasattr(target, name):
+            delattr(target, name)
+
+
 def _make_residue_pressure_model(
     engine: str,
     gas_channels: Sequence[tuple[str, Sequence[Any]]],
@@ -1631,6 +1654,7 @@ def _make_residue_pressure_model(
     total_pressure_Pa: float,
     engine_metadata: dict[str, str],
     engine_flags: set[str],
+    starting_inventory: Mapping[str, float],
     missing_channels_reason: str,
     caller: str,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
@@ -1643,6 +1667,11 @@ def _make_residue_pressure_model(
             else -float(reaction[2]) / float(reaction[1])
         )
         for species, reaction in gas_channels
+    }
+    starting_parent_oxides = {
+        str(oxide)
+        for oxide, amount in starting_inventory.items()
+        if float(amount) > 0.0
     }
     if engine == "openimcc":
         from openimcc.kernel import ImccNonconvergenceError
@@ -1747,6 +1776,7 @@ def _make_residue_pressure_model(
             )
 
         pressure_model.declares_fixed_activities = True
+        pressure_model.engine_flags = engine_flags
         return pressure_model
 
     if engine == "internal-analytical":
@@ -1778,11 +1808,6 @@ def _make_residue_pressure_model(
         omission_notices: list[Any] = []
         omission_records: dict[str, dict[str, Any]] = {}
         noticed_omissions: set[str] = set()
-        # Species this engine has already returned at a positive pressure.
-        # A later evaluation that drops one (trace parent, oxidizing bracket
-        # end) is a zero, not a new missing channel.
-        seen_positive_vapours: set[str] = set()
-
         def pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
         ) -> Mapping[str, float]:
@@ -1875,14 +1900,11 @@ def _make_residue_pressure_model(
                     parent_amount = float(inventory.get(parent_name, 0.0) or 0.0)
                 except (TypeError, ValueError):
                     continue
-                if parent_amount <= 0.0:
+                if (
+                    parent_name in starting_parent_oxides
+                    and parent_amount <= 0.0
+                ):
                     pressures[name] = 0.0
-            for species, _reaction in gas_channels:
-                name = str(species)
-                if name not in pressures and name in seen_positive_vapours:
-                    # Same engine, same channel, this pO2 omitted it.
-                    pressures[name] = 0.0
-                    engine_flags.add("residue_omitted_vapour_pressure_zero")
             missing = [
                 str(species)
                 for species, _reaction in gas_channels
@@ -1908,9 +1930,6 @@ def _make_residue_pressure_model(
                 str(species): float(pressures[str(species)])
                 for species, _reaction in gas_channels
             }
-            for name, pressure in evaluated.items():
-                if pressure > 0.0:
-                    seen_positive_vapours.add(name)
             return _pressure_with_fe_speciation(
                 pressure_model,
                 evaluated,
@@ -1924,6 +1943,8 @@ def _make_residue_pressure_model(
 
         if floor_inversion_diagnostics is not None:
             pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
+        pressure_model.declares_redox_active = True
+        pressure_model.engine_flags = engine_flags
         pressure_model.below_threshold_omission_notices = omission_notices
         pressure_model.below_threshold_omission_records = omission_records
         return pressure_model
@@ -2205,18 +2226,16 @@ def _mass_loss_corner_bounds(
             for channel in oxygen_channels
         )
         def pressure_at(logp: float) -> Mapping[str, float]:
-            return pressure_model(inventory, logp)
-
-        pressure_at.declares_fixed_activities = bool(
-            getattr(pressure_model, "declares_fixed_activities", False)
-        )
+            pressures = pressure_model(inventory, logp)
+            _inherit_residue_pressure_contract(pressure_at, pressure_model)
+            return pressures
         try:
             roots.append(_solve_vacuum_oxygen_balance(
                 pressure_at, selected,
                 temperature_K=temperature_K,
             ).pO2_bar)
         except ValueError as exc:
-            raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
+            raise _residue_oxygen_balance_failure(exc) from exc
     low, high = roots
     if low > high:
         raise ResidueInventoryRefusal("mass_loss_corner_order_invalid", str(roots))
@@ -2410,15 +2429,17 @@ def predict_knudsen_residue_composition(
                     engine, gas_channels, gas_pack, temperature_K=temperature_K,
                     total_pressure_Pa=_located_point(environment.total_pressure_Pa) or 0.0,
                     engine_metadata=metadata, engine_flags=flags,
+                    starting_inventory=initial,
                     missing_channels_reason="residue_pressure_channels_missing",
                     caller="Knudsen residue prediction",
                 )
-            return pressure_callbacks[temperature_K](inventory, logp)
+            callback = pressure_callbacks[temperature_K]
+            pressures = callback(inventory, logp)
+            _inherit_residue_pressure_contract(pressure_model, callback)
+            return pressures
 
         # OpenIMCC freezes parent activities and applies the stoichiometric
         # power. Internal-analytical pressures are the engine's own law.
-        pressure_model.declares_fixed_activities = engine == "openimcc"
-
         kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
                       near_saturated=True, source_fO2_log_by_interval=source_logs)
         primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
@@ -2676,7 +2697,8 @@ def predict_mass_loss_fraction(
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
-            engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
+            engine_flags=flags, starting_inventory=initial_inventory_mol,
+            missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
         def measure(incoming, active_channels, area, duration):
@@ -3243,6 +3265,7 @@ def _hashimoto_run_setup(
     if not any(channel.parent_oxide for channel in common_channels):
         raise ResidueInventoryRefusal("hashimoto_common_unity_channels_missing")
     engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
+    engine_flags: set[str] = set()
     pressure_model = _make_residue_pressure_model(
         engine,
         gas_channels,
@@ -3250,7 +3273,8 @@ def _hashimoto_run_setup(
         temperature_K=temperature_K,
         total_pressure_Pa=total_pressure_Pa,
         engine_metadata=engine_metadata,
-        engine_flags=set(),
+        engine_flags=engine_flags,
+        starting_inventory=initial_inventory_mol,
         missing_channels_reason="hashimoto_internal_analytical_channels_missing",
         caller="Hashimoto residue cohort",
         floor_inversion_diagnostics=(
@@ -3277,6 +3301,7 @@ def _hashimoto_run_setup(
         catalog_matches=catalog_matches,
         alpha_specs=alpha_specs,
         pressure_model=pressure_model,
+        engine_flags=engine_flags,
         engine_floor_inversion_diagnostics=engine_floor_inversion_diagnostics,
     )
 
@@ -3695,6 +3720,7 @@ def _predict_hashimoto_residue_cohort(
                 "engine_floor_inversion_diagnostics": tuple(
                     engine_floor_inversion_diagnostics.values()
                 ),
+                "engine_flags": tuple(sorted(setup.engine_flags)),
                 "liquid_rows_used": tuple(active_liquid_rows[row_key]),
                 "d060_pending": True,
                 "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
