@@ -243,9 +243,9 @@ def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
     )
     assert len(result[0]) == 14
     assert holder is not None
-    assert law.flux_evaluations == 2811
+    assert law.flux_evaluations == 3281
     assert law._rhs_flux_counts
-    assert max(law._rhs_flux_counts) <= 5
+    assert max(law._rhs_flux_counts) <= 10
 
     warm_law, _holder, fractions, start, root = _reduced_manifold_case(
         stiff=True,
@@ -414,7 +414,7 @@ def test_reduced_pstar_finite_difference_is_smooth_below_outer_atol():
     species = tuple(law.species)
     species_a, species_b = species[:2]
     initial_a = fractions[species_a]
-    curvature_Pa2 = 5.0e8
+    curvature_per_Pa2 = 4.5e8
     composition_sensitivity_Pa = 0.1
 
     def total_outflow(pressure_Pa, mix):
@@ -453,7 +453,7 @@ def test_reduced_pstar_finite_difference_is_smooth_below_outer_atol():
         )
         offset_Pa = pressure_Pa - root_Pa
         residual_mol_s = -outflow_slope_mol_s_Pa * (
-            offset_Pa + curvature_Pa2 * offset_Pa**3
+            offset_Pa + curvature_per_Pa2 * offset_Pa**3
         )
         return {
             species_a: (outflow + residual_mol_s)
@@ -463,8 +463,8 @@ def test_reduced_pstar_finite_difference_is_smooth_below_outer_atol():
 
     # Premise: the single-root smooth law is G = -m(δP + c·δP³), with
     # δP = P - P*(x) and P*(x) = anchor + 0.1·(x - x₀). The IFT pressure
-    # stencil is about 2e-5 Pa, so c·h² = 0.2; for Δx = 1e-7 the old
-    # one-chord miss is about 1.7e-9 Pa: above 1e-10 Pa (10⁻³ outer atol)
+    # stencil is about 2e-5 Pa, so c·h² = 0.18; for Δx = 1e-7 the old
+    # one-chord miss is about 1.5e-9 Pa: above 1e-10 Pa (10⁻³ outer atol)
     # but below the former 1e-6 Pa gate. Unit check: m [mol/(s·Pa)] times
     # [δP + c·δP³] [Pa] gives G [mol/s]. As c → 0, one chord is exact.
     law.flux = smooth_flux

@@ -3547,7 +3547,7 @@ def _reduced_open_fixed_point(
     fractions: Mapping[str, float],
     hint_Pa: float,
 ) -> tuple[str | None, float | None]:
-    """Advance P* once on the continuous open branch; bracket on a miss."""
+    """Advance P* on the continuous open branch; bracket on a miss."""
 
     downstream = law.downstream_pa
 
@@ -3572,6 +3572,33 @@ def _reduced_open_fixed_point(
             if resolved is not None and resolved[0] == "shut":
                 law.reduced_shut_branch_hits += 1
 
+    def open_derivative(pressure: float, residual: float) -> float | None:
+        # Implicit-function premise: G(P*, n) = 0, so
+        # dP*/dn_j = -(∂G/∂n_j)/(∂G/∂P). Difference the same species-level
+        # G used by root selection backward on the open piece. Cap h at
+        # half the distance to P_down so both pressure samples stay strictly
+        # above the pipe kink. Each G sample's Q is the production pipe law
+        # through `_flows`; divide by the actual pressure span. Unit check:
+        # (mol/s) / (mol/(s·Pa)) = Pa. Constant source and locally linear Q
+        # give a linear G, so one correction lands the closed-form root.
+        step = max(abs(float(pressure)) * 1.0e-6, 1.0e-9)
+        step = min(
+            step,
+            0.25 * _KINK_BAND_PA,
+            0.5 * (float(pressure) - downstream),
+        )
+        lower = float(pressure) - step
+        if not (step > 0.0 and lower > downstream):
+            return None
+        residual_lower = _mixture_g(law, fractions, lower)
+        derivative_at_pressure = (residual - residual_lower) / step
+        if not (
+            math.isfinite(derivative_at_pressure)
+            and derivative_at_pressure < 0.0
+        ):
+            return None
+        return derivative_at_pressure
+
     if not (math.isfinite(hint_Pa) and hint_Pa > downstream):
         return resolve_fallback()
 
@@ -3585,31 +3612,8 @@ def _reduced_open_fixed_point(
         corrected = float(hint_Pa)
         derivative = None
     else:
-        # Implicit-function premise: G(P*, n) = 0, so
-        # dP*/dn_j = -(∂G/∂n_j)/(∂G/∂P). One Newton correction from the
-        # preceding stage's root is P_hint - G(P_hint, n)/(dG/dP).
-        # Difference the same species-level G used by root selection
-        # backward on the open piece. Cap h at half the distance to
-        # P_down so both pressure samples remain strictly above the pipe
-        # kink. Each G sample's Q is the production pipe law
-        # (`pipe_species_outflow_mol_s` through `_flows`). Divide by the
-        # actual pressure span to obtain dG/dP without a second G form.
-        # Unit check: (mol/s) / (mol/(s·Pa)) = Pa.
-        # Limit: constant source and locally linear Q give a linear G,
-        # so this single correction lands the closed-form open root.
-        step = max(abs(float(hint_Pa)) * 1.0e-6, 1.0e-9)
-        step = min(
-            step,
-            0.25 * _KINK_BAND_PA,
-            0.5 * (float(hint_Pa) - downstream),
-        )
-        lower = float(hint_Pa) - step
-        if not (step > 0.0 and lower > downstream):
-            return resolve_fallback()
-        residual_lower = _mixture_g(law, fractions, lower)
-        pressure_span = float(hint_Pa) - lower
-        derivative = (residual - residual_lower) / pressure_span
-        if not (math.isfinite(derivative) and derivative < 0.0):
+        derivative = open_derivative(float(hint_Pa), residual)
+        if derivative is None:
             return resolve_fallback()
         corrected = float(hint_Pa) - residual / derivative
 
@@ -3623,36 +3627,50 @@ def _reduced_open_fixed_point(
         return resolve_fallback()
 
     if derivative is not None:
-        # G is mol/s and dG/dP is mol/(s·Pa), so |G|/|dG/dP| is a
-        # first-order pressure-error estimate in Pa. Require that estimate
-        # to meet DEFAULT_ABS_TOL_PA before the continuity helper may publish
-        # this stage root. If it misses, take one more chord correction and
-        # validate once more; a second miss returns to the established root
-        # publisher. A linear G (constant source and linear pipe flow) has
-        # zero residual after the first correction, its closed-form root.
-        corrected_residual = _mixture_g(law, fractions, corrected)
-        if (
-            not math.isfinite(corrected_residual)
-            or abs(corrected_residual) / abs(derivative) > DEFAULT_ABS_TOL_PA
-        ):
+        # The reduced Radau species atol maps to _SLOW_ATOL_PA because
+        # atol_mol · R T / V = 1e-7 Pa. Keep the root error 1000x below
+        # that outer tolerance: |δP| ≈ |G|/|dG/dP| <= 1e-3 · atol,
+        # with four ulps as the binary64 floor. G is mol/s and dG/dP is
+        # mol/(s·Pa), so this ratio is Pa. Recompute the one-sided open
+        # slope after each correction so curvature is not left in the
+        # frozen-anchor chord estimate. A linear G (constant source and
+        # linear pipe flow) reaches its root in the first correction.
+        converged = False
+        for correction_index in range(3):
+            corrected_residual = _mixture_g(law, fractions, corrected)
+            if not math.isfinite(corrected_residual):
+                return resolve_fallback()
+            if corrected_residual == 0.0:
+                converged = True
+                break
+
+            derivative = open_derivative(float(corrected), corrected_residual)
+            if derivative is None:
+                return resolve_fallback()
+
+            correction_Pa = -corrected_residual / derivative
+            correction_tolerance_Pa = max(
+                1.0e-3 * _SLOW_ATOL_PA,
+                4.0 * math.ulp(float(corrected)),
+            )
+            if abs(correction_Pa) <= correction_tolerance_Pa:
+                converged = True
+                break
             law.reduced_ift_residual_check_rejections += 1
+            if correction_index == 2:
+                return resolve_fallback()
             law.reduced_second_corrections += 1
-            second = corrected - corrected_residual / derivative
+            candidate = float(corrected) + correction_Pa
             if (
-                not math.isfinite(second)
-                or second <= downstream
-                or abs(second - float(hint_Pa)) > _KINK_BAND_PA
+                not math.isfinite(candidate)
+                or candidate <= downstream
+                or abs(candidate - float(hint_Pa)) > _KINK_BAND_PA
             ):
                 return resolve_fallback()
-            second_residual = _mixture_g(law, fractions, second)
-            if (
-                not math.isfinite(second_residual)
-                or abs(second_residual) / abs(derivative)
-                > DEFAULT_ABS_TOL_PA
-            ):
-                law.reduced_ift_residual_check_rejections += 1
-                return resolve_fallback()
-            corrected = second
+            corrected = candidate
+
+        if not converged:
+            return resolve_fallback()
 
     decision, continuous = _continuous_warm_root(
         lambda pressure: _mixture_g(law, fractions, pressure),
