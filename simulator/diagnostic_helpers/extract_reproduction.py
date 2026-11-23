@@ -3970,8 +3970,8 @@ def _melt_recipe_mol(
                 return None, source, errors[0] if errors else "missing_condition:melt_composition"
             composition = battery_migrate.wt_pct_to_mole_fraction(flat)
             return {oxide: float(amount) for oxide, amount in composition.components}, source, None
-        if point_has_located_composition or point_has_named_recipe:
-            # A measured row's own suite takes precedence over parent-level defaults.
+        if point_has_located_composition or point_has_named_recipe or point.get("composition_source_gap"):
+            # A point's own suite or explicit gap takes precedence over the parent recipe.
             for key in (
                 *point_recipe_keys,
                 "sample_Na2O_wt_pct",
