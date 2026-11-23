@@ -376,9 +376,22 @@ def test_analytical_knudsen_mass_default_reports_dp008(extent_point, mass_kg):
     )
 
 
-@pytest.mark.parametrize("printed_resolution", (True, False, "component"))
-def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monkeypatch, printed_resolution):
+@pytest.mark.parametrize(
+    ("printed_resolution", "precision_multiplier"),
+    ((True, 1), (False, 1), ("component", 1), ("component", 2)),
+    ids=("exact-mass-loss", "approximate-mass-loss", "exact-component", "shared-rule-mutation"),
+)
+def test_microgram_loader_tail_stays_numeric_in_flagged_tier(
+    extent_point, monkeypatch, printed_resolution, precision_multiplier,
+):
     from simulator.battery import residue, score
+
+    if precision_multiplier != 1:
+        precision_rule = residue._trace_tail_precision_threshold
+        monkeypatch.setattr(
+            residue, "_trace_tail_precision_threshold",
+            lambda value, **kwargs: precision_multiplier * precision_rule(value, **kwargs),
+        )
 
     reference, experiment, rows = extent_point
     locator = reference.locator
@@ -423,11 +436,14 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monke
     assert bound == pytest.approx(100 * feo_kg / oxide_residue_kg)
     assert bound >= float(candidate.value.point)  # removing the FeO tail gives 0 wt% FeO
     assert bound > 100 * feo_kg / 8e-10
-    expected_threshold = {True: 5e-6, False: 1e-6, "component": 0.05}[printed_resolution]
+    expected_threshold = (
+        {True: 5e-6, False: 1e-6, "component": 0.05}[printed_resolution]
+        * precision_multiplier
+    )
     assert tail["material_threshold"] == pytest.approx(expected_threshold)
     if printed_resolution == "component":
         assert tail["fraction_of_measured_mass_loss"] < expected_threshold
-        assert bound > tail["component_material_threshold_wt_pct"] == 0.1
+        assert bound > tail["component_material_threshold_wt_pct"] == 0.1 * precision_multiplier
     assert candidate.provenance["atom_closure_mol"]["Fe"] == 0.0
     assert candidate.provenance["final_inventory_mol"]["FeO"] == candidate.provenance["initial_inventory_mol"]["FeO"]
 

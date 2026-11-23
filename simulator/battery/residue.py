@@ -2798,10 +2798,7 @@ def predict_knudsen_residue_composition(
             loss_fraction = tail_mass_kg / measured_loss_kg
             wt_pct_bound = 100.0 * tail_mass_kg / residue_oxide_mass_kg
             mass_loss_value = anchors[target_temperature][1].value
-            threshold = (
-                1e-6 if mass_loss_value.approximate else
-                0.1 * float(Decimal(1).scaleb(mass_loss_value.point.as_tuple().exponent)) / target
-            )
+            threshold = _trace_tail_precision_threshold(mass_loss_value) / target
             trace_tail = {
                 "retained_kg_by_parent": dict(primary.trace_tail_kg),
                 "measured_loss_kg": measured_loss_kg,
@@ -2845,11 +2842,9 @@ def _knudsen_trace_tail_notices(trace_tail, reference, *, oxide_wt_pct: bool):
     value = reference.value
     if oxide_wt_pct and value.point is not None:
         component = reference.identity.species.formula
-        if value.approximate:
-            component_threshold = abs(float(value.point)) * 1e-6
-        else:
-            printed_quantum = Decimal(1).scaleb(value.point.as_tuple().exponent)
-            component_threshold = float(printed_quantum) / 10.0
+        component_threshold = _trace_tail_precision_threshold(
+            value, magnitude=abs(float(value.point)),
+        )
         trace_tail["component_material_threshold_wt_pct"] = component_threshold
         material |= trace_tail["bound_wt_pct_by_component"][component] > component_threshold
     trace_tail["material"] = material
@@ -2867,6 +2862,14 @@ def _knudsen_trace_tail_notices(trace_tail, reference, *, oxide_wt_pct: bool):
         )
         for parent, mass_kg in trace_tail["retained_kg_by_parent"].items()
     )
+
+
+def _trace_tail_precision_threshold(value, *, magnitude: float = 1.0) -> float:
+    """Return the trace-tail tolerance at the value's stated precision."""
+    if value.approximate:
+        return magnitude * 1e-6
+    printed_quantum = Decimal(1).scaleb(value.point.as_tuple().exponent)
+    return float(printed_quantum) / 10.0
 
 
 def predict_mass_loss_fraction(
