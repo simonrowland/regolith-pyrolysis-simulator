@@ -2865,6 +2865,12 @@ def _openimcc_species_input(
                 "phase": phase.value,
             },
         )
+    if phase is Phase.CR and polymorph_token(species) is None:
+        return None, None, _OpenIMCCBridgeRefusal(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-polymorph-unresolved",
+            {"engine": Engine.OPENIMCC.value, "formula": formula},
+        )
     return formula, phase, None
 
 
@@ -2940,12 +2946,6 @@ def _openimcc_formation_from_species_thermo(
             input_refusal.extra,
         )
     assert formula is not None and phase is not None
-    if phase is Phase.CR and polymorph_token(identity.species) is None:
-        return refuse(
-            RefusalReason.UNSUPPORTED,
-            "pure-phase-polymorph-unresolved",
-            {"engine": Engine.OPENIMCC.value, "formula": formula},
-        )
     per = _per_basis(identity)
     if per not in {PerBasis.MOL_SPECIES, PerBasis.MOL_O2}:
         return refuse(
@@ -3326,12 +3326,6 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             input_refusal.extra,
         )
     assert formula is not None and phase is not None
-    if phase is Phase.CR and polymorph_token(identity.species) is None:
-        return refuse(
-            RefusalReason.UNSUPPORTED,
-            "pure-phase-polymorph-unresolved",
-            {"engine": Engine.OPENIMCC.value, "formula": formula},
-        )
 
     temperature = identity.temperature_K
     if not isinstance(temperature, State) or not temperature.is_value or temperature.value is None:

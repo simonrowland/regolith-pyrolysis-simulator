@@ -1236,8 +1236,8 @@ def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> No
     expected_counts = {
         "requestable_before": 240_209,
         "typed_refused_before": 88_091,
-        "requestable_after": 306_808,
-        "typed_refused_after": 21_492,
+        "requestable_after": 252_131,
+        "typed_refused_after": 76_169,
         "classes": {
             "formula_phase_suffix": {
                 "affected_cells": 568,
@@ -1250,15 +1250,15 @@ def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> No
                 "affected_cells": 1_146,
                 "requestable_before": 371,
                 "typed_refused_before": 775,
-                "requestable_after": 971,
-                "typed_refused_after": 175,
+                "requestable_after": 371,
+                "typed_refused_after": 775,
             },
             "parenthesized_group": {
                 "affected_cells": 3_836,
                 "requestable_before": 2_424,
                 "typed_refused_before": 1_412,
-                "requestable_after": 3_729,
-                "typed_refused_after": 107,
+                "requestable_after": 2_424,
+                "typed_refused_after": 1_412,
             },
             "source_phase": {
                 "affected_cells": 30_227,
