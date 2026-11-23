@@ -2616,7 +2616,11 @@ def test_runtime_identity_is_captured_once_when_each_engine_opens(
         )
 
     monkeypatch.setattr(battery, "_open_resolved_backend", fake_open_resolved_backend)
-    engines = tuple(engine_cache.ENGINE_CHEMISTRY_VERSION)
+    # simulator has no melt opener. The deck cache records its own identity.
+    engines = tuple(
+        engine for engine in engine_cache.ENGINE_CHEMISTRY_VERSION
+        if engine != "simulator"
+    )
     for engine in engines:
         for _ in range(3):
             battery._open_battery_engine_with_settings(engine)

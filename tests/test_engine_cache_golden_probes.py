@@ -519,7 +519,13 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
     assert result["context_inherited"]
 
 
-@pytest.mark.parametrize("engine_name", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
+@pytest.mark.parametrize(
+    "engine_name",
+    tuple(
+        name for name in engine_cache.ENGINE_CHEMISTRY_VERSION
+        if name != "simulator"
+    ),
+)
 def test_live_engine_numeric_probe_matches_version(
     engine_name, request, tmp_path, monkeypatch
 ) -> None:

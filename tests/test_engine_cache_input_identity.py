@@ -19,6 +19,9 @@ from simulator.engine_cache import EngineCacheValue
 _EXPECTED_SOURCE_PATHS = {
     "pyproject.toml",
     "engines/engines.lock.toml",
+    "data/feedstocks.yaml",
+    "data/foulant_thermo.yaml",
+    "data/materials.yaml",
     "data/vapor_pressures.yaml",
     "data/setpoints.yaml",
     "data/species_catalog.yaml",

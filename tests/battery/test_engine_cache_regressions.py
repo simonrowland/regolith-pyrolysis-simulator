@@ -9,8 +9,15 @@ import pytest
 from simulator import engine_cache
 from simulator.diagnostic_helpers import binary_pot_battery as battery
 
+# simulator is a deck cache, not a melt opener. These loops call
+# normalize_engine_settings, which only knows the six melt engines.
+_MELT_CACHE_ENGINES = tuple(
+    engine for engine in engine_cache.ENGINE_CHEMISTRY_VERSION
+    if engine != "simulator"
+)
 
-@pytest.mark.parametrize("engine", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
+
+@pytest.mark.parametrize("engine", _MELT_CACHE_ENGINES)
 def test_every_normalized_prediction_setting_changes_the_key(engine):
     normalized = battery.normalize_engine_settings(engine, None)
     settings = engine_cache.engine_cache_settings(engine, normalized)
@@ -20,7 +27,7 @@ def test_every_normalized_prediction_setting_changes_the_key(engine):
         assert engine_cache.engine_cache_key(engine, engine_cache.ENGINE_CHEMISTRY_VERSION[engine], {"engine_settings": changed}) != original, name
 
 
-@pytest.mark.parametrize("engine", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
+@pytest.mark.parametrize("engine", _MELT_CACHE_ENGINES)
 def test_isolated_request_keys_cover_all_consumed_physics_inputs(engine, monkeypatch):
     keys = []
 

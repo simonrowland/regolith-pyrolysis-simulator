@@ -357,6 +357,9 @@ ENGINE_CHEMISTRY_VERSION = {
     "magemin": 4,
     "alphamelts": 4,
     "thermoengine": 4,
+    # Deck cache for integrated-bench runs. Not a melt engine and not a
+    # SCORE_ENGINE_SET member. Owned by simulator/battery/integrated_bench.py.
+    "simulator": 1,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -378,6 +381,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
+# simulator v1: 2026-11-22 integrated_bench.py deck cache - bump when the runner projection, schedule interpretation, process timestep, session-config resolution, feedstocks, setpoints, vapor, species, materials, foulant, or nested melt-engine chemistry changes a cached number
 
 
 @dataclass(frozen=True)
@@ -475,6 +479,35 @@ ENGINE_CACHE_INPUTS = {
         EngineCacheInput(
             "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
         ),  # Catalog-backed vapor fallback reads this executable IVTAN extract.
+    ),
+    "simulator": (
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # The runner's default analytical backend delegates melt activity to OpenIMCC.
+        EngineCacheInput(
+            "data/feedstocks.yaml", "data", None
+        ),  # The session loads the bound feedstock oxide vector from this file.
+        EngineCacheInput(
+            "data/setpoints.yaml", "data", None
+        ),  # Session config merges setpoint and activity settings from this file.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # The analytical backend reads these vapor-pressure coefficients.
+        EngineCacheInput(
+            "data/species_catalog.yaml", "data", None
+        ),  # The session catalog supplies species used by the runner.
+        EngineCacheInput(
+            "data/materials.yaml", "data", None
+        ),  # Session config loads the material table the runner receives.
+        EngineCacheInput(
+            "data/foulant_thermo.yaml", "data", None
+        ),  # Session config loads foulant thermo with the other bundle files.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # The analytical catalog reads these executable NASA thermo rows.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # The analytical catalog reads these executable IVTAN thermo rows.
     ),
 }
 _ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
@@ -614,6 +647,10 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "identity": "version:1.2.0;record-sha256:462a81b3fda92acf74a1e9e38f260dac65232d855340f72307e05a65219c1b27",
         "date": "2026-11-18",
     },
+    "simulator": {
+        "identity": "source-sha256:4a5c3ef66f8921ebf9a59bbdeff8f119c72fe358ad5affe751f5a99efa6cbbbf",
+        "date": "2026-11-22",
+    },
 }
 
 OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
@@ -645,7 +682,7 @@ _SYNC_WATERMARKS_TABLE = "sync_watermarks"
 _ENGINE_NUMBERS = {
     name: number for number, name in enumerate((
         "openimcc", "internal-analytical", "vaporock", "magemin",
-        "alphamelts", "thermoengine",
+        "alphamelts", "thermoengine", "simulator",
     ), start=1)
 }
 _NATURAL_KEY_LIMIT = 128
@@ -1090,6 +1127,14 @@ def _compute_runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
         )
     if engine_id == "vaporock":
         return _distribution_identity(engine_id, ("VapoRock", "vaporock"))
+    if engine_id == "simulator":
+        # Provenance only. The cache key is the chemistry version plus the
+        # packed deck request; this hash does not enter it.
+        runner = Path(__file__).resolve().parent / "runner" / "__init__.py"
+        try:
+            return f"source-sha256:{_file_sha256(runner)}"
+        except OSError:
+            return "unavailable"
     raise ValueError(f"unknown engine {engine_id!r}")
 
 
