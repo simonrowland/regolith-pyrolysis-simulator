@@ -632,3 +632,227 @@ def test_the_tonne_sky_does_not_spend_the_pellet_sink():
     )
     assert notice["kind"] == "typed_unknown"
     assert notice["value"] == "not_applied"
+
+
+def _bind_power_balance_host(
+    *,
+    liquid_fraction_at,
+    raw_sio_kg_hr: float,
+    depletion: float,
+    pump_scale: float | None,
+    pipe_scale: float,
+):
+    """Real root callback, with the flux owner and the two caps stubbed.
+
+    The equilibrium's liquid fraction stays the step-start value. The
+    trial fraction is whatever ``liquid_fraction_at`` returns.
+    """
+
+    from types import SimpleNamespace
+
+    from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+    from simulator.core import PyrolysisSimulator
+    from simulator.state import EvaporationFlux
+    from simulator.thermal_budget import EVAPORATIVE_BRACKET_CEILING_K
+
+    host = object.__new__(PyrolysisSimulator)
+    equilibrium = SimpleNamespace(liquid_fraction=0.0)
+    calls = {"calc": 0, "gate": 0, "bakeout": 0, "trial_lf": []}
+
+    class _Ledger:
+        def kg_by_account(self, _name):
+            return {"SiO2": 1.0}
+
+    host.atom_ledger = _Ledger()
+    host.melt = SimpleNamespace(temperature_C=25.0)
+    host._restore_power_balance_host = lambda _snapshot: None
+    host.process_dt_hr = lambda: 60.0 / 3600.0
+    host._subsolidus_handed_off = False
+    host._subsolidus_pending_release = None
+    host._subsolidus_committed_kg_hr_by_species = {}
+    host._subsolidus_bakeout_by_hour = []
+    host._wall_supply_computed_kg_hr = {}
+    host._last_subsolidus_bakeout = None
+
+    def gate():
+        calls["gate"] += 1
+        return "cheap-curve"
+
+    def fraction(temperature_K, *, gate_authority):
+        assert gate_authority == "cheap-curve"
+        value = float(liquid_fraction_at(float(temperature_K)))
+        calls["trial_lf"].append(value)
+        return value
+
+    def calculate(trial):
+        calls["calc"] += 1
+        trial_fraction = float(trial.liquid_fraction)
+        if trial_fraction <= 0.0:
+            return EvaporationFlux()
+        return EvaporationFlux(species_kg_hr={"SiO": raw_sio_kg_hr})
+
+    def deplete_flux(flux, dt_hr=1.0):
+        assert dt_hr == pytest.approx(60.0 / 3600.0)
+        out = EvaporationFlux(species_kg_hr={
+            species: float(rate) * depletion
+            for species, rate in flux.species_kg_hr.items()
+        })
+        out.update_totals()
+        return out
+
+    def bakeout(**_kwargs):
+        calls["bakeout"] += 1
+        diagnostic = {
+            "provider_status": "ok" if pump_scale is not None else None,
+            "pump_scale": pump_scale,
+            "handoff": False,
+            "committed": False,
+        }
+        host._last_subsolidus_bakeout = diagnostic
+        return diagnostic
+
+    def pipe_cap(flux):
+        out = EvaporationFlux(species_kg_hr={
+            species: float(rate) * pipe_scale
+            for species, rate in flux.species_kg_hr.items()
+            if float(rate) * pipe_scale > 1.0e-15
+        })
+        out.update_totals()
+        return out
+
+    host._power_balance_liquid_gate = gate
+    host._melt_redox_liquid_fraction_factor = fraction
+    host._get_equilibrium = lambda **_kwargs: equilibrium
+    host._calculate_evaporation = calculate
+    host._apply_analytic_evaporation_depletion = deplete_flux
+    host._apply_c0_bakeout = bakeout
+    host._cap_c0_joint_release_to_pipe_capacity = pipe_cap
+    cache = {"host": {}, "step_start_C": 25.0}
+
+    def rates(temperature_K: float) -> dict[str, float]:
+        return PyrolysisSimulator._power_balance_species_rates_kg_hr(
+            host,
+            temperature_K,
+            floor_K=BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+            ceiling_K=EVAPORATIVE_BRACKET_CEILING_K,
+            cache=cache,
+        )
+
+    return host, equilibrium, calls, rates
+
+
+def test_a_solid_start_minute_root_includes_the_sink():
+    # Step-start liquid fraction is 0. The cheap curve is liquid only
+    # above 1400 °C. The no-sink root is the hotter one; a root that
+    # ignored the trial fraction would match it.
+    solidus_K = 1400.0 + 273.15
+    host, equilibrium, calls, rates = _bind_power_balance_host(
+        liquid_fraction_at=lambda temperature_K: (
+            0.0 if temperature_K < solidus_K else 1.0
+        ),
+        raw_sio_kg_hr=0.02,
+        depletion=1.0,
+        pump_scale=None,
+        pipe_scale=1.0,
+    )
+    bare = _solve()
+    coupled = _solve(species_rate_kg_hr_at_K=rates)
+    cold = rates(500.0 + 273.15)
+
+    assert equilibrium.liquid_fraction == 0.0
+    assert cold == {}
+    assert 0.0 in calls["trial_lf"]
+    assert 1.0 in calls["trial_lf"]
+    assert calls["gate"] == 1
+    assert coupled["temperature_C"] < bare["temperature_C"] - 1.0
+    booked = host._power_balance_root_booking[float(coupled["temperature_K"])]
+    assert booked["rates"]["SiO"] == pytest.approx(0.02)
+    assert booked["liquid_fraction"] == pytest.approx(1.0)
+
+
+def test_a_molten_minute_books_the_root_rate_times_dt():
+    raw = 0.02
+    depletion = 0.5
+    pump = 0.4
+    pipe = 0.25
+    # The three stubs are the scales. The product is their composition,
+    # not a copy of the pump-scale predicate.
+    expected = raw * depletion * pump * pipe
+    host, _equilibrium, calls, rates = _bind_power_balance_host(
+        liquid_fraction_at=lambda _temperature_K: 1.0,
+        raw_sio_kg_hr=raw,
+        depletion=depletion,
+        pump_scale=pump,
+        pipe_scale=pipe,
+    )
+    coupled = _solve(species_rate_kg_hr_at_K=rates)
+    root = host._power_balance_root_booking[float(coupled["temperature_K"])]
+    assert root["rates"]["SiO"] == pytest.approx(expected)
+    dt_hr = 60.0 / 3600.0
+    assert root["rates"]["SiO"] * dt_hr == pytest.approx(expected * dt_hr)
+
+    from types import SimpleNamespace
+
+    record = {
+        "temperature_C": coupled["temperature_C"],
+        "temperature_K": coupled["temperature_K"],
+        "notices": (),
+    }
+    host.campaign_mgr = SimpleNamespace()
+    host.campaign_mgr._power_temperature_for_step = record
+    host.melt.temperature_C = float(coupled["temperature_C"])
+    host._select_power_root_booking()
+    assert host._power_balance_applied_booking is not None
+    host.melt.temperature_C = float(coupled["temperature_C"]) - 10.0
+    host._select_power_root_booking()
+    assert host._power_balance_applied_booking is None
+    host.melt.temperature_C = float(coupled["temperature_C"])
+    host._select_power_root_booking()
+    host._flag_frozen_power_balance_premise()
+    host._flag_frozen_power_balance_premise()
+    notices = [
+        item
+        for item in record["notices"]
+        if item["knob"] == "frozen_step_start_activities_and_redox"
+    ]
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "typed_unknown"
+    assert notices[0]["unit"] == "s"
+    assert notices[0]["value"] == pytest.approx(60.0)
+
+    before_calc = calls["calc"]
+    before_bakeout = calls["bakeout"]
+    booked, capacity = host._evaporation_booking_this_step(
+        None,
+        evaporation_campaign=True,
+    )
+    assert capacity is None
+    assert calls["calc"] == before_calc
+    assert calls["bakeout"] == before_bakeout
+    assert booked.species_kg_hr["SiO"] == pytest.approx(expected)
+    assert booked.species_kg_hr["SiO"] * dt_hr == pytest.approx(
+        root["rates"]["SiO"] * dt_hr
+    )
+
+
+def test_a_second_evaluation_after_the_root_turns_red():
+    host, equilibrium, calls, rates = _bind_power_balance_host(
+        liquid_fraction_at=lambda _temperature_K: 1.0,
+        raw_sio_kg_hr=0.01,
+        depletion=1.0,
+        pump_scale=None,
+        pipe_scale=1.0,
+    )
+    coupled = _solve(species_rate_kg_hr_at_K=rates)
+    host._power_balance_applied_booking = host._power_balance_root_booking[
+        float(coupled["temperature_K"])
+    ]
+    before = calls["calc"]
+    assert before > 0
+    host._evaporation_booking_this_step(
+        equilibrium,
+        evaporation_campaign=True,
+    )
+    # A second ``_calculate_evaporation`` in the root-booking branch
+    # increments this count. The branch returns the stored flux.
+    assert calls["calc"] == before

@@ -1256,6 +1256,43 @@ def read_high_t_melt_activity_fallback_notice(
     return dict(notice)
 
 
+class _PowerBalanceTrialEquilibrium:
+    """Step-start equilibrium with the trial temperature's liquid fraction.
+
+    Activities, redox, and vapor pressures stay the frozen object. Only
+    ``liquid_fraction`` changes, so a solid step-start does not force an
+    empty flux at a molten trial. This is not a second equilibrium.
+    """
+
+    def __init__(self, equilibrium: Any, liquid_fraction: float) -> None:
+        self._equilibrium = equilibrium
+        self.liquid_fraction = liquid_fraction
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._equilibrium, name)
+
+
+def _c0_bakeout_pump_scale(diagnostic: Mapping[str, Any]) -> float | None:
+    """Scale the booking applies when the bakeout provider admits one.
+
+    ``provider_status == "ok"`` and a finite scale in ``[0, 1)`` is the
+    predicate at the evaporation booking. One owner, two callers: the
+    power-balance trial and the post-equilibrium booking.
+    """
+
+    if diagnostic.get("provider_status") != "ok":
+        return None
+    joint_scale = diagnostic.get("pump_scale")
+    if (
+        isinstance(joint_scale, (int, float))
+        and not isinstance(joint_scale, bool)
+        and math.isfinite(float(joint_scale))
+        and 0.0 <= float(joint_scale) < 1.0
+    ):
+        return float(joint_scale)
+    return None
+
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
@@ -16048,6 +16085,126 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.cost_ledger.__dict__.update(cost_state)
         self._chem_kernel = self._build_chemistry_kernel()
 
+    def _evaporation_booking_this_step(
+        self,
+        equilibrium,
+        *,
+        evaporation_campaign: bool,
+    ) -> tuple[EvaporationFlux, Any]:
+        """Flux this step debits, and the capacity shadow when it ran.
+
+        A power-driven minute that reached its root already evaluated
+        this flux, including depletion, the bakeout pump scale, and the
+        pipe cap. That object is the booking. The capacity-coupling
+        shadow calls the flux owner again and does not run on that
+        minute. Every other minute keeps the post-equilibrium booking.
+        """
+
+        evap_flux = evaporation_flux_for_campaign_hour(
+            evaporation_campaign=evaporation_campaign,
+            host=self,
+        )
+        capacity_result = None
+        root_booking = (
+            getattr(self, "_power_balance_applied_booking", None)
+            if evaporation_campaign
+            else None
+        )
+        if isinstance(root_booking, Mapping):
+            return self._replay_power_root_booking(root_booking), None
+        if evaporation_campaign:
+            if (
+                self._overhead_headspace_enabled()
+                and hasattr(equilibrium, 'vapor_pressures_Pa')
+            ):
+                from simulator.capacity_coupling import (
+                    CapacityCouplingRefusalError,
+                    CapacityShadowRefusal,
+                )
+
+                from simulator.thermal_train import FiniteCapacity
+
+                capacity, cold_train = self._cold_train_capacity_policy()
+                if isinstance(capacity, FiniteCapacity):
+                    assert cold_train is not None
+                    capacity_result = (
+                        self._compute_capacity_coupling_shadow(equilibrium)
+                    )
+                    if isinstance(capacity_result, CapacityShadowRefusal):
+                        raise CapacityCouplingRefusalError(capacity_result)
+            if capacity_result is not None:
+                live_raw_flux = self._calculate_evaporation(
+                    equilibrium,
+                    overhead_partials_override_Pa=(
+                        capacity_result.partial_pressures_Pa
+                    ),
+                )
+                live_effective_flux = (
+                    self._apply_analytic_evaporation_depletion(
+                        live_raw_flux,
+                        dt_hr=self.process_dt_hr(),
+                    )
+                )
+                solved_rates = {
+                    species: float(rate)
+                    for species, rate in (
+                        capacity_result.evaporation_flux_kg_hr.items()
+                    )
+                    if float(rate) > 1.0e-12
+                }
+                live_rates = {
+                    species: float(rate)
+                    for species, rate in live_effective_flux.species_kg_hr.items()
+                    if float(rate) > 1.0e-12
+                }
+                assert set(live_rates) == set(solved_rates)
+                assert all(
+                    math.isclose(
+                        live_rates[species],
+                        solved_rates[species],
+                        rel_tol=1.0e-12,
+                        abs_tol=1.0e-15,
+                    )
+                    for species in solved_rates
+                )
+                evap_flux.species_kg_hr = {
+                    species: float(rate)
+                    for species, rate in (
+                        solved_rates.items()
+                    )
+                    if float(rate) > 1.0e-12
+                }
+                evap_flux.alpha_authority_status_by_species = {
+                    species: status
+                    for species, status in (
+                        live_effective_flux.alpha_authority_status_by_species.items()
+                    )
+                    if species in evap_flux.species_kg_hr
+                }
+                evap_flux.carrier_authority_by_species = copy.deepcopy(
+                    live_effective_flux.carrier_authority_by_species
+                )
+                evap_flux.update_totals()
+            else:
+                evap_flux = self._calculate_evaporation(equilibrium)
+                evap_flux = self._apply_analytic_evaporation_depletion(
+                    evap_flux,
+                    dt_hr=self.process_dt_hr(),
+                )
+        # Hertz-Knudsen reads the headspace persisted last step. A same-step
+        # ordinary-only provisional would replace that combined basis.
+        bakeout_diag = self._apply_c0_bakeout(
+            liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
+            headspace_mbar=None,
+            admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
+            commit_release=False,
+        )
+        self._apply_bakeout_pump_scale(evap_flux, bakeout_diag)
+        # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
+        # is capped this step. Outside C0 this leaves the flux alone.
+        evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
+        return evap_flux, capacity_result
+
     def process_dt_hr(self) -> float:
         """Hours in the current process step. The one-hour path returns 1.0."""
 
@@ -16312,117 +16469,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._wall_supply_computed_kg_hr = {}
         self._wall_supply_interval_physical_zero = None
         self._pre_evaporation_melt_oxide_kg = None
-        evap_flux = evaporation_flux_for_campaign_hour(
+        evap_flux, capacity_result = self._evaporation_booking_this_step(
+            equilibrium,
             evaporation_campaign=evaporation_campaign,
-            host=self,
         )
-        capacity_result = None
-        if evaporation_campaign:
-            if (
-                self._overhead_headspace_enabled()
-                and hasattr(equilibrium, 'vapor_pressures_Pa')
-            ):
-                from simulator.capacity_coupling import (
-                    CapacityCouplingRefusalError,
-                    CapacityShadowRefusal,
-                )
-
-                from simulator.thermal_train import FiniteCapacity
-
-                capacity, cold_train = self._cold_train_capacity_policy()
-                if isinstance(capacity, FiniteCapacity):
-                    assert cold_train is not None
-                    capacity_result = (
-                        self._compute_capacity_coupling_shadow(equilibrium)
-                    )
-                    if isinstance(capacity_result, CapacityShadowRefusal):
-                        raise CapacityCouplingRefusalError(capacity_result)
-            if capacity_result is not None:
-                live_raw_flux = self._calculate_evaporation(
-                    equilibrium,
-                    overhead_partials_override_Pa=(
-                        capacity_result.partial_pressures_Pa
-                    ),
-                )
-                live_effective_flux = (
-                    self._apply_analytic_evaporation_depletion(
-                        live_raw_flux,
-                        dt_hr=self.process_dt_hr(),
-                    )
-                )
-                solved_rates = {
-                    species: float(rate)
-                    for species, rate in (
-                        capacity_result.evaporation_flux_kg_hr.items()
-                    )
-                    if float(rate) > 1.0e-12
-                }
-                live_rates = {
-                    species: float(rate)
-                    for species, rate in live_effective_flux.species_kg_hr.items()
-                    if float(rate) > 1.0e-12
-                }
-                assert set(live_rates) == set(solved_rates)
-                assert all(
-                    math.isclose(
-                        live_rates[species],
-                        solved_rates[species],
-                        rel_tol=1.0e-12,
-                        abs_tol=1.0e-15,
-                    )
-                    for species in solved_rates
-                )
-                evap_flux.species_kg_hr = {
-                    species: float(rate)
-                    for species, rate in (
-                        solved_rates.items()
-                    )
-                    if float(rate) > 1.0e-12
-                }
-                evap_flux.alpha_authority_status_by_species = {
-                    species: status
-                    for species, status in (
-                        live_effective_flux.alpha_authority_status_by_species.items()
-                    )
-                    if species in evap_flux.species_kg_hr
-                }
-                evap_flux.carrier_authority_by_species = copy.deepcopy(
-                    live_effective_flux.carrier_authority_by_species
-                )
-                evap_flux.update_totals()
-            else:
-                evap_flux = self._calculate_evaporation(equilibrium)
-                evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux,
-                    dt_hr=self.process_dt_hr(),
-                )
-        # Hertz-Knudsen reads the headspace persisted last step. A same-step
-        # ordinary-only provisional would replace that combined basis.
-        bakeout_diag = self._apply_c0_bakeout(
-            liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
-            headspace_mbar=None,
-            admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
-            commit_release=False,
-        )
-        if bakeout_diag.get("provider_status") == "ok":
-            joint_scale = bakeout_diag.get("pump_scale")
-            if (
-                isinstance(joint_scale, (int, float))
-                and not isinstance(joint_scale, bool)
-                and math.isfinite(float(joint_scale))
-                and 0.0 <= float(joint_scale) < 1.0
-            ):
-                joint_scale = float(joint_scale)
-                evap_flux.species_kg_hr = {
-                    species: rate * joint_scale
-                    for species, rate in evap_flux.species_kg_hr.items()
-                    if rate * joint_scale > 1.0e-15
-                }
-                evap_flux.update_totals()
-                self._scale_wall_supply_computed(joint_scale)
-        # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
-        # is capped this step. Outside C0 this leaves the flux alone.
-        evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
         overhead_flux = evap_flux
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
         self._commit_pending_subsolidus_release()
@@ -16848,16 +16898,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         The root calls the evaporation owner at trial temperatures. That
         owner writes diagnostics and, via one equilibrium for activities,
-        can commit a ledger transition. Neither belongs to this step: the
-        real equilibrium and the real debit run later, at the solved
-        temperature, after redox. The snapshot is restored when the root
-        returns.
+        can commit a ledger transition. Bakeout can also hand the
+        subsolidus hosts across and set the C0 first-melt flag. None of
+        that belongs to a rejected trial: the snapshot is restored before
+        the next probe. The booked trial's flux is kept aside, on
+        ``_power_balance_root_booking``, which is not a diagnostic key.
         """
 
         diagnostics: dict[str, Any] = {}
         for key, value in self.__dict__.items():
             if self._power_balance_diagnostic_key(key):
                 diagnostics[key] = copy.deepcopy(value)
+        manager = getattr(self, "campaign_mgr", None)
         return {
             "diagnostics": diagnostics,
             "ledger": snapshot_atom_ledger(self.atom_ledger),
@@ -16877,6 +16929,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if self.backend is not None
                 else None
             ),
+            # Bakeout writes these. They are not diagnostic keys, so a
+            # restore that only walks ``_last_`` would leave a probe's
+            # handoff committed.
+            "subsolidus_handed_off": bool(
+                getattr(self, "_subsolidus_handed_off", False)
+            ),
+            "subsolidus_pending_release": copy.deepcopy(
+                getattr(self, "_subsolidus_pending_release", None)
+            ),
+            "subsolidus_committed_kg_hr": copy.deepcopy(
+                dict(
+                    getattr(self, "_subsolidus_committed_kg_hr_by_species", {})
+                    or {}
+                )
+            ),
+            "subsolidus_bakeout_by_hour": copy.deepcopy(
+                list(getattr(self, "_subsolidus_bakeout_by_hour", []) or [])
+            ),
+            "c0_first_melt_backstop": bool(
+                getattr(manager, "c0_first_melt_backstop", False)
+            ),
         }
 
     def _restore_power_balance_host(self, snapshot: Mapping[str, Any]) -> None:
@@ -16892,6 +16965,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._backend_failed = bool(snapshot["backend_failed"])
         if self.backend is not None and snapshot["backend_available"] is not None:
             self.backend._available = snapshot["backend_available"]
+        self._subsolidus_handed_off = bool(snapshot["subsolidus_handed_off"])
+        self._subsolidus_pending_release = copy.deepcopy(
+            snapshot["subsolidus_pending_release"]
+        )
+        self._subsolidus_committed_kg_hr_by_species = copy.deepcopy(
+            dict(snapshot["subsolidus_committed_kg_hr"])
+        )
+        self._subsolidus_bakeout_by_hour = copy.deepcopy(
+            list(snapshot["subsolidus_bakeout_by_hour"])
+        )
+        manager = getattr(self, "campaign_mgr", None)
+        if manager is not None:
+            manager.c0_first_melt_backstop = bool(
+                snapshot["c0_first_melt_backstop"]
+            )
         diagnostics = snapshot["diagnostics"]
         for key in list(self.__dict__):
             if self._power_balance_diagnostic_key(key) and key not in diagnostics:
@@ -16912,10 +17000,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ``_update_temperature``, before redox and before this hour's
         equilibrium. Activities come from one equilibrium at that
         step-start temperature (sulfur saturation off). The trial
-        temperature is applied only to the evaporation booking, which
-        recomputes K(T). The ledger is not debited. Below ``floor_K``
-        the evaporation owner returns a physical zero, and the balance
-        does not call it: the bisection bracket starts at 0 K.
+        temperature reaches K(T), the thermal velocity, and the cheap
+        liquid-fraction curve. It does not reach a new equilibrium.
+        The same evaluation applies the bakeout pump scale and the C0
+        pipe cap, and that flux is what the step books. A repeat call
+        at the same temperature returns the stored rates: the closing
+        residual, the enthalpy report, and a sensitivity probe must
+        not replace J(T_root). The ledger is not debited. Below
+        ``floor_K`` the evaporation owner returns a physical zero, and
+        the balance does not call it: the bisection bracket starts at 0 K.
 
         An empty cleaned-melt inventory is a physical zero. A melt that
         has composition and whose booking raises is not turned into a
@@ -16928,8 +17021,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
         from simulator.thermal_budget import PowerTemperatureRefusal
 
-        if temperature_K < floor_K or cache.get("empty"):
+        key = float(temperature_K)
+        if key < floor_K or cache.get("empty"):
             return {}
+        bookings = getattr(self, "_power_balance_root_booking", None)
+        if not isinstance(bookings, dict):
+            bookings = {}
+            self._power_balance_root_booking = bookings
+        cached = bookings.get(key)
+        if isinstance(cached, Mapping):
+            return dict(cached["rates"])
         if "equilibrium" not in cache:
             cleaned = self.atom_ledger.kg_by_account("process.cleaned_melt")
             if not any(float(kg) > 0.0 for kg in dict(cleaned).values()):
@@ -16952,55 +17053,253 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._restore_power_balance_host(cache["host"])
             cache["diagnostic"] = diagnostic
             cache["equilibrium"] = equilibrium_copy
-        # Each trial starts from that step-start host. Evaporation writes
-        # diagnostics; the next trial must not inherit them. The equilibrium
-        # object stays the step-start copy. Activities are not recomputed.
+        if "liquid_gate" not in cache:
+            # Once per step. The hour's redox gate is established after
+            # this root, so the curve is resolved here and reused at
+            # every trial temperature.
+            cache["liquid_gate"] = self._power_balance_liquid_gate()
+        # Each trial starts from that step-start host. Evaporation and
+        # bakeout write diagnostics and may commit a handoff; the next
+        # trial must not inherit them. The equilibrium object stays the
+        # step-start copy. Activities are not recomputed.
         self._restore_power_balance_host(cache["host"])
         try:
-            self.melt.temperature_C = (
-                float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
-            )
+            self.melt.temperature_C = key - CELSIUS_TO_KELVIN_OFFSET
             self._last_vapor_pressure_diagnostic = copy.deepcopy(
                 cache["diagnostic"]
             )
+            liquid_fraction = self._melt_redox_liquid_fraction_factor(
+                key,
+                gate_authority=cache["liquid_gate"],
+            )
+            trial = _PowerBalanceTrialEquilibrium(
+                cache["equilibrium"],
+                liquid_fraction,
+            )
             try:
-                flux = self._calculate_evaporation(cache["equilibrium"])
+                flux = self._calculate_evaporation(trial)
             except EvaporationFluxRefusal as exc:
                 # A flux refusal is the hot side of this probe. The
                 # balance keeps the best finite temperature and flags
                 # it. It does not abort the step.
                 reason = (
                     "evaporative_flux_above_bracket"
-                    if temperature_K >= ceiling_K
+                    if key >= ceiling_K
                     else "evaporative_flux_refused"
                 )
                 raise PowerTemperatureRefusal(reason, str(exc)) from exc
-            # The mutating depletion wrapper records a phase diagnostic
-            # and overlays wall supply. The pure rate is what that
-            # wrapper debits. scalar 1.0 is the value
-            # ``_record_phase_context_diagnostic`` returns when the
-            # wrapper passes scalar_liquid_fraction=1.0. supply_out
-            # stays None: this call does not publish a wall supply.
-            rates = self._analytic_evaporation_depletion_rates(
-                flux.species_kg_hr,
+            # The wrapper is the booking's depletion. phase_scalar 1.0
+            # is what ``_record_phase_context_diagnostic`` returns for
+            # the scalar the wrapper passes. The root and the debit
+            # share this flux; there is no second call.
+            flux = self._apply_analytic_evaporation_depletion(
+                flux,
                 dt_hr=self.process_dt_hr(),
-                phase_scalar=1.0,
-                cleaned_melt_kg=self.atom_ledger.kg_by_account(
-                    "process.cleaned_melt"
-                ),
-                available_o2_kg=float(
-                    self.atom_ledger.kg_by_account(
-                        "process.overhead_gas"
-                    ).get("O2", 0.0)
-                ),
             )
-            return {
+            bakeout = self._apply_c0_bakeout(
+                liquid_fraction=liquid_fraction,
+                headspace_mbar=None,
+                admitted_gas_kg_hr=dict(flux.species_kg_hr),
+                commit_release=False,
+                temperature_K=key,
+            )
+            self._apply_bakeout_pump_scale(flux, bakeout)
+            flux = self._cap_c0_joint_release_to_pipe_capacity(flux)
+            stored = copy.deepcopy(flux)
+            rates = {
                 str(species): float(rate)
-                for species, rate in rates.items()
+                for species, rate in stored.species_kg_hr.items()
                 if float(rate) > 0.0
             }
+            bookings[key] = {
+                "rates": dict(rates),
+                "flux": stored,
+                "temperature_K": key,
+                "liquid_fraction": float(liquid_fraction),
+                "wall_supply": copy.deepcopy(
+                    dict(getattr(self, "_wall_supply_computed_kg_hr", {}) or {})
+                ),
+                "pending_release": copy.deepcopy(
+                    getattr(self, "_subsolidus_pending_release", None)
+                ),
+                "committed_kg_hr": copy.deepcopy(
+                    dict(
+                        getattr(
+                            self,
+                            "_subsolidus_committed_kg_hr_by_species",
+                            {},
+                        )
+                        or {}
+                    )
+                ),
+                "bakeout": copy.deepcopy(
+                    getattr(self, "_last_subsolidus_bakeout", None)
+                ),
+                "handed_off": bool(
+                    getattr(self, "_subsolidus_handed_off", False)
+                ),
+                "bakeout_by_hour": copy.deepcopy(
+                    list(getattr(self, "_subsolidus_bakeout_by_hour", []) or [])
+                ),
+                "c0_first_melt_backstop": bool(
+                    getattr(
+                        getattr(self, "campaign_mgr", None),
+                        "c0_first_melt_backstop",
+                        False,
+                    )
+                ),
+            }
+            return dict(rates)
         finally:
             self.melt.temperature_C = float(cache["step_start_C"])
+
+    def _power_balance_liquid_gate(self):
+        """Liquid-fraction authority for this power-balance step.
+
+        The hour gate is established after the temperature root. This
+        resolves the curve once; the trial loop passes it back into
+        ``_melt_redox_liquid_fraction_factor`` instead of building an
+        equilibrium at every bisection temperature. A floor fallback
+        stays a floor fallback. A record's curve is what the factor
+        interpolates, so a failed admission cannot collapse a hot trial
+        to a solid.
+        """
+
+        authority = self._melt_redox_liquidus_gate_record()
+        if (
+            isinstance(authority, Mapping)
+            and isinstance(authority.get("curve"), Mapping)
+        ):
+            return authority["curve"]
+        return authority
+
+    def _apply_bakeout_pump_scale(self, evap_flux: EvaporationFlux, diagnostic: Mapping[str, Any]) -> float | None:
+        """Apply the admitted C0 pump scale to this flux and its wall supply."""
+
+        scale = _c0_bakeout_pump_scale(diagnostic)
+        if scale is None:
+            return None
+        evap_flux.species_kg_hr = {
+            species: rate * scale
+            for species, rate in evap_flux.species_kg_hr.items()
+            if rate * scale > 1.0e-15
+        }
+        evap_flux.update_totals()
+        self._scale_wall_supply_computed(scale)
+        return scale
+
+    def _select_power_root_booking(self) -> None:
+        """Keep J(T_root) only when the step actually arrived there.
+
+        Loop 3 and Loop 4 can stop the ramp short. That minute books
+        the post-equilibrium flux, because the root's J is not the J
+        at the temperature the step reached. 1e-4 °C is float noise on
+        the full ramp, and far below a throttle that holds the melt.
+        """
+
+        self._power_balance_applied_booking = None
+        record = self.campaign_mgr.__dict__.get("_power_temperature_for_step")
+        if not isinstance(record, Mapping):
+            return
+        solved_C = record.get("temperature_C")
+        solved_K = record.get("temperature_K")
+        if isinstance(solved_C, bool) or not isinstance(solved_C, (int, float)):
+            return
+        if isinstance(solved_K, bool) or not isinstance(solved_K, (int, float)):
+            return
+        if abs(float(self.melt.temperature_C) - float(solved_C)) > 1.0e-4:
+            return
+        bookings = getattr(self, "_power_balance_root_booking", None)
+        if not isinstance(bookings, dict):
+            return
+        entry = bookings.get(float(solved_K))
+        if isinstance(entry, Mapping):
+            self._power_balance_applied_booking = entry
+
+    def _flag_frozen_power_balance_premise(self) -> None:
+        """One notice per step: activities and redox stay at step start.
+
+        The liquid fraction does not. It is the cheap curve at the trial
+        temperature. ``value`` is this step's duration in seconds.
+        """
+
+        record = self.campaign_mgr.__dict__.get("_power_temperature_for_step")
+        if not isinstance(record, dict):
+            return
+        from simulator.process_timestep import PROCESS_HOUR_S
+        from simulator.thermal_budget import TYPED_UNKNOWN
+
+        knob = "frozen_step_start_activities_and_redox"
+        notices = list(record.get("notices") or ())
+        if any(
+            isinstance(item, Mapping) and item.get("knob") == knob
+            for item in notices
+        ):
+            return
+        dt_s = float(self.process_dt_hr()) * float(PROCESS_HOUR_S)
+        notices.append({
+            "kind": TYPED_UNKNOWN,
+            "knob": knob,
+            "value": dt_s,
+            "unit": "s",
+            "source": (
+                "activities and redox stay the step-start equilibrium "
+                "for this step; the liquid fraction is the cheap curve "
+                "at the trial temperature"
+            ),
+        })
+        record["notices"] = tuple(notices)
+
+    def _replay_power_root_booking(
+        self,
+        booking: Mapping[str, Any],
+    ) -> EvaporationFlux:
+        """Install the root's flux without a second evaporation call.
+
+        The probe's ledger writes were rolled back. A first-melt handoff
+        is committed here, once, on the post-redox ledger: the handoff
+        returns before any pump scale, so this call does not scale J.
+        Every other bakeout result is the probe's pending release, and
+        the step's existing commit books it.
+        """
+
+        flux = copy.deepcopy(booking["flux"])
+        bakeout = booking.get("bakeout")
+        if isinstance(bakeout, Mapping) and bakeout.get("handoff") is True:
+            self._subsolidus_handed_off = False
+            self._apply_c0_bakeout(
+                liquid_fraction=booking.get("liquid_fraction"),
+                headspace_mbar=None,
+                admitted_gas_kg_hr=dict(flux.species_kg_hr),
+                commit_release=False,
+                temperature_K=float(booking["temperature_K"]),
+            )
+        else:
+            self._subsolidus_pending_release = copy.deepcopy(
+                booking.get("pending_release")
+            )
+            self._subsolidus_committed_kg_hr_by_species = copy.deepcopy(
+                dict(booking.get("committed_kg_hr") or {})
+            )
+            if isinstance(bakeout, Mapping):
+                self._last_subsolidus_bakeout = copy.deepcopy(dict(bakeout))
+            history = booking.get("bakeout_by_hour")
+            if isinstance(history, list):
+                self._subsolidus_bakeout_by_hour = copy.deepcopy(history)
+            self._subsolidus_handed_off = bool(booking.get("handed_off"))
+            manager = getattr(self, "campaign_mgr", None)
+            if manager is not None:
+                manager.c0_first_melt_backstop = bool(
+                    booking.get("c0_first_melt_backstop")
+                )
+        wall = booking.get("wall_supply")
+        if isinstance(wall, Mapping):
+            self._wall_supply_computed_kg_hr = {
+                str(species): float(rate)
+                for species, rate in wall.items()
+                if isinstance(rate, (int, float)) and not isinstance(rate, bool)
+            }
+        return flux
 
     def _update_temperature(self):
         """
@@ -17025,11 +17324,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         The primary control is throttling; venting is the safety valve.
         """
         # Power-driven steps close the quasi-steady balance on the
-        # evaporation booking at the trial temperature. Composition is
-        # this step's start (pre-redox). The real hour still solves
-        # equilibrium and debits later, at the solved temperature.
-        # The callback is not a campaign field: it is installed for this
-        # call and removed before the ramp reads the step-start melt.
+        # evaporation booking at the trial temperature. Composition,
+        # activities, and redox are this step's start. The liquid
+        # fraction is the cheap curve at the trial temperature. The
+        # root's own flux, after the pump scale and the pipe cap, is
+        # what an unthrottled step books. The callback is not a
+        # campaign field: it is installed for this call and removed
+        # before the ramp reads the step-start melt.
+        self._power_balance_root_booking = {}
+        self._power_balance_applied_booking = None
         from engines.builtin.vapor_pressure import (
             BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
         )
@@ -17068,6 +17371,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if installed:
                 self.campaign_mgr.__dict__.pop("_species_rate_kg_hr_at_K", None)
                 self._restore_power_balance_host(host)
+        if installed:
+            self._flag_frozen_power_balance_premise()
 
         if target_T is None:
             self._last_nominal_ramp = 0.0
@@ -17187,6 +17492,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ramp_cap = actual_ramp * self.process_dt_hr()
             step = min(abs(delta), ramp_cap)
             self.melt.temperature_C += math.copysign(step, delta)
+        if installed:
+            self._select_power_root_booking()
 
     def _get_turbine_spec(self):
         """
