@@ -54,15 +54,19 @@ class PressureLawChannelDiagnostic:
     observed: float
     expected: float
     reason: str
+    arm: str | None = None
 
     def as_record(self) -> dict[str, str | float]:
-        return {
+        record: dict[str, str | float] = {
             "species": self.species,
             "declared": self.declared,
             "observed": self.observed,
             "expected": self.expected,
             "reason": self.reason,
         }
+        if self.arm is not None:
+            record["arm"] = self.arm
+        return record
 
     def evidence_text(self) -> str:
         return (

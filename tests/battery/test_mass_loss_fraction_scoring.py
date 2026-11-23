@@ -398,22 +398,37 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
         expected_numeric.unit,
         expected_numeric.value,
     )
-    redox_notice = next(
-        notice
-        for notice in residual.notices
-        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        and notice.reason == "residue_pressure_law_redox_active"
-        and "species=Fe" in notice.origin
-    )
-    diagnostic_numbers = {
-        key: float(value)
-        for key, value in (
+    fe_diagnostics = []
+    for notice in residual.notices:
+        if (
+            notice.kind is not NoticeKind.ENGINE_MODEL_CAVEAT
+            or notice.reason != "residue_pressure_law_redox_active"
+        ):
+            continue
+        fields = dict(
             part.strip().split("=", 1)
-            for part in redox_notice.origin.split(";")
+            for part in notice.origin.split(";")
             if "=" in part
         )
-        if key in {"declared", "observed", "expected"}
+        if fields.get("species") == "Fe":
+            fe_diagnostics.append((fields, notice))
+    assert {fields["arm"] for fields, _notice in fe_diagnostics} >= {
+        "POINT", "JOINT",
     }
+    assert sum(fields["arm"] == "POINT" for fields, _notice in fe_diagnostics) == 1
+    assert sum(fields["arm"] == "JOINT" for fields, _notice in fe_diagnostics) == 1
+    point_numbers = next(
+        {key: float(fields[key]) for key in ("declared", "observed", "expected")}
+        for fields, _notice in fe_diagnostics
+        if fields["arm"] == "POINT"
+    )
+    joint_numbers = next(
+        {key: float(fields[key]) for key in ("declared", "observed", "expected")}
+        for fields, _notice in fe_diagnostics
+        if fields["arm"] == "JOINT"
+    )
+    assert point_numbers["observed"] != pytest.approx(joint_numbers["observed"])
+    diagnostic_numbers = point_numbers
     assert diagnostic_numbers["declared"] == pytest.approx(-0.5)
     assert diagnostic_numbers["expected"] < diagnostic_numbers["declared"]
     assert diagnostic_numbers["observed"] == pytest.approx(

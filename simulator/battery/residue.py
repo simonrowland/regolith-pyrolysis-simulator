@@ -530,11 +530,10 @@ def _mapping_float(mapping: Mapping[str, object], key: str) -> float | None:
 def _engine_fe_speciation(
     response: object,
 ) -> tuple[float | None, float | None]:
-    """Read q and a ferrous activity from the same engine response, if present.
+    """Read q and the Fe pressure numerator's activity from this response.
 
-    q is Fe3+/sumFe. Accepted activity keys are the engine's own a_FeO or the
-    ferrous fraction from that speciation. A frozen activity computed at
-    another pO2 is not this response.
+    q is Fe3+/sumFe. A separately attached CALPHAD central estimate is not
+    necessarily the activity used by the Fe pressure law.
     """
 
     mappings: list[Mapping[str, object]] = []
@@ -542,6 +541,16 @@ def _engine_fe_speciation(
     if isinstance(diagnostics, Mapping):
         vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
         if isinstance(vapor_diagnostic, Mapping):
+            numerator_provenance = vapor_diagnostic.get(
+                "vapor_pressure_numerator_provenance"
+            )
+            fe_numerator = (
+                numerator_provenance.get("Fe")
+                if isinstance(numerator_provenance, Mapping)
+                else None
+            )
+            if isinstance(fe_numerator, Mapping):
+                mappings.append(fe_numerator)
             mappings.append(vapor_diagnostic)
             activity_record = vapor_diagnostic.get("a_FeO_calphad")
             if isinstance(activity_record, Mapping):
@@ -569,15 +578,7 @@ def _engine_fe_speciation(
                 if q is not None:
                     break
         if activity is None:
-            for key in (
-                "a_FeO_calphad",
-                "a_FeO",
-                "a_FeO_authoritative",
-                "x_feo",
-            ):
-                activity = _mapping_float(mapping, key)
-                if activity is not None:
-                    break
+            activity = _mapping_float(mapping, "activity_used_for_pressure")
     return q, activity
 
 
@@ -2240,115 +2241,100 @@ def _mass_loss_corner_bounds(
 ) -> tuple[dict[str, float], dict[str, Any]]:
     terms = _channel_terms(channels)
     oxygen_channels = _residue_oxygen_channels(terms, inventory)
-    # At fixed composition P_i is proportional to pO2**nu_i. The closure is
-    # monotone: adding a releaser (nu<0) raises its root; adding a consumer
-    # (nu>0) lowers it. Thus all alpha_i in [0,1] lie between the low corner
-    # (releasers off, consumers on) and high corner (the reverse). Evaluate
-    # each unsourced alpha=1 flux at its maximizing corner: low for nu<0,
-    # high for nu>0, either for nu=0. Sum its OWN parent-oxide kg over dt;
-    # sourced-flux suppression cannot cancel B. This envelope is not a joint
-    # trajectory. The point arm and its original area/inventory remain L.
+    # Maximize each unsourced channel's own parent-oxide loss over the alpha
+    # corners, using each corner's actual alphas. Sourced channels stay at
+    # their documented alpha; this envelope is not a joint trajectory.
+    # Ferric FeO(g) contributes -q*J_FeO/2 to the residual even with a declared
+    # zero pressure exponent, so exponent-sign shortcuts miss mixed corners.
+    # Hold sourced alphas fixed and enumerate every 0/1 assignment for the n
+    # unsourced active channels: 2**n solves, with n bounded by this call's
+    # finite active-channel list. If n grows, cost grows exponentially; capping
+    # corners would make the reported envelope non-conservative.
     roots: list[float] = []
-    corner_channels: list[tuple[_VacuumOxygenChannel, ...]] = []
-    low_corner_channels: tuple[_VacuumOxygenChannel, ...] | None = None
-    for low_corner in (True, False):
+    variable_alpha_channels = tuple(
+        channel for channel in oxygen_channels
+        if channel.active and channel.species in unsourced
+    )
+    bounds: dict[str, float] = {}
+    inventory_caps: dict[str, float] = {}
+    for corner_mask in range(1 << len(variable_alpha_channels)):
+        alpha_by_species = {
+            channel.species: float(bool(corner_mask & (1 << index)))
+            for index, channel in enumerate(variable_alpha_channels)
+        }
         selected = tuple(
-            replace(channel, alpha=(
-                1.0 if channel.pO2_exponent == 0.0
-                or (channel.pO2_exponent > 0.0) == low_corner else 0.0
-            ), alpha_source="alpha<=1 oxygen-corner bound")
-            if channel.species in unsourced else channel
+            replace(
+                channel,
+                alpha=alpha_by_species[channel.species],
+                alpha_source="alpha<=1 oxygen-corner bound",
+            )
+            if channel.species in alpha_by_species else channel
             for channel in oxygen_channels
         )
-        if low_corner:
-            low_corner_channels = selected
-        corner_channels.append(selected)
-
-    # With ferric FeO(g), its residual contribution is -q*J_FeO/2 even
-    # though its declared pressure exponent is zero. For the Fe flux envelope,
-    # evaluate the mixed alpha_Fe=1, alpha_FeO=0 arm and its mirror; assigning
-    # every zero-exponent channel alpha=1 misses the lower-pO2, higher-Fe-flux
-    # arm. Other channels keep the established low-corner choices here.
-    channel_by_species = {channel.species: channel for channel in oxygen_channels}
-    if (
-        low_corner_channels is not None
-        and {"Fe", "FeO"} <= set(unsourced)
-        and "Fe" in channel_by_species
-        and "FeO" in channel_by_species
-        and channel_by_species["Fe"].oxygen_per_metal_atom is not None
-        and channel_by_species["FeO"].oxygen_per_metal_atom is not None
-    ):
-        low_alpha_by_species = {
-            channel.species: channel.alpha for channel in low_corner_channels
-        }
-        for alpha_fe, alpha_feo in ((1.0, 0.0), (0.0, 1.0)):
-            selected = tuple(
-                replace(
-                    channel,
-                    alpha=(
-                        alpha_fe if channel.species == "Fe"
-                        else alpha_feo if channel.species == "FeO"
-                        else low_alpha_by_species[channel.species]
-                    ),
-                    alpha_source="alpha<=1 ferric Fe/FeO corner bound",
-                )
-                if channel.species in unsourced
-                else channel
-                for channel in oxygen_channels
-            )
-            corner_channels.append(selected)
-
-    for selected in corner_channels:
         def pressure_at(logp: float) -> Mapping[str, float]:
             pressures = pressure_model(inventory, logp)
             _inherit_residue_pressure_contract(pressure_at, pressure_model)
             return pressures
 
         try:
-            roots.append(_solve_vacuum_oxygen_balance(
+            root = _solve_vacuum_oxygen_balance(
                 pressure_at, selected, temperature_K=temperature_K,
-            ).pO2_bar)
+            ).pO2_bar
         except ValueError as exc:
             raise _residue_oxygen_balance_failure(exc) from exc
+        roots.append(root)
+        corner_pressures = dict(
+            pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
+        )
+        if root == 0.0:
+            for channel in selected:
+                if channel.pO2_exponent != 0.0:
+                    corner_pressures[channel.species] = 0.0
+        corner_terms = tuple(
+            replace(
+                term,
+                source=replace(
+                    term.source,
+                    alpha=channel.alpha,
+                    alpha_source=channel.alpha_source,
+                ),
+            )
+            for term, channel in zip(terms, selected)
+        )
+        rates = _finite_step_fluxes(
+            corner_terms,
+            inventory,
+            temperature_K=temperature_K,
+            area_m2=area_m2,
+            pressures_Pa=corner_pressures,
+            include_below_threshold=True,
+        )
+        for term, channel in zip(terms, selected):
+            if (
+                term.source.parent_oxide is None
+                or not channel.active
+                or (channel.species not in unsourced and not include_sourced)
+                or channel.alpha == 0.0
+            ):
+                continue
+            if root == 0.0 and channel.pO2_exponent < 0.0:
+                cap = (
+                    float(inventory.get(term.source.parent_oxide, 0.0))
+                    * _formula_terms(term.source.parent_oxide)[1]
+                )
+                inventory_caps[channel.species] = max(
+                    inventory_caps.get(channel.species, 0.0), cap,
+                )
+                continue
+            amount = (
+                rates.get(channel.species, 0.0)
+                * duration_s * term.oxide_per_product_kg
+            )
+            bounds[channel.species] = max(
+                bounds.get(channel.species, 0.0), amount,
+            )
 
     low, high = min(roots), max(roots)
-    pressures = [pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
-                 for root in roots]
-    selected_pressures = {}
-    inventory_caps = {}
-    for term, channel in zip(terms, oxygen_channels):
-        if (term.source.parent_oxide is None or not channel.active
-                or (channel.species not in unsourced and not include_sourced)):
-            continue
-        if channel.pO2_exponent < 0.0 and 0.0 in roots:
-            # A negative-power pressure diverges at a supplier-free low
-            # corner. Its physical finite-step ceiling is all available
-            # parent, never a zero flux or a clipped logarithmic root.
-            inventory_caps[channel.species] = (
-                float(inventory.get(term.source.parent_oxide, 0.0))
-                * _formula_terms(term.source.parent_oxide)[1]
-            )
-        else:
-            candidates = [
-                0.0 if root == 0.0 and channel.pO2_exponent > 0.0
-                else float(pressure_row[channel.species])
-                for root, pressure_row in zip(roots, pressures)
-            ]
-            selected_pressures[channel.species] = max(candidates)
-    bound_terms = tuple(replace(term, source=replace(
-        term.source, alpha=(1.0 if term.source.species in unsourced else term.source.alpha)
-        if term.source.species in selected_pressures else 0.0,
-        alpha_source="worst-corner envelope; sourced alphas retained",
-    )) for term in terms)
-    rates = _finite_step_fluxes(
-        bound_terms, inventory, temperature_K=temperature_K, area_m2=area_m2,
-        pressures_Pa=selected_pressures, include_below_threshold=True,
-    )
-    bounds = {
-        term.source.species: rates.get(term.source.species, 0.0)
-        * duration_s * term.oxide_per_product_kg
-        for term in terms if term.source.species in selected_pressures
-    }
     bounds.update(inventory_caps)
     return bounds, {"pO2_low_bar": low, "pO2_high_bar": high,
                     "inventory_capped_channels": sorted(inventory_caps)}
@@ -2668,7 +2654,9 @@ def predict_mass_loss_fraction(
     )
     flags: set[str] = set()
     metadata: dict[str, str] = {}
-    pressure_law_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
+    pressure_law_diagnostics_by_arm: dict[
+        str, dict[str, PressureLawChannelDiagnostic]
+    ] = {}
     flags.add(
         "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
         "declared free-desorption assumption, not independently sourced coefficients; "
@@ -2769,6 +2757,7 @@ def predict_mass_loss_fraction(
             missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
+        arm = "PREHEAT" if rectangle else "JOINT" if unsourced_unity else "POINT"
         def measure(incoming, active_channels, area, duration):
             bounds, corners = _mass_loss_corner_bounds(
                 incoming, active_channels, pressure_model, unsourced=unsourced,
@@ -2793,8 +2782,11 @@ def predict_mass_loss_fraction(
             )
             if result.refusal is not None:
                 raise result.refusal
+            arm_diagnostics = pressure_law_diagnostics_by_arm.setdefault(arm, {})
             for diagnostic in result.pressure_law_diagnostics:
-                pressure_law_diagnostics[diagnostic.species] = diagnostic
+                arm_diagnostics[diagnostic.species] = replace(
+                    diagnostic, arm=arm,
+                )
             terms = _channel_terms(channels)
             parent_loss = {
                 term.source.species: result.evaporated_mol.get(term.source.species, 0.0)
@@ -2908,7 +2900,11 @@ def predict_mass_loss_fraction(
         return ResidueMassLossPrediction(
             mass_loss_fraction=point_loss_kg / sample_mass_kg,
             engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
-            pressure_law_diagnostics=tuple(pressure_law_diagnostics.values()),
+            pressure_law_diagnostics=tuple(
+                diagnostic
+                for arm in ("POINT", "JOINT", "PREHEAT")
+                for diagnostic in pressure_law_diagnostics_by_arm.get(arm, {}).values()
+            ),
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attach_omissions(exc)
