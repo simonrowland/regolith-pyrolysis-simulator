@@ -65,7 +65,6 @@ def test_new_method_tokens_round_trip(token: MethodToken) -> None:
             "Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti",
             MethodToken.WET_CHEMICAL_ANALYSIS,
         ),
-        ("vacuum_evaporation", MethodToken.LANGMUIR_FREE_EVAPORATION),
         (
             "high_pressure_anhydrous_piston_cylinder",
             MethodToken.PISTON_CYLINDER,
@@ -150,12 +149,16 @@ def test_vacuum_evaporation_migrates_yakovlev_without_creating_observations() ->
             "::experiment::yakovlev-shornikov-2021-vacuum-evaporation"
         )
     )
-    assert experiment.method.is_value
-    assert experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+    assert experiment.method.is_unknown
     assert not any(
         observation.experiment_id == experiment.experiment_id
         for observation in migrator.result.observations.values()
     )
+
+
+def test_generic_vacuum_evaporation_does_not_resolve_to_langmuir() -> None:
+    assert "vacuum_evaporation" not in METHOD_TOKEN_ALIASES
+    assert map_method("vacuum_evaporation").is_unknown
 
 
 def test_gibson_hubbard_source_stays_on_vacuum_chamber_pyrolysis() -> None:

@@ -37,10 +37,10 @@ def test_ivanova_2018_residue_series_migrates_and_pins_table_1_values():
         if experiment.experiment_id.endswith(f"::experiment::{experiment_id}")
     )
     assert experiment.method.is_value
-    assert experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+    assert experiment.method.value is MethodToken.VACUUM_CHAMBER_PYROLYSIS
     assert (
         document["species"]["CaO"]["observations"][0]["regime"]
-        == MethodToken.LANGMUIR_FREE_EVAPORATION.value
+        == MethodToken.VACUUM_CHAMBER_PYROLYSIS.value
     )
     for observation in migrator.result.observations.values():
         assert observation.identity.quantity.is_value

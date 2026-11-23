@@ -8,7 +8,7 @@ source:
 experiments:
   - experiment_id: ivanova_2018_5an_vacuum_evaporation_1900c
     bench_id: ivanova_2018_vacuum_furnace
-    method: langmuir_free_evaporation
+    method: vacuum_chamber_pyrolysis
     locator:
       page: 1
       published_page: 1
@@ -170,7 +170,7 @@ species:
           table: "1"
         T_range_K: [2173.15, 2173.15]
         phase: quenched CAI-like evaporation residues
-        regime: langmuir_free_evaporation
+        regime: vacuum_chamber_pyrolysis
         units: wt.% oxide composition; time in min; loss in percent
         values:
           quantity: residue_composition_vs_time
