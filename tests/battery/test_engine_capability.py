@@ -291,10 +291,12 @@ def test_production_score_compiles_only_covered_pairs(monkeypatch) -> None:
     assert [residual.reference for residual in residuals] == ["covered-psat"]
 
 
-def test_injected_predictor_still_scores_an_uncovered_quantity() -> None:
+def test_injected_predictor_still_scores_an_uncovered_quantity(monkeypatch) -> None:
     from dataclasses import replace
     from decimal import Decimal
 
+    from simulator.battery.enums import ExecutionState, MetricOperation, ResidualStatus, SourceRelation
+    from simulator.battery.records import Execution, Residual, ResidualNumeric
     from simulator.battery.score import ScoreContext, score_store
     from tests.battery import factories as F
     from tests.battery.test_score import _predict
@@ -319,6 +321,33 @@ def test_injected_predictor_still_scores_an_uncovered_quantity() -> None:
         calls.append(engine)
         return _predict(Decimal("1"), observed.identity)
 
+    def fake_compile(reference, engine, *, predict=None, **_kwargs):
+        assert predict is not None
+        prediction = predict(engine, reference)
+        return (
+            Residual(
+                key=f"k::{reference.observation_id}",
+                reference=reference.observation_id,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                rail=None,
+                status=ResidualStatus.MATCH,
+                source_relation=SourceRelation.UNKNOWN,
+                score_eligible=False,
+                exclusions=(),
+                notices=(),
+                numeric=ResidualNumeric(
+                    MetricOperation.DEX,
+                    "dimensionless",
+                    prediction.value,
+                    None,
+                ),
+            ),
+            None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._compile_residual_with_lineage", fake_compile
+    )
     residuals, _candidates = score_store(
         context,
         engines=(Engine.MAGEMIN,),

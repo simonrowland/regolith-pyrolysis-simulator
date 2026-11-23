@@ -12089,16 +12089,22 @@ def test_static_lineage_memo_matches_the_prediction_source_relation(
     monkeypatch.setattr(
         score_mod, "_score_predict_with_engine", refusal_with_other_sources
     )
-    compiled_rows = _assert_score_store_matches_compile_jsonl(
+    # Alpha is in no declared set and this row is not an implied-alpha
+    # rewrite, so the score loop does not emit it. The predict path still
+    # records the foreign coefficient source as unknown.
+    scored, _candidates = score_store(
         context,
-        reference,
         engines=(Engine.VAPOROCK,),
+        include_diagnostics=False,
     )
-
-    assert (
-        compiled_rows[Engine.VAPOROCK][0].source_relation
-        is SourceRelation.UNKNOWN
+    assert scored == ()
+    compiled_residual, _compiled_candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        comparison_ids={reference.observation_id},
     )
+    assert compiled_residual.source_relation is SourceRelation.UNKNOWN
 
 
 def _printed_unresolved_observation(
