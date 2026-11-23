@@ -319,6 +319,10 @@ def test_primary_timeout_retries_without_alpha_continuation(
     assert record['disposition'] == 'environment'
     assert 'gate_provider_step_down' not in record
     assert 'alphamelts_reference_pressure' not in record
+    attempt = record['provider_attempt']
+    assert attempt['provider'] == 'magemin'
+    assert attempt['disposition'] == 'environment'
+    assert 'engine_worker_timeout' in attempt['reason']
 
 
 def test_engine_worker_timeout_retries_freeze_gate_dispatch_once(
@@ -425,10 +429,45 @@ def test_projected_out_of_domain_bounds_skip_alpha_continuation(
     assert 'gate_provider_step_down' not in curve
 
 
+def test_primary_terminal_refusal_does_not_claim_a_step_down(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: a notice before any alternate call fails this assertion."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='unavailable',
+        diagnostic={'reason': 'missing_input'},
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='ok',
+        diagnostic={'solidus_T_C': 950, 'liquidus_T_C': 1500},
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    result = sim._dispatch_only(
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        control_inputs={},
+        fO2_log=-2,
+    )
+
+    primary.assert_called_once()
+    alternate.assert_not_called()
+    assert result.status == 'unavailable'
+    assert result.diagnostic['reason'] == 'missing_input'
+    assert 'gate_provider_step_down' not in result.diagnostic
+
+
 def test_flagged_alpha_bounds_are_published_as_the_step_down_curve(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
-    """Mutation note: restoring primary on non-ok status drops AlphaMELTS bounds."""
+    """Mutation note: dropping flagged bounds or their reason loses publication data."""
 
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
 
@@ -462,6 +501,9 @@ def test_flagged_alpha_bounds_are_published_as_the_step_down_curve(
     )
     assert curve['gate_provider_step_down']['failed_providers'][0]['provider'] == (
         'magemin-shadow'
+    )
+    assert curve['gate_provider_step_down']['realized_provider_reason'] == (
+        'out_of_calibration_range'
     )
 
 
@@ -561,6 +603,9 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
     assert 'alphamelts_reference_pressure' not in recovered_record['curve'][
         'environment_retries'
     ]
+    assert recovered_record['curve']['environment_retries']['provider_attempt'][
+        'provider'
+    ] == 'magemin'
     assert _stripped_gate_bytes(clean_record['curve']) == _stripped_gate_bytes(
         recovered_record['curve'],
     )
@@ -593,6 +638,8 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
     assert abandoned['disposition'] == 'environment'
     assert 'alphamelts_reference_pressure' not in abandoned
     assert 'gate_provider_step_down' not in abandoned
+    assert abandoned['provider_attempt']['provider'] == 'magemin'
+    assert 'engine_worker_timeout' in abandoned['provider_attempt']['reason']
     assert recovered_projected_curve['alphamelts_reference_pressure'][
         'physical_overhead_pressure_bar'
     ] == .02
@@ -923,10 +970,10 @@ def test_held_last_good_omits_prior_environment_retries(
     )
 
 
-def test_engine_worker_timeout_outside_planner_keeps_its_row(
+def test_engine_worker_timeout_outside_planner_keeps_primary_attempt(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
-    """A timeout that never reaches the planner still has a visible row."""
+    """An outside-planner timeout is an environment attempt, not a step-down."""
 
     from simulator.engine_pool import EngineWorkerTimeout
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
@@ -950,9 +997,9 @@ def test_engine_worker_timeout_outside_planner_keeps_its_row(
     assert 'gate_provider_step_down' not in curve
     record = curve['environment_retries']
     assert record['disposition'] == 'environment'
-    attempt = record['gate_provider_step_down']['failed_providers'][0]
+    assert 'gate_provider_step_down' not in record
+    attempt = record['provider_attempt']
     assert attempt['provider'] == 'magemin'
     assert attempt['disposition'] == 'environment'
     assert 'engine_worker_timeout' in attempt['reason']
     assert 'gate_provider_step_down' not in attempt['diagnostic']
-    assert record['gate_provider_step_down']['realized_provider'] is None

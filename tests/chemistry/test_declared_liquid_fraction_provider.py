@@ -518,11 +518,24 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 notice = curve['gate_provider_refusal']
                 assert curve['source'] == 'kress91_liquid_calibration_floor'
                 assert notice['authority'] == 'extrapolated (lower-rung)'
-                attempts = diagnostics[-1]['gate_provider_step_down'][
-                    'failed_providers'
-                ]
-                assert attempts[0]['provider'] == 'magemin-shadow'
-                projected_failure = attempts[0]['diagnostic'][
+                if reason == 'engine_worker_timeout':
+                    # The primary timeout moved from a synthesized
+                    # step-down attempt to environment_retries.provider_attempt.
+                    attempt = curve['environment_retries']['provider_attempt']
+                    assert 'gate_provider_step_down' not in (
+                        curve['environment_retries']
+                    )
+                    assert attempt['provider'] == 'magemin'
+                    assert attempt['disposition'] == 'environment'
+                    assert 'engine_worker_timeout' in attempt['reason']
+                    attempt_diagnostic = attempt['diagnostic']
+                else:
+                    attempts = diagnostics[-1]['gate_provider_step_down'][
+                        'failed_providers'
+                    ]
+                    assert attempts[0]['provider'] == 'magemin-shadow'
+                    attempt_diagnostic = attempts[0]['diagnostic']
+                projected_failure = attempt_diagnostic[
                     'backend_diagnostics'
                 ]['projected_liquidus_diagnostics']
                 held_failure = notice['provider_diagnostic'][

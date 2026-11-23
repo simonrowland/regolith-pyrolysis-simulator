@@ -679,7 +679,10 @@ class ChemistryKernel:
         attempts = []
         order = self._registry.gate_provider_order
         primary_result = None
-        for provider in order:
+        step_down_provider_ran = False
+        for provider_index, provider in enumerate(order):
+            if provider_index > 0:
+                step_down_provider_ran = True
             is_primary = primary_result is None
             try:
                 result = self._dispatch_through_provider(
@@ -734,7 +737,7 @@ class ChemistryKernel:
             # Missing/invalid controls remain typed terminal failures.
             if gate_curve_provider_has_terminal_input(reasons):
                 break
-        if attempts:
+        if attempts and step_down_provider_ran:
             # Preserve the primary failure only when no provider produced a
             # usable curve; a flagged AlphaMELTS curve is still the step-down.
             if not gate_curve_bounds_are_usable(
@@ -742,17 +745,24 @@ class ChemistryKernel:
             ):
                 result = primary_result
                 diagnostic = dict(result.diagnostic or {})
-            diagnostic['gate_provider_step_down'] = {
+            realized = gate_curve_bounds_are_usable(
+                diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+            )
+            step_down = {
                 'requested_provider_order': [p.capability_profile().provider_id for p in order],
                 'failed_providers': attempts,
                 'realized_provider': (
                     provider.capability_profile().provider_id
-                    if gate_curve_bounds_are_usable(
-                        diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
-                    )
-                    else None
+                    if realized else None
                 ),
             }
+            if realized and result.status != 'ok':
+                # A flagged status can still carry usable bounds; keep its
+                # reason with the realized provider in the published notice.
+                realized_reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+                if realized_reasons:
+                    step_down['realized_provider_reason'] = realized_reasons[0]
+            diagnostic['gate_provider_step_down'] = step_down
             result = replace(result, diagnostic=diagnostic)
         return result
 
