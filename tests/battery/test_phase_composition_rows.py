@@ -29,9 +29,11 @@ from simulator.battery.enums import (
     QUANTITY_UNITS,
     AmountBasis,
     Authority,
+    BenchIdentityBasis,
     Engine,
     EvidenceClass,
     ExecutionState,
+    MethodToken,
     MetricOperation,
     NoticeKind,
     Phase,
@@ -49,6 +51,8 @@ from simulator.battery.enums import (
 from simulator.battery.identity import Identity, ValenceBasis, celsius_to_kelvin, profile_for
 from simulator.battery.migrate import REPO_ROOT, is_engine_map_oxide_key, migrate
 from simulator.battery.records import (
+    Bench,
+    BenchIdentity,
     Composition,
     Derivation,
     Execution,
@@ -69,6 +73,7 @@ from simulator.battery.score import (
     compile_residual,
     composition_wt_pct,
     compute_metric,
+    flagged_strata,
     metric_operation_for_identity,
     no_headline_rail_reason,
     populate_numeric,
@@ -1146,6 +1151,123 @@ def test_fe_free_phase_and_element_condition_rows_omit_dp010(
     )
 
 
+def test_magemin_iron_free_phase_uses_declared_transport_oxygen(monkeypatch):
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    transport_controls = []
+
+    def transport(**kwargs):
+        transport_controls.append(kwargs["fO2_log"])
+        return {"phases": {"liq": {
+            "mass_kg": 1.0,
+            "composition": {"SiO2": 60.0, "MgO": 40.0},
+        }}}
+
+    monkeypatch.setattr(backend, "_call_magemin", transport)
+    handle = EngineHandle(
+        name="magemin", backend=backend, available=True,
+        unavailable_reason=None, takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT, fO2_Pa=None,
+    )
+    row = F.observation("phase-magemin-transport", "exp", identity, Decimal("60"))
+    prediction = predict_with_engine(Engine.MAGEMIN, row, handles={"magemin": handle})
+
+    assert prediction.value == Decimal("60"), prediction.refusal_detail
+    assert transport_controls == [-9.0]
+    transport_notice = next(
+        notice for notice in prediction.notices
+        if notice.kind is NoticeKind.OXYGEN_INPUT_REQUIRED_BY_ENGINE
+    )
+    assert "log10(fO2/bar)=-9" in transport_notice.reason
+    assert flagged_strata((transport_notice,)) == ()
+    assert not any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
+    assert prediction.identity.fO2_Pa is None or not prediction.identity.fO2_Pa.is_value
+
+
+@pytest.mark.parametrize("row_kind", ("phase", "element", "redox"))
+def test_unsupported_oxygen_apparatus_reaches_phase_and_redox_scorers(
+    monkeypatch, row_kind,
+):
+    from simulator.battery import score
+
+    identity = replace(
+        _phase_identity(
+            "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.MELT, fO2_Pa=None,
+        ),
+        composition=State.of(Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("0.7")), ("FeO", Decimal("0.3"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )),
+    )
+    experiment = F.tabulation_experiment(
+        method=MethodToken.QUENCH_EQUILIBRATION, T_K=identity.temperature_K.value,
+    )
+    experiment = replace(experiment, sample=replace(
+        experiment.sample, container=F.located("molybdenum capsule"),
+    ))
+    bench = Bench(
+        id="unsupported-apparatus", work_id="work-1",
+        identity=BenchIdentity(BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE, reason="test fixture"),
+    )
+    if row_kind == "redox":
+        identity = replace(identity, quantity=State.of(Quantity.FE3_FE2_RATIO),
+                           species=Species("FeO", Phase.L))
+    if row_kind == "element":
+        identity = replace(identity, species=Species("Fe", Phase.L),
+                           subtype=State.of("element_wt_percent"))
+    row = F.observation("apparatus", experiment.experiment_id, identity, Decimal("1"))
+    if row_kind == "element":
+        row = replace(
+            row,
+            derivation=Derivation(
+                relation="oxygen_excess", inputs=("printed_elemental_analysis",),
+                parameters=(), output_unit="wt%",
+            ),
+            point_conditions={"element_wt_percent": F.located(Composition(
+                basis="element_wt_percent",
+                components=(("Fe", Decimal("21.59")), ("Si", Decimal("24.72")),
+                            ("Mg", Decimal("10.69")), ("O", Decimal("43.00"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            ))},
+        )
+
+    def never_open(*_args, **_kwargs):
+        raise AssertionError("unsupported oxygen apparatus reached an engine handle")
+
+    monkeypatch.setattr(score, "_open_cached_battery_handle", never_open)
+    result = predict_with_engine(Engine.ALPHAMELTS, row, experiment=experiment, bench=bench)
+    assert result.execution.state is ExecutionState.NOT_PROBED
+    assert result.refusal_detail["reason"] == "unsupported_print_form"
+    assert "molybdenum capsule" in result.refusal_detail["why"]
+
+    printed = replace(row, point_conditions={
+        **(row.point_conditions or {}), "fO2_log": F.located(Decimal("-8")),
+    })
+    if row_kind == "redox":
+        result = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL, printed, experiment=experiment, bench=bench,
+        )
+    else:
+        def equilibrate(_engine, *, fO2_log, **_kwargs):
+            assert fO2_log == -8.0
+            return EquilibriumResult(
+                liquid_fraction=1.0, phase_compositions={"liquid": {"SiO2": 60.0, "FeO": 40.0}},
+            )
+
+        monkeypatch.setattr(score, "_equilibrate_phase_assemblage", equilibrate)
+        result = predict_with_engine(Engine.ALPHAMELTS, printed, experiment=experiment, bench=bench)
+    assert result.value is not None, result.refusal_detail
+
+
 def test_missing_pressure_and_fo2_phase_rows_reach_each_melts_adapter(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1235,13 +1357,16 @@ def test_missing_pressure_and_fo2_phase_rows_reach_each_melts_adapter(
             notice.policy is not None and notice.policy.id == "DP-001"
             for notice in prediction.notices
         )
-        ferric_ratio_flag = any(
+        assert any(
+            notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+            and notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in prediction.notices
+        )
+        assert not any(
             notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
             for notice in prediction.notices
         )
-        assert ferric_ratio_flag
-        assert resolved_fo2 is not None
-        assert resolved_fo2.route.startswith("kress_inverse:")
+        assert resolved_fo2.route == "dp010_ambient_air_unprinted_atmosphere"
 
     assert [call["engine"] for call in calls] == [
         Engine.ALPHAMELTS,
@@ -1293,11 +1418,16 @@ def test_missing_pressure_and_fo2_element_rows_reach_each_melts_adapter(
         fO2_Pa=None,
         total_pressure_Pa=None,
     )
+    identity = replace(identity, composition=State.of(Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.7")), ("FeO", Decimal("0.3"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )))
     observation = F.observation(
         "unstated-pressure-and-fo2-element-phase",
         "unstated-pressure-and-fo2-element-experiment",
         identity,
-        Decimal("24.57"),
+        Decimal("21.59"),
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="fixture-phase-source",
         derivation=Derivation(
@@ -1310,10 +1440,10 @@ def test_missing_pressure_and_fo2_element_rows_reach_each_melts_adapter(
     element_analysis = Composition(
         basis="element_wt_percent",
         components=(
-            ("Fe", Decimal("24.57")),
+            ("Fe", Decimal("21.59")),
             ("Si", Decimal("24.72")),
             ("Mg", Decimal("10.69")),
-            ("O", Decimal("40.02")),
+            ("O", Decimal("43.00")),
         ),
         amount_basis=AmountBasis.MASS_PERCENT,
     )

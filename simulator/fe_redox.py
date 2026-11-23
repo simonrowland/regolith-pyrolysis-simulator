@@ -949,6 +949,10 @@ def _kress91_fe2o3_over_feo_molar(
     T_K: float,
     pressure_bar: float,
 ) -> float:
+    # Public forwards require pressure. The private inverse still passes
+    # None into ``_kress91_ln_ratio`` and is the only omission.
+    if pressure_bar is None:
+        _kress91_require_control("pressure_bar", pressure_bar, positive=True)
     ln_ratio = _kress91_ln_ratio(
         fO2_log=fO2_log,
         mol_fractions=mol_fractions,

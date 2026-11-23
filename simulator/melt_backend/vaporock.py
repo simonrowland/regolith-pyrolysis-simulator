@@ -416,7 +416,7 @@ def vaporock_pressure_bar_admitted(pressure_bar: Any) -> bool:
 
 
 def _single_positive_non_oxide(composition: Mapping[str, Any] | None) -> str | None:
-    """One positive component whose formula contains no oxygen.
+    """One positive elemental component other than oxygen.
 
     VapoRock equilibrates a silicate melt. A pure metal is the saturation
     observable of another owner, not an omitted-fO2 melt.
@@ -434,7 +434,14 @@ def _single_positive_non_oxide(composition: Mapping[str, Any] | None) -> str | N
             return None
         if number > 0.0:
             positive.append(str(name))
-    if len(positive) != 1 or "O" in positive[0] or "o" in positive[0]:
+    if len(positive) != 1:
+        return None
+    from simulator.reference_data.janaf import formula_elements
+
+    # Element tokens, not letters: "Mo" has no oxygen. An unparseable
+    # name is not a pure metal.
+    elements = formula_elements(positive[0])
+    if elements != (positive[0],) or positive[0] == "O":
         return None
     return positive[0]
 

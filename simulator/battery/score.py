@@ -8035,6 +8035,14 @@ def oxygen_is_scorer_input(
         )
     if "fO2_Pa" in profile_for(identity).required:
         qname = quantity.value if quantity is not None else "quantity"
+        reservoir = stated_pure_substance_reservoir(identity)
+        if (
+            quantity is Quantity.P_REFERENCE
+            and reservoir is not None
+            and reservoir[0] == identity.species.formula
+            and parse_formula_elements(reservoir[0]) == (reservoir[0],)
+        ):
+            return False, f"{qname} pure elemental reservoir does not take oxygen", ()
         return True, f"{qname} requires oxygen", redox
     qname = quantity.value if quantity is not None else "quantity"
     return False, f"{qname} does not take oxygen as an input; oxygen was omitted", redox
@@ -9409,6 +9417,82 @@ def _closed_system_experiment(experiment: Experiment | None) -> bool:
     )
 
 
+def _dp108_sum_eligible(experiment: Experiment | None, identity: Identity) -> bool:
+    """Partial-pressure sum only for an unstated method with a condensed phase."""
+
+    if experiment is not None and experiment.method.is_value:
+        return False
+    return stated_pure_substance_reservoir(identity) is not None or (
+        identity.composition is not None
+        and identity.composition.is_value
+        and isinstance(identity.composition.value, Composition)
+    )
+
+
+def _oxide_reference_defined_pressure(
+    identity: Identity,
+) -> tuple[float, State[Any]] | None:
+    """Reference pressure of an oxide P_REFERENCE row, in bar and Pa.
+
+    Pure-metal reference rows stay pressureless: the reservoir formula is
+    the gas. The defined reference pressure is the quantity's pressure.
+    Absent that number, return None rather than invent a default.
+    """
+
+    reservoir = stated_pure_substance_reservoir(identity)
+    species = identity.species
+    if reservoir is None or species is None or reservoir[0] == species.formula:
+        return None
+    state = identity.reference_state
+    if (
+        state is None
+        or not state.is_value
+        or not isinstance(state.value, StandardState)
+        or state.value.reference_pressure_bar is None
+    ):
+        return None
+    bar = as_decimal(state.value.reference_pressure_bar)
+    if not bar.is_finite() or bar <= 0:
+        return None
+    return float(bar), State.of(bar * PA_PER_BAR_DEC)
+
+
+def _unsupported_oxygen_gap(
+    experiment: Experiment | None,
+    bench: Bench | None,
+    observation: Observation | None,
+    quantity: Quantity,
+) -> dict[str, str] | None:
+    """Relay a typed waypoint absence when the oxygen ladder has no value."""
+
+    if experiment is None or bench is None or observation is None:
+        return None
+    from simulator.battery.waypoints import GapReason, oxygen_condition
+
+    gap = oxygen_condition(experiment, bench, observation).absence
+    if gap is None or gap.reason is not GapReason.UNSUPPORTED_PRINT_FORM:
+        return None
+    return {
+        "reason": gap.reason.value,
+        "quantity": quantity.value,
+        "why": "; ".join(gap.missing),
+    }
+
+
+def _magemin_oxygen_transport_notice(quantity: Quantity) -> Notice:
+    from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+
+    return Notice(
+        kind=NoticeKind.OXYGEN_INPUT_REQUIRED_BY_ENGINE,
+        affected_quantities=(quantity,),
+        reason=(
+            f"MAGEMin transport uses log10(fO2/bar)={MAGEMIN_NOMINAL_FO2_LOG:g} "
+            "for an oxygen-insensitive bulk"
+        ),
+        origin="engine:magemin",
+    )
+
+
 def _resolve_score_total_pressure(
     identity: Identity,
     quantity: Quantity,
@@ -9419,7 +9503,13 @@ def _resolve_score_total_pressure(
 ) -> tuple[float | None, State[Any] | None, Notice | None, str | None]:
     """Choose pressure from quantity and apparatus evidence, in ruling order."""
 
-    if quantity in {Quantity.P_REFERENCE, Quantity.P_SAT}:
+    if quantity is Quantity.P_SAT:
+        return None, None, None, None
+    if quantity is Quantity.P_REFERENCE:
+        defined = _oxide_reference_defined_pressure(identity)
+        if defined is not None:
+            pressure_bar, pressure_state = defined
+            return pressure_bar, pressure_state, None, None
         return None, None, None, None
 
     pressure_pa = _score_pressure_state(identity, observation, experiment)
@@ -9499,7 +9589,8 @@ def _resolve_score_total_pressure(
         return pressure_bar, pressure_state, notice, None
 
     if quantity is Quantity.P_PARTIAL:
-        # DP-108 is resolved after the engine supplies the complete partial-pressure map.
+        # Leave the pressure unset here. Eligible methodless rows can use
+        # DP-108 after the engine returns its complete gas map.
         return None, None, None, None
 
     if method is None and quantity in {
@@ -10016,6 +10107,12 @@ def _predict_redox(
         if resolved_fo2 is not None:
             fo2_log = Decimal(str(resolved_fo2.log10_fO2_bar))
             material_notices.append(fo2_tier_notice(quantity, resolved_fo2))
+        else:
+            oxygen_gap = _unsupported_oxygen_gap(
+                experiment, bench, fo2_observation, quantity
+            )
+            if oxygen_gap is not None:
+                return refused(RefusalReason.IDENTITY_INCOMPLETE, oxygen_gap)
     handle: object | None = None
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.
@@ -10844,18 +10941,9 @@ def _oxygen_input_request(
             else 10.0 ** resolved.log10_fO2_bar
         )
         return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
-    refusal_reason = "missing_fO2"
-    refusal_why: object = oxygen_why
-    if experiment is not None and bench is not None and observation is not None:
-        from simulator.battery.waypoints import GapReason, oxygen_condition
-
-        oxygen_gap = oxygen_condition(experiment, bench, fo2_observation).absence
-        if (
-            oxygen_gap is not None
-            and oxygen_gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
-        ):
-            refusal_reason = oxygen_gap.reason.value
-            refusal_why = "; ".join(oxygen_gap.missing)
+    oxygen_gap = _unsupported_oxygen_gap(
+        experiment, bench, fo2_observation, quantity
+    )
     return _input_refusal(
         engine=engine,
         channel=channel,
@@ -10864,9 +10952,11 @@ def _oxygen_input_request(
         requested=requested,
         reason=RefusalReason.IDENTITY_INCOMPLETE,
         detail={
-            "reason": refusal_reason,
-            "quantity": quantity.value,
-            "why": refusal_why,
+            **(oxygen_gap or {
+                "reason": "missing_fO2",
+                "quantity": quantity.value,
+                "why": oxygen_why,
+            }),
             "multivalent": list(redox),
         },
         notices=(
@@ -11628,7 +11718,11 @@ def _equilibrate_phase_assemblage(
                         f"{type(backend).__name__} does not accept redox_mode; "
                         "a measured-oxygen ferric fraction is not converted to fO2"
                     )
-        if not (omit_unconsumed_oxygen and fO2_log is None):
+        if omit_unconsumed_oxygen and fO2_log is None and engine is Engine.MAGEMIN:
+            from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+
+            kwargs["fO2_log"] = MAGEMIN_NOMINAL_FO2_LOG
+        elif not (omit_unconsumed_oxygen and fO2_log is None):
             kwargs["fO2_log"] = fO2_log
         from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
@@ -12289,17 +12383,18 @@ def _predict_element_mass_fraction_phase(
                 resolve_row_fo2,
             )
 
+            fo2_observation = replace(
+                observation,
+                identity=(
+                    replace(identity, total_pressure_Pa=pressure_state)
+                    if pressure_state is not None
+                    else identity
+                ),
+            )
             resolved = resolve_row_fo2(
                 experiment,
                 bench,
-                replace(
-                    observation,
-                    identity=(
-                        replace(identity, total_pressure_Pa=pressure_state)
-                        if pressure_state is not None
-                        else identity
-                    ),
-                ),
+                fo2_observation,
                 composition_wt=dict(weights),
                 temperature_K=float(temperature),
                 quantity=quantity,
@@ -12307,7 +12402,8 @@ def _predict_element_mass_fraction_phase(
             if resolved is None:
                 return refused(
                     RefusalReason.IDENTITY_INCOMPLETE,
-                    {"reason": "missing_input", "input": "fO2_Pa"},
+                    _unsupported_oxygen_gap(experiment, bench, fo2_observation, quantity)
+                    or {"reason": "missing_input", "input": "fO2_Pa"},
                     execution=ExecutionState.NOT_PROBED,
                     notices=notices,
                 )
@@ -12331,6 +12427,12 @@ def _predict_element_mass_fraction_phase(
             execution=ExecutionState.NOT_PROBED,
             notices=notices,
         )
+    if (
+        engine is Engine.MAGEMIN
+        and redox_mode is not None
+        and not measured_ferric_fraction
+    ):
+        notices += (_magemin_oxygen_transport_notice(quantity),)
     try:
         if pressure_state is not None:
             identity = replace(identity, total_pressure_Pa=pressure_state)
@@ -12762,16 +12864,19 @@ def _predict_phase_row(
             exclusion_notices = exclusion_notices + (
                 _omission_notice(quantity, oxygen_reason),
             )
+            if engine is Engine.MAGEMIN:
+                exclusion_notices += (_magemin_oxygen_transport_notice(quantity),)
     if oxygen_required and fo2_log is None:
         from simulator.battery.fo2_ladder import (
             fo2_tier_notice,
             resolve_row_fo2,
         )
 
+        fo2_observation = replace(observation, identity=identity)
         resolved = resolve_row_fo2(
             experiment,
             bench,
-            replace(observation, identity=identity),
+            fo2_observation,
             composition_wt=wt,
             temperature_K=float(temperature),
             quantity=quantity,
@@ -12779,7 +12884,8 @@ def _predict_phase_row(
         if resolved is None:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "fO2_Pa"},
+                _unsupported_oxygen_gap(experiment, bench, fo2_observation, quantity)
+                or {"reason": "missing_input", "input": "fO2_Pa"},
                 execution=ExecutionState.NOT_PROBED,
                 notices=exclusion_notices,
             )
@@ -14663,6 +14769,7 @@ def _predict_with_engine(
         ARM_QUALIFICATION,
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
+        PO2_NOT_AN_INPUT,
         PO2_OXYGEN_BALANCE_EFFUSION,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
@@ -15037,7 +15144,7 @@ def _predict_with_engine(
                     notices = (
                         Notice(
                             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                            affected_quantities=(Quantity.P_SAT,),
+                            affected_quantities=(quantity,),
                             reason="pure_component_antoine_extrapolated",
                             origin=observation.observation_id,
                             band=f"[{low:g}, {high:g}] K",
@@ -15048,7 +15155,7 @@ def _predict_with_engine(
                 notices = notices + (
                     Notice(
                         kind=NoticeKind.INPUT_OMITTED,
-                        affected_quantities=(Quantity.P_SAT,),
+                        affected_quantities=(quantity,),
                         reason="antoine-segment-phase-undeclared",
                         origin=observation.observation_id,
                     ),
@@ -15986,6 +16093,13 @@ def _predict_with_engine(
             version=engine_version,
         )
 
+    transport_po2 = po2
+    if native_activity_formula is not None and po2.mode == PO2_NOT_AN_INPUT:
+        from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+
+        extra_notices.append(_magemin_oxygen_transport_notice(quantity))
+        transport_po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=10.0**MAGEMIN_NOMINAL_FO2_LOG)
+
     solve_oxygen_balance_at_current_pressure = None
     oxygen_balance_notice: Notice | None = None
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
@@ -16118,7 +16232,7 @@ def _predict_with_engine(
                 handle,
                 pot,
                 temperature_K=float(T),
-                po2=po2,
+                po2=transport_po2,
                 qualification=qualification,
                 isolated=use_isolated,
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
@@ -16829,6 +16943,82 @@ def _predict_with_engine(
                 engine=engine,
             ),
         )
+    if (
+        quantity is Quantity.P_PARTIAL
+        and pressure_bar is None
+        and not _closed_system_experiment(experiment)
+        and _dp108_sum_eligible(experiment, identity)
+    ):
+        invalid_components = tuple(
+            getattr(cell, "invalid_gas_partial_pressure_components", ())
+            or getattr(cell, "invalid_components", ())
+            or ()
+        )
+        total_pressure_pa = (
+            None if invalid_components else _sum_gas_partial_pressures_pa(pressures)
+        )
+        if total_pressure_pa is None:
+            detail = {
+                "reason": "partial_pressure_sum_incomplete_gas_map",
+                "policy": "DP-108",
+                "invalid_components": sorted(str(name) for name in invalid_components),
+                "target_partial_pressure_Pa": magnitude,
+            }
+            if (
+                magnitude is not None
+                and (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+            ):
+                notices = union_notices(
+                    notices,
+                    (Notice(
+                        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+                        affected_quantities=(quantity,),
+                        reason=f"DP-108 {detail['reason']}: {detail['invalid_components']}",
+                        origin="score:total_pressure",
+                    ),),
+                )
+            else:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.PRODUCED,
+                        call_evidence=call_evidence,
+                    ),
+                    authority=Authority.REFUSED,
+                    notices=notices,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                    refusal_detail=detail,
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
+        elif magnitude is not None:
+            original_pressure_reason = _original_pressure_reason(
+                identity, observation, experiment
+            )
+            dp108 = resolve(
+                "DP-108", predicted_total_pressure_pa=total_pressure_pa
+            )
+            pressure_bar = float(total_pressure_pa) / PA_PER_BAR
+            pressure_state = State.of(as_decimal(dp108.value))
+            identity = replace(identity, total_pressure_Pa=pressure_state)
+            notices = union_notices(
+                notices,
+                (
+                    _default_policy_notice(
+                        dp108,
+                        quantity,
+                        "DP-108 default_total_pressure_Pa={value}; "
+                        f"original_reason={original_pressure_reason}; "
+                        "closed equilibrium contains no background gas; inert-background "
+                        "effect is below Poynting order V*dP/RT",
+                        origin="score:total_pressure",
+                    ),
+                ),
+            )
     if magnitude is None:
         detail: dict[str, object] = {
             "reason": "species_unmatched_in_engine_output",
@@ -16857,41 +17047,6 @@ def _predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
-    if (
-        quantity is Quantity.P_PARTIAL
-        and pressure_bar is None
-        and not _closed_system_experiment(experiment)
-        and not (
-            experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        )
-    ):
-        total_pressure_pa = _sum_gas_partial_pressures_pa(pressures)
-        if total_pressure_pa is not None:
-            original_pressure_reason = _original_pressure_reason(
-                identity, observation, experiment
-            )
-            dp108 = resolve(
-                "DP-108", predicted_total_pressure_pa=total_pressure_pa
-            )
-            pressure_bar = float(total_pressure_pa) / PA_PER_BAR
-            pressure_state = State.of(as_decimal(dp108.value))
-            identity = replace(identity, total_pressure_Pa=pressure_state)
-            notices = union_notices(
-                notices,
-                (
-                    _default_policy_notice(
-                        dp108,
-                        quantity,
-                        "DP-108 default_total_pressure_Pa={value}; "
-                        f"original_reason={original_pressure_reason}; "
-                        "closed equilibrium contains no background gas; inert-background "
-                        "effect is below Poynting order V*dP/RT",
-                        origin="score:total_pressure",
-                    ),
-                ),
-            )
     if not math.isfinite(magnitude):
         return EnginePrediction(
             engine=engine,

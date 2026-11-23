@@ -212,6 +212,10 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
 # are unchanged by this input; pressure-sensitive gas equilibria move toward
 # their vacuum limit, so actual higher pressure may bias the prediction.
 DP_019_VACUUM_BOUNDARY_BAR = 1.0e-6
+# Diagnostic arms are not the observation scorer. They pass this labelled
+# boundary into the shared cell. The cell does not apply it itself, and
+# the observation scorer does not import it.
+DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR = DP_019_VACUUM_BOUNDARY_BAR
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
@@ -5748,6 +5752,7 @@ def run_engine_arm(
                                 po2=po2,
                                 qualification=job.qualification,
                                 arm=job.arm,
+                                physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
                             )
                             if not battery_engine_handle_is_live(handle) and (
                                 had_live_handle
@@ -6143,7 +6148,7 @@ def build_report(
                 "engine_default": grid.engine_default_po2,
                 "commanded": list(grid.commanded_po2_bar),
             },
-            "pressure_bar": DP_019_VACUUM_BOUNDARY_BAR,
+            "pressure_bar": DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         },
         "pots": [
             {

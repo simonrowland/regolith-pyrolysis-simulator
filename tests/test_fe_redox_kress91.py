@@ -533,6 +533,14 @@ def test_kress91_invalid_pressure_fails_loudly(pressure_bar: float) -> None:
         )
 
 
+def test_kress91_public_forward_refuses_omitted_pressure() -> None:
+    with pytest.raises(Kress91InvalidControls, match="pressure_bar"):
+        kress91_fe3_over_sigma_fe(
+            fO2_log=-9.0, mol_fractions={"FeOt": 0.1}, T_K=1500.0,
+            pressure_bar=None,
+        )
+
+
 # kress91_ferrous_feo_activity serves the evaporation / vapor-pressure path,
 # whose valid-input domain DIFFERS from kress91_split's: it is called at furnace
 # vacuum with pressure_bar == 0.0, so it FLOORS non-positive pressure to 1e-9

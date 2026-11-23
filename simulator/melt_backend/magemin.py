@@ -115,6 +115,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.oxygen_buffers import (
@@ -1810,7 +1811,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self,
         temperature_C: float,
         composition_kg: Optional[Dict[str, float]] = None,
-        fO2_log: float = -9.0,
+        fO2_log: Optional[float] = None,
         pressure_bar: float = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
@@ -2263,7 +2264,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     def find_liquidus_solidus(
         self,
         composition_kg: Optional[Dict[str, float]] = None,
-        fO2_log: float = -9.0,
+        fO2_log: float = MAGEMIN_NOMINAL_FO2_LOG,
         pressure_bar: float = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
@@ -4297,7 +4298,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection=projection,
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
-                fO2_log=-9.0,
+                fO2_log=MAGEMIN_NOMINAL_FO2_LOG,
                 capture_native_activities=True,
             )
         )
@@ -4347,7 +4348,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # This accessor reads pre-minimisation standard-state endmember G,
         # not an equilibrium at -9. Preserve the native control failure as
         # a notice rather than certifying the probe's arbitrary redox input.
-        control = self._fo2_operating_point(-9.0, native_log, buffer_present)
+        control = self._fo2_operating_point(
+            MAGEMIN_NOMINAL_FO2_LOG, native_log, buffer_present
+        )
         buffer_warnings.append(
             f'MAGEMin pure-phase native fO2 readback: {control}'
         )

@@ -330,6 +330,8 @@ class NoticeKind(StrEnum):
     # A nonblocking limitation of an engine model or how it is applied. The
     # reason carries detail; it adds no stratum and does not change authority.
     ENGINE_MODEL_CAVEAT = "engine_model_caveat"
+    # A transport control with no effect on the oxygen-insensitive observable.
+    OXYGEN_INPUT_REQUIRED_BY_ENGINE = "oxygen_input_required_by_engine"
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"

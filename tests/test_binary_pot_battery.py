@@ -152,6 +152,48 @@ def test_run_engine_arm_closes_owned_handles_on_every_exit(
     assert backend.close_calls == 1
 
 
+@pytest.mark.parametrize("arm", ("engine", "scoring"))
+def test_diagnostic_arms_pass_pressure_through_the_real_cell(monkeypatch, arm):
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers import binary_pot_scoring as scoring
+    from simulator.melt_backend.base import EquilibriumResult
+
+    pressures = []
+
+    def adapter(*, pressure_bar, **_kwargs):
+        pressures.append(pressure_bar)
+        return EquilibriumResult(liquid_fraction=1.0)
+
+    handle = EngineHandle(
+        name="alphamelts", backend=SimpleNamespace(equilibrate=adapter),
+        available=True, unavailable_reason=None,
+        takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    handles = {"alphamelts": handle}
+    pot = BinaryPot("pressure-probe", None, "test fixture", {"SiO2": 80.0, "MgO": 20.0})
+    monkeypatch.setattr(
+        battery, "equilibrate_cell", partial(equilibrate_cell, isolated=False),
+    )
+    if arm == "engine":
+        run_engine_arm(
+            engine_names=("alphamelts",), handles=handles, pots=(pot,),
+            grid=BatteryGrid((1500.0,), False, (1e-8,)),
+        )
+    else:
+        scoring_pot = scoring.ScoringPot(
+            pot_id=pot.pot_id, source_id="fixture", observation_id="row",
+            sample_no=None, temperatures_K=(1500.0,), composition_basis="test",
+            composition_conversion="test", composition_as_printed=pot.composition_wt_pct,
+            composition_wt_pct=pot.composition_wt_pct, why=pot.why,
+        )
+        scoring.run_scoring_arm(
+            engine_names=("alphamelts",), handles=handles,
+            pots=(scoring_pot,), extract_paths=(),
+        )
+
+    assert pressures == [1e-6]
+
+
 def test_run_engine_arm_reopens_dead_backend_after_worker_death(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -946,7 +988,7 @@ def test_equilibrate_cell_refuses_invalid_fraction_without_assemblage():
     assert cell.refusal_reason == "liquid_fraction_invalid"
 
 
-def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> None:
+def test_magemin_native_activity_receives_explicit_fo2_control() -> None:
     captured = {}
 
     class _Backend:
@@ -957,7 +999,7 @@ def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> 
             composition_kg,
             composition_mol,
             pressure_bar,
-            fO2_log=-9.0,
+            fO2_log,
             call_timeout_s=None,
             native_activity_formula=None,
         ):
@@ -990,7 +1032,7 @@ def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> 
     pot = BinaryPot(
         pot_id="magemin-uncommanded-fo2",
         kato_1993_table4_system=None,
-        why="native activity uses MAGEMin's declared default redox seed",
+        why="native activity receives a declared transport control",
         composition_wt_pct={"MgO": 50.0, "SiO2": 50.0},
     )
 
@@ -998,7 +1040,7 @@ def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> 
         handle,
         pot,
         temperature_K=1800.0,
-        po2=Po2Request(mode="not_an_input", po2_bar=None),
+        po2=Po2Request(mode="commanded", po2_bar=1e-9),
         native_activity_formula="MgO",
     )
 

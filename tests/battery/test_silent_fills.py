@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     BenchIdentityBasis,
     CellMaterial,
     Engine,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
@@ -909,19 +910,55 @@ def test_oxide_reference_pressure_does_not_use_metal_saturation(monkeypatch) -> 
         "engines.builtin.sodium_saturation.sodium_saturation_block",
         _refuse,
     )
-    _capture_cell(monkeypatch)
     observation = F.observation("na-oxide-pref", "exp", F.pref_identity(), Decimal("1"))
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL, observation, isolated=False
     )
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.value.is_finite() and prediction.value > 0
+    assert prediction.refusal_reason is None
     assert prediction.coefficient_basis != "pure_component_saturation"
+    assert prediction.identity.total_pressure_Pa == State.of(Decimal("100000"))
+    assert not any(notice.policy and notice.policy.id == "DP-001" for notice in prediction.notices)
 
 
-def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -> None:
-    observation, experiment = _kems_partial(cell_material=None)
+@pytest.mark.parametrize("quantity", (Quantity.P_SAT, Quantity.P_REFERENCE))
+def test_non_sodium_antoine_notices_name_the_actual_quantity(quantity) -> None:
+    identity = replace(F.psat_identity("Mg", T_K=Decimal("1500")), quantity=State.of(quantity))
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("mg-antoine", "exp", identity, Decimal("1")),
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    for reason in ("pure_component_antoine_extrapolated", "antoine-segment-phase-undeclared"):
+        notice = next(notice for notice in prediction.notices if notice.reason == reason)
+        assert notice.affected_quantities == (quantity,)
+
+
+@pytest.mark.parametrize(
+    ("engine", "method", "invalid_components"),
+    (
+        (Engine.OPENIMCC, None, ()),
+        (Engine.OPENIMCC, MethodToken.TABULATION, ()),
+        (Engine.OPENIMCC, None, ("O2",)),
+        (Engine.OPENIMCC, None, ("K",)),
+        (Engine.VAPOROCK, None, ("O2",)),
+    ),
+    ids=(
+        "complete-methodless", "tabulation", "invalid-oxygen-channel",
+        "invalid-target-channel", "pressure-consuming",
+    ),
+)
+def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(
+    monkeypatch, engine, method, invalid_components,
+) -> None:
+    observation, experiment = _kems_partial(
+        cell_material=None,
+        fO2_Pa=Decimal("1000") if engine is Engine.VAPOROCK else None,
+    )
     experiment = replace(
         experiment,
-        method=State.unknown("method is not printed"),
+        method=State.unknown("method is not printed") if method is None else State.of(method),
         pressure_environment=replace(
             experiment.pressure_environment,
             total_pressure_Pa=replace(
@@ -940,7 +977,11 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
         ),
         point_conditions=point_conditions,
     )
-    partials = {"K": 125.0, "KO": 75.0}
+    partials = {
+        name: pressure
+        for name, pressure in {"K": 125.0, "KO": 75.0}.items()
+        if name not in invalid_components
+    }
 
     def _open(name):
         return types.SimpleNamespace(
@@ -952,7 +993,10 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
         )
 
     def _cell(_handle, _pot, *, po2, physical_pressure_bar=None, **_kwargs):
-        assert po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        expected_oxygen_mode = (
+            PO2_COMMANDED if engine is Engine.VAPOROCK else PO2_OXYGEN_BALANCE_EFFUSION
+        )
+        assert po2.mode == expected_oxygen_mode
         assert physical_pressure_bar is None
         return types.SimpleNamespace(
             status="ok",
@@ -966,7 +1010,7 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
             melt_activities={},
             melt_activity_coefficients={},
             gas_partial_pressures_Pa=partials,
-            invalid_gas_partial_pressure_components=(),
+            invalid_gas_partial_pressure_components=invalid_components,
         )
 
     monkeypatch.setattr(
@@ -978,15 +1022,39 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
         _cell,
     )
     prediction = predict_with_engine(
-        Engine.OPENIMCC,
+        engine,
         observation,
         experiment=experiment,
         bench=_cell_material_bench((CellMaterial.PT,)),
         isolated=False,
     )
 
+    if engine is Engine.VAPOROCK or "K" in invalid_components:
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert prediction.refusal_detail == {
+            "reason": "partial_pressure_sum_incomplete_gas_map",
+            "policy": "DP-108",
+            "invalid_components": list(invalid_components),
+            "target_partial_pressure_Pa": partials.get("K"),
+        }
+        return
+
     assert prediction.value == Decimal(str(partials["K"]))
-    assert Decimal(str(sum(partials.values()))) == Decimal("200")
+    dp108_notices = [notice for notice in prediction.notices if notice.policy and notice.policy.id == "DP-108"]
+    if method is not None or invalid_components:
+        assert not dp108_notices
+        assert not prediction.identity.total_pressure_Pa.is_value
+        incomplete = [
+            notice for notice in prediction.notices
+            if notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and "partial_pressure_sum_incomplete_gas_map" in notice.reason
+        ]
+        assert bool(incomplete) is bool(invalid_components)
+        if incomplete:
+            assert "O2" in incomplete[0].reason
+        return
+
     assert prediction.identity.total_pressure_Pa == State.of(Decimal("200"))
     from simulator.battery.default_policy import load_policy_table, resolve
 
@@ -1002,11 +1070,7 @@ def test_unstated_vapour_pressure_uses_dp108_partial_pressure_sum(monkeypatch) -
     assert resolve(
         "DP-108", predicted_total_pressure_pa=Decimal("200")
     ).value == Decimal("200")
-    notice = next(
-        item
-        for item in prediction.notices
-        if item.policy is not None and item.policy.id == "DP-108"
-    )
+    (notice,) = dp108_notices
     assert notice.kind is NoticeKind.ASSUMED_PRESSURE
     assert notice.policy.status == "proposed"
     assert notice.policy.value == "200"

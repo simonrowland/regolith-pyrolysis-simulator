@@ -193,7 +193,7 @@ def test_method_fixed_ambient_pressure_uses_dp002() -> None:
         assert invalid is None
 
 
-def test_reference_pressure_quantity_does_not_consume_total_pressure() -> None:
+def test_oxide_reference_pressure_uses_the_defined_pressure() -> None:
     identity = replace(
         F.pref_identity(),
         total_pressure_Pa=State.unknown("ambient pressure unknown"),
@@ -205,7 +205,7 @@ def test_reference_pressure_quantity_does_not_consume_total_pressure() -> None:
         engine=Engine.INTERNAL_ANALYTICAL,
     )
 
-    assert pressure == (None, None, None, None)
+    assert pressure == (1.0, State.of(Decimal("100000")), None, None)
 
 
 def test_closed_system_pressure_uses_supported_path_or_typed_capability_gap() -> None:

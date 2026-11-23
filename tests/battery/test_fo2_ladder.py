@@ -948,14 +948,29 @@ def test_vacuum_bound_does_not_hide_an_unsupported_container() -> None:
     assert vacuum.selected.route == "vacuum_total_pressure_upper_bound"
 
 
-def test_printed_feo_fe2o3_pair_is_the_kress_inverse() -> None:
+@pytest.mark.parametrize(
+    ("method", "column_note", "located", "qualifies"),
+    [
+        (MethodToken.WET_CHEMICAL_ANALYSIS, "ferrous oxide", True, True),
+        (MethodToken.MOSSBAUER_SPECTROSCOPY, "ferrous oxide", True, True),
+        (MethodToken.TABULATION, "FeO by wet-chemical analysis", True, True),
+        (MethodToken.TABULATION, "ferrous oxide", True, False),
+        (MethodToken.KNUDSEN_EFFUSION, "ferrous oxide", True, False),
+        (MethodToken.WET_CHEMICAL_ANALYSIS, "ferrous oxide", False, False),
+    ],
+)
+def test_printed_feo_fe2o3_pair_is_the_kress_inverse(
+    method: MethodToken, column_note: str, located: bool, qualifies: bool,
+) -> None:
     experiment, bench, observation = _feo_case()
+    experiment = replace(experiment, method=State.of(method))
+    ferric = F.located(Decimal("5"))
     observation = replace(
         observation,
         point_conditions={
             **observation.point_conditions,
-            "FeO_wt_pct": F.located(Decimal("10")),
-            "Fe2O3_wt_pct": F.located(Decimal("5")),
+            "FeO_wt_pct": F.located(Decimal("10"), page=1, note=column_note),
+            "Fe2O3_wt_pct": ferric if located else replace(ferric, locator=None),
         },
     )
     resolved = resolve_row_fo2(
@@ -964,7 +979,7 @@ def test_printed_feo_fe2o3_pair_is_the_kress_inverse() -> None:
     assert resolved is not None
     assert resolved.route.startswith(
         "kress_inverse:FeO_wt_pct+Fe2O3_wt_pct;"
-    )
+    ) is qualifies
 
 
 def test_graphite_container_uses_closed_cco_at_printed_or_resolved_pressure() -> None:

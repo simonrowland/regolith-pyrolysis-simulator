@@ -4750,3 +4750,53 @@ def test_warm_pool_inflight_disable_is_typed_worker_death():
     assert "worker exited without a result" in (
         result.diagnostics["engine_exception_message"]
     )
+
+
+@pytest.mark.parametrize("formula", ("Na", "Mo"))
+@pytest.mark.parametrize("quantity_token", ("p_sat", "p_reference"))
+def test_pure_metal_public_scorer_reaches_vaporock_capability_gap(
+    monkeypatch, formula, quantity_token,
+):
+    from dataclasses import replace
+    from decimal import Decimal
+    from functools import wraps
+
+    from simulator.battery.enums import Engine, NoticeKind, Quantity, RefusalReason
+    from simulator.battery.records import State
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from tests.battery import factories as F
+
+    def upstream_must_not_run(**_kwargs):
+        raise AssertionError("pure metal reached the VapoRock melt solver")
+
+    _install_fake_import(
+        monkeypatch, types.SimpleNamespace(calc_vapor_pressures=upstream_must_not_run)
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False, "vapor_pressure_units": "Pa"})
+    received = []
+    equilibrate = backend.equilibrate
+
+    @wraps(equilibrate)
+    def record_call(*args, **kwargs):
+        received.append((kwargs["pressure_bar"], kwargs["fO2_log"]))
+        return equilibrate(*args, **kwargs)
+
+    monkeypatch.setattr(backend, "equilibrate", record_call)
+    handle = EngineHandle(
+        name="vaporock", backend=backend, available=True,
+        unavailable_reason=None, takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    identity = replace(F.psat_identity(formula), quantity=State.of(Quantity(quantity_token)))
+    row = F.observation("pure-metal", "exp", identity, Decimal("1"))
+    prediction = predict_with_engine(
+        Engine.VAPOROCK, row, handles={"vaporock": handle}, isolated=False,
+    )
+    assert received == [(None, None)]
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["engine_reason"] == OutOfDomainReason.UNSUPPORTED_INPUT.value
+    assert not any(
+        notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+        for notice in prediction.notices
+    )

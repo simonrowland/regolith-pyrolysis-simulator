@@ -833,7 +833,7 @@ def _tier2(
 ) -> ResolvedFo2 | None:
     if temperature_K is None:
         return None
-    fraction, source = _printed_ferric_fraction(observation, weights)
+    fraction, source = _printed_ferric_fraction(observation, weights, experiment)
     if fraction is None:
         return None
     pressure_bar, pressure_route = _kress_pressure_bar(
@@ -879,11 +879,15 @@ def _tier2(
 def _printed_ferric_fraction(
     observation: Observation | None,
     weights: dict[str, float] | None,
+    experiment: Experiment | None = None,
 ) -> tuple[float | None, str]:
     """Printed ferric evidence only.
 
     ``weights`` is the row's bulk composition. A solver map or an FeOt
     conversion is not a reported Fe3+/sumFe, so it is not read here.
+    A located FeO plus Fe2O3 pair is that evidence only with wet-chemical
+    or Mössbauer provenance. Printed Fe3+/sumFe and Fe3+/Fe2+ stay
+    method-independent.
     """
 
     del weights
@@ -906,6 +910,32 @@ def _printed_ferric_fraction(
     feo = _printed_number(observation, KRESS_FEO_WT_PCT_FIELD)
     fe2o3 = _printed_number(observation, KRESS_FE2O3_WT_PCT_FIELD)
     if feo is None or fe2o3 is None or feo <= 0.0 or fe2o3 <= 0.0:
+        return None, ""
+    conditions = observation.point_conditions or {}
+    locators = (
+        conditions[KRESS_FEO_WT_PCT_FIELD].locator,
+        conditions[KRESS_FE2O3_WT_PCT_FIELD].locator,
+    )
+    if any(locator is None for locator in locators):
+        return None, ""
+    analytical_method = (
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value in {
+            MethodToken.WET_CHEMICAL_ANALYSIS,
+            MethodToken.MOSSBAUER_SPECTROSCOPY,
+        }
+    )
+    column_provenance = " ".join(
+        field
+        for locator in locators
+        for field in (locator.note, locator.table)
+        if field
+    ).casefold()
+    if not analytical_method and not any(
+        marker in column_provenance
+        for marker in ("wet chemical", "wet-chemical", "mossbauer", "mössbauer")
+    ):
         return None, ""
     ratio = fe3_fe2_ratio_from_oxide_wt_pct(Decimal(str(fe2o3)), Decimal(str(feo)))
     if ratio is None or ratio <= 0:

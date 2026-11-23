@@ -935,6 +935,7 @@ def run_scoring_arm(
     from scripts.calibration_battery import envelope, rail_for
     from simulator.diagnostic_helpers.binary_pot_battery import (
         BATTERY_ENGINE_NAMES,
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         _emit_progress,
         _engine_identities_from_toml,
         _hostname,
@@ -987,6 +988,7 @@ def run_scoring_arm(
                         binary,
                         temperature_K=float(temperature_K),
                         po2=SCORING_PO2,
+                        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
                     )
                     cells.append(cell)
                     _emit_progress(
