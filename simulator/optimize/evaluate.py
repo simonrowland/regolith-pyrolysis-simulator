@@ -167,7 +167,10 @@ from simulator.pumping_cost import (
     pumping_context_from_sim,
     pumping_environment_for_feedstock,
 )
-from simulator.reduced_real_determinism import PT0NonFinitePayload
+from simulator.reduced_real_determinism import (
+    PT0NonFinitePayload,
+    optimizer_engine_neighbour,
+)
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.recipe_errors import MalformedRecipeError
@@ -844,11 +847,16 @@ def evaluate(
     )
 
     try:
-        run_execution = _execute_run(
-            active_executor,
-            run_config,
-            worker_runtime=runtime,
-        )
+        # Coarse presets may reuse a nearby engine result. fine stays exact.
+        # Battery scoring does not enter this scope.
+        with optimizer_engine_neighbour(
+            getattr(run_config, "reduced_real_cache", None)
+        ):
+            run_execution = _execute_run(
+                active_executor,
+                run_config,
+                worker_runtime=runtime,
+            )
     except PT0NonFinitePayload as exc:
         return _non_finite_payload_result(
             candidate_id,
