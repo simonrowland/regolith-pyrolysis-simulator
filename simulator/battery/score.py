@@ -199,7 +199,11 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
-from simulator.battery.uncertainty_conventions import printed_uncertainty_convention
+from simulator.battery.uncertainty_conventions import (
+    NORMAL_95_TICKET_MULTIPLIER,
+    UncertaintyConventionConflict,
+    printed_uncertainty_convention,
+)
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -485,7 +489,6 @@ REVIEW_BLOCKS_USE: frozenset[str] = frozenset({"rejected", "withdrawn", "retired
 # endpoint of the central 95% interval. MAD(N(0,1)) = Φ⁻¹(.75), so the
 # consistency scale is 1/Φ⁻¹(.75) = 1.482602218505602.
 DECISION_BAND_PERCENTILE = 95
-NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
 MAD_NORMAL_SCALE = Decimal("1.482602218505602")
 DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
@@ -1060,6 +1063,8 @@ class _PrintedBandResolution:
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
     standard_uncertainty_dex: Decimal | None = None
+    standard_uncertainty: Decimal | None = None
+    standard_uncertainty_unit: str | None = None
     two_sigma_band: DecisionBand | None = None
 
 
@@ -6759,7 +6764,10 @@ def _stated_printed_confidence_level(
 ) -> str | None:
     raw = uncertainty.verbatim
     if isinstance(raw, Mapping):
-        convention = printed_uncertainty_convention(raw)
+        try:
+            convention = printed_uncertainty_convention(raw)
+        except UncertaintyConventionConflict:
+            return None
         if convention is not None:
             return convention[0]
     return _textual_printed_confidence_level(uncertainty)
@@ -7049,6 +7057,18 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution()
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
         return _PrintedBandResolution()
+    raw_declaration = uncertainty.verbatim
+    convention = None
+    if isinstance(raw_declaration, Mapping):
+        try:
+            convention = printed_uncertainty_convention(raw_declaration)
+        except UncertaintyConventionConflict as exc:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "uncertainty_convention_conflict",
+                    "detail": str(exc),
+                }
+            )
     if _is_source_wide_kems_pressure_envelope(
         quantity, method, source_observation
     ):
@@ -7060,7 +7080,11 @@ def _printed_uncertainty_band(
             )
         )
     raw_text = _uncertainty_original(uncertainty)
-    stated_confidence_level = _stated_printed_confidence_level(uncertainty)
+    stated_confidence_level = (
+        convention[0]
+        if convention is not None
+        else _textual_printed_confidence_level(uncertainty)
+    )
     confidence_level = stated_confidence_level or "not_stated"
     if confidence_level == "not_stated" and confidence_level_override is not None:
         confidence_level = confidence_level_override
@@ -7154,17 +7178,15 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
-    raw_declaration = uncertainty.verbatim
-    if converted is not None and isinstance(raw_declaration, Mapping):
-        convention = printed_uncertainty_convention(raw_declaration)
-        if convention is not None:
-            confidence_token, coverage_factor = convention
-            if (
-                "k" in raw_declaration
-                and confidence_token == "one_sigma"
-                and coverage_factor not in {Decimal(1), Decimal(2)}
-            ):
-                converted /= coverage_factor
+    if converted is not None and convention is not None:
+        confidence_token, coverage_factor = convention
+        if (
+            isinstance(raw_declaration, Mapping)
+            and "k" in raw_declaration
+            and confidence_token == "one_sigma"
+            and coverage_factor not in {Decimal(1), Decimal(2)}
+        ):
+            converted /= coverage_factor
     if converted is None:
         return _PrintedBandResolution(
             refusal={
@@ -7304,6 +7326,21 @@ def _printed_uncertainty_band(
         ),
     )
     standard_uncertainty_dex = None
+    standard_uncertainty = None
+    standard_uncertainty_unit = None
+    if convention is not None and confidence_level != "range_half_width":
+        confidence_token, coverage_factor = convention
+        standard_uncertainty = (
+            converted
+            if (
+                isinstance(raw_declaration, Mapping)
+                and "k" in raw_declaration
+                and confidence_token == "one_sigma"
+                and coverage_factor not in {Decimal(1), Decimal(2)}
+            )
+            else converted / coverage_factor
+        )
+        standard_uncertainty_unit = converted_unit
     if operation is MetricOperation.DEX:
         if confidence_level in {"one_sigma", "ci95"}:
             standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
@@ -7321,6 +7358,8 @@ def _printed_uncertainty_band(
         DecisionBand(ticket, unit, rule, band_basis=band_basis),
         notice=notice,
         standard_uncertainty_dex=standard_uncertainty_dex,
+        standard_uncertainty=standard_uncertainty,
+        standard_uncertainty_unit=standard_uncertainty_unit,
         two_sigma_band=two_sigma_band,
     )
 

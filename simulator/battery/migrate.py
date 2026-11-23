@@ -85,7 +85,10 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
-from simulator.battery.uncertainty_conventions import printed_uncertainty_convention
+from simulator.battery.uncertainty_conventions import (
+    UncertaintyConventionConflict,
+    printed_uncertainty_convention,
+)
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
@@ -30819,12 +30822,25 @@ class Migrator:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
-            if extra_unc is None and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 parent_uncertainty = uncertainty.verbatim
-                uncertainty_declares_convention = (
-                    printed_uncertainty_convention(parent_uncertainty) is not None
-                )
-                if uncertainty_declares_convention:
+                try:
+                    uncertainty_declares_convention = (
+                        printed_uncertainty_convention(parent_uncertainty) is not None
+                    )
+                except UncertaintyConventionConflict:
+                    uncertainty_declares_convention = False
+                    extra_unc = None
+                    extra_unc_k = None
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["uncertainty"],
+                        "uncertainty_convention_conflict",
+                        source=source_key,
+                        observation_id=point_id,
+                    )
+                if extra_unc is None and uncertainty_declares_convention:
                     standard_errors = raw_item.get("standard_errors")
                     field_name = value_sel.field_name if value_sel is not None else None
                     component = (

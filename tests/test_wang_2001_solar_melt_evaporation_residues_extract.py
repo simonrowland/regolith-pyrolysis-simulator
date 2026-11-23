@@ -558,23 +558,50 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
 
 
 @pytest.mark.parametrize(
-    ("declaration", "is_convention"),
+    ("declaration", "expected_token", "expected_sigma", "expected_band"),
     [
-        ({"k": 2}, True),
-        ({"kind": "two_sigma"}, True),
-        ({"kind": "one_sigma"}, True),
-        ({"confidence_level": "not_stated"}, False),
-        ({"kind": "printed"}, False),
-        ({"k": "Infinity"}, False),
-        ({"k": "NaN"}, False),
-        ({"k": 0}, False),
-        ({"confidence_level": "unknown convention"}, False),
+        ({"k": 2}, "two_sigma", Decimal("0.2"), Decimal("0.4")),
+        ({"kind": "two_sigma"}, "two_sigma", Decimal("0.2"), Decimal("0.4")),
+        (
+            {"confidence_level": "two_sigma", "k": 2},
+            "two_sigma",
+            Decimal("0.2"),
+            Decimal("0.4"),
+        ),
+        (
+            {"confidence_level": "one_sigma", "kind": "replicate_error"},
+            "one_sigma",
+            Decimal("0.4"),
+            Decimal("0.7839855938160216"),
+        ),
+        (
+            {"kind": "one_sigma"},
+            "one_sigma",
+            Decimal("0.4"),
+            Decimal("0.7839855938160216"),
+        ),
+        (
+            {"confidence_level": "ci95", "k": "1.96"},
+            "ci95",
+            Decimal("0.2040853827698615877696685115"),
+            Decimal("0.4"),
+        ),
+        ({"confidence_level": "not_stated"}, None, None, None),
+        ({"kind": "printed"}, None, None, None),
+        ({"k": "Infinity"}, None, None, None),
+        ({"k": "NaN"}, None, None, None),
+        ({"k": 0}, None, None, None),
+        ({"confidence_level": "unknown convention"}, None, None, None),
+        ({"confidence_level": "ci95", "k": 3}, "conflict", None, None),
+        ({"confidence_level": "range_half_width", "kind": "two_sigma"}, "conflict", None, None),
     ],
 )
 def test_residue_component_parent_convention_controls_width_lookup(
     monkeypatch: pytest.MonkeyPatch,
     declaration: dict[str, object],
-    is_convention: bool,
+    expected_token: str | None,
+    expected_sigma: Decimal | None,
+    expected_band: Decimal | None,
 ) -> None:
     extract = yaml.safe_load(EXTRACT.read_text())
     ion_probe = next(
@@ -601,7 +628,26 @@ def test_residue_component_parent_convention_controls_width_lookup(
         for observation in migrator.result.observations.values()
         if observation.observation_id.endswith("122b3beaa55d")
     )
-    if is_convention:
+    if expected_token == "conflict":
+        assert any(
+            item.observation_id == row.observation_id
+            and item.why == "uncertainty_convention_conflict"
+            for item in migrator.result.queue
+        )
+        from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+        magnitude = point_magnitude(row.value)
+        assert magnitude is not None
+        resolution = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            row.uncertainty,
+            magnitude,
+            source_observation=row,
+        )
+        assert resolution.band is None
+        assert resolution.refusal is not None
+        assert resolution.refusal["reason"] == "uncertainty_convention_conflict"
+    elif expected_token is not None:
         assert row.uncertainty.kind is UncertaintyKind.PRINTED
         assert row.uncertainty.verbatim is not None
         assert row.uncertainty.verbatim["sigma"] == "0.4"
@@ -613,9 +659,7 @@ def test_residue_component_parent_convention_controls_width_lookup(
             point_magnitude,
         )
 
-        assert _stated_printed_confidence_level(row.uncertainty) == (
-            "one_sigma" if declaration.get("kind") == "one_sigma" else "two_sigma"
-        )
+        assert _stated_printed_confidence_level(row.uncertainty) == expected_token
         magnitude = point_magnitude(row.value)
         assert magnitude is not None
         resolution = _printed_uncertainty_band(
@@ -626,9 +670,10 @@ def test_residue_component_parent_convention_controls_width_lookup(
         )
         assert resolution.band is not None
         assert resolution.notice is None
-        assert resolution.band.rule.startswith(
-            "printed_1sigma:" if declaration.get("kind") == "one_sigma"
-            else "printed_2sigma:"
-        )
+        assert resolution.standard_uncertainty == expected_sigma
+        assert resolution.standard_uncertainty_unit == "mass_percent"
+        assert resolution.band.value == expected_band
+        assert resolution.band.unit == "mass_percent"
+        assert resolution.band.rule.startswith("printed_")
     else:
         assert row.uncertainty.verbatim is None or "sigma" not in row.uncertainty.verbatim
