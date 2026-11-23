@@ -4707,3 +4707,190 @@ def test_continuation_hour_with_nonzero_buffer_stays_under_the_flux_cap():
             identity * factor_end,
             abs=1.0e-6,
         )
+
+
+def test_hour_cost_records_opening_flush_time_and_rhs_span():
+    """The published hour cost is n/Q, the rhs span, and the P* bucket.
+
+    Mutation: reporting the composition time n/Σs as tau passes a root
+    where Q = Σs and fails here, because the opening holdup is not on
+    P*. Reporting the mean of the rhs samples as the median fails the
+    10, 3, 7 span (mean 20/3, median 7). Counting a warm hit, or a
+    shut return, as a sign-scan or a Brent solve fails the buckets.
+    """
+
+    mass = _o2_molar_mass_kg()
+    temperature_K = 1453.15
+    downstream_pa = 20.0
+    dt_s = 448.142
+    # Opening pressure sits above the downstream, and the source is
+    # not the pipe flow there. n/Q and n/Σs are different numbers.
+    opening_pa = downstream_pa + 0.139
+    n_mol = opening_pa * _HS_V_M3 / (GAS_CONSTANT * temperature_K)
+    source_kg_h = 1.0e-6
+    source_mol_s = source_kg_h / mass / 3600.0
+    outflow = pipe_species_outflow_mol_s(
+        opening_pa,
+        downstream_pa,
+        temperature_K,
+        {"O2": n_mol},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol={"O2": mass},
+    )
+    outflow_mol_s = float(outflow.species_mol_s["O2"])
+    assert outflow_mol_s > 0.0
+    assert outflow_mol_s != pytest.approx(source_mol_s, rel=1.0e-3)
+    flush_s = n_mol / outflow_mol_s
+    composition_s = n_mol / source_mol_s
+    holder: dict = {}
+    built = capacity_coupling._build_law(
+        pre_holdup_mol={"O2": n_mol},
+        molar_mass_kg_mol={"O2": mass},
+        flux_kg_hr_at_partials=lambda _partials: {"O2": source_kg_h},
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        downstream_pressure_Pa=downstream_pa,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+        extent_holder=holder,
+    )
+    assert not isinstance(built, CapacityShadowRefusal)
+    law, n0 = built
+    calls_before = law.flux_evaluations
+    law._record_opening_scales(n0, dt_s)
+    # The sample is not a solver evaluation.
+    assert law.flux_evaluations == calls_before
+    assert law.opening_tau_s == pytest.approx(flush_s, rel=1.0e-12)
+    assert law.opening_dt_over_tau == pytest.approx(dt_s / flush_s, rel=1.0e-12)
+    assert law.opening_composition_tau_s == pytest.approx(
+        composition_s, rel=1.0e-12,
+    )
+    assert law.opening_tau_s != pytest.approx(law.opening_composition_tau_s)
+    # 10, then 3, then 7. Median of three is the middle sample, 7.
+    law._note_rhs_flux()
+    law.flux_evaluations = calls_before + 10
+    law._note_rhs_flux()
+    law.flux_evaluations = calls_before + 13
+    law._note_rhs_flux()
+    law.flux_evaluations = calls_before + 20
+    law._close_rhs_flux()
+    cost = capacity_coupling._hour_cost_payload(law)
+    assert cost["flux_per_rhs_min"] == 3
+    assert cost["flux_per_rhs_median"] == 7.0
+    assert cost["flux_per_rhs_max"] == 10
+    assert cost["flux_per_rhs_median"] != pytest.approx(20.0 / 3.0)
+    # A shut pipe is not a P* publish.
+    shut = capacity_coupling._build_law(
+        pre_holdup_mol={"O2": n_mol},
+        molar_mass_kg_mol={"O2": mass},
+        flux_kg_hr_at_partials=lambda _partials: {"O2": 0.0},
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        downstream_pressure_Pa=downstream_pa,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+    )
+    assert not isinstance(shut, CapacityShadowRefusal)
+    shut_law, _shut_n0 = shut
+    kind, root = capacity_coupling._open_or_shut_fixed_point(
+        shut_law, {"O2": 1.0}, near_Pa=opening_pa,
+    )
+    assert kind == "shut"
+    assert root is None
+    assert shut_law.pstar_warm_newton == 0
+    assert shut_law.pstar_brent_band == 0
+    assert shut_law.pstar_sign_scan == 0
+    # The open root. A guess on it is the warm Newton. A guess a
+    # pascal away is the geometric Brent, not the sign scan.
+    kind, root = capacity_coupling._open_or_shut_fixed_point(
+        law, {"O2": 1.0}, near_Pa=None,
+    )
+    assert kind == "open"
+    assert root is not None
+    assert law.pstar_brent_band == 1
+    assert law.pstar_warm_newton == 0
+    assert law.pstar_sign_scan == 0
+    kind, warmed = capacity_coupling._open_or_shut_fixed_point(
+        law, {"O2": 1.0}, near_Pa=float(root),
+    )
+    assert kind == "open"
+    assert warmed == pytest.approx(root, abs=1.0e-9)
+    assert law.pstar_warm_newton == 1
+    assert law.pstar_sign_scan == 0
+    kind, missed = capacity_coupling._open_or_shut_fixed_point(
+        law, {"O2": 1.0}, near_Pa=float(root) + 1.0,
+    )
+    assert kind == "open"
+    assert missed == pytest.approx(root, abs=1.0e-6)
+    assert law.pstar_warm_newton == 1
+    assert law.pstar_brent_band == 2
+    assert law.pstar_sign_scan == 0
+    refused = capacity_coupling._BalanceRefused(
+        "headspace_balance_work_cap",
+        cap="flux",
+        flux_evaluations=law.flux_evaluations,
+        integrator_evaluations=3,
+    )
+    shadow = capacity_coupling._refused_shadow(law, refused)
+    assert shadow.tau_s == pytest.approx(flush_s, rel=1.0e-12)
+    assert shadow.dt_over_tau == pytest.approx(dt_s / flush_s, rel=1.0e-12)
+    assert shadow.composition_tau_s == pytest.approx(composition_s, rel=1.0e-12)
+    assert shadow.flux_per_rhs_min == 3
+    assert shadow.flux_per_rhs_median == 7.0
+    assert shadow.flux_per_rhs_max == 10
+    assert shadow.pstar_warm_newton == 1
+    assert shadow.pstar_brent_band == 2
+    assert shadow.pstar_sign_scan == 0
+    # The booking step is what a success hour publishes. It is not an
+    # integration of the 448 s transient.
+    booked = capacity_coupling._build_law(
+        pre_holdup_mol={"O2": n_mol},
+        molar_mass_kg_mol={"O2": mass},
+        flux_kg_hr_at_partials=lambda _partials: {"O2": source_kg_h},
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_s / 3600.0,
+        downstream_pressure_Pa=downstream_pa,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+        extent_holder=holder,
+    )
+    assert not isinstance(booked, CapacityShadowRefusal)
+    booked_law, booked_n0 = booked
+    booked_law._record_opening_scales(booked_n0, dt_s)
+    step = booked_law.step_from_moles(booked_n0, dt_s, booked_n0, 1, 0.0)
+    published = capacity_coupling._publish(
+        booked_law,
+        step,
+        NoColdTrain("runtime_enforcement_disabled"),
+        None,
+    )
+    assert isinstance(published, CapacityShadowResult)
+    notice = [
+        item
+        for item in published.species_notices
+        if item.get("reason") == "headspace_hour_cost"
+    ]
+    assert len(notice) == 1
+    assert notice[0]["tau_s"] == pytest.approx(flush_s, rel=1.0e-12)
+    assert notice[0]["dt_over_tau"] == pytest.approx(
+        dt_s / flush_s, rel=1.0e-12,
+    )
+    assert holder["_balance_terms"]["tau_s"] == pytest.approx(
+        flush_s, rel=1.0e-12,
+    )
+    assert holder["_balance_terms"]["composition_tau_s"] == pytest.approx(
+        composition_s, rel=1.0e-12,
+    )

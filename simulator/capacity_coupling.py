@@ -7,7 +7,7 @@ import math
 import sys
 from collections import deque
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from types import MappingProxyType
 from typing import Any
 
@@ -148,6 +148,30 @@ class CapacityShadowRefusal:
     rejected_error_dominators: list[dict[str, Any]] | None = None
     jacobian_abs_eigenvalue_min: float | None = None
     jacobian_abs_eigenvalue_max: float | None = None
+    # Hour-open scales and the integrator's flux. tau_s is n/Q at the
+    # opening holdup: n is the positive inventory (mol) and Q is the
+    # outflow the pipe or the cap publishes there (mol/s). dt_over_tau
+    # is dt/tau. Both stay unset when Q is not positive. A shut pipe
+    # has no flush time. composition_tau_s is n/Σ(q+S) at that same
+    # holdup. It is not a solved P*: the source is the opening
+    # partials. flux_per_rhs_* counts flux evaluations from one
+    # right-hand-side entry to the next, including the Jacobian and a
+    # stall callback in that gap. An even count's median is the mean
+    # of the two middle samples. pstar_* counts P* solves: the warm
+    # Newton that published inside the kink band, the geometric Brent
+    # after a warm miss, and the sign-scan fallback. A shut return is
+    # none of the three. A fast-root scan that is not a P* solve is
+    # not counted. Unset means the hour never measured them.
+    tau_s: float | None = None
+    dt_over_tau: float | None = None
+    composition_tau_s: float | None = None
+    dt_over_composition_tau: float | None = None
+    flux_per_rhs_min: int | None = None
+    flux_per_rhs_median: float | None = None
+    flux_per_rhs_max: int | None = None
+    pstar_warm_newton: int | None = None
+    pstar_brent_band: int | None = None
+    pstar_sign_scan: int | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -1120,6 +1144,53 @@ def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
     }
 
 
+def _rhs_flux_span(
+    counts: list[int],
+) -> tuple[int | None, float | None, int | None]:
+    """Min, median, max of one rhs-interval list.
+
+    An odd count takes the middle sample. An even count takes the
+    mean of the two middle samples. That mean is still a count of
+    flux evaluations, so a half is a real value, not a rounded int.
+    An empty list was not an integrator hour.
+    """
+
+    if not counts:
+        return None, None, None
+    ordered = sorted(int(item) for item in counts)
+    size = len(ordered)
+    mid = size // 2
+    if size % 2 == 1:
+        median = float(ordered[mid])
+    else:
+        median = 0.5 * (ordered[mid - 1] + ordered[mid])
+    return ordered[0], median, ordered[-1]
+
+
+def _hour_cost_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
+    """The opening scales and the integrator's flux, as plain values.
+
+    The caller closes the open rhs interval first. A fast root has
+    no interval, and the three flux fields stay unset. The P* counts
+    are zero when no reduced step ran. They are not unset: the hour
+    did measure them.
+    """
+
+    low, median, high = _rhs_flux_span(law._rhs_flux_counts)
+    return {
+        "tau_s": law.opening_tau_s,
+        "dt_over_tau": law.opening_dt_over_tau,
+        "composition_tau_s": law.opening_composition_tau_s,
+        "dt_over_composition_tau": law.opening_dt_over_composition_tau,
+        "flux_per_rhs_min": low,
+        "flux_per_rhs_median": median,
+        "flux_per_rhs_max": high,
+        "pstar_warm_newton": int(law.pstar_warm_newton),
+        "pstar_brent_band": int(law.pstar_brent_band),
+        "pstar_sign_scan": int(law.pstar_sign_scan),
+    }
+
+
 def _refused_shadow(
     law: _HeadspaceLaw,
     refused: _BalanceRefused,
@@ -1135,17 +1206,26 @@ def _refused_shadow(
     count = law.balance_iterations
     if not isinstance(count, int) or isinstance(count, bool) or count < 0:
         count = 0
+    # The cap fires inside the open rhs interval. Close it before the
+    # span is read, so the evaluation that crossed the cap is in the
+    # last sample. A second close is a no-op.
+    law._close_rhs_flux()
+    cost = _hour_cost_payload(law)
+    law._remember_hour_cost(cost)
     payload: dict[str, Any] = {}
     if refused.reason == "headspace_balance_work_cap":
         # The hour wrapper returns a work-cap refusal unchanged.
         # Filling the last accepted state here is what the walk shows.
         payload = _work_cap_payload(law)
-    return _shadow_from_balance(
+    shadow = _shadow_from_balance(
         refused,
         count,
         path=law.balance_path,
         **payload,
     )
+    if refused.reason != "headspace_balance_work_cap":
+        return shadow
+    return replace(shadow, **cost)
 
 
 @dataclass
@@ -1298,6 +1378,23 @@ class _HeadspaceLaw:
         # both. None is an unset iteration count, not a solved 0.
         self.balance_path: str | None = None
         self.balance_iterations: int | None = None
+        # Opening scales. None until the hour records them. The sample
+        # that records them is not a counted flux evaluation.
+        self.opening_tau_s: float | None = None
+        self.opening_dt_over_tau: float | None = None
+        self.opening_composition_tau_s: float | None = None
+        self.opening_dt_over_composition_tau: float | None = None
+        # Flux from one rhs entry to the next. The mark is the counter
+        # at the open entry. None means no interval is open.
+        self._rhs_flux_counts: list[int] = []
+        self._flux_at_rhs: int | None = None
+        # P* solves. Mutually exclusive per solve: warm Newton, the
+        # geometric Brent after a miss, or the sign-scan fallback.
+        self.pstar_warm_newton = 0
+        self.pstar_brent_band = 0
+        self.pstar_sign_scan = 0
+        self._counting_pstar = False
+        self._pstar_scan_seen = False
 
     def _remember_species_notices(
         self,
@@ -1382,17 +1479,143 @@ class _HeadspaceLaw:
         )
         return {species: moles}
 
-    def _flux_kg_hr(self, partials: Mapping[str, float]) -> dict[str, float]:
+    def _note_rhs_flux(self) -> None:
+        """Open a new rhs interval, closing the one the previous entry left.
+
+        The closed span is the flux evaluations since that entry. It
+        includes the body, and the Jacobian and stall callback that
+        ran before this entry. The booking after the integrator
+        returns is not an rhs, and it is not in this span.
+        """
+
+        mark = self._flux_at_rhs
+        if mark is not None:
+            self._rhs_flux_counts.append(self.flux_evaluations - mark)
+        self._flux_at_rhs = self.flux_evaluations
+
+    def _close_rhs_flux(self) -> None:
+        """Close the open rhs interval. A second call does not append."""
+
+        mark = self._flux_at_rhs
+        if mark is None:
+            return
+        self._rhs_flux_counts.append(self.flux_evaluations - mark)
+        self._flux_at_rhs = None
+
+    def _remember_hour_cost(self, cost: Mapping[str, Any]) -> None:
+        # One notice per hour. The walk publishes species notices.
+        # The balance terms and the work-cap payload carry the same
+        # numbers. A later call does not replace the first.
+        notice = {
+            "species": "headspace",
+            "reason": "headspace_hour_cost",
+        }
+        notice.update(dict(cost))
+        self._remember_species_notices((notice,))
+
+    def _record_opening_scales(
+        self,
+        n0: Mapping[str, float],
+        dt_s: float,
+    ) -> None:
+        """Stash n/Q and n/Σ(q+S) at the opening holdup.
+
+        The sample is not a solver evaluation. The flux counter, the
+        accepted-step stash, and the species notices are restored, so
+        the root still sees the hour it would have seen without the
+        sample. A refusal from the sample leaves the scales unset and
+        does not become the hour's refusal: the solve still runs.
+
+        Premise: dn_i/dt = s_i − y_i Q, with one composition time
+        shared by every species. The flush time is tau = n/Q. The
+        composition time is n/Σ s. Both are taken at the opening
+        holdup. Neither is a solved P*.
+        Algebra: n = Σ max(n_i, 0), Q = Σ Q_i, s = Σ (q_i + S_i),
+        and dt/tau = dt · Q / n.
+        Unit check: mol / (mol/s) = s, and s/s = 1.
+        Limit: Q <= 0 leaves tau unset. A shut pipe has no flush
+        time. Σ s <= 0 leaves the composition time unset. n <= 0
+        leaves both unset.
+        """
+
+        saved_flux = self.flux_evaluations
+        saved_gross = dict(self._last_gross_kg_s)
+        saved_flux_partials = self.accepted_flux_partials
+        saved_flux_key = self.accepted_flux_key
+        saved_piece = self._last_pipe_piece
+        saved_notices = dict(self.species_notices)
+        saved_redox = dict(self._last_redox_mol_s)
+        saved_paired = self.paired_redox_mol_s
+        saved_redox_key = self.accepted_redox_key
+        source: dict[str, float] | None = None
+        outflow: dict[str, float] | None = None
+        redox: dict[str, float] | None = None
+        try:
+            partials = self.partials_of(n0)
+            source, outflow, _binding, _piece = self._flows(
+                partials,
+                counted=False,
+            )
+            redox = self._redox_rates(partials)
+        except _BalanceRefused:
+            source = None
+        finally:
+            self.flux_evaluations = saved_flux
+            self._last_gross_kg_s = saved_gross
+            self.accepted_flux_partials = saved_flux_partials
+            self.accepted_flux_key = saved_flux_key
+            self._last_pipe_piece = saved_piece
+            self.species_notices = saved_notices
+            self._last_redox_mol_s = saved_redox
+            self.paired_redox_mol_s = saved_paired
+            self.accepted_redox_key = saved_redox_key
+        if source is None or outflow is None or redox is None:
+            return
+        total = math.fsum(
+            max(0.0, float(n0[name])) for name in self.species
+        )
+        outflow_mol_s = math.fsum(float(outflow[name]) for name in self.species)
+        source_mol_s = math.fsum(
+            float(source[name]) + float(redox[name]) for name in self.species
+        )
+        if not math.isfinite(total) or total <= 0.0:
+            return
+        if (
+            math.isfinite(outflow_mol_s)
+            and outflow_mol_s > 0.0
+        ):
+            tau = total / outflow_mol_s
+            if math.isfinite(tau) and tau > 0.0:
+                self.opening_tau_s = tau
+                ratio = float(dt_s) / tau
+                if math.isfinite(ratio):
+                    self.opening_dt_over_tau = ratio
+        if math.isfinite(source_mol_s) and source_mol_s > 0.0:
+            composition = total / source_mol_s
+            if math.isfinite(composition) and composition > 0.0:
+                self.opening_composition_tau_s = composition
+                ratio = float(dt_s) / composition
+                if math.isfinite(ratio):
+                    self.opening_dt_over_composition_tau = ratio
+
+    def _flux_kg_hr(
+        self,
+        partials: Mapping[str, float],
+        *,
+        counted: bool = True,
+    ) -> dict[str, float]:
         from simulator.evaporation import EvaporationFluxRefusal
 
-        self.flux_evaluations += 1
-        if self.flux_evaluations > _MAX_FLUX_EVALUATIONS:
-            raise _BalanceRefused(
-                "headspace_balance_work_cap",
-                cap="flux",
-                flux_evaluations=self.flux_evaluations,
-                integrator_evaluations=self.integrator_evaluations,
-            )
+        if counted:
+            self.flux_evaluations += 1
+            if self.flux_evaluations > _MAX_FLUX_EVALUATIONS:
+                self._close_rhs_flux()
+                raise _BalanceRefused(
+                    "headspace_balance_work_cap",
+                    cap="flux",
+                    flux_evaluations=self.flux_evaluations,
+                    integrator_evaluations=self.integrator_evaluations,
+                )
         try:
             raw = self.flux(partials)
         except EvaporationFluxRefusal:
@@ -1435,10 +1658,15 @@ class _HeadspaceLaw:
         self._remember_flux_partials(partials)
         return out
 
-    def _source_mol_s(self, partials: Mapping[str, float]) -> dict[str, float]:
+    def _source_mol_s(
+        self,
+        partials: Mapping[str, float],
+        *,
+        counted: bool = True,
+    ) -> dict[str, float]:
         # kg/h / (kg/mol) / (s/h) = mol/s. 3600 is exact in binary64.
         # Limit: a non-positive vapour rate contributes no moles.
-        flux = self._flux_kg_hr(partials)
+        flux = self._flux_kg_hr(partials, counted=counted)
         return {
             species: flux.get(species, 0.0) / self.masses[species] / 3600.0
             for species in self.species
@@ -1447,8 +1675,10 @@ class _HeadspaceLaw:
     def _flows(
         self,
         partials: Mapping[str, float],
+        *,
+        counted: bool = True,
     ) -> tuple[dict[str, float], dict[str, float], str, tuple]:
-        source = self._source_mol_s(partials)
+        source = self._source_mol_s(partials, counted=counted)
         pressure = math.fsum(partials[species] for species in self.species)
         moles = {
             species: partials[species]
@@ -1682,6 +1912,10 @@ class _HeadspaceLaw:
         vapour_extent_kg: Mapping[str, float] | None = None,
         redox_added_mol: Mapping[str, float] | None = None,
     ) -> _HeadspaceStep:
+        # The booking below evaluates the flux. That is not an rhs.
+        # Close the open interval first so the span stays the
+        # integrator's.
+        self._close_rhs_flux()
         partials = self.partials_of(moles)
         source, outflow, binding, _piece = self._flows(partials)
         flux = self._flux_kg_hr(partials)
@@ -1792,6 +2026,10 @@ class _HeadspaceLaw:
         )
         # The inventory refusal reads this. A success hour does not.
         # The key is not a species and not a rate the flux callback reads.
+        # The cost notice is what the walk publishes on a success hour.
+        # The balance terms carry the same numbers when a holder exists.
+        cost = _hour_cost_payload(self)
+        self._remember_hour_cost(cost)
         holder = self.extent_holder
         if isinstance(holder, dict):
             gross = dict(vapour_extent_kg)
@@ -1824,6 +2062,7 @@ class _HeadspaceLaw:
                     species: _stored(gross, species)
                     for species in self.species
                 },
+                **cost,
             }
         return _HeadspaceStep(
             moles=dict(published),
@@ -1911,7 +2150,11 @@ def _pressure_sign_scan(
 
 def _remember_sign_scan_fallback(law: _HeadspaceLaw, detail: str) -> None:
     # One flag per hour. The sweep samples every species; the notice
-    # is the fallback, not one row per flux call.
+    # is the fallback, not one row per flux call. A P* solve counts
+    # the scan once, even if this notice was already stored.
+    if law._counting_pstar and not law._pstar_scan_seen:
+        law._pstar_scan_seen = True
+        law.pstar_sign_scan += 1
     law._remember_species_notices((
         {
             "species": "headspace",
@@ -2868,60 +3111,81 @@ def _open_or_shut_fixed_point(
         def piece_at(pressure: float) -> tuple:
             return _mixture_piece(law, fractions, pressure)
 
-    if value_at(downstream) <= 0.0:
-        return "shut", None
-    # The scan is the publisher when this neighborhood has no root.
-    # A hit is the same Brent root the scan would keep, and it does
-    # not walk the pressure grid.
-    if near_Pa is not None:
-        warmed = _warm_started_open_root(
-            value_at,
-            piece_at,
-            float(near_Pa),
-            downstream,
+    # One solve, one bucket. The warm Newton, the geometric Brent,
+    # and the sign scan are mutually exclusive. A shut return, or no
+    # bracket, is none of them. The scan counter moves inside
+    # _remember_sign_scan_fallback while _counting_pstar is set.
+    law._counting_pstar = True
+    law._pstar_scan_seen = False
+    scan_before = law.pstar_sign_scan
+
+    def _count_brent(root: float) -> tuple[str, float]:
+        if law.pstar_sign_scan == scan_before:
+            law.pstar_brent_band += 1
+        return "open", root
+
+    try:
+        if value_at(downstream) <= 0.0:
+            return "shut", None
+        # The scan is the publisher when this neighborhood has no root.
+        # A hit is the same Brent root the scan would keep, and it does
+        # not walk the pressure grid.
+        if near_Pa is not None:
+            warmed = _warm_started_open_root(
+                value_at,
+                piece_at,
+                float(near_Pa),
+                downstream,
+            )
+            if warmed is not None:
+                law.pstar_warm_newton += 1
+                return "open", warmed
+        if len(law.species) == 1:
+            samples = law.g_samples(refuse_multiple=False)
+        else:
+            samples = _ray_samples(law, fractions, refuse_multiple=False)
+        open_crossings = [
+            crossing
+            for crossing in _crossings(samples)
+            if max(crossing[1], crossing[2]) > downstream
+        ]
+        if len(open_crossings) == 0:
+            return None, None
+        roots: list[float] = []
+        for crossing in open_crossings:
+            root = _solve_open_crossing(
+                value_at, piece_at, crossing, downstream,
+            )
+            if root is None:
+                continue
+            if all(abs(root - earlier) > 1.0e-9 for earlier in roots):
+                roots.append(root)
+        if len(roots) == 0:
+            return None, None
+        if len(roots) == 1 and len(open_crossings) == 1:
+            return _count_brent(roots[0])
+        attractors = [
+            root
+            for root in roots
+            if _pressure_root_attracts(value_at, root, downstream)
+        ]
+        anchor = downstream if near_Pa is None else float(near_Pa)
+        chosen = _continuous_open_root(
+            attractors, anchor, value_at(anchor),
         )
-        if warmed is not None:
-            return "open", warmed
-    if len(law.species) == 1:
-        samples = law.g_samples(refuse_multiple=False)
-    else:
-        samples = _ray_samples(law, fractions, refuse_multiple=False)
-    open_crossings = [
-        crossing
-        for crossing in _crossings(samples)
-        if max(crossing[1], crossing[2]) > downstream
-    ]
-    if len(open_crossings) == 0:
-        return None, None
-    roots: list[float] = []
-    for crossing in open_crossings:
-        root = _solve_open_crossing(value_at, piece_at, crossing, downstream)
-        if root is None:
-            continue
-        if all(abs(root - earlier) > 1.0e-9 for earlier in roots):
-            roots.append(root)
-    if len(roots) == 0:
-        return None, None
-    if len(roots) == 1 and len(open_crossings) == 1:
-        return "open", roots[0]
-    attractors = [
-        root
-        for root in roots
-        if _pressure_root_attracts(value_at, root, downstream)
-    ]
-    anchor = downstream if near_Pa is None else float(near_Pa)
-    chosen = _continuous_open_root(attractors, anchor, value_at(anchor))
-    if chosen is None:
-        raise _BalanceRefused("headspace_balance_multiple_roots")
-    law._remember_species_notices((
-        {
-            "species": "headspace",
-            "reason": "continuous_root",
-            "root_Pa": chosen,
-            "discarded_roots": len(roots) - 1,
-        },
-    ))
-    return "open", chosen
+        if chosen is None:
+            raise _BalanceRefused("headspace_balance_multiple_roots")
+        law._remember_species_notices((
+            {
+                "species": "headspace",
+                "reason": "continuous_root",
+                "root_Pa": chosen,
+                "discarded_roots": len(roots) - 1,
+            },
+        ))
+        return _count_brent(chosen)
+    finally:
+        law._counting_pstar = False
 
 
 def _quasi_steady_tau(jacobian, state) -> float | None:
@@ -3212,6 +3476,7 @@ def _reduced_manifold(
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
 
     def rhs(_time: float, state) -> list[float]:
+        law._note_rhs_flux()
         raw = [max(float(state[index]), 0.0) for index in range(count)]
         total = math.fsum(raw)
         if total <= 0.0:
@@ -3688,6 +3953,7 @@ def _slow_converge(
         return net, added, bled, gross, redox_rate, compared
 
     def rhs(_time: float, state) -> list[float]:
+        law._note_rhs_flux()
         law.integrator_evaluations += 1
         if law.integrator_evaluations > _MAX_INTEGRATOR_EVALUATIONS:
             raise _BalanceRefused(
@@ -5677,6 +5943,7 @@ def _commit_headspace_balance(
     from simulator.evaporation import EvaporationFluxRefusal
 
     try:
+        law._record_opening_scales(n0, dt_s)
         if len(law.species) == 1:
             step = _commit_one(law, n0, dt_s)
         else:
