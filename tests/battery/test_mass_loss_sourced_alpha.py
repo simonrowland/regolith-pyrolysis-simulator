@@ -304,7 +304,10 @@ def test_mass_loss_bounds_use_each_channels_worst_oxygen_corner(
     assert corners["pO2_low_bar"] == pytest.approx(expected_low, rel=1e-10, abs=0.0)
     assert corners["pO2_high_bar"] == pytest.approx(expected_high, rel=1e-10, abs=0.0)
     assert bounds == pytest.approx(expected_bounds, rel=1e-10, abs=0.0)
-    assert corners["primary_corner_count"] == 2 * len(expected_bounds)
+    expected_primary_corners = 2 * len(expected_bounds)
+    if kind in {"both", "supplier-free"}:
+        expected_primary_corners += 1
+    assert corners["primary_corner_count"] == expected_primary_corners
     assert corners["corner_root_solves"] == corners["primary_corner_count"] + 1
     if kind == "supplier-free":
         assert corners["inventory_capped_channels"] == ["Ca"]
@@ -344,7 +347,9 @@ def test_zero_net_oxygen_channel_alpha_does_not_move_other_species_bound():
     )
 
 
-def test_single_channel_corner_recovers_congruent_oxygen_root():
+def test_single_channel_corner_recovers_congruent_oxygen_root(
+    monkeypatch: pytest.MonkeyPatch,
+):
     import simulator.battery.residue as residue
     from simulator.battery.oxygen_balance import _solve_vacuum_oxygen_balance
     from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
@@ -364,6 +369,23 @@ def test_single_channel_corner_recovers_congruent_oxygen_root():
         ResidueChannel("Mg", "Mg", "MgO", 0.0, "unsourced Mg"),
         ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
     )
+    production_solver = residue._solve_vacuum_oxygen_balance
+    roots_by_corner = {}
+
+    def capture_root(model, selected, *, temperature_K):
+        result = production_solver(model, selected, temperature_K=temperature_K)
+        if all(
+            channel.alpha_source == "alpha<=1 oxygen-corner bound"
+            for channel in selected if channel.species == "Mg"
+        ):
+            vector = tuple(
+                (channel.species, channel.alpha)
+                for channel in selected if channel.species == "Mg"
+            )
+            roots_by_corner[vector] = result.pO2_bar
+        return result
+
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", capture_root)
     _bounds, corners = _mass_loss_corner_bounds(
         {"MgO": 1.0}, channels, pressure, unsourced=("Mg",),
         temperature_K=1800.0, area_m2=1.0e-4, duration_s=1.0,
@@ -375,6 +397,11 @@ def test_single_channel_corner_recovers_congruent_oxygen_root():
         / (2.0 * coefficient_o2 * math.sqrt(mg_molar_mass))
     ) ** (2.0 / 3.0)
     assert corners["pO2_high_bar"] == pytest.approx(congruent_root, rel=1e-10)
+    assert set(roots_by_corner) == {(('Mg', 0.0),), (('Mg', 1.0),)}
+    assert roots_by_corner[(('Mg', 0.0),)] == pytest.approx(0.0, abs=0.0)
+    assert roots_by_corner[(('Mg', 1.0),)] == pytest.approx(
+        congruent_root, rel=1e-10,
+    )
 
     oxygen_channels = residue._residue_oxygen_channels(
         residue._channel_terms(channels), {"MgO": 1.0}
@@ -386,6 +413,123 @@ def test_single_channel_corner_recovers_congruent_oxygen_root():
     assert quarter_root == pytest.approx(
         congruent_root * 0.25 ** (2.0 / 3.0), rel=1e-10,
     )
+
+
+def test_multi_releaser_per_step_caps_use_max_corner_without_path_neighbours(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+
+    channels = (
+        ResidueChannel("Ca", "Ca", "CaO", 0.0, "unsourced Ca"),
+        ResidueChannel("Mg", "Mg", "MgO", 0.0, "unsourced Mg"),
+        ResidueChannel("AlO2", "AlO2", "Al2O3", 0.0, "unsourced AlO2"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+    )
+    inventory = {"CaO": 1.0, "MgO": 1.0, "Al2O3": 1.0}
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        return {
+            "Ca": 2.0e-4 * pO2_bar**-0.5,
+            "Mg": 1.0e-3 * pO2_bar**-0.5,
+            "AlO2": 1.0e-3 * pO2_bar**0.25,
+            "O2": 1.0e5 * pO2_bar,
+        }
+
+    pressure.declares_fixed_activities = True
+    production_solver = residue._solve_vacuum_oxygen_balance
+    primary_vectors = []
+
+    def capture_root(model, selected, *, temperature_K):
+        if all(
+            channel.alpha_source == "alpha<=1 oxygen-corner bound"
+            for channel in selected if channel.species in {"Ca", "Mg", "AlO2"}
+        ):
+            primary_vectors.append({
+                channel.species: channel.alpha
+                for channel in selected if channel.species in {"Ca", "Mg", "AlO2"}
+            })
+        return production_solver(model, selected, temperature_K=temperature_K)
+
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", capture_root)
+    bounds, corners = _mass_loss_corner_bounds(
+        inventory, channels, pressure, unsourced=("Ca", "Mg", "AlO2"),
+        temperature_K=1800.0, area_m2=1.0e-4, duration_s=1.0,
+    )
+
+    assert bounds["Ca"] == pytest.approx(0.056077, rel=1e-12)
+    assert bounds["Mg"] == pytest.approx(0.040304, rel=1e-12)
+    assert corners["inventory_capped_channels"] == ["Ca", "Mg"]
+    assert {"Ca": 0.0, "Mg": 0.0, "AlO2": 1.0} in primary_vectors
+    assert {"Ca": 0.0, "Mg": 1.0, "AlO2": 0.0} in primary_vectors
+    assert corners["corner_not_extremal_on_path"] == []
+
+    _neighbour_bounds, neighbour_corners = _mass_loss_corner_bounds(
+        inventory, channels, pressure, unsourced=("Ca", "Mg", "AlO2"),
+        temperature_K=1800.0, area_m2=1.0e-4, duration_s=1.0,
+        check_neighbours=True,
+    )
+    assert neighbour_corners["corner_not_extremal_on_path"] == []
+
+
+def test_reported_cr6_valence_is_shared_by_corner_sign_and_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+    from simulator.vacuum_oxygen_balance import PressureEvaluation
+
+    channels = (
+        ResidueChannel("CrO2", "CrO2", "Cr2O3", 0.0, "unsourced CrO2"),
+        ResidueChannel("AlO2", "AlO2", "Al2O3", 0.0, "unsourced AlO2"),
+        ResidueChannel("Mg", "Mg", "MgO", 0.0, "unsourced Mg"),
+        ResidueChannel("O2", "O2", None, 1.0, "oxygen escape"),
+    )
+    inventory = {"Cr2O3": 1.0, "Al2O3": 1.0, "MgO": 1.0}
+
+    def pressure(_inventory, logp):
+        pO2_bar = 10.0**logp
+        evaluation = PressureEvaluation({
+            "CrO2": pO2_bar**0.25,
+            "AlO2": 1.0e-20 * pO2_bar**0.25,
+            "Mg": 1.0e-4 * pO2_bar**-0.5,
+            "O2": 1.0e5 * pO2_bar,
+        })
+        evaluation.cr_valence = 6.0
+        return evaluation
+
+    pressure.declares_fixed_activities = True
+    production_solver = residue._solve_vacuum_oxygen_balance
+    primary_vectors = []
+    sign_probe_demands = []
+
+    def capture_root(model, selected, *, temperature_K):
+        result = production_solver(model, selected, temperature_K=temperature_K)
+        if any(channel.alpha_source == "alpha<=1 oxygen-corner sign probe" for channel in selected):
+            sign_probe_demands.append(result.parent_oxygen_demand_at_root["CrO2"])
+        if all(
+            channel.alpha_source == "alpha<=1 oxygen-corner bound"
+            for channel in selected if channel.species in {"CrO2", "AlO2", "Mg"}
+        ):
+            primary_vectors.append({
+                channel.species: channel.alpha
+                for channel in selected if channel.species in {"CrO2", "AlO2", "Mg"}
+            })
+        return result
+
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", capture_root)
+    _bounds, corners = _mass_loss_corner_bounds(
+        inventory, channels, pressure, unsourced=("CrO2", "AlO2", "Mg"),
+        temperature_K=1800.0, area_m2=1.0e-4, duration_s=1.0,
+    )
+
+    assert corners["corner_sign_ambiguous"] == []
+    assert sign_probe_demands == [3.0]
+    assert 2.0 - sign_probe_demands[0] == -1.0
+    assert residue._chromium_oxygen_per_cr_from_valence(6.0) == 3.0
+    assert {"CrO2": 0.0, "AlO2": 1.0, "Mg": 1.0} in primary_vectors
 
 
 def test_unreported_cr_valence_flags_both_alpha_corners_and_unions_bounds(
@@ -464,8 +608,8 @@ def test_unreported_cr_valence_flags_both_alpha_corners_and_unions_bounds(
     assert "alkali-rich melts near air" in detail["context"]
     assert "no sourced Cr6+ stability bound" in detail["context"]
     assert "t-1962" in detail["context"]
-    assert corners["primary_corner_count"] == 10
-    assert len(bound_alpha_vectors) == 10
+    assert corners["primary_corner_count"] == 12
+    assert len(bound_alpha_vectors) == 12
     al_corner_vectors = {
         vector for vector in bound_alpha_vectors
         if dict(vector)["AlO2"] == 1.0 and dict(vector)["Mg"] == 1.0
@@ -521,7 +665,7 @@ def test_cr_absence_suppresses_ambiguous_corner(monkeypatch: pytest.MonkeyPatch)
 
     assert corners["corner_sign_ambiguous"] == []
     assert corners["corner_sign_ambiguity_details"] == []
-    assert corners["primary_corner_count"] == 4
+    assert corners["primary_corner_count"] == 5
 
 
 def test_thirteen_alpha_corner_count_is_linear_and_endpoint_checks_flips(
@@ -569,13 +713,15 @@ def test_thirteen_alpha_corner_count_is_linear_and_endpoint_checks_flips(
         area_m2=1.0e-4, duration_s=1.0, check_neighbours=True,
     )
 
-    # Thirteen target species need 26 primary corners, then one sign probe.
-    # The endpoint path guard checks 13 single flips for each of 13 extrema.
-    assert corners["primary_corner_count"] == 26
+    # Thirteen negative-exponent targets need two ordinary endpoints plus one
+    # alpha-zero max-assignment cap candidate each, then one sign probe. The
+    # endpoint path guard checks 13 single flips for each of 13 extrema.
+    assert corners["primary_corner_count"] == 39
     assert corners["corner_neighbour_evaluations"] == 169
-    assert corners["corner_count"] == 195
-    assert corners["corner_root_solves"] == 196
-    assert corners["corner_not_extremal_on_path"] == sorted(species)
+    assert corners["corner_count"] == 208
+    assert corners["corner_root_solves"] == 209
+    assert corners["inventory_capped_channels"] == sorted(species)
+    assert corners["corner_not_extremal_on_path"] == []
 
 
 def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(

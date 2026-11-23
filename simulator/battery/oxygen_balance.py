@@ -117,7 +117,13 @@ def _channel_parent_oxygen_demand(
     channel: _VacuumOxygenChannel,
     model_pressures: Mapping[str, float],
 ) -> float:
-    """Return melt oxygen demand; Fe channels use this evaluation's valence."""
+    """Return melt oxygen demand using this evaluation's Fe or Cr valence."""
+    if channel.species == "CrO2" and channel.redox_metal_atoms > 0.0:
+        o_bar_cr = _chromium_oxygen_per_cr_from_valence(
+            getattr(model_pressures, "cr_valence", None)
+        )
+        if o_bar_cr is not None:
+            return o_bar_cr * channel.redox_metal_atoms
     # o_bar_M = sum_v x_v * v/2 is O atoms per metal atom. Fe(g) releases
     # o_bar and FeO(g) releases o_bar - 1. No q keeps formula stoichiometry.
     q = getattr(model_pressures, "fe3_over_sum_fe", None)
@@ -444,6 +450,9 @@ def _solve_vacuum_oxygen_balance(
                 low_model_pressures, "below_threshold_omissions", None
             ),
         )
+        reported_cr_valence = getattr(low_model_pressures, "cr_valence", None)
+        if reported_cr_valence is not None:
+            boundary_pressures.cr_valence = reported_cr_valence
         (
             residual,
             pressures,
