@@ -151,6 +151,19 @@ def _aliases(tree: ast.Module) -> tuple[dict[str, str], dict[str, str]]:
         elif isinstance(node, ast.ImportFrom) and node.module:
             for alias in node.names:
                 objects[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+        elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+            value = node.value
+            if (
+                isinstance(value, ast.Call)
+                and _dotted(value.func) in {"pytest.importorskip", "importorskip"}
+                and value.args
+                and isinstance(value.args[0], ast.Constant)
+                and isinstance(value.args[0].value, str)
+            ):
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for target in targets:
+                    if isinstance(target, ast.Name):
+                        modules[target.id] = value.args[0].value
     return modules, objects
 
 
@@ -397,6 +410,7 @@ def _is_class_constructor(
 
 def scan_tests(root: Path) -> Census:
     repository_root = Path(__file__).resolve().parents[1]
+    root = root.resolve()
     if str(repository_root) not in sys.path:
         sys.path.insert(0, str(repository_root))
     scanned = resolved = 0
@@ -428,7 +442,10 @@ def scan_tests(root: Path) -> Census:
                 continue
             resolved += 1
             if not _compatible(production, double):
-                relative = path.relative_to(root).as_posix()
+                try:
+                    relative = path.relative_to(repository_root).as_posix()
+                except ValueError:
+                    relative = path.relative_to(root).as_posix()
                 test_name = _test_name(site.call, parents)
                 target = ast.unparse(site.target)
                 violations.append(f"{relative}::{test_name}::{target}")

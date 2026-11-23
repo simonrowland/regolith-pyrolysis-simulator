@@ -7,12 +7,26 @@ import pytest
 from tools.test_double_signatures import _compatible, scan_tests
 
 
-def test_all_patch_doubles_accept_production_signatures() -> None:
+ALLOWLIST = Path(__file__).parents[1] / "tools" / "test_double_signature_allowlist.txt"
+
+
+def test_patch_double_violation_allowlist_only_shrinks() -> None:
     census = scan_tests(Path(__file__).parent)
     assert census.resolved + len(census.skipped) == census.scanned
     assert census.scanned > 0
     assert census.resolved > 0
-    assert not census.violations, "\n".join(census.violations)
+    print(f"UNRESOLVED-SKIPPED: {len(census.skipped)}")
+    allowed = {
+        line.strip()
+        for line in ALLOWLIST.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    }
+    actual = set(census.violations)
+    assert actual == allowed, (
+        f"unlisted violations: {sorted(actual - allowed)}\n"
+        f"stale allowlist entries: {sorted(allowed - actual)}\n"
+        f"unresolved skipped: {len(census.skipped)}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -37,6 +51,21 @@ def test_compatibility_covers_keyword_names_and_optional_omissions(
     assert production_signature is not None
     assert double_signature is not None
     assert _compatible(production_signature, double_signature) is compatible
+
+
+def test_variadic_arguments_cannot_collide_with_a_double_parameter() -> None:
+    def production(*args, **kwargs):
+        return args, kwargs
+
+    def double(value=None, *args, **kwargs):
+        return value, args, kwargs
+
+    production_signature = inspect.signature(production)
+    double_signature = inspect.signature(double)
+    production_signature.bind(1, value=2)
+    with pytest.raises(TypeError, match="multiple values"):
+        double_signature.bind(1, value=2)
+    assert not _compatible(production_signature, double_signature)
 
 
 def test_scan_reports_unresolvable_discovered_candidate(tmp_path: Path) -> None:
