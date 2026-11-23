@@ -21,6 +21,7 @@ from simulator.reduced_real_determinism import (
     _quantize,
     _sigfig,
     coarsen_engine_request,
+    coarsen_engine_requests,
     optimizer_engine_neighbour,
     optimizer_neighbour_preset,
 )
@@ -284,6 +285,12 @@ def test_readonly_skips_neighbour_index_and_a_missing_index_stays_exact(
     nearby = _request(1700.2)
     with optimizer_engine_neighbour({"control_quantization": "coarse"}):
         _call(base, {"answer": "base"})
+    with sqlite3.connect(path) as connection:
+        writable_neighbour_rows = connection.execute(
+            "SELECT COUNT(*) FROM engine_neighbour_cells"
+        ).fetchone()[0]
+    assert writable_neighbour_rows == len(coarsen_engine_requests(base))
+
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
     engine_cache._MEMORY_CACHE.clear()
     engine_cache._close_connections()
@@ -314,7 +321,7 @@ def test_readonly_skips_neighbour_index_and_a_missing_index_stays_exact(
             "SELECT COUNT(*) FROM engine_neighbour_cells"
         ).fetchone()[0]
     assert rows == 1
-    assert neighbour_rows == 1
+    assert neighbour_rows == writable_neighbour_rows
 
     bare = tmp_path / "exact-only.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(bare))
