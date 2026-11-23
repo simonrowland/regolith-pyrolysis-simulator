@@ -11,6 +11,7 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import (
     LiquidFeODomain,
     calphad_ferrous_feo_activity_diagnostic,
+    fe_metal_saturation_log10_fO2_bar,
     holzheid_stoich_feo_gamma_band,
     kress91_ferrous_feo_activity,
     kress91_split,
@@ -503,7 +504,17 @@ def test_feo_activity_iw_pure_feo_basis_documents_melt_offset():
     )
     assert diagnostic["a_FeO_current"] == pytest.approx(central)
     assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(iw)
-    assert offset == pytest.approx(2.0 * math.log10(central))
+    expected = fe_metal_saturation_log10_fO2_bar(
+        _T_K,
+        a_feo_stoich=central,
+    )
+    assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
+        pytest.approx(expected)
+    )
+    assert offset == pytest.approx(expected - iw)
+    # The unconverted 2 log10(a) pairing is more oxidizing by
+    # 2 log10(multiplier). The tie point no longer publishes it.
+    assert offset < 2.0 * math.log10(central)
     assert offset < 0.0
     assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
         pytest.approx(iw + offset)
