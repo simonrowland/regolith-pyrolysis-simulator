@@ -927,7 +927,7 @@ def _engine_lacks_quantity_capability(
         return False
     if quantity in FUSION_QUANTITIES:
         return False
-    from simulator.battery.compilation_tier import _engine_thermo_quantities
+    from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
     return quantity not in _engine_thermo_quantities(engine)
 
@@ -14158,7 +14158,7 @@ def _predict_with_engine(
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     if engine is Engine.NASA_CEA_9 and quantity is not None:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity is not Quantity.FE3_FE2_RATIO
@@ -14298,7 +14298,7 @@ def _predict_with_engine(
     if wall_prediction is not None:
         return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity not in _engine_thermo_quantities(engine)
@@ -23635,6 +23635,24 @@ def write_headline_summary_json(
     payload["assumed_band"] = _assumed_band_summary(
         (to_plain(row) for row in residuals), context.observations
     )
+    from simulator.battery.engine_capability import (
+        capability_summary,
+        residual_record_stats,
+    )
+
+    n_records, n_scored, n_refused, scored_ids = residual_record_stats(residuals)
+    payload.update(
+        capability_summary(
+            observations=context.observations,
+            origins=context.origins,
+            experiments=context.experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored,
+            n_refused_records=n_refused,
+        )
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
@@ -23834,7 +23852,7 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
             engine_value = Engine(engine)
         except ValueError:
             return True
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         return (
             quantity in _engine_thermo_quantities(engine_value)
@@ -24047,6 +24065,18 @@ def _render_score_report_from_payloads_legacy(
             pending += 1
         elif observation.admission.status is AdmissionStatus.ADMITTED:
             admitted += 1
+    from simulator.battery.engine_capability import capability_summary
+
+    capability = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=engines,
+        scored_observation_ids=aggregate.numeric_observation_ids,
+        n_records=aggregate.count,
+        n_scored_records=aggregate.numeric_count,
+        n_refused_records=aggregate.refused_count,
+    )
     report = render_legacy_score_report_markdown(
         hostname=context.hostname,
         studio_hostname=studio_hostname,
@@ -24081,6 +24111,8 @@ def _render_score_report_from_payloads_legacy(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=capability["coverage"],
+        capability_matrix=capability["capability_matrix"],
     )
     if shard_failures:
         report = (
@@ -24831,104 +24863,12 @@ def flagged_stratum_payloads(
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
     observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
-    groups: dict[
-        tuple[str, str, str, str | None, str | None], list[Decimal]
-    ] = {}
-    counts: dict[tuple[str, str, str, str | None, str | None], int] = {}
-    engine_names = {engine.value for engine in engines}
+    census = _FlaggedStratumAccumulator(
+        engines, hulls=hulls, observations=observations
+    )
     for row in rows:
-        numeric = row.get("numeric")
-        if not isinstance(numeric, Mapping):
-            continue
-        rail = str(row.get("rail") or "")
-        if not rail:
-            continue
-        engine = str(
-            ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or _engine_from_residual_key(row.get("key"))
-        )
-        if engine_names and engine not in engine_names:
-            continue
-        notices = tuple(
-            notice
-            for notice in (row.get("notices") or ())
-            if isinstance(notice, Mapping)
-        )
-        for stratum in _flagged_payload_strata(row):
-            for policy_id, policy_status in _policies_for_stratum(
-                notices, stratum
-            ):
-                key = (stratum, rail, engine, policy_id, policy_status)
-                counts[key] = counts.get(key, 0) + 1
-                if hulls is not None:
-                    from simulator.battery.compilation_tier import reference_observation
-
-                    reference = str(row.get("reference") or "")
-                    hull_key = (
-                        f"flagged:{stratum}"
-                        if policy_id is None
-                        else (
-                            f"flagged:{stratum}:policy={policy_id}"
-                            f":status={policy_status}"
-                        )
-                    )
-                    hulls.setdefault(
-                        (hull_key, rail, engine), _ConditionHull()
-                    ).add(reference, reference_observation(observations or {}, reference))
-                dex = (
-                    numeric.get("value")
-                    if numeric.get("operation") == MetricOperation.DEX.value
-                    else None
-                )
-                if dex is None:
-                    continue
-                try:
-                    value = as_decimal(dex)
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
-                groups.setdefault(key, []).append(value)
-    return [
-        {
-            "stratum": stratum,
-            "rail": rail,
-            "engine": engine,
-            "n": counts[(stratum, rail, engine, policy_id, policy_status)],
-            "median_dex": (
-                None
-                if not groups.get(
-                    (stratum, rail, engine, policy_id, policy_status)
-                )
-                else str(
-                    _median(
-                        groups[
-                            (stratum, rail, engine, policy_id, policy_status)
-                        ]
-                    )
-                )
-            ),
-            "rms_dex": (
-                None
-                if not groups.get(
-                    (stratum, rail, engine, policy_id, policy_status)
-                )
-                else str(
-                    _rms(
-                        groups[
-                            (stratum, rail, engine, policy_id, policy_status)
-                        ]
-                    )
-                )
-            ),
-            **(
-                {"policy_id": policy_id, "policy_status": policy_status}
-                if policy_id is not None
-                else {}
-            ),
-        }
-        for stratum, rail, engine, policy_id, policy_status in sorted(
-            counts, key=_flagged_census_sort_key
-        )
-    ]
+        census.add(row)
+    return census.records()
 
 
 def _redox_source_relation_fields(relation: str) -> dict[str, str]:
@@ -25127,6 +25067,105 @@ class _ScorePayloadRowMetadata:
     tier_uncertainty: str
 
 
+class _FlaggedStratumAccumulator:
+    """One owner for flagged residual counts and dex statistics."""
+
+    def __init__(
+        self,
+        engines: Sequence[Engine],
+        *,
+        hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
+        observations: Mapping[str, Observation] | None = None,
+    ) -> None:
+        self.engine_names = {engine.value for engine in engines}
+        self.hulls = hulls
+        self.observations = observations or {}
+        self.counts: dict[
+            tuple[str, str, str, str | None, str | None], int
+        ] = defaultdict(int)
+        self.dex_values: dict[
+            tuple[str, str, str, str | None, str | None], list[Decimal]
+        ] = defaultdict(list)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            return
+        rail = str(row.get("rail") or "")
+        if not rail:
+            return
+        engine = _engine_from_payload(row)
+        if self.engine_names and engine not in self.engine_names:
+            return
+        notices = tuple(
+            notice
+            for notice in (row.get("notices") or ())
+            if isinstance(notice, Mapping)
+        )
+        for stratum in _flagged_payload_strata(row):
+            for policy_id, policy_status in _policies_for_stratum(
+                notices, stratum
+            ):
+                key = (stratum, rail, engine, policy_id, policy_status)
+                self.counts[key] += 1
+                if self.hulls is not None:
+                    from simulator.battery.compilation_tier import reference_observation
+
+                    reference = str(row.get("reference") or "")
+                    hull_key = (
+                        f"flagged:{stratum}"
+                        if policy_id is None
+                        else (
+                            f"flagged:{stratum}:policy={policy_id}"
+                            f":status={policy_status}"
+                        )
+                    )
+                    self.hulls.setdefault(
+                        (hull_key, rail, engine), _ConditionHull()
+                    ).add(
+                        reference,
+                        reference_observation(self.observations, reference),
+                    )
+                if numeric.get("operation") != MetricOperation.DEX.value:
+                    continue
+                dex = numeric.get("value")
+                if dex is None:
+                    continue
+                try:
+                    self.dex_values[key].append(as_decimal(dex))
+                except (TypeError, ValueError, ArithmeticError):
+                    continue
+
+    def records(self) -> list[dict[str, object]]:
+        rows: list[dict[str, object]] = []
+        for (
+            stratum,
+            rail,
+            engine,
+            policy_id,
+            policy_status,
+        ), n in sorted(
+            self.counts.items(),
+            key=lambda item: _flagged_census_sort_key(item[0]),
+        ):
+            values = self.dex_values.get(
+                (stratum, rail, engine, policy_id, policy_status), ()
+            )
+            row: dict[str, object] = {
+                "stratum": stratum,
+                "rail": rail,
+                "engine": engine,
+                "n": n,
+                "median_dex": None if not values else str(_median(values)),
+                "rms_dex": None if not values else str(_rms(values)),
+            }
+            if policy_id is not None:
+                row["policy_id"] = policy_id
+                row["policy_status"] = policy_status
+            rows.append(row)
+        return rows
+
+
 class _ScorePayloadAccumulator:
     """Compact report statistics collected in one pass over residual payloads."""
 
@@ -25181,9 +25220,17 @@ class _ScorePayloadAccumulator:
         self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
+        self.flagged_census = _FlaggedStratumAccumulator(
+            self.engines,
+            hulls=self.headline_hulls,
+            observations=context.observations,
+        )
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
+        self.numeric_count = 0
+        self.refused_count = 0
+        self.numeric_observation_ids: set[str] = set()
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
@@ -25476,6 +25523,14 @@ class _ScorePayloadAccumulator:
             except (TypeError, ValueError, ArithmeticError):
                 pass
         reference = metadata.reference
+        if (
+            isinstance(numeric_payload, Mapping)
+            and numeric_payload.get("value") is not None
+        ):
+            self.numeric_count += 1
+            self.numeric_observation_ids.add(str(reference))
+        if row.get("status") == ResidualStatus.REFUSED.value:
+            self.refused_count += 1
         engine = metadata.engine
         flags = metadata.flags
         flagged = bool(flags)
@@ -25557,6 +25612,7 @@ class _ScorePayloadAccumulator:
                 flagged=flagged,
                 numeric_value=numeric_value,
             )
+        self.flagged_census.add(row)
         exclusions_tuple = tuple(exclusions or ())
         if "admission_admitted" in exclusions_tuple:
             self.admission_with += 1
@@ -25694,6 +25750,9 @@ class _ScorePayloadAccumulator:
                 )
             record["decision_strata"] = strata
 
+    def flagged_records(self) -> list[dict[str, object]]:
+        return self.flagged_census.records()
+
     def condition_hull_lines(self) -> list[str]:
         return _condition_hull_lines(
             {
@@ -25724,6 +25783,20 @@ class _ScorePayloadAccumulator:
             static_refusals=self.static_refusals,
         )
         payload["assumed_band"] = self.assumed_bands.payload()
+        from simulator.battery.engine_capability import capability_summary
+
+        payload.update(
+            capability_summary(
+                observations=self.context.observations,
+                origins=self.context.origins,
+                experiments=self.context.experiments,
+                engines=self.engines,
+                scored_observation_ids=self.numeric_observation_ids,
+                n_records=self.count,
+                n_scored_records=self.numeric_count,
+                n_refused_records=self.refused_count,
+            )
+        )
         return payload
 
 
@@ -25734,6 +25807,7 @@ def write_headline_summary_from_payloads_json(
     engines: Sequence[Engine],
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
     rows = tuple(rows)
@@ -25747,6 +25821,25 @@ def write_headline_summary_from_payloads_json(
         store_stamp=store_stamp,
     )
     payload["assumed_band"] = _assumed_band_summary(rows, observations)
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored, n_refused, scored_ids = payload_record_stats(rows)
+        payload.update(
+            capability_summary(
+                observations=observations,
+                origins=origins,
+                experiments=experiments,
+                engines=engines,
+                scored_observation_ids=scored_ids,
+                n_records=n_records,
+                n_scored_records=n_scored,
+                n_refused_records=n_refused,
+            )
+        )
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25833,6 +25926,7 @@ def render_score_report_from_payloads(
     mismatch_warning: str | None = None,
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
 ) -> str:
     eligibility_census = eligibility_failure_census(
         rows,
@@ -25911,6 +26005,26 @@ def render_score_report_from_payloads(
         condition_lines: Sequence[str] | None = _condition_hull_lines(hulls)
     else:
         condition_lines = None
+    capability = None
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored_records, n_refused_records, scored_ids = payload_record_stats(
+            rows
+        )
+        capability = capability_summary(
+            observations=observations,
+            origins=origins,
+            experiments=experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored_records,
+            n_refused_records=n_refused_records,
+        )
     refusal_counts = refusal_census_payloads(measured_rows)
     admit = admission_census_payloads(rows)
     notice_counts = notice_backlog_payloads(rows)
@@ -25946,6 +26060,8 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=None if capability is None else capability["coverage"],
+        capability_matrix=None if capability is None else capability["capability_matrix"],
     )
     report = format_assumed_band_report(
         report, _assumed_band_summary(rows, observations)

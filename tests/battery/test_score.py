@@ -871,6 +871,32 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     ] == [
         (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
     ]
+    payload = residual_to_plain(residual)
+    aggregate = score_mod._ScorePayloadAccumulator.from_rows(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert aggregate.flagged_records() == serialized_strata
+    expected_flagged_rows = (
+        "| method_implied | vapour | internal-analytical | DP-101 | rejected | 1 |",
+    )
+    legacy_report = score_mod._render_score_report_from_payloads_legacy(
+        (payload,),
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        store_stamp={"revision": "unknown"},
+        _aggregate=aggregate,
+    )
+    payload_report = score_mod.render_score_report_from_payloads(
+        (payload,),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        observations=context.observations,
+        origins=context.origins,
+    )
+    assert all(row in legacy_report for row in expected_flagged_rows)
+    assert all(row in payload_report for row in expected_flagged_rows)
     clean_residual = replace(
         residual,
         notices=tuple(
@@ -12104,16 +12130,22 @@ def test_static_lineage_memo_matches_the_prediction_source_relation(
     monkeypatch.setattr(
         score_mod, "_score_predict_with_engine", refusal_with_other_sources
     )
-    compiled_rows = _assert_score_store_matches_compile_jsonl(
+    # Alpha is in no declared set and this row is not an implied-alpha
+    # rewrite, so the score loop does not emit it. The predict path still
+    # records the foreign coefficient source as unknown.
+    scored, _candidates = score_store(
         context,
-        reference,
         engines=(Engine.VAPOROCK,),
+        include_diagnostics=False,
     )
-
-    assert (
-        compiled_rows[Engine.VAPOROCK][0].source_relation
-        is SourceRelation.UNKNOWN
+    assert scored == ()
+    compiled_residual, _compiled_candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=context,
+        comparison_ids={reference.observation_id},
     )
+    assert compiled_residual.source_relation is SourceRelation.UNKNOWN
 
 
 def _printed_unresolved_observation(
@@ -14870,7 +14902,14 @@ def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     )
     default_partial = default_path.with_name(default_path.name + ".partial")
     default_rows = score_mod.load_residuals_jsonl(default_partial)
-    assert default_written == len(fixture_residuals)
+    # Internal-analytical does not declare S. The two relabeled entropy
+    # rows are capability-matrix cells, not residuals.
+    skipped_entropy = {
+        "fixture-scaled-max-first",
+        "fixture-scaled-max-second",
+    }
+    assert default_written == len(fixture_residuals) - len(skipped_entropy)
+    assert not any(row["reference"] in skipped_entropy for row in default_rows)
     assert score_mod.load_residuals_stamp(default_partial).get("static_refusals") is None
     assert any(row["reference"] == static_id for row in default_rows)
 
@@ -21097,23 +21136,45 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
 
+    context = _context(
+        F.work("fusion-work"),
+        experiment,
+        observation,
+        review="reviewed",
+    )
     residuals, _candidates = score_store(
-        _context(
-            F.work("fusion-work"),
-            experiment,
-            observation,
-            review="reviewed",
-        ),
+        context,
         engines=(Engine.MAGEMIN,),
         rail=Rail.THERMOCHEMISTRY,
         include_diagnostics=False,
     )
-    assert len(residuals) == 1
-    residual = residuals[0]
-    assert residual.rail is Rail.THERMOCHEMISTRY
-    assert residual.execution.state is ExecutionState.UNSUPPORTED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+    # MAGEMin does not compute fusion. The pair is a capability-matrix cell.
+    # predict_with_engine above still returns engine_does_not_report_fusion.
+    assert residuals == ()
+    from simulator.battery.engine_capability import capability_summary
+
+    summary = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=(Engine.MAGEMIN,),
+        scored_observation_ids=(),
+        n_records=0,
+        n_scored_records=0,
+        n_refused_records=0,
+    )
+    matrix = summary["capability_matrix"]
+    assert matrix["uncovered_pair_total"] == 1
+    assert matrix["rows"] == [
+        {
+            "covered": False,
+            "engine": Engine.MAGEMIN.value,
+            "n_observations": 1,
+            "quantity": quantity.value,
+            "rail": Rail.THERMOCHEMISTRY.value,
+        }
+    ]
+    assert matrix["quantities_no_engine_predicts"] == []
 
 
 @pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))

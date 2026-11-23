@@ -142,11 +142,24 @@ def _resolved_value(
             context["P_total"], context_name="P_total"
         )
     if policy_id == "DP-007":
-        if "runtime_default" not in context:
-            raise ValueError("DP-007 requires the owning runtime_default")
+        sample_mass = context.get("sample_mass_kg")
+        if sample_mass is None:
+            raise ValueError(
+                "DP-007 requires sample_mass_kg: an absolute rate needs an "
+                "area or sample mass"
+            )
+        sample_mass_kg = _decimal(
+            sample_mass, context_name="DP-007 sample_mass_kg"
+        )
+        if sample_mass_kg <= 0:
+            raise ValueError("DP-007 sample_mass_kg must be positive")
+
+        from simulator.equipment import EquipmentDesigner
+
+        crucible = EquipmentDesigner().size_crucible(float(sample_mass_kg))
         return _decimal(
-            context["runtime_default"],
-            context_name="runtime size_crucible face area",
+            crucible.melt_surface_area_m2,
+            context_name="DP-007 crucible face area",
         )
     if policy_id == "DP-008":
         if "runtime_default" not in context:
