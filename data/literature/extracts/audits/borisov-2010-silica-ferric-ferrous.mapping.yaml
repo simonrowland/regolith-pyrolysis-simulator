@@ -22,6 +22,9 @@ tables:
   - values.rows[].point_conditions.composition.state.value.components
   - values.rows[].composition_total_wt_pct_as_printed
   - values.rows[].silica_formula_x_as_printed
+  - values.composition_map_cell_locators
+  - values.composition_total_wt_pct_locators
+  - values.silica_formula_x_locators
   row_binding: >-
     Table 1 identifies these as initial mixtures and notes the compositions are
     calculated averages from similar experimental glasses. Table 2 and Table 4
@@ -72,10 +75,13 @@ tables:
   - Fe3+ magnetic component fit parameters
   - Fe3+ magnetic / Fe3+ total
   - Fe3+/Fe2+
+  - vmax (mm/s)
   mapped_fields:
   - values.rows[].run_id_as_printed
+  - values.rows[].cell_locators.run_id_as_printed
   - values.rows[].Fe3_over_Fe2
   - values.rows[].vmax_mm_s_as_printed
+  - values.rows[].cell_locators
   row_binding: >-
     Twenty-two distinct oxidized-glass samples have a final-column ratio. For
     DAFL-9 and DAFL-10, the full-range ±19 mm/s fit is retained; the other
@@ -84,19 +90,54 @@ tables:
     magnetic ferric component; the lower values printed under “magnetic ferric
     was ignored” are alternate fits, not separate experiments.
   uncertainty: >-
-    The ratio column has no printed uncertainties. Parenthetical numbers in
-    Tables 4 and 4—Extended are fit-parameter uncertainties and are not applied
-    to the Fe3+/Fe2+ ratios.
+    Folio 550 estimates an absolute Δ(Fe3+/Fe2+) of about 0.05 for most
+    iron-rich samples from a baseline shift of ±1σ, and states total ratio error
+    after reprocessing cannot exceed 0.1. The baseline perturbation is not a
+    per-row 1σ interval. Individual row uncertainties are not printed. Figure
+    7 on folio 551 displays error bars for the iron-rich series. Parenthetical
+    values in Tables 4 and 4—Extended are fit-parameter uncertainties, not
+    ratio uncertainties.
+  uncertainty_locator:
+    published_page: 550
+    pdf_page_index: 5
+    section: The effect of silica concentration on the Fe3+/Fe2+ ratio
+  figure_uncertainty_locator: {published_page: 551, pdf_page_index: 6, figure: '7', series: iron-rich}
   cross_source_count_check: >-
     Aithala et al. supplementary Table S-5 summarizes 21 fitted experiments in
     six series. Its listed series counts total 21 and omit the one printed
     DAS90F-5 ratio row. DAS90F-5 is retained because the source paper prints
     its ratio and Table 2 gives its run conditions.
+- table: '3'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 547
+    table: '3'
+  printed_data_rows: 6
+  distinct_context_samples: 3
+  extracted_run_rows: 0
+  columns_as_printed:
+  - Sample no.
+  - Fe2+-I hyperfine parameters
+  - Fe2+-II hyperfine parameters
+  mapped_fields:
+  - comparison_context.sample_ids_as_printed
+  - comparison_context.conditions
+  - comparison_context.source_relation
+  row_binding: >-
+    DAFe-11, DAS25Fe-11, and DAS70Fe-11 are reduced-glass comparisons from
+    Borisov (2007), not numeric Fe3+/Fe2+ results in this paper. The discussion
+    gives their shared conditions as 1400 °C and log fO2 = -12.3. Table 3
+    reports Fe2+ hyperfine parameters; the text says the ferric proportion was
+    negligible and prints no Fe3+/Fe2+ ratio for these runs.
+  conditions_locator: {published_page: 546, pdf_page_index: 1, section: Experimental Methods}
+  sample_id_locator: {published_page: 547, pdf_page_index: 2, table: '3', column: Sample no.}
 render_check:
   method: >-
-    Table 1, Table 2, and Table 4 were crop-checked against 600 dpi renders.
-    Table 4 spans printed pages 548 and 549 (physical indices 3 and 4).
-  dpi: 600
+    Table 1 and 2 cells on folio 546, Table 3 IDs on folio 547, Table 4
+    velocity cells on folio 548, and ratio cells on folio 549 were checked
+    against page crops. Table 4 spans physical indices 3 and 4.
+  dpi: 240
   verified_cells:
   - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: SiO2, value: '47.9'}
   - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: Fe2O3, value: '5.1'}
@@ -108,9 +149,86 @@ render_check:
   - {page: 2, pdf_page_index: 1, table: '2', row: '1398', column: T °C, value: '1398'}
   - {page: 2, pdf_page_index: 1, table: '2', row: '1424', column: samples, value: DAFL-9}
   - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: h, value: '70'}
-  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: DA-1 to DAS80F-1}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: 'DA-1, DAS20F-1, DAS40F-1, DAS60F-1, DAS80F-1'}
   - {page: 2, pdf_page_index: 1, table: '2', row: '1540', column: samples, value: DAFL-10}
   - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: DAS90F-5}
+  - {page: 4, pdf_page_index: 3, table: '4', row: DAFL-9, column: vmax (mm/s), value: '19'}
+  - {page: 4, pdf_page_index: 3, table: '4', row: DAFL-10, column: vmax (mm/s), value: '19'}
+  - {page: 3, pdf_page_index: 2, table: '3', row: DAFe-11, column: 'Sample no.', value: DAFe-11}
+  - {page: 3, pdf_page_index: 2, table: '3', row: DAS25Fe-11, column: 'Sample no.', value: DAS25Fe-11}
+  - {page: 3, pdf_page_index: 2, table: '3', row: DAS70Fe-11, column: 'Sample no.', value: DAS70Fe-11}
+  - {page: 2, pdf_page_index: 1, section: Experimental Methods, text: '1400 °C and log fO2 = -12.3'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: SiO2, value: '47.9'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: Al2O3, value: '15.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: Fe2O3, value: '5.2'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: MgO, value: '9.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: CaO, value: '22.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAF, column: x, value: '0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: SiO2, value: '53.2'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: Al2O3, value: '13.4'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: Fe2O3, value: '5.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: MgO, value: '8.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: CaO, value: '19.6'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS20F, column: x, value: '11'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: SiO2, value: '58.5'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: Al2O3, value: '11.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: Fe2O3, value: '5.2'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: MgO, value: '7.5'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: CaO, value: '17.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS40F, column: x, value: '21'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: SiO2, value: '63.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: Al2O3, value: '10'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: Fe2O3, value: '5.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: MgO, value: '6.5'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: CaO, value: '14.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS60F, column: x, value: '32'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: SiO2, value: '69.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: Al2O3, value: '8.3'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: Fe2O3, value: '5.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: MgO, value: '5.3'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: CaO, value: '12.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS80F, column: x, value: '43'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: SiO2, value: '74.7'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: Al2O3, value: '6.5'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: Fe2O3, value: '5.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: MgO, value: '4.2'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: CaO, value: '9.6'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAS90F, column: x, value: '54'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: SiO2, value: '50.3'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: Al2O3, value: '15.6'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: Fe2O3, value: '1.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: MgO, value: '10.1'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: CaO, value: '22.9'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: Total, value: '100.0'}
+  - {page: 2, pdf_page_index: 1, table: '1', row: DAFL, column: x, value: '–'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1424', column: samples, value: 'DAFL-9'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1540', column: samples, value: 'DAFL-10'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: 'DA-1'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: 'DAS20F-1'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: 'DAS40F-1'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: 'DAS60F-1'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1500', column: samples, value: 'DAS80F-1'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1398', column: samples, value: 'DA-2'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1398', column: samples, value: 'DAS20F-2'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1398', column: samples, value: 'DAS40F-2'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1398', column: samples, value: 'DAS60F-2'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: 'DA-5'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: 'DAS20F-5'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: 'DAS40F-5'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: 'DAS60F-5'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: 'DAS80F-5'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1571', column: samples, value: 'DAS90F-5'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: samples, value: 'DA-6'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: samples, value: 'DAS20F-6'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: samples, value: 'DAS40F-6'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: samples, value: 'DAS60F-6'}
+  - {page: 2, pdf_page_index: 1, table: '2', row: '1450', column: samples, value: 'DAS80F-6'}
   - {page: 5, pdf_page_index: 4, table: '4', row: DAFL-9, column: Fe3+/Fe2+, value: '3.44'}
   - {page: 5, pdf_page_index: 4, table: '4', row: DAFL-10, column: Fe3+/Fe2+, value: '2.45'}
   - {page: 5, pdf_page_index: 4, table: '4', row: DAF-1, column: Fe3+/Fe2+, value: '2.08'}

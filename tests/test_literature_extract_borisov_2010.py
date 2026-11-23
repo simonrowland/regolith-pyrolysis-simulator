@@ -72,8 +72,36 @@ def test_borisov_2010_table4_runs_keep_printed_values_and_conditions():
     assert len(migrator.result.validation.hard_issues) == 0
 
     for source_row in source_rows:
+        cells = source_row["cell_locators"]
+        assert {
+            "run_id_as_printed",
+            "Fe3_over_Fe2",
+            "value",
+            "T_C",
+            "duration_h_as_printed",
+            "atmosphere_as_printed",
+            "total_pressure_atm",
+            "composition_as_printed",
+            "sample_series_as_printed",
+            "composition_total_wt_pct_as_printed",
+            "silica_formula_x_as_printed",
+        } <= cells.keys()
+        assert cells["run_id_as_printed"]["column"] == "Sample no."
+        assert cells["Fe3_over_Fe2"]["column"] == "Fe3+/Fe2+"
+        assert cells["T_C"]["column"] == "T °C"
+        assert cells["duration_h_as_printed"]["column"] == "h"
+        assert cells["total_pressure_atm"]["section"] == "Experimental Methods"
+        assert cells["composition_total_wt_pct_as_printed"]["column"] == "Total"
+        assert cells["silica_formula_x_as_printed"]["column"] == "x"
+        assert all(
+            cells[f"composition.{oxide}"]["column"] == oxide
+            for oxide in ("SiO2", "Al2O3", "Fe2O3", "MgO", "CaO")
+        )
         composition = source_row["point_conditions"]["composition"]
         assert composition["locator"]["pdf_page_index"] == 1
+        source_pressure = source_row["point_conditions"]["total_pressure_atm"]
+        assert source_pressure["units"] == "atm"
+        assert source_pressure["as_printed"] == "one atmosphere"
         assert composition["state"]["value"]["components"] == document[
             "species"
         ]["Fe"]["observations"][0]["values"]["composition_maps"][
@@ -88,11 +116,23 @@ def test_borisov_2010_table4_runs_keep_printed_values_and_conditions():
         assert observation.value.point == Decimal(source_row["value"])
         assert conditions["T_C"].state.value == Decimal(source_row["T_C"])
         assert conditions["T_C"].locator is not None
+        assert conditions["total_pressure_atm"].state.value == Decimal("1")
+        assert conditions["total_pressure_atm"].locator is not None
+        assert conditions["atmosphere_as_printed"].state.value == "air"
         assert conditions["composition"].locator is not None
         assert conditions["composition"].locator.pdf_page_index == 1
         assert (
             conditions["composition"].locator.record
             == source_row["composition_as_printed"]
         )
+        identity_pressure = observation.identity.total_pressure_Pa
+        assert identity_pressure is not None and identity_pressure.is_value
+        assert identity_pressure.value == Decimal("101325")
+
+        series = source_row["sample_series_as_printed"]
+        suffix = source_row["run_id_as_printed"].rsplit("-", 1)[1]
+        table2_sample = "DA-" + suffix if series == "DAF" else series + "-" + suffix
+        assert source_row["temperature_run_id_as_printed"] == table2_sample
+        assert cells["temperature_run_id_as_printed"]["column"] == "samples"
 
     assert validate_extract_file(EXTRACT, check_fidelity_match=True) == []
