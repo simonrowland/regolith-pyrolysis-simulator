@@ -43,11 +43,15 @@ def _observations(document: dict) -> dict[str, dict]:
     }
 
 
-def _table_ii_oxygen_metal_rows(document: dict) -> list[dict]:
-    """Table II Metal rows printed under the shared O/SiO2 column's O heading (one source selector)."""
+def _table_ii_oxygen_metal_rows(document: dict) -> list[tuple[str, dict]]:
+    """Table II Metal rows printed under the shared O/SiO2 column's O heading (one source selector).
+
+    Returns (species_bucket, row) for EVERY occurrence, so callers can assert the bucket each
+    occurrence actually sits in (a duplicate under another species must not pass by equality).
+    """
     return [
-        row
-        for group in document["species"].values()
+        (species, row)
+        for species, group in document["species"].items()
         for row in group["observations"]
         if row["locator"].get("table") == "II"
         and row.get("phase_as_published") == "Metal"
@@ -77,7 +81,6 @@ def _assert_render_pins(document: dict) -> None:
     assert exp31["uncertainty"]["as_published"] == "± 0.00"
     table_ii_metals = _table_ii_oxygen_metal_rows(document)
     assert len(table_ii_metals) == 36
-    assert all(row in document["species"]["O"]["observations"] for row in table_ii_metals)
     assert not any(
         row["locator"].get("table") == "II"
         and row.get("phase_as_published") == "Metal"
@@ -85,7 +88,8 @@ def _assert_render_pins(document: dict) -> None:
         for group in document["species"].values()
         for row in group["observations"]
     )
-    for row in table_ii_metals:
+    for species, row in table_ii_metals:
+        assert species == "O"
         assert row["locator"]["column"] == "O"
         assert row["values"]["component_as_published"] == "O"
         assert row["values"]["basis_as_published"] == "O mass percent in Metal phase"
@@ -199,7 +203,7 @@ def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> No
             assert condition.state.value == expected
             assert condition.locator is not None
 
-    for source_row in _table_ii_oxygen_metal_rows(document):
+    for _species, source_row in _table_ii_oxygen_metal_rows(document):
         migrated_row = by_id[source_row["observation_id"]]
         assert migrated_row.identity.species.formula == "O"
         assert migrated_row.value.point == Decimal(str(source_row["values"]["value"]))
