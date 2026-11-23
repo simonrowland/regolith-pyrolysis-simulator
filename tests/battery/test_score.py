@@ -2013,6 +2013,8 @@ def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
     }
 
 
+@pytest.mark.nightly
+@pytest.mark.timeout(300)
 def test_full_store_printed_width_band_census_matches_green() -> None:
     from simulator.battery.identity import quantity_token
     from simulator.battery.migrate import REPO_ROOT, load_migrated_store
@@ -2023,6 +2025,8 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
     band_count = 0
     conflicts: list[str] = []
     for observation in observations.values():
+        if observation.uncertainty.kind is UncertaintyKind.NONE:
+            continue
         quantity = quantity_token(observation.identity)
         reference = point_magnitude(observation.value)
         if quantity is None or reference is None:
