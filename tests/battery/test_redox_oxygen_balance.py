@@ -87,6 +87,7 @@ def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch
     from simulator.battery import residue
 
     response = SimpleNamespace(
+        fe_redox_split={"fe3_over_sum_fe": 0.75, "activity_used_for_pressure": 0.12},
         diagnostics={
             "vapor_pressure_diagnostic": {
                 "vapor_pressure_numerator_provenance": {
@@ -120,6 +121,7 @@ def test_pressure_response_reads_nested_fe_speciation_from_this_call(monkeypatch
         engine_response=response,
     )
     assert _engine_fe_speciation(response) == (0.5, 0.29)
+    assert _engine_fe_speciation(SimpleNamespace(fe_redox_split=response.fe_redox_split)) == (0.75, 0.12)
     assert evaluated.fe3_over_sum_fe == 0.5
     assert evaluated.fe_activity == 0.29
     assert evaluated.speciation_source == "engine"
