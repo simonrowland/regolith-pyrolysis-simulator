@@ -146,8 +146,12 @@ from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     KRESS_FE2O3_WT_PCT_FIELD,
     KRESS_FEO_WT_PCT_FIELD,
+)
+from simulator.battery.printed_cells import (
+    has_printed_cell,
     inherited_row_locator,
     located_printed_cell,
+    normalize_printed_unit as _normalize_printed_unit,
     printed_cell_address,
 )
 from simulator.battery.source_lineage import _is_unknown_source_asset
@@ -2797,10 +2801,11 @@ def _retain_condition_print(
                 return _with_located_print(
                     condition, printed, declared_unit if isinstance(declared_unit, str) else None,
                 )
+        if has_printed_cell(condition.locator):
+            return condition
         # A canonical state contains no information about what was printed.
         # Keep a located absence so downstream code cannot fall back to that state.
-        raw = _printed_pressure_phrase(condition) if unit == "Pa" else None
-        return replace(condition, locator=located_printed_cell(condition.locator, *(raw or (None, None))))
+        return replace(condition, locator=located_printed_cell(condition.locator, None, None))
     if not isinstance(payload, Mapping):
         return condition
     published = payload.get("as_published")
@@ -10379,49 +10384,6 @@ def _agrees_stored(converted: Decimal, stored: Decimal) -> bool:
     return bool(rounded.is_finite() and rounded == stored)
 
 
-def _normalize_printed_unit(unit: str) -> str:
-    token = unit.strip().lower().replace("³", "3")
-    token = re.sub(r"\s+", "", token)
-    return {
-        "c": "C",
-        "°c": "C",
-        "degc": "C",
-        "c/min": "C/min",
-        "torr": "Torr",
-        "mmhg": "Torr",
-        "atm": "atm",
-        "atmosphere": "atm",
-        "atmospheres": "atm",
-        "bar": "bar",
-        "bars": "bar",
-        "mbar": "mbar",
-        "millibar": "mbar",
-        "mpa": "MPa",
-        "mm": "mm",
-        "cm": "cm",
-        "cm3": "cm3",
-        "mg": "mg",
-        "g": "g",
-        "gram": "g",
-        "grams": "g",
-        "kg": "kg",
-        "s": "s",
-        "sec": "s",
-        "second": "s",
-        "seconds": "s",
-        "min": "min",
-        "minute": "min",
-        "minutes": "min",
-        "h": "h",
-        "hr": "h",
-        "hour": "h",
-        "hours": "h",
-        "ks": "ks",
-        "l/s": "L/s",
-        "liters-1": "L/s",
-    }.get(token, unit)
-
-
 def _convert_printed_amount(amount: Decimal, unit: str) -> tuple[Decimal, str] | None:
     """Return (stored-unit amount, trail) at high precision, or None."""
 
@@ -10546,36 +10508,6 @@ def _parse_printed_operands(note: str) -> list[tuple[Decimal, str]] | None:
     if not spans:
         return None
     return spans[:2]
-
-
-def _printed_pressure_phrase(condition: Located) -> tuple[str, str] | None:
-    """Recover a verbatim pressure phrase only when it accounts for the stored point."""
-    locator = condition.locator
-    if locator is None or not locator.note or _pressure_locator_is_unprinted(locator):
-        return None
-    note = locator.note
-    if _PRESSURE_NON_POINT_RE.search(note) or _PRESSURE_BOUND_OPERATOR_RE.search(note):
-        return None
-    stored = _stored_magnitudes(to_plain(condition.state.value))
-    if stored is None or stored[0] != "point":
-        return None
-    operands = _parse_printed_operands(note)
-    if operands is None or len(operands) != 1:
-        return None
-    amount, unit = operands[0]
-    pressure_pa, _ = convert_pressure_to_pa(amount, _normalize_printed_unit(unit))
-    if pressure_pa is None or not _agrees_stored(pressure_pa, stored[1][0]):
-        return None
-    words = "|".join(_PRINTED_WORD_NUMBERS)
-    matches = []
-    for match in re.finditer(
-        rf"(?<![\w.])(?:\b(?:{words})\b|{_PRINTED_NUM})\s*-?\s*({_PRINTED_UNIT})\b",
-        note, re.IGNORECASE,
-    ):
-        text = match[0].strip()
-        if _parse_printed_operands(text) == operands:
-            matches.append((text, match[1]))
-    return matches[0] if len(matches) == 1 else None
 
 
 def _stored_magnitudes(raw: object) -> tuple[str, list[Decimal], str | None] | None:
@@ -21389,7 +21321,10 @@ def condition_identity_value(name: str, value: object) -> object:
     """Compare a control operand in the same units as its identity axis."""
     axis = condition_identity_axis(name)
     if axis == "temperature_K":
-        return select_declared_source(AXIS_TEMPERATURE_K, None, {name: _temperature_number(value)}).amount
+        if name == "temperature":
+            return convert_temperature_to_k(_temperature_number(value), "K")[0]
+        unit = dict(_TEMPERATURE_FIELDS).get(name)
+        return convert_temperature_to_k(_temperature_number(value), unit)[0] if unit else None
     if axis == "total_pressure_Pa":
         unit = _PRESSURE_CONDITION_UNITS[name]
         if isinstance(value, Value) and value.kind is ValueKind.INTERVAL:
@@ -21405,7 +21340,7 @@ def condition_identity_value(name: str, value: object) -> object:
 def located_run_temperature(conditions: Mapping[str, Located]) -> State[Decimal] | None:
     """Apply the migration temperature selection to retained run controls."""
     selection = _located_temperature_selection(conditions)
-    return State.of(selection.amount) if selection.amount is not None else None
+    return State.of(selection[1]) if selection is not None else None
 
 
 def located_run_pressure(conditions: Mapping[str, Located]) -> Decimal | Value | None:
@@ -21424,18 +21359,43 @@ def _located_pressure_selections(
                 yield field, pressure
 
 
-def _located_temperature_selection(conditions: Mapping[str, Located]) -> SourceSelection:
-    payload = {
-        key: value
-        for key, condition in conditions.items()
-        if condition.state.is_value and condition_identity_axis(key) == "temperature_K"
-        and (value := _temperature_number(condition.state.value)) is not None
-    }
-    for key in ("T_units", "temperature_units"):
-        units = conditions.get(key)
-        if units is not None and units.state.is_value:
-            payload[key] = units.state.value
-    return select_declared_source(AXIS_TEMPERATURE_K, None, payload)
+def _located_temperature_selection(
+    conditions: Mapping[str, Located],
+) -> tuple[str, Decimal] | None:
+    """Convert retained controls with the migration temperature unit owner."""
+    found: list[tuple[str, object, Decimal, str]] = []
+    for field, default_unit in _TEMPERATURE_FIELDS:
+        condition = conditions.get(field)
+        if condition is None or not condition.state.is_value:
+            continue
+        raw = _temperature_number(condition.state.value)
+        if raw is None:
+            return None
+        amount, trail = convert_temperature_to_k(raw, default_unit)
+        if amount is None:
+            return None
+        found.append((field, raw, amount, trail or "identity:K"))
+    if found:
+        field, _raw, amount, _trail = _prefer_printed_temperature(found)
+        return field, amount
+    temperature = conditions.get("temperature")
+    if temperature is not None and temperature.state.is_value:
+        raw = _temperature_number(temperature.state.value)
+        amount, _trail = convert_temperature_to_k(raw, "K")
+        if amount is not None:
+            return "temperature", amount
+    generic = conditions.get("T")
+    units = next((
+        str(conditions[key].state.value)
+        for key in ("T_units", "temperature_units")
+        if key in conditions and conditions[key].state.is_value
+    ), None)
+    if generic is not None and generic.state.is_value:
+        raw = _temperature_number(generic.state.value)
+        amount, _trail = convert_temperature_to_k(raw, units)
+        if amount is not None:
+            return "T", amount
+    return None
 
 
 def redox_identity_sources(
@@ -21476,8 +21436,8 @@ def redox_identity_sources(
         available_paths.update(f"{scope}.{key}" for key in located)
         if "temperature_K" not in sources:
             temperature = _located_temperature_selection(located)
-            if temperature.available and temperature.field_name is not None:
-                sources["temperature_K"] = (f"{scope}.{temperature.field_name}",)
+            if temperature is not None:
+                sources["temperature_K"] = (f"{scope}.{temperature[0]}",)
         if pressure_state is not None and pressure_state.is_value:
             # Legacy rows do not say which assignment supplied the axis. A
             # differing canonical control cannot be the source of that value.

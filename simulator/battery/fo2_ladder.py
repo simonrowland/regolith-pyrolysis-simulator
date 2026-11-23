@@ -67,7 +67,6 @@ from simulator.battery.records import (
 )
 from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
-    GapReason,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
@@ -387,12 +386,6 @@ def resolve_row_fo2(
     tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
     if tier2 is not None:
         return tier2
-    if (
-        oxygen_result is not None
-        and oxygen_result.absence is not None
-        and oxygen_result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    ):
-        return None
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
             log = _log_point(route.value)

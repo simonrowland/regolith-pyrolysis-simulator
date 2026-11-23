@@ -8763,36 +8763,39 @@ def _comparison_identity(
     quantity = quantity_token(identity)
     pressure_notice: Notice | None = None
     pressure_state: State[Any] | None = None
-    if "total_pressure_Pa" not in excluded_axes and quantity is not None and (
-        identity.total_pressure_Pa is None
-        or not identity.total_pressure_Pa.is_value
-    ):
-        _bar, pressure_state, pressure_notice, _invalid = (
-            _resolve_score_total_pressure(
-                identity,
-                quantity,
-                observation=reference,
-                experiment=experiment,
-                engine=prediction.engine,
-            )
+    if (
+        "total_pressure_Pa" not in excluded_axes
+        and quantity is not None
+        and not pressure_independent
+        and (
+            identity.total_pressure_Pa is None
+            or not identity.total_pressure_Pa.is_value
         )
-        if (
-            pressure_state is None
-            and quantity not in {Quantity.P_REFERENCE, Quantity.P_SAT}
-            and isinstance(prediction.identity, Identity)
-        ):
+    ):
+        if isinstance(prediction.identity, Identity):
             predicted_pressure = prediction.identity.total_pressure_Pa
             if predicted_pressure is not None and predicted_pressure.is_value:
                 pressure_state = predicted_pressure
-        if pressure_notice is None:
-            pressure_notice = next(
-                (
-                    notice
-                    for notice in prediction.notices
-                    if notice.origin == "score:total_pressure"
-                ),
-                None,
+        pressure_notice = next(
+            (
+                notice
+                for notice in prediction.notices
+                if notice.origin == "score:total_pressure"
+            ),
+            None,
+        )
+        if pressure_state is None and quantity not in {Quantity.P_REFERENCE, Quantity.P_SAT}:
+            _bar, pressure_state, resolved_notice, _invalid = (
+                _resolve_score_total_pressure(
+                    identity,
+                    quantity,
+                    observation=reference,
+                    experiment=experiment,
+                    engine=prediction.engine,
+                )
             )
+            if pressure_notice is None:
+                pressure_notice = resolved_notice
     if (
         not resolved_oxygen
         and not shared_oxygen_condition
@@ -9512,8 +9515,32 @@ def _unsupported_oxygen_gap(
     }
 
 
+def _unsupported_oxygen_gap_notice(
+    experiment: Experiment | None,
+    bench: Bench | None,
+    observation: Observation | None,
+    quantity: Quantity,
+    policy_id: str | None = None,
+) -> Notice | None:
+    gap = _unsupported_oxygen_gap(experiment, bench, observation, quantity)
+    if gap is None:
+        return None
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=(
+            f"{policy_id} fO2 policy applied; original oxygen apparatus "
+            if policy_id is not None
+            else "oxygen input selected; original oxygen apparatus "
+        ) + (
+            f"evidence remains unsupported: {gap['why']}"
+        ),
+        origin="score:fo2_ladder",
+    )
+
+
 def _magemin_oxygen_transport_notice(quantity: Quantity) -> Notice:
-    from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+    from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
 
     return Notice(
         kind=NoticeKind.OXYGEN_INPUT_REQUIRED_BY_ENGINE,
@@ -10176,6 +10203,12 @@ def _predict_redox(
             fo2_log = Decimal(str(resolved_fo2.log10_fO2_bar))
             resolved_po2_bar = resolved_fo2.po2_bar
             material_notices.append(fo2_tier_notice(quantity, resolved_fo2))
+            gap_notice = _unsupported_oxygen_gap_notice(
+                experiment, bench, fo2_observation, quantity,
+                resolved_fo2.policy.id if resolved_fo2.policy is not None else None,
+            )
+            if gap_notice is not None:
+                material_notices.append(gap_notice)
         else:
             oxygen_gap = _unsupported_oxygen_gap(
                 experiment, bench, fo2_observation, quantity
@@ -11002,6 +11035,12 @@ def _oxygen_input_request(
     ):
         input_notices.append(source_oxygen_condition_notice(quantity, observation))
     if resolved is not None and resolved.closure:
+        gap_notice = _unsupported_oxygen_gap_notice(
+            experiment, bench, fo2_observation, quantity,
+            resolved.policy.id if resolved.policy is not None else None,
+        )
+        if gap_notice is not None:
+            input_notices.append(gap_notice)
         if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
             input_notices.append(fo2_tier_notice(quantity, resolved))
         return Po2Request(
@@ -11011,6 +11050,12 @@ def _oxygen_input_request(
         )
     if resolved is not None and not resolved.closure:
         input_notices.append(fo2_tier_notice(quantity, resolved))
+        gap_notice = _unsupported_oxygen_gap_notice(
+            experiment, bench, fo2_observation, quantity,
+            resolved.policy.id if resolved.policy is not None else None,
+        )
+        if gap_notice is not None:
+            input_notices.append(gap_notice)
         bar = (
             resolved.po2_bar
             if resolved.po2_bar is not None
@@ -11795,7 +11840,7 @@ def _equilibrate_phase_assemblage(
                         "a measured-oxygen ferric fraction is not converted to fO2"
                     )
         if omit_unconsumed_oxygen and fO2_log is None and engine is Engine.MAGEMIN:
-            from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+            from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
 
             kwargs["fO2_log"] = MAGEMIN_NOMINAL_FO2_LOG
         elif not (omit_unconsumed_oxygen and fO2_log is None):
@@ -12506,6 +12551,12 @@ def _predict_element_mass_fraction_phase(
                 )
             fo2_log = resolved.log10_fO2_bar
             notices = notices + (fo2_tier_notice(quantity, resolved),)
+            gap_notice = _unsupported_oxygen_gap_notice(
+                experiment, bench, fo2_observation, quantity,
+                resolved.policy.id if resolved.policy is not None else None,
+            )
+            if gap_notice is not None:
+                notices += (gap_notice,)
             oxygen_bar = resolved.po2_bar
             if oxygen_bar is None:
                 oxygen_bar = 10.0**fo2_log
@@ -12983,6 +13034,12 @@ def _predict_phase_row(
         exclusion_notices = exclusion_notices + (
             fo2_tier_notice(quantity, resolved),
         )
+        gap_notice = _unsupported_oxygen_gap_notice(
+            experiment, bench, fo2_observation, quantity,
+            resolved.policy.id if resolved.policy is not None else None,
+        )
+        if gap_notice is not None:
+            exclusion_notices += (gap_notice,)
         oxygen_bar = resolved.po2_bar
         if oxygen_bar is None:
             oxygen_bar = 10.0**fo2_log
@@ -16220,7 +16277,7 @@ def _predict_with_engine(
 
     transport_po2 = po2
     if native_activity_formula is not None and po2.mode == PO2_NOT_AN_INPUT:
-        from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+        from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
 
         extra_notices.append(_magemin_oxygen_transport_notice(quantity))
         transport_po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=10.0**MAGEMIN_NOMINAL_FO2_LOG)

@@ -14,7 +14,7 @@ import os
 import sys
 from dataclasses import replace
 from decimal import Decimal
-from types import MappingProxyType
+from types import MappingProxyType, SimpleNamespace
 
 import pytest
 import yaml
@@ -1286,14 +1286,21 @@ def test_unsupported_oxygen_apparatus_reaches_phase_and_redox_scorers(
             ))},
         )
 
-    def never_open(*_args, **_kwargs):
-        raise AssertionError("unsupported oxygen apparatus reached an engine handle")
+    def unavailable(*_args, **_kwargs):
+        return SimpleNamespace(
+            available=False, backend=None, unavailable_reason="test adapter unavailable",
+        )
 
-    monkeypatch.setattr(score, "_open_cached_battery_handle", never_open)
+    monkeypatch.setattr(score, "_open_cached_battery_handle", unavailable)
     result = predict_with_engine(Engine.ALPHAMELTS, row, experiment=experiment, bench=bench)
-    assert result.execution.state is ExecutionState.NOT_PROBED
-    assert result.refusal_detail["reason"] == "unsupported_print_form"
-    assert "molybdenum capsule" in result.refusal_detail["why"]
+    assert result.execution.state is not ExecutionState.NOT_PROBED
+    assert any(notice.policy and notice.policy.id == "DP-010" for notice in result.notices)
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "molybdenum capsule" in notice.reason
+        and "DP-010" in notice.reason
+        for notice in result.notices
+    )
 
     printed = replace(row, point_conditions={
         **(row.point_conditions or {}), "fO2_log": F.located(Decimal("-8")),

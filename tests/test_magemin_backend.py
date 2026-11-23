@@ -342,6 +342,34 @@ def _make_pooled_subprocess_backend(exception):
     return backend
 
 
+def test_magemin_omitted_oxygen_uses_flagged_nominal_control(monkeypatch):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    calls = []
+
+    def native_call(**kwargs):
+        calls.append(kwargs)
+        raise magemin_module._MAGEMinEngineCallError("TestFailure", "probe")
+
+    monkeypatch.setattr(backend, "_call_magemin", native_call)
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={"SiO2": 1.0},
+        pressure_bar=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert calls and calls[0]["fO2_log"] == -9.0
+    assert result.diagnostics["magemin_omitted_oxygen_default"] == {
+        "value": -9.0,
+        "reason": "oxygen input omitted; nominal MAGEMin transport control applied",
+    }
+    assert any("oxygen was omitted" in warning for warning in result.warnings)
+
+
 @pytest.mark.parametrize(
     ('database', 'capture_error', 'nonfinite_projection'),
     [

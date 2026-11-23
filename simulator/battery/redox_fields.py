@@ -1,12 +1,19 @@
 """Source fields and information flow for predictive redox controls."""
 
-import json
-from collections.abc import Callable, Iterator, Mapping
-from dataclasses import dataclass, replace
-from decimal import Decimal, InvalidOperation
+from collections.abc import Callable, Mapping
+from dataclasses import replace
+from decimal import Decimal
 
 from simulator.battery.enums import FO2Channel, NoticeKind, Quantity, ValueKind
-from simulator.battery.records import Experiment, Located, Locator, Notice, Observation, State, Value
+from simulator.battery.records import Experiment, Located, Notice, Observation, State, Value
+from simulator.battery.printed_cells import (
+    PrintedCell as _PrintedCell,
+    inherited_row_locator,
+    located_printed_cell,
+    printed_cell as _printed_cell,
+    printed_cell_address,
+    same_printed_cell,
+)
 
 FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
 FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
@@ -26,117 +33,6 @@ CONTROL_VARIABLE_FIELDS = {
                                   "oxygen_fugacity_buffer_relation"}),
     "duration": frozenset({"duration_h", "duration_s", "hold_duration_s"}),
 }
-
-
-def _address_note_segments(locator: Locator) -> Iterator[tuple[str, str | None, str | None]]:
-    # Migration stores row/column as note segments. Other notes are prose.
-    for segment in (locator.note or "").split(";"):
-        key, separator, value = segment.strip().partition("=")
-        yield segment, key.strip() if separator else None, value.strip() or None
-
-
-def inherited_row_locator(locator: Locator | None) -> Locator | None:
-    """An inherited observation locator locates the row, not another column."""
-    if locator is None or not locator.note:
-        return locator
-    parts = [segment for segment, key, _ in _address_note_segments(locator) if key != "column"]
-    note = ";".join(parts)
-    if note == locator.note:
-        return locator
-    try:
-        return replace(locator, note=note.strip() or None)
-    except ValueError:  # The inherited column was the only locator field.
-        return None
-
-
-def printed_cell_address(locator: Locator) -> tuple[str | None, ...]:
-    coordinates = {}
-    for _, key, value in _address_note_segments(locator):
-        if key in {"row", "column"}:
-            coordinates[key] = value
-    page = locator.pdf_page_index + 1 if locator.pdf_page_index is not None else locator.page
-    return (
-        locator.source_path, str(page) if page is not None else None,
-        locator.table, locator.figure, coordinates.get("row") or locator.record,
-        coordinates.get("column"),
-    )
-
-
-@dataclass(frozen=True)
-class _PrintedCell:
-    address: tuple[str | None, ...]
-    value: str | None
-    unit: str | None = None
-
-
-_PRINTED_CELL_NOTE = "printed_cell="
-
-
-def located_printed_cell(locator: Locator | None, value: str | None, unit: str | None) -> Locator | None:
-    """Keep the raw scalar and unit beside the source address in its locator."""
-    if locator is None:
-        return None
-    # Escape semicolons because the locator also uses them to delimit addresses.
-    encoded = json.dumps([value, unit], ensure_ascii=False).replace(";", r"\u003b")
-    note = f"{locator.note}; " if locator.note else ""
-    return replace(locator, note=f"{note}{_PRINTED_CELL_NOTE}{encoded}")
-
-
-def _printed_cell(value: Located, *, address_only: bool = False) -> _PrintedCell | None:
-    if value.locator is None or not value.state.is_value:
-        return None
-    address = printed_cell_address(value.locator)
-    for segment, _, _ in reversed(list(_address_note_segments(value.locator))):
-        if segment.strip().startswith(_PRINTED_CELL_NOTE):
-            try:
-                raw, unit = json.loads(segment.strip().removeprefix(_PRINTED_CELL_NOTE))
-            except (ValueError, TypeError):
-                continue
-            if (raw is None or isinstance(raw, str)) and (unit is None or isinstance(unit, str)):
-                return _PrintedCell(address, raw, unit)
-    if address_only:
-        return _PrintedCell(address, None)
-    # Legacy stores and in-memory callers can still supply an unconverted print.
-    scalar = value.state.value
-    if isinstance(scalar, Value):
-        if scalar.kind is ValueKind.INTERVAL:
-            # Old records can establish the address even without a raw range.
-            return _PrintedCell(address, None)
-        scalar = scalar.point
-    if not isinstance(scalar, (str, Decimal, int)) or isinstance(scalar, bool):
-        return None
-    return _PrintedCell(address, str(scalar))
-
-
-def same_printed_cell(a: _PrintedCell | None, b: _PrintedCell | None) -> str | None:
-    """Return the match kind for two raw printed values, or None for distinct cells."""
-    if a is None or b is None:
-        return None
-    left, right = a.address, b.address
-    if left[4] is None or left[4] != right[4]:
-        return None
-    if not any(locus is not None and locus == other for locus, other in zip(left[1:4], right[1:4])):
-        return None
-    if any(locus is not None and other is not None and locus != other for locus, other in zip(left, right)):
-        return None
-    if left[5] is not None and right[5] is not None:
-        return "same"
-    if a.value is None or b.value is None:
-        return None
-    try:
-        first, second = Decimal(a.value), Decimal(b.value)
-    except InvalidOperation:
-        # Migration imports the cell helpers. Resolve the unit rule at call time.
-        from simulator.battery.migrate import _normalize_printed_unit
-
-        units_agree = (
-            a.unit is None or b.unit is None
-            or _normalize_printed_unit(a.unit) == _normalize_printed_unit(b.unit)
-        )
-        return "ambiguous" if a.value == b.value and units_agree else None
-    return (
-        "ambiguous" if first.is_finite() and second.is_finite() and first == second else None
-    )
 
 
 def _condition_references(observation: Observation, field: str) -> set[str]:

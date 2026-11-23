@@ -18,9 +18,7 @@ from __future__ import annotations
 from typing import Dict, Iterable, List, Mapping, Tuple
 
 from engines.domain_reason import OutOfDomainReason, reason_value
-
-# Nominal transport control for oxygen-insensitive score inputs and legacy probes.
-MAGEMIN_NOMINAL_FO2_LOG = -9.0
+from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
 
 # Native melt activities exposed by the ig database. These are standard
 # states, not liquid-endmember activities: periclase for MgO and quartz for

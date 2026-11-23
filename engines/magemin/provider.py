@@ -54,7 +54,8 @@ import weakref
 from dataclasses import replace
 from typing import Any, Mapping, Optional
 
-from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG, MAGEMinDomainGate
+from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
+from engines.magemin.domain import MAGEMinDomainGate
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
 from engines.magemin.result import MAGEMinShadowDiagnostics
 from simulator.chemistry.kernel.capabilities import (

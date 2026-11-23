@@ -46,3 +46,23 @@ def test_drop_version_invalidates_the_process_hot_table(tmp_path, monkeypatch):
     engine_cache.cached_engine_call("openimcc", {}, lambda: {"answer": 1})
     assert engine_cache.drop_chemistry_version("openimcc", engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]) == 1
     assert engine_cache.cached_engine_call("openimcc", {}, lambda: {"answer": 2}) == {"answer": 2}
+
+
+def test_magemin_v4_omitted_oxygen_cache_does_not_mask_v5_default(tmp_path, monkeypatch):
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "magemin.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    request = {"kwargs": {"temperature_C": 1500.0, "fO2_log": None}}
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "magemin", 4)
+    stale = engine_cache.cached_engine_call(
+        "magemin", request, lambda: {"status": "v4-refusal"}
+    )
+    assert stale == {"status": "v4-refusal"}
+
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "magemin", 5)
+    calls = []
+    current = engine_cache.cached_engine_call(
+        "magemin", request,
+        lambda: calls.append("cold") or {"status": "v5-defaulted"},
+    )
+    assert current == {"status": "v5-defaulted"}
+    assert calls == ["cold"]

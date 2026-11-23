@@ -115,7 +115,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from engines.magemin.domain import MAGEMIN_NOMINAL_FO2_LOG
+from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.oxygen_buffers import (
@@ -1859,6 +1859,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         prior_warnings: List[str] = []
+        omitted_oxygen = fO2_log is None
+        if omitted_oxygen:
+            # d-460: MAGEMin is callable, so use its declared nominal
+            # transport control and preserve the omission as a per-call flag.
+            fO2_log = MAGEMIN_NOMINAL_FO2_LOG
+            prior_warnings.append(
+                'MAGEMin used nominal fO2_log=-9.0 because oxygen was omitted'
+            )
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}
         if projected_oxide_wt_pct is not None:
@@ -1980,6 +1988,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
+        if omitted_oxygen:
+            result_diagnostics['magemin_omitted_oxygen_default'] = {
+                'value': MAGEMIN_NOMINAL_FO2_LOG,
+                'reason': 'oxygen input omitted; nominal MAGEMin transport control applied',
+            }
         if bulk_projection.dropped_components:
             # A result for a different (projected) bulk is not a result for
             # this one. Do not call MAGEMin on the truncated vector.
