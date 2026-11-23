@@ -599,6 +599,10 @@ def test_clear_removes_one_class_and_leaves_the_other(tmp_path, monkeypatch):
     )
     assert applied["deleted_mask_cells"] == 1
     assert applied["deleted_audit_records"] == 1
+    # The class is gone before the next call. clear also deletes the
+    # witness, so a later refusal of this class is allowed to teach again.
+    cleared, _cleared_audit = _mask_rows(path)
+    assert cleared == [("thermoengine", "4", "refusal:unavailable")]
     calls = []
 
     def solve():
@@ -610,7 +614,10 @@ def test_clear_removes_one_class_and_leaves_the_other(tmp_path, monkeypatch):
     assert "mask_hit" not in _call("alphamelts", alpha, solve)
     assert calls == [1]
     cells, _audit = _mask_rows(path)
-    assert cells == [("thermoengine", "4", "refusal:unavailable")]
+    assert cells == [
+        ("alphamelts", "4", "refusal:engine_crash"),
+        ("thermoengine", "4", "refusal:unavailable"),
+    ]
     with pytest.raises(ValueError, match="unknown engine"):
         engine_cache.clear_refusal_mask(
             path, engine="not-an-engine", refusal_class="refusal:engine_crash",
