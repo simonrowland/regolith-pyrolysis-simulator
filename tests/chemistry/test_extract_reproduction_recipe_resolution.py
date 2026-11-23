@@ -365,3 +365,74 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         if runtime.get("temperature_K") in {1366.12, 1314.06}
     )
     assert "melt-only oxygen balance" in evaluation.skip_reason
+
+    datum_document = deepcopy(document)
+    datum_observation = next(
+        row
+        for row in datum_document["species"]["K"]["observations"]
+        if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
+    )
+    for point in datum_observation["values"]["points"]:
+        composition_role = point.get("composition_role")
+        if (
+            not isinstance(composition_role, dict)
+            or composition_role.get("value") != "initial_charge_only"
+        ):
+            continue
+        located_composition = point["point_conditions"]["composition"]["state"][
+            "value"
+        ]
+        point["composition_role"] = {
+            **composition_role,
+            "value": "datum_state",
+        }
+        point["composition_mol"] = {
+            oxide: float(amount)
+            for oxide, amount in battery_migrate._composition_from_plain(
+                located_composition
+            ).components
+        }
+    datum_dir = tmp_path / "datum-extracts"
+    datum_dir.mkdir()
+    (datum_dir / source_path.name).write_text(
+        yaml.safe_dump(datum_document, sort_keys=False), encoding="utf-8"
+    )
+    datum_obs = next(
+        row
+        for row in load_adopted_observations(extracts_dir=datum_dir)
+        if row.source_id == "kems-022-demaria-1971"
+        and row.species_id == "K"
+        and row.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    )
+    closure_calls.clear()
+    melt_calls.clear()
+    runtimes.clear()
+
+    datum_evaluation = evaluate_observation(datum_obs, vapor_pressure_data={})
+    datum_coverage = extract_reproduction.coverage_summary([datum_evaluation])
+    datum_entry = datum_coverage["entries"][0]
+
+    assert len(closure_calls) == 2
+    assert len(melt_calls) == 2
+    assert all(
+        observation.identity.composition.is_value
+        and observation.identity.composition.value.proxy_flag is None
+        for observation, _experiment in closure_calls
+    )
+    assert len(datum_evaluation.records) == 10
+    assert sum(
+        record.status == "assumed-input" for record in datum_evaluation.records
+    ) == 2
+    assert sum(
+        record.status == "unsupported-speciation"
+        for record in datum_evaluation.records
+    ) == 8
+    flagged_values = [
+        record.actual_value
+        for record in datum_evaluation.records
+        if record.status == "assumed-input"
+    ]
+    assert all(value is not None and value > 0 for value in flagged_values)
+    assert datum_entry["comparable_points"] == 0
+    assert datum_entry["gap_points"] == 10
+    assert "melt-only oxygen balance" in datum_entry["primary_skip_reason"]

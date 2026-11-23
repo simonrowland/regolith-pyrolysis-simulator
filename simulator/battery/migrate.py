@@ -225,7 +225,6 @@ from simulator.battery.stable_ids import (
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     INITIAL_CHARGE_ONLY_PROXY_NOTICE,
-    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     AmbientPressureEvidence,
     Admission,
     AdmissionDecision,
@@ -270,6 +269,7 @@ from simulator.battery.records import (
     Work,
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
+    initial_charge_only_proxy_notice,
     _value_has_numeric_value,
     approx_pressure_from_mapping,
     approximate_derived_total_reason,
@@ -9799,18 +9799,7 @@ def _initial_charge_only_composition_proxy(
     conditions["composition"] = located_proxy
     updated_identity = replace(identity, composition=State.of(composition))
     if quantity is not None:
-        updated_notices.append(
-            Notice(
-                kind=NoticeKind.SOURCE_DISAGREEMENT,
-                affected_quantities=(quantity,),
-                reason=(
-                    f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-                    f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
-                    f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
-                ),
-                origin=origin,
-            )
-        )
+        updated_notices.append(initial_charge_only_proxy_notice(quantity, origin))
     return updated_identity, conditions, updated_notices
 
 

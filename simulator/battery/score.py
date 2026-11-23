@@ -203,8 +203,6 @@ from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
-    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
     Composition,
@@ -225,6 +223,8 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
+    initial_charge_only_proxy_notice,
+    is_initial_charge_only_proxy_notice,
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
@@ -2064,9 +2064,7 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         (
             notice
             for notice in reference.notices
-            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
-            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+            if is_initial_charge_only_proxy_notice(notice)
         ),
         None,
     )
@@ -2075,17 +2073,7 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         # this proxy-backed residual. Keep it in flagged_notices so the band
         # policy sees it; union_notices deduplicates it in the final row.
         return existing_proxy_notice
-    reason = (
-        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
-        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
-    )
-    return Notice(
-        kind=NoticeKind.SOURCE_DISAGREEMENT,
-        affected_quantities=(quantity,),
-        reason=reason,
-        origin=reference.observation_id,
-    )
+    return initial_charge_only_proxy_notice(quantity, reference.observation_id)
 
 
 def _require_gate_check(check: object) -> GateCheck:

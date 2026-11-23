@@ -3160,6 +3160,7 @@ def _evaluate_psat(
             composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
         )
         typed_input_reason: str | None = None
+        point_melt_only_assumption: str | None = None
         if initial_charge_only:
             role_reason = battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE
             runtime["input_assumption"] = {
@@ -3346,12 +3347,13 @@ def _evaluate_psat(
                         None,
                     )
                     if reactive_notice is not None:
-                        melt_only_assumption = (
+                        point_melt_only_assumption = (
                             "reactive_cell_not_modelled: melt-only oxygen balance; "
                             + reactive_notice.reason
                         )
+                        melt_only_assumption = point_melt_only_assumption
                         runtime["oxygen_closure"]["melt_only_assumption"] = (
-                            melt_only_assumption
+                            point_melt_only_assumption
                         )
                 else:
                     last_refusal = "missing_condition:pO2_boundary"
@@ -3442,7 +3444,10 @@ def _evaluate_psat(
             runtime={**runtime, "uncertainty_defaulted": bool(unc.get("defaulted"))},
             unsupported_speciation=unsupported and actual is None,
             out_of_domain=out_of_domain and actual is None,
-            assumed_input=initial_charge_only and actual is not None,
+            assumed_input=(
+                initial_charge_only or point_melt_only_assumption is not None
+            )
+            and actual is not None,
         )
         evaluation.records.append(record)
         if typed_input_reason is not None:

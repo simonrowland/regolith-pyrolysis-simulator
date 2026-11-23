@@ -1072,6 +1072,36 @@ def _is_source_internally_inconsistent(
     )
 
 
+def _initial_charge_only_proxy_notice_reason() -> str:
+    return (
+        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+    )
+
+
+def initial_charge_only_proxy_notice(
+    quantity: Quantity, origin: str
+) -> Notice:
+    """Build the canonical flag for a printed starting charge used as input."""
+
+    return Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(quantity,),
+        reason=_initial_charge_only_proxy_notice_reason(),
+        origin=origin,
+    )
+
+
+def is_initial_charge_only_proxy_notice(notice: Notice) -> bool:
+    """Identify only the canonical starting-charge notice, not contradictions."""
+
+    return (
+        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        and notice.reason == _initial_charge_only_proxy_notice_reason()
+    )
+
+
 _VALUE_PAYLOAD = {
     ValueKind.POINT: ("point",),
     ValueKind.SERIES: ("series",),

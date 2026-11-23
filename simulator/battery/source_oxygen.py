@@ -13,9 +13,6 @@ from typing import Iterable, Mapping
 from simulator.battery.enums import AdmissionStatus, EvidenceClass, NoticeKind, Phase, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import (
-    INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
-    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     Derivation,
     Located,
@@ -27,6 +24,7 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     _is_source_internally_inconsistent,
+    is_initial_charge_only_proxy_notice,
 )
 from simulator.battery.source_declarations import source_rule_enabled
 from simulator.battery.waypoints import identity_composition_waypoint
@@ -577,14 +575,9 @@ def resolve_source_oxygen(
     inconsistent = [reference, *(
         row for row in oxygen_rows if key is not None and _point_key(row) == key
     )]
-    initial_charge_proxy_reason = (
-        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
-        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
-    )
     if any(
         _is_source_internally_inconsistent(notice.kind, notice.reason)
-        and notice.reason != initial_charge_proxy_reason
+        and not is_initial_charge_only_proxy_notice(notice)
         for row in inconsistent
         for notice in row.notices
     ):
