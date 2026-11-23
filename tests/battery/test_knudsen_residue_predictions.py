@@ -681,7 +681,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     tmp_path,
     monkeypatch,
 ):
-    """Cold storage and a fresh-process hit retain the below-threshold proof."""
+    """A legacy hit lacks Fe speciation. The current cold and warm paths retain it."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.enums import NoticeKind
     from simulator import engine_cache
@@ -691,6 +691,8 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
         Po2Request,
         internal_analytical_residue_vapor_pressure,
     )
+    from simulator.fe_redox import _engine_fe_speciation
+    from simulator.melt_backend.base import equilibrium_to_hot
 
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
@@ -710,6 +712,27 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     database = tmp_path / "markova-engine-cache.sqlite"
     database.unlink(missing_ok=True)
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    engine_name = "internal-analytical"
+    legacy_request = {
+        "call": "residue_pressure",
+        "temperature_C": residue_request["temperature_C"],
+        "pressure_bar": residue_request["pressure_bar"],
+        "composition_kg": residue_request["composition_kg"],
+        "composition_mol": inventory,
+        "po2": residue_request["po2_request"].as_payload(),
+        "engine_settings": battery._internal_analytical_cache_settings(residue_request["core"]),
+    }
+    legacy_fields = {name: value for name, value in vars(response).items() if name != "fe_redox_split"}
+    with monkeypatch.context() as legacy:
+        legacy.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, engine_name, 3)
+        engine_cache.cached_engine_call(
+            engine_name, legacy_request,
+            lambda: equilibrium_to_hot(legacy_fields, engine_id=engine_name),
+        )
+        old_warm = internal_analytical_residue_vapor_pressure(**residue_request)
+        assert _engine_fe_speciation(old_warm) == (None, None)
+        assert old_warm.vapor_pressures_Pa == response.vapor_pressures_Pa
+
     engine_cache.engine_cache_counters(reset=True)
     cold = internal_analytical_residue_vapor_pressure(**residue_request)
     counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]
@@ -738,6 +761,9 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     consumed = [equilibrium_cache_value(vars(result), engine_id="internal-analytical") for result in (response, cold, warm)]
     assert consumed[0] == consumed[1] == consumed[2]
     assert response.vapor_pressures_Pa == cold.vapor_pressures_Pa == warm.vapor_pressures_Pa
+    fe_speciation = _engine_fe_speciation(response)
+    assert None not in fe_speciation
+    assert _engine_fe_speciation(cold) == _engine_fe_speciation(warm) == fe_speciation
     omissions = response.diagnostics["vapor_pressure_diagnostic"]["below_reporting_threshold_omissions"]
     record = omissions["Al"]
     assert "Al" not in response.vapor_pressures_Pa
