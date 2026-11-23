@@ -274,6 +274,27 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
             assert [
                 item["n_scored"] for item in headline if item["rail"] == "redox"
             ] == [1]
+
+            # The supplied identity takes precedence over the conflicting point
+            # pressure on green. The backend command and candidate must agree.
+            conflict = replace(
+                equilibrium,
+                identity=replace(
+                    equilibrium.identity, fO2_Pa=State.of(Decimal("10000"))
+                ),
+            )
+            backend.reset_mock()
+            residual, candidate = score.compile_residual(conflict, engine, context=context)
+            backend.assert_called_once()
+            command = backend.call_args.kwargs
+            if engine is Engine.INTERNAL_ANALYTICAL:
+                assert command["fO2_log"] == -1.0
+            else:
+                assert isclose(command["lambda_imposed"], log(0.1))
+            assert candidate is not None
+            assert candidate.identity.fO2_Pa.value == Decimal("10000")
+            assert residual.numeric is not None, residual.refusal
+
             # Green's missing-oxygen gate applies until the canonical default lands.
             backend.reset_mock()
             for row in missing_oxygen:
@@ -292,18 +313,26 @@ def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: P
     ]["fO2_control"]
     original = dict(control)
     path = tmp_path / EXTRACT.name
-    for keep_locator, inferred in (
-        (True, False), (False, False), (True, True), (False, True)
+    for locator, inferred, printed in (
+        (original["locator"], False, True),
+        (None, False, False),
+        (original["locator"], True, False),
+        (None, True, False),
+        ({"note": "oxygen statement"}, False, False),
+        ({"published_page": 532}, False, False),
+        ({"pdf_page_index": 3}, False, False),
+        ({"published_page": 532, "pdf_page_index": True}, False, False),
     ):
         control.clear()
         control.update(original)
-        if not keep_locator:
+        if locator is None:
             del control["locator"]
+        else:
+            control["locator"] = locator
         if inferred:
             control["inferred"] = True
         path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
         row = _row_at(_migrate_extract(path).observations.values(), "1430", "23")
-        printed = keep_locator and not inferred
         assert has_printed_fo2(row, row.identity) == printed
         if printed:
             pressure = row.point_conditions["fO2_Pa"]

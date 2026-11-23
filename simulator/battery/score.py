@@ -9197,21 +9197,20 @@ def _fe_redox_kress_basis(
     )
 
 
-def _printed_fe_redox_fo2_log(
+def _printed_fe_redox_oxygen(
     observation: Observation, identity: Identity
-) -> Decimal | None:
-    """Printed log10(fO2/bar), or None when oxygen is missing or only derived.
+) -> tuple[Decimal | None, State[Decimal] | None]:
+    """Resolve the solver log and its pressure identity from one oxygen input.
 
-    The extract labels this column log10 fO2; its air rows are about -0.68,
-    i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
-    A derived fO2 is not a printed command. Callers that require a printed
-    value refuse; an engine that computes its own fO2 does not.
+    As on green, a direct printed log wins. Otherwise the pressure on the
+    supplied identity wins over a point-condition fallback. Keep that pressure
+    exact instead of round-tripping it through the solver's floating-point log.
     """
 
     fo2_log = _printed_condition_decimal(observation, "fO2_log")
     if fo2_log is None:
         if _derived_fo2_condition(observation):
-            return None
+            return None, None
         oxygen_pa = identity.fO2_Pa
         point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
         if (
@@ -9229,10 +9228,16 @@ def _printed_fe_redox_fo2_log(
         ):
             oxygen_value = float(oxygen_pa.value)
             if oxygen_value > 0.0 and math.isfinite(oxygen_value):
-                fo2_log = Decimal(str(math.log10(oxygen_value / PA_PER_BAR)))
+                return Decimal(str(math.log10(oxygen_value / PA_PER_BAR))), oxygen_pa
     if fo2_log is None or not fo2_log.is_finite():
-        return None
-    return fo2_log
+        return None, None
+    return fo2_log, State.of(log10_fo2_to_pa(fo2_log))
+
+
+def _printed_fe_redox_fo2_log(
+    observation: Observation, identity: Identity
+) -> Decimal | None:
+    return _printed_fe_redox_oxygen(observation, identity)[0]
 
 
 def _fe_redox_pressure(
@@ -9676,7 +9681,7 @@ def _predict_redox(
         if isinstance(kress_basis, _FeRedoxRefusal):
             return refused(kress_basis.reason, kress_basis.detail)
 
-    fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    fo2_log, commanded_fo2_pa = _printed_fe_redox_oxygen(observation, identity)
     handle: object | None = None
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.
@@ -9707,18 +9712,6 @@ def _predict_redox(
         return refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "printed_fO2"},
-        )
-
-    commanded_fo2_pa = None
-    if fo2_log is not None:
-        # Keep a printed pressure exact across the log conversion sent to the solver.
-        printed_pa = (
-            printed_source_pressure(observation)
-            if _printed_condition_decimal(observation, "fO2_log") is None
-            else None
-        )
-        commanded_fo2_pa = State.of(
-            printed_pa if printed_pa is not None else log10_fo2_to_pa(fo2_log)
         )
 
     if engine is Engine.OPENIMCC:

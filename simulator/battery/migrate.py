@@ -23251,15 +23251,19 @@ def _walk_printed_oxygen(
                 and control_state.get("tag") == "value"
                 else None
             )
-            control_locator = (
-                locator_from_mapping(control.get("locator"))
-                if isinstance(control, Mapping)
-                else None
-            )
+            control_address = control.get("locator") if isinstance(control, Mapping) else None
+            control_locator = locator_from_mapping(control_address)
             if (
                 isinstance(control_text, str)
                 and isinstance(control, Mapping)
                 and control_locator is not None
+                and isinstance(control_address, Mapping)
+                and Locator._is_pdf_page_index(control_address.get("pdf_page_index"))
+                and any(
+                    (type(page) is int and page > 0)
+                    or (isinstance(page, str) and page.strip())
+                    for page in (control_locator.page, control_locator.published_page)
+                )
                 and not _oxygen_node_rejected(control, control_text)
                 and control.get("inference") is None
                 and control.get("derivation") is None

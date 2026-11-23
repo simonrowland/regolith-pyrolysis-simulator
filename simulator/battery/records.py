@@ -512,16 +512,18 @@ class Locator:
             return True
         return False
 
+    @staticmethod
+    def _is_pdf_page_index(index: object) -> bool:
+        return type(index) is int and index >= 0
+
     def has_method_location(self) -> bool:
         """A physical page plus a section, paragraph, equation, or table anchor."""
 
         page = self.page
         has_physical_page = (
             isinstance(page, int) and not isinstance(page, bool) and page > 0
-        ) or (isinstance(page, str) and bool(page.strip())) or (
-            isinstance(self.pdf_page_index, int)
-            and not isinstance(self.pdf_page_index, bool)
-            and self.pdf_page_index >= 0
+        ) or (isinstance(page, str) and bool(page.strip())) or self._is_pdf_page_index(
+            self.pdf_page_index
         )
         has_method_anchor = any(
             isinstance(value, str) and bool(value.strip())
