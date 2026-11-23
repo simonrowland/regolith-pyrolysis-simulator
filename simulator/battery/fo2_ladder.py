@@ -68,7 +68,7 @@ from simulator.battery.waypoints import (
     oxygen_condition,
 )
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
-from simulator.physical_constants import ATM_PA_DECIMAL, PA_PER_BAR
+from simulator.physical_constants import PA_PER_BAR
 
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
@@ -103,6 +103,9 @@ class ResolvedFo2:
     cell_material: str | None = None
     # Physics-95 rung is separate from the existing generic ``tier`` taxonomy.
     physics_rung: int | None = None
+    # The air route resolves DP-003 alongside its pressure input so notice
+    # construction reuses the same audited formula result.
+    policy: NoticePolicy | None = None
 
 
 _PHYSICS_RUNG_LABELS = {
@@ -134,12 +137,14 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             "original_reason=no printed fO2; "
             f"{reason}; borrowed"
         )
-        from simulator.battery.default_policy import notice_policy
+        from simulator.battery.default_policy import resolve
 
-        policy = notice_policy(
-            "DP-010", resolved.log10_fO2_bar, NoticeKind.ASSUMED_FO2
+        policy_result = resolve(
+            "DP-010",
+            intrinsic_fo2_log10_bar=resolved.log10_fO2_bar,
         )
-        policy_flag = NoticeKind.ASSUMED_FO2
+        policy = NoticePolicy(**policy_result.payload["policy"])
+        policy_flag = policy_result.flag
     assumed_air = resolved.route == "dp003_ambient_air"
     if assumed_air:
         reason = (
@@ -147,10 +152,9 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             f"{reason}"
         )
         if resolved.po2_bar is not None:
-            from simulator.battery.default_policy import notice_policy
-
-            oxygen_pa = Decimal(str(resolved.po2_bar)) * Decimal(str(PA_PER_BAR))
-            policy = notice_policy("DP-003", oxygen_pa, NoticeKind.METHOD_IMPLIED)
+            policy = resolved.policy
+            if policy is None:
+                raise ValueError("ambient-air fO2 is missing its DP-003 policy")
             policy_flag = NoticeKind.METHOD_IMPLIED
     if policy_flag is not None:
         kind = policy_flag
@@ -341,16 +345,17 @@ def resolve_row_fo2(
         pressure_pa = (
             nominal_pressure_pa(total_pressure)
             if total_pressure.is_value
-            else ATM_PA_DECIMAL
+            else Decimal(str(resolve("DP-002").value))
         )
         if pressure_pa is not None and pressure_pa.is_finite() and pressure_pa > 0:
             # Premise: the dry-air composition and atmospheric pressure are
             # method-implied. The DP-003 owner computes pO2=xO2·P_total in Pa;
             # the dimensionless mole fraction preserves Pa, and pO2→0 as
             # xO2→0. At the DP-002 pressure, pO2 is 21227.6 Pa.
-            from simulator.battery.default_policy import dp003_oxygen_pressure
+            from simulator.battery.default_policy import resolve
 
-            oxygen_pa = dp003_oxygen_pressure(pressure_pa)
+            policy_result = resolve("DP-003", P_total=pressure_pa)
+            oxygen_pa = Decimal(str(policy_result.value))
             oxygen_bar = float(oxygen_pa / Decimal(str(PA_PER_BAR)))
             return ResolvedFo2(
                 math.log10(oxygen_bar),
@@ -358,6 +363,7 @@ def resolve_row_fo2(
                 "dp003_ambient_air",
                 False,
                 po2_bar=oxygen_bar,
+                policy=NoticePolicy(**policy_result.payload["policy"]),
             )
     if knudsen_vapour and source_oxygen_bar is not None:
         try:

@@ -9,9 +9,7 @@ import pytest
 
 from simulator.battery.default_policy import (
     append_proposal,
-    dp003_oxygen_pressure,
     load_policy_table,
-    notice_policy,
     resolve,
 )
 from simulator.battery.enums import (
@@ -19,6 +17,7 @@ from simulator.battery.enums import (
     Engine,
     NoticeKind,
     Quantity,
+    ResidualStatus,
 )
 from simulator.battery.records import Notice, NoticePolicy
 from simulator.battery.migrate import to_plain
@@ -26,10 +25,13 @@ from simulator.battery.records import union_notices
 from simulator.battery.score import (
     _headline_payload_admits,
     _flagged_payload_strata,
+    flagged_strata,
     flagged_stratum_payloads,
+    flagged_stratum_rows,
     headline_payloads,
 )
 from simulator.state import MeltState
+from tests.battery import factories as F
 
 
 EXPECTED_POLICY_FLAGS = {
@@ -102,38 +104,66 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
             seen_flags.add(flag)
     assert seen_flags == closed_flags
 
-    assert resolve(
-        "DP-017",
-        value="fixture composition",
-        flag="composition_from_run_siblings",
-    ).flag.value == "composition_from_run_siblings"
-
-
 def test_canonical_policy_values() -> None:
     assert resolve("DP-001").value == Decimal("101325")
     assert resolve("DP-001").units == "Pa"
     assert resolve("DP-003", P_total=Decimal("100000")).value == Decimal("20950")
-    assert dp003_oxygen_pressure(Decimal("100000")) == resolve(
-        "DP-003", P_total=Decimal("100000")
-    ).value
     assert resolve("DP-005").value == Decimal("1")
     assert resolve("DP-006").value == Decimal("1")
     assert resolve("DP-015").value == Decimal("298.15")
     assert resolve("DP-015").units == "K"
 
 
-def test_notice_policy_reads_metadata_and_normalizes_numeric_value() -> None:
-    assert notice_policy(
-        "DP-019", Decimal("1e-1"), NoticeKind.METHOD_IMPLIED
-    ) == NoticePolicy(
-        id="DP-019",
-        version=1,
-        status="canonical",
-        value="0.1",
-        units="Pa",
+def test_numeric_policy_payloads_construct_notice_policy_with_normalized_values() -> None:
+    expected = {
+        "DP-001": ("101325", Decimal("101325")),
+        "DP-005": ("1", Decimal("1")),
+        "DP-006": ("1", Decimal("1")),
+        "DP-015": ("298.15", Decimal("298.15")),
+        "DP-019": ("0.1", Decimal("0.1")),
+    }
+    for policy_id, (expected_text, expected_value) in expected.items():
+        resolved = resolve(policy_id)
+        policy = NoticePolicy(**resolved.payload["policy"])
+        assert isinstance(resolved.value, Decimal)
+        assert resolved.value == expected_value
+        assert policy.value == expected_text
+
+
+def test_method_implied_notice_requires_policy_metadata() -> None:
+    with pytest.raises(ValueError, match="method_implied requires policy metadata"):
+        Notice(
+            kind=NoticeKind.METHOD_IMPLIED,
+            affected_quantities=(Quantity.P_SAT,),
+            reason="the method fixes the missing condition",
+            origin="test",
+        )
+
+
+def test_formula_results_must_come_from_the_named_owner() -> None:
+    intrinsic = resolve(
+        "DP-010", intrinsic_fo2_log10_bar=Decimal("-9.125")
     )
-    with pytest.raises(ValueError, match="does not use the assumed_pressure flag"):
-        notice_policy("DP-019", Decimal("1e-1"), NoticeKind.ASSUMED_PRESSURE)
+    assert intrinsic.value == Decimal("-9.125")
+    assert intrinsic.payload["policy"]["value"] == "-9.125"
+    assert intrinsic.flag is NoticeKind.ASSUMED_FO2
+
+    measured_total = resolve(
+        "DP-004", in_cell_total_pressure_pa=Decimal("250")
+    )
+    assert measured_total.value == Decimal("250")
+    assert measured_total.flag is NoticeKind.EFFUSION_REGIME_ASSUMED
+
+    regime_only = resolve("DP-004", regime_only=True)
+    assert regime_only.value == "P_total(cell) = sum of measured partial pressures"
+
+    for policy_id, context in (
+        ("DP-010", {"value": Decimal("-9.125")}),
+        ("DP-004", {"value": Decimal("250")}),
+        ("DP-004", {"measured_partial_pressures": [Decimal("100"), Decimal("150")]}),
+    ):
+        with pytest.raises(ValueError, match="owning|requires"):
+            resolve(policy_id, **context)
 
 
 def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
@@ -176,14 +206,77 @@ def test_contextual_formula_does_not_return_its_text_as_a_value() -> None:
         resolve("DP-010")
 
 
-def test_basis_conversion_resolves_the_transform_context() -> None:
-    resolved = resolve(
-        "DP-013",
-        value=Decimal("12"),
-        flag="basis_converted",
-        transform_id="mol_percent_to_fraction",
+def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
+    assert load_policy_table()["DP-004"]["formula_owner"] == (
+        "simulator.battery.score._sum_gas_partial_pressures_pa"
     )
-    assert resolved.payload["flag_context"] == "mol_percent_to_fraction"
+    cases = (
+        ("DP-004", {"measured_partial_pressures": [Decimal("1"), Decimal("2")]}),
+        ("DP-004", {"value": Decimal("3")}),
+        (
+            "DP-013",
+            {
+                "value": Decimal("12"),
+                "flag": "basis_converted",
+                "transform_id": "mol_percent_to_fraction",
+            },
+        ),
+        (
+            "DP-017",
+            {"value": "fixture composition", "flag": "composition_from_run_siblings"},
+        ),
+    )
+    for policy_id, context in cases:
+        with pytest.raises(ValueError, match="owning formula result"):
+            resolve(policy_id, **context)
+
+
+def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
+    typed_notice = Notice(
+        kind=NoticeKind.ASSUMED_FO2,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="intrinsic melt fO2 was used",
+        origin="test",
+        policy=NoticePolicy(
+            id="DP-010",
+            version=1,
+            status="canonical",
+            value="-9",
+            units="log10(bar)",
+        ),
+    )
+    with_policy = F.residual(
+        "with-policy",
+        "with-policy",
+        status=ResidualStatus.MATCH,
+        notices=(typed_notice,),
+    )
+
+    live_rows = flagged_stratum_rows(
+        (with_policy,), engines=(Engine.NASA_CEA_9,)
+    )
+    assert [row.get("policy_id") for row in live_rows] == ["DP-010"]
+
+    untyped_payload = {
+        "kind": NoticeKind.ASSUMED_FO2.value,
+        "affected_quantities": [Quantity.P_SAT.value],
+        "reason": "legacy intrinsic melt fO2 notice",
+        "origin": "test",
+    }
+    typed_payload = to_plain(typed_notice)
+    payload_rows = [
+        {
+            "rail": "thermochemistry",
+            "candidate_request": {"engine": Engine.NASA_CEA_9.value},
+            "numeric": {"operation": "dex", "value": "0.25"},
+            "notices": [notice_payload],
+        }
+        for notice_payload in (untyped_payload, typed_payload)
+    ]
+    summarized_rows = flagged_stratum_payloads(
+        payload_rows, (Engine.NASA_CEA_9,)
+    )
+    assert [row.get("policy_id") for row in summarized_rows] == [None, "DP-010"]
 
 
 def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monkeypatch) -> None:
@@ -222,6 +315,10 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         reason="the fixture's original missing-knob reason",
         origin="fixture-observation",
         policy=typed_policy,
+    )
+    assert flagged_strata((notice,)) == (
+        "knob_defaulted",
+        "proposed-policy",
     )
     assert to_plain(notice)["policy"] == notice_policy
     assert len(

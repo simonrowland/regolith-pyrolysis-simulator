@@ -128,20 +128,47 @@ def _resolved_value(
         return value
 
     formula = entry.get("formula")
+    if "value" in context:
+        raise ValueError(
+            f"{policy_id} requires its owning formula result; value overrides are not accepted"
+        )
     if policy_id == "DP-003":
         if "P_total" not in context:
             raise ValueError("DP-003 requires P_total in Pa")
-        return _dp003_oxygen_pressure(formula, context["P_total"])
-    if policy_id == "DP-004" and "measured_partial_pressures" in context:
-        pressures = context["measured_partial_pressures"]
-        if not isinstance(pressures, (list, tuple)) or not pressures:
-            raise ValueError("measured_partial_pressures must be a non-empty sequence")
-        return sum(
-            (
-                _decimal(pressure, context_name="measured partial pressure")
-                for pressure in pressures
-            ),
-            Decimal(0),
+        assert isinstance(formula, str)
+        match = re.fullmatch(r"pO2 = ([0-9]+(?:\.[0-9]+)?) · P_total", formula)
+        if match is None:
+            raise ValueError("DP-003 formula has an unsupported form")
+        # Premise: dry-air oxygen is its mole fraction times total pressure.
+        # The fraction is dimensionless, so the result remains Pa; at P=0,
+        # pO2=0.
+        return Decimal(match.group(1)) * _decimal(
+            context["P_total"], context_name="P_total"
+        )
+    if policy_id == "DP-004":
+        if context.get("regime_only") is True:
+            if "in_cell_total_pressure_pa" in context:
+                raise ValueError("DP-004 regime-only resolution cannot include a total")
+            return "P_total(cell) = sum of measured partial pressures"
+        if "in_cell_total_pressure_pa" in context:
+            pressure = _decimal(
+                context["in_cell_total_pressure_pa"],
+                context_name="in-cell total pressure",
+            )
+            if pressure <= 0:
+                raise ValueError("in-cell total pressure must be positive")
+            return pressure
+        raise ValueError(
+            "DP-004 requires the total from its owning partial-pressure sum"
+        )
+    if policy_id == "DP-010":
+        if "intrinsic_fo2_log10_bar" not in context:
+            raise ValueError(
+                "DP-010 requires the owning formula result from its oxygen ladder"
+            )
+        return _decimal(
+            context["intrinsic_fo2_log10_bar"],
+            context_name="intrinsic fO2 in log10(bar)",
         )
     if policy_id == "DP-007":
         from simulator.state import MeltState
@@ -167,46 +194,10 @@ def _resolved_value(
         )
     if policy_id == "DP-012" and "printed_value" in context:
         return context["printed_value"]
-    if "value" in context:
-        return context["value"]
     raise ValueError(
-        f"{policy_id} requires its owning formula result in the resolve context"
+        f"{policy_id} requires a value from its owning formula result: "
+        f"{entry.get('formula_owner', 'no formula owner recorded')}"
     )
-
-
-def _dp003_oxygen_pressure(formula: object, total_pressure: object) -> Decimal:
-    if not isinstance(formula, str):
-        raise ValueError("DP-003 formula must be text")
-    match = re.fullmatch(r"pO2 = ([0-9]+(?:\.[0-9]+)?) · P_total", formula)
-    if match is None:
-        raise ValueError("DP-003 formula has an unsupported form")
-    # Premise: dry-air oxygen is its mole fraction times total pressure. The
-    # fraction is dimensionless, so the result remains Pa; at P=0, pO2=0.
-    return Decimal(match.group(1)) * _decimal(total_pressure, context_name="P_total")
-
-
-def dp003_oxygen_pressure(total_pressure: object) -> Decimal:
-    """Evaluate the DP-003 formula for the scorer's oxygen ladder."""
-
-    entry = load_policy_table().get("DP-003")
-    if entry is None:
-        raise KeyError("unknown default policy id: DP-003")
-    return _dp003_oxygen_pressure(entry.get("formula"), total_pressure)
-
-
-def _policy_value_string(value: object) -> str:
-    if isinstance(value, bool):
-        raise ValueError("policy value cannot be boolean")
-    if isinstance(value, (Decimal, int, float)):
-        numeric = _decimal(value, context_name="policy value")
-        return format(numeric.normalize(), "f")
-    if isinstance(value, str):
-        try:
-            numeric = _decimal(value, context_name="policy value")
-        except ValueError:
-            return value
-        return format(numeric.normalize(), "f")
-    return str(value)
 
 
 def resolve(policy_id: str, **context: object) -> Resolved:
@@ -257,7 +248,11 @@ def resolve(policy_id: str, **context: object) -> Resolved:
             "id": policy_id,
             "version": entry["version"],
             "status": entry["status"],
-            "value": value,
+            "value": (
+                format(value.normalize(), "f")
+                if isinstance(value, Decimal)
+                else str(value)
+            ),
             "units": units,
         },
     }
@@ -281,37 +276,6 @@ def resolve(policy_id: str, **context: object) -> Resolved:
             raise ValueError(f"{policy_id} requires its {context_key} context")
         payload["flag_context"] = context[context_key]
     return Resolved(value=value, units=units, flag=flag, payload=payload)
-
-
-def notice_policy(policy_id: str, value: object, flag: NoticeKind):
-    """Build Notice.policy metadata without coercing a resolver payload."""
-
-    from simulator.battery.records import NoticePolicy
-
-    try:
-        entry = load_policy_table()[policy_id]
-    except KeyError as exc:
-        raise KeyError(f"unknown default policy id: {policy_id}") from exc
-    status = entry.get("status")
-    if status == "rejected":
-        raise ValueError(f"default policy {policy_id} is rejected")
-    version = entry.get("version")
-    units = entry.get("units")
-    raw_flag = entry.get("flag")
-    flags = raw_flag if isinstance(raw_flag, list) else [raw_flag]
-    if flag.value not in flags:
-        raise ValueError(f"{policy_id} does not use the {flag.value} flag")
-    if not isinstance(version, (str, int)) or isinstance(version, bool):
-        raise ValueError(f"{policy_id} version must be a string or integer")
-    if not isinstance(status, str) or not isinstance(units, str):
-        raise ValueError(f"{policy_id} notice metadata is incomplete")
-    return NoticePolicy(
-        id=policy_id,
-        version=version,
-        status=status,
-        value=_policy_value_string(value),
-        units=units,
-    )
 
 
 def append_proposal(

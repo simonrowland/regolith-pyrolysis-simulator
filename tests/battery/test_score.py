@@ -834,26 +834,28 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assert assumption_notice in residual.notices
     assert not residual.score_eligible
     assert "assumed_pressure" in score_mod.flagged_strata(residual.notices)
+    payload = residual_to_plain(residual)
     assert sum(
         int(row["n_candidates"])
         for row in headline_payloads(
-            [residual_to_plain(residual)],
+            [payload],
             (Engine.INTERNAL_ANALYTICAL,),
             tier="measured",
         )
     ) == 0
 
-    clean_prediction = replace(prediction, notices=())
-    clean_residual, _candidate = _compile(reference, experiment, clean_prediction)
-    assert clean_residual.score_eligible
-    assert sum(
-        int(row["n_candidates"])
-        for row in headline_payloads(
-            [residual_to_plain(clean_residual)],
-            (Engine.INTERNAL_ANALYTICAL,),
-            tier="measured",
-        )
-    ) == 1
+    mutated_payload = dict(payload)
+    mutated_notices = [dict(notice) for notice in payload["notices"]]
+    default_notice = next(
+        notice
+        for notice in mutated_notices
+        if notice.get("policy", {}).get("id") == "DP-001"
+    )
+    default_notice.pop("kind")
+    mutated_payload["notices"] = mutated_notices
+    with pytest.raises(ValueError, match="policy-bearing notice kind"):
+        score_mod._headline_payload_admits(mutated_payload, tier="measured")
+
     assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
     assert assumption_notice.policy == NoticePolicy(
         id="DP-001",
@@ -877,8 +879,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     )
 
     assert flagged_strata(residual.notices) == (
-        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
-        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
+        NoticeKind.ASSUMED_PRESSURE.value,
     )
     assert [
         (
@@ -917,29 +918,6 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             1,
         )
     ]
-    clean_residual = replace(
-        residual,
-        notices=tuple(
-            notice
-            for notice in residual.notices
-            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
-        ),
-    )
-
-    def measured_headline_count(row: Residual) -> int:
-        return next(
-            item["n"]
-            for item in headline_rows(
-                (row,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
-            )
-            if item["rail"] == Rail.VAPOUR.value
-            and item["engine"] == Engine.INTERNAL_ANALYTICAL.value
-        )
-
-    assert measured_headline_count(residual) == 0
-    assert measured_headline_count(clean_residual) == 1
-
-
 def _partial_prediction(engine, observation, **_kwargs):
     return EnginePrediction(
         engine=engine,

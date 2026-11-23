@@ -208,7 +208,9 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
 # This is a model boundary, not inferred source pressure. For condensed-phase
 # comparisons V·ΔP/(RT) tends to zero as ΔP tends to zero; gas equilibria can
 # remain pressure-sensitive, so the boundary is not substituted for an
-# observed in-cell total.
+# observed in-cell total. Limiting check: pressure-independent comparisons
+# are unchanged by this input; pressure-sensitive gas equilibria move toward
+# their vacuum limit, so actual higher pressure may bias the prediction.
 DP_019_VACUUM_BOUNDARY_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9

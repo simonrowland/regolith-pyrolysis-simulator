@@ -45,6 +45,7 @@ from typing import (
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.battery.default_policy import Resolved, resolve
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
@@ -158,7 +159,6 @@ from simulator.battery.input_provenance import (
     single_phase_printed_bulk_policy,
 )
 from simulator.physical_constants import (
-    ATM_PA_DECIMAL,
     GAS_CONSTANT,
     GAS_CONSTANT_DECIMAL,
     PA_PER_BAR,
@@ -231,6 +231,7 @@ from simulator.battery.records import (
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
+    identity_pressure_state,
     nominal_pressure_pa,
     charge_value,
     phase_token,
@@ -637,8 +638,7 @@ FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
 _DEFAULT_POLICY_FLAG_VALUES = frozenset(
     kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS
 )
-_DP_001_TOTAL_PRESSURE_PA = ATM_PA_DECIMAL
-_DP_002_TOTAL_PRESSURE_PA = _DP_001_TOTAL_PRESSURE_PA
+
 
 @dataclass(frozen=True)
 class EnginePrediction:
@@ -2491,12 +2491,26 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata = _classify_flagged_notice_facts(
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
-    if any(
-        notice.policy is not None and notice.policy.status == "proposed"
-        for notice in notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
-        strata = (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    if (
+        _has_proposed_policy(notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
+
+
+def _has_proposed_policy(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> bool:
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is not None and notice.policy.status == "proposed":
+                return True
+        elif isinstance(notice, Mapping):
+            policy = notice.get("policy")
+            if isinstance(policy, Mapping) and policy.get("status") == "proposed":
+                return True
+    return False
 
 
 def _classify_flagged_notice_facts(
@@ -8191,21 +8205,20 @@ def _activity_request_or_contract_refusal(
 
 
 def _default_policy_notice(
-    policy_id: str,
+    resolved: Resolved,
     quantity: Quantity,
     reason: str,
     *,
-    kind: NoticeKind,
-    value: object,
     origin: str,
 ) -> Notice:
-    """Carry the registered policy metadata with its stated default value."""
+    """Attach the registry's resolved policy payload to its typed flag."""
 
-    from simulator.battery.default_policy import notice_policy
-
-    policy = notice_policy(policy_id, value, kind)
+    policy_payload = resolved.payload.get("policy")
+    if not isinstance(policy_payload, Mapping):
+        raise ValueError("resolved default policy is missing its Notice payload")
+    policy = NoticePolicy(**policy_payload)
     return Notice(
-        kind=kind,
+        kind=resolved.flag,
         affected_quantities=(quantity,),
         reason=reason.replace("{value}", policy.value),
         policy=policy,
@@ -9301,7 +9314,12 @@ def _score_pressure_state(
     ):
         located_pressure = experiment.pressure_environment.total_pressure_Pa
         if located_pressure.inference is None:
-            return located_pressure.state
+            identity_pressure = identity_pressure_state(located_pressure.state)
+            return (
+                located_pressure.state
+                if identity_pressure is None
+                else identity_pressure
+            )
     return pressure
 
 
@@ -9390,19 +9408,14 @@ def _resolve_score_total_pressure(
         and stated_vacuum
     )
     if vacuum_method:
-        from simulator.diagnostic_helpers.binary_pot_battery import (
-            DP_019_VACUUM_BOUNDARY_BAR,
-        )
-
-        pressure_pa = Decimal(str(DP_019_VACUUM_BOUNDARY_BAR)) * PA_PER_BAR_DEC
+        resolved = resolve("DP-019")
+        pressure_pa = as_decimal(resolved.value)
         notice = _default_policy_notice(
-            "DP-019",
+            resolved,
             quantity,
             "DP-019 default_total_pressure_Pa={value}; "
             f"original_reason={original_reason}; "
             "vacuum method fixes a finite high-vacuum engine boundary",
-            kind=NoticeKind.METHOD_IMPLIED,
-            value=pressure_pa,
             origin="score:total_pressure",
         )
         pressure_state = State.of(pressure_pa)
@@ -9412,14 +9425,13 @@ def _resolve_score_total_pressure(
         return pressure_bar, pressure_state, notice, None
 
     if method is MethodToken.KNUDSEN_EFFUSION:
+        resolved = resolve("DP-004", regime_only=True)
         notice = _default_policy_notice(
-            "DP-004",
+            resolved,
             quantity,
             "Knudsen method implies molecular effusion inside and vacuum outside; "
             f"original_reason={original_reason}; in-cell total pressure is not "
             "available without the measured partial-pressure sum",
-            kind=NoticeKind.EFFUSION_REGIME_ASSUMED,
-            value="P_total(cell) = sum of measured partial pressures",
             origin="score:total_pressure",
         )
         return None, None, notice, None
@@ -9439,15 +9451,14 @@ def _resolve_score_total_pressure(
             is AmbientPressureEvidenceClass.GAS_MIXING
             else "atmospheric-pressure statement implies 1 atm"
         )
-        pressure_state = State.of(_DP_002_TOTAL_PRESSURE_PA)
+        resolved = resolve("DP-002")
+        pressure_state = State.of(as_decimal(resolved.value))
         notice = _default_policy_notice(
-            "DP-002",
+            resolved,
             quantity,
             "DP-002 default_total_pressure_Pa={value}; "
             f"original_reason={original_reason}; "
             f"{implied_pressure}",
-            kind=NoticeKind.METHOD_IMPLIED,
-            value=_DP_002_TOTAL_PRESSURE_PA,
             origin="score:total_pressure",
         )
         pressure_bar, invalid = _score_pressure_bar(pressure_state)
@@ -9461,15 +9472,14 @@ def _resolve_score_total_pressure(
     # Units: Pa·m³/mol = J/mol, so the ratio to RT is dimensionless. As
     # ΔP→0 the correction tends to zero. This estimates the stated fallback;
     # no measured residual is used to select it.
-    pressure_state = State.of(_DP_001_TOTAL_PRESSURE_PA)
+    resolved = resolve("DP-001")
+    pressure_state = State.of(as_decimal(resolved.value))
     notice = _default_policy_notice(
-        "DP-001",
+        resolved,
         quantity,
         "DP-001 default_total_pressure_Pa={value}; "
         f"original_reason={original_reason}; "
         "method does not fix total pressure",
-        kind=NoticeKind.ASSUMED_PRESSURE,
-        value=_DP_001_TOTAL_PRESSURE_PA,
         origin="score:total_pressure",
     )
     pressure_bar, invalid = _score_pressure_bar(pressure_state)
@@ -18706,14 +18716,16 @@ def _compile_residual_with_lineage(
                     original_reason = _original_pressure_reason(
                         identity, reference, experiment
                     )
-                    regime_notice = _default_policy_notice(
+                    resolved_pressure = resolve(
                         "DP-004",
+                        in_cell_total_pressure_pa=measured_total_pressure_pa,
+                    )
+                    regime_notice = _default_policy_notice(
+                        resolved_pressure,
                         quantity,
                         "DP-004 measured in-cell total pressure={value} Pa; "
                         f"original_reason={original_reason}; the regime remains "
                         "method-implied",
-                        kind=NoticeKind.EFFUSION_REGIME_ASSUMED,
-                        value=measured_total_pressure_pa,
                         origin="score:total_pressure",
                     )
                     identity = replace(
@@ -23440,7 +23452,8 @@ def flagged_stratum_rows(
                 ).append(residual)
     rows: list[dict[str, object]] = []
     for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
-        groups.items()
+        groups.items(),
+        key=lambda item: _flagged_census_sort_key(item[0]),
     ):
         dex_values = [
             residual.numeric.value
@@ -23461,6 +23474,12 @@ def flagged_stratum_rows(
             row["policy_status"] = policy_status
         rows.append(row)
     return rows
+
+
+def _flagged_census_sort_key(
+    key: tuple[str, str, str, str | None, str | None],
+) -> tuple[str, ...]:
+    return tuple("" if value is None else value for value in key)
 
 
 def headline_records(
@@ -24723,13 +24742,11 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         for notice in raw_notices
     )
     strata = _classify_flagged_notice_facts(notices)
-    if any(
-        notice.get("kind") in _DEFAULT_POLICY_FLAG_VALUES
-        and isinstance(notice.get("policy"), Mapping)
-        and notice["policy"].get("status") == "proposed"
-        for notice in raw_notices
-    ) and FLAGGED_STRATUM_PROPOSED_POLICY not in strata:
-        strata = (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    if (
+        _has_proposed_policy(raw_notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
     return strata
 
 
@@ -25234,7 +25251,9 @@ def flagged_stratum_payloads(
                 else {}
             ),
         }
-        for stratum, rail, engine, policy_id, policy_status in sorted(counts)
+        for stratum, rail, engine, policy_id, policy_status in sorted(
+            counts, key=_flagged_census_sort_key
+        )
     ]
 
 
