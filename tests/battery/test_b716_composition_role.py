@@ -286,6 +286,76 @@ def test_undeclared_partial_point_oxide_map_is_refused(tmp_path) -> None:
     _assert_partial_analysis_refusal(_fixture_points(tmp_path))
 
 
+def test_proxy_selects_the_assay_and_resolves_its_role_once(monkeypatch) -> None:
+    calls = []
+    real = resolve_composition_role
+
+    def spy(*args, **kwargs):
+        calls.append(args)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(
+        "simulator.battery.migrate.composition_roles.resolve_composition_role", spy
+    )
+    composition = _composition(None)
+    identity = F.activity_identity(composition=composition)
+    updated, _conditions, notices = _initial_charge_only_composition_proxy(
+        identity,
+        None,
+        (),
+        row={"composition_role": INITIAL_CHARGE_ONLY},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="one-resolve",
+    )
+    assert len(calls) == 1
+    assert updated.composition is not None and updated.composition.is_value
+    assert updated.composition.value.proxy_flag == INITIAL_CHARGE_ONLY
+    assert sum(
+        INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason for notice in notices
+    ) == 1
+
+
+def test_unusable_declared_map_keeps_a_usable_located_composition(monkeypatch) -> None:
+    calls = []
+    real = resolve_composition_role
+
+    def spy(*args, **kwargs):
+        calls.append(args)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(
+        "simulator.battery.migrate.composition_roles.resolve_composition_role", spy
+    )
+    usable = _composition(None)
+    other = Composition(
+        basis="printed_oxides",
+        components=(("SiO2", Decimal("0.1")), ("CaO", Decimal("0.9"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(composition=other)
+    updated, conditions, _notices = _initial_charge_only_composition_proxy(
+        identity,
+        {"composition": Located(State.of(usable))},
+        (),
+        row={"composition_role": INITIAL_CHARGE_ONLY},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="located-over-unusable-map",
+        point_composition_map_declared=True,
+        point_declared_component_map={"SiO2": {"left": 1}, "MgO": {"right": 2}},
+    )
+    assert len(calls) == 1
+    assert updated.composition is not None and updated.composition.is_value
+    assert updated.composition.value.components == usable.components
+    assert updated.composition.value.proxy_flag == INITIAL_CHARGE_ONLY
+    point = conditions["composition"]
+    assert point.state.is_value
+    assert point.state.value.components == usable.components
+
+
 def test_declared_initial_charge_point_map_is_flagged_proxy(tmp_path) -> None:
     conditions = _fixture_points(
         tmp_path,

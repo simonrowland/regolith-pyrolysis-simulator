@@ -96,15 +96,15 @@ def resolve_composition_role(
         point = (row.point_conditions or {}).get("composition")
         if isinstance(point, Located):
             point_composition = point.state
-    has_proxy = is_initial_charge_composition(composition) or is_initial_charge_composition(
-        point_composition
-    )
+    # Choose the assay first. A discarded identity proxy must not decide the
+    # role of the composition that is actually used.
     if point_composition is not None and (
         isinstance(point_composition.value, Composition) or composition is None
     ):
         composition = point_composition
     if composition is None:
         composition = State.unknown("missing_condition:melt_composition")
+    has_proxy = is_initial_charge_composition(composition)
     role = None
     original_reason = None
     for context in (row, parent):
@@ -141,7 +141,11 @@ def resolve_composition_role(
     if defaulted:
         role = INITIAL_CHARGE_ONLY_PROXY_FLAG
         status = RoleStatus.DEFAULTED
-        if composition.is_value and isinstance(composition.value, Composition):
+        if (
+            composition.is_value
+            and isinstance(composition.value, Composition)
+            and composition.value.proxy_flag != role
+        ):
             composition = State.of(replace(composition.value, proxy_flag=role))
         if default_notice is not None:
             reason = default_notice.reason
@@ -160,7 +164,9 @@ def resolve_composition_role(
                     ),
                 )
         flags = (ROLE_DEFAULT_FLAG,)
-    elif role == INITIAL_CHARGE_ONLY_PROXY_FLAG or (has_proxy and original_reason is None):
+    elif role == INITIAL_CHARGE_ONLY_PROXY_FLAG or (
+        role is None and has_proxy and original_reason is None
+    ):
         role = INITIAL_CHARGE_ONLY_PROXY_FLAG
         status = RoleStatus.DECLARED
         reason = f"typed-refusal:{role}: {INITIAL_CHARGE_ONLY_PROXY_NOTICE}"

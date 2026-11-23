@@ -891,6 +891,34 @@ def _antoine_fallback_pressure_scale_pa(source_form: str) -> float | None:
     return None
 
 
+_PRINTED_POINT_COMPOSITION_KEYS = (
+    "composition_mol",
+    "melt_composition_mol",
+    "composition_wt_pct",
+    "melt_composition_wt_pct",
+    "sample_oxide_composition_wt_pct",
+    "sample_Na2O_wt_pct",
+    "sample_K2O_wt_pct",
+    "composition_source_observation_id",
+    "composition_source_gap",
+    COMPOSITION_ROLE_FIELD,
+    "point_conditions",
+    "sample",
+)
+
+
+def _with_printed_point(
+    parsed: dict[str, Any], point: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Carry one printed point's assay and role onto a parsed rate or pressure row."""
+
+    parsed["source_point"] = point
+    for key in _PRINTED_POINT_COMPOSITION_KEYS:
+        if key in point:
+            parsed[key] = point[key]
+    return parsed
+
+
 def _literature_pressure_points(
     obs: AdoptedObservation,
 ) -> tuple[list[dict[str, Any]] | None, str | None, list[dict[str, Any]]]:
@@ -1007,29 +1035,8 @@ def _literature_pressure_points(
                 "units": units_hint,
                 "point_index": idx,
                 "note": pt.get("note"),
-                "source_point": pt,
             }
-            parsed_point.update(
-                {
-                    key: pt[key]
-                    for key in (
-                        "composition_mol",
-                        "melt_composition_mol",
-                        "composition_wt_pct",
-                        "melt_composition_wt_pct",
-                        "sample_oxide_composition_wt_pct",
-                        "sample_Na2O_wt_pct",
-                        "sample_K2O_wt_pct",
-                        "composition_source_observation_id",
-                        "composition_source_gap",
-                        COMPOSITION_ROLE_FIELD,
-                        "point_conditions",
-                        "sample",
-                    )
-                    if key in pt
-                }
-            )
-            out.append(parsed_point)
+            out.append(_with_printed_point(parsed_point, pt))
         if out:
             return out, None, drops
         if drops:
@@ -1373,12 +1380,15 @@ def _literature_rate_points(
                 )
                 continue
             out.append(
-                {
-                    "T_K": T_K,
-                    "rate_mol_m2_s": rate,
-                    "point_index": idx,
-                    "source_units": "mol cm^-2 s^-1",
-                }
+                _with_printed_point(
+                    {
+                        "T_K": T_K,
+                        "rate_mol_m2_s": rate,
+                        "point_index": idx,
+                        "source_units": "mol cm^-2 s^-1",
+                    },
+                    point,
+                )
             )
         if out:
             return out, None, drops
@@ -1418,12 +1428,15 @@ def _literature_rate_points(
                 continue
             try:
                 out.append(
-                    {
-                        "T_K": float(T),
-                        "rate_mol_m2_s": float(raw) * scale,
-                        "point_index": idx,
-                        "source_units": str(obs.units or "mol m^-2 s^-1"),
-                    }
+                    _with_printed_point(
+                        {
+                            "T_K": float(T),
+                            "rate_mol_m2_s": float(raw) * scale,
+                            "point_index": idx,
+                            "source_units": str(obs.units or "mol m^-2 s^-1"),
+                        },
+                        point,
+                    )
                 )
             except (TypeError, ValueError):
                 drops.append({"point_index": idx, "reason": "rate_point_not_numeric"})
@@ -3516,23 +3529,30 @@ def _evaluate_rate(
         return _rate_payload_skip(obs, evaluation, reason)
 
     candidates = _engine_species_candidates(obs)
-    role, melt_recipe_source = _resolve_melt_recipe(obs)
-    melt_recipe = role.composition.value
-    condition_gaps: list[str] = []
-    if melt_recipe is None:
-        condition_gaps.append(role.composition.reason or "missing_condition:melt_composition")
+    observation_gaps: list[str] = []
     if pO2 is None:
-        condition_gaps.append("missing_condition:pO2_boundary")
+        observation_gaps.append("missing_condition:pO2_boundary")
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
-    if condition_gaps:
+    if observation_gaps:
         evaluation.runtime_notes.append(
             "HKL assumption diagnostic excluded from external residuals: "
-            + "; ".join(condition_gaps)
+            + "; ".join(observation_gaps)
         )
     any_numeric = False
-    role_reason = None
+    role_reasons: list[str] = []
+    composition_gaps: list[str] = []
     last_refusal = "missing_capability:vapor_rail_species_or_hkl_inputs"
     for point in points:
+        role, melt_recipe_source = _resolve_melt_recipe(obs, point=point)
+        melt_recipe = role.composition.value
+        point_gaps = list(observation_gaps)
+        if melt_recipe is None:
+            composition_gap = (
+                role.composition.reason or "missing_condition:melt_composition"
+            )
+            point_gaps.append(composition_gap)
+            if composition_gap not in composition_gaps:
+                composition_gaps.append(composition_gap)
         T_K = float(point["T_K"])
         expected = float(point["rate_mol_m2_s"])
         uncertainty = resolve_uncertainty(obs, point=point, kind_hint="rate")
@@ -3546,13 +3566,15 @@ def _evaluate_rate(
             "candidates": candidates,
             "source_units": point.get("source_units"),
             "melt_recipe_source": melt_recipe_source,
-            "condition_gaps": list(condition_gaps),
+            "condition_gaps": point_gaps,
             "engine_uncertainty": (
                 "unavailable: vapor-pressure, alpha, composition, and pO2 "
                 "components are not jointly quantified"
             ),
         }
         role_reason = _record_composition_role(runtime, role)
+        if role_reason is not None and role_reason not in role_reasons:
+            role_reasons.append(role_reason)
         for species in candidates:
             if melt_recipe is not None and pO2 is not None:
                 pressure, refusal, pressure_runtime = _engine_melt_psat_pa(
@@ -3624,7 +3646,7 @@ def _evaluate_rate(
             units="mol m^-2 s^-1",
             runtime=runtime,
             unsupported_speciation=actual is None,
-            assumed_input=bool((condition_gaps or role_reason) and actual is not None),
+            assumed_input=bool((point_gaps or role_reason) and actual is not None),
         )
         evaluation.records.append(record)
         if actual is not None:
@@ -3637,8 +3659,19 @@ def _evaluate_rate(
                 f"residual_dex={dex:.6g} budget={uncertainty}"
             )
 
-    if any_numeric and role_reason is not None:
-        condition_gaps.append(role_reason)
+    condition_gaps = [*observation_gaps, *composition_gaps]
+    if any_numeric:
+        condition_gaps.extend(
+            reason for reason in role_reasons if reason not in condition_gaps
+        )
+    if composition_gaps and not any(
+        note.startswith("HKL assumption diagnostic excluded")
+        for note in evaluation.runtime_notes
+    ):
+        evaluation.runtime_notes.append(
+            "HKL assumption diagnostic excluded from external residuals: "
+            + "; ".join(composition_gaps)
+        )
     if condition_gaps:
         typed_gaps = [
             gap if gap.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{gap}"
@@ -3954,6 +3987,17 @@ def _melt_recipe_mol(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
             for key in point_recipe_keys
         )
+        if (
+            not point_has_located_composition
+            and not point_has_named_recipe
+            and point.get("composition_source_gap")
+        ):
+            # An explicit gap is decided before the parent-dependent flat decode.
+            return (
+                None,
+                "extract composition_source_gap",
+                "missing_condition:melt_composition",
+            )
         if (
             not point_has_located_composition
             and not point_has_named_recipe

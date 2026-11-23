@@ -12,7 +12,11 @@ from simulator.battery import composition_roles
 from simulator.battery import migrate as battery_migrate
 import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 from simulator.diagnostic_helpers.extract_reproduction import (
+    AdoptedObservation,
+    ObservationEvaluation,
+    _evaluate_rate,
     _literature_pressure_points,
+    _literature_rate_points,
     _melt_recipe_mol,
     _resolve_melt_recipe,
     evaluate_observation,
@@ -120,19 +124,30 @@ def test_located_mole_fraction_composition_overrides_parent_recipe() -> None:
         ("unreported", "flagged", composition_roles.RoleStatus.DEFAULTED,
          (composition_roles.ROLE_DEFAULT_FLAG,)),
         ("unreported", "refused", composition_roles.RoleStatus.UNKNOWN, ()),
+        (None, "clean", composition_roles.RoleStatus.UNKNOWN, ()),
+        (
+            composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "flagged",
+            composition_roles.RoleStatus.DECLARED,
+            (composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG,),
+        ),
     ],
 )
 def test_role_resolution_matrix(shape, token, tier, status, flags) -> None:
     from types import SimpleNamespace
 
     amounts = {"SiO2": "bad" if tier == "refused" else 60, "MgO": 40}
-    values = {"composition_role": {"value": token}}
+    values = {}
+    if token is not None:
+        values["composition_role"] = {"value": token}
     point = None
     if shape == "parent":
         values["composition_wt_pct"] = amounts
     elif shape == "point":
-        point = {"composition_wt_pct": amounts, "composition_role": token}
-        values["composition_role"] = "initial_charge_only"
+        point = {"composition_wt_pct": amounts}
+        if token is not None:
+            point["composition_role"] = token
+            values["composition_role"] = "initial_charge_only"
     elif shape == "flat":
         point = amounts
         values["composition_wt_pct"] = {"SiO2": 50, "MgO": 50}
@@ -152,6 +167,286 @@ def test_role_resolution_matrix(shape, token, tier, status, flags) -> None:
         assert role.initial_charge_only
         assert "default=initial_charge_only" in role.reason
         assert "'unreported'" in role.original_reason
+    if token is None:
+        assert role.role is None
+        assert role.original_reason is None
+    if token == composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG:
+        assert role.initial_charge_only
+        assert role.status is composition_roles.RoleStatus.DECLARED
+
+
+def test_located_datum_beats_parent_charge_and_flat_columns() -> None:
+    from types import SimpleNamespace
+
+    payload = {
+        "basis": "oxide_mole_fraction_as_published",
+        "amount_basis": "mole_fraction",
+        "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+    }
+    parent = {
+        "composition_role": "initial_charge_only",
+        "composition_wt_pct": {"SiO2": 70, "MgO": 30},
+    }
+    located = {
+        "SiO2": 55,
+        "MgO": 45,
+        "composition_role": "datum_state",
+        "point_conditions": {
+            "composition": {"state": {"tag": "value", "value": payload}},
+        },
+    }
+    role, source = _resolve_melt_recipe(
+        SimpleNamespace(values=parent, units=None), point=located
+    )
+    expected = battery_migrate._composition_from_plain(payload)
+    assert role.status is composition_roles.RoleStatus.DECLARED
+    assert role.role == composition_roles.DATUM_STATE
+    assert role.flags == ()
+    assert source == "extract point_conditions.composition"
+    assert role.composition.value == pytest.approx(
+        {name: float(amount) for name, amount in expected.components}
+    )
+
+    flat = {"SiO2": 55, "MgO": 45, "composition_role": "datum_state"}
+    flat_role, flat_source = _resolve_melt_recipe(
+        SimpleNamespace(values=parent, units=None), point=flat
+    )
+    assert flat_role.status is composition_roles.RoleStatus.DECLARED
+    assert flat_role.role == composition_roles.DATUM_STATE
+    assert flat_role.flags == ()
+    assert flat_source == "extract flat run composition"
+    assert flat_role.callable
+    parent_recipe, _parent_source, parent_error = _melt_recipe_mol(
+        SimpleNamespace(values=parent, units=None)
+    )
+    assert parent_error is None
+    assert flat_role.composition.value != parent_recipe
+
+
+def test_explicit_datum_is_not_overridden_by_a_discarded_identity_proxy() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import AmountBasis
+    from simulator.battery.records import Composition
+    from simulator.state_types import State
+
+    def composition(silica: str, *, proxy: str | None) -> Composition:
+        return Composition(
+            basis="printed_oxides",
+            components=(("SiO2", Decimal(silica)), ("MgO", Decimal("0.4"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+            proxy_flag=proxy,
+        )
+
+    datum = composition("0.6", proxy=None)
+    proxy = composition("0.2", proxy=composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG)
+    selected = composition_roles.resolve_composition_role(
+        {"composition_role": composition_roles.DATUM_STATE},
+        composition=State.of(proxy),
+        point_composition=State.of(datum),
+    )
+    assert selected.role == composition_roles.DATUM_STATE
+    assert selected.status is composition_roles.RoleStatus.DECLARED
+    assert selected.flags == ()
+    assert selected.composition.value.proxy_flag is None
+    assert selected.composition.value.components[0][1] == Decimal("0.6")
+
+    kept = composition_roles.resolve_composition_role(
+        {},
+        composition=State.of(datum),
+        point_composition=State.of(proxy),
+    )
+    assert kept.initial_charge_only
+    assert kept.status is composition_roles.RoleStatus.DECLARED
+    assert kept.composition.value.proxy_flag == (
+        composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+
+
+def test_explicit_gap_beats_parent_flat_columns_at_pressure_boundary(monkeypatch) -> None:
+    obs = _adopted_observation(
+        "kems-022-demaria-1971", "K", "demaria_1971_k_psat_figure2_digitized"
+    )
+    obs = replace(
+        obs,
+        values={
+            **obs.values,
+            "composition_wt_pct": {"SiO2": 70, "MgO": 30},
+            "points": [{
+                "T_K": 1500.0,
+                "p_Pa": 1.0,
+                "SiO2": 55,
+                "MgO": 45,
+                "composition_source_gap": "not reported",
+            }],
+        },
+    )
+    calls = []
+    runtimes = []
+    compare_point = extract_reproduction._compare_point
+
+    def melt_stub(*_args, **_kwargs):
+        calls.append(_kwargs.get("account_mol"))
+        return 1.0, None, {"provider_status": "ok"}
+
+    def capture_runtime(**kwargs):
+        runtimes.append(dict(kwargs["runtime"]))
+        return compare_point(**kwargs)
+
+    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", melt_stub)
+    monkeypatch.setattr(extract_reproduction, "_compare_point", capture_runtime)
+    monkeypatch.setattr(
+        extract_reproduction, "resolve_pO2_bar", lambda _obs: (5e-9, "fixture")
+    )
+    assert observation_admission_reason(obs) is None
+    result = evaluate_observation(obs)
+    assert calls == []
+    assert [record.status for record in result.records] == ["unsupported-observable"]
+    assert runtimes[0]["melt_recipe_source"] == "extract composition_source_gap"
+    assert runtimes[0]["refusal"] == "missing_condition:melt_composition"
+
+
+def _rate_observation() -> AdoptedObservation:
+    return AdoptedObservation(
+        species_id="K",
+        source_id="fixture-rate",
+        observation_id="point_role_rate",
+        obs_type="rate_series",
+        review_status="draft",
+        phase="silicate_melt",
+        regime="langmuir_free_evaporation",
+        standard_state=None,
+        T_range_K=(1500.0, 1600.0),
+        units="mol m^-2 s^-1",
+        uncertainty={"kind": "relative_fraction", "value": 1.0},
+        locator={"note": "fixture"},
+        values={
+            "gas_species": "K",
+            "composition_role": "datum_state",
+            "composition_wt_pct": {"SiO2": 70, "MgO": 30},
+            "points": [
+                {
+                    "T_K": 1500.0,
+                    "rate_mol_m2_s": 1.0e-6,
+                    "composition_wt_pct": {"SiO2": 60, "MgO": 40},
+                    "composition_role": "unreported",
+                },
+                {
+                    "T_K": 1600.0,
+                    "rate_mol_m2_s": 1.0e-6,
+                },
+            ],
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="fixture",
+    )
+
+
+def test_rate_point_keeps_its_role_and_assay(monkeypatch) -> None:
+    obs = _rate_observation()
+    parsed, skip, _drops = _literature_rate_points(obs)
+    assert skip is None
+    assert parsed is not None and len(parsed) == 2
+    assert parsed[0]["composition_role"] == "unreported"
+    assert parsed[0]["source_point"]["composition_wt_pct"] == {"SiO2": 60, "MgO": 40}
+    assert "composition_role" not in parsed[1]
+    point_recipe, _source, point_error = _melt_recipe_mol(obs, point=parsed[0])
+    parent_recipe, _parent_source, parent_error = _melt_recipe_mol(obs)
+    assert point_error is None and parent_error is None
+    assert point_recipe != parent_recipe
+    calls = []
+
+    def melt_stub(*_args, **kwargs):
+        calls.append(kwargs.get("account_mol"))
+        return 1.0, None, {"provider_status": "ok"}
+
+    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", melt_stub)
+    monkeypatch.setattr(
+        extract_reproduction, "_engine_alpha", lambda *_args, **_kwargs: (1.0, None, {})
+    )
+    monkeypatch.setattr(
+        extract_reproduction, "species_molar_mass_kg_mol", lambda _species: 0.039
+    )
+    monkeypatch.setattr(extract_reproduction, "langmuir_molar_flux", lambda *_a, **_k: 1.0e-6)
+    result = _evaluate_rate(obs, ObservationEvaluation(observation=obs), {}, 1.0e-8)
+    assert calls == [point_recipe, parent_recipe]
+    assert [record.status for record in result.records] == ["assumed-input", "match"]
+    assert composition_roles.is_role_default_reason(result.skip_reason)
+
+
+def test_restoring_flat_decode_before_the_gap_breaks_the_pressure_pin(monkeypatch) -> None:
+    real = extract_reproduction._melt_recipe_mol
+
+    def restored(obs, *, point=None):
+        if isinstance(point, Mapping) and point.get("composition_source_gap"):
+            stripped = {
+                key: value
+                for key, value in point.items()
+                if key != "composition_source_gap"
+            }
+            source = point.get("source_point")
+            if isinstance(source, Mapping):
+                stripped["source_point"] = {
+                    key: value
+                    for key, value in source.items()
+                    if key != "composition_source_gap"
+                }
+            return real(obs, point=stripped)
+        return real(obs, point=point)
+
+    monkeypatch.setattr(extract_reproduction, "_melt_recipe_mol", restored)
+    with pytest.raises(AssertionError):
+        test_explicit_gap_beats_parent_flat_columns_at_pressure_boundary(monkeypatch)
+
+
+def test_reusing_the_parent_rate_recipe_breaks_the_point_pin(monkeypatch) -> None:
+    real = extract_reproduction._resolve_melt_recipe
+
+    def parent_only(obs, *, point=None):
+        return real(obs, point=None)
+
+    monkeypatch.setattr(extract_reproduction, "_resolve_melt_recipe", parent_only)
+    with pytest.raises(AssertionError):
+        test_rate_point_keeps_its_role_and_assay(monkeypatch)
+
+
+@pytest.mark.parametrize("consumer", ["migration", "pressure", "scoring"])
+def test_bypassing_role_resolution_breaks_the_consumer_pin(
+    monkeypatch, tmp_path, consumer
+) -> None:
+    resolve = composition_roles.resolve_composition_role
+
+    def bypass(row, parent=None, **kwargs):
+        observation = isinstance(row, composition_roles.Observation)
+        if consumer == "scoring" and observation:
+            return replace(resolve(row, parent, **kwargs), notices=())
+        if not observation and consumer != "scoring":
+            if isinstance(row, Mapping):
+                row = {
+                    key: value
+                    for key, value in row.items()
+                    if key != composition_roles.COMPOSITION_ROLE_FIELD
+                }
+            if isinstance(parent, Mapping):
+                parent = {
+                    key: value
+                    for key, value in parent.items()
+                    if key != composition_roles.COMPOSITION_ROLE_FIELD
+                }
+        return resolve(row, parent, **kwargs)
+
+    monkeypatch.setattr(composition_roles, "resolve_composition_role", bypass)
+    with pytest.raises(AssertionError):
+        if consumer == "migration":
+            test_flat_run_unknown_role_is_flagged_at_scorer_boundary(tmp_path)
+        elif consumer == "pressure":
+            test_pressure_with_inherited_unknown_role_predicts_in_flagged_tier(
+                monkeypatch
+            )
+        else:
+            test_scorer_reads_a_persisted_role_default_without_a_legacy_proxy()
 
 
 def test_mapping_backed_composition_role_is_resolved_after_admission() -> None:
