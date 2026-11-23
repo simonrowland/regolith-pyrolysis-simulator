@@ -37,7 +37,7 @@ import subprocess
 import sys
 import threading
 import weakref
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields, is_dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional
@@ -152,6 +152,7 @@ from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
     PowerTemperatureRefusal,
     declared_benchtop_lengths_m,
+    _power_trace_curve_s,
     furnace_power_driver_payload,
     measured_furnace_power_trace,
 )
@@ -162,7 +163,6 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
-    _has_runtime_surface_temperature_schedule,
 )
 from simulator.state import (
     Atmosphere,
@@ -1093,6 +1093,94 @@ def _canonical_runtime_campaign_overrides(
 # ----------------------------------------------------------------------
 
 
+# Engine tables and non-data session slots. They are not the run's
+# resolved configuration. A new scalar on SimSessionConfig is included.
+_RESOLVED_SESSION_OMIT = frozenset({
+    "feedstocks",
+    "setpoints",
+    "vapor_pressures",
+    "materials",
+    "unavailable_error_cls",
+    "force_builtin_vapor_pressure",
+    "result_document_factory",
+    "reduced_real_cache",
+    "backend_config",
+    "runtime_campaign_overrides",
+    "setpoints_overrides",
+})
+
+
+def _plain_resolved(value: Any) -> Any:
+    """Copy dataclasses and mappings into JSON-ready data."""
+
+    from enum import Enum
+
+    if is_dataclass(value) and not isinstance(value, type):
+        return {
+            item.name: _plain_resolved(getattr(value, item.name))
+            for item in fields(value)
+        }
+    if isinstance(value, Enum):
+        return _plain_resolved(value.value)
+    if isinstance(value, Mapping):
+        return {
+            str(key): _plain_resolved(item) for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return [_plain_resolved(item) for item in value]
+    if isinstance(value, list):
+        return [_plain_resolved(item) for item in value]
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (bool, int, float, str)) or value is None:
+        return value
+    raise TypeError(
+        f"resolved configuration cannot pack {type(value).__name__}"
+    )
+
+
+def _resolved_power_schedule(schedule: Mapping[str, Any]) -> dict[str, Any]:
+    """The runner's schedule, with the power trace reduced to its curve."""
+
+    resolved = copy.deepcopy(dict(schedule))
+    driver = resolved.get(FURNACE_POWER_DRIVER_KEY)
+    if not isinstance(driver, Mapping):
+        return resolved
+    trace = driver.get("trace")
+    if not isinstance(trace, Mapping):
+        return resolved
+    curve = _power_trace_curve_s(trace)
+    payload = dict(driver)
+    payload.pop("trace", None)
+    payload["power_W"] = [
+        {"t_s": float(time_s), "power_W": float(watts)}
+        for time_s, watts in curve
+    ]
+    resolved[FURNACE_POWER_DRIVER_KEY] = payload
+    return resolved
+
+
+def _inventory_after_stage0(
+    feedstock_id: str,
+    entry: Mapping[str, Any],
+    mass_kg: float,
+) -> dict[str, Any]:
+    """Stage 0 inventory from the frozen feedstock entry, via ``load_batch``."""
+
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    simulator = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {feedstock_id: copy.deepcopy(dict(entry))},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    simulator.load_batch(feedstock_id, mass_kg=float(mass_kg))
+    return _plain_resolved(simulator.inventory)
+
+
 @dataclass
 class PyrolysisRun:
     """Configuration for a single deterministic simulator run.
@@ -1457,52 +1545,24 @@ class PyrolysisRun:
                 raise RunnerError(str(exc)) from exc
         return copy.deepcopy(self._config_bundle)
 
-    def _resolved_geometry_segments(
+    def resolved_configuration(
         self,
+        preset_document: Mapping[str, Any],
         *,
-        allow_temperature_profiles: bool,
-    ) -> list[dict[str, Any]]:
-        """Pipe segments ``to_pipe_segment`` builds for this run's geometry."""
+        leg: str,
+        mitigation: str,
+    ) -> dict[str, Any]:
+        """The whole resolved run, after this object's one config load.
 
-        raw = (
-            self.setpoints_patch.get("lab_geometry")
-            if isinstance(self.setpoints_patch, Mapping)
-            else None
-        )
-        if not isinstance(raw, Mapping):
-            return []
-        geometry = parse_lab_geometry(
-            raw,
-            allow_temperature_profiles=allow_temperature_profiles,
-        )
-        if geometry is None:
-            return []
-        segments: list[dict[str, Any]] = []
-        for segment in geometry.to_pipe_segments():
-            segments.append({
-                "name": segment.name,
-                "role": segment.role,
-                "inner_diameter_m": float(segment.inner_diameter_m),
-                "length_m": float(segment.length_m),
-                "declared_area_m2": float(segment.declared_area_m2 or 0.0),
-                "wall_temperature_C": float(segment.wall_temperature_C),
-                "view_factor_from_melt": float(
-                    segment.view_factor_from_melt or 0.0
-                ),
-                "line_of_sight_to_melt": bool(segment.line_of_sight_to_melt),
-            })
-        return segments
-
-    def resolved_prediction_inputs(self) -> dict[str, Any]:
-        """Prediction-driving state after this object's one config load.
-
-        Geometry is the session's pipe segments, including a quoted
-        holder diameter. Feedstock masses are the inventory owner.
-        Area and its typed notice come from the exposed-area bridge.
-        ``dt_s`` is the process step ``run`` will pass. The notice is
-        for the caller to keep outside the packed key.
+        The tree still contains metadata. The cache key omits that list.
+        Every other leaf, including a field added later, stays in the tree.
+        Geometry, gas, the schedule, the pump, and the Stage 0 inventory
+        are the objects the runner resolved, not a field allowlist.
+        ``area_notice`` is metadata for the caller to keep off the key.
         """
 
+        if not isinstance(preset_document, Mapping):
+            raise RunnerError("preset document is not a mapping")
         config = self._session_config()
         try:
             entry = config.feedstocks[self.feedstock_id]
@@ -1514,18 +1574,6 @@ class PyrolysisRun:
             raise RunnerError(
                 f"feedstock {self.feedstock_id!r} has no usable composition"
             )
-        try:
-            masses = PyrolysisSimulator.resolved_prediction_driving_feedstock_kg(
-                entry, float(config.mass_kg)
-            )
-        except (TypeError, ValueError) as exc:
-            raise RunnerError(
-                f"feedstock {self.feedstock_id!r} is not a usable composition: {exc}"
-            ) from exc
-        if not masses:
-            raise RunnerError(
-                f"feedstock {self.feedstock_id!r} resolved to no component mass"
-            )
         raw_geometry = (
             self.setpoints_patch.get("lab_geometry")
             if isinstance(self.setpoints_patch, Mapping)
@@ -1536,23 +1584,76 @@ class PyrolysisRun:
         )
         area = bridge.get("effective_exposed_area_m2")
         notice = bridge.get("notice")
+        if self.lab_schedule is None:
+            raise RunnerError("resolved configuration requires a lab schedule")
+        from simulator.teststand import parse_teststand
+
+        apparatus = parse_teststand(
+            self.lab_schedule,
+            raw_geometry if isinstance(raw_geometry, Mapping) else None,
+        )
+        try:
+            inventory = _inventory_after_stage0(
+                self.feedstock_id,
+                entry,
+                float(config.mass_kg),
+            )
+        except (TypeError, ValueError) as exc:
+            raise RunnerError(
+                f"feedstock {self.feedstock_id!r} is not a usable composition: {exc}"
+            ) from exc
+        if not inventory.get("raw_components_kg"):
+            raise RunnerError(
+                f"feedstock {self.feedstock_id!r} resolved to no component mass"
+            )
+        session: dict[str, Any] = {}
+        for item in fields(config):
+            if item.name in _RESOLVED_SESSION_OMIT:
+                continue
+            value = getattr(config, item.name)
+            if isinstance(value, type) or (
+                callable(value) and not isinstance(value, type)
+            ):
+                continue
+            session[item.name] = _plain_resolved(value)
+        overrides = {
+            str(campaign): dict(block)
+            for campaign, block in dict(
+                config.runtime_campaign_overrides or {}
+            ).items()
+            if isinstance(block, Mapping)
+        }
+        for block in overrides.values():
+            block.pop(LAB_SCHEDULE_OVERRIDE_KEY, None)
+        session["runtime_campaign_overrides"] = _plain_resolved(overrides)
+        session["allow_fallback_vapor"] = bool(self.allow_fallback_vapor)
+        session["allow_unmeasured_alpha_fallback"] = bool(
+            self.allow_unmeasured_alpha_fallback
+        )
+        session["force_builtin_vapor_pressure"] = bool(
+            self.force_builtin_vapor_pressure
+        )
+        session["effective_dt_s"] = float(self.process_dt_s)
+        session["leg"] = str(leg)
+        session["mitigation"] = str(mitigation)
         return {
-            "config": config,
-            "segments": self._resolved_geometry_segments(
-                allow_temperature_profiles=(
-                    _has_runtime_surface_temperature_schedule(
-                        config.runtime_campaign_overrides
-                    )
-                ),
-            ),
-            "feedstock_component_kg": {
-                str(name): float(kg) for name, kg in sorted(masses.items())
+            "preset": copy.deepcopy(dict(preset_document)),
+            "feedstock": {
+                "id": str(self.feedstock_id),
+                "entry": copy.deepcopy(dict(entry)),
             },
+            "inventory": inventory,
+            "apparatus": _plain_resolved(apparatus),
+            "schedule": _plain_resolved(
+                _resolved_power_schedule(self.lab_schedule)
+            ),
+            "session": session,
             "exposed_area_m2": None if area is None else float(area),
             "area_notice": (
-                copy.deepcopy(notice) if isinstance(notice, Mapping) else None
+                copy.deepcopy(dict(notice))
+                if isinstance(notice, Mapping)
+                else None
             ),
-            "dt_s": float(self.process_dt_s),
         }
 
     def _load_feedstocks(self) -> dict:

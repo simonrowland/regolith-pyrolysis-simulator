@@ -5,10 +5,11 @@ default, and does not join rows by experiment id. A refusal here is a
 disposition. A cached value is a whole-run projection or it is not stored.
 
 The chemistry version for engine ``simulator`` lives in
-``simulator.engine_cache``. Bump that version when the projection, the
-schedule interpretation, the process timestep, session-config resolution,
-or nested melt chemistry changes a cached number. The runner file hash
-and the preset digest are provenance and stay out of the cache key.
+``simulator.engine_cache``. Bump that version when a cached number
+changes. The cache key is the runner's resolved configuration after the
+one load, minus the metadata list below; a new prediction field is in
+the key without a version bump. The runner file hash and the preset
+digest are provenance and stay out of the cache key.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from simulator.condensation import LabGeometryError
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.engine_cache import (
     EngineCacheValue,
     cached_engine_call,
@@ -84,7 +86,6 @@ FORBIDDEN_REQUEST_KEYS = frozenset({
     "expected_value",
     "expected_values",
     "measurement_selectors",
-    "sticking_provenance",
     "source_notes",
     "extraction_note",
     "citation_id",
@@ -106,6 +107,191 @@ FORBIDDEN_REQUEST_KEYS = frozenset({
     "lineage",
     "trial_id",
 })
+
+# Metadata only. Anything else in the resolved configuration is key material,
+# including a field that shows up later. Over-keying misses; a wrong hit does not.
+METADATA_ONLY_KEYS = frozenset({
+    "area_notice",
+    "basis",
+    "citation_id",
+    "comparison_contract",
+    "comparison_points",
+    "composition_basis",
+    "confidence",
+    "digest",
+    "digests",
+    "display_name",
+    "elemental_composition_status",
+    "elemental_composition_wt_pct",
+    "elemental_cross_check_note",
+    "elemental_sum_check",
+    "expected_value",
+    "expected_values",
+    "exposed_melt_area_notice",
+    "extraction_note",
+    "extraction_status",
+    "fast_tier_policy",
+    "findings_ref",
+    "grid_end_min",
+    "grid_interval_min",
+    "grid_resampling",
+    "input_role",
+    "label",
+    "lineage",
+    "measurement_id",
+    "measurement_selectors",
+    "model",
+    "named_missing_fields",
+    "note",
+    "notes",
+    "notices",
+    "observation_id",
+    "observation_sidecar_path",
+    "observable_id",
+    "observed",
+    "other_trial_fraction",
+    "paper_aliases",
+    "paper_citation_id",
+    "paper_id",
+    "process_notes",
+    "provenance",
+    "qualifier",
+    "reason",
+    "resolution_rationale",
+    "sidecar",
+    "simulant_vs_real_caveat",
+    "source",
+    "source_class",
+    "source_notes",
+    "source_ref",
+    "target",
+    "trajectory_comparison",
+    "trial_id",
+    "uncertainty",
+})
+METADATA_ONLY_SUFFIXES = (
+    "_citation_id",
+    "_digest",
+    "_extraction_note",
+    "_note",
+    "_notes",
+    "_qualifier",
+    "_reason",
+    "_source_class",
+    "_source_ref",
+)
+METADATA_ONLY_PREFIXES = ("observed_",)
+
+
+def metadata_only_key(name: str) -> bool:
+    """True when this field is a label, citation, note, target, or uncertainty."""
+
+    return (
+        name in METADATA_ONLY_KEYS
+        or name.startswith(METADATA_ONLY_PREFIXES)
+        or name.endswith(METADATA_ONLY_SUFFIXES)
+    )
+
+
+def _canonicalize(value: Any) -> Any:
+    """Sorted keys and the runner's numeric-string parse, metadata omitted."""
+
+    if isinstance(value, Mapping):
+        return {
+            str(key): _canonicalize(item)
+            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+            if not metadata_only_key(str(key))
+        }
+    if isinstance(value, (list, tuple)):
+        return [_canonicalize(item) for item in value]
+    if isinstance(value, bool) or value is None:
+        return value
+    if is_declared_real_scalar(value, allow_numeric_str=True):
+        number = float(value)
+        if not math.isfinite(number):
+            raise IntegratedBenchContractError(
+                "resolved configuration contains a non-finite number",
+                kind="no_deck",
+                reason="non_numeric",
+            )
+        if number == 0.0:
+            return 0.0
+        return number
+    if isinstance(value, str):
+        return value
+    raise IntegratedBenchContractError(
+        f"resolved configuration cannot pack {type(value).__name__}",
+        kind="no_deck",
+        reason="non_numeric",
+    )
+
+
+def cache_key_document(resolved: Mapping[str, Any]) -> dict[str, Any]:
+    """Canonical key material for one resolved configuration."""
+
+    document = _canonicalize(resolved)
+    if not isinstance(document, dict):
+        raise IntegratedBenchContractError(
+            "resolved configuration is not a mapping",
+            kind="no_deck",
+            reason="non_numeric",
+        )
+    return document
+
+
+def iter_resolved_leaves(
+    value: Any,
+    path: tuple[Any, ...] = (),
+):
+    """Yield ``(path, value)`` for each leaf and each metadata field.
+
+    Metadata fields are yielded whole and are not descended into. Every
+    other leaf of a mapping or sequence is yielded, including an empty
+    container.
+    """
+
+    if isinstance(value, Mapping):
+        yielded = False
+        for key in sorted(value, key=str):
+            child = path + (str(key),)
+            item = value[key]
+            if metadata_only_key(str(key)):
+                yielded = True
+                yield child, item
+                continue
+            if isinstance(item, (Mapping, list, tuple)):
+                nested = False
+                for leaf in iter_resolved_leaves(item, child):
+                    nested = True
+                    yielded = True
+                    yield leaf
+                if not nested:
+                    yielded = True
+                    yield child, item
+            else:
+                yielded = True
+                yield child, item
+        if not yielded:
+            yield path, value
+        return
+    if isinstance(value, (list, tuple)):
+        if len(value) == 0:
+            yield path, value
+            return
+        for index, item in enumerate(value):
+            child = path + (index,)
+            if isinstance(item, (Mapping, list, tuple)):
+                nested = False
+                for leaf in iter_resolved_leaves(item, child):
+                    nested = True
+                    yield leaf
+                if not nested:
+                    yield child, item
+            else:
+                yield child, item
+        return
+    yield path, value
+
 
 _SUCCESS_STATUS = "ok"
 _HOUR_NUMERIC = (
@@ -175,6 +361,7 @@ class DeckRequest:
     """
 
     cache_request: dict[str, Any]
+    resolved_configuration: dict[str, Any]
     lineage: dict[str, Any]
     preset_digest: str
     run: PyrolysisRun
@@ -641,8 +828,13 @@ def build_deck_request(
         process_dt_s=spec.process_dt_s,
     )
     # One load. ``run`` freezes the bundle here; ``run()`` reuses it.
+    # The key is that whole resolved tree, minus metadata. No field allowlist.
     try:
-        resolved = run.resolved_prediction_inputs()
+        resolved = run.resolved_configuration(
+            spec.document,
+            leg=str(leg),
+            mitigation=_mitigation_token(spec, leg),
+        )
     except LabGeometryError as exc:
         raise IntegratedBenchContractError(
             str(exc),
@@ -657,51 +849,11 @@ def build_deck_request(
             kind="no_deck",
             reason="no_usable_composition",
         ) from exc
-    config = resolved["config"]
-    schedule, schedule_lineage = _project_schedule(
+    _, schedule_lineage = _project_schedule(
         run.lab_schedule,
         run.setpoints_patch["lab_geometry"],
     )
-    geometry: dict[str, Any] = {"segments": resolved["segments"]}
-    if resolved["exposed_area_m2"] is not None:
-        geometry["exposed_area_m2"] = float(resolved["exposed_area_m2"])
-    component_kg = resolved["feedstock_component_kg"]
-    additives = {
-        str(name): _num(amount, f"additives_kg.{name}")
-        for name, amount in sorted(dict(config.additives_kg).items())
-    }
-    cache_request = {
-        "feedstock": {
-            "id": spec.feedstock_id,
-            "resolved_component_kg": component_kg,
-        },
-        "session": {
-            "campaign": str(config.campaign),
-            "hours": int(config.hours),
-            "mass_kg": _num(config.mass_kg, "mass_kg"),
-            "backend_name": str(config.backend_name),
-            "backend_policy": str(config.backend_policy.value),
-            "track": str(config.track),
-            "c5_enabled": bool(config.c5_enabled),
-            "additives_kg": additives,
-            "allow_fallback_vapor": bool(run.allow_fallback_vapor),
-            "allow_unmeasured_alpha_fallback": bool(
-                run.allow_unmeasured_alpha_fallback
-            ),
-            "force_builtin_vapor_pressure": bool(run.force_builtin_vapor_pressure),
-            "high_t_melt_activity": str(config.high_t_melt_activity),
-            "until_campaign_complete": bool(config.until_campaign_complete),
-            "imcc_activity_shadow": bool(config.imcc_activity_shadow),
-            "effective_dt_s": float(resolved["dt_s"]),
-            "leg": str(leg),
-            "mitigation": _mitigation_token(spec, leg),
-            "mre_target_species": str(run.mre_target_species),
-            "mre_max_voltage_V": _num(run.mre_max_voltage_V, "mre_max_voltage_V"),
-            "campaigns_elapsed": _num(config.campaigns_elapsed, "campaigns_elapsed"),
-        },
-        "schedule": schedule,
-        "geometry": geometry,
-    }
+    cache_request = cache_key_document(resolved)
     assert_cache_request_has_no_measurement(cache_request)
     if spec.feedstock_id == "lunar_eac_1a":
         feedstock_lineage: dict[str, Any] = {
@@ -723,6 +875,7 @@ def build_deck_request(
     digest = "sha256:" + hashlib.sha256(preset_path.read_bytes()).hexdigest()
     return DeckRequest(
         cache_request=cache_request,
+        resolved_configuration=resolved,
         lineage=lineage,
         preset_digest=digest,
         run=run,
@@ -750,14 +903,34 @@ def _copy_diagnostic(value: Any) -> Any:
     return None
 
 
-def _project_hour_row(row: Mapping[str, Any]) -> dict[str, Any]:
+def _project_hour_row(row: Mapping[str, Any]) -> tuple[dict[str, Any], str | None]:
+    """Copy one hour. A present bad leaf is kept and marked malformed.
+
+    An empty species map is valid. A nonnumeric rate such as ``O2: 'bad'``
+    stays in the row; it is not dropped.
+    """
+
     projected: dict[str, Any] = {"hour": float(row["hour"])}
+    issue: str | None = None
     for key in _HOUR_NUMERIC:
-        if key in row and _finite(row.get(key)):
-            projected[key] = float(row[key])
-    species = row.get("vapor_species_kg_hr")
-    if isinstance(species, Mapping):
-        projected["vapor_species_kg_hr"] = _project_numeric_tree(species)
+        if key not in row:
+            continue
+        value = row.get(key)
+        if _finite(value):
+            projected[key] = float(value)
+        else:
+            projected[key] = value
+            issue = "malformed_row"
+    if "vapor_species_kg_hr" in row:
+        species = row.get("vapor_species_kg_hr")
+        if isinstance(species, Mapping):
+            copied, clean = _copy_species_tree(species)
+            projected["vapor_species_kg_hr"] = copied
+            if not clean:
+                issue = "malformed_row"
+        elif species is not None:
+            projected["vapor_species_kg_hr"] = species
+            issue = "malformed_row"
     refusals = row.get("condensation_refusals_by_species")
     if isinstance(refusals, Mapping):
         projected["condensation_refusals_by_species"] = _copy_diagnostic(refusals)
@@ -772,28 +945,15 @@ def _project_hour_row(row: Mapping[str, Any]) -> dict[str, Any]:
             }
             if kept:
                 projected["vapour_batch_summary"] = {"metadata": kept}
-    return projected
-
-
-def _project_numeric_tree(value: Mapping[str, Any], depth: int = 0) -> dict[str, Any]:
-    projected: dict[str, Any] = {}
-    for name, item in value.items():
-        if not isinstance(name, str) or " " in name or name in FORBIDDEN_REQUEST_KEYS:
-            continue
-        if _finite(item):
-            projected[name] = float(item)
-        elif depth < 2 and isinstance(item, Mapping):
-            child = _project_numeric_tree(item, depth + 1)
-            if child:
-                projected[name] = child
-    return dict(sorted(projected.items()))
+    return projected, issue
 
 
 def _project_step(row: Any) -> tuple[dict[str, Any], str | None]:
     """Project one step. A bad numeric payload stays a malformed row.
 
     An index-only row keeps its hour. It is not dropped and it is not
-    promoted by discarding the missing payload.
+    promoted by discarding the missing payload. A present species rate
+    that is not a finite number is kept on the row.
     """
 
     if (
@@ -812,13 +972,10 @@ def _project_step(row: Any) -> tuple[dict[str, Any], str | None]:
                 "malformed_row",
             )
         return {"status": "malformed_row"}, "malformed_row"
-    for key in _HOUR_NUMERIC:
-        if key in row and not _finite(row.get(key)):
-            return (
-                {"status": "malformed_row", "hour": float(row["hour"])},
-                "malformed_row",
-            )
-    projected = _project_hour_row(row)
+    projected, issue = _project_hour_row(row)
+    if issue is not None:
+        projected["status"] = "malformed_row"
+        return projected, issue
     if not any(_finite(projected.get(key)) for key in _HOUR_NUMERIC):
         return projected, "index_only_row"
     return projected, None
@@ -847,11 +1004,15 @@ def _copy_species_tree(
     return dict(sorted(projected.items())), clean
 
 
-def _project_final_state(state: Any) -> tuple[dict[str, Any], bool]:
-    """Ledger accounts. Valid when one account holds a finite mol."""
+def _project_final_state(state: Any) -> tuple[dict[str, Any], str | None]:
+    """Ledger accounts. Valid when one account holds a finite mol.
+
+    Absent or empty is ``missing_final_state``. A present leaf that is
+    not a finite mol is ``malformed_row`` and the leaf is kept.
+    """
 
     if not isinstance(state, Mapping) or not state:
-        return {}, False
+        return {}, "missing_final_state"
     projected: dict[str, Any] = {}
     clean = True
     saw_finite = False
@@ -868,14 +1029,23 @@ def _project_final_state(state: Any) -> tuple[dict[str, Any], bool]:
         clean = clean and mols_clean
         if mols_clean and any(_finite(mol) for mol in mols.values()):
             saw_finite = True
-    return dict(sorted(projected.items())), clean and saw_finite
+    projected = dict(sorted(projected.items()))
+    if not clean:
+        return projected, "malformed_row"
+    if not saw_finite:
+        return projected, "missing_final_state"
+    return projected, None
 
 
-def _project_final_report(final: Any) -> tuple[dict[str, Any], bool]:
-    """The runner's final report. Empty maps and the pump token count."""
+def _project_final_report(final: Any) -> tuple[dict[str, Any], str | None]:
+    """The runner's final report. Empty maps and the pump token count.
 
-    if not isinstance(final, Mapping):
-        return {}, False
+    Absent or empty is ``missing_final_report``. A present bad leaf is
+    ``malformed_row`` and the leaf is kept.
+    """
+
+    if not isinstance(final, Mapping) or not final:
+        return {}, "missing_final_report"
     projected: dict[str, Any] = {}
     clean = True
     for key in _FINAL_FIELDS:
@@ -892,7 +1062,11 @@ def _project_final_report(final: Any) -> tuple[dict[str, Any], bool]:
             continue
         projected[key] = value
         clean = False
-    return projected, clean and bool(projected)
+    if not clean:
+        return projected, "malformed_row"
+    if not projected:
+        return projected, "missing_final_report"
+    return projected, None
 
 
 def _expected_hours(requested_steps: int) -> list[float]:
@@ -956,8 +1130,10 @@ def project_whole_run(
         projected_rows.append({"status": "malformed_row"})
         issues.append("malformed_row")
 
-    final_state, final_state_ok = _project_final_state(document.get("final_state"))
-    final, final_ok = _project_final_report(document.get("final"))
+    final_state, state_issue = _project_final_state(document.get("final_state"))
+    final, report_issue = _project_final_report(document.get("final"))
+    if state_issue == "malformed_row" or report_issue == "malformed_row":
+        issues.append("malformed_row")
 
     status = document.get("status")
     status_text = str(status) if isinstance(status, str) else "missing"
@@ -974,12 +1150,12 @@ def project_whole_run(
             if actual != _expected_hours(requested_steps):
                 status_text = "partial"
                 reason = "incomplete_steps"
-            elif not final_state_ok:
+            elif state_issue is not None:
                 status_text = "partial"
-                reason = "missing_final_state"
-            elif not final_ok:
+                reason = state_issue
+            elif report_issue is not None:
                 status_text = "partial"
-                reason = "missing_final_report"
+                reason = report_issue
 
     hot: dict[str, Any] = {
         "status": status_text,
