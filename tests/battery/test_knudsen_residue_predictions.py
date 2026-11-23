@@ -407,6 +407,29 @@ def test_analytical_knudsen_mass_default_reports_dp008(extent_point, mass_kg):
     )
 
 
+def test_analytical_knudsen_inventory_mass_equals_weighed_charge(extent_point):
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.score import ScoreContext, compile_residual
+
+    reference, experiment, rows = extent_point
+    charge_kg = 0.002
+    experiment = replace(experiment, sample=replace(
+        experiment.sample,
+        mass_kg=Located(State.of(Value.point_of(str(charge_kg))), reference.locator),
+    ))
+    context = ScoreContext({}, {experiment.experiment_id: experiment},
+                           {row.observation_id: row for row in (reference, *rows)})
+    residual, candidate = compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=context)
+
+    assert residual.numeric is not None and candidate is not None
+    inventory = candidate.provenance["initial_inventory_mol"]
+    inventory_mass_kg = math.fsum(
+        amount * float(parse_formula(oxide).molar_mass_kg_per_mol())
+        for oxide, amount in inventory.items()
+    )
+    assert inventory_mass_kg == pytest.approx(charge_kg)
+
+
 @pytest.mark.parametrize(
     ("printed_resolution", "precision_multiplier"),
     ((True, 1), (False, 1), ("component-exact", 1),

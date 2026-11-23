@@ -52,6 +52,7 @@ _KNUDSEN_MAX_RHS_EVALUATIONS = 1024
 _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
 _KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
 TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
+_OXIDE_WT_PERCENT_REFERENCE_MASS_KG = 1.0
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
 _HASHIMOTO_GEOMETRIES = (
@@ -2111,9 +2112,9 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
 
 
 def _oxide_wt_percent_to_mol_inventory(wt_percent: Mapping[str, float]) -> dict[str, float]:
-    """Convert oxide wt% to a scale-free inventory on a 100 g basis."""
+    """Convert oxide wt% to moles on a 1 kg reference-mass basis."""
     return {
-        oxide: weight / 100.0 / _formula_terms(oxide)[1]
+        oxide: weight / 100.0 * _OXIDE_WT_PERCENT_REFERENCE_MASS_KG / _formula_terms(oxide)[1]
         for oxide, weight in wt_percent.items()
     }
 
@@ -2701,9 +2702,12 @@ def predict_knudsen_residue_composition(
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
     use_loader_cutoff = engine == "internal-analytical"
     measured_charge_kg = _located_point(experiment.sample.mass_kg)
-    # The shared converter uses a 100 g reference basis. The analytical loader
-    # applies an absolute mass cutoff, so scale that basis to the weighed charge.
-    charge_kg = 0.1
+    # The shared converter returns mol per 1 kg of melt: wt% / 100 is a
+    # dimensionless mass fraction; dividing by kg/mol gives mol/kg, then
+    # multiplying by charge_kg gives mol. The scale is charge_kg divided by
+    # the converter's 1 kg reference mass. A 1e-3 kg pure-FeO charge contains
+    # 1e-3 / 0.0718 mol FeO and has an inventory mass of 1e-3 kg.
+    charge_kg = _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
     assumed_charge = use_loader_cutoff and (measured_charge_kg is None or measured_charge_kg <= 0.0)
     charge_default = None
     if assumed_charge:
@@ -2718,7 +2722,7 @@ def predict_knudsen_residue_composition(
         charge_kg = measured_charge_kg
     initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
     if use_loader_cutoff:
-        scale = charge_kg / 0.1
+        scale = charge_kg / _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
         initial = {oxide: amount * scale for oxide, amount in initial.items()}
     anchors = {}
     for row in rows:
