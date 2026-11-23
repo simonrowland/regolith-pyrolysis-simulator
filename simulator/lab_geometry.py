@@ -42,6 +42,52 @@ class LabGeometryError(ValueError):
         self.code = code
 
 
+def read_gram_lab_exposed_melt_area(
+    lab_geometry: Mapping[str, Any] | None,
+) -> float | None:
+    """Printed gram-lab melt face, or None when this geometry has no sample face.
+
+    None means the mapping is not a gram-lab sample. The scale token is
+    ``LAB_GEOMETRY_SCALE``. A gram-lab sample whose area is null or blank
+    raises ``exposed_melt_area_not_printed``. A present value that is not
+    a finite positive declared scalar raises
+    ``invalid_lab_geometry_positive_value``. Numeric strings stay admitted.
+    A binary scalar, and an integer that ``float()`` cannot convert, are
+    that refusal. ``LabGeometryError`` is a ``ValueError``, so this
+    function raises it outside the conversion ``except``.
+    """
+    if not isinstance(lab_geometry, Mapping):
+        return None
+    if str(lab_geometry.get('scale') or '').strip() != LAB_GEOMETRY_SCALE:
+        return None
+    sample = lab_geometry.get('sample')
+    if not isinstance(sample, Mapping):
+        return None
+    raw_area = sample.get('exposed_melt_area_m2', None)
+    if raw_area in (None, ''):
+        raise LabGeometryError(
+            'exposed_melt_area_not_printed',
+            'lab_geometry.sample.exposed_melt_area_m2 is null; '
+            'size_crucible must not supply the melt face',
+        )
+    try:
+        if is_declared_real_scalar(raw_area, allow_numeric_str=True):
+            area: float | None = float(raw_area)
+        else:
+            area = None
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise LabGeometryError(
+            'invalid_lab_geometry_positive_value',
+            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
+        ) from exc
+    if area is None or not math.isfinite(area) or area <= 0.0:
+        raise LabGeometryError(
+            'invalid_lab_geometry_positive_value',
+            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
+        )
+    return area
+
+
 @dataclass(frozen=True)
 class LabSurface:
     """One declared gram-scale deposition surface."""
