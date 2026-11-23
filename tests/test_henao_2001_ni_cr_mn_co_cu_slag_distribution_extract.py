@@ -286,6 +286,22 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.admission.status.value == "admitted" for row in observations)
     assert not [entry for entry in result.queue if entry.source.endswith(EXTRACT.name)]
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
+    henao_experiments = [
+        row
+        for row in result.experiments.values()
+        if row.experiment_id.startswith(
+            "10.2320/matertrans.42.1959::experiment::henao:"
+        )
+    ]
+    assert len(henao_experiments) == 55
+    assert all(
+        row.pressure_environment.total_pressure_Pa.state.is_value
+        and row.pressure_environment.total_pressure_Pa.state.value == Decimal("101300")
+        and row.pressure_environment.total_pressure_Pa.locator is not None
+        and row.pressure_environment.total_pressure_Pa.locator.pdf_page_index == 0
+        and row.pressure_environment.total_pressure_Pa.locator.published_page == "1959"
+        for row in henao_experiments
+    )
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
     # The unprinted slag iron valence leaves slag compositions unknown; alloy
