@@ -341,6 +341,7 @@ def test_persisted_kems_activity_recovers_comparison_method_from_calibration(
 
 def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_valid() -> None:
     from simulator.battery.enums import Authority
+    from simulator.battery.default_policy import load_policy_table
     from simulator.battery.records import Notice, NoticePolicy
 
     notice = Notice(
@@ -358,26 +359,27 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
     assert payload["kind"] == "reference_phase_by_convention"
     assert payload["authority"] == "convention"
     assert payload["certification"] == "fetch the JANAF 4th ed. printed page for the table"
+    phase_entry = load_policy_table()["DP-016"]
     policy_notice = Notice(
         kind=NoticeKind.PHASE_INFERRED,
         affected_quantities=(Quantity.DELTA_FG,),
         reason="phase_inferred: value=unspecified; evidence=no phase identified",
         origin="policy-round-trip",
         policy=NoticePolicy(
-            id="DP-016",
-            version="v1",
-            status="canonical",
-            value="unspecified",
-            units=None,
+            id=phase_entry["id"],
+            version=phase_entry["version"],
+            status=phase_entry["status"],
+            value=Phase.UNSPECIFIED.value,
+            units=phase_entry["units"],
         ),
     )
     policy_payload = to_plain(policy_notice)
     assert policy_payload["policy"] == {
-        "id": "DP-016",
-        "version": "v1",
-        "status": "canonical",
-        "value": "unspecified",
-        "units": None,
+        "id": phase_entry["id"],
+        "version": phase_entry["version"],
+        "status": phase_entry["status"],
+        "value": Phase.UNSPECIFIED.value,
+        "units": phase_entry["units"],
     }
     assert _notice_from_plain(policy_payload) == policy_notice
     assert _notice_from_plain(payload) == notice

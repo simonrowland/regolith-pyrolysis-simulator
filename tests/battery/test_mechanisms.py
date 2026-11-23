@@ -3200,20 +3200,34 @@ def test_d460_row_flags_can_survive_when_quantity_is_unknown() -> None:
 
 
 def test_policy_metadata_is_part_of_notice_union_identity() -> None:
+    from simulator.battery.default_policy import load_policy_table
     from simulator.battery.records import NoticePolicy
 
+    entry = load_policy_table()["DP-016"]
     notice = Notice(
         kind=NoticeKind.PHASE_INFERRED,
         affected_quantities=(Quantity.ACTIVITY,),
         reason="same reason",
         origin="row",
-        policy=NoticePolicy("DP-016", "v1", "canonical", "l", None),
+        policy=NoticePolicy(
+            id=entry["id"],
+            version=entry["version"],
+            status=entry["status"],
+            value=Phase.UNSPECIFIED.value,
+            units=entry["units"],
+        ),
     )
-    other_policy = replace(
+    other = replace(
         notice,
-        policy=NoticePolicy("DP-102", "v1", "proposed", "unspecified", None),
+        policy=NoticePolicy(
+            id=entry["id"],
+            version=entry["version"],
+            status=entry["status"],
+            value=Phase.L.value,
+            units=entry["units"],
+        ),
     )
-    assert union_notices((notice, other_policy)) == (notice, other_policy)
+    assert union_notices((notice, other)) == (notice, other)
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:

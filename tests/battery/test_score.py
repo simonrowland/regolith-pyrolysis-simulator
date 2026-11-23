@@ -79,6 +79,7 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -792,17 +793,95 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         notices=(assumption_notice,),
     )
 
-    residual, _candidate = _compile(reference, experiment, prediction)
+    context = _context(F.work(), experiment, reference)
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
 
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
     assert assumption_notice in residual.notices
+    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert assumption_notice.policy == NoticePolicy(
+        id="DP-101",
+        version="v1",
+        status="proposed",
+        value=f"{assumed_bar:g}",
+        units="bar",
+    )
+    assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
+    assert f"{assumed_bar:g} bar" not in assumption_notice.reason
+    assert "not printed" in assumption_notice.reason
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "total-pressure-independent" in notice.reason
         for notice in residual.notices
     )
+
+    from simulator.battery.score import (
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    assert flagged_strata(residual.notices) == (
+        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
+        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
+    )
+    assert [
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
+        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+    ]
+    serialized_strata = flagged_stratum_payloads(
+        (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert [
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
+        for row in serialized_strata
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
+        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+    ]
+    clean_residual = replace(
+        residual,
+        notices=tuple(
+            notice
+            for notice in residual.notices
+            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
+        ),
+    )
+
+    def measured_headline_count(row: Residual) -> int:
+        return next(
+            item["n"]
+            for item in headline_rows(
+                (row,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+            )
+            if item["rail"] == Rail.VAPOUR.value
+            and item["engine"] == Engine.INTERNAL_ANALYTICAL.value
+        )
+
+    assert measured_headline_count(residual) == 0
+    assert measured_headline_count(clean_residual) == 1
 
 
 def _partial_prediction(engine, observation, **_kwargs):
@@ -1254,7 +1333,10 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
-    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+    assert (
+        "| calibration-not-grounded | vapour | internal-analytical | — | — | 1 |"
+        in report
+    )
 
 
 def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
@@ -9207,6 +9289,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
 
 
 def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None:
+    from simulator.battery.default_policy import load_policy_table
     from simulator.battery.records import ResidualRefusal
     from simulator.battery.records import NoticePolicy
     from simulator.battery.score import (
@@ -9232,12 +9315,20 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     unit = "dimensionless"
     band = DecisionBand(Decimal("20"), unit, "fixture band")
 
+    phase_entry = load_policy_table()["DP-016"]
+    phase_policy = {
+        "id": phase_entry["id"],
+        "version": phase_entry["version"],
+        "status": phase_entry["status"],
+        "value": Phase.UNSPECIFIED.value,
+        "units": phase_entry["units"],
+    }
     flagged_notice = Notice(
         NoticeKind.PHASE_INFERRED,
         (Quantity.P_SAT,),
         "phase_inferred: value=unspecified; original_reason=source does not state phase",
         "engine:fixture",
-        policy=NoticePolicy("DP-016", "v1", "canonical", "unspecified", None),
+        policy=NoticePolicy(**phase_policy),
     )
     flagged_species = observations[2].identity.species
     assert flagged_species is not None
@@ -9268,12 +9359,20 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
             numeric=ResidualNumeric(MetricOperation.DEX, unit, Decimal(value), band),
         )
 
+    method_entry = load_policy_table()["DP-100"]
+    proposed_method_policy = {
+        "id": method_entry["id"],
+        "version": method_entry["version"],
+        "status": method_entry["status"],
+        "value": MethodToken.UNSPECIFIED.value,
+        "units": method_entry["units"],
+    }
     proposed_method_notice = Notice(
         NoticeKind.METHOD_UNSTATED,
         (Quantity.P_SAT,),
         "method_unstated: default=unspecified; original_reason=source does not state method",
         "engine:fixture",
-        policy=NoticePolicy("DP-102", "v1", "proposed", "unspecified", None),
+        policy=NoticePolicy(**proposed_method_policy),
     )
     assert flagged_strata((proposed_method_notice,)) == (
         NoticeKind.METHOD_UNSTATED.value,
@@ -9295,13 +9394,8 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
             replace(measured(2, "10"), notices=(flagged_notice,))
         )
     )
-    assert serialized_flagged["notices"][0]["policy"] == {
-        "id": "DP-016",
-        "version": "v1",
-        "status": "canonical",
-        "value": "unspecified",
-        "units": None,
-    }
+    assert serialized_flagged["notices"][0]["policy"] == phase_policy
+    assert serialized_proposed["notices"][0]["policy"] == proposed_method_policy
     residuals = (
         measured(0, "3"),
         measured(1, "4"),
@@ -10663,6 +10757,40 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert rail_for_quantity(Quantity.MASS_LOSS_RATE, species_formula="Zn") is None
     assert rail_for_quantity(Quantity.VISCOSITY) is None
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
+
+
+@pytest.mark.parametrize("engine", SCORE_ENGINE_SET)
+def test_unknown_quantity_refusal_does_not_fabricate_psat_request(
+    engine: Engine,
+) -> None:
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        F.psat_identity("Na"),
+        quantity=State.unknown("source does not identify the quantity"),
+    )
+    reference = F.observation(
+        "unknown-quantity",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unknown-quantity-source",
+    )
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+    )
+
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "quantity_unknown"
+    assert residual.rail is None
+    assert f"::quantity_unknown::none::{engine.value}" in residual.key
+    assert residual.candidate_request is not None
+    assert residual.candidate_request.quantity is None
+    assert residual.candidate_request.engine is engine
 
 
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
@@ -19022,7 +19150,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
+        f"{residual.rail.value} | {Engine.OPENIMCC.value} | — | — | 1 |"
     ) in report
 
     source_point_reference = replace(
@@ -20399,7 +20527,7 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.OPENIMCC,)
     )
-    assert strata[0]["stratum"] == "cell-material-inferred"
+    assert any(row["stratum"] == "cell-material-inferred" for row in strata)
 
 
 

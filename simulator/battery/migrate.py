@@ -1403,7 +1403,7 @@ def to_plain(obj: object) -> object:
             "id": obj.id,
             "version": obj.version,
             "status": obj.status,
-            "value": obj.value,
+            "value": to_plain(obj.value),
             "units": obj.units,
         }
     if isinstance(obj, State):
@@ -3572,10 +3572,10 @@ def _notice_from_plain(payload: object) -> Notice:
         assert _is_mapping(raw_policy)
         policy = NoticePolicy(
             id=str(raw_policy["id"]),
-            version=str(raw_policy["version"]),
+            version=raw_policy["version"],
             status=str(raw_policy["status"]),
-            value=str(raw_policy["value"]),
-            units=None if raw_policy.get("units") is None else str(raw_policy["units"]),
+            value=raw_policy["value"],
+            units=raw_policy["units"],
         )
     return Notice(
         kind=NoticeKind(str(payload["kind"])),
@@ -10627,17 +10627,8 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
-# Canonical phase fallback and the proposed method-token fallback are named
-# after their policy entries so the registry handoff changes only this owner.
-DP_016_POLICY_ID = "DP-016"
-DP_016_POLICY_VERSION = "v1"
 DP_016_PHASE_UNSPECIFIED = Phase.UNSPECIFIED
-# DP-102 is proposed: an unspecified token represents the absence of a
-# reported technique without asserting apparatus-specific conditions.
-DP_102_POLICY_ID = "DP-102"
-DP_102_POLICY_VERSION = "v1"
-DP_102_POLICY_STATUS = "proposed"
-DP_102_METHOD_UNSPECIFIED = MethodToken.UNSPECIFIED
+DP_100_METHOD_UNSPECIFIED = MethodToken.UNSPECIFIED
 
 
 def _phase_policy_resolution(
@@ -10663,11 +10654,11 @@ def _phase_policy_resolution(
         ),
         origin=origin,
         policy=NoticePolicy(
-            id=DP_016_POLICY_ID,
-            version=DP_016_POLICY_VERSION,
+            id="DP-016",
+            version=1,
             status="canonical",
             value=phase.value,
-            units=None,
+            units="phase token",
         ),
     )
 
@@ -25860,14 +25851,14 @@ class Migrator:
                     observation.observation_id,
                 )
             elif _is_unstated_method_reason(experiment.method.reason):
-                # An unspecified token makes no claim about technique. This
-                # prevents unprinted method-specific conditions from entering.
+                # No technique is reported, so "unspecified" asserts no
+                # apparatus condition; DP-100 records that physical basis.
                 method_default_reason = (
                     experiment.method.reason or "source does not state method"
                 )
                 experiment = replace(
                     experiment,
-                    method=State.of(DP_102_METHOD_UNSPECIFIED),
+                    method=State.of(DP_100_METHOD_UNSPECIFIED),
                 )
                 self.result.experiments[observation.experiment_id] = experiment
         elif experiment is not None and experiment.method.is_value:
@@ -25885,7 +25876,7 @@ class Migrator:
                     else None,
                     observation.observation_id,
                 )
-            if experiment.method.value is DP_102_METHOD_UNSPECIFIED:
+            if experiment.method.value is MethodToken.UNSPECIFIED:
                 method_default_reason = "source does not state method"
         if (
             experiment is not None
@@ -25902,6 +25893,7 @@ class Migrator:
                 if isinstance(identity, Identity) and identity.quantity.is_value
                 else None
             )
+            method_token = DP_100_METHOD_UNSPECIFIED
             observation_notices.append(
                 Notice(
                     kind=NoticeKind.METHOD_UNSTATED,
@@ -25909,16 +25901,16 @@ class Migrator:
                         (quantity,) if isinstance(quantity, Quantity) else ()
                     ),
                     reason=(
-                        "method_unstated: default=unspecified; "
+                        f"method_unstated: default={method_token.value}; "
                         f"original_reason={method_default_reason or 'source does not state method'}"
                     ),
                     origin=observation.observation_id,
                     policy=NoticePolicy(
-                        id=DP_102_POLICY_ID,
-                        version=DP_102_POLICY_VERSION,
-                        status=DP_102_POLICY_STATUS,
-                        value=DP_102_METHOD_UNSPECIFIED.value,
-                        units=None,
+                        id="DP-100",
+                        version=1,
+                        status="proposed",
+                        value=method_token.value,
+                        units="method token",
                     ),
                 )
             )

@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
+    DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -1015,16 +1016,26 @@ class Derivation:
 @dataclass(frozen=True)
 class NoticePolicy:
     id: str
-    version: str
+    version: str | int
     status: str
     value: str
-    units: str | None
+    units: str
 
     def __post_init__(self) -> None:
-        if not all((self.id, self.version, self.status, self.value)):
-            raise ValueError("NoticePolicy requires id, version, status, and value")
+        if not isinstance(self.id, str) or not self.id.startswith("DP-"):
+            raise ValueError("notice policy id must be a DP id")
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not isinstance(self.value, str)
+            or not self.value
+            or not isinstance(self.units, str)
+            or not self.units
+        ):
+            raise ValueError("notice policy requires id, version, value, and units")
         if self.status not in {"canonical", "proposed", "rejected"}:
-            raise ValueError("NoticePolicy.status is not a closed policy status")
+            raise ValueError("notice policy status is not recognized")
 
 
 @dataclass(frozen=True)
@@ -1071,6 +1082,13 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        if self.policy is not None:
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
+        if self.kind is NoticeKind.ASSUMED_PRESSURE and self.policy is None:
+            raise ValueError("assumed_pressure requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
@@ -1904,8 +1922,10 @@ class Observation:
 
 @dataclass(frozen=True)
 class CandidateRequest:
+    """Requested engine comparison; quantity is None when identity is unknown."""
+
     experiment_id: str
-    quantity: Quantity
+    quantity: Quantity | None
     engine: Engine
     channel: str
 
