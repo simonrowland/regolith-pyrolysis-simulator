@@ -5482,29 +5482,34 @@ class EvaporationMixin:
         captured_kg,
         wall_fraction=0.0,
         booking=None,
+        *,
+        post_subfloor_captured_share=False,
     ):
         # Premise: the condensation route posts one overhead oxygen
         # figure. With no booking, captured CrO2 returns 0.25 mol O2
         # per mol vapor from the static map. The wall share
         # disproportionates too. With a booking, that map is replaced:
         # the oxygen is the booking yield times this captured mass.
-        # A baffle product in (0, floor] retains the whole parcel, so
-        # neither share posts. A wall share whose own products are in
-        # (0, floor] rolls back and does not return its oxygen.
+        # Off the headspace commit, a baffle product in (0, floor]
+        # retains the whole parcel, so neither share posts, and a
+        # wall share whose own products are in (0, floor] rolls back.
+        # The headspace flag posts every positive parcel. Oxygen is
+        # then homogeneous in the captured mass, so the rate integrated
+        # over the hour is the booking of the integrated mass.
         # The evaporation projector already debited the oxygen. S adds
         # back only the credit the route will post.
         # Algebra: baffle = captured * (1 - f), wall = captured * f.
         # Booking: n = (credit - debit) * captured_mol / booked_mol.
         # Unit check: mol O2 per mol vapor, times mol vapor, is mol.
+        # A kg/h argument integrates to mol: n(rate) * hours = n(mass).
         # Limit: no captured mass is 0. A retained parcel returns the
         # prior credit only when that prior itself clears the floor.
         from engines.builtin.condensation_route import (
-            baffle_product_is_subfloor,
             booked_overhead_oxygen_mol,
             booking_scaled_to_vapour_split,
+            headspace_commit_drops_positive_mass,
         )
         from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
-        from simulator.accounting.lots import EMPTY_KG_TOLERANCE
 
         if captured_kg <= 0.0:
             return 0.0
@@ -5530,6 +5535,12 @@ class EvaporationMixin:
                 or 0.0
             )
 
+        def _drops(mass_kg: float) -> bool:
+            return headspace_commit_drops_positive_mass(
+                mass_kg,
+                post_subfloor_captured_share=post_subfloor_captured_share,
+            )
+
         def _subfloor(mass_kg: float) -> bool:
             if not sp_data or mass_kg <= 0.0:
                 return False
@@ -5538,10 +5549,7 @@ class EvaporationMixin:
                 mass_kg,
                 sp_data,
             )
-            return any(
-                baffle_product_is_subfloor(kg, EMPTY_KG_TOLERANCE)
-                for kg in product_kg.values()
-            )
+            return any(_drops(kg) for kg in product_kg.values())
 
         def _oxygen_mol(mass_kg: float) -> float:
             if not sp_data or mass_kg <= 0.0:
@@ -5558,10 +5566,11 @@ class EvaporationMixin:
         prior_clears = prior_kg > 0.0 and not _subfloor(prior_kg)
 
         if isinstance(booking, Mapping):
-            # The route does not dispatch a parcel at or below the
-            # numerical floor, so its booking oxygen does not post.
-            # The scaled booking is the one the commit dispatches.
-            if captured <= EMPTY_KG_TOLERANCE:
+            # Off the headspace commit the route does not dispatch a
+            # parcel at or below the numerical floor, so its booking
+            # oxygen does not post. The flag posts that parcel. The
+            # scaled booking is the one the commit dispatches.
+            if _drops(captured):
                 return 0.0
             vapor_mass = resolve_species_formula(
                 str(species),
@@ -5581,10 +5590,7 @@ class EvaporationMixin:
                         str(name),
                         self.species_formula_registry,
                     ).molar_mass_kg_per_mol()
-                    if baffle_product_is_subfloor(
-                        float(mol) * solid_mass,
-                        EMPTY_KG_TOLERANCE,
-                    ):
+                    if _drops(float(mol) * solid_mass):
                         return True
                 return False
 
@@ -5620,7 +5626,7 @@ class EvaporationMixin:
                     )
                 else:
                     arrival_kg = wall_kg
-                if 0.0 < arrival_kg <= EMPTY_KG_TOLERANCE:
+                if _drops(arrival_kg):
                     retained_account = True
                 else:
                     rolled_account = True

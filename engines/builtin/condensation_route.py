@@ -132,6 +132,26 @@ def baffle_product_is_subfloor(product_kg: float, floor_kg: float) -> bool:
     return 0.0 < float(product_kg) <= float(floor_kg)
 
 
+def headspace_commit_drops_positive_mass(
+    mass_kg: float,
+    *,
+    post_subfloor_captured_share: bool,
+) -> bool:
+    """True when the numerical floor drops this positive mass.
+
+    A headspace-owned commit posts every positive parcel the solve
+    integrated. The flag is that commit. Every other path keeps the
+    kilogram floor. Zero is not a parcel, and a negative mass is not
+    this comparison.
+    """
+
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+
+    if post_subfloor_captured_share:
+        return False
+    return baffle_product_is_subfloor(mass_kg, EMPTY_KG_TOLERANCE)
+
+
 def booked_overhead_oxygen_mol(booking, *, include_wall: bool) -> tuple[float, float]:
     """(debit_mol, credit_mol) this booking posts to process.overhead_gas.
 
@@ -313,7 +333,6 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # init -- see engines/builtin/__init__.py for the cycle
         # description.
         from simulator.accounting.formulas import resolve_species_formula
-        from simulator.accounting.lots import EMPTY_KG_TOLERANCE
         from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
 
         wrong_intent = reject_wrong_intent(
@@ -353,8 +372,9 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # Absent, the kilogram floor leaves the parcel in overhead.
         # The headspace commit sets the flag for every species: q is
         # already net of capture, so this parcel is the captured share
-        # and it has to reach the condenser. An above-floor parcel
-        # ignores the flag. A non-bool is not a second floor.
+        # and it has to reach the condenser. The flag posts every
+        # positive leg, including one under the floor while the vapour
+        # itself is above it. A non-bool is not a second floor.
         post_subfloor_captured_share = controls.get(
             "post_subfloor_captured_share", False,
         )
@@ -372,21 +392,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     ),
                 },
             )
-        captured_below_floor = (
-            post_subfloor_captured_share
-            and current_condensed_kg > 0.0
-            and current_condensed_kg <= EMPTY_KG_TOLERANCE
-        )
-        # The wall plan and the baffle fold are the two places a
-        # positive product at or under the floor is retained instead
-        # of posted. Zero keeps this parcel on the same accounts an
-        # above-floor hour uses. The alkali deferral and the prior
-        # holdup stay on the kilogram floor.
-        parcel_floor_kg = (
-            0.0 if captured_below_floor else EMPTY_KG_TOLERANCE
-        )
-        if current_condensed_kg <= EMPTY_KG_TOLERANCE and (
-            not captured_below_floor
+        # The flag is the whole commit, not only a vapour mass that
+        # is itself under the kilogram floor. A coupled leg under
+        # that floor is the same parcel. Zero stays in overhead.
+        if current_condensed_kg <= 0.0 or headspace_commit_drops_positive_mass(
+            current_condensed_kg,
+            post_subfloor_captured_share=post_subfloor_captured_share,
         ):
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
@@ -456,10 +467,23 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     intent=ChemistryIntent.CONDENSATION_ROUTE, status='refused',
                     control_audit=control_audit,
                     diagnostic={'reason': 'invalid_or_unavailable_reactive_alkali_supply'})
-            if min(reactive_mol * vapor_molar_mass,
-                   oxygen_mol * resolve_species_formula('O2', registry).molar_mass_kg_per_mol(),
-                   oxide_mol * resolve_species_formula(oxide, registry).molar_mass_kg_per_mol()
-                   ) <= EMPTY_KG_TOLERANCE:
+            lightest_leg_kg = min(
+                reactive_mol * vapor_molar_mass,
+                oxygen_mol * resolve_species_formula(
+                    'O2', registry
+                ).molar_mass_kg_per_mol(),
+                oxide_mol * resolve_species_formula(
+                    oxide, registry
+                ).molar_mass_kg_per_mol(),
+            )
+            # A non-positive leg is not a reaction. A positive leg
+            # under the kilogram floor is dropped only off the
+            # headspace commit. The flag posts the reaction the
+            # solve already netted out of q.
+            if lightest_leg_kg <= 0.0 or headspace_commit_drops_positive_mass(
+                lightest_leg_kg,
+                post_subfloor_captured_share=post_subfloor_captured_share,
+            ):
                 # Keep the entire coupled reaction in overhead; ordinary
                 # downstream condensate must still commit. MaterialLot would
                 # otherwise floor only its O2 debit and break oxygen closure.
@@ -468,7 +492,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 baffle_condensed_kg = max(0.0, baffle_condensed_kg - deferred_kg)
                 reactive_mol = oxygen_mol = oxide_mol = 0.0
                 reaction['materialization_status'] = 'reactive_parcel_retained_below_numerical_floor'
-                if current_condensed_kg <= EMPTY_KG_TOLERANCE:
+                if (
+                    current_condensed_kg <= 0.0
+                    or headspace_commit_drops_positive_mass(
+                        current_condensed_kg,
+                        post_subfloor_captured_share=(
+                            post_subfloor_captured_share
+                        ),
+                    )
+                ):
                     return IntentResult(
                         intent=ChemistryIntent.CONDENSATION_ROUTE, status='ok',
                         control_audit=control_audit,
@@ -555,7 +587,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 ),
                 registry,
                 resolve_species_formula,
-                parcel_floor_kg,
+                post_subfloor_captured_share,
             )
         )
 
@@ -578,12 +610,17 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         prior_credits = self._credits_by_product_account(
             prior_product_mol, sp_data
         )
-        prior_credits_materializable = bool(prior_credits) and all(
-            float(mol)
-            * resolve_species_formula(
+        def _prior_product_posts(product_species: str, mol: float) -> bool:
+            mass_kg = float(mol) * resolve_species_formula(
                 product_species, registry
             ).molar_mass_kg_per_mol()
-            > EMPTY_KG_TOLERANCE
+            return mass_kg > 0.0 and not headspace_commit_drops_positive_mass(
+                mass_kg,
+                post_subfloor_captured_share=post_subfloor_captured_share,
+            )
+
+        prior_credits_materializable = bool(prior_credits) and all(
+            _prior_product_posts(product_species, mol)
             for product_mol in prior_credits.values()
             for product_species, mol in product_mol.items()
         )
@@ -601,7 +638,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             wall_plan["product_mol_by_account"],
             registry,
             resolve_species_formula,
-            parcel_floor_kg,
+            post_subfloor_captured_share,
         )
         retained_baffle_kg = 0.0
         if subfloor_baffle_credits_kg:
@@ -1276,7 +1313,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         prior_alkali_state_by_account: Mapping[str, Any],
         registry: Mapping[str, Any],
         resolve_species_formula,
-        floor_kg: float,
+        post_subfloor_captured_share: bool,
     ) -> tuple[dict[str, Any], dict[str, float]]:
         products_by_account = {
             account: dict(species_mol)
@@ -1301,12 +1338,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
 
         def has_subfloor_component(side: Mapping[str, float]) -> bool:
             return any(
-                0.0
-                < float(mol)
-                * resolve_species_formula(
-                    component_species, registry
-                ).molar_mass_kg_per_mol()
-                <= floor_kg
+                headspace_commit_drops_positive_mass(
+                    float(mol)
+                    * resolve_species_formula(
+                        component_species, registry
+                    ).molar_mass_kg_per_mol(),
+                    post_subfloor_captured_share=(
+                        post_subfloor_captured_share
+                    ),
+                )
                 for component_species, mol in side.items()
             )
 
@@ -1336,7 +1376,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 ]
             else:
                 alkali_state_by_account.pop(account, None)
-            if float(arrival_mol) * vapor_molar_mass > floor_kg:
+            arrival_kg = float(arrival_mol) * vapor_molar_mass
+            if arrival_kg > 0.0 and not headspace_commit_drops_positive_mass(
+                arrival_kg,
+                post_subfloor_captured_share=post_subfloor_captured_share,
+            ):
                 products_by_account[account] = {species: float(arrival_mol)}
             else:
                 products_by_account.pop(account, None)
@@ -1358,7 +1402,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         wall_products_by_account: dict[str, dict[str, float]],
         registry: Mapping[str, Any],
         resolve_species_formula,
-        floor_kg: float,
+        post_subfloor_captured_share: bool,
     ) -> tuple[dict[str, dict[str, float]], dict[str, float]]:
         """Fold only identical species into an active materializable wall lot."""
         unresolved: dict[str, dict[str, float]] = {}
@@ -1369,15 +1413,32 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     product_species, registry
                 ).molar_mass_kg_per_mol()
                 product_kg = float(mol) * molar_mass
-                if not baffle_product_is_subfloor(product_kg, floor_kg):
+                if not headspace_commit_drops_positive_mass(
+                    product_kg,
+                    post_subfloor_captured_share=(
+                        post_subfloor_captured_share
+                    ),
+                ):
                     continue
+
+                def _wall_posts(account: str) -> bool:
+                    if product_species not in wall_products_by_account[account]:
+                        return False
+                    wall_kg = (
+                        float(wall_products_by_account[account][product_species])
+                        * molar_mass
+                    )
+                    return wall_kg > 0.0 and not headspace_commit_drops_positive_mass(
+                        wall_kg,
+                        post_subfloor_captured_share=(
+                            post_subfloor_captured_share
+                        ),
+                    )
+
                 destination = next((
                     account
                     for account in sorted(wall_products_by_account)
-                    if product_species in wall_products_by_account[account]
-                    and float(
-                        wall_products_by_account[account][product_species]
-                    ) * molar_mass > floor_kg
+                    if _wall_posts(account)
                 ), None)
                 if destination is None:
                     unresolved.setdefault(source_account, {})[

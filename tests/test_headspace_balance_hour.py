@@ -1490,3 +1490,408 @@ def test_continuation_posts_the_captured_share_not_the_gross():
         )
         moved = float(accumulate.credits[0].species_kg[species])
         assert moved == extent[species] - remaining[species]
+
+
+def _alkali_reaction(species: str, captured_kg: float, molar_kg: float) -> dict:
+    """4 M + O2 -> 2 M2O, the production stage-3 update.
+
+    uptake is the captured share. The debit is uptake/4 and the oxide
+    is uptake/2, which is the stoichiometry condensation.py writes
+    once the reaction is favoured. The ledger assertion is the
+    remaining share, not this ratio.
+    """
+
+    uptake_mol = captured_kg / molar_kg
+    oxide = "Na2O" if species == "Na" else "K2O"
+    return {
+        "uptake_mol": uptake_mol,
+        "oxide_species": oxide,
+        "oxide_product_mol": uptake_mol / 2.0,
+        "oxygen_debit_mol": uptake_mol / 4.0,
+        "silica_partner": "structural substrate/deposit; no SiO2 ledger debit",
+    }
+
+
+def _route_one_parcel(
+    sim,
+    species: str,
+    gross_kg: float,
+    remaining_kg: float,
+    *,
+    headspace: bool,
+    reaction: dict | None = None,
+    post_subfloor: bool = False,
+    booking: dict | None = None,
+):
+    from simulator.condensation import CondensationRouteResult
+    from simulator.state import EvaporationFlux
+
+    route_result = CondensationRouteResult(
+        remaining_by_species={species: remaining_kg},
+        stage3_reactive_alkali_by_species=(
+            {species: dict(reaction)} if reaction is not None else {}
+        ),
+    )
+    sim.condensation_model.route = lambda _flux, _melt: route_result
+    flux = EvaporationFlux(species_kg_hr={species: gross_kg})
+    flux.update_totals()
+    kwargs = {}
+    if headspace:
+        kwargs["headspace_remaining_kg_hr"] = {species: remaining_kg}
+    if post_subfloor:
+        kwargs["post_subfloor_species"] = (species,)
+    # The booking is S's oxygen. Passing it without the remaining
+    # override keeps the condensation floor and still scales the
+    # declared reaction, which is the withheld side of the identity.
+    if booking is not None:
+        kwargs["headspace_booking_by_species"] = {species: booking}
+        kwargs["headspace_wall_fraction_by_species"] = {}
+        kwargs["headspace_wall_accounts_by_species"] = {}
+    sim._route_to_condensation(flux, **kwargs)
+
+
+def _ledger_mol(sim, account: str, species: str) -> float:
+    return float(sim.atom_ledger.mol_by_account(account).get(species, 0.0) or 0.0)
+
+
+def test_favoured_alkali_headspace_hours_post_the_captured_share():
+    """Na 9e-13, Na 2e-12 and K 2e-12 close onto the remaining share.
+
+    The favoured reaction's lightest leg is the O2 debit, under the
+    kilogram floor. Na 2e-12 and K 2e-12 are themselves above that
+    floor. The headspace commit posts the oxide and leaves the
+    remainder in the overhead. The same parcel with the evaporation
+    leg posted and the condensation flag off keeps the gross metal
+    and posts no oxide. An above-floor Na hour is the same ledger
+    with the flag and without it.
+    """
+
+    from engines.builtin.evaporation_transition import (
+        evaporation_parent_is_below_floor,
+    )
+    from simulator.accounting.formulas import resolve_species_formula
+
+    capture = 0.9999
+    cases = (("Na", 9.0e-13), ("Na", 2.0e-12), ("K", 2.0e-12))
+    for species, captured_kg in cases:
+        gross_kg = captured_kg / capture
+        remaining_kg = gross_kg - captured_kg
+        posted = _lunar()
+        withheld = _lunar()
+        molar = resolve_species_formula(
+            species, posted.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        reaction = _alkali_reaction(species, captured_kg, molar)
+        oxide = reaction["oxide_species"]
+        row = dict(
+            (posted.vapor_pressures.get("metals", {}) or {}).get(species)
+            or {}
+        )
+        stoich = posted._evaporation_stoich(species, row)
+        parent = stoich["parent_oxide"]
+        parent_molar = resolve_species_formula(
+            parent, posted.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for sim in (posted, withheld):
+            _seed(
+                sim,
+                "process.cleaned_melt",
+                {parent: 1.0 / parent_molar},
+                f"{species} parent",
+            )
+            _seed(
+                sim,
+                "process.overhead_gas",
+                {"O2": 1.0},
+                f"{species} overhead oxygen",
+            )
+        stock = float(
+            posted.atom_ledger.kg_by_account("process.cleaned_melt").get(
+                parent, 0.0,
+            )
+            or 0.0
+        )
+        oxide_kg = gross_kg * float(stoich["oxide_per_product_kg"])
+        needs_evaporation_flag = (
+            evaporation_parent_is_below_floor(oxide_kg, stock)
+            or not posted._evaporation_transition_posts_parcel(
+                gross_kg, stoich, stock,
+            )
+        )
+        _route_one_parcel(
+            posted,
+            species,
+            gross_kg,
+            remaining_kg,
+            headspace=True,
+            reaction=reaction,
+            post_subfloor=needs_evaporation_flag,
+        )
+        _route_one_parcel(
+            withheld,
+            species,
+            gross_kg,
+            remaining_kg,
+            headspace=False,
+            reaction=reaction,
+            post_subfloor=needs_evaporation_flag,
+        )
+        captured_mol = captured_kg / molar
+        gap_pa = posted._headspace_inventory_pressure_Pa(
+            {species: captured_mol},
+        )
+        assert gap_pa > DEFAULT_ABS_TOL_PA
+        overhead = "process.overhead_gas"
+        train = "process.condensation_train"
+        overhead_mol = _ledger_mol(posted, overhead, species)
+        # The ledger debits the captured mol from the gross mol. The
+        # remaining mass divided by the molar mass is that difference
+        # to a unit in the last place, whose pressure is dust beside
+        # the 1e-6 Pa gate.
+        dust_pa = posted._headspace_inventory_pressure_Pa(
+            {species: abs(overhead_mol - remaining_kg / molar)},
+        )
+        assert dust_pa < 1.0e-18
+        assert posted._headspace_inventory_pressure_Pa(
+            {species: abs(overhead_mol - gross_kg / molar)},
+        ) == gap_pa or abs(
+            posted._headspace_inventory_pressure_Pa(
+                {species: abs(overhead_mol - gross_kg / molar)},
+            )
+            - gap_pa
+        ) < 1.0e-18
+        assert _ledger_mol(posted, train, oxide) == reaction["oxide_product_mol"]
+        assert _ledger_mol(posted, overhead, "O2") == (
+            1.0 - reaction["oxygen_debit_mol"]
+        )
+        assert _ledger_mol(withheld, train, oxide) == 0.0
+        withheld_mol = _ledger_mol(withheld, overhead, species)
+        assert posted._headspace_inventory_pressure_Pa(
+            {species: abs(withheld_mol - gross_kg / molar)},
+        ) < 1.0e-18
+        assert _ledger_mol(withheld, overhead, "O2") == 1.0
+
+    # Above the floor on every leg. The flag and the kilogram floor
+    # post the same reaction, so the two ledgers match.
+    species = "Na"
+    captured_kg = 1.0e-6
+    gross_kg = captured_kg / capture
+    remaining_kg = gross_kg - captured_kg
+    flagged = _lunar()
+    plain = _lunar()
+    molar = resolve_species_formula(
+        species, flagged.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    reaction = _alkali_reaction(species, captured_kg, molar)
+    parent = flagged._evaporation_stoich(
+        species,
+        dict((flagged.vapor_pressures.get("metals", {}) or {}).get(species) or {}),
+    )["parent_oxide"]
+    parent_molar = resolve_species_formula(
+        parent, flagged.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    for sim in (flagged, plain):
+        _seed(
+            sim,
+            "process.cleaned_melt",
+            {parent: 1.0 / parent_molar},
+            "above-floor parent",
+        )
+        _seed(sim, "process.overhead_gas", {"O2": 1.0}, "above-floor oxygen")
+    _route_one_parcel(
+        flagged, species, gross_kg, remaining_kg,
+        headspace=True, reaction=reaction,
+    )
+    _route_one_parcel(
+        plain, species, gross_kg, remaining_kg,
+        headspace=False, reaction=reaction,
+    )
+    oxide = reaction["oxide_species"]
+    for account, label in (
+        ("process.overhead_gas", species),
+        ("process.condensation_train", oxide),
+        ("process.overhead_gas", "O2"),
+    ):
+        assert _ledger_mol(flagged, account, label) == _ledger_mol(
+            plain, account, label,
+        )
+    assert _ledger_mol(flagged, "process.condensation_train", oxide) == (
+        reaction["oxide_product_mol"]
+    )
+
+
+def _oxygen_crediting_booking(sim, species: str) -> dict:
+    """The declared wall reaction that credits oxygen, per mol of vapour.
+
+    The continuation hour builds this same booking inline for CrO3.
+    The scale the predictor and the route share is
+    booking_scaled_to_vapour_split, not this dict.
+    """
+
+    from simulator.vapour_rail.wall_saturation import _assert_atom_balance
+
+    oxides = sim.vapor_pressures.get("oxide_vapors", {}) or {}
+    row = dict(oxides.get(species) or {})
+    declared = row["wall_reactions"]["reactions"]
+    crediting = next(
+        reaction
+        for reaction in declared
+        if float(reaction["oxygen_stoichiometry"]) < 0.0
+        and float(reaction["vapour_stoichiometry"]) > 0.0
+    )
+    _assert_atom_balance(species, crediting)
+    nu_vapour = float(crediting["vapour_stoichiometry"])
+    nu_oxygen = float(crediting["oxygen_stoichiometry"])
+    products = {
+        str(product["species"]): float(product["stoichiometry"]) / nu_vapour
+        for product in crediting["products"]
+    }
+    oxygen_credit = (-nu_oxygen) / nu_vapour
+    return {
+        "baffle_products_mol": products,
+        "baffle_oxygen_credit_mol": oxygen_credit,
+        "baffle_oxygen_debit_mol": 0.0,
+        "wall_products_mol_by_account": {},
+        "wall_oxygen_credit_mol": 0.0,
+        "wall_oxygen_debit_mol": 0.0,
+        "reaction_legs": [
+            {
+                "surface": "baffle",
+                "vapour_mol": 1.0,
+                "products_mol": dict(products),
+                "oxygen_credit_mol": oxygen_credit,
+                "oxygen_debit_mol": 0.0,
+                "reaction_id": crediting.get("id"),
+            },
+        ],
+    }
+
+
+def test_cro3_band_hour_oxygen_matches_the_integrated_captured_mass():
+    """The CrO3 product floor no longer splits the rate from its integral.
+
+    The declared reductive booking credits oxygen and posts Cr2O3.
+    A captured mass in (1e-12, 1.32e-12] kg still has that product in
+    (0, 1e-12] kg, and 1.2e-12 kg/h over 0.8 h is 9.6e-13 kg. Off the
+    headspace commit the predictor and the route post no oxygen. On
+    it the predictor is homogeneous in the captured mass, so the rate
+    integrated over the hour equals the oxygen the route posts for
+    the integrated mass. A mass whose product clears the floor posts
+    the same oxygen with the flag and without it.
+    """
+
+    from engines.builtin.condensation_route import (
+        BuiltinCondensationRouteProvider,
+        booking_scaled_to_vapour_split,
+    )
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+
+    sim = _lunar()
+    registry = sim.species_formula_registry
+    row = dict(
+        (sim.vapor_pressures.get("oxide_vapors", {}) or {}).get("CrO3") or {}
+    )
+    assert row
+    booking = _oxygen_crediting_booking(sim, "CrO3")
+    vapour_molar = resolve_species_formula(
+        "CrO3", registry,
+    ).molar_mass_kg_per_mol()
+
+    def _product_kg(mass_kg: float) -> dict[str, float]:
+        scaled = booking_scaled_to_vapour_split(
+            booking,
+            baffle_mol=mass_kg / vapour_molar,
+            wall_mol=0.0,
+        )
+        masses = {}
+        for name, mol in dict(scaled["baffle_products_mol"]).items():
+            solid = resolve_species_formula(
+                str(name), registry,
+            ).molar_mass_kg_per_mol()
+            masses[str(name)] = float(mol) * solid
+        return masses
+
+    def _predict(mass_kg: float, *, headspace: bool) -> float:
+        return sim._condensation_overhead_o2_mol(
+            "CrO3",
+            mass_kg,
+            booking=booking,
+            post_subfloor_captured_share=headspace,
+        )
+
+    rate_kg_h = 1.2e-12
+    hours = 0.8
+    integral_kg = rate_kg_h * hours
+    assert EMPTY_KG_TOLERANCE < rate_kg_h
+    assert integral_kg <= EMPTY_KG_TOLERANCE
+    assert any(
+        0.0 < kg <= EMPTY_KG_TOLERANCE
+        for kg in _product_kg(rate_kg_h).values()
+    )
+    assert _predict(rate_kg_h, headspace=False) == 0.0
+    assert _predict(integral_kg, headspace=False) == 0.0
+    per_hour = _predict(rate_kg_h, headspace=True)
+    posted_o2 = _predict(integral_kg, headspace=True)
+    assert per_hour > 0.0
+    assert per_hour * hours == posted_o2
+
+    chromium = BuiltinCondensationRouteProvider.CHROMIUM_CONDENSED_ACCOUNT
+    parent = sim._evaporation_stoich("CrO3", row)["parent_oxide"]
+    parent_molar = resolve_species_formula(
+        parent, registry,
+    ).molar_mass_kg_per_mol()
+
+    def _routed(mass_kg: float, *, headspace: bool) -> tuple[float, float]:
+        trial = _lunar()
+        _seed(
+            trial,
+            "process.cleaned_melt",
+            {parent: 1.0 / parent_molar},
+            "CrO3 parent",
+        )
+        _seed(trial, "reservoir.fo2_buffer", {"O2": 1.0}, "CrO3 oxidant")
+        before = _ledger_mol(trial, "process.overhead_gas", "O2")
+        _route_one_parcel(
+            trial,
+            "CrO3",
+            mass_kg,
+            0.0,
+            headspace=headspace,
+            post_subfloor=True,
+            booking=booking,
+        )
+        after = _ledger_mol(trial, "process.overhead_gas", "O2")
+        return after - before, _ledger_mol(trial, chromium, "Cr2O3")
+
+    delta, oxide = _routed(integral_kg, headspace=True)
+    assert delta == posted_o2
+    assert oxide > 0.0
+    withheld_delta, withheld_oxide = _routed(integral_kg, headspace=False)
+    assert withheld_delta == 0.0
+    assert withheld_oxide == 0.0
+    for mass_kg in (1.01e-12, 1.2e-12):
+        assert mass_kg > EMPTY_KG_TOLERANCE
+        assert any(
+            0.0 < kg <= EMPTY_KG_TOLERANCE
+            for kg in _product_kg(mass_kg).values()
+        )
+        flagged = _predict(mass_kg, headspace=True)
+        assert _predict(mass_kg, headspace=False) == 0.0
+        assert flagged > 0.0
+        delta, oxide = _routed(mass_kg, headspace=True)
+        assert delta == flagged
+        assert oxide > 0.0
+        withheld_delta, withheld_oxide = _routed(mass_kg, headspace=False)
+        assert withheld_delta == 0.0
+        assert withheld_oxide == 0.0
+    clearing = 1.5e-12
+    assert all(kg > EMPTY_KG_TOLERANCE for kg in _product_kg(clearing).values())
+    clearing_on = _predict(clearing, headspace=True)
+    clearing_off = _predict(clearing, headspace=False)
+    assert clearing_off > 0.0
+    assert clearing_on == clearing_off
+    delta, _oxide = _routed(clearing, headspace=True)
+    withheld_delta, _withheld_oxide = _routed(clearing, headspace=False)
+    assert delta == clearing_on
+    assert withheld_delta == clearing_off

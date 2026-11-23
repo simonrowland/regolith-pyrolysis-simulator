@@ -8634,8 +8634,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # booking, and it is not added on top of a yaml credit.
             # The commit posts this same booking, scaled to the
             # captured vapour, so the ledger carries the mols S added.
-            # A baffle product in (0, floor] retains the parcel and
-            # credits no O2. A wall that does post still returns oxygen.
+            # The headspace flag posts a positive product the kilogram
+            # floor would have retained. This rate uses that flag, so
+            # the oxygen integrated over the hour is the booking of
+            # the integrated captured mass. Off that commit the floor
+            # still retains the parcel and credits no O2.
             # Algebra: q = gross - captured, captured = 0 when
             # gross * f <= floor, else gross * f.
             # Hold: available_kg >= rate * oxide_per > 0.
@@ -8704,12 +8707,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if captured_kg <= rate_floor_kg_hr:
                     captured_kg = 0.0
                 source[label] = rate - captured_kg
+                # The commit posts the integral of this captured mass.
+                # The flag makes the oxygen credit homogeneous in that
+                # mass, so n(rate) * hours is the booking of the integral.
+                # The clip above is the captured quantity both share.
                 returned_o2_terms.append(
                     self._condensation_overhead_o2_mol(
                         label,
                         captured_kg,
                         wall_fraction=float(walls.get(label, 0.0) or 0.0),
                         booking=bookings.get(label),
+                        post_subfloor_captured_share=True,
                     )
                 )
             returned_o2_mol_hr = (
