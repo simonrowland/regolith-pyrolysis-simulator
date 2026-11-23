@@ -14,40 +14,1626 @@ extraction:
 review_status: draft
 fidelity_samples:
 - path: species.SiO2.observations[mendybaev_2013_table1_fun1_residue_composition_series].values.series[0].MgO_wt_pct
-  value: '50.01'
+  value: "50.01"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
   locator:
     page: 5
     published_page: 372
     pdf_page_index: 4
-    table: '1'
-    row: FUN1-3
+    table: "1"
+    row: "FUN1-3"
+    line_range: "268-268"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_3_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-3"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-3"
+    line_range: "268-268"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
 - path: species.unknown.observations[mendybaev_2013_table1_fun1_3_mass_loss_fraction].values.initial_weight_g
-  value: '0.0161'
+  value: "0.0161"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
   locator:
     page: 5
     published_page: 372
     pdf_page_index: 4
-    table: '1'
-    row: FUN1-3
-    column_header: Initial weight, g
+    table: "1"
+    row: "FUN1-3"
+    line_range: "268-268"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_3_mass_loss_fraction].values.final_weight_g
+  value: "0.0148"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-3"
+    line_range: "268-268"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_3_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_3_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "0"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-3"
+    line_range: "268-268"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_12_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-12"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-12"
+    line_range: "269-269"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_12_mass_loss_fraction].values.initial_weight_g
+  value: "0.0214"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-12"
+    line_range: "269-269"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_12_mass_loss_fraction].values.final_weight_g
+  value: "0.0176"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-12"
+    line_range: "269-269"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_12_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_12_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "0"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-12"
+    line_range: "269-269"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_15_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-15"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-15"
+    line_range: "270-270"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_15_mass_loss_fraction].values.initial_weight_g
+  value: "0.0258"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-15"
+    line_range: "270-270"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_15_mass_loss_fraction].values.final_weight_g
+  value: "0.0208"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-15"
+    line_range: "270-270"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_15_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_15_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "5"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-15"
+    line_range: "270-270"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_13_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-13"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-13"
+    line_range: "271-271"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_13_mass_loss_fraction].values.initial_weight_g
+  value: "0.0286"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-13"
+    line_range: "271-271"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_13_mass_loss_fraction].values.final_weight_g
+  value: "0.0210"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-13"
+    line_range: "271-271"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_13_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_13_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "10"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-13"
+    line_range: "271-271"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_1_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-1"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-1"
+    line_range: "272-272"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_1_mass_loss_fraction].values.initial_weight_g
+  value: "0.0103"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-1"
+    line_range: "272-272"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_1_mass_loss_fraction].values.final_weight_g
+  value: "0.0049"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-1"
+    line_range: "272-272"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_1_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_1_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "15"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-1"
+    line_range: "272-272"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_10_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-10"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-10"
+    line_range: "273-273"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_10_mass_loss_fraction].values.initial_weight_g
+  value: "0.0214"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-10"
+    line_range: "273-273"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
 - path: species.unknown.observations[mendybaev_2013_table1_fun1_10_mass_loss_fraction].values.final_weight_g
-  value: '0.0078'
+  value: "0.0078"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
   locator:
     page: 5
     published_page: 372
     pdf_page_index: 4
-    table: '1'
-    row: FUN1-10
-    column_header: Final weight, g
+    table: "1"
+    row: "FUN1-10"
+    line_range: "273-273"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_10_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_10_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "15"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-10"
+    line_range: "273-273"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_5_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-5"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-5"
+    line_range: "274-274"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_5_mass_loss_fraction].values.initial_weight_g
+  value: "0.0180"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-5"
+    line_range: "274-274"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_5_mass_loss_fraction].values.final_weight_g
+  value: "0.0057"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-5"
+    line_range: "274-274"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_5_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_5_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "20"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-5"
+    line_range: "274-274"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_11_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-11"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-11"
+    line_range: "275-275"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_11_mass_loss_fraction].values.initial_weight_g
+  value: "0.0300"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-11"
+    line_range: "275-275"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_11_mass_loss_fraction].values.final_weight_g
+  value: "0.0045"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-11"
+    line_range: "275-275"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_11_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_11_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "25"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-11"
+    line_range: "275-275"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_16_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-16"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-16"
+    line_range: "276-276"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_16_mass_loss_fraction].values.initial_weight_g
+  value: "0.0238"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-16"
+    line_range: "276-276"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_16_mass_loss_fraction].values.final_weight_g
+  value: "0.0100"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-16"
+    line_range: "276-276"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_16_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_16_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "25"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-16"
+    line_range: "276-276"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_4_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-4"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-4"
+    line_range: "277-277"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_4_mass_loss_fraction].values.initial_weight_g
+  value: "0.0278"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-4"
+    line_range: "277-277"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_4_mass_loss_fraction].values.final_weight_g
+  value: "0.0037"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-4"
+    line_range: "277-277"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_4_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_4_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "30"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-4"
+    line_range: "277-277"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_14_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-14"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-14"
+    line_range: "278-278"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_14_mass_loss_fraction].values.initial_weight_g
+  value: "0.0290"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-14"
+    line_range: "278-278"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_14_mass_loss_fraction].values.final_weight_g
+  value: "0.0094"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-14"
+    line_range: "278-278"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_14_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_14_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "30"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-14"
+    line_range: "278-278"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_9_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-9"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-9"
+    line_range: "279-279"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_9_mass_loss_fraction].values.initial_weight_g
+  value: "0.0377"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-9"
+    line_range: "279-279"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_9_mass_loss_fraction].values.final_weight_g
+  value: "0.0126"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-9"
+    line_range: "279-279"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_9_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_9_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "35"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-9"
+    line_range: "279-279"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_17_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-17"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-17"
+    line_range: "280-280"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_17_mass_loss_fraction].values.initial_weight_g
+  value: "0.0278"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-17"
+    line_range: "280-280"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_17_mass_loss_fraction].values.final_weight_g
+  value: "0.0059"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-17"
+    line_range: "280-280"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_17_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_17_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "35"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-17"
+    line_range: "280-280"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_18_mass_loss_fraction].values.sample_as_printed
+  value: "FUN1-18"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-18"
+    line_range: "281-281"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_18_mass_loss_fraction].values.initial_weight_g
+  value: "0.0312"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-18"
+    line_range: "281-281"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_18_mass_loss_fraction].values.final_weight_g
+  value: "0.0060"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-18"
+    line_range: "281-281"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_18_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun1_18_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "40"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN1-18"
+    line_range: "281-281"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_4_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-4"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-4"
+    line_range: "283-283"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_4_mass_loss_fraction].values.initial_weight_g
+  value: "0.0334"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-4"
+    line_range: "283-283"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_4_mass_loss_fraction].values.final_weight_g
+  value: "0.0319"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-4"
+    line_range: "283-283"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_4_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_4_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "0"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-4"
+    line_range: "283-283"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_5_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-5"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-5"
+    line_range: "284-284"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_5_mass_loss_fraction].values.initial_weight_g
+  value: "0.0315"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-5"
+    line_range: "284-284"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_5_mass_loss_fraction].values.final_weight_g
+  value: "0.0243"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-5"
+    line_range: "284-284"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_5_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_5_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "10"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-5"
+    line_range: "284-284"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_1_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-1"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-1"
+    line_range: "285-285"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_1_mass_loss_fraction].values.initial_weight_g
+  value: "0.0619"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-1"
+    line_range: "285-285"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_1_mass_loss_fraction].values.final_weight_g
+  value: "0.0431"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-1"
+    line_range: "285-285"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_1_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_1_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "20"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-1"
+    line_range: "285-285"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_2_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-2"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-2"
+    line_range: "286-286"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_2_mass_loss_fraction].values.initial_weight_g
+  value: "0.0455"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-2"
+    line_range: "286-286"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_2_mass_loss_fraction].values.final_weight_g
+  value: "0.0298"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-2"
+    line_range: "286-286"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_2_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_2_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "20"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-2"
+    line_range: "286-286"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_3_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-3"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-3"
+    line_range: "287-287"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_3_mass_loss_fraction].values.initial_weight_g
+  value: "0.0372"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-3"
+    line_range: "287-287"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_3_mass_loss_fraction].values.final_weight_g
+  value: "0.0206"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-3"
+    line_range: "287-287"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_3_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_3_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "25"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-3"
+    line_range: "287-287"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_8_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-8"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-8"
+    line_range: "288-288"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_8_mass_loss_fraction].values.initial_weight_g
+  value: "0.0309"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-8"
+    line_range: "288-288"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_8_mass_loss_fraction].values.final_weight_g
+  value: "0.0137"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-8"
+    line_range: "288-288"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_8_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_8_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "30"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-8"
+    line_range: "288-288"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_7_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-7"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-7"
+    line_range: "289-289"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_7_mass_loss_fraction].values.initial_weight_g
+  value: "0.0418"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-7"
+    line_range: "289-289"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_7_mass_loss_fraction].values.final_weight_g
+  value: "0.0194"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-7"
+    line_range: "289-289"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_7_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_7_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "35"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-7"
+    line_range: "289-289"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_6_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-6"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-6"
+    line_range: "290-290"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_6_mass_loss_fraction].values.initial_weight_g
+  value: "0.0419"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-6"
+    line_range: "290-290"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_6_mass_loss_fraction].values.final_weight_g
+  value: "0.0160"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-6"
+    line_range: "290-290"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_6_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_6_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "40"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-6"
+    line_range: "290-290"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_9_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-9"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-9"
+    line_range: "291-291"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_9_mass_loss_fraction].values.initial_weight_g
+  value: "0.0559"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-9"
+    line_range: "291-291"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_9_mass_loss_fraction].values.final_weight_g
+  value: "0.0215"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-9"
+    line_range: "291-291"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_9_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_9_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "50"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-9"
+    line_range: "291-291"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_10_mass_loss_fraction].values.sample_as_printed
+  value: "FUN2-10"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-10"
+    line_range: "292-292"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
 - path: species.unknown.observations[mendybaev_2013_table1_fun2_10_mass_loss_fraction].values.initial_weight_g
-  value: '0.0514'
+  value: "0.0514"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
   locator:
     page: 5
     published_page: 372
     pdf_page_index: 4
-    table: '1'
-    row: FUN2-10
-    column_header: Initial weight, g
+    table: "1"
+    row: "FUN2-10"
+    line_range: "292-292"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Initial weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_10_mass_loss_fraction].values.final_weight_g
+  value: "0.0176"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-10"
+    line_range: "292-292"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Final weight, g"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_10_mass_loss_fraction].point_conditions.temperature_C.state.value
+  value: "1900"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: "Experimental"
+    line_range: "229-229"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+- path: species.unknown.observations[mendybaev_2013_table1_fun2_10_mass_loss_fraction].point_conditions.time_min.state.value
+  value: "55"
+  reviewed_by: Simon Rowland
+  reviewed_on: '2026-11-23'
+  locator:
+    page: 5
+    published_page: 372
+    pdf_page_index: 4
+    table: "1"
+    row: "FUN2-10"
+    line_range: "292-292"
+    source_path: "text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt"
+    source_sha256: "cd95cb6d42ab92027dd3d0a481d930ee9108eded4ec8f600d0943655c839ef8c"
+    column_header: "Run duration, min"
 experiments:
 - experiment_id: mendybaev-fun1-vacuum-evaporation
   method: langmuir_free_evaporation
@@ -71,6 +1657,27 @@ experiments:
           Al2O3: '2.97'
           SiO2: '41.27'
           CaO: '2.36'
+      locator:
+        page: 5
+        published_page: 372
+        pdf_page_index: 4
+        table: '1'
+        row: FUN1 starting
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '53.14'
+          - - Al2O3
+            - '2.97'
+          - - SiO2
+            - '41.27'
+          - - CaO
+            - '2.36'
       locator:
         page: 5
         published_page: 372
@@ -128,6 +1735,27 @@ experiments:
         pdf_page_index: 4
         table: '1'
         row: FUN2 starting
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '33.03'
+          - - Al2O3
+            - '15.18'
+          - - SiO2
+            - '38.39'
+          - - CaO
+            - '13.40'
+      locator:
+        page: 5
+        published_page: 372
+        pdf_page_index: 4
+        table: '1'
+        row: FUN2 starting
   conditions:
     temperature_C: *mendybaev_temperature_1900
     total_pressure_Pa: &mendybaev_fun2_pressure
@@ -159,9 +1787,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: &mendybaev_fO2_not_reported
           state:
             tag: unknown
@@ -189,41 +1815,40 @@ species:
         sample_as_printed: FUN1-3
         initial_weight_g: '0.0161'
         final_weight_g: '0.0148'
-        mass_loss_fraction: '0.0807453416149068322981366459627329192546'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-3
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0161'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-3
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0148'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-3
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-3
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0161'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-3
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0148'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-3
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_12_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -237,9 +1862,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -259,41 +1882,40 @@ species:
         sample_as_printed: FUN1-12
         initial_weight_g: '0.0214'
         final_weight_g: '0.0176'
-        mass_loss_fraction: '0.1775700934579439252336448598130841121495'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-12
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0214'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-12
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0176'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-12
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-12
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0214'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-12
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0176'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-12
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_15_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -307,9 +1929,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -329,41 +1949,40 @@ species:
         sample_as_printed: FUN1-15
         initial_weight_g: '0.0258'
         final_weight_g: '0.0208'
-        mass_loss_fraction: '0.1937984496124031007751937984496124031007'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-15
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0258'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-15
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0208'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-15
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-15
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0258'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-15
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0208'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-15
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_13_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -377,9 +1996,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -399,41 +2016,40 @@ species:
         sample_as_printed: FUN1-13
         initial_weight_g: '0.0286'
         final_weight_g: '0.0210'
-        mass_loss_fraction: '0.2657342657342657342657342657342657342657'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-13
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0286'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-13
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0210'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-13
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-13
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0286'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-13
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0210'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-13
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_1_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -447,9 +2063,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -469,41 +2083,40 @@ species:
         sample_as_printed: FUN1-1
         initial_weight_g: '0.0103'
         final_weight_g: '0.0049'
-        mass_loss_fraction: '0.5242718446601941747572815533980582524271'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-1
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0103'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-1
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0049'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-1
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-1
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0103'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-1
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0049'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-1
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_10_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -517,9 +2130,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -539,41 +2150,40 @@ species:
         sample_as_printed: FUN1-10
         initial_weight_g: '0.0214'
         final_weight_g: '0.0078'
-        mass_loss_fraction: '0.6355140186915887850467289719626168224299'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-10
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0214'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-10
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0078'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-10
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-10
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0214'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-10
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0078'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-10
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_5_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -587,9 +2197,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -609,41 +2217,40 @@ species:
         sample_as_printed: FUN1-5
         initial_weight_g: '0.0180'
         final_weight_g: '0.0057'
-        mass_loss_fraction: '0.6833333333333333333333333333333333333333'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-5
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0180'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-5
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0057'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-5
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-5
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0180'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-5
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0057'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-5
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_11_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -657,9 +2264,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -679,41 +2284,40 @@ species:
         sample_as_printed: FUN1-11
         initial_weight_g: '0.0300'
         final_weight_g: '0.0045'
-        mass_loss_fraction: '0.8500000000000000000000000000000000000000'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-11
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0300'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-11
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0045'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-11
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-11
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0300'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-11
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0045'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-11
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_16_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -727,9 +2331,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -749,41 +2351,40 @@ species:
         sample_as_printed: FUN1-16
         initial_weight_g: '0.0238'
         final_weight_g: '0.0100'
-        mass_loss_fraction: '0.5798319327731092436974789915966386554621'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-16
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0238'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-16
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0100'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-16
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-16
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0238'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-16
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0100'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-16
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_4_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -797,9 +2398,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -819,41 +2418,40 @@ species:
         sample_as_printed: FUN1-4
         initial_weight_g: '0.0278'
         final_weight_g: '0.0037'
-        mass_loss_fraction: '0.8669064748201438848920863309352517985611'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-4
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0278'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-4
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0037'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-4
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-4
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0278'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-4
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0037'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-4
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_14_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -867,9 +2465,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -889,41 +2485,40 @@ species:
         sample_as_printed: FUN1-14
         initial_weight_g: '0.0290'
         final_weight_g: '0.0094'
-        mass_loss_fraction: '0.6758620689655172413793103448275862068965'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-14
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0290'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-14
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0094'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-14
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-14
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0290'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-14
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0094'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-14
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_9_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -937,9 +2532,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -959,41 +2552,40 @@ species:
         sample_as_printed: FUN1-9
         initial_weight_g: '0.0377'
         final_weight_g: '0.0126'
-        mass_loss_fraction: '0.6657824933687002652519893899204244031830'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-9
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0377'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-9
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0126'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-9
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-9
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0377'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-9
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0126'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-9
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_17_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -1007,9 +2599,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1029,41 +2619,40 @@ species:
         sample_as_printed: FUN1-17
         initial_weight_g: '0.0278'
         final_weight_g: '0.0059'
-        mass_loss_fraction: '0.7877697841726618705035971223021582733812'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-17
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0278'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-17
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0059'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-17
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-17
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0278'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-17
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0059'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-17
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun1_18_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun1-vacuum-evaporation
@@ -1077,9 +2666,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun1_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *id001
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1099,41 +2686,40 @@ species:
         sample_as_printed: FUN1-18
         initial_weight_g: '0.0312'
         final_weight_g: '0.0060'
-        mass_loss_fraction: '0.8076923076923076923076923076923076923076'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN1-18
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0312'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-18
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0060'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN1-18
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN1-18
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0312'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-18
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0060'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN1-18
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_4_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1147,9 +2733,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1169,41 +2753,40 @@ species:
         sample_as_printed: FUN2-4
         initial_weight_g: '0.0334'
         final_weight_g: '0.0319'
-        mass_loss_fraction: '0.0449101796407185628742514970059880239520'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-4
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0334'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-4
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0319'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-4
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-4
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0334'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-4
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0319'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-4
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_5_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1217,9 +2800,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1239,41 +2820,40 @@ species:
         sample_as_printed: FUN2-5
         initial_weight_g: '0.0315'
         final_weight_g: '0.0243'
-        mass_loss_fraction: '0.2285714285714285714285714285714285714285'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-5
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0315'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-5
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0243'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-5
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-5
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0315'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-5
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0243'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-5
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_1_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1287,9 +2867,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1309,41 +2887,40 @@ species:
         sample_as_printed: FUN2-1
         initial_weight_g: '0.0619'
         final_weight_g: '0.0431'
-        mass_loss_fraction: '0.3037156704361873990306946688206785137318'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-1
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0619'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-1
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0431'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-1
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-1
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0619'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-1
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0431'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-1
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_2_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1357,9 +2934,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1379,41 +2954,40 @@ species:
         sample_as_printed: FUN2-2
         initial_weight_g: '0.0455'
         final_weight_g: '0.0298'
-        mass_loss_fraction: '0.3450549450549450549450549450549450549450'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-2
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0455'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-2
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0298'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-2
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-2
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0455'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-2
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0298'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-2
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_3_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1427,9 +3001,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1449,41 +3021,40 @@ species:
         sample_as_printed: FUN2-3
         initial_weight_g: '0.0372'
         final_weight_g: '0.0206'
-        mass_loss_fraction: '0.4462365591397849462365591397849462365591'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-3
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0372'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-3
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0206'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-3
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-3
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0372'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-3
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0206'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-3
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_8_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1497,9 +3068,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1519,41 +3088,40 @@ species:
         sample_as_printed: FUN2-8
         initial_weight_g: '0.0309'
         final_weight_g: '0.0137'
-        mass_loss_fraction: '0.5566343042071197411003236245954692556634'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-8
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0309'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-8
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0137'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-8
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-8
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0309'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-8
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0137'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-8
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_7_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1567,9 +3135,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1589,41 +3155,40 @@ species:
         sample_as_printed: FUN2-7
         initial_weight_g: '0.0418'
         final_weight_g: '0.0194'
-        mass_loss_fraction: '0.5358851674641148325358851674641148325358'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-7
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0418'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-7
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0194'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-7
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-7
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0418'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-7
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0194'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-7
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_6_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1637,9 +3202,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1659,41 +3222,40 @@ species:
         sample_as_printed: FUN2-6
         initial_weight_g: '0.0419'
         final_weight_g: '0.0160'
-        mass_loss_fraction: '0.6181384248210023866348448687350835322195'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-6
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0419'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-6
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0160'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-6
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-6
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0419'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-6
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0160'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-6
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_9_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1707,9 +3269,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1729,41 +3289,40 @@ species:
         sample_as_printed: FUN2-9
         initial_weight_g: '0.0559'
         final_weight_g: '0.0215'
-        mass_loss_fraction: '0.6153846153846153846153846153846153846153'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-9
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0559'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-9
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0215'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-9
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-9
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0559'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-9
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0215'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-9
+              column_header: Final weight, g
     - observation_id: mendybaev_2013_table1_fun2_10_mass_loss_fraction
       type: mass_loss
       experiment: mendybaev-fun2-vacuum-evaporation
@@ -1777,9 +3336,7 @@ species:
       derived_from:
         - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
       point_conditions:
-        printed_composition: *mendybaev_fun2_starting_composition
         temperature_C: *mendybaev_temperature_1900
-        total_pressure_Pa: *mendybaev_fun2_pressure
         fO2_log: *mendybaev_fO2_not_reported
         time_min:
           state:
@@ -1799,41 +3356,40 @@ species:
         sample_as_printed: FUN2-10
         initial_weight_g: '0.0514'
         final_weight_g: '0.0176'
-        mass_loss_fraction: '0.6575875486381322957198443579766536964980'
-        derivation:
-          relation: (initial_weight_g - final_weight_g) / initial_weight_g
-          inputs:
-            - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
-          output_unit: fraction
-          locator:
-            page: 5
-            published_page: 372
-            pdf_page_index: 4
-            table: '1'
-            row: FUN2-10
-          parameters:
-          - - initial_weight_g
-            - state:
-                tag: value
-                value: '0.0514'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-10
-                column_header: Initial weight, g
-          - - final_weight_g
-            - state:
-                tag: value
-                value: '0.0176'
-              locator:
-                page: 5
-                published_page: 372
-                pdf_page_index: 4
-                table: '1'
-                row: FUN2-10
-                column_header: Final weight, g
+      derivation:
+        relation: (initial_weight_g - final_weight_g) / initial_weight_g
+        inputs:
+          - mendybaev-2013-fun-cai-evaporation::context::mendybaev_2013_table1_all_printed_cells
+        output_unit: fraction
+        locator:
+          page: 5
+          published_page: 372
+          pdf_page_index: 4
+          table: '1'
+          row: FUN2-10
+        parameters:
+        - - initial_weight_g
+          - state:
+              tag: value
+              value: '0.0514'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-10
+              column_header: Initial weight, g
+        - - final_weight_g
+          - state:
+              tag: value
+              value: '0.0176'
+            locator:
+              page: 5
+              published_page: 372
+              pdf_page_index: 4
+              table: '1'
+              row: FUN2-10
+              column_header: Final weight, g
   SiO2:
     observations:
     - observation_id: mendybaev_2013_table1_fun1_residue_composition_series

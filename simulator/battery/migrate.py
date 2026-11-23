@@ -54,7 +54,7 @@ import unicodedata
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass, replace
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
 from enum import Enum
 from fractions import Fraction
 from functools import lru_cache
@@ -12172,6 +12172,68 @@ _MASS_LOSS_YIELD_FIELDS = (
     "water_released_wt_pct_as_printed",
     "mass_loss_wt_pct_range",
 )
+
+
+def _mass_loss_fraction_from_printed_weights(
+    values: Mapping[str, Any],
+    derivation: object,
+    source_locator: Mapping[str, Any] | None = None,
+) -> Decimal | None:
+    """Reduce Mendybaev 2013 FUN Table 1 xi from its located gram weights."""
+    relation = derivation.get("relation") if isinstance(derivation, Mapping) else None
+    normalized_relation = " ".join(str(relation or "").casefold().split())
+    if normalized_relation != (
+        "(initial_weight_g - final_weight_g) / initial_weight_g"
+    ):
+        return None
+
+    fields = ("initial_weight_g", "final_weight_g")
+    located_parameters: dict[str, Decimal] = {}
+    raw_parameters = (
+        derivation.get("parameters") if isinstance(derivation, Mapping) else None
+    )
+    if isinstance(raw_parameters, (list, tuple)):
+        for item in raw_parameters:
+            if not isinstance(item, (list, tuple)) or len(item) != 2:
+                continue
+            name, payload = item
+            if name not in fields or not isinstance(payload, Mapping):
+                continue
+            state = payload.get("state")
+            locator = payload.get("locator")
+            if (
+                not isinstance(state, Mapping)
+                or state.get("tag") != "value"
+                or not isinstance(locator, Mapping)
+            ):
+                continue
+            amount = _as_dec_or_none(state.get("value"))
+            if amount is not None:
+                located_parameters[str(name)] = amount
+
+    amounts = {name: _as_dec_or_none(values.get(name)) for name in fields}
+    if (
+        set(located_parameters) != set(fields)
+        or any(amounts[name] != located_parameters[name] for name in fields)
+    ):
+        return None
+    initial, final = (amounts[name] for name in fields)
+    if (
+        initial is None
+        or final is None
+        or not initial.is_finite()
+        or not final.is_finite()
+        or initial <= 0
+        or not isinstance(source_locator, Mapping)
+    ):
+        return None
+
+    with localcontext() as context:
+        context.prec = 80
+        fraction = (initial - final) / initial
+        return fraction.quantize(Decimal("1e-40"), rounding=ROUND_DOWN)
+
+
 _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
     ("mass_yield_percent", Quantity.YIELD_FRACTION),
     ("fraction_of_feedstock_oxygen_percent", Quantity.O2_YIELD),
@@ -27595,6 +27657,7 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        mass_loss_fraction_from_weights: Decimal | None = None
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
@@ -27642,6 +27705,31 @@ class Migrator:
             except (KeyError, TypeError, ValueError) as exc:
                 ident_kwargs["reaction"] = State.unknown(
                     f"source structured reaction is invalid: {exc}"
+                )
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and source_id == "mendybaev-2013-fun-cai-evaporation"
+        ):
+            source_derivation_payload = obs.get("derivation", values.get("derivation"))
+            mass_loss_fraction_from_weights = _mass_loss_fraction_from_printed_weights(
+                values,
+                source_derivation_payload,
+                source_locator=obs.get("locator") or locator,
+            )
+            for field_name in _MASS_LOSS_YIELD_FIELDS:
+                values.pop(field_name, None)
+            if mass_loss_fraction_from_weights is None:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["values.initial_weight_g", "values.final_weight_g"],
+                    "Mendybaev mass_loss_fraction requires both located Table 1 gram weights; any stored scalar was ignored",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
+            else:
+                values["mass_loss_fraction"] = format(
+                    mass_loss_fraction_from_weights, "f"
                 )
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
@@ -28843,6 +28931,22 @@ class Migrator:
                     quantity=q_token,
                 )
             )
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and source_id == "mendybaev-2013-fun-cai-evaporation"
+            and mass_loss_fraction_from_weights is not None
+        ):
+            # A gravimetric fraction declared from initial and final weights
+            # is normalized to the run's starting charge. Its identity is the
+            # experiment's located initial composition.
+            experiment = self.result.experiments.get(experiment_id)
+            initial = (
+                experiment.sample.initial_composition
+                if experiment is not None
+                else None
+            )
+            if initial is not None and initial.state.is_value:
+                ident_kwargs["composition"] = initial.state
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,

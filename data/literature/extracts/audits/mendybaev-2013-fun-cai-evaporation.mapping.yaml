@@ -200,8 +200,8 @@ table_tool:
   reason: No MinerU table blocks or tables index were present to convert or compare.
   comparison_output: Not generated; the full render audit above covers the stored cells.
 migration:
-  status: isolated_migration_complete_d460_composition_unbound
-  required_mutation: The authored focused test changes FUN1-10 final_weight_g, recomputes the fraction, and pins the changed migrated value; the pytest mutation is not run under owner hold.
+  status: isolated_migration_complete_car3_flagged_residue_extent
+  required_mutation: The focused tests change FUN1-10 final_weight_g and require xi to move, then delete both grams while retaining the scalar and require the migrated xi value to become unavailable; pytest is not run under owner hold.
   code_path_checked:
     - simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
     - simulator/battery/migrate.py::_MASS_LOSS_YIELD_FIELDS
@@ -211,58 +211,68 @@ migration:
     - simulator/battery/score.py::_predict_mass_loss_with_residue
     - simulator/battery/residue.py::predict_mass_loss_fraction
     - simulator/battery/residue.py::_initial_oxide_wt_percent
-  finding: The existing mass-loss reader consumes values.mass_loss_fraction. Printed grams and their arithmetic derivation are retained on every row. The extract binds each row to its experiment's printed initial-charge composition and initial_mass basis, but migration leaves identity.composition unknown under the Car 1 ruling.
-  scope_rule: No simulator or migrator code changed.
-  isolated_migration: Direct in-memory Migrator run; 120 observations, 24 mass_loss_fraction and 96 residue_component_composition, 0 hard issues, 0 unavailable values, 0 registry issues, 0 quantity-unknown observations. Species phase is unknown for all 120 observations; Car 1 does not assign a single phase to this integrated mass-loss quantity, and the existing composition rows are unchanged. This was not a simulator run or store regeneration.
+    - simulator/battery/migrate.py::_mass_loss_fraction_from_printed_weights
+    - simulator/battery/residue.py::predict_langmuir_residue_composition
+    - simulator/battery/score.py::_extent_residue_prediction
+  finding: The generic extract migrator derives mass_loss_fraction from the two located gram operands and drops a stale scalar when either operand is absent. Table 1's starting assays now migrate through sample.initial_composition; residue point_conditions retain the per-row assay. Both FUN experiments resolve to langmuir_free_evaporation with method_locator.
+  scope_rule: One generic mass-loss operand rule lives in simulator/battery/migrate.py. The residue caller reuses integrate_knudsen_residue_inventory and the existing pressure closure; no second integrator or DP id was added.
+  isolated_migration: Direct in-memory Migrator._migrate_extract plus finalize; 120 observations, 24 mass_loss_fraction and 96 residue_component_composition, 0 hard issues, 0 registry issues, 52 queued locator/source issues. Every row has the correct FUN start composition and 2173.15 K temperature, with its printed row time in point_conditions. This was not a store regeneration.
+  fidelity_counts:
+    pre_car1_green: {uncovered_observation: 2, unattested_sample: 1}
+    car1_base: {uncovered_observation: 26, unattested_sample: 4}
+    tip: {uncovered_observation: 2, unattested_sample: 0}
+    evidence: Production fidelity_source_warnings one-off with REGOLITH_CORPUS_ROOT set; 120 Table 1 xi-field pins are located and attested, including 3 retained pins and 117 additions.
   uncertainty_counts:
     printed: 96
     none: 24
     confidence_not_stated: 96
     confidence_not_recorded: 24
   identity_axes_after_migration:
-    FUN1-3: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
-    FUN1-10: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
-    FUN2-10: {composition: unknown, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN1-3: {composition: FUN1 starting charge, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN1-10: {composition: FUN1 starting charge, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN2-10: {composition: FUN2 starting charge, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
   identity_composition_d460_finding: >-
-    The printed FUN1/FUN2 starting compositions are linked through sample.printed_composition and each mass-loss
-    observation's point_conditions.printed_composition, but the isolated Migrator leaves identity.composition
-    unknown. The controller ruled to keep composition_role absent: initial_charge_only marks a proxy for an evolving
-    measurement state, while these rows describe integrated loss from their true starting charge. This is an approved
-    d-460 finding; a separate migrator task will bind sample.printed_composition to identity composition generically,
-    without a role or proxy flag. No schema or migrator change was made in Car 1.
+    Page 5 (published page 372), Table 1 caption: “starting materials and evaporation residues from FUN1 and FUN2 experiments.”
+    The starting rows are the true initial charge, and both experiment records now carry that located Table 1 assay
+    in sample.initial_composition through the existing converter. Every FUN1 residue and xi identity uses the FUN1
+    charge; every FUN2 row uses the FUN2 charge. No composition_role is used. Row-local point_conditions.composition
+    continues to hold only the measured residue assay.
   current_prediction_first_refusal: >-
-    Static code-path inspection (no simulator run under owner hold):
-    simulator/battery/score.py::_predict_mass_loss_with_residue calls
-    simulator/battery/residue.py::predict_mass_loss_fraction, whose first composition lookup is
-    simulator/battery/residue.py::_initial_oxide_wt_percent. That helper reads experiment.sample.initial_composition,
-    while these experiments store the printed map under sample.printed_composition, so the current prediction path
-    raises initial_composition_not_stated; the score wrapper maps *_not_stated to IDENTITY_INCOMPLETE / NOT_PROBED.
-    The printed map is therefore present in the extract but is not bound to the field this predictor currently consumes.
+    The car-3 score path dispatches only residue_component_composition on langmuir_free_evaporation experiments
+    with no declared cohort predictor. It calls predict_langmuir_residue_composition using the matching Table 1
+    sample row's measured xi. Missing xi returns measured_mass_loss_fraction_missing_or_invalid before any clock
+    predictor can run. The caller scores a one-point isothermal 2173.15 K extent, including positive xi on zero-time
+    diagnostic rows.
   identity_pressure: >-
-    Car 1 design section 4 directs this case: retain the printed one-sided ceiling in point_conditions and leave
-    identity.total_pressure_Pa unknown. The existing simulator/battery/migrate.py::_point_pressure_for_identity
-    path cannot represent this bound as an identity pressure; no point value is inferred.
+    Keep identity.total_pressure_Pa unknown. The source ceiling remains located in experiment conditions and the
+    row point conditions where printed; the scorer reads the evidence and evaluates p_bulk = 0 Pa inside the
+    <0.0001 Pa bound. A printed point mutation to 101325 or 0.1 Pa is carried into pressure-model provenance.
 engine_readiness:
   observable: mass_loss_fraction, used as the per-bead gravimetric extent anchor by the later residue comparison.
   rows: 24
   ready_for_extent_anchor: 24
   direct_mass_loss_profile_ready: 0
-  prediction_code_path: "simulator/battery/score.py::_predict_mass_loss_with_residue -> simulator/battery/residue.py::predict_mass_loss_fraction -> simulator/battery/residue.py::_initial_oxide_wt_percent"
-  prediction_first_refusal: initial_composition_not_stated, mapped to IDENTITY_INCOMPLETE / NOT_PROBED; see migration.current_prediction_first_refusal.
-  experiment_links: FUN1 and FUN2 remain separate; each row points to its experiment's starting composition and has its own printed temperature and pressure bound. The identity composition gap is recorded above.
+  prediction_code_path: "simulator/battery/score.py::_extent_residue_prediction -> simulator/battery/score.py::_langmuir_residue_prediction -> simulator/battery/residue.py::predict_langmuir_residue_composition"
+  prediction_first_refusal: measured_mass_loss_fraction_missing_or_invalid when the bead has no matched Table 1 xi anchor.
+  experiment_links: FUN1 and FUN2 remain separate; each residue and xi row uses its experiment's located Table 1 starting composition and 2173.15 K.
   missing_or_deferred_inputs:
-    identity.composition: Printed starting compositions are present and linked to each run, but identity remains unknown per the controller ruling; the generic binding is assigned to a separate migrator task. This also leaves the current mass-loss predictor's initial_composition input unstated.
-    identity.total_pressure_Pa: The printed one-sided ceiling remains in point_conditions; the design directs identity pressure to remain unknown for a bound.
-    identity.fO2_Pa: No absolute fO2 value or oxygen-buffer condition is printed; every row carries a located unknown.
-    identity.sample_mass_kg: The observation profile requires it, but Car 1 forbids sample.mass_kg; the initial and final grams remain in the mass-loss values and are not converted to kilograms.
-    identity.reservoir: The design leaves this bulk-bead phase unspecified.
-    identity.sweep_gas: No gas mixture or carrier-flow value is reported for the vacuum-furnace conditions.
-    identity.exposure: Run duration is printed per bead; exposed area is not printed.
+    identity.total_pressure_Pa: The printed one-sided ceiling remains located as evidence; identity pressure stays unknown because the source gives a bound.
+    identity.fO2_Pa: No imposed fO2 is printed; the scorer uses the existing congruent-vapour zero-storage closure and flags it.
+    sample_mass_and_area: Not read on the extent path; each bead's independent gravimetric xi anchors the comparison.
+    phase: The recovered bulk phase remains unspecified; no liquid phase stamp is added.
     identity.per: Bound to the printed fraction denominator with simulator/battery/enums.py::PerBasis.INITIAL_MASS.
-  method_token: vacuum_evaporation still awaits the separate Car 2 alias.
+  method_token: Both Mendybaev experiment records migrate as langmuir_free_evaporation with method_locator; the alias car is complete.
   next_car_note: >-
-    Car 1 emits no scored or predicted residue rows, so steer 4 requires no changes here. For Car 3, phrase DP-005 alpha_assumed as relative-alpha sensitivity for MgO and SiO2, and add the typed melt_well_mixed_assumed notice using diffusion time R^2/D against evaporation time; bead radius is unprinted. Reuse an existing notice mechanism and add no DP id. Leave method fields to the separate alias fold.
-expected_store_delta: +24 mass-loss observations; the existing 96 composition points remain unchanged and sample_mass_kg remains unknown. No battery-store regen was committed.
+    Car 3 scores all 96 existing residue rows in the flagged absolute tier; it adds DP-005 relative-alpha sensitivity and melt_well_mixed_assumed notices, the 1900 C isothermal extent-band notice, the congruent-vapour closure notice, and pressure provenance. No new cohort or DP id is added.
+expected_store_delta: >-
+  No store regen was committed. Score-time car 3 changes no stored observations.
+  Migration retains all 120 Mendy observation ids and all 24 xi point values;
+  the 24 xi identities bind to their FUN starting charge, and the 24 rows no
+  longer repeat the charge composition or pressure as point conditions. All 96
+  residue identities already matched their FUN starts. Wang retains 538 rows,
+  while its 16 mass-loss point values are recomputed from located weights and
+  receive replacement ids. No row count changes. The relation census found no
+  other source using either supported weight derivation.
 queued_tests:
   - tests/test_mendybaev_2013_fun_cai_extract.py
   - tests/test_yaml_flow_scalar_commas.py

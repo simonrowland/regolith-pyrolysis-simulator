@@ -367,17 +367,11 @@ def test_table1_mass_loss_rows_retain_printed_weights_and_derived_ratios() -> No
         assert values["method_class"] == "measured_reduced"
         assert values["initial_weight_g"] == initial
         assert values["final_weight_g"] == final
-        assert values["mass_loss_fraction"] == expected_fraction
+        assert "mass_loss_fraction" not in values
         conditions = row["point_conditions"]
-        expected_charge_row = (
-            "FUN1 starting" if sample.startswith("FUN1-") else "FUN2 starting"
-        )
         expected_series = sample.split("-", 1)[0]
-        printed_charge = conditions["printed_composition"]
-        assert printed_charge["locator"]["row"] == expected_charge_row
-        assert printed_charge["state"]["value"] == EXPECTED_STARTING_WT_PCT[
-            expected_series
-        ]
+        assert "printed_composition" not in conditions
+        assert "total_pressure_Pa" not in conditions
         assert "composition_role" not in values
         assert conditions["temperature_C"]["state"]["value"] == "1900"
         assert conditions["time_min"]["state"]["value"] == EXPECTED_RUN_MINUTES[sample]
@@ -385,13 +379,21 @@ def test_table1_mass_loss_rows_retain_printed_weights_and_derived_ratios() -> No
         assert conditions["fO2_log"]["state"]["tag"] == "unknown"
         assert abs(
             _fraction_from_printed_weights(initial, final)
-            - Decimal(values["mass_loss_fraction"])
+            - Decimal(expected_fraction)
         ) <= Decimal("1e-39")
         assert "sample_mass_kg" not in values
         experiment = next(
             item
             for item in document["experiments"]
             if item["experiment_id"] == row["experiment"]
+        )
+        starting = experiment["sample"]["initial_composition"]
+        assert starting["locator"]["row"] == f"{expected_series} starting"
+        assert dict(starting["state"]["value"]["components"]) == EXPECTED_STARTING_WT_PCT[
+            expected_series
+        ]
+        assert experiment["sample"]["printed_composition"]["state"]["value"] == (
+            EXPECTED_STARTING_WT_PCT[expected_series]
         )
         assert "mass_kg" not in experiment["sample"]
 
@@ -402,7 +404,7 @@ def test_table1_mass_loss_rows_retain_printed_weights_and_derived_ratios() -> No
         assert locator["table"] == "1"
         assert locator["row"] == sample
         assert row["derived_from"] == [MASS_LOSS_CONTEXT]
-        derivation = values["derivation"]
+        derivation = row["derivation"]
         assert derivation["relation"] == (
             "(initial_weight_g - final_weight_g) / initial_weight_g"
         )
@@ -431,22 +433,22 @@ def test_table1_mass_loss_rows_retain_printed_weights_and_derived_ratios() -> No
     }
     assert zero_time_minutes == {sample: "0" for sample in zero_time}
     assert all(
-        Decimal(by_sample[sample]["values"]["mass_loss_fraction"]) > 0
+        Decimal(EXPECTED_MASS_LOSS[sample][2]) > 0
         for sample in zero_time
     )
-    assert Decimal(by_sample["FUN1-3"]["values"]["mass_loss_fraction"]) != Decimal(
-        by_sample["FUN1-12"]["values"]["mass_loss_fraction"]
+    assert Decimal(EXPECTED_MASS_LOSS["FUN1-3"][2]) != Decimal(
+        EXPECTED_MASS_LOSS["FUN1-12"][2]
     )
 
     fidelity = document["fidelity_samples"]
     mass_fidelity = [
         row for row in fidelity if row["path"].startswith("species.unknown.")
     ]
-    assert len(mass_fidelity) == 3
+    assert len(mass_fidelity) == 120
     assert all(
-        row["locator"]["page"] == 5
-        and row["locator"]["published_page"] == 372
-        and row["locator"]["table"] == "1"
+        row["reviewed_by"] == "Simon Rowland"
+        and row["reviewed_on"] == "2026-11-23"
+        and row["locator"]["source_path"].endswith("pdftotext-layout.txt")
         for row in mass_fidelity
     )
 
@@ -481,13 +483,12 @@ def test_table1_mass_loss_rows_migrate_as_separate_fun_experiments() -> None:
         observation = mass_loss[observation_id]
         assert observation.identity.species.formula == "unknown"
         assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
-        # Car 1 keeps the starting charge in sample.printed_composition without
-        # declaring it as a proxy via composition_role; generic identity binding
-        # is deferred to the separate migrator task.
-        assert observation.identity.composition.is_unknown
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert experiment.sample.initial_composition is not None
+        assert observation.identity.composition == experiment.sample.initial_composition.state
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert observation.value.kind is ValueKind.POINT
-        assert observation.value.point == Decimal(expected_fraction)
+        assert abs(observation.value.point - Decimal(expected_fraction)) <= Decimal("1e-39")
         assert observation.derivation is not None
         assert observation.locator.page == 5
         assert observation.derivation.relation == (
@@ -505,10 +506,7 @@ def test_table1_mass_loss_rows_migrate_as_separate_fun_experiments() -> None:
         )
         assert observation.point_conditions["temperature_C"].locator.page == 4
         assert observation.point_conditions["temperature_K"].state.value == Decimal("2173.15")
-        pressure = observation.point_conditions["total_pressure_Pa"]
-        assert pressure.state.value.kind is ValueKind.BOUND
-        assert pressure.state.value.bound_value == Decimal("0.0001")
-        assert pressure.locator.page == 4
+        experiment = migrator.result.experiments[observation.experiment_id]
         assert observation.point_conditions["fO2_log"].state.is_unknown
         assert observation.point_conditions["time_min"].state.value == Decimal(
             EXPECTED_RUN_MINUTES[sample]
@@ -527,17 +525,17 @@ def test_fun1_10_final_weight_mutation_moves_its_migrated_fraction(
     target = next(
         row
         for row in document["species"]["unknown"]["observations"]
-        if row["values"]["sample_as_printed"] == "FUN1-10"
+        if row["locator"]["row"] == "FUN1-10"
     )
     values = target["values"]
     values["final_weight_g"] = "0.0079"
     changed_fraction = _fraction_from_printed_weights(
         values["initial_weight_g"], values["final_weight_g"]
     )
-    values["mass_loss_fraction"] = format(changed_fraction, ".40f")
+    values.pop("mass_loss_fraction", None)
     final_parameter = next(
         entry
-        for name, entry in values["derivation"]["parameters"]
+        for name, entry in target["derivation"]["parameters"]
         if name == "final_weight_g"
     )
     final_parameter["state"]["value"] = values["final_weight_g"]
@@ -554,5 +552,89 @@ def test_fun1_10_final_weight_mutation_moves_its_migrated_fraction(
             "mendybaev_2013_table1_fun1_10_mass_loss_fraction"
         )
     )
-    assert migrated.value.point == Decimal(values["mass_loss_fraction"])
+    assert abs(migrated.value.point - changed_fraction) <= Decimal("1e-39")
     assert migrated.value.point != Decimal(EXPECTED_MASS_LOSS["FUN1-10"][2])
+
+
+def test_fun1_10_mass_loss_scalar_cannot_survive_deleted_weight_operands(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    target = next(
+        row
+        for row in document["species"]["unknown"]["observations"]
+        if row["locator"]["row"] == "FUN1-10"
+    )
+    target["values"]["mass_loss_fraction"] = EXPECTED_MASS_LOSS["FUN1-10"][2]
+    del target["values"]["initial_weight_g"]
+    del target["values"]["final_weight_g"]
+
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(mutated_extract)
+    migrator.finalize()
+    migrated = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "mendybaev_2013_table1_fun1_10_mass_loss_fraction"
+        )
+    )
+    assert migrated.value.kind is not ValueKind.POINT
+
+
+def test_mendybaev_residue_and_xi_rows_use_their_fun_starting_composition() -> None:
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    for experiment_suffix in (
+        "mendybaev-fun1-vacuum-evaporation",
+        "mendybaev-fun2-vacuum-evaporation",
+    ):
+        experiment = next(
+            experiment
+            for experiment in migrator.result.experiments.values()
+            if experiment.experiment_id.endswith(experiment_suffix)
+        )
+        starting = experiment.sample.initial_composition
+        assert starting is not None and starting.state.is_value
+        rows = [
+            observation
+            for observation in migrator.result.observations.values()
+            if observation.experiment_id == experiment.experiment_id
+            and observation.identity.quantity.value
+            in {Quantity.RESIDUE_COMPONENT_COMPOSITION, Quantity.MASS_LOSS_FRACTION}
+        ]
+        assert len(rows) == (70 if experiment_suffix.endswith("fun1-vacuum-evaporation") else 50)
+        assert all(observation.identity.composition == starting.state for observation in rows)
+        residue_rows = [
+            observation for observation in rows
+            if observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ]
+        pressure = experiment.conditions["total_pressure_Pa"]
+        assert pressure.state.value.kind is ValueKind.BOUND
+        assert pressure.state.value.bound_value == Decimal("0.0001")
+        assert pressure.locator.page == 4
+        assert all(
+            observation.identity.temperature_K.value == Decimal("2173.15")
+            and "time_min" in observation.point_conditions
+            and observation.point_conditions["time_min"].state.is_value
+            for observation in rows
+        )
+        assert all(
+            observation.identity.composition == starting.state
+            and observation.point_conditions["composition"].state != starting.state
+            for observation in residue_rows
+        )
+
+
+def test_mendybaev_fidelity_warnings_do_not_grow_with_xi_rows() -> None:
+    from tools.validate_literature_extracts import fidelity_source_warnings
+
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    warnings = {warning.kind: warning.count for warning in fidelity_source_warnings(document)}
+    assert warnings.get("uncovered_observation", 0) == 2
+    assert warnings.get("unattested_sample", 0) == 0
