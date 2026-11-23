@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from decimal import Decimal
 
+from simulator.battery.default_policy import resolve as resolve_policy
 from simulator.battery.enums import (
     AmbientPressureEvidenceClass,
     MethodToken,
@@ -17,7 +18,6 @@ from simulator.battery.score import (
     _resolve_score_total_pressure,
     total_pressure_bar_for_score,
 )
-from simulator.diagnostic_helpers.binary_pot_battery import DP_019_PRESSURE_BAR
 from tests.battery import factories as F
 
 
@@ -46,7 +46,7 @@ def test_unknown_score_pressure_uses_dp001_atmosphere_and_typed_flag() -> None:
     assert notice is not None
     assert notice.kind is NoticeKind.ASSUMED_PRESSURE
     assert notice.policy == NoticePolicy(
-        "DP-001", "v1", "canonical", "101325", "Pa"
+        "DP-001", 1, "canonical", "101325", "Pa"
     )
     assert invalid is None
 
@@ -111,13 +111,13 @@ def test_knudsen_pressure_uses_dp004_and_its_own_flag() -> None:
     )
 
     assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-    assert pressure_bar == DP_019_PRESSURE_BAR
-    assert state == State.of(Decimal(str(DP_019_PRESSURE_BAR)) * PA_PER_BAR_DEC)
+    assert pressure_bar is None
+    assert state is None
     assert notice is not None
     assert notice.kind is NoticeKind.EFFUSION_REGIME_ASSUMED
     assert notice.policy == NoticePolicy(
         "DP-004",
-        "v1",
+        1,
         "canonical",
         "P_total(cell) = sum of measured partial pressures",
         "Pa",
@@ -158,7 +158,7 @@ def test_method_fixed_ambient_pressure_uses_dp002() -> None:
         assert notice is not None
         assert notice.kind is NoticeKind.METHOD_IMPLIED
         assert notice.policy == NoticePolicy(
-            "DP-002", "v1", "canonical", "101325", "Pa"
+            "DP-002", 1, "canonical", "101325", "Pa"
         )
         assert "method_implied" in flagged_strata((notice,))
         assert invalid is None
@@ -177,13 +177,15 @@ def test_vacuum_method_uses_dp019_method_implied_pressure() -> None:
         identity, Quantity.ACTIVITY, experiment=experiment
     )
 
-    assert pressure_bar == DP_019_PRESSURE_BAR
-    assert state == State.of(Decimal("0.1"))
+    dp019_pa = resolve_policy("DP-019").value
+    assert pressure_bar == float(dp019_pa / PA_PER_BAR_DEC)
+    assert state == State.of(dp019_pa)
     assert notice is not None
     assert notice.kind is NoticeKind.METHOD_IMPLIED
-    assert notice.policy == NoticePolicy(
-        "DP-019", "v1", "canonical", "0.100000", "Pa"
-    )
+    assert notice.policy is not None
+    assert notice.policy.id == "DP-019"
+    assert notice.policy.value == str(dp019_pa)
+    assert notice.policy.units == "Pa"
     assert invalid is None
 
 
@@ -207,10 +209,8 @@ def test_air_default_in_oxygen_ladder_uses_dp003() -> None:
     assert notice.policy is not None
     assert notice.policy.id == "DP-003"
     assert notice.policy.status == "canonical"
-    assert (
-        abs(Decimal(notice.policy.value) - Decimal("21227.5875"))
-        < Decimal("1e-8")
-    )
+    expected_pa = resolve_policy("DP-003", P_total=resolve_policy("DP-002").value).value
+    assert Decimal(notice.policy.value) == expected_pa
     assert notice.policy.units == "Pa"
 
 

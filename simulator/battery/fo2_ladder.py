@@ -85,7 +85,6 @@ _VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
 _BLANK_CARRIER = frozenset({"", "none", "n/a", "na", "absent", "unknown", "null"})
 _TEMPERATURE_UNSET = object()
-DP_003_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
 
 @dataclass(frozen=True)
@@ -117,6 +116,7 @@ _PHYSICS_RUNG_LABELS = {
 def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     reason = f"fo2_tier={resolved.tier}"
     policy = None
+    policy_flag = None
     assumed_intrinsic = (
         resolved.tier == 4
         and resolved.route == "intrinsic_melt_fO2"
@@ -130,34 +130,38 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     reason += f"; route={resolved.route}"
     if assumed_intrinsic:
         reason = (
-            "default=intrinsic_melt_fO2; original_reason=no printed fO2; "
+            "DP-010 default=intrinsic_melt_fO2; "
+            "original_reason=no printed fO2; "
             f"{reason}; borrowed"
         )
-        policy = NoticePolicy(
-            id="DP-010",
-            version="v1",
-            status="canonical",
-            value=str(resolved.log10_fO2_bar),
-            units="log10(bar)",
+        from simulator.battery.default_policy import (
+            notice_policy,
+            resolve as resolve_policy,
         )
+
+        policy_result = resolve_policy("DP-010", value=resolved.log10_fO2_bar)
+        policy = notice_policy(policy_result)
+        policy_flag = policy_result.flag
     assumed_air = resolved.route == "dp003_ambient_air"
     if assumed_air:
         reason = (
-            "default_fO2_from_air=0.2095*P_total; "
+            "DP-003 default_fO2_from_air; original_reason=no printed fO2; "
             f"{reason}"
         )
         if resolved.po2_bar is not None:
-            policy = NoticePolicy(
-                id="DP-003",
-                version="v1",
-                status="canonical",
-                value=str(Decimal(str(resolved.po2_bar)) * Decimal("100000")),
-                units="Pa",
+            from simulator.battery.default_policy import (
+                notice_policy,
+                resolve as resolve_policy,
             )
-    if assumed_intrinsic:
-        kind = NoticeKind.ASSUMED_FO2
-    elif assumed_air:
-        kind = NoticeKind.METHOD_IMPLIED
+
+            policy_result = resolve_policy(
+                "DP-003",
+                value=Decimal(str(resolved.po2_bar)) * Decimal(str(PA_PER_BAR)),
+            )
+            policy = notice_policy(policy_result)
+            policy_flag = policy_result.flag
+    if policy_flag is not None:
+        kind = policy_flag
     elif resolved.route.endswith("rys_pO2_calculated_from_pNa_not_independent"):
         reason += "; source-calculated pO2 from observed pNa omitted as a circular condition"
         kind = NoticeKind.INPUT_OMITTED
@@ -348,12 +352,16 @@ def resolve_row_fo2(
             else ATM_PA_DECIMAL
         )
         if pressure_pa is not None and pressure_pa.is_finite() and pressure_pa > 0:
-            # Premise: dry air has the ruled oxygen mole fraction 0.2095 and
-            # the air method fixes the missing pressure to one atmosphere.
-            # Algebra: pO2 = xO2·P_total; units are 1·Pa=Pa. At 1 atm this is
-            # 21227.5875 Pa (0.212275875 bar). As xO2→0, pO2→0.
-            oxygen_pa = DP_003_AIR_O2_MOLE_FRACTION * pressure_pa
-            oxygen_bar = float(oxygen_pa / Decimal("100000"))
+            # Premise: the dry-air composition and atmospheric pressure are
+            # method-implied. The DP-003 owner computes pO2=xO2·P_total in Pa;
+            # the dimensionless mole fraction preserves Pa, and pO2→0 as
+            # xO2→0. At the DP-002 pressure, pO2 is 21227.6 Pa.
+            from simulator.battery.default_policy import resolve as resolve_policy
+
+            oxygen_pa = resolve_policy("DP-003", P_total=pressure_pa).value
+            if not isinstance(oxygen_pa, Decimal):
+                raise TypeError("DP-003 did not resolve an oxygen pressure")
+            oxygen_bar = float(oxygen_pa / Decimal(str(PA_PER_BAR)))
             return ResolvedFo2(
                 math.log10(oxygen_bar),
                 3,
