@@ -103,6 +103,8 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    source_relation_is_same_source,
+    source_relation_is_unseen,
     UncertaintyKind,
     ValenceDenominatorKind,
     ValenceValueForm,
@@ -651,6 +653,8 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+    # (source_table_id, source_row_id, authority) after an OpenIMCC thermo call.
+    openimcc_provenance: tuple[str | None, str | None, str | None] | None = None
 
 
 @dataclass(frozen=True)
@@ -5844,7 +5848,7 @@ def build_conjuncts(
             and authority_allowed(quantity, candidate.authority)
         )
     independent = (
-        source_relation is SourceRelation.INDEPENDENT and lineage_complete
+        source_relation_is_unseen(source_relation) and lineage_complete
     )
     # Engine band notices remain visible to the measured report's flagged
     # population. Prediction authority is already gated separately.
@@ -14654,6 +14658,7 @@ def _predict_with_engine(
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
+            openimcc_provenance=attempt.openimcc_provenance,
         )
 
     distin_feo_activity = (
@@ -18532,16 +18537,46 @@ def _compile_residual_with_lineage(
         and source_relation is SourceRelation.SAME_INPUT
     ):
         source_relation = SourceRelation.TRAINING
+    from simulator.battery.compilation_tier import (
+        openimcc_thermo_relation_for_prediction,
+    )
+
+    relation_detail = prediction.refusal_detail or {}
+    relation_reason = (
+        str(relation_detail.get("reason") or "")
+        if isinstance(relation_detail, Mapping)
+        else ""
+    )
+    source_relation, provenance_flag = openimcc_thermo_relation_for_prediction(
+        engine,
+        quantity,
+        refusal_reason=relation_reason,
+        provenance=prediction.openimcc_provenance,
+        source_id=reference.source_id,
+        origin=origin,
+        lineage_relation=source_relation,
+    )
+    if provenance_flag and quantity is not None:
+        notices = union_notices(
+            notices,
+            (
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=provenance_flag,
+                    origin=reference.observation_id,
+                ),
+            ),
+        )
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )
     # Internal-consistency ledgers are not a scoring tier. Compilations
-    # keep the relation resolve_source_relation returned: INDEPENDENT
-    # stays independent, and SAME_INPUT / TRAINING is the same-source
-    # flag (engine coefficients drawn from this compilation). Evidence
-    # is not restamped and admission is not changed.
+    # keep unseen rows (independent, held_out) in the unseen bucket and
+    # same-source rows (same_input, training, exposed) on the circularity
+    # notice. Evidence is not restamped and admission is not changed.
     if is_internal_consistency(origin):
-        if source_relation is SourceRelation.INDEPENDENT:
+        if source_relation_is_unseen(source_relation):
             source_relation = SourceRelation.UNKNOWN
         notices = union_notices(
             notices,
@@ -18554,10 +18589,7 @@ def _compile_residual_with_lineage(
                 ),
             ),
         )
-    elif compilation and source_relation in {
-        SourceRelation.SAME_INPUT,
-        SourceRelation.TRAINING,
-    }:
+    elif compilation and source_relation_is_same_source(source_relation):
         notices = union_notices(
             notices,
             (

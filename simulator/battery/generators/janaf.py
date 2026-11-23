@@ -1825,6 +1825,34 @@ def _subtype(left: str, right: str) -> str:
     return f"{token(left)}-{token(right)}"
 
 
+def reference_phase_convention_notices(
+    convention_tables: Sequence[tuple[str, str]],
+    quantity: Quantity,
+) -> tuple[Notice, ...]:
+    """One notice per (ref) table that prints no phase.
+
+    The monograph's ideal-gas convention is the phase. Origin names that
+    table. Formation quantities are the only rows that consume it.
+    """
+
+    if quantity not in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
+        return ()
+    return tuple(
+        Notice(
+            kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
+            affected_quantities=(quantity,),
+            reason=(
+                "JANAF web table prints no phase; ideal-gas reference state per "
+                "the monograph convention, page not held"
+            ),
+            origin=f"{reference_table} ({reference_element}) reference-element table",
+            authority=Authority.CONVENTION,
+            certification="fetch the JANAF 4th ed. printed page for the table",
+        )
+        for reference_element, reference_table in convention_tables
+    )
+
+
 def _observation(
     *,
     table_id: str,
@@ -1875,22 +1903,9 @@ def _observation(
                 known["reaction"] = formation_basis.reaction
                 known["formation_elements"] = formation_basis.formation_elements
     identity = fill_identity(quantity, species, **known)
-    notices = tuple(
-        Notice(
-            kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
-            affected_quantities=(quantity,),
-            reason=(
-                "JANAF web table prints no phase; ideal-gas reference state per "
-                "the monograph convention, page not held"
-            ),
-            origin=f"{reference_table} ({reference_element}) reference-element table",
-            authority=Authority.CONVENTION,
-            certification="fetch the JANAF 4th ed. printed page for the table",
-        )
-        for reference_element, reference_table in (
-            () if formation_basis is None else formation_basis.convention_tables
-        )
-        if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+    notices = reference_phase_convention_notices(
+        () if formation_basis is None else formation_basis.convention_tables,
+        quantity,
     )
     role_note = (
         "compilation_role engine_reference_input=true, scoring_eligible=false; "

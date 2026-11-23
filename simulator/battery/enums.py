@@ -763,6 +763,30 @@ class SourceRelation(StrEnum):
     QUOTED_OVERLAP = "quoted_overlap"
     CORRELATED = "correlated"
     UNKNOWN = "unknown"
+    # OpenIMCC thermochemistry reproduced a table the fit was built from.
+    # Charts keep this with same-source. It is not a validation population.
+    EXPOSED = "exposed"
+    # OpenIMCC names a different authority than this row. Unseen data.
+    HELD_OUT = "held_out"
+
+
+def source_relation_is_same_source(relation: SourceRelation) -> bool:
+    """Compilations the engine consumes. Not a validation count."""
+
+    return relation in {
+        SourceRelation.SAME_INPUT,
+        SourceRelation.TRAINING,
+        SourceRelation.EXPOSED,
+    }
+
+
+def source_relation_is_unseen(relation: SourceRelation) -> bool:
+    """Rows the engine was not built from. Held-out joins independent."""
+
+    return relation in {
+        SourceRelation.INDEPENDENT,
+        SourceRelation.HELD_OUT,
+    }
 
 
 class MetricOperation(StrEnum):

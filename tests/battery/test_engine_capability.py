@@ -39,7 +39,14 @@ _THERMO_PIN: dict[Engine, frozenset[Quantity]] = {
         }
     ),
     Engine.OPENIMCC: frozenset(
-        {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+        {
+            Quantity.CP,
+            Quantity.S,
+            Quantity.H_MINUS_H298,
+            Quantity.DELTA_FH,
+            Quantity.DELTA_FG,
+            Quantity.LOG10_KF,
+        }
     ),
 }
 
@@ -134,9 +141,14 @@ def test_declared_capability_is_the_adapter_set() -> None:
         (Engine.MAGEMIN, Quantity.ACTIVITY),
         (Engine.ALPHAMELTS, Quantity.P_PARTIAL),
         (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        (Engine.OPENIMCC, Quantity.ACTIVITY),
+        (Engine.OPENIMCC, Quantity.ACTIVITY_COEFFICIENT),
         (Engine.OPENIMCC, Quantity.CP),
         (Engine.OPENIMCC, Quantity.S),
         (Engine.OPENIMCC, Quantity.H_MINUS_H298),
+        (Engine.OPENIMCC, Quantity.DELTA_FH),
+        (Engine.OPENIMCC, Quantity.DELTA_FG),
+        (Engine.OPENIMCC, Quantity.LOG10_KF),
         (Engine.INTERNAL_ANALYTICAL, Quantity.DELTA_FG),
         (Engine.INTERNAL_ANALYTICAL, Quantity.LOG10_KF),
         (Engine.INTERNAL_ANALYTICAL, Quantity.ENTHALPY_OF_FUSION),
@@ -157,7 +169,7 @@ def test_declared_capability_is_the_adapter_set() -> None:
         (Engine.MAGEMIN, Quantity.ENTHALPY_OF_FUSION),
         (Engine.ALPHAMELTS, Quantity.CP),
         (Engine.ALPHAMELTS, Quantity.DELTA_FG),
-        (Engine.OPENIMCC, Quantity.DELTA_FG),
+        (Engine.OPENIMCC, Quantity.ENTHALPY_OF_FUSION),
         (Engine.INTERNAL_ANALYTICAL, Quantity.CP),
         (Engine.INTERNAL_ANALYTICAL, Quantity.S),
         (Engine.INTERNAL_ANALYTICAL, Quantity.DELTA_FH),

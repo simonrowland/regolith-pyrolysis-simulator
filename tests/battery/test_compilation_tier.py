@@ -1108,7 +1108,7 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     assert _compilation_engines_for_pair(
         SCORE_ENGINE_SET,
         replace(gas_cp, quantity=Quantity.DELTA_FH),
-    ) == (Engine.NASA_CEA_9,)
+    ) == (Engine.OPENIMCC, Engine.NASA_CEA_9)
     assert _compilation_engines_for_pair(
         SCORE_ENGINE_SET, gas_cp
     ) == (Engine.VAPOROCK, Engine.OPENIMCC, Engine.NASA_CEA_9)
@@ -1121,7 +1121,13 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     assert Engine.INTERNAL_ANALYTICAL in _compilation_engines_for_pair(
         SCORE_ENGINE_SET, liquid_delta_fg
     )
+    assert Engine.OPENIMCC in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, liquid_delta_fg
+    )
     assert Engine.INTERNAL_ANALYTICAL not in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, unsupported_ellingham
+    )
+    assert Engine.OPENIMCC in _compilation_engines_for_pair(
         SCORE_ENGINE_SET, unsupported_ellingham
     )
     assert _compilation_engines_for_pair(
@@ -1129,6 +1135,13 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     ) == (Engine.INTERNAL_ANALYTICAL,)
     assert Engine.NASA_CEA_9 in _compilation_engines_for_pair(
         SCORE_ENGINE_SET, unknown_phase_cp
+    )
+    assert Engine.OPENIMCC in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, unknown_phase_cp
+    )
+    assert Engine.OPENIMCC in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET,
+        replace(gas_cp, species=Species("NotARealFormula", Phase.G)),
     )
     assert _compilation_engines_for_pair(
         SCORE_ENGINE_SET,
@@ -1165,21 +1178,26 @@ def test_openimcc_species_thermo_refuses_ambiguous_inputs_before_native_call(
         species=Species("FeO", Phase.L),
         subtype=State.of("H(T)-H(298.15 K); reference phase: solid"),
     )
-    apparent_g = _gas_thermo("FeO", Quantity.DELTA_FG, Decimal("2000"))
+    glass_formation = replace(
+        _gas_thermo("FeO", Quantity.DELTA_FG, Decimal("2000")),
+        species=Species("FeO", Phase.GLASS),
+    )
 
     attempts = tuple(
         predict_thermo_attempt(
             Engine.OPENIMCC,
             F.observation(f"openimcc-invalid-{index}", "exp-1", identity, Decimal("1")),
         )
-        for index, identity in enumerate((gas, unknown_polymorph, liquid_h, apparent_g))
+        for index, identity in enumerate(
+            (gas, unknown_polymorph, liquid_h, glass_formation)
+        )
     )
 
     assert [attempt.refusal_detail["reason"] for attempt in attempts] == [
         "pure-phase-per-basis-mismatch",
         "pure-phase-polymorph-unresolved",
         "pure-phase-enthalpy-anchor-mismatch",
-        "apparent-gibbs-is-not-delta-fG",
+        "pure-phase-phase-unsupported",
     ]
 
 

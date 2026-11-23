@@ -31,6 +31,7 @@ from simulator.battery.enums import (
     Engine,
     Quantity,
     ResidualStatus,
+    residual_status_token,
 )
 from simulator.battery.validate import _VAPOUR_EQUILIBRIUM
 
@@ -48,6 +49,10 @@ ELLINGHAM_QUANTITIES = frozenset({Quantity.DELTA_FG, Quantity.LOG10_KF})
 PURE_PHASE_QUANTITIES = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )
+# species_thermo(formula, phase, T) supplies Cp, S, and H−H298. ΔfH and ΔfG
+# subtract the JANAF elemental reference at the same T, and log10 Kf follows
+# ΔfG. Source relation stays on the residual, not in this table.
+_OPENIMCC_THERMO = PURE_PHASE_QUANTITIES | FORMATION_QUANTITIES
 
 # Generic cell dispatch: melt activity, phase rows, and the shared
 # attempt quantities. Vapour pressures are added per engine. MAGEMin has
@@ -107,7 +112,7 @@ ENGINE_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.ALPHAMELTS: _cell_quantities(vapour=True, thermo=frozenset()),
     Engine.THERMOENGINE: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
     Engine.MAGEMIN: _cell_quantities(vapour=False, thermo=PURE_PHASE_QUANTITIES),
-    Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
+    Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=_OPENIMCC_THERMO),
     Engine.INTERNAL_ANALYTICAL: _cell_quantities(
         vapour=True, thermo=ELLINGHAM_QUANTITIES | FUSION_QUANTITIES
     ),
@@ -314,3 +319,97 @@ def payload_record_stats(
         if row.get("status") == refused:
             n_refused += 1
     return n, n_scored, n_refused, frozenset(scored)
+
+
+def _openimcc_row_kind(row: Mapping[str, object]) -> str:
+    status = residual_status_token(row.get("status"))
+    numeric = row.get("numeric")
+    has_value = isinstance(numeric, Mapping) and numeric.get("value") is not None
+    execution = row.get("execution")
+    state = execution.get("state") if isinstance(execution, Mapping) else None
+    if (
+        has_value
+        or state == "produced"
+        or status in {
+            ResidualStatus.MATCH,
+            ResidualStatus.MISMATCH,
+            ResidualStatus.NO_BAND,
+        }
+    ):
+        return "produced"
+    refusal = row.get("refusal")
+    if status is ResidualStatus.REFUSED or isinstance(refusal, Mapping):
+        return "typed_refused"
+    return "other"
+
+
+def openimcc_coverage_tally(
+    rows: Iterable[Mapping[str, object]],
+) -> dict[str, object]:
+    """OpenIMCC produced, typed-refused, and absent counts per rail × quantity.
+
+    One cell is a residual-key head × quantity × rail. Absent means
+    OpenIMCC lists that quantity and the cell has some residual but no
+    OpenIMCC residual. A listed quantity with a non-zero absent count
+    was not routed.
+    """
+
+    from simulator.battery.score import _engine_from_payload, _residual_key_parts
+
+    groups: dict[tuple[str, str, str], dict[str, str]] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        parts = _residual_key_parts(row.get("key"))
+        if parts is None:
+            continue
+        head, quantity, rail, _engine = parts
+        engine = _engine_from_payload(row)
+        kind = _openimcc_row_kind(row)
+        slot = groups.setdefault((head, quantity, rail), {})
+        previous = slot.get(engine)
+        if previous == "produced":
+            continue
+        if kind == "produced" or previous is None:
+            slot[engine] = kind
+    counts: dict[tuple[str, str], dict[str, int]] = defaultdict(
+        lambda: {"produced": 0, "typed_refused": 0, "absent": 0, "other": 0}
+    )
+    for (_head, quantity, rail), engines in groups.items():
+        try:
+            quantity_token = Quantity(quantity)
+        except ValueError:
+            quantity_token = None
+        listed = (
+            quantity_token is not None
+            and engine_covers_quantity(Engine.OPENIMCC, quantity_token)
+        )
+        bucket = counts[(rail, quantity)]
+        kind = engines.get(Engine.OPENIMCC.value)
+        if kind is None:
+            if listed:
+                bucket["absent"] += 1
+            continue
+        bucket[kind] += 1
+    table = []
+    absent_listed = 0
+    for (rail, quantity), bucket in sorted(counts.items()):
+        try:
+            listed = engine_covers_quantity(Engine.OPENIMCC, Quantity(quantity))
+        except ValueError:
+            listed = False
+        if listed:
+            absent_listed += bucket["absent"]
+        table.append(
+            {
+                "rail": rail,
+                "quantity": quantity,
+                "listed": listed,
+                **bucket,
+            }
+        )
+    return {
+        "engine": Engine.OPENIMCC.value,
+        "absent_listed": absent_listed,
+        "rows": table,
+    }
