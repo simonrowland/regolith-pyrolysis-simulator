@@ -1190,16 +1190,21 @@ def _normalize_ascii_adduct_dots(text: str) -> str:
                 if multiplier is not None
                 else ""
             )
+            # Fe0.95O must keep its decimal when the tail is a single element;
+            # treating 95O as an adduct corrupts the existing composition.
             decimal_subscript = (
                 multiplier is not None
                 and re.search(r"[A-Z][a-z]?\d+$", prefix) is not None
                 and re.match(r"[A-Z][a-z]?\d*(?=\.|$)", multiplier_tail)
                 is not None
             )
+            # The dot in a leading hydrate multiplier such as 6.5H2O is decimal.
+            decimal_multiplier = prefix.isdigit() and suffix[:1].isdigit()
             starts_with_water = suffix.startswith(("H2O", "H₂O"))
             if (
                 (multiplier is not None or starts_with_water)
                 and not decimal_subscript
+                and not decimal_multiplier
             ):
                 normalized.append("·")
                 segment_start = index + 1

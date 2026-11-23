@@ -4156,6 +4156,9 @@ def test_species_formula_parser_accepts_ascii_dot_adducts_and_decimal_counts() -
     )
     assert parse_species_formula("CoSO₄.7H₂O") == parse_species_formula("CoSO4·7H2O")
     assert parse_species_formula("Al2O3.3H2O") == parse_species_formula("Al2O3·3H2O")
+    assert parse_species_formula("ZnSO4.6H2O") == parse_species_formula(
+        "ZnSO4·6H2O"
+    )
     alumina = dict(score_mod.formula_composition("Al2O3"))
     silica = dict(score_mod.formula_composition("SiO2"))
     assert parse_species_formula("3Al2O3.2SiO2") == tuple(
@@ -4220,6 +4223,9 @@ def test_species_formula_parser_accepts_bullet_hydrates_and_unicode_phase() -> N
     assert parse_species_formula(
         "H2SO4·6.5H2O(l)", species=Species("H2SO4", Phase.L)
     ) == (("H", 15.0), ("O", 10.5), ("S", 1.0))
+    assert parse_species_formula("H2SO4.6.5H2O") == (
+        ("H", 15.0), ("O", 10.5), ("S", 1.0)
+    )
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:
