@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.campaigns import CampaignManager
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_schedule import lab_schedule_digests
@@ -126,18 +127,17 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert 350.0 < temperatures[0] < 2000.0
     assert temperatures[29] > temperatures[4] > temperatures[0]
     assert temperatures[-1] > temperatures[0]
-    # The tonne-sizer root was 4864 °C. The booked hot-upper path is the
-    # two-node top temperature: the wall is not at that temperature, so
-    # the top runs hotter than the one-node lumped hot-upper area. That
-    # is the radiating-area result. It is not pulled back under 2500 °C.
+    # The tonne-sizer root was 4864 °C. Node 1 radiates the lumped
+    # hot-upper area. A full wall on node 2 sits near the top-face-only
+    # root; the booked root stays closer to the lumped area.
     areas = pellet_face_areas_m2(0.013, 0.010)
+    half_wall = math.pi * 0.013 * 0.010 / 2.0
     late_target, _late_ramp, late, late_previous = rows[29]
-    lumped_late = solve_power_driven_melt_temperature_C(
+    shared = dict(
         power_W=late["focal_power_W"],
         previous_temperature_C=late_previous,
         dt_s=_DT_S,
         mass_kg=late["mass_kg"],
-        area_m2=areas["hot_upper"],
         emissivity=late["emissivity"],
         pellet_diameter_m=0.013,
         pellet_height_m=0.010,
@@ -146,11 +146,23 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
         window_transmittance=late["window_transmittance"],
         conductivity_W_m_K=late["conductivity_W_m_K"],
     )
+    lumped_late = solve_power_driven_melt_temperature_C(
+        area_m2=areas["hot_upper"],
+        **shared,
+    )
+    top_only_late = solve_power_driven_melt_temperature_C(
+        area_m2=areas["top"],
+        **shared,
+    )
     assert late_target == pytest.approx(late["temperature_C"])
     assert lumped_late["nodes"] == "one_node"
+    assert top_only_late["nodes"] == "one_node"
     assert math.isfinite(late["temperature_C"])
-    assert 1800.0 < late["temperature_C"] < 4000.0
-    assert late["temperature_C"] > lumped_late["temperature_C"]
+    assert late["node_1_area_m2"] == pytest.approx(areas["top"] + half_wall)
+    assert late["node_2_area_m2"] == pytest.approx(half_wall)
+    assert abs(late["temperature_C"] - lumped_late["temperature_C"]) < abs(
+        late["temperature_C"] - top_only_late["temperature_C"]
+    )
 
     target, ramp, record, previous = rows[0]
     # Eq. (6) watts are the focal spot. The pellet takes the uniform-disk
@@ -172,8 +184,8 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert record["mass_kg"] == pytest.approx(0.00338)
     # Investigation areas for the 13 mm by 10 mm cylinder: top
     # 1.327e-4 m², lumped hot upper 3.369e-4 m², full side 5.411e-4 m².
-    # The booked hot-upper radiator is the top face. The lumped
-    # hot-upper area is the one-node comparison, not the booked area.
+    # area_m2 stays the top face. Node 1 radiates the top plus the
+    # upper half-wall. side_area_m2 stays the full cylinder wall.
     assert areas["hot_upper"] == pytest.approx(3.369e-4, abs=5.0e-8)
     assert areas["full_side"] == pytest.approx(5.411e-4, abs=5.0e-8)
     assert record["face_set"] == "hot_upper"
@@ -201,6 +213,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
         "window_transmittance",
         "pellet_conductivity_W_m_K",
         "cold_boundary_K",
+        "two_node_geometry",
     }
     assert knobs["melt_emissivity"]["kind"] == "knob_defaulted"
     assert knobs["solar_absorptance"]["kind"] == "knob_defaulted"
@@ -229,6 +242,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
             ("typed_unknown", "window_transmittance"),
             ("knob_defaulted", "pellet_conductivity_W_m_K"),
             ("typed_unknown", "cold_boundary_K"),
+            ("typed_unknown", "two_node_geometry"),
         }
         assert step_record["face_set"] == "hot_upper"
         assert step_record["scored_as_observed_temperature"] is False
@@ -600,8 +614,8 @@ def test_printed_face_areas_match_the_investigation_with_holder_and_argon():
     # Investigation table at the peak focal power, k = 1, Nu = 2,
     # losses at the solved temperature. The hot-upper number is the
     # one-node lumped area. The full-side number is the one-node
-    # isothermal bound. The booked hot-upper path is hotter than the
-    # lumped area because the wall is not at the top temperature.
+    # isothermal bound. Node 1 radiates that lumped area, so the
+    # booked root stays closer to it than to the top face alone.
     anchors = (
         (0.906, 2112.0, 1851.0),
         (0.85, 2072.0, 1816.0),
@@ -613,13 +627,23 @@ def test_printed_face_areas_match_the_investigation_with_holder_and_argon():
         lumped = _lumped_hot_upper(solar_absorptance=alpha)
         booked = _peak_pellet(solar_absorptance=alpha)
         full = _peak_pellet(solar_absorptance=alpha, radiating_face_set="full_side")
+        top_only = _peak_pellet(
+            solar_absorptance=alpha,
+            area_m2=areas["top"],
+            radiating_face_set=None,
+        )
         solved[alpha] = booked
         assert lumped["nodes"] == "one_node"
         assert lumped["area_m2"] == pytest.approx(areas["hot_upper"])
         assert lumped["temperature_C"] == pytest.approx(hot_C, abs=2.0)
         assert booked["nodes"] == "two_node"
         assert booked["area_m2"] == pytest.approx(areas["top"])
-        assert booked["temperature_C"] > lumped["temperature_C"]
+        half_wall = math.pi * 0.013 * 0.010 / 2.0
+        assert booked["node_1_area_m2"] == pytest.approx(areas["top"] + half_wall)
+        assert booked["node_2_area_m2"] == pytest.approx(half_wall)
+        assert abs(booked["temperature_C"] - lumped["temperature_C"]) < abs(
+            booked["temperature_C"] - top_only["temperature_C"]
+        )
         assert booked["sensitivity"]["area_m2"] == pytest.approx(areas["full_side"])
         assert booked["sensitivity"]["face_set"] == "full_side"
         assert booked["sensitivity"]["nodes"] == "one_node"
@@ -645,12 +669,21 @@ def test_printed_face_areas_match_the_investigation_with_holder_and_argon():
     )
     # The Gaier midpoint is 0.7875. Its one-node lumped hot-upper root
     # is 2025.77 °C, rounded to the 2026 °C pin. The booked two-node
-    # top is hotter than that lumped root.
+    # top stays closer to that lumped root than to the top face alone.
     midpoint = _lumped_hot_upper(solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT)
     booked_midpoint = _peak_pellet(solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT)
+    top_only_midpoint = _peak_pellet(
+        solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT,
+        area_m2=areas["top"],
+        radiating_face_set=None,
+    )
     assert SOLAR_ABSORPTANCE_DEFAULT == pytest.approx(0.7875)
     assert midpoint["temperature_C"] == pytest.approx(2026.0, abs=0.5)
-    assert booked_midpoint["temperature_C"] > midpoint["temperature_C"]
+    assert abs(
+        booked_midpoint["temperature_C"] - midpoint["temperature_C"]
+    ) < abs(
+        booked_midpoint["temperature_C"] - top_only_midpoint["temperature_C"]
+    )
 
 
 def test_holder_series_is_not_the_cold_boundary():
@@ -725,7 +758,7 @@ def test_campaign_thread_puts_the_evaporative_sink_in_the_root():
     kg_hr = 401.0 * 1.0e-6 * 60.0
 
     def rates(temperature_K: float) -> dict[str, float]:
-        if temperature_K < 400.0:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             return {}
         return {"SiO": kg_hr}
 

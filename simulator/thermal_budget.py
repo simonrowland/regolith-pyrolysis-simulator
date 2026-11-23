@@ -1439,11 +1439,10 @@ def pellet_face_areas_m2(
     Premise: Robinot section 3.2 prints a 13 mm by 10 mm cylinder on a
     water-cooled holder. The contacted base conducts. It does not see
     the chamber. Fig. 3 shows the lower half still solid, so that side
-    wall is not at the top temperature. ``hot_upper`` is the lumped
-    area (top plus half the wall) the one-zone model put at one
-    temperature. The booked hot-upper path no longer radiates that
-    area at the peak temperature: the top face and the full wall are
-    separate nodes. ``full_side`` remains the isothermal bound.
+    wall is not at the top temperature. ``hot_upper`` is the top plus
+    half the wall. The booked two-node path radiates that area from
+    node 1 at T_top and the other half-wall from node 2 at T_side.
+    ``full_side`` remains the isothermal bound.
 
     Algebra::
 
@@ -1862,16 +1861,16 @@ def _side_node_temperature_K(
 ) -> float:
     """Quasi-steady temperature of the lower body.
 
-    Premise: node 2 stores nothing. Heat that arrives from the molten
-    top through the upper half of the pellet leaves by radiation from
-    the full cylindrical wall and by conduction through the lower half
-    into the holder.
+    Premise: node 2 stores nothing. Heat that arrives from node 1
+    leaves by radiation from the area this call is given and by
+    conduction through the lower half into the holder. The two-node
+    caller passes the lower half-wall, ``pi * d * H / 2``.
 
     Algebra. Each half has conductance ``G_half = 2 k A_top / H``, so
     the two in series are the one-node holder term ``k A_top / H``::
 
         G_half * (T_top - T_side)
-            = eps * sigma * A_side * (T_side**4 - T_b**4)
+            = eps * sigma * A_node_2 * (T_side**4 - T_b**4)
             + G_half * (T_side - T_b)
 
     Units: kelvin in, kelvin out. Limit: as k → ∞ the nodes become one
@@ -2019,14 +2018,13 @@ def two_node_pellet_loss_W(
 ) -> tuple[float, float]:
     """External watts from the two-node pellet, and the side temperature.
 
-    Premise: Fig. 3 shows the top molten and the lower half solid, so
-    the wall is not at the brightness temperature. Node 1 is that
-    molten layer. It absorbs the beam, radiates from the top face,
-    loses continuum argon, carries the evaporative sink, and conducts
-    into node 2. Node 2 radiates from the full cylindrical wall
-    (``A_side = pi * d * H``, not half of it) and conducts to the
-    holder. The lumped hot-upper area put half the wall at the peak
-    temperature; that is the idealization this split replaces.
+    Premise: the preset books the top face plus the hot upper side.
+    That is a stated geometry, not a moving melt front. Node 1 is the
+    top face plus the upper half-wall. It absorbs the beam, radiates
+    that area at T_top, loses continuum argon, carries the evaporative
+    sink, and conducts into node 2. Node 2 is the lower half-wall plus
+    the holder. It radiates ``pi * d * H / 2`` at T_side and conducts
+    with the same half-slab conductance.
 
     Gas is on node 1. A hot free surface keeps that sink. At high
     conductivity the nodes are one temperature, so which node owns
@@ -2034,20 +2032,22 @@ def two_node_pellet_loss_W(
 
     Algebra, external sum (the inter-node flux cancels)::
 
-        Q = eps * sigma * A_top * (T_top**4 - T_b**4)
+        A_node_1 = A_top + A_side / 2
+        A_node_2 = A_side / 2
+        Q = eps * sigma * A_node_1 * (T_top**4 - T_b**4)
             + Q_gas(T_top)
             + sum_i J_i(T_top) * dH_i(T_top)
-            + eps * sigma * A_side * (T_side**4 - T_b**4)
+            + eps * sigma * A_node_2 * (T_side**4 - T_b**4)
             + G_half * (T_side - T_b)
 
         G_half = 2 * k * A_top / H
         T_side from _side_node_temperature_K
 
     Units: watts, and T_side in kelvin. High-k limit: both nodes sit
-    on ``pellet_energy_loss_W`` evaluated with radiating area
-    A_top + A_side. With k = 1 the half-slab cannot carry the beam,
-    so T_top runs hotter than the lumped hot-upper root and near the
-    top-face-only balance.
+    on one temperature and radiate A_top + A_side, which is
+    ``pellet_energy_loss_W`` on the full side. Node 1's area equals
+    the lumped hot-upper area, and the lower half-wall still radiates
+    at its own temperature when the nodes are not isothermal.
     """
 
     boundary_K = COLD_BOUNDARY_K
@@ -2056,9 +2056,11 @@ def two_node_pellet_loss_W(
         top_area_m2,
         height_m,
     )
+    node_2_area_m2 = 0.5 * side_area_m2
+    node_1_area_m2 = top_area_m2 + node_2_area_m2
     side_K = _side_node_temperature_K(
         temperature_top_K,
-        side_area_m2=side_area_m2,
+        side_area_m2=node_2_area_m2,
         emissivity=emissivity,
         boundary_K=boundary_K,
         half_conductance_W_per_K=half,
@@ -2074,13 +2076,13 @@ def two_node_pellet_loss_W(
     )
     radiation_top = _radiation_exchange_W(
         temperature_top_K,
-        area_m2=top_area_m2,
+        area_m2=node_1_area_m2,
         emissivity=emissivity,
         boundary_K=boundary_K,
     )
     radiation_side = _radiation_exchange_W(
         side_K,
-        area_m2=side_area_m2,
+        area_m2=node_2_area_m2,
         emissivity=emissivity,
         boundary_K=boundary_K,
     )
@@ -2093,6 +2095,8 @@ def two_node_pellet_loss_W(
     return (
         radiation_top + gas + evaporative + radiation_side + holder,
         side_K,
+        node_1_area_m2,
+        node_2_area_m2,
     )
 
 
@@ -2251,14 +2255,16 @@ def solve_power_driven_melt_temperature_C(
     The charge stores sensible heat at
     ``EquipmentDesigner.MELT_CP_J_KG_K``. A printed pellet diameter
     and height use ``pellet_face_areas_m2``. The hot-upper face, and
-    an unset face below 1 kg, is the two-node balance: the molten top
-    radiates from the top face at T_top, the lower body radiates from
-    the full side wall at T_side, and the nodes conduct through the
-    pellet. The booked temperature is T_top. The full side and an
-    explicit area stay one node, ``pellet_energy_loss_W``, which is
-    also the high-conductivity limit of the two nodes. The other of
-    those two solutions is reported beside the booked temperature and
-    does not replace it. A missing conductivity takes the basalt-band
+    an unset face below 1 kg, is the two-node balance. Node 1 is the
+    top face plus the upper half-wall at T_top. Node 2 is the lower
+    half-wall plus the holder at T_side. That split is the
+    preset-declared geometry, flagged, and not a moving melt front.
+    The booked temperature is T_top. The full side and an explicit
+    area stay one node, ``pellet_energy_loss_W``, which is also the
+    high-conductivity limit of the two nodes: isothermal nodes
+    radiate the top and both half-walls. The other of those two
+    solutions is reported beside the booked temperature and does not
+    replace it. A missing conductivity takes the basalt-band
     midpoint and is noticed. The 300 K boundary is a typed unknown.
     The preset holder series is not a temperature this solver reads.
     With no printed cylinder the loss stays ``_tonne_sky_loss_W``:
@@ -2282,7 +2288,8 @@ def solve_power_driven_melt_temperature_C(
 
         m * cp * (T - T_prev) / dt = P_abs - pellet_energy_loss_W(T)
 
-    Two nodes, hot upper, sensible heat on the top node only::
+    Two nodes, hot upper, sensible heat on the top node only.
+    Node 1 radiates ``A_top + pi * d * H / 2``::
 
         m * cp * (T_top - T_prev) / dt = P_abs
             - two_node_pellet_loss_W(T_top)
@@ -2301,8 +2308,10 @@ def solve_power_driven_melt_temperature_C(
     A 13 mm pellet in a 20 mm spot intercepts 0.4225 of the focal watts.
     At the digitized peak, alpha 0.85, k = 1, Nu = 2, and T_b = 300 K,
     the one-node lumped hot-upper area is 2072 °C and the full side
-    is 1816 °C. The booked hot-upper path is the two-node root, which
-    runs hotter than that lumped area because the wall is not at T_top.
+    is 1816 °C. The booked hot-upper path is the two-node root. Node
+    1's area is that lumped hot-upper area, and the lower half-wall
+    radiates at T_side, so the booked root is not the top-face-only
+    balance.
     """
 
     power = _declared_finite(
@@ -2468,7 +2477,7 @@ def solve_power_driven_melt_temperature_C(
             return loss
 
         def two_node_loss(temperature_K: float) -> float:
-            watts, _side_K = two_node_pellet_loss_W(
+            watts, _side_K, _node_1_m2, _node_2_m2 = two_node_pellet_loss_W(
                 temperature_K,
                 top_area_m2=top_area_m2,
                 side_area_m2=side_area_m2,
@@ -2537,8 +2546,10 @@ def solve_power_driven_melt_temperature_C(
         capacity_W_per_K=capacity,
         loss_W=root_loss,
     )
+    node_1_area_m2 = None
+    node_2_area_m2 = None
     if nodes == "two_node":
-        _watts, side_K = two_node_pellet_loss_W(
+        _watts, side_K, node_1_area_m2, node_2_area_m2 = two_node_pellet_loss_W(
             root_K,
             top_area_m2=top_area_m2,
             side_area_m2=side_area_m2,
@@ -2548,6 +2559,19 @@ def solve_power_driven_melt_temperature_C(
             diameter_m=pellet_d,
             species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
         )
+        notices.append({
+            "kind": TYPED_UNKNOWN,
+            "knob": "two_node_geometry",
+            "value": "top_face_plus_upper_half_wall",
+            "unit": "1",
+            "source": (
+                "preset-declared geometry: the booked surface is the "
+                "top face plus the hot upper side. Node 1 radiates "
+                "that area at T_top. Node 2 radiates the lower "
+                "half-wall and conducts to the holder. This is not a "
+                "moving melt front."
+            ),
+        })
     elif nodes == "one_node":
         side_K = root_K
     else:
@@ -2598,6 +2622,8 @@ def solve_power_driven_melt_temperature_C(
         "area_m2": area,
         "top_area_m2": top_area_m2,
         "side_area_m2": side_area_m2,
+        "node_1_area_m2": node_1_area_m2,
+        "node_2_area_m2": node_2_area_m2,
         "evaporative_sink_W": evaporative_sink_W,
         "emissivity": eps,
         "role": "prediction",
