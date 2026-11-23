@@ -755,6 +755,7 @@ def main(argv: list[str] | None = None) -> int:
             mismatch_warning=mismatch,
             observations=context.observations,
             origins=context.origins,
+            experiments=context.experiments,
         )
         report = format_nasa9_fit_comparison_stratum(
             report,
@@ -772,6 +773,7 @@ def main(argv: list[str] | None = None) -> int:
             engines=engines,
             observations=context.observations,
             origins=context.origins,
+            experiments=context.experiments,
             store_stamp=recorded,
         )
         _attach_engine_cache_summary(summary_partial_path, engine_cache_path)
