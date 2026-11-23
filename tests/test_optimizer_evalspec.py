@@ -15,6 +15,7 @@ import pytest
 from simulator.config import load_config_bundle
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
+import simulator.lab_schedule as lab_schedule
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.lab_schedule import (
     LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
@@ -4102,6 +4103,29 @@ def test_lab_schedule_pressure_mutations_reject_invalid_values(
     with pytest.raises(LabScheduleValidationError) as error:
         normalize_lab_schedule(schedule)
     assert str(error.value) == expected_reason
+
+
+def test_normalize_lab_schedule_marks_subfloor_pressure_as_extrapolated() -> None:
+    pressure_mbar = lab_schedule.LAB_SCHEDULE_PRESSURE_FLOOR_MBAR / 2.0
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=((0.0, pressure_mbar), (1.0, pressure_mbar)),
+        furnace_ceiling_C=1300.0,
+    )
+    normalized = normalize_lab_schedule(schedule)
+
+    notices = normalized["pressure_domain_notices"]
+    assert len(notices) == 2
+    assert [notice["pressure_mbar"] for notice in notices] == [
+        pressure_mbar,
+        pressure_mbar,
+    ]
+    assert all(
+        notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+        and notice["authority"] == "extrapolated"
+        for notice in notices
+    )
 
 
 def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:

@@ -2595,13 +2595,16 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
     }
 
 
-def test_transitional_missing_pressure_notice_is_pinned() -> None:
+def test_assumed_pressure_notice_token_is_pinned() -> None:
+    from simulator.battery.default_policy import resolve
+
+    resolved = resolve("DP-001")
     notice = score_mod._assumption_notice(
         Quantity.P_PARTIAL,
         "observation does not carry total_pressure_Pa",
-        1e-6,
+        resolved,
     )
-    assert notice.kind is NoticeKind.METHOD_IMPLIED
+    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
     residual = replace(
         F.residual(
             "assumed-pressure::partial",
@@ -2612,14 +2615,8 @@ def test_transitional_missing_pressure_notice_is_pinned() -> None:
     )
     payload = json.loads(score_mod.dumps_residual_line(residual))
 
-    assert payload["notices"][0]["kind"] == NoticeKind.METHOD_IMPLIED.value
-    assert payload["notices"][0]["policy"] == {
-        "id": "DP-101",
-        "version": 1,
-        "status": "rejected",
-        "value": "1e-6",
-        "units": "bar",
-    }
+    assert payload["notices"][0]["kind"] == NoticeKind.ASSUMED_PRESSURE.value
+    assert payload["notices"][0]["policy"] == resolved.payload["policy"]
     from simulator.battery.migrate import _notice_from_plain
 
     assert _notice_from_plain(payload["notices"][0]) == notice

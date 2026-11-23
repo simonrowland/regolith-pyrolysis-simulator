@@ -14,10 +14,12 @@ import yaml
 
 from simulator import runner as runner_module
 from simulator import condensation as condensation_module
+from simulator.battery.default_policy import resolve
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
+from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
@@ -381,23 +383,36 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
     )
 
 
-def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
-    for name in ("sesko_2024.yaml",):
-        preset = _vacuum_preset(name)
-        assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
-            None,
-            "",
-        )
-        run = _gram_lab_run(preset, campaign="C0")
-        session = SimSession()
-        with pytest.raises(LabGeometryError) as caught:
-            session.start(run._session_config())
-        assert caught.value.code == "exposed_melt_area_not_printed"
-        sim = session.simulator
-        crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
-        assert crucible_area_m2 > 0.0
-        assert sim.melt.melt_surface_area_m2 == pytest.approx(0.2)
-        assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
+def test_gram_lab_without_sample_mass_refuses_before_area_default(
+    tmp_path: Path,
+) -> None:
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+    )
+    preset = yaml.safe_load(preset_path.read_text(encoding="utf-8"))
+    del preset["lab_geometry"]["sample"]["mass_g"]
+    preset_path.write_text(yaml.safe_dump(preset, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(
+        runner_module.PresetRunnerError,
+        match="lab_geometry.sample.mass_g is required",
+    ):
+        runner_module._load_preset_run_spec(preset_path, "faithful")
+
+
+def test_null_exposed_melt_area_uses_sized_crucible_face_with_flag() -> None:
+    preset = _vacuum_preset("sesko_2024.yaml")
+    sample = preset["lab_geometry"]["sample"]
+    assert sample.get("exposed_melt_area_m2") in (None, "")
+    run = _gram_lab_run(preset, campaign="C0")
+    assert run._lab_area_bridge() == {}
+    session = run._start_session()
+    sim = session.simulator
+    expected_area_m2 = EquipmentDesigner().size_crucible(
+        sample["mass_g"] / 1000.0
+    ).melt_surface_area_m2
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(expected_area_m2)
 
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
@@ -459,21 +474,56 @@ def test_c0_start_installs_printed_area_before_the_bridge(
     omitted = copy.deepcopy(printed)
     omitted["lab_geometry"]["sample"]["exposed_melt_area_m2"] = None
     omitted_session = SimSession()
-    with pytest.raises(LabGeometryError) as caught:
-        omitted_session.start(
-            _gram_lab_run(omitted, campaign="C0")._session_config()
-        )
-    assert caught.value.code == "exposed_melt_area_not_printed"
-    assert omitted_session.simulator.melt.melt_surface_area_m2 == pytest.approx(
-        0.2
+    omitted_session.start(
+        _gram_lab_run(omitted, campaign="C0")._session_config()
     )
-    assert forecast_areas == [pytest.approx(0.000123)]
+    omitted_sim = omitted_session.simulator
+    omitted_sized_area_m2 = omitted_sim._equipment.crucible.melt_surface_area_m2
+    assert omitted_sim.melt.melt_surface_area_m2 == pytest.approx(
+        omitted_sized_area_m2
+    )
+    assert omitted_sim._dp007_area_default is not None
+    assert len(forecast_areas) == 2
+    assert forecast_areas[0] == pytest.approx(0.000123)
+    assert forecast_areas[1] == pytest.approx(omitted_sized_area_m2)
+
+
+def test_dp007_area_notice_is_attached_to_run_metadata() -> None:
+    preset = _vacuum_preset("sesko_2024.yaml")
+    sample_mass_kg = preset["lab_geometry"]["sample"]["mass_g"] / 1000.0
+    expected = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+    run = _gram_lab_run(preset, campaign="C0")
+    output = run._run_session(run._start_session())
+
+    notices = output["run_metadata"]["runtime_notices"]
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "knob_defaulted"
+    assert notices[0]["reason"] == "exposed_melt_area_not_printed"
+    assert notices[0]["policy"] == {
+        "id": "DP-007",
+        "version": 1,
+        "status": "canonical",
+        "value": expected.payload["policy"]["value"],
+        "units": "m²",
+    }
+
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    declared_area_m2 = robinot["lab_geometry"]["sample"]["exposed_melt_area_m2"]
+    run = _gram_lab_run(robinot, campaign="C0")
+    session = run._start_session()
+    output = run._run_session(session)
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(declared_area_m2)
+    assert all(
+        notice.get("policy", {}).get("id") != "DP-007"
+        for notice in output["run_metadata"].get("runtime_notices", ())
+    )
 
 
 @pytest.mark.parametrize(
     "raw_area",
     [
         0,
+        -1,
         False,
         True,
         "nope",

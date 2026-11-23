@@ -41,6 +41,39 @@ class LabScheduleValidationError(ValueError):
     """Raised when a declared lab schedule cannot be honored at runtime."""
 
 
+def _pressure_floor_notice_mbar(value: float) -> tuple[str, str] | None:
+    pressure_mbar = float(value)
+    if pressure_mbar < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
+        return (
+            "lab_schedule_pressure_below_implemented_floor",
+            f"{pressure_mbar:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar",
+        )
+    return None
+
+
+def _pressure_domain_notice_mbar(
+    value: float,
+    *,
+    t_h: float | None = None,
+) -> dict[str, Any] | None:
+    pressure_mbar = float(value)
+    floor_notice = _pressure_floor_notice_mbar(pressure_mbar)
+    if floor_notice is None:
+        return None
+    notice: dict[str, Any] = {
+        "kind": "lab_schedule_pressure_domain_notice",
+        "reason": floor_notice[0],
+        "authority": "extrapolated",
+        "pressure_mbar": pressure_mbar,
+        "certified_band": {
+            "minimum_pressure_mbar": LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
+        },
+    }
+    if t_h is not None:
+        notice["t_h"] = float(t_h)
+    return notice
+
+
 def normalize_lab_schedule(
     raw: Any,
     *,
@@ -81,21 +114,15 @@ def normalize_lab_schedule(
         duration_h=duration_h,
         field="chamber_pressure_mbar",
     )
-    pressure_domain_notices = tuple(
-        {
-            "kind": "lab_schedule_pressure_domain_notice",
-            "reason": "lab_schedule_pressure_below_implemented_floor",
-            "authority": "extrapolated",
-            "pressure_mbar": float(point["value"]),
-            "certified_band": {
-                "minimum_pressure_mbar": LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
-            },
-            "t_h": float(point["t_h"]),
-        }
-        for point in chamber_pressure_mbar
-        if float(point["value"]) < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
-    )
-
+    pressure_domain_notices_list: list[dict[str, Any]] = []
+    for point in chamber_pressure_mbar:
+        notice = _pressure_domain_notice_mbar(
+            float(point["value"]),
+            t_h=float(point["t_h"]),
+        )
+        if notice is not None:
+            pressure_domain_notices_list.append(notice)
+    pressure_domain_notices = tuple(pressure_domain_notices_list)
     gas_boundary = _normalize_gas_boundary(schedule.get("gas_boundary"))
     surface_temperature_C = _normalize_surface_temperatures(
         schedule.get("surface_temperature_C", {}),

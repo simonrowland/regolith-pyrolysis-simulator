@@ -1753,8 +1753,7 @@ def read_gram_lab_exposed_melt_area(
     if raw_area in (None, ''):
         raise LabGeometryError(
             'exposed_melt_area_not_printed',
-            'lab_geometry.sample.exposed_melt_area_m2 is null; '
-            'size_crucible must not supply the melt face',
+            'lab_geometry.sample.exposed_melt_area_m2 is unprinted',
         )
     try:
         if is_declared_real_scalar(raw_area, allow_numeric_str=True):

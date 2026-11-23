@@ -1362,6 +1362,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._engine_commissioning_steps: list[dict[str, Any]] = []
         self._sulfur_saturation_steps: list[dict[str, Any]] = []
+        self._dp007_area_default: dict[str, Any] | None = None
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -18400,9 +18401,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # condensation imports core at module level.
             from simulator.condensation import read_gram_lab_exposed_melt_area
 
-            declared_area_m2 = read_gram_lab_exposed_melt_area(
-                self.setpoints.get('lab_geometry'),
-            )
+            try:
+                declared_area_m2 = read_gram_lab_exposed_melt_area(
+                    self.setpoints.get('lab_geometry'),
+                )
+            except LabGeometryError as exc:
+                if exc.code != 'exposed_melt_area_not_printed':
+                    raise
+                sample_mass_g = self.lab_geometry.sample_mass_g
+                if sample_mass_g is None:
+                    raise
+                from simulator.battery.default_policy import resolve
+
+                resolved = resolve('DP-007', sample_mass_kg=sample_mass_g / 1000.0)
+                declared_area_m2 = float(resolved.value)
+                self._dp007_area_default = {
+                    'resolved': resolved,
+                    'reason': exc.code,
+                    'detail': str(exc),
+                }
             self.melt.melt_surface_area_m2 = (
                 crucible_area_m2
                 if declared_area_m2 is None

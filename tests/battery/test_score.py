@@ -563,17 +563,30 @@ def _mathieu_pressure_context() -> tuple[ScoreContext, tuple[Observation, ...]]:
 def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine) -> None:
     context, admitted = _mathieu_pressure_context()
     reference = admitted[0]
-    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
-        reference.identity, Quantity.P_PARTIAL
+    experiment = context.experiments[reference.experiment_id]
+    method = experiment.method.value if experiment.method.is_value else None
+    from simulator.battery.default_policy import resolve
+    from simulator.physical_constants import PA_PER_BAR
+
+    policy_id = (
+        "DP-019"
+        if method is MethodToken.LANGMUIR_FREE_EVAPORATION
+        else "DP-001"
     )
-    assert assumed_bar == 1e-6
+    policy = resolve(policy_id)
+    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
+        reference.identity, Quantity.P_PARTIAL, method=method
+    )
+    assert assumed_bar == float(
+        Decimal(str(policy.value)) / Decimal(str(PA_PER_BAR))
+    )
     assert assumption_notice is not None
     assert invalid is None
     prediction = replace(
         _partial_prediction(engine, reference),
         identity=replace(
             reference.identity,
-            total_pressure_Pa=State.of(Decimal("0.1")),
+            total_pressure_Pa=State.of(Decimal(str(policy.value))),
         ),
         notices=(assumption_notice,),
     )
@@ -779,10 +792,16 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         source_id="other-source",
     )
     reference = replace(reference, point_conditions=None)
+    from simulator.battery.default_policy import resolve
+    from simulator.physical_constants import PA_PER_BAR
+
+    policy = resolve("DP-001")
     assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
-        identity, Quantity.P_PARTIAL
+        identity, Quantity.P_PARTIAL, method=experiment.method.value
     )
-    assert assumed_bar == 1e-6
+    assert assumed_bar == float(
+        Decimal(str(policy.value)) / Decimal(str(PA_PER_BAR))
+    )
     assert assumption_notice is not None
     assert invalid is None
     prediction = replace(
@@ -805,14 +824,8 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assert residual.numeric is not None
     assert residual.refusal is None
     assert assumption_notice in residual.notices
-    assert assumption_notice.kind is NoticeKind.METHOD_IMPLIED
-    assert assumption_notice.policy == NoticePolicy(
-        id="DP-101",
-        version=1,
-        status="rejected",
-        value="1e-6",
-        units="bar",
-    )
+    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert assumption_notice.policy == NoticePolicy(**policy.payload["policy"])
     assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
     assert f"{assumed_bar:g} bar" not in assumption_notice.reason
     assert "not printed" in assumption_notice.reason
@@ -828,7 +841,9 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         headline_rows,
     )
 
-    assert flagged_strata(residual.notices) == (NoticeKind.METHOD_IMPLIED.value,)
+    assert flagged_strata(residual.notices) == (
+        NoticeKind.ASSUMED_PRESSURE.value,
+    )
     assert [
         (
             row["stratum"],
@@ -840,7 +855,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     ] == [
-        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
+        (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
     ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
@@ -854,7 +869,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         )
         for row in serialized_strata
     ] == [
-        (NoticeKind.METHOD_IMPLIED.value, "DP-101", "rejected", 1),
+        (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
     ]
     payload = residual_to_plain(residual)
     aggregate = score_mod._ScorePayloadAccumulator.from_rows(
@@ -887,7 +902,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         notices=tuple(
             notice
             for notice in residual.notices
-            if notice.kind is not NoticeKind.METHOD_IMPLIED
+            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
         ),
     )
 
@@ -20482,7 +20497,17 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.OPENIMCC,)
     )
-    assert any(row["stratum"] == "cell-material-inferred" for row in strata)
+    # The census sorts strata by name (_flagged_census_sort_key), so position 0 is not
+    # "cell material first". The migrated Stolyarova row prints no total pressure, so
+    # the pressure resolver also attaches its registry pressure notice. Its stratum name
+    # depends on the pressure policy that resolves the row, so pin membership, not order:
+    # the cell-material stratum must be present, and so must a pressure-policy stratum.
+    names = [item["stratum"] for item in strata]
+    assert "cell-material-inferred" in names
+    assert any(
+        name in {"assumed_pressure", "method_implied", "effusion_regime_assumed"}
+        for name in names
+    ), names
 
 
 

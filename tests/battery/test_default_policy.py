@@ -27,7 +27,6 @@ from simulator.battery.score import (
     headline_payloads,
 )
 from simulator.equipment import EquipmentDesigner
-from simulator.state import MeltState
 from tests.battery import factories as F
 
 
@@ -137,8 +136,8 @@ def test_method_implied_notice_requires_policy_metadata() -> None:
         )
 
 
-def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
-    runtime_area = MeltState().melt_surface_area_m2
+def test_other_apparatus_default_resolves_runtime_value() -> None:
+    runtime_area = Decimal("0.000123")
 
     assert resolve("DP-008", runtime_default=runtime_area).value == runtime_area
 
@@ -164,6 +163,12 @@ def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
         ),
     ):
         resolve("DP-007")
+    for invalid_mass_kg in (0.0, -sample_mass_kg):
+        with pytest.raises(
+            ValueError,
+            match="DP-007 sample_mass_kg must be positive",
+        ):
+            resolve("DP-007", sample_mass_kg=invalid_mass_kg)
 
 
 def test_vacuum_pressure_uses_the_runtime_owner_constant() -> None:
