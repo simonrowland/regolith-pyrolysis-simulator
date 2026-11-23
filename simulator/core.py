@@ -1531,6 +1531,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._redox_source_terms_this_hr: Dict[str, float] = {}
         self._redox_source_context_this_hr: Dict[str, Any] = {}
         self._redox_source_delta_ln_this_hr = 0.0
+        # Sticky for the batch. Cleared in load_batch, not per hour:
+        # a later Fe split can recreate Fe2O3 and must not reopen the
+        # tangent the exhaustion handover just closed.
+        self._ferric_tangent_exhausted = False
         self._pt0_determinism_store: Any | None = None
         self._last_reduced_real_cache_state: str | None = None
         self._rump_expectation_warnings: list[str] = []
@@ -1917,6 +1921,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
         self._last_fe_redox_respeciation_diagnostic = {}
+        self._ferric_tangent_exhausted = False
         self._last_melt_redox_liquidus_gate_diagnostic = {}
         self._last_melt_redox_liquid_fraction_diagnostic = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
@@ -3275,17 +3280,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             account='process.overhead_gas',
             species=OXYGEN_SPECIES,
         )
-        net_overhead_o2_mol = overhead_o2_credit_mol - overhead_o2_debit_mol
-        # Actual ledger destination outranks carrier class. Premise: when a
-        # channel credits/debits O2 in process.overhead_gas, that physical O2
-        # transfer is the redox source even if the vapor itself is elemental
-        # (Ti is explicitly co-routed with TiO/TiO2). Algebra uses
-        # source=-net_overhead_O2 so release is reducing (negative) and uptake
-        # is oxidising (positive). Units remain mol O2 equivalent. Sanity:
-        # legacy Na/K buffer-routed channels have net=0 and retain the metal-loss
-        # branch; TiO2(g) has net=0 and no spurious source.
-        if abs(net_overhead_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
-            return {'redox_source:evaporative_oxygen_loss': -net_overhead_o2_mol}
+        buffer_o2_debit_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account=FO2_BUFFER_ACCOUNT,
+            species=OXYGEN_SPECIES,
+        )
+        # Actual ledger destination outranks carrier class. A coproduct
+        # released to overhead is reducing. Oxygen that leaves the fO2
+        # buffer to oxidise a vapour leaves the melt redox reservoir, so
+        # the melt is more reducing and fO2 falls. An overhead debit keeps
+        # the oxidising sign it had when that debit was overhead gas.
+        # This reader sums the oxygen the transition posted. It does not
+        # choose the account. The apply step divides this source by C_m.
+        # Algebra: source = overhead_debit - buffer_debit - overhead_credit.
+        # Unit: mol O2. Limit: a posting inside the noop is not a source.
+        # Sanity: Na/K credit the buffer and keep the metal-loss branch.
+        # TiO2(g) posts no O2 and has no source. A buffer credit is not
+        # this debit. A buffer debit of 1 mol at 1 mol/ln lowers fO2 by 1 ln.
+        # On this base, evaporation credits the buffer and does not debit
+        # it, so the buffer term is idle until an oxidative vapour posts
+        # one. The headspace overdraw refusal is a different owner.
+        net_posted_o2_mol = (
+            overhead_o2_credit_mol
+            - overhead_o2_debit_mol
+            + buffer_o2_debit_mol
+        )
+        if abs(net_posted_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
+            return {
+                'redox_source:evaporative_oxygen_loss': -net_posted_o2_mol,
+            }
         if vapor_oxygen_atoms > 0.0:
             return {}
 
@@ -5712,6 +5736,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
     ) -> float:
+        # The Kress derivative stays finite after Fe2O3 is gone. Langmuir
+        # enters only when this source capacity is at the noop, so the
+        # exhaustion flag has to win before the derivative is evaluated.
+        if getattr(self, '_ferric_tangent_exhausted', False):
+            return OXYGEN_RESERVOIR_NOOP_MOL
         C_m_full = self._melt_redox_capacity_mol_per_ln_fO2(
             fO2_log=fO2_log,
             T_K=T_K,
@@ -6044,6 +6073,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._sync_oxygen_reservoir_mirror()
         return reservoir
 
+    def _bookable_ferric_o2_mol(self) -> float:
+        """O2 the cleaned-melt Fe2O3 inventory can book, mol.
+
+        The factor lives on the respeciation owner
+        (``ferric_couple_o2_mol``): Fe2O3 → 2 FeO + 1/2 O2.
+        """
+        from engines.builtin.fe_redox_respeciation import ferric_couple_o2_mol
+
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        _feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
+        return max(0.0, ferric_couple_o2_mol(fe2o3_mol))
+
     def _melt_redox_tangent_fO2_step(
         self,
         *,
@@ -6051,7 +6092,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log: float,
         capacity_mol_per_ln: float,
         apply_pressure_ceiling: bool,
-    ) -> tuple[float, float]:
+    ) -> tuple[float, float, bool]:
         """Advance melt fO2 by one tangent step.
 
         signed_o2_equiv_mol is mol O2 equivalent added to the melt couple
@@ -6059,28 +6100,69 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Δln fO2 = signed_o2_equiv_mol / capacity_mol_per_ln is
         dimensionless and log10 fO2 = ln fO2 / ln(10).
 
-        When apply_pressure_ceiling is set, compare the oxygen moles with
-        C_m * Δln(to the ideal-gas ceiling) before dividing. A finite
-        source divided by a collapsing C_m can overflow; the ceiling
-        stops the prediction and the caller does not discard the leftover
-        oxygen. The exchange site passes false: its transport target was
-        already limited, and this update must stay x_m - dn_ledger / C_m.
+        Returns (applied_delta_ln, candidate_log10_fO2, ferric_exhausted).
+
+        Reducing inventory. C_m is the Kress91 tangent, not an oxygen
+        store. The ferric couple books Fe2O3 → 2 FeO + 1/2 O2, so the
+        O2 that can be booked is 1/2 mol per mol Fe2O3, which is 1/4 mol
+        per mol Fe3+ (``ferric_couple_o2_mol``; the reducing arm credits
+        that O2 and 2 FeO). Unit check: mol Fe2O3 * 1/2 = mol O2.
+        Compare that inventory with the demand in mol before dividing,
+        the same way the oxidizing arm compares
+        net_o2 >= C_m * Δln(to the gas-pressure ceiling) before dividing.
+        Dust within OXYGEN_RESERVOIR_NOOP_MOL of the inventory is the
+        full step. A larger demand stops at the inventory. The leftover
+        is not discarded and is not booked by this clamp: the atoms are
+        already on the ledger, and the caller sets the source capacity
+        to the noop (1e-15 mol per ln) so the next evaporation enters
+        apply_langmuir_surface_oxygen. No crashed fO2 is published.
+
+        Worked example, Robinot default minute 42. SiO demand
+        0.001216111 mol, C_m = 0.001216111 / (17.853327 * ln 10)
+        = 2.958e-5 mol per ln, bookable ferric O2 1.790e-4 mol.
+        Uncapped: 17.853327 dex, from log10 fO2 -1.886 to -19.74.
+        Capped: 1.790e-4 / 2.958e-5 / ln(10) ≈ 2.63 dex. The -19.74
+        value is not the published state.
+
+        Next couple. FeO left after Fe3+ is exhausted would be bounded
+        by the Fe2+/Fe0 iron-wüstite equilibrium, FeO(l) = Fe + 1/2 O2.
+        This step does not integrate that couple. The native-Fe
+        saturation split books FeO → Fe + 1/2 O2 as a ledger move and
+        then pushes fO2 up toward saturation; it is not a reducing
+        tangent. The load_batch IW fit is inert. Until a ruling adds
+        the iron-wüstite Euler buffer, exhaustion hands the surface to
+        Langmuir.
+
+        When apply_pressure_ceiling is set, the oxidizing ceiling above
+        still applies to whatever oxygen remains after the ferric stop.
+        The exchange site passes false: its transport target was already
+        limited, and a reducing exchange must not shrink the ledger dn
+        this helper does not see.
         """
+        signed = float(signed_o2_equiv_mol)
+        ferric_exhausted = False
+        if signed < 0.0:
+            demand_o2_mol = -signed
+            bookable_o2_mol = self._bookable_ferric_o2_mol()
+            if demand_o2_mol > bookable_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL:
+                ferric_exhausted = True
+                self._ferric_tangent_exhausted = True
+                signed = -bookable_o2_mol
         ln10 = math.log(10.0)
         x_m = base_fO2_log * ln10
         if apply_pressure_ceiling:
             upper_bound = self._melt_redox_fO2_upper_bound_log()
             delta_to_bound = (upper_bound - base_fO2_log) * ln10
-            if signed_o2_equiv_mol >= capacity_mol_per_ln * delta_to_bound:
+            if signed >= capacity_mol_per_ln * delta_to_bound:
                 applied_delta_ln = delta_to_bound
                 candidate_fO2_log = upper_bound
             else:
-                applied_delta_ln = signed_o2_equiv_mol / capacity_mol_per_ln
+                applied_delta_ln = signed / capacity_mol_per_ln
                 candidate_fO2_log = (x_m + applied_delta_ln) / ln10
         else:
-            applied_delta_ln = signed_o2_equiv_mol / capacity_mol_per_ln
+            applied_delta_ln = signed / capacity_mol_per_ln
             candidate_fO2_log = (x_m + applied_delta_ln) / ln10
-        return applied_delta_ln, candidate_fO2_log
+        return applied_delta_ln, candidate_fO2_log, ferric_exhausted
 
     def _apply_oxygen_reservoir_redox_source_terms(
         self,
@@ -6175,7 +6257,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'
         else:
-            applied_delta_ln, candidate_fO2_log = (
+            applied_delta_ln, candidate_fO2_log, ferric_exhausted = (
                 self._melt_redox_tangent_fO2_step(
                     signed_o2_equiv_mol=net_o2_equiv_mol,
                     base_fO2_log=base_fO2_log,
@@ -6184,6 +6266,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             )
             if (
+                ferric_exhausted
+                and abs(applied_delta_ln) <= OXYGEN_RESERVOIR_NOOP_MOL
+            ):
+                # Nothing in the ferric couple to book. Do not publish a
+                # move. The noop capacity is what the next evaporation's
+                # Langmuir gate reads.
+                skip_reason = 'ferric_couple_exhausted'
+                applied_delta_ln = 0.0
+                reservoir.melt_redox_capacity_mol_per_ln_fO2 = (
+                    OXYGEN_RESERVOIR_NOOP_MOL
+                )
+            elif (
                 not math.isfinite(applied_delta_ln)
                 or not math.isfinite(candidate_fO2_log)
             ):
@@ -6219,6 +6313,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         candidate_fO2_log=candidate_fO2_log,
                     )
                 )
+                if ferric_exhausted:
+                    # Partial book: the exhaustion-point fO2 is published,
+                    # mirroring the ceiling path, and the tangent closes.
+                    reservoir.melt_redox_capacity_mol_per_ln_fO2 = (
+                        OXYGEN_RESERVOIR_NOOP_MOL
+                    )
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(
@@ -7332,11 +7432,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # managed-floor / clamp remainder that has no atom backing.
         # No pressure ceiling here: the transport target was already limited
         # when dn was solved.
-        applied_delta_ln, candidate_fO2_log = self._melt_redox_tangent_fO2_step(
-            signed_o2_equiv_mol=-dn_ledger_to_headspace,
-            base_fO2_log=base_fO2_log,
-            capacity_mol_per_ln=C_m,
-            apply_pressure_ceiling=False,
+        applied_delta_ln, candidate_fO2_log, ferric_exhausted = (
+            self._melt_redox_tangent_fO2_step(
+                signed_o2_equiv_mol=-dn_ledger_to_headspace,
+                base_fO2_log=base_fO2_log,
+                capacity_mol_per_ln=C_m,
+                apply_pressure_ceiling=False,
+            )
         )
         reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
             candidate_fO2_log,
@@ -7345,6 +7447,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             delta_ln_fO2=applied_delta_ln,
             candidate_fO2_log=candidate_fO2_log,
         )
+        if ferric_exhausted:
+            # The ledger dn above is already committed. This only stops
+            # the fO2 tangent; it does not put atoms back.
+            reservoir.melt_redox_capacity_mol_per_ln_fO2 = (
+                OXYGEN_RESERVOIR_NOOP_MOL
+            )
         post_head_o2_mol = max(0.0, float(
             self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
