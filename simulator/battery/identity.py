@@ -2136,7 +2136,7 @@ def _identity_equal(
     allow_unknown_species_phase: bool = False,
     allow_unknown_species_polymorph: bool = False,
     ignore_fO2: bool = False,
-    knudsen_residue_extent: bool = False,
+    same_row_residue_extent: bool = False,
 ) -> IdentityEqualOutcome:
     """Compare identities with the narrow caller-selected axis allowances."""
 
@@ -2181,12 +2181,12 @@ def _identity_equal(
             return species_outcome
 
     profile = _comparison_profile(left, right)
-    if knudsen_residue_extent and left_q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-        # Same-row extent predictions validate measured xi and its printed
-        # temperature path in the residue owner. Absolute time, mass and
-        # chamber pressure do not enter molecular-effusion composition ratios.
-        # Printed oxygen still distinguishes two actually different commands;
-        # a model-selected cell oxygen is provenance, not a printed identity.
+    if same_row_residue_extent and left_q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        # Same-row extent predictors validate their measured xi and source
+        # conditions in the residue owner. Exposure and sample mass are not
+        # identity coordinates for the normalized composition result; run
+        # pressure is taken from the same experiment record, and a printed
+        # oxygen value still distinguishes different commands.
         omitted = {"exposure", "sample_mass_kg", "total_pressure_Pa", "fO2_Pa"}
         if any(i.fO2_Pa is not None and i.fO2_Pa.is_value for i in (left, right)):
             omitted.remove("fO2_Pa")
@@ -2279,11 +2279,24 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
     return _identity_equal(left, right)
 
 
-def _same_row_knudsen_residue_identity_equal(
-    left: Identity, right: Identity,
+def _same_row_residue_extent_identity_equal(
+    left: Identity,
+    right: Identity,
+    *,
+    allow_unknown_species_phase: bool = False,
 ) -> IdentityEqualOutcome:
-    """Compare a validated same-row Knudsen extent request, not a timed run."""
-    return _identity_equal(left, right, knudsen_residue_extent=True)
+    """Compare residue identities after a method-specific extent call."""
+    if (
+        quantity_token(left) is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+        or quantity_token(right) is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ):
+        return identity_equal(left, right)
+    return _identity_equal(
+        left,
+        right,
+        allow_unknown_species_phase=allow_unknown_species_phase,
+        same_row_residue_extent=True,
+    )
 
 
 def _same_row_redox_identity_equal(

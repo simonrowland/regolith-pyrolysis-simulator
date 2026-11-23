@@ -2,7 +2,7 @@
 
 from collections import Counter, defaultdict
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 import re
 
@@ -223,6 +223,74 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
             assert point["VF_wt_pct"] == TABLE4_EVAP[index]
 
 
+def test_wang_mass_loss_anchor_uses_located_weights_and_withholds_missing_operands(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    sc1 = next(
+        row
+        for row in document["species"]["SiO2"]["observations"]
+        if row["observation_id"] == "wang_2001_table2_sc1_mass_loss"
+    )["values"]["points"][0]
+    with localcontext() as context:
+        context.prec = 80
+        expected = (
+            Decimal(sc1["initial_mass_mg_as_printed"])
+            - Decimal(sc1["final_mass_mg_as_printed"])
+        ) / Decimal(sc1["initial_mass_mg_as_printed"])
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    sc1_observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and re.search(r"row=SC1(?!\d)", row.locator.note or "")
+    )
+    assert abs(sc1_observation.value.point - expected) <= Decimal("1e-40")
+    assert sc1_observation.derivation is not None
+    assert sc1_observation.derivation.relation == sc1["derivation"]["relation"]
+    assert [name for name, _located in sc1_observation.derivation.parameters] == [
+        "initial_mass_mg_as_printed",
+        "final_mass_mg_as_printed",
+    ]
+
+    missing = deepcopy(document)
+    missing_sc1 = next(
+        row
+        for row in missing["species"]["SiO2"]["observations"]
+        if row["observation_id"] == "wang_2001_table2_sc1_mass_loss"
+    )["values"]["points"][0]
+    del missing_sc1["initial_mass_mg_as_printed"]
+    del missing_sc1["final_mass_mg_as_printed"]
+    assert "mass_loss_wt_pct" in missing_sc1
+
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(yaml.safe_dump(missing, sort_keys=False), encoding="utf-8")
+    mutated = Migrator(root=ROOT, index={}, aliases={})
+    mutated._migrate_extract(mutated_extract)
+    mutated.finalize()
+    remaining = [
+        row
+        for row in mutated.result.observations.values()
+        if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    ]
+    assert len(remaining) == 16
+    sc1_refusal = next(
+        row
+        for row in remaining
+        if re.search(r"row=SC1(?!\d)", row.locator.note or "")
+    )
+    assert sc1_refusal.value.kind is ValueKind.UNAVAILABLE
+    assert sum(row.value.kind is ValueKind.POINT for row in remaining) == 15
+    assert any(
+        "mass_loss_fraction requires both source-located weight operands" in entry.why
+        and entry.observation_id == "wang_2001_table2_sc1_mass_loss::point:0"
+        for entry in mutated.result.queue
+    )
+
+
 def test_migrated_species_temperature_and_point_conditions() -> None:
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -230,6 +298,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     assert not migrator.result.validation.hard_issues
     observations = tuple(migrator.result.observations.values())
     assert len(observations) == 538
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    mass_loss_by_sample = {
+        point["sample"]: point
+        for row in source["species"]["SiO2"]["observations"]
+        if row["values"].get("quantity") == "mass_loss_fraction"
+        for point in row["values"]["points"]
+    }
 
     expected_by_quantity = {
         Quantity.RESIDUE_COMPONENT_COMPOSITION: {
@@ -280,6 +355,15 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         if quantity is Quantity.MASS_LOSS_FRACTION:
             assert formula == "unknown"
             assert row.identity.species.phase.value == "l"
+            point = mass_loss_by_sample[sample]
+            with localcontext() as context:
+                context.prec = 80
+                initial = Decimal(point["initial_mass_mg_as_printed"])
+                final = Decimal(point["final_mass_mg_as_printed"])
+                expected_loss = (initial - final) / initial
+            assert abs(row.value.point - expected_loss) <= Decimal("1e-40")
+            assert row.derivation is not None
+            assert row.derivation.relation == point["derivation"]["relation"]
             assert conditions["printed_composition"].state.value == {
                 "MgO": "24.8",
                 "Al2O3": "2.46",

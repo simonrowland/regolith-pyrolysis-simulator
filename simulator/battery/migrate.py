@@ -54,7 +54,7 @@ import unicodedata
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass, replace
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
 from enum import Enum
 from fractions import Fraction
 from functools import lru_cache
@@ -12172,6 +12172,126 @@ _MASS_LOSS_YIELD_FIELDS = (
     "water_released_wt_pct_as_printed",
     "mass_loss_wt_pct_range",
 )
+_MASS_LOSS_WEIGHT_RELATIONS = {
+    "(initial_weight_g - final_weight_g) / initial_weight_g": (
+        "initial_weight_g",
+        "final_weight_g",
+    ),
+    "(initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed": (
+        "initial_mass_mg_as_printed",
+        "final_mass_mg_as_printed",
+    ),
+}
+_MASS_LOSS_WEIGHT_RELATION_LOOKUP = {
+    " ".join(relation.casefold().split()): pair
+    for relation, pair in _MASS_LOSS_WEIGHT_RELATIONS.items()
+}
+
+
+@dataclass(frozen=True)
+class _MassLossReduction:
+    fraction: Decimal | None
+    initial_field: str
+    final_field: str
+    initial: Decimal | None
+    final: Decimal | None
+
+
+def _mass_loss_fraction_from_printed_weights(
+    values: Mapping[str, Any],
+    derivation: object,
+    *,
+    source_locator: Mapping[str, Any] | None = None,
+) -> _MassLossReduction | None:
+    """Reduce a declared gravimetric mass-loss point from its located weights."""
+    relation = derivation.get("relation") if isinstance(derivation, Mapping) else None
+    normalized_relation = " ".join(str(relation or "").casefold().split())
+    pair = _MASS_LOSS_WEIGHT_RELATION_LOOKUP.get(normalized_relation)
+    if pair is None:
+        return None
+
+    initial_field, final_field = pair
+    raw_initial = values.get(initial_field)
+    raw_final = values.get(final_field)
+    raw_operands = {initial_field: raw_initial, final_field: raw_final}
+    amounts: dict[str, Decimal | None] = {}
+    located_fields: set[str] = set()
+    located_parameters: dict[str, tuple[Decimal, Mapping[str, Any]]] = {}
+    raw_parameters = (
+        derivation.get("parameters") if isinstance(derivation, Mapping) else None
+    )
+    if isinstance(raw_parameters, (list, tuple)):
+        for item in raw_parameters:
+            if not isinstance(item, (list, tuple)) or len(item) != 2:
+                continue
+            name, payload = item
+            if name not in pair or not isinstance(payload, Mapping):
+                continue
+            state = payload.get("state")
+            locator = payload.get("locator")
+            if not isinstance(state, Mapping) or state.get("tag") != "value" or not isinstance(locator, Mapping):
+                continue
+            amount = _as_dec_or_none(state.get("value"))
+            if amount is not None:
+                located_parameters[str(name)] = (amount, locator)
+
+    for name, raw in raw_operands.items():
+        raw_locator = None
+        if isinstance(raw, Mapping) and isinstance(raw.get("state"), Mapping):
+            state = raw["state"]
+            raw_locator = raw.get("locator")
+            raw = state.get("value") if state.get("tag") == "value" else None
+        amount = _as_dec_or_none(raw)
+        amounts[name] = amount
+        parameter = located_parameters.get(name)
+        if parameter is not None:
+            located_amount, parameter_locator = parameter
+            if amount != located_amount:
+                return _MassLossReduction(
+                    None,
+                    initial_field,
+                    final_field,
+                    amounts.get(initial_field),
+                    amounts.get(final_field),
+                )
+            raw_locator = raw_locator or parameter_locator
+        if raw_locator is None:
+            raw_locator = values.get("locator") or source_locator
+        if amount is not None:
+            if not isinstance(raw_locator, Mapping):
+                return _MassLossReduction(
+                    None,
+                    initial_field,
+                    final_field,
+                    amounts.get(initial_field),
+                    amounts.get(final_field),
+                )
+            located_fields.add(name)
+
+    initial = amounts[initial_field]
+    final = amounts[final_field]
+    if (
+        initial is None
+        or final is None
+        or not initial.is_finite()
+        or not final.is_finite()
+        or initial <= 0
+        or located_fields != set(pair)
+    ):
+        return _MassLossReduction(None, initial_field, final_field, initial, final)
+
+    with localcontext() as context:
+        context.prec = 80
+        fraction = (initial - final) / initial
+        return _MassLossReduction(
+            fraction.quantize(Decimal("1e-40"), rounding=ROUND_DOWN),
+            initial_field,
+            final_field,
+            initial,
+            final,
+        )
+
+
 _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
     ("mass_yield_percent", Quantity.YIELD_FRACTION),
     ("fraction_of_feedstock_oxygen_percent", Quantity.O2_YIELD),
@@ -27595,6 +27715,7 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        mass_loss_reduction: _MassLossReduction | None = None
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
@@ -27643,6 +27764,32 @@ class Migrator:
                 ident_kwargs["reaction"] = State.unknown(
                     f"source structured reaction is invalid: {exc}"
                 )
+        if q_token is Quantity.MASS_LOSS_FRACTION:
+            source_derivation_payload = obs.get("derivation", values.get("derivation"))
+            mass_loss_reduction = _mass_loss_fraction_from_printed_weights(
+                values,
+                source_derivation_payload,
+                source_locator=obs.get("locator") or locator,
+            )
+            if mass_loss_reduction is not None:
+                for field_name in _MASS_LOSS_YIELD_FIELDS:
+                    values.pop(field_name, None)
+                if mass_loss_reduction.fraction is None:
+                    self.result.add_queue(
+                        work.work_id,
+                        locator,
+                        [
+                            f"values.{mass_loss_reduction.initial_field}",
+                            f"values.{mass_loss_reduction.final_field}",
+                        ],
+                        "mass_loss_fraction requires both source-located weight operands; any stored scalar was ignored",
+                        source=source_key,
+                        observation_id=obs_id,
+                    )
+                else:
+                    values["mass_loss_fraction"] = format(
+                        mass_loss_reduction.fraction, "f"
+                    )
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
@@ -28843,6 +28990,22 @@ class Migrator:
                     quantity=q_token,
                 )
             )
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and mass_loss_reduction is not None
+            and mass_loss_reduction.fraction is not None
+        ):
+            # A gravimetric fraction declared from initial and final weights
+            # is normalized to the run's starting charge. Its identity is the
+            # experiment's located initial composition.
+            experiment = self.result.experiments.get(experiment_id)
+            initial = (
+                experiment.sample.initial_composition
+                if experiment is not None
+                else None
+            )
+            if initial is not None and initial.state.is_value:
+                ident_kwargs["composition"] = initial.state
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -29238,6 +29401,13 @@ class Migrator:
             for index, item in enumerate(yield_items):
                 if not isinstance(item, Mapping):
                     continue
+                point_for_migration = {
+                    "index": index,
+                    "item": item,
+                    "units": obs.get("units"),
+                }
+                point_derived_from = derived_from
+                point_source_derivation = source_derivation
                 point_locator = locator
                 if item.get("locator"):
                     point_locator = (
@@ -29246,6 +29416,89 @@ class Migrator:
                         )
                         or locator
                     )
+                point_quantity = (
+                    yield_quantity.value
+                    if isinstance(yield_quantity, State) and yield_quantity.is_value
+                    else yield_quantity
+                )
+                if point_quantity is Quantity.MASS_LOSS_FRACTION:
+                    point_derivation = item.get("derivation")
+                    if point_derivation is None:
+                        point_derivation = obs.get(
+                            "derivation", values.get("derivation")
+                        )
+                    mass_loss_reduction = _mass_loss_fraction_from_printed_weights(
+                        item,
+                        point_derivation,
+                        source_locator=item.get("locator") or obs.get("locator"),
+                    )
+                    if mass_loss_reduction is not None:
+                        if mass_loss_reduction.fraction is None:
+                            self.result.add_queue(
+                                work.work_id,
+                                point_locator,
+                                [
+                                    f"values.{mass_loss_reduction.initial_field}",
+                                    f"values.{mass_loss_reduction.final_field}",
+                                ],
+                                "mass_loss_fraction requires both source-located weight operands; any stored scalar was ignored",
+                                source=source_key,
+                                observation_id=f"{obs_id}::point:{index}",
+                            )
+                            continue
+                        normalized_point = {
+                            key: value
+                            for key, value in item.items()
+                            if key not in _MASS_LOSS_YIELD_FIELDS
+                        }
+                        normalized_point["mass_loss_fraction"] = format(
+                            mass_loss_reduction.fraction, "f"
+                        )
+                        point_for_migration = {
+                            "index": index,
+                            "item": normalized_point,
+                            "units": "fraction",
+                        }
+                        point_read_from = choose_read_from(work, point_locator)
+                        point_derived_from = tuple(
+                            dict.fromkeys((*(derived_from or ()), point_read_from))
+                        )
+                        relation = (
+                            point_derivation.get("relation")
+                            if isinstance(point_derivation, Mapping)
+                            else None
+                        )
+                        if not isinstance(relation, str) or not relation.strip():
+                            relation = next(
+                                relation_text
+                                for relation_text, pair in _MASS_LOSS_WEIGHT_RELATIONS.items()
+                                if pair
+                                == (
+                                    mass_loss_reduction.initial_field,
+                                    mass_loss_reduction.final_field,
+                                )
+                            )
+                        point_source_derivation = Derivation(
+                            relation=relation,
+                            inputs=(point_read_from,),
+                            parameters=(
+                                (
+                                    mass_loss_reduction.initial_field,
+                                    Located(
+                                        State.of(mass_loss_reduction.initial),
+                                        locator=point_locator,
+                                    ),
+                                ),
+                                (
+                                    mass_loss_reduction.final_field,
+                                    Located(
+                                        State.of(mass_loss_reduction.final),
+                                        locator=point_locator,
+                                    ),
+                                ),
+                            ),
+                            output_unit="fraction",
+                        )
                 if _item_mass_loss_field(item) is None:
                     self.result.add_queue(
                         work.work_id,
@@ -29302,7 +29555,7 @@ class Migrator:
                         if yield_key == "series"
                         else obs_id
                     ),
-                    item={"index": index, "item": item, "units": obs.get("units")},
+                    item=point_for_migration,
                     work=work,
                     source_id=source_id,
                     source_key=source_key,
@@ -29313,10 +29566,10 @@ class Migrator:
                     evidence=evidence,
                     admission=point_admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
-                    units=str(obs.get("units") or ""),
+                    units=str(point_for_migration.get("units") or obs.get("units") or ""),
                     read_from=read_from,
-                    derived_from=derived_from,
-                    source_derivation=source_derivation,
+                    derived_from=point_derived_from,
+                    source_derivation=point_source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(*point_notices, *ambient_pressure_notices),
