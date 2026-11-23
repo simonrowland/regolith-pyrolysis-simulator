@@ -1829,8 +1829,19 @@ Applicability / conversion refusals:
 
 None.
 """
+PIN_DEFAULT_POLICY_CENSUS_SECTION = """\
+## Default policy census
+
+Numeric flagged residuals, grouped by the applied policy id and status.
+
+| policy_id | status | flagged residuals |
+|---|---|---:|
+| (none) | — | 0 |
+"""
 PIN_REPORT += "\n" + PIN_ASSUMED_BAND_SECTION
 PIN_PAYLOAD_REPORT += "\n" + PIN_ASSUMED_BAND_SECTION
+PIN_REPORT += "\n" + PIN_DEFAULT_POLICY_CENSUS_SECTION
+PIN_PAYLOAD_REPORT += "\n" + PIN_DEFAULT_POLICY_CENSUS_SECTION
 
 PIN_ELEMENT_RETENTION_SECTION = """\
 ## Element retention diagnostics
