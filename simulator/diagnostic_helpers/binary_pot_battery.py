@@ -1603,8 +1603,19 @@ def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
                     and row.get("authority_level") == AUTHORITY_EXTRAPOLATED
                 ):
                     row["authority"] = AUTHORITY_EXTRAPOLATED
+                row.setdefault("affected_quantities", ["p_partial"])
                 notices.append(row)
-            pending.extend(current.values())
+            authority = current.get("authority")
+            calphad_weight = (
+                authority.get("calphad_weight")
+                if isinstance(authority, Mapping)
+                else None
+            )
+            pending.extend(
+                child
+                for key, child in current.items()
+                if not (key == "gamma_FeO" and calphad_weight == 0)
+            )
         elif isinstance(current, (list, tuple)):
             pending.extend(current)
     return notices

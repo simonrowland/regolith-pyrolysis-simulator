@@ -30,16 +30,15 @@ from simulator.battery.score import (
     composition_wt_pct,
     predict_with_engine,
 )
-from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
 from simulator.diagnostic_helpers.binary_pot_battery import (
     AUTHORITY_EXTRAPOLATED,
     BinaryPot,
     EngineHandle,
+    PO2_COMMANDED,
     Po2Request,
     equilibrate_cell,
     extract_reported_quantities,
     composition_kg_and_mol,
-    _nested_notice_flags,
     engine_flags_from_result,
     identity_battery_pot,
     open_battery_engine,
@@ -302,38 +301,80 @@ def test_openimcc_temperature_notice_survives_cell_notices() -> None:
 
 
 def test_nested_provider_notice_reaches_score_visible_cell() -> None:
-    provider_diagnostic = {
-        "a_FeO_calphad": calphad_ferrous_feo_activity_diagnostic(
-            comp_wt={"FeO": 20.0, "Na2O": 20.0, "SiO2": 60.0},
-            fO2_log=-12.0,
-            T_K=1605.0 + 273.15,
-            pressure_bar=1e-6,
+    handle = open_battery_engine("internal-analytical")
+    try:
+        outputs = {}
+        for fO2_log in (-12.0, -6.17939589339):
+            core = handle.backend._core
+            core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
+            core.melt.melt_fO2_log = fO2_log
+            result = handle.backend.equilibrate(
+                temperature_C=1605.0,
+                composition_kg={"FeO": 0.2, "Na2O": 0.2, "SiO2": 0.6},
+                composition_mol={
+                    "FeO": 2.7838093647,
+                    "Na2O": 3.2269234585,
+                    "SiO2": 9.9861857763,
+                },
+                fO2_log=fO2_log,
+                pressure_bar=1e-6,
+                po2_request=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=10.0**fO2_log,
+                ),
+            )
+            diagnostic = result.diagnostics["vapor_pressure_diagnostic"][
+                "a_FeO_calphad"
+            ]
+            flags, authority, _band = engine_flags_from_result(result)
+            cell = types.SimpleNamespace(notices=flags, authority=authority)
+            outputs[fO2_log] = (
+                diagnostic,
+                cell_notices(
+                    Quantity.P_PARTIAL, Engine.INTERNAL_ANALYTICAL, cell
+                ),
+                result,
+            )
+    finally:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            close_battery_engine_handle,
         )
-    }
-    flags = _nested_notice_flags(provider_diagnostic)
-    result = types.SimpleNamespace(
-        diagnostics={
-            "authority": AUTHORITY_EXTRAPOLATED,
-            "imcc_notices": flags,
-        }
+
+        close_battery_engine_handle(handle)
+
+    reducing_diag, reducing_notices, reducing_result = outputs[-12.0]
+    assert reducing_diag["authority"]["calphad_weight"] == 1.0
+    assert any(
+        notice.reason
+        == "Holzheid stoichiometric FeO gamma conversion extrapolated"
+        for notice in reducing_notices
     )
-    notices, authority, _band = engine_flags_from_result(result)
-    cell = types.SimpleNamespace(
-        notices=notices,
-        authority=authority,
+    reducing_flags, reducing_authority, _ = engine_flags_from_result(
+        reducing_result
+    )
+    assert not any(
+        notice.reason
+        == "Holzheid stoichiometric FeO gamma conversion extrapolated"
+        for notice in cell_notices(
+            Quantity.ACTIVITY,
+            Engine.INTERNAL_ANALYTICAL,
+            types.SimpleNamespace(
+                notices=reducing_flags,
+                authority=reducing_authority,
+            ),
+        )
     )
 
-    scored = cell_notices(Quantity.P_PARTIAL, Engine.INTERNAL_ANALYTICAL, cell)
-
-    diagnostic = provider_diagnostic["a_FeO_calphad"]
-    gamma = diagnostic["gamma_FeO"]["holzheid"]
-    assert diagnostic["a_FeO_authoritative"] > 0.0
-    assert gamma["conversion_status"] == "extrapolated_above_verified_range"
-    assert gamma["notice"]["kind"] == "out_of_certified_band"
-    assert authority == AUTHORITY_EXTRAPOLATED
-    assert len(scored) == 1
-    assert scored[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-    assert scored[0].reason == "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    oxidizing_diag, oxidizing_notices, _oxidizing_result = outputs[-6.17939589339]
+    assert oxidizing_diag["authority"]["calphad_weight"] == 0.0
+    assert oxidizing_diag["a_FeO_authoritative"] == pytest.approx(
+        oxidizing_diag["a_FeO_kress91"]
+    )
+    assert not any(
+        notice.reason
+        == "Holzheid stoichiometric FeO gamma conversion extrapolated"
+        for notice in oxidizing_notices
+    )
 
 
 def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:

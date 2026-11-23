@@ -7758,6 +7758,13 @@ def cell_notices(
     for row in raw_notices:
         if not isinstance(row, Mapping):
             continue
+        affected_quantities = row.get("affected_quantities")
+        if (
+            isinstance(affected_quantities, (list, tuple, set, frozenset))
+            and affected_quantities
+            and quantity.value not in affected_quantities
+        ):
+            continue
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
             raw_band = row.get("certified_band") or row.get("band")

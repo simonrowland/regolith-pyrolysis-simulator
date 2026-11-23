@@ -524,11 +524,36 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
             else math.log1p(math.exp(segment_log_ratio))
         )
         log10_scale = math.log(10.0)
-        sigma_band_log10 = max(
-            (central_log - scaled_low_log) / log10_scale,
-            (scaled_high_log - central_log) / log10_scale,
-            segment_log_spread / log10_scale,
-        )
+        try:
+            scaled_low = math.exp(scaled_low_log)
+            scaled_high = math.exp(scaled_high_log)
+            sigma_band = max(
+                central - scaled_low,
+                scaled_high - central,
+                edge_segment_spread,
+            )
+        except OverflowError:
+            sigma_band = math.inf
+        if (
+            math.isfinite(sigma_band)
+            and central - sigma_band > 0.0
+            and math.isfinite(central + sigma_band)
+        ):
+            # Preserve the ruled symmetric linear spread mapped to dex exactly
+            # wherever the original endpoints are representable.
+            sigma_band_log10 = max(
+                math.log10(central / (central - sigma_band)),
+                math.log10((central + sigma_band) / central),
+            )
+        else:
+            # A positive lower log bound is impossible when the symmetric
+            # linear spread crosses zero. Fall back to transported endpoint
+            # distances, which stay finite in log space.
+            sigma_band_log10 = max(
+                (central_log - scaled_low_log) / log10_scale,
+                (scaled_high_log - central_log) / log10_scale,
+                segment_log_spread / log10_scale,
+            )
 
         # The printed 1400 C point is scatter around the constant-W curve, not
         # a fit target. Derive the larger edge residual from the printed data;
