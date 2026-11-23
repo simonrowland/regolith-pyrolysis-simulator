@@ -625,6 +625,17 @@ def test_scoped_pressure_notices_match_canonical_gas_species_keys() -> None:
         )
 
 
+def test_phase_aware_gas_alias_matcher_keeps_predecessor_acceptance() -> None:
+    from simulator.battery.score import match_reported_species
+
+    for formula in (r"$SiO_2(g)$", "O2Si(g)", "SiO2[g]"):
+        assert match_reported_species(
+            formula,
+            {"SiO2_gas": 42.0},
+            species=Species(formula, Phase.G),
+        ) == ("SiO2_gas", 42.0)
+
+
 def test_openimcc_cell_notice_record_kinds_are_classified_separately() -> None:
     rows = (
         {"kind": "openimcc_flag", "reason": "liquid_only_model"},

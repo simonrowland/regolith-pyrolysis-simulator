@@ -2350,6 +2350,49 @@ def test_fe_pure_component_antoine_provider_pressure_pin(vapor_pressure_data):
     )
 
 
+def test_feo_activity_ceiling_blocks_holzheid_pressure_notice(
+    vapor_pressure_data, monkeypatch
+):
+    from simulator import fe_redox
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": _wt_pct_to_mol_account(
+                    {"FeO": 70.0, "SiO2": 30.0}
+                )
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1605.0,
+        pressure_bar=1e-6,
+        fO2_log=-12.0,
+        control_inputs={"pO2_bar": 1e-6, "intrinsic_fO2_log": -12.0},
+    )
+    baseline = provider.dispatch(request).diagnostic
+    gamma_band = fe_redox.holzheid_stoich_feo_gamma_band
+
+    def higher_gamma(temperature_K):
+        band = gamma_band(temperature_K)
+        band["central"] *= 1.1
+        return band
+
+    monkeypatch.setattr(fe_redox, "holzheid_stoich_feo_gamma_band", higher_gamma)
+    mutated = provider.dispatch(request).diagnostic
+
+    for diagnostic in (baseline, mutated):
+        activity = diagnostic["a_FeO_calphad"]
+        assert activity["a_FeO_authoritative_clamped_to_pure_feo_ceiling"]
+        rail = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+        assert rail["raw_metal_activity_root"] < 1.0
+    baseline_rail = baseline["vapor_pressure_numerator_provenance"]["Fe"]
+    mutated_rail = mutated["vapor_pressure_numerator_provenance"]["Fe"]
+    assert baseline_rail["P_eq_Pa"] == mutated_rail["P_eq_Pa"]
+    assert "notice" not in baseline_rail
+
+
 def test_mg_reconstructed_bridge_derivation_and_declared_bounds(
     vapor_pressure_data,
 ):

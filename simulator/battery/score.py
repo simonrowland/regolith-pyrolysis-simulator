@@ -1361,7 +1361,6 @@ def _match_reported_species_with_notices(
     target = parse_species_formula(formula, species=species)
     if target is None:
         return None, ()
-    target_key = canonical_species_key(formula)
     if oxide_activity and _is_raw_element_label(formula, species=species):
         return None, ()
     oxide_activities: Mapping[str, float] = {}
@@ -1391,10 +1390,7 @@ def _match_reported_species_with_notices(
             stem = canonical_species_key(text)
             if stem == text:
                 continue
-            if (
-                canonical_species_key(stem) == target_key
-                and parse_species_formula(stem, species=species) == target
-            ):
+            if parse_species_formula(stem, species=species) == target:
                 return (text, float(value)), ()
         return None, ()
 
@@ -15539,12 +15535,21 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
+    notice_species = formula
+    if quantity is Quantity.P_PARTIAL:
+        initial_pressures = dict(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {}
+        )
+        initial_target = match_reported_species(
+            formula, initial_pressures, species=identity.species
+        )
+        notice_species = "" if initial_target is None else initial_target[0]
     notices = union_notices(
         tuple(extra_notices),
-        cell_notices(quantity, engine, cell, species=formula),
+        cell_notices(quantity, engine, cell, species=notice_species),
     )
     authority, certified_band = _flags_from_scored_cell(
-        cell, authority, certified_band, quantity=quantity, species=formula
+        cell, authority, certified_band, quantity=quantity, species=notice_species
     )
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
@@ -15829,8 +15834,16 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
+        updated_pressures = dict(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {}
+        )
+        updated_target = match_reported_species(
+            formula, updated_pressures, species=identity.species
+        )
+        notice_species = "" if updated_target is None else updated_target[0]
         notices = union_notices(
-            notices, cell_notices(quantity, engine, cell, species=formula)
+            notices,
+            cell_notices(quantity, engine, cell, species=notice_species),
         )
         if getattr(cell, "status", None) != "ok":
             return EnginePrediction(
@@ -15865,13 +15878,11 @@ def _predict_with_engine(
         if invalid_refusal is not None:
             return invalid_refusal
         authority, certified_band = _flags_from_scored_cell(
-            cell, authority, certified_band, quantity=quantity, species=formula
-        )
-        updated_pressures = dict(
-            getattr(cell, "gas_partial_pressures_Pa", None) or {}
-        )
-        updated_target = match_reported_species(
-            formula, updated_pressures, species=identity.species
+            cell,
+            authority,
+            certified_band,
+            quantity=quantity,
+            species=notice_species,
         )
         if updated_target is None:
             return missing_knudsen_target_refusal(

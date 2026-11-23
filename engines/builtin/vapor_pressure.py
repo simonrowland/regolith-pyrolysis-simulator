@@ -3970,10 +3970,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     calphad_activity_consumed = (
                         fe_activity_basis == "kress91_ferrous"
                     )
+                    feo_activity_is_capped = (
+                        isinstance(feo_activity_diagnostic, Mapping)
+                        and feo_activity_diagnostic.get(
+                            "a_FeO_authoritative_clamped_to_pure_feo_ceiling"
+                        ) is True
+                    )
                     effective_calphad_weight = (
                         calphad_weight
                         if isinstance(calphad_weight, (int, float))
                         and calphad_activity_consumed
+                        and not feo_activity_is_capped
                         and not pressure_activity_is_capped
                         else 0.0
                     )
