@@ -2993,10 +2993,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"{notice.get('message', '')}"
                 )
         feo_activity_diagnostic = None
+        from simulator.fe_redox import holzheid_authority_notice
+
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 calphad_ferrous_feo_activity_diagnostic,
-                holzheid_authority_notice,
             )
 
             feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(

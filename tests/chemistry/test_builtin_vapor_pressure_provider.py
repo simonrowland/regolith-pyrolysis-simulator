@@ -3661,7 +3661,7 @@ def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
     assert lower_transport_vp["SiO"] > reduced_vp["SiO"]
 
 
-def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
+def test_fe_pressure_without_intrinsic_fO2_uses_typed_fallback(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -3700,6 +3700,7 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
 
     # Documented degraded public-caller path: wt-frac remains reachable when
     # intrinsic_fO2_log is absent, but must be typed (not silent).
+    assert no_channel_result.diagnostic["vapor_pressures_Pa"]["Fe"] > 0.0
     no_channel_prov = no_channel_result.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]["Fe"]
