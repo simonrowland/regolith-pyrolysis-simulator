@@ -30819,29 +30819,37 @@ class Migrator:
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
             if extra_unc is None and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-                standard_errors = raw_item.get("standard_errors")
-                field_name = value_sel.field_name if value_sel is not None else None
-                component = (
-                    _mass_percent_component_key(field_name)[0]
-                    if isinstance(field_name, str)
-                    else None
+                uncertainty_declares_convention = (
+                    isinstance(uncertainty.verbatim, Mapping)
+                    and any(
+                        uncertainty.verbatim.get(key) not in (None, "", "none")
+                        for key in ("kind", "confidence_level", "k")
+                    )
                 )
-                if isinstance(standard_errors, Mapping) and component is not None:
-                    extra_unc = standard_errors.get(component)
-                if extra_unc is None and isinstance(uncertainty.verbatim, Mapping):
-                    zero_width_cells = uncertainty.verbatim.get("zero_width_cells")
-                    sample = raw_item.get("sample")
-                    if isinstance(zero_width_cells, list):
-                        extra_unc = next(
-                            (
-                                cell.get("sigma")
-                                for cell in zero_width_cells
-                                if isinstance(cell, Mapping)
-                                and cell.get("sample") == sample
-                                and cell.get("formula") == component
-                            ),
-                            None,
-                        )
+                if uncertainty_declares_convention:
+                    standard_errors = raw_item.get("standard_errors")
+                    field_name = value_sel.field_name if value_sel is not None else None
+                    component = (
+                        _mass_percent_component_key(field_name)[0]
+                        if isinstance(field_name, str)
+                        else None
+                    )
+                    if isinstance(standard_errors, Mapping) and component is not None:
+                        extra_unc = standard_errors.get(component)
+                    if extra_unc is None and isinstance(uncertainty.verbatim, Mapping):
+                        zero_width_cells = uncertainty.verbatim.get("zero_width_cells")
+                        sample = raw_item.get("sample")
+                        if isinstance(zero_width_cells, list):
+                            extra_unc = next(
+                                (
+                                    cell.get("sigma")
+                                    for cell in zero_width_cells
+                                    if isinstance(cell, Mapping)
+                                    and cell.get("sample") == sample
+                                    and cell.get("formula") == component
+                                ),
+                                None,
+                            )
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)

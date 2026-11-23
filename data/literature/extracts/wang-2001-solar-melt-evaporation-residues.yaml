@@ -1268,6 +1268,15 @@ species:
       phase: cr
       regime: langmuir_free_evaporation
       units: wt%
+      uncertainty:
+        confidence_level: one_sigma
+        note: '“Uncertainties are ±1σ standard errors calculated from replicate analyses.”'
+        locator:
+          page: 5
+          published_page: 483
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 footnote on replicate-analysis standard errors.
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct

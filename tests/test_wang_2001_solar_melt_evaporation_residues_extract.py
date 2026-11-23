@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
+from simulator.battery import migrate as migrate_module
 from simulator.battery.migrate import Migrator
 
 
@@ -109,11 +110,20 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         row for row in table1
         if row["values"]["analytical_method"] == "electron microprobe"
     )
+    ion_probe = next(
+        row for row in table1
+        if row["values"]["analytical_method"] == "ion microprobe"
+    )
     assert len(electron_probe["values"]["series"]) == 16
     assert electron_probe["uncertainty"]["confidence_level"] == "one_sigma"
     assert electron_probe["uncertainty"]["locator"]["page"] == 5
     assert electron_probe["uncertainty"]["locator"]["published_page"] == 483
     assert electron_probe["uncertainty"]["locator"]["pdf_page_index"] == 4
+    assert ion_probe["uncertainty"]["confidence_level"] == "one_sigma"
+    assert ion_probe["uncertainty"]["locator"]["page"] == 5
+    assert ion_probe["uncertainty"]["locator"]["published_page"] == 483
+    assert ion_probe["uncertainty"]["locator"]["pdf_page_index"] == 4
+    assert "±1σ standard errors" in ion_probe["uncertainty"]["note"]
     zero_widths = {
         (cell["sample"], cell["formula"]): cell["sigma"]
         for cell in electron_probe["uncertainty"]["zero_width_cells"]
@@ -334,6 +344,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         for formula in (label.split(".", maxsplit=1)[1],)
         for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
     }
+    expected_ion_probe_cells = {
+        (sample, formula): split_value_and_error(raw_cell)
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label.startswith("IM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -354,8 +371,12 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     actual_by_sample: dict[tuple[Quantity, str], Counter[str]] = defaultdict(Counter)
     migrated_mass_loss_samples: set[str] = set()
     migrated_electron_probe_cells: set[tuple[str, str]] = set()
+    migrated_ion_probe_cells: set[tuple[str, str]] = set()
     electron_probe_prefix = (
         f"{extract['source_id']}::wang_2001_table1_electron_microprobe_residue_compositions::"
+    )
+    ion_probe_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
     )
     temperature_c = {
         "SC1": "1800", "SC2": "1800", "SC3": "1800", "SC4": "1800",
@@ -381,6 +402,16 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             assert row.uncertainty.verbatim["sigma"] == expected_sigma
             assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
             migrated_electron_probe_cells.add((sample, formula))
+        elif row.observation_id.startswith(ion_probe_prefix):
+            expected_sigma = expected_ion_probe_cells[(sample, formula)][1]
+            if expected_sigma is None:
+                assert row.uncertainty.kind is UncertaintyKind.NONE
+            else:
+                assert row.uncertainty.kind is UncertaintyKind.PRINTED
+                assert isinstance(row.uncertainty.verbatim, dict)
+                assert row.uncertainty.verbatim["sigma"] == expected_sigma
+                assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            migrated_ion_probe_cells.add((sample, formula))
 
         expected_temperature = Decimal(temperature_c[sample]) + Decimal("273.15")
         assert row.identity.temperature_K.value == expected_temperature, (quantity, sample, formula)
@@ -432,6 +463,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         assert actual_by_quantity[quantity] == Counter(expected)
     assert migrated_mass_loss_samples == set(mass_loss_fraction_by_sample)
     assert migrated_electron_probe_cells == set(expected_electron_probe_cells)
+    assert migrated_ion_probe_cells == set(expected_ion_probe_cells)
     component_formulas = ("MgO", "Al2O3", "SiO2", "CaO", "TiO2", "FeO")
     trace_formulas = "La Ce Pr Nd Sm Eu Gd Tb Dy Ho Er Tm Yb Lu".split()
     for sample in TABLE1_SAMPLES:
@@ -446,3 +478,60 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             assert actual_by_sample[(Quantity.ISOTOPE_DELTA, sample)] == Counter({"O": 2, "Mg": 2, "Si": 2})
         else:
             assert actual_by_sample[(Quantity.ISOTOPE_DELTA, sample)] == Counter()
+
+
+def test_residue_component_errors_without_parent_convention_keep_green_behavior(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    ion_probe = next(
+        row
+        for row in extract["species"]["SiO2"]["observations"]
+        if row["observation_id"]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+    )
+    del ion_probe["uncertainty"]
+    original_load_yaml = migrate_module.load_yaml
+
+    def load_mutated_extract(path: Path):
+        if Path(path) == EXTRACT:
+            return extract
+        return original_load_yaml(path)
+
+    monkeypatch.setattr(migrate_module, "load_yaml", load_mutated_extract)
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    ion_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
+    )
+    ion_records = [row for row in observations if row.observation_id.startswith(ion_prefix)]
+    assert len(ion_records) == 112
+    assert all(row.uncertainty.kind is UncertaintyKind.NONE for row in ion_records)
+
+    electron_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_electron_microprobe_residue_compositions::"
+    )
+    electron_records = [
+        row for row in observations if row.observation_id.startswith(electron_prefix)
+    ]
+    expected_electron_errors = {
+        (sample, formula): split_value_and_error(raw_cell)[1]
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label.startswith("EM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
+    assert len(electron_records) == 96
+    for row in electron_records:
+        match = re.search(r"row=(SC\d+)(?!\d)", row.locator.note or "")
+        assert match is not None
+        sample = match.group(1)
+        expected_sigma = expected_electron_errors[(sample, row.identity.species.formula)]
+        assert expected_sigma is not None
+        assert row.uncertainty.kind is UncertaintyKind.PRINTED
+        assert row.uncertainty.verbatim is not None
+        assert row.uncertainty.verbatim["sigma"] == expected_sigma
+        assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
