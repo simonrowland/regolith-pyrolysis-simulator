@@ -580,7 +580,7 @@ def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic():
     value = Value.point_of("0.2")
     divisor = 0.2
     production_threshold = residue._trace_tail_precision_threshold(value, divisor=divisor)
-    round_eight_threshold = residue._trace_tail_precision_threshold(value) / divisor
+    round_eight_threshold = float(Decimal("0.049999999999999996"))
     chosen_tail = Decimal("0.05")
 
     # The production threshold is 0.05000000000000001; round 8's division-first
