@@ -9543,6 +9543,7 @@ def _initial_charge_only_composition_proxy(
     point_declared_component_map: Mapping[str, Any] | None = None,
     point_composition_map_declared: bool = False,
     run_composition_columns_declared: bool = False,
+    role_default_flag: str | None = None,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
@@ -9561,6 +9562,7 @@ def _initial_charge_only_composition_proxy(
     outside_initial_charge_proxy_scope = (
         role != INITIAL_CHARGE_ONLY_PROXY_FLAG
         and not existing_initial_charge_proxy
+        and not run_composition_columns_declared
     )
     if outside_initial_charge_proxy_scope:
         malformed_state_reason = None
@@ -9685,7 +9687,11 @@ def _initial_charge_only_composition_proxy(
         ):
             run = replace(
                 initial.state.value,
-                proxy_flag=None,
+                proxy_flag=(
+                    INITIAL_CHARGE_ONLY_PROXY_FLAG
+                    if role_default_flag is not None
+                    else None
+                ),
                 input_provenance=None,
             )
             located_run = Located(
@@ -9739,6 +9745,15 @@ def _initial_charge_only_composition_proxy(
             unknown = Located(State.unknown(reason), locator=locator)
             conditions["composition"] = unknown
             return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    if isinstance(point_composition, Located) and point_composition.state.is_value:
+        candidate = point_composition.state.value
+        if isinstance(candidate, Composition):
+            composition = replace(
+                candidate,
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            )
+            composition_locator = point_composition.locator or locator
 
     if composition is None and initial_charge_context is not None:
         initial_map = _named_printed_composition_map(initial_charge_context)
@@ -32230,6 +32245,7 @@ class Migrator:
                 point_conditions,
                 child_notices,
                 role=effective_point_composition_role,
+                role_default_flag=role_default_flag,
                 initial_charge_context=(
                     parent_values if isinstance(parent_values, Mapping) else None
                 ),

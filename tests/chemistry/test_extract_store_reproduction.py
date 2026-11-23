@@ -1500,6 +1500,7 @@ def test_numeric_activity_executes_melt_activity_model(
     monkeypatch, adopted_observations: tuple[AdoptedObservation, ...]
 ) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
+    from dataclasses import replace
 
     real_activity = er.melt_oxide_activity
     calls: list[str] = []
@@ -1516,12 +1517,42 @@ def test_numeric_activity_executes_melt_activity_model(
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
     comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
-    assert calls == ["FeO"]
+    assert calls == []
     assert not comparable
     assert {r.status for r in evaluation.records} == {"assumed-input"}
     assert (
-        "typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO"
+        "typed-refusal:missing_condition:source_sample_composition"
         in evaluation.skip_reasons
+    )
+
+    calls.clear()
+    fixture = replace(
+        obs,
+        observation_id="fixture_fe_activity_with_printed_composition",
+        values={
+            **obs.values,
+            "composition_wt_pct": {
+                "SiO2": 45.0,
+                "MgO": 10.0,
+                "Al2O3": 15.0,
+                "CaO": 12.0,
+                "FeO": 18.0,
+            },
+        },
+    )
+    fixture_evaluation = evaluate_observation(
+        fixture, vapor_pressure_data=load_vapor_pressure_data()
+    )
+    fixture_comparable = [
+        record for record in fixture_evaluation.records
+        if record.status in {"match", "mismatch"}
+    ]
+    assert calls == ["FeO"]
+    assert not fixture_comparable
+    assert {record.status for record in fixture_evaluation.records} == {"assumed-input"}
+    assert (
+        "typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO"
+        in fixture_evaluation.skip_reasons
     )
 
 
@@ -1947,6 +1978,7 @@ def test_battery_rollup_matches_committed_model_limitations(
         f"regenerate with {REGEN_ENV}=1"
     )
     if committed_section.strip() != generated_section.strip():
+        print(generated_section)
         # Produce a short diagnostic without dumping the whole doc.
         c_lines = committed_section.strip().splitlines()
         g_lines = generated_section.strip().splitlines()
@@ -2030,7 +2062,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # Gap records follow the same +16: Ichise Table 4 adds 17 gap points and
     # the Markova VI row leaves one, then the residue refusal replaces its
     # scored point with one gap record.
-    assert coverage["gap_points"] == 2029
+    assert coverage["gap_points"] == 2029, coverage["by_source"]
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")

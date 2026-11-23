@@ -517,7 +517,7 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         for observation, _experiment in closure_calls
         if float(observation.identity.temperature_K.value) == 1366.12
     )
-    assert dict(changed_composition.components)["K2O"] == pytest.approx(
+    assert float(dict(changed_composition.components)["K2O"]) == pytest.approx(
         0.00400546853226304
     )
     assert len(melt_calls) == 2
@@ -641,6 +641,10 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         for row in unknown_role_document["species"]["K"]["observations"]
         if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
     )
+    unknown_role_observation["values"]["composition_wt_pct"] = {
+        "SiO2": 60.0,
+        "MgO": 40.0,
+    }
     for point in unknown_role_observation["values"]["points"]:
         role = point.get("composition_role")
         if not isinstance(role, dict) or role.get("value") != "initial_charge_only":
@@ -672,14 +676,37 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
 
     assert len(closure_calls) == 2
     assert len(melt_calls) == 2
+    diagnostic_recipes = {
+        float(point["T_K"]): _melt_recipe_mol(unknown_role_obs, point=point)[0]
+        for point in _literature_pressure_points(unknown_role_obs)[0]
+        if float(point["T_K"]) in {1366.12, 1314.06}
+    }
+    point_locators = {
+        float(point["T_K"]): point["point_conditions"]["composition"].get("locator")
+        for point in _literature_pressure_points(unknown_role_obs)[0]
+        if float(point["T_K"]) in {1366.12, 1314.06}
+    }
+    assert all(recipe is not None for recipe in diagnostic_recipes.values())
     assert all(
         observation.identity.composition.is_value
         and observation.identity.composition.value.proxy_flag == "initial_charge_only"
+        and {
+            oxide: float(amount)
+            for oxide, amount in observation.identity.composition.value.components
+        }
+        == pytest.approx(
+            diagnostic_recipes[float(observation.identity.temperature_K.value)]
+        )
         and any(
             "typed-refusal:composition_role_defaulted_to_initial_charge_only"
             in notice.reason
             for notice in observation.notices
         )
+        for observation, _experiment in closure_calls
+    )
+    assert all(
+        observation.point_conditions["composition"].locator
+        == point_locators[float(observation.identity.temperature_K.value)]
         for observation, _experiment in closure_calls
     )
     assert sum(
@@ -739,3 +766,35 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
         for runtime in runtimes
         if runtime.get("temperature_K") in {1366.12, 1314.06}
     )
+
+
+def test_flat_run_unknown_role_is_flagged_at_scorer_boundary(tmp_path) -> None:
+    from simulator.battery.enums import Quantity
+    from simulator.battery.migrate import migrate
+    from simulator.battery.score import blocking_qualifications, flagged_strata
+    from tests.battery.test_b716_composition_role import _series_extract
+    from tests.battery.test_migrate import _write_min_tree
+
+    doc = _series_extract({"composition_wt_pct": {"SiO2": 50, "MgO": 50}})
+    point = doc["species"]["Fe"]["observations"][0]["values"]["points"][0]
+    del point["composition_wt_pct"]
+    point.update(SiO2=55, MgO=45, composition_role="unreported")
+    store = migrate(_write_min_tree(tmp_path, doc), write=False)
+    rows = [
+        row for row in store.observations.values()
+        if row.observation_id.startswith("fixture-source::fixture_series::")
+        and row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+        and row.identity.composition is not None
+        and row.identity.composition.is_value
+    ]
+    assert len(rows) == 1
+    (row,) = rows
+    assert row.identity.composition.value.proxy_flag == "initial_charge_only"
+    role_notices = tuple(
+        notice for notice in row.notices
+        if "composition_role_defaulted_to_initial_charge_only" in notice.reason
+    )
+    assert len(role_notices) == 1
+    assert flagged_strata(row.notices)
+    assert blocking_qualifications(Quantity.P_PARTIAL, row.notices)
