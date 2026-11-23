@@ -432,6 +432,35 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monke
     assert candidate.provenance["final_inventory_mol"]["FeO"] == candidate.provenance["initial_inventory_mol"]["FeO"]
 
 
+def test_approximate_component_tail_uses_relative_effect_threshold():
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.residue import _knudsen_trace_tail_notices
+
+    component_bound = 2.2271715e-6
+    trace_tail = {
+        "fraction_of_measured_mass_loss": 1.0470108e-9,
+        "material_threshold": 1e-6,
+        "bound_wt_pct_by_component": {"FeO": component_bound, "MgO": component_bound},
+        "retained_kg_by_parent": {"FeO": 1e-12},
+        "measured_loss_kg": 9.551e-4,
+        "residue_oxide_mass_kg": 4.49e-5,
+    }
+    reference = SimpleNamespace(
+        value=SimpleNamespace(point=Decimal("0.08"), approximate=True),
+        identity=SimpleNamespace(species=SimpleNamespace(formula="FeO")),
+    )
+
+    notices = _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=True)
+
+    assert trace_tail["fraction_of_measured_mass_loss"] < trace_tail["material_threshold"]
+    assert trace_tail["bound_wt_pct_by_component"] == {"FeO": component_bound, "MgO": component_bound}
+    assert trace_tail["component_material_threshold_wt_pct"] == pytest.approx(0.08e-6)
+    assert component_bound / 0.08 > 1e-6
+    assert trace_tail["material"]
+    assert notices[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert notices[0].certification == "material"
+
+
 def test_knudsen_tail_uses_the_real_ledger_loader_cutoff(monkeypatch):
     from simulator import core
     from simulator.battery.residue import _formula_terms

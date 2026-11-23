@@ -2843,10 +2843,13 @@ def _knudsen_trace_tail_notices(trace_tail, reference, *, oxide_wt_pct: bool):
 
     material = trace_tail["fraction_of_measured_mass_loss"] > trace_tail["material_threshold"]
     value = reference.value
-    if oxide_wt_pct and value.point is not None and not value.approximate:
+    if oxide_wt_pct and value.point is not None:
         component = reference.identity.species.formula
-        printed_quantum = Decimal(1).scaleb(value.point.as_tuple().exponent)
-        component_threshold = float(printed_quantum) / 10.0
+        if value.approximate:
+            component_threshold = abs(float(value.point)) * 1e-6
+        else:
+            printed_quantum = Decimal(1).scaleb(value.point.as_tuple().exponent)
+            component_threshold = float(printed_quantum) / 10.0
         trace_tail["component_material_threshold_wt_pct"] = component_threshold
         material |= trace_tail["bound_wt_pct_by_component"][component] > component_threshold
     trace_tail["material"] = material
