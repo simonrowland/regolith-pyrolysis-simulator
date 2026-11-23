@@ -972,3 +972,18 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
     assert scored_payload["records"]["Al"][0]["provenance"] == (
         "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
     )
+
+
+def test_missing_runtime_alpha_golden_pin_is_hkl_upper_bound() -> None:
+    from engines.builtin.evaporation_flux import publisher_effective_alpha
+
+    # Golden pin before renaming the shared runtime default to DP-005.
+    decision = publisher_effective_alpha(
+        "Mg",
+        2073.15,
+        {},
+        allow_unmeasured_alpha_fallback=False,
+        unmeasured_alpha_fallback_species_allowlist=None,
+    )
+
+    assert decision.alpha == 1.0
