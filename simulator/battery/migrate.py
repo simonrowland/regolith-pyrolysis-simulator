@@ -147,6 +147,8 @@ from simulator.battery.redox_fields import (
     KRESS_FE2O3_WT_PCT_FIELD,
     KRESS_FEO_WT_PCT_FIELD,
     inherited_row_locator,
+    located_printed_cell,
+    printed_cell_address,
 )
 from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
@@ -2556,6 +2558,19 @@ def _point_condition_from_plain(
     *,
     key: str | None = None,
     closure_context: object = None,
+    retain_print: bool = False,
+) -> Located[Any]:
+    condition = _decode_point_condition(payload, key=key, closure_context=closure_context)
+    if not retain_print or not condition.state.is_value:
+        return condition
+    return _retain_condition_print(condition, payload, key)
+
+
+def _decode_point_condition(
+    payload: object,
+    *,
+    key: str | None,
+    closure_context: object,
 ) -> Located[Any]:
     """Located lab axes, pressure evidence, or printed composition maps."""
 
@@ -2730,6 +2745,96 @@ def _condition_value_from_plain(payload: object) -> object:
     if _is_mapping(payload) and payload.get("kind") is not None:
         return _value_from_plain(payload)
     return as_decimal(payload)
+
+
+def _raw_scalar_print(payload: object, unit: str | None) -> tuple[str, str | None] | None:
+    while isinstance(payload, Mapping):
+        units = payload.get("units", payload.get("unit"))
+        if isinstance(units, str):
+            unit = units
+        if payload.get("kind") not in (None, "point"):
+            return None
+        payload = next(
+            (payload[key] for key in ("as_printed", "as_published", "state", "value", "point")
+             if payload.get(key) is not None),
+            None,
+        )
+    if isinstance(payload, (str, int, float, Decimal)) and not isinstance(payload, bool):
+        return str(payload), unit
+    return None
+
+
+def _with_located_print(condition: Located, payload: object, unit: str | None) -> Located:
+    raw = _raw_scalar_print(payload, unit)
+    if raw is None or condition.locator is None:
+        return condition
+    return replace(condition, locator=located_printed_cell(condition.locator, *raw))
+
+
+def _retain_condition_print(condition: Located, payload: object, field: str | None) -> Located:
+    unit = _PRESSURE_CONDITION_UNITS.get(field) or dict(_TEMPERATURE_FIELDS).get(field)
+    if condition.inference is None:
+        return _with_located_print(condition, payload, unit)
+    if not isinstance(payload, Mapping):
+        return condition
+    published = payload.get("as_published")
+    if isinstance(published, Mapping):
+        # The location decoder already verified this conversion.
+        return _with_located_print(condition, published, unit)
+    declaration = payload.get("inference")
+    if not isinstance(declaration, Mapping):
+        return condition
+    parameters = dict(declaration.get("parameters", ()))
+    original_unit = next((
+        item.removeprefix("original_unit=") for item in condition.inference.inputs
+        if item.startswith("original_unit=")
+    ), None)
+    return replace(condition, inference=replace(
+        condition.inference,
+        parameters=tuple(
+            (name, _with_located_print(operand, parameters.get(name), original_unit)
+             if name == "original" and operand.inference is None
+             else _retain_condition_print(operand, parameters.get(name), None))
+            for name, operand in condition.inference.parameters
+        ),
+    ))
+
+
+def _with_target_print(
+    provenance: Mapping[str, Any] | None, selection: SourceSelection | None,
+    payload: object, units: str | None, identity: Identity,
+) -> Mapping[str, Any] | None:
+    quantity = identity.quantity.value
+    redox = quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+    if not redox and not (
+        quantity in {Quantity.FUGACITY, Quantity.P_PARTIAL}
+        and identity.species is not None and identity.species.formula == "O2"
+    ):
+        return provenance
+    if selection is None or selection.value.kind is not ValueKind.POINT or not isinstance(payload, Mapping):
+        return provenance
+    # A ratio reduced from several printed analytes has no single raw scalar.
+    if selection.reduction is not None and len(selection.reduction[1]) != 1:
+        return provenance
+    field = selection.field_name
+    source_inference = payload.get("inference")
+    if isinstance(source_inference, Mapping):
+        inputs = source_inference.get("inputs")
+        if isinstance(inputs, (list, tuple)) and len(inputs) == 1:
+            source_field = inputs[0]
+            if isinstance(source_field, str) and source_field.endswith("_as_published") and source_field in payload:
+                field = source_field
+                if field.startswith("log10_"):
+                    units = "log10"
+    node = _temperature_field_value(payload, field)
+    raw = _raw_scalar_print(node, units or ("1" if redox else None))
+    if raw is None:
+        return provenance
+    printed: dict[str, Any] = {"value": raw[0], "unit": raw[1]}
+    locator = locator_from_mapping(node.get("locator")) if isinstance(node, Mapping) else None
+    if locator is not None:
+        printed["address"] = printed_cell_address(locator)
+    return {**(provenance or {}), "printed_target": printed}
 
 
 def _inferred_derivation_from_plain(payload: Mapping[str, Any]) -> Derivation:
@@ -4174,15 +4279,17 @@ def _quoted_from_from_plain(payload: object) -> QuotedFrom | None:
 
 
 def _experiment_from_plain(
-    payload: object, *, registry_issues: list[ValidationIssue] | None
+    payload: object, *, registry_issues: list[ValidationIssue] | None,
+    retain_print: bool = False,
 ) -> Experiment:
     assert _is_mapping(payload)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
         try:
-            conditions[str(key)] = _located_from_plain(
-                value, _condition_value_from_plain
-            )
+            condition = _located_from_plain(value, _condition_value_from_plain)
+            if retain_print and condition.state.is_value:
+                condition = _retain_condition_print(condition, value, str(key))
+            conditions[str(key)] = condition
         except (ArithmeticError, TypeError, ValueError):
             locator = (
                 _locator_from_plain(value.get("locator"))
@@ -10068,6 +10175,7 @@ def _converted_temperature(
     *,
     source_inference: Derivation | None = None,
     read_from: str = "",
+    printed: tuple[str, str | None] | None = None,
 ) -> Located[Decimal]:
     """Kelvin point condition. A unit conversion keeps its printed original.
 
@@ -10084,7 +10192,7 @@ def _converted_temperature(
         )
     return Located(
         State.of(amount),
-        locator=locator,
+        locator=located_printed_cell(locator, *printed) if printed is not None else locator,
         inference=inference,
     )
 
@@ -21210,6 +21318,12 @@ def condition_identity_value(name: str, value: object) -> object:
         return select_declared_source(AXIS_TEMPERATURE_K, None, {name: _temperature_number(value)}).amount
     if axis == "total_pressure_Pa":
         unit = _PRESSURE_CONDITION_UNITS[name]
+        if isinstance(value, Value) and value.kind is ValueKind.INTERVAL:
+            low, _ = convert_pressure_to_pa(value.interval_low, unit)
+            high, _ = convert_pressure_to_pa(value.interval_high, unit)
+            if low is None or high is None:
+                return None
+            return replace(value, interval_low=low, interval_high=high)
         return convert_pressure_to_pa(_temperature_number(value), unit)[0]
     return value
 
@@ -21222,16 +21336,18 @@ def located_run_temperature(conditions: Mapping[str, Located]) -> State[Decimal]
 
 def located_run_pressure(conditions: Mapping[str, Located]) -> Decimal | Value | None:
     """Select a run pressure in the migration owner's declared field order."""
+    return next((value for _, value in _located_pressure_selections(conditions)), None)
+
+
+def _located_pressure_selections(
+    conditions: Mapping[str, Located],
+) -> Iterable[tuple[str, Decimal | Value]]:
     for field in _PRESSURE_CONDITION_UNITS:
         condition = conditions.get(field)
         if condition is not None and condition.state.is_value:
-            value = condition.state.value
-            if isinstance(value, Value) and value.kind is ValueKind.INTERVAL:
-                return value
-            pressure = condition_identity_value(field, value)
-            if pressure is not None:
-                return pressure
-    return None
+            pressure = condition_identity_value(field, condition.state.value)
+            if isinstance(pressure, (Decimal, Value)):
+                yield field, pressure
 
 
 def _located_temperature_selection(conditions: Mapping[str, Located]) -> SourceSelection:
@@ -21255,12 +21371,14 @@ def redox_identity_sources(
     """Resolve the located field paths that supplied each redox identity axis.
 
     Extract migration records its selected sources in observation provenance.
-    Older stores carry the same located fields without that record. Resolve
-    those by source scope and field precedence, without matching magnitudes.
+    Older stores carry the same located fields without reliable pressure
+    links. Recover a pressure link only from a matching canonical control.
     """
     recorded = (observation.provenance or {}).get("identity_condition_sources")
     sources: dict[str, tuple[str, ...]] = {}
     available_paths: set[str] = set()
+    matching_pressure_paths: set[str] = set()
+    pressure_state = observation.identity.total_pressure_Pa
     candidate_groups = [("point_conditions", observation.point_conditions or {})]
     if experiment is not None:
         candidate_groups.extend((
@@ -21286,9 +21404,23 @@ def redox_identity_sources(
             temperature = _located_temperature_selection(located)
             if temperature.available and temperature.field_name is not None:
                 sources["temperature_K"] = (f"{scope}.{temperature.field_name}",)
-        pressure = next((key for key in _PRESSURE_CONDITION_UNITS if key in located), None)
-        if pressure is not None:
-            sources.setdefault("total_pressure_Pa", (f"{scope}.{pressure}",))
+        if pressure_state is not None and pressure_state.is_value:
+            # Legacy rows do not say which assignment supplied the axis. A
+            # differing canonical control cannot be the source of that value.
+            for field, pressure in _located_pressure_selections(located):
+                raw = located[field].state.value
+                try:
+                    projected = (
+                        identity_pressure_from_converted_point(pressure, approximate=raw.approximate)
+                        if isinstance(raw, Value) and raw.kind is ValueKind.POINT
+                        else identity_pressure_state(pressure)
+                    )
+                except ValueError:
+                    continue
+                if projected == pressure_state:
+                    path = f"{scope}.{field}"
+                    matching_pressure_paths.add(path)
+                    sources.setdefault("total_pressure_Pa", (path,))
         composition = next((key for key in ("composition", "initial_composition", "printed_composition")
                             if key in located), None)
         if composition is not None:
@@ -21310,6 +21442,7 @@ def redox_identity_sources(
             axis: tuple(paths)
             for axis, paths in recorded.items()
             if all(path in available_paths for path in paths)
+            and (axis != "total_pressure_Pa" or all(path in matching_pressure_paths for path in paths))
         })
     return sources
 
@@ -23509,7 +23642,10 @@ def _walk_printed_oxygen(
                         condition_value,
                         Located(
                             State.of(condition_value),
-                            locator=located_condition.locator or local,
+                            locator=_with_located_print(
+                                replace(located_condition, locator=located_condition.locator or local),
+                                condition, None,
+                            ).locator,
                             inference=located_condition.inference,
                         ),
                         reference_pressure_pa,
@@ -23577,13 +23713,13 @@ def _walk_printed_oxygen(
                     continue
                 logs.append((
                     amount,
-                    Located(
+                    _with_located_print(Located(
                         State.of(amount),
                         locator=_locator_with_note(
                             locator, f"quote={quote_text}" if quote_text else None
                         ),
                         inference=None,
-                    ),
+                    ), node or raw, None),
                     reference_pressure_pa,
                     units == "" and not state_wrapped_log,
                 ))
@@ -23606,7 +23742,7 @@ def _walk_printed_oxygen(
                 pa = located.state.value
                 if not isinstance(pa, Value) or pa.kind is not ValueKind.POINT or pa.point is None:
                     continue
-                pressures.append((pa.point, located, units))
+                pressures.append((pa.point, _with_located_print(located, node or raw, units), units))
             continue
         _walk_printed_oxygen(
             value, local, logs, pressures, rejected_logs,
@@ -25714,6 +25850,7 @@ class Migrator:
         *,
         source_row_index: int | None = None,
         oxygen_kind: str | None = None,
+        pressure_source: str | None = None,
     ) -> None:
         identity = observation.identity
         basis_state = (
@@ -25842,6 +25979,8 @@ class Migrator:
                 observation, self.result.experiments.get(observation.experiment_id),
                 oxygen_kind=oxygen_kind,
             )
+            if pressure_source is not None:
+                sources["total_pressure_Pa"] = (pressure_source,)
             if sources:
                 observation = replace(observation, provenance={
                     **(observation.provenance or {}),
@@ -26074,7 +26213,7 @@ class Migrator:
                 }
             )
             experiment = _experiment_from_plain(
-                payload, registry_issues=self.result.registry_issues
+                payload, registry_issues=self.result.registry_issues, retain_print=True,
             )
             existing_experiment = self.result.experiments.get(
                 experiment.experiment_id
@@ -28336,6 +28475,7 @@ class Migrator:
                     value,
                     key=str(key),
                     closure_context=composition_closure_context,
+                    retain_print=q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO},
                 )
                 for key, value in raw_point_conditions.items()
             }
@@ -28351,6 +28491,10 @@ class Migrator:
                         t_payload, t_sel.field_name
                     ),
                     read_from=choose_read_from(work, temperature_locator),
+                    printed=_raw_scalar_print(
+                        _temperature_field_value(t_payload, t_sel.field_name),
+                        "C" if t_sel.unit_trail == "celsius_to_kelvin" else "K",
+                    ) if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO} else None,
                 )
             }
         elif (
@@ -29061,6 +29205,7 @@ class Migrator:
                 else None
             ),
         )
+        pressure_source = None
         pressure_for_oxygen = ident_kwargs.get("total_pressure_Pa")
         existing_pressure = pressure_for_oxygen
         pressure_can_fill = existing_pressure is None or (
@@ -29083,6 +29228,7 @@ class Migrator:
                 )
                 if pressure_for_oxygen is not None:
                     ident_kwargs["total_pressure_Pa"] = pressure_for_oxygen
+                    pressure_source = "point_conditions.pressure_MPa"
         oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
             facts=oxygen_facts,
             from_fallback=oxygen_from_fallback,
@@ -29145,6 +29291,7 @@ class Migrator:
         )
         if pressure_state is not None:
             ident_kwargs["total_pressure_Pa"] = pressure_state
+            pressure_source = "point_conditions.total_pressure_Pa"
         uncompared_identity_axes = (
             _uncompared_axes_for(identity_for_profile)
             if identity_for_profile is not None
@@ -29165,6 +29312,12 @@ class Migrator:
             ):
                 ident_kwargs[name] = state
                 inherited_identity_fields.add(name)
+        if (
+            "total_pressure_Pa" in inherited_identity_fields
+            and any(item.startswith("identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa")
+                    for item in experiment_provenance)
+        ):
+            pressure_source = "experiment.pressure_environment.total_pressure_Pa"
         identity_provenance += tuple(
             item
             for item in experiment_provenance
@@ -29192,6 +29345,7 @@ class Migrator:
                 point_state = identity_pressure_state(point_pressure.state.value)
                 if point_state is not None:
                     ident_kwargs["total_pressure_Pa"] = point_state
+                    pressure_source = "point_conditions.total_pressure_Pa"
                     pressure_missing = False
             if pressure_missing and not printed_point_pressure:
                 ambient_pressure_evidence = (
@@ -30282,7 +30436,7 @@ class Migrator:
             evidence=evidence,
             admission=admission,
             notices=tuple(observation_notices),
-            provenance=observation_provenance,
+            provenance=_with_target_print(observation_provenance, value_sel, values, obs.get("units"), identity),
             source_id=source_id,
             locator=locator,
             read_from=read_from,
@@ -30302,6 +30456,7 @@ class Migrator:
         self._add_observation(
             observation, source_key,
             oxygen_kind=oxygen_decision.kind if oxygen_decision is not None else None,
+            pressure_source=pressure_source,
         )
 
     def _emit_mass_fraction_pair_ratio(
@@ -31502,6 +31657,10 @@ class Migrator:
                         else None
                     ),
                     read_from=read_from,
+                    printed=_raw_scalar_print(
+                        _temperature_field_value(raw_item, t_sel.field_name),
+                        "C" if t_trail == "celsius_to_kelvin" else "K",
+                    ) if q_for_species in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO} else None,
                 )
             }
         if (
@@ -31992,7 +32151,10 @@ class Migrator:
             raw_point_conditions = raw_item.get("point_conditions")
             if isinstance(raw_point_conditions, Mapping):
                 explicit_point_conditions = {
-                    str(key): _point_condition_from_plain(value, key=str(key))
+                    str(key): _point_condition_from_plain(
+                        value, key=str(key),
+                        retain_print=q_token_point in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO},
+                    )
                     for key, value in raw_point_conditions.items()
                 }
                 if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -32080,6 +32242,7 @@ class Migrator:
             # source field supplied them.
             point_conditions = dict(point_conditions or {})
             point_conditions.pop("composition", None)
+        pressure_source = None
         if (
             q_token_point not in PHASE_ROW_QUANTITIES
             and isinstance(q_token_point, Quantity)
@@ -32093,6 +32256,7 @@ class Migrator:
                 identity = replace(
                     identity, total_pressure_Pa=row_pressure_state
                 )
+                pressure_source = "point_conditions.total_pressure_Pa"
         oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
             facts=oxygen_facts,
             from_fallback=oxygen_from_fallback,
@@ -32156,6 +32320,7 @@ class Migrator:
                     identity = replace(
                         identity, total_pressure_Pa=pressure_state
                     )
+                    pressure_source = "point_conditions.pressure_MPa"
         if point_composition_refusal:
             composition_reason = composition_unknown_reason(
                 point_composition_refusal
@@ -32574,7 +32739,7 @@ class Migrator:
             evidence=evidence,
             admission=admission,
             notices=tuple(child_notices),
-            provenance=provenance,
+            provenance=_with_target_print(provenance, value_sel, raw_item, units, identity),
             source_id=source_id,
             locator=point_locator,
             read_from=read_from,
@@ -32594,6 +32759,7 @@ class Migrator:
         self._add_observation(
             observation, source_key,
             oxygen_kind=oxygen_decision.kind if oxygen_decision is not None else None,
+            pressure_source=pressure_source,
         )
         children = self._exploded_children.setdefault(parent_id, [])
         if point_id not in children:

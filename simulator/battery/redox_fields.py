@@ -1,10 +1,11 @@
 """Source fields and information flow for predictive redox controls."""
 
+import json
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 
-from simulator.battery.enums import FO2Channel, NoticeKind, Quantity
+from simulator.battery.enums import FO2Channel, NoticeKind, Quantity, ValueKind
 from simulator.battery.records import Experiment, Located, Locator, Notice, Observation, State, Value
 
 FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
@@ -48,7 +49,7 @@ def inherited_row_locator(locator: Locator | None) -> Locator | None:
         return None
 
 
-def _cell_coordinates(locator: Locator) -> tuple[str | None, ...]:
+def printed_cell_address(locator: Locator) -> tuple[str | None, ...]:
     coordinates = {}
     for _, key, value in _address_note_segments(locator):
         if key in {"row", "column"}:
@@ -65,19 +66,43 @@ def _cell_coordinates(locator: Locator) -> tuple[str | None, ...]:
 class _PrintedCell:
     address: tuple[str | None, ...]
     value: str | None
+    unit: str | None = None
+
+
+_PRINTED_CELL_NOTE = "printed_cell="
+
+
+def located_printed_cell(locator: Locator | None, value: str, unit: str | None) -> Locator | None:
+    """Keep the raw scalar and unit beside the source address in its locator."""
+    if locator is None:
+        return None
+    # Escape semicolons because the locator also uses them to delimit addresses.
+    encoded = json.dumps([value, unit], ensure_ascii=False).replace(";", r"\u003b")
+    note = f"{locator.note}; " if locator.note else ""
+    return replace(locator, note=f"{note}{_PRINTED_CELL_NOTE}{encoded}")
 
 
 def _printed_cell(value: Located, *, address_only: bool = False) -> _PrintedCell | None:
     if value.locator is None or not value.state.is_value:
         return None
+    address = printed_cell_address(value.locator)
+    for segment, _, _ in reversed(list(_address_note_segments(value.locator))):
+        if segment.strip().startswith(_PRINTED_CELL_NOTE):
+            try:
+                raw, unit = json.loads(segment.strip().removeprefix(_PRINTED_CELL_NOTE))
+            except (ValueError, TypeError):
+                continue
+            if isinstance(raw, str) and (unit is None or isinstance(unit, str)):
+                return _PrintedCell(address, raw, unit)
+    if address_only:
+        return _PrintedCell(address, None)
+    # Legacy stores and in-memory callers can still supply an unconverted print.
     scalar = value.state.value
     if isinstance(scalar, Value):
         scalar = scalar.point
-    if address_only:
-        return _PrintedCell(_cell_coordinates(value.locator), None)
     if not isinstance(scalar, (str, Decimal, int)) or isinstance(scalar, bool):
         return None
-    return _PrintedCell(_cell_coordinates(value.locator), str(scalar))
+    return _PrintedCell(address, str(scalar))
 
 
 def same_printed_cell(a: _PrintedCell | None, b: _PrintedCell | None) -> str | None:
@@ -109,34 +134,55 @@ def _condition_references(observation: Observation, field: str) -> set[str]:
     return {field, path, f"observation[{observation.observation_id}].{path}"}
 
 
-def _raw_printed_value(value: Located) -> Located:
-    if value.inference is not None:
-        for key, operand in value.inference.parameters:
-            if key == "original" and operand.locator is not None and operand.state.is_value:
-                return operand
-    return value
+def _printed_cells(value: Located) -> tuple[_PrintedCell, ...]:
+    derivation = value.inference
+    own = _printed_cell(value, address_only=derivation is not None)
+    originals = () if derivation is None else tuple(
+        _printed_cell(operand)
+        for key, operand in derivation.parameters if key == "original"
+    )
+    return tuple(cell for cell in (own, *originals) if cell is not None)
 
 
-def _target_cell(observation: Observation) -> Located:
-    return _raw_printed_value(Located(
-        State.of(observation.value), observation.locator, observation.derivation,
-    ))
+def _target_cells(observation: Observation) -> tuple[_PrintedCell, ...]:
+    value = Located(State.of(observation.value), observation.locator, observation.derivation)
+    cells = _printed_cells(value)
+    printed = (observation.provenance or {}).get("printed_target")
+    if not isinstance(printed, Mapping) or not isinstance(printed.get("value"), str):
+        return cells
+    selected_address = printed.get("address")
+    own_address = printed_cell_address(value.locator) if value.locator is not None else None
+    if isinstance(selected_address, (list, tuple)) and len(selected_address) == 6:
+        address = tuple(selected_address)
+    else:
+        address = own_address
+    if address is None:
+        return cells
+    selected = _PrintedCell(address, printed["value"], printed.get("unit"))
+    if address == own_address:
+        return selected, *cells[1:]
+    return selected, *cells
 
 
-def _is_imposed_oxygen_cell(value: Located, experiment: Experiment | None) -> bool:
+def _match_target_cell(targets: tuple[_PrintedCell, ...], candidate: _PrintedCell | None) -> str | None:
+    matches = {same_printed_cell(target, candidate) for target in targets}
+    return "same" if "same" in matches else "ambiguous" if "ambiguous" in matches else None
+
+
+def _is_imposed_oxygen_cell(targets: tuple[_PrintedCell, ...], experiment: Experiment | None) -> bool:
     control = experiment.fO2_control if experiment is not None else None
     return (
         control is not None
         and control.channel.is_value
         and control.channel.value is not FO2Channel.INTRINSIC
         and control.oxygen_partial_pressure_Pa is not None
-        and _target_dependency(_printed_cell(value), control.oxygen_partial_pressure_Pa) is not None
+        and _target_dependency(targets, control.oxygen_partial_pressure_Pa) is not None
     )
 
 
-def _target_dependency(target: _PrintedCell | None, condition: Located) -> str | None:
+def _target_dependency(target: tuple[_PrintedCell, ...], condition: Located) -> str | None:
     inference = condition.inference
-    match = same_printed_cell(target, _printed_cell(
+    match = _match_target_cell(target, _printed_cell(
         condition, address_only=inference is not None,
     ))
     if match is not None:
@@ -183,8 +229,7 @@ def independent_redox_conditions(
     """Build the one permitted input view and retain the reason for each exclusion."""
     conditions = observation.point_conditions or {}
     identity = observation.identity
-    target_value = _target_cell(observation)
-    target = _printed_cell(target_value)
+    target = _target_cells(observation)
     imposed = imposed_oxygen_target(observation, experiment, quantity)
     derivation = observation.derivation
     parameters = dict(derivation.parameters) if derivation is not None else {}
@@ -200,7 +245,7 @@ def independent_redox_conditions(
             or any(field in fields for fields in CONTROL_VARIABLE_FIELDS.values())
             or (
                 axis == "fO2_Pa" and condition is not None
-                and _is_imposed_oxygen_cell(_raw_printed_value(condition), experiment)
+                and _is_imposed_oxygen_cell(_printed_cells(condition), experiment)
             )
         ):
             excluded[field] = "analyte_operand"
@@ -251,7 +296,7 @@ def independent_redox_conditions(
             })
             if projected_value in (None, original_value):
                 correction_axes.add(axis)
-                if axis == "total_pressure_Pa" and isinstance(run_value, Decimal):
+                if axis == "total_pressure_Pa":
                     correction_pressure = run_value
 
     for field, condition in conditions.items():
@@ -342,6 +387,9 @@ def independent_redox_conditions(
             replacement = correction_pressure
         if isinstance(replacement, Decimal):
             identity_fields["total_pressure_Pa"] = State.of(replacement)
+        elif isinstance(replacement, Value) and replacement.kind is ValueKind.INTERVAL:
+            # Preserve the printed band for the scorer's interval policy.
+            independent["total_pressure_Pa"] = Located(State.of(replacement))
 
     notices = tuple(
         Notice(
@@ -354,7 +402,7 @@ def independent_redox_conditions(
             origin=observation.observation_id,
             dropped=(field,),
             source=repr(located_inputs[field].locator) if field in located_inputs else None,
-            destination=repr(target_value.locator),
+            destination=repr(observation.locator),
         )
         for field, reason in sorted(excluded.items())
         if field in located_inputs or condition_identity_axis(field) in invalid_axes
@@ -363,7 +411,7 @@ def independent_redox_conditions(
         return observation, experiment, notices
     return replace(
         observation, identity=replace(identity, **identity_fields),
-        point_conditions=independent if observation.point_conditions is not None else None,
+        point_conditions=independent or ({} if observation.point_conditions is not None else None),
     ), experiment, notices
 
 
@@ -376,7 +424,7 @@ def imposed_oxygen_target(observation: Observation, experiment: Experiment | Non
     derivation = observation.derivation
     if control is not None and control.channel.is_value and control.channel.value is FO2Channel.INTRINSIC:
         return False
-    if _is_imposed_oxygen_cell(_target_cell(observation), experiment):
+    if _is_imposed_oxygen_cell(_target_cells(observation), experiment):
         return True
     if derivation is None or experiment is None:
         return False
