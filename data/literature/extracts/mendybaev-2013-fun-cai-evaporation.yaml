@@ -24,12 +24,17 @@ fidelity_samples:
 experiments:
 - experiment_id: mendybaev-fun1-vacuum-evaporation
   method: langmuir_free_evaporation
-  locator:
+  method_locator:
     page: 4
     published_page: 371
     pdf_page_index: 3
     section: 2.1 Experimental
     note: 'Section 2.1 specifies 2.5 mm diameter iridium wire loops; quote: “introduced into the vacuum furnace hot spot while the furnace was cold”.'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: Experimental
   sample:
     printed_composition:
       state:
@@ -70,12 +75,17 @@ experiments:
         note: Pressure fell below 10^-9 bar before the temperature was raised to 1900 °C.
 - experiment_id: mendybaev-fun2-vacuum-evaporation
   method: langmuir_free_evaporation
-  locator:
+  method_locator:
     page: 4
     published_page: 371
     pdf_page_index: 3
     section: 2.1 Experimental
     note: 'Section 2.1 specifies 2.5 mm diameter iridium wire loops; quote: “introduced into the vacuum furnace hot spot while the furnace was cold”.'
+  locator:
+    page: 4
+    published_page: 371
+    pdf_page_index: 3
+    section: Experimental
   sample:
     printed_composition:
       state:
