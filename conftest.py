@@ -358,41 +358,6 @@ def runner_golden_loader(tmp_path_factory):
     return load
 
 
-# Golden producers share one dedicated group, serial among themselves and
-# parallel with magemin_fullrun_a..d. They used to join chain a. That chain
-# is already the long one, and the 15s warm-call timeout is not raised.
-# Tests that already have a group (serial, an existing magemin chain, the
-# lunar pin and lunar C0 consumers) stay on it. A held curve still fails
-# as an environment error before the digest compare.
-_GOLDEN_MAGEMIN_GROUP_FILES = frozenset({
-    "test_coating_rate.py",
-    "test_condensation_green_pins.py",
-    "test_condensation_vapour_fog_ledger.py",
-    "test_golden_sections.py",
-    "test_recipe_io.py",
-    "test_run_executor.py",
-    "test_runner_smoke.py",
-    "test_sio_yield_regression.py",
-    "test_web_socket_trace.py",
-})
-
-
-def pytest_itemcollected(item: pytest.Item) -> None:
-    # Mark at collection time, not in pytest_collection_modifyitems. On an
-    # xdist worker, xdist's own modifyitems hook (xdist/remote.py) is
-    # registered after this conftest, so pluggy calls it first: it reads
-    # xdist_group, suffixes the node id with @group, and never sees a mark
-    # added later. tests/_plugins/loadgroup_order.py (tryfirst) also needs
-    # the mark. A remote -n 6 run of 2398a3dba0 showed the old hook's
-    # producers ungrouped (no @magemin_golden on any hook-marked item).
-    filename = _Path(item.nodeid.split("::", 1)[0]).name
-    if filename not in _GOLDEN_MAGEMIN_GROUP_FILES:
-        return
-    if any(mark.name == "xdist_group" for mark in item.iter_markers()):
-        return
-    item.add_marker(pytest.mark.xdist_group("magemin_golden"))
-
-
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         get_closest_marker = getattr(item, "get_closest_marker", None)
