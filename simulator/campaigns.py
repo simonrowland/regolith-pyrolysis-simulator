@@ -2486,6 +2486,14 @@ class CampaignManager:
                     previous_temperature_C=float(melt.temperature_C),
                     dt_s=float(self._process_dt_h) * float(PROCESS_HOUR_S),
                     live_mass_kg=melt.total_mass_kg,
+                    # The simulator installs this for the power-driven step.
+                    # It is the evaporation booking at the trial temperature,
+                    # closed over the step-start composition. Absent, the
+                    # evaporative sink is zero. Campaigns does not own the
+                    # flux law.
+                    species_rate_kg_hr_at_K=getattr(
+                        self, "_species_rate_kg_hr_at_K", None
+                    ),
                 )
                 self._power_temperature_for_step = record
                 target = float(record["temperature_C"])

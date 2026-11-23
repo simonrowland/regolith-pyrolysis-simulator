@@ -17656,6 +17656,175 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_imcc_activity_shadow = payload
             return payload
 
+    def _power_balance_diagnostic_key(self, key: str) -> bool:
+        return key.startswith((
+            "_last_",
+            "_wall_",
+            "_langmuir",
+            "_silent_zero",
+            "_unmeasured_alpha",
+            "_degraded_path",
+            "_backend_status",
+            "_engine_commissioning",
+            "_pre_evaporation",
+            "_feedstock_recovered",
+            "_non_feedstock_reagent",
+        )) or key in {"_backend_failed", "_last_backend_error"}
+
+    def _snapshot_power_balance_host(self) -> dict[str, Any]:
+        """Diagnostics and ledger as they were before the temperature root.
+
+        The root calls the evaporation owner at trial temperatures. That
+        owner writes diagnostics and, via one equilibrium for activities,
+        can commit a ledger transition. Neither belongs to this step: the
+        real equilibrium and the real debit run later, at the solved
+        temperature, after redox. The snapshot is restored when the root
+        returns.
+        """
+
+        diagnostics: dict[str, Any] = {}
+        for key, value in self.__dict__.items():
+            if self._power_balance_diagnostic_key(key):
+                diagnostics[key] = copy.deepcopy(value)
+        return {
+            "diagnostics": diagnostics,
+            "ledger": snapshot_atom_ledger(self.atom_ledger),
+            "composition_kg": copy.deepcopy(dict(self.melt.composition_kg)),
+            "total_mass_kg": float(self.melt.total_mass_kg),
+            "melt_oxide_kg": copy.deepcopy(
+                dict(getattr(self.inventory, "melt_oxide_kg", {}) or {})
+            ),
+            "temperature_C": float(self.melt.temperature_C),
+            # _get_equilibrium mirrors the reservoir onto these. The probe
+            # must not leave that write behind for the real hour.
+            "fO2_log": float(self.melt.fO2_log),
+            "melt_fO2_log": float(self.melt.melt_fO2_log),
+            "backend_failed": bool(getattr(self, "_backend_failed", False)),
+            "backend_available": (
+                getattr(self.backend, "_available", None)
+                if self.backend is not None
+                else None
+            ),
+        }
+
+    def _restore_power_balance_host(self, snapshot: Mapping[str, Any]) -> None:
+        restored_ledger = snapshot_atom_ledger(snapshot["ledger"])
+        self.atom_ledger.__dict__ = restored_ledger.__dict__
+        self.melt.composition_kg = dict(snapshot["composition_kg"])
+        self.melt.total_mass_kg = float(snapshot["total_mass_kg"])
+        if hasattr(self, "inventory"):
+            self.inventory.melt_oxide_kg = dict(snapshot["melt_oxide_kg"])
+        self.melt.temperature_C = float(snapshot["temperature_C"])
+        self.melt.fO2_log = float(snapshot["fO2_log"])
+        self.melt.melt_fO2_log = float(snapshot["melt_fO2_log"])
+        self._backend_failed = bool(snapshot["backend_failed"])
+        if self.backend is not None and snapshot["backend_available"] is not None:
+            self.backend._available = snapshot["backend_available"]
+        diagnostics = snapshot["diagnostics"]
+        for key in list(self.__dict__):
+            if self._power_balance_diagnostic_key(key) and key not in diagnostics:
+                del self.__dict__[key]
+        self.__dict__.update(diagnostics)
+
+    def _power_balance_species_rates_kg_hr(
+        self,
+        temperature_K: float,
+        *,
+        floor_K: float,
+        ceiling_K: float,
+        cache: dict[str, Any],
+    ) -> dict[str, float]:
+        """Booked kg/h at ``temperature_K`` for the quasi-steady root.
+
+        Composition is the step-start ledger: this runs in
+        ``_update_temperature``, before redox and before this hour's
+        equilibrium. Activities come from one equilibrium at that
+        step-start temperature (sulfur saturation off). The trial
+        temperature is applied only to the evaporation booking, which
+        recomputes K(T). The ledger is not debited. Below ``floor_K``
+        the evaporation owner returns a physical zero, and the balance
+        does not call it: the bisection bracket starts at 0 K.
+
+        An empty cleaned-melt inventory is a physical zero. A melt that
+        has composition and whose booking raises is not turned into a
+        zero. A refusal at or above ``ceiling_K`` is the hot side of
+        the bracket (see ``EVAPORATIVE_BRACKET_CEILING_K``).
+        """
+
+        from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+        from simulator.thermal_budget import PowerTemperatureRefusal
+
+        if temperature_K < floor_K or cache.get("empty"):
+            return {}
+        if "equilibrium" not in cache:
+            cleaned = self.atom_ledger.kg_by_account("process.cleaned_melt")
+            if not any(float(kg) > 0.0 for kg in dict(cleaned).values()):
+                cache["empty"] = True
+                return {}
+            # One equilibrium, at the step-start temperature. A raised
+            # equilibrium restores the host and propagates: the root does
+            # not keep a half-committed ledger, and it does not retry the
+            # probe with ``probed`` set and no result.
+            self.melt.temperature_C = float(cache["step_start_C"])
+            try:
+                equilibrium = self._get_equilibrium(
+                    run_post_equilibrium_sulfsat=False,
+                )
+                diagnostic = copy.deepcopy(
+                    getattr(self, "_last_vapor_pressure_diagnostic", {}) or {}
+                )
+                equilibrium_copy = copy.deepcopy(equilibrium)
+            finally:
+                self._restore_power_balance_host(cache["host"])
+            cache["diagnostic"] = diagnostic
+            cache["equilibrium"] = equilibrium_copy
+        # Each trial starts from that step-start host. Evaporation writes
+        # diagnostics; the next trial must not inherit them. The equilibrium
+        # object stays the step-start copy. Activities are not recomputed.
+        self._restore_power_balance_host(cache["host"])
+        try:
+            self.melt.temperature_C = (
+                float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
+            )
+            self._last_vapor_pressure_diagnostic = copy.deepcopy(
+                cache["diagnostic"]
+            )
+            try:
+                flux = self._calculate_evaporation(cache["equilibrium"])
+            except EvaporationFluxRefusal as exc:
+                if temperature_K >= ceiling_K:
+                    raise PowerTemperatureRefusal(
+                        "evaporative_flux_above_bracket",
+                        str(exc),
+                    ) from exc
+                raise
+            # The mutating depletion wrapper records a phase diagnostic
+            # and overlays wall supply. The pure rate is what that
+            # wrapper debits. scalar 1.0 is the value
+            # ``_record_phase_context_diagnostic`` returns when the
+            # wrapper passes scalar_liquid_fraction=1.0. supply_out
+            # stays None: this call does not publish a wall supply.
+            rates = self._analytic_evaporation_depletion_rates(
+                flux.species_kg_hr,
+                dt_hr=self.process_dt_hr(),
+                phase_scalar=1.0,
+                cleaned_melt_kg=self.atom_ledger.kg_by_account(
+                    "process.cleaned_melt"
+                ),
+                available_o2_kg=float(
+                    self.atom_ledger.kg_by_account(
+                        "process.overhead_gas"
+                    ).get("O2", 0.0)
+                ),
+            )
+            return {
+                str(species): float(rate)
+                for species, rate in rates.items()
+                if float(rate) > 0.0
+            }
+        finally:
+            self.melt.temperature_C = float(cache["step_start_C"])
+
     def _update_temperature(self):
         """
         Ramp temperature toward the campaign's target.
@@ -17678,8 +17847,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         The primary control is throttling; venting is the safety valve.
         """
-        target_T, ramp_rate = self.campaign_mgr.get_temp_target(
-            self.melt.campaign, self.melt.campaign_hour, self.melt)
+        # Power-driven steps close the quasi-steady balance on the
+        # evaporation booking at the trial temperature. Composition is
+        # this step's start (pre-redox). The real hour still solves
+        # equilibrium and debits later, at the solved temperature.
+        # The callback is not a campaign field: it is installed for this
+        # call and removed before the ramp reads the step-start melt.
+        from simulator.thermal_budget import (
+            EVAPORATIVE_BRACKET_CEILING_K,
+            EVAPORATIVE_FLUX_FLOOR_K,
+            FURNACE_POWER_DRIVER_KEY,
+        )
+        schedule = self.campaign_mgr._lab_schedule(self.melt.campaign)
+        installed = False
+        host = None
+        if isinstance(schedule, Mapping) and FURNACE_POWER_DRIVER_KEY in schedule:
+            host = self._snapshot_power_balance_host()
+            cache: dict[str, Any] = {
+                "host": host,
+                "step_start_C": float(self.melt.temperature_C),
+            }
+
+            def _rates(temperature_K: float) -> dict[str, float]:
+                return self._power_balance_species_rates_kg_hr(
+                    temperature_K,
+                    floor_K=EVAPORATIVE_FLUX_FLOOR_K,
+                    ceiling_K=EVAPORATIVE_BRACKET_CEILING_K,
+                    cache=cache,
+                )
+
+            self.campaign_mgr._species_rate_kg_hr_at_K = _rates
+            installed = True
+        try:
+            target_T, ramp_rate = self.campaign_mgr.get_temp_target(
+                self.melt.campaign, self.melt.campaign_hour, self.melt)
+        finally:
+            if installed:
+                self.campaign_mgr.__dict__.pop("_species_rate_kg_hr_at_K", None)
+                self._restore_power_balance_host(host)
 
         if target_T is None:
             self._last_nominal_ramp = 0.0

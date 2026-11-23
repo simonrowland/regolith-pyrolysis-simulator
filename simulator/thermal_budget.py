@@ -17,7 +17,8 @@ Assumptions and uncertified refinements:
   pO2 and neutral sweep remain chemistry controls, not furnace-wall heat
   sinks. The benchtop power-driven pellet residual is a separate balance:
   continuum argon at Nu = 2 is a sink there, because that pellet sits in
-  the printed low-pressure argon. That term is not part of this floor;
+  the printed low-pressure argon, and so is the evaporative enthalpy at
+  the same trial temperature. Neither term is part of this floor;
 - wall conductivity, wall thickness, wall area, solidus, outer-wall
   temperature, sky temperature, and view factor are caller-supplied unless a
   caller provides source tags;
@@ -1249,6 +1250,20 @@ PELLET_CONDUCTIVITY_DEFAULT_W_M_K = 1.0
 # Still-gas sphere. Continuum conduction at the printed diameter, not a
 # fitted Nusselt number and not a free-molecular flux.
 NU_STILL_SPHERE = 2.0
+# evaporation._calculate_evaporation: once catalog pressure exists,
+# T_K < 400 is a physical zero ("thermal physical zero"). The balance
+# does not call the flux callback below that floor. The bisection
+# bracket starts at 0 K, and an empty pressure map there raises
+# EvaporationFluxRefusal. This module does not import evaporation.
+EVAPORATIVE_FLUX_FLOOR_K = 400.0
+# Bracket ceiling, not a material limit. The 13 mm top face at
+# emissivity 0.85 radiates eps * sigma * A * T**4. A_top = pi*(6.5 mm)**2
+# = 1.327e-4 m². At 4000 K, T**4 = 2.56e14, sigma*T**4 = 1.45e7 W/m²,
+# times A and 0.85 is about 1640 W. That is above the Robinot focal
+# peak (1469 W) and above the doubled-power test's absorbed watts.
+# A flux refusal at or above this temperature is the hot side of the
+# bracket, not a missed root. Below it, a refusal still fails the step.
+EVAPORATIVE_BRACKET_CEILING_K = 4000.0
 # NIST argon thermal conductivity, lambda column, at 1000 K. Monatomic
 # conductivity tracks viscosity, so the exponent 0.75 is that scaling.
 ARGON_CONDUCTIVITY_ANCHOR_K = 1000.0
@@ -1423,9 +1438,11 @@ def pellet_face_areas_m2(
     Premise: Robinot section 3.2 prints a 13 mm by 10 mm cylinder on a
     water-cooled holder. The contacted base conducts. It does not see
     the chamber. Fig. 3 shows the lower half still solid, so that side
-    wall is not at the top temperature. The booked hot surface is the
-    top face plus the upper half of the side. The full side is the
-    bound that puts the whole wall at the top temperature.
+    wall is not at the top temperature. ``hot_upper`` is the lumped
+    area (top plus half the wall) the one-zone model put at one
+    temperature. The booked hot-upper path no longer radiates that
+    area at the peak temperature: the top face and the full wall are
+    separate nodes. ``full_side`` remains the isothermal bound.
 
     Algebra::
 
@@ -1445,6 +1462,7 @@ def pellet_face_areas_m2(
     side = math.pi * diameter_m * height_m
     return {
         "top": top,
+        "side": side,
         FACE_HOT_UPPER: top + 0.5 * side,
         FACE_FULL_SIDE: top + side,
     }
@@ -1691,6 +1709,211 @@ def argon_conductivity_W_m_K(temperature_K: float) -> float:
     return ARGON_CONDUCTIVITY_1000K_W_M_K * ratio ** ARGON_CONDUCTIVITY_EXPONENT
 
 
+def _radiation_exchange_W(
+    temperature_K: float,
+    *,
+    area_m2: float,
+    emissivity: float,
+    boundary_K: float,
+) -> float:
+    """Net radiation from one face to one boundary.
+
+    Premise: the face is grey at the booked emissivity and the boundary
+    is black. Algebra: Q = eps * sigma * A * (T**4 - T_b**4).
+    Units: kelvin, m², watts. Limit: T = T_b gives 0.
+    """
+
+    return (
+        STEFAN_BOLTZMANN
+        * emissivity
+        * area_m2
+        * (temperature_K ** 4 - boundary_K ** 4)
+    )
+
+
+def _slab_conductance_W_per_K(
+    conductivity_W_m_K: float,
+    area_m2: float,
+    length_m: float,
+) -> float:
+    """Conductance of one slab, k * A / L, in W/K.
+
+    Premise: one-dimensional conduction. Limit: k → ∞ sends this to
+    infinity, so a finite heat flow requires the temperature drop
+    across that slab to vanish.
+    """
+
+    return conductivity_W_m_K * area_m2 / length_m
+
+
+def _argon_loss_W(
+    temperature_K: float,
+    *,
+    diameter_m: float,
+    boundary_K: float,
+) -> float:
+    """Continuum argon on a still sphere of the printed diameter.
+
+    Premise and Nu = 2 are the chamber limit named on
+    ``pellet_energy_loss_W``. Algebra:
+    Q = Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b).
+    Units: watts. Limit: T = T_b gives 0.
+    """
+
+    film_K = 0.5 * (temperature_K + boundary_K)
+    return (
+        NU_STILL_SPHERE
+        * argon_conductivity_W_m_K(film_K)
+        * math.pi
+        * diameter_m
+        * (temperature_K - boundary_K)
+    )
+
+
+def evaporative_enthalpy_sink_W(
+    temperature_K: float,
+    species_kg_hr: Mapping[str, float],
+    *,
+    vapor_pressures: Mapping[str, Any] | None = None,
+) -> float:
+    """Watts of vaporization enthalpy at the trial temperature.
+
+    Premise: the pellet thermal time constant is a few seconds and the
+    step is a minute, so the end-of-step temperature is the quasi-steady
+    root of absorbed power against every sink at that same temperature.
+    The evaporative term is sum_i J_i(T) * dH_i(T). Subtracting a sink
+    that was evaluated at another temperature does not close: the flux
+    falls as the melt cools, and the melt cools because of the flux.
+
+    ``species_kg_hr`` is the booked rate at this T. This function does
+    not own a flux law. dH_i is whatever ``evaporation_enthalpy_budget``
+    already charges: oxide vapors (SiO, and the CEA oxide set) use the
+    single cited reaction, and the O2 coproduct of
+    SiO2 → SiO(g) + 1/2 O2 sits inside that SiO enthalpy (NIST-JANAF
+    Chase 1998, +810.52 kJ/mol SiO), not as a second latent. Metals use
+    the 298 K liquid→gas latent plus the 298 K oxide-dissociation
+    reversal. Analytical channels use the NASA polynomial at
+    ``temperature_K``. The sensible Kirchhoff correction on the 298 K
+    tables is the approximation that owner already documents.
+
+    Algebra: the budget returns kWh per hour at the supplied kg/h,
+    which is a kilowatt. Watts = evaporation_thermal_kWh * 1000.
+
+    Units: kg/h in, watts out. A zero rate contributes nothing.
+
+    Sanity: 30.2 mg/min of SiO is 1.812×10⁻³ kg/h. Divided by the SiO
+    molar mass and multiplied by 810.52 kJ/mol that is 9.25 W.
+    401 mg/min is 122.8 W.
+    """
+
+    if not species_kg_hr:
+        return 0.0
+    if not math.isfinite(temperature_K) or temperature_K < 0.0:
+        raise PowerTemperatureRefusal(
+            "evaporative_sink_temperature_not_usable",
+            f"temperature is {temperature_K} K",
+        )
+    budget = evaporation_enthalpy_budget(
+        species_kg_hr,
+        vapor_pressures=vapor_pressures,
+        temperature_K=temperature_K,
+    )
+    watts = float(budget["evaporation_thermal_kWh"]) * 1000.0
+    if not math.isfinite(watts) or watts < 0.0:
+        raise PowerTemperatureRefusal(
+            "evaporative_sink_not_usable",
+            f"evaporative enthalpy is {watts} W",
+        )
+    return watts
+
+
+def _species_rates_kg_hr(
+    temperature_K: float,
+    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None,
+) -> Mapping[str, float]:
+    """Booked kg/h at this trial temperature, or an empty map.
+
+    Below ``EVAPORATIVE_FLUX_FLOOR_K`` the callback is not called.
+    That is the evaporation owner's physical zero, not a new cutoff.
+    """
+
+    if (
+        species_rate_kg_hr_at_K is None
+        or temperature_K < EVAPORATIVE_FLUX_FLOOR_K
+    ):
+        return {}
+    rates = species_rate_kg_hr_at_K(float(temperature_K))
+    if not isinstance(rates, Mapping):
+        raise PowerTemperatureRefusal(
+            "evaporative_rate_callback_malformed",
+            "species rates must be a mapping of kg/h",
+        )
+    return rates
+
+
+def _side_node_temperature_K(
+    temperature_top_K: float,
+    *,
+    side_area_m2: float,
+    emissivity: float,
+    boundary_K: float,
+    half_conductance_W_per_K: float,
+) -> float:
+    """Quasi-steady temperature of the lower body.
+
+    Premise: node 2 stores nothing. Heat that arrives from the molten
+    top through the upper half of the pellet leaves by radiation from
+    the full cylindrical wall and by conduction through the lower half
+    into the holder.
+
+    Algebra. Each half has conductance ``G_half = 2 k A_top / H``, so
+    the two in series are the one-node holder term ``k A_top / H``::
+
+        G_half * (T_top - T_side)
+            = eps * sigma * A_side * (T_side**4 - T_b**4)
+            + G_half * (T_side - T_b)
+
+    Units: kelvin in, kelvin out. Limit: as k → ∞ the nodes become one
+    temperature and the holder term of that isothermal pellet is
+    ``G_half / 2 * (T - T_b)``, the existing one-node slab. A holder
+    leg of only ``k A / H`` in series with another ``k A / H`` would
+    present half that conductance and would not meet the one-node
+    full-side root.
+    """
+
+    def residual(temperature_side_K: float) -> float:
+        coupling = half_conductance_W_per_K * (
+            temperature_top_K - temperature_side_K
+        )
+        radiation = _radiation_exchange_W(
+            temperature_side_K,
+            area_m2=side_area_m2,
+            emissivity=emissivity,
+            boundary_K=boundary_K,
+        )
+        holder = half_conductance_W_per_K * (
+            temperature_side_K - boundary_K
+        )
+        return coupling - radiation - holder
+
+    low = min(temperature_top_K, boundary_K)
+    high = max(temperature_top_K, boundary_K)
+    if high <= low:
+        return float(boundary_K)
+    if residual(low) < 0.0 or residual(high) > 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "side-node conduction has no bracket",
+        )
+    for _step in range(_BISECTION_STEPS):
+        mid = 0.5 * (low + high)
+        if residual(mid) > 0.0:
+            low = mid
+        else:
+            high = mid
+    return 0.5 * (low + high)
+
+
 def pellet_energy_loss_W(
     temperature_K: float,
     *,
@@ -1700,8 +1923,10 @@ def pellet_energy_loss_W(
     top_area_m2: float,
     height_m: float,
     diameter_m: float,
+    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
+    vapor_pressures: Mapping[str, Any] | None = None,
 ) -> float:
-    """Watts leaving a printed pellet: radiation, holder, continuum argon.
+    """Watts leaving one isothermal pellet temperature.
 
     Premise: Robinot section 3.1 seats the pellet on a water-cooled
     steel holder, and section 4.1 flows argon at about 13 mbar. The
@@ -1709,22 +1934,34 @@ def pellet_energy_loss_W(
     (Knudsen number about 3e-3 at 2073 K), so the gas is continuum.
     Free-molecular heat transfer does not apply. The enthalpy the
     same argon stream could carry is the same physical loss and is
-    not added on top. Latent heat is not in this residual.
+    not added on top.
+
+    This is the one-node balance: the booked radiating area, the
+    holder slab, continuum argon, and the evaporative enthalpy, all
+    at one temperature. The full-side face and an explicit area use
+    it. It is also the high-conductivity limit of the two-node
+    balance. The hot-upper face does not: that path is
+    ``two_node_pellet_loss_W``.
 
     The cold boundary is the cooling water. T_sur, T_cold, and T_gas
     are that one temperature, 300 K. The preset holder series that
     ends at 1500 C is not read. Nu = 2 is the still-gas sphere on
     the printed diameter. The pellet is a cylinder for the slab and
     a sphere of that diameter for the gas term, which is the
-    continuum limit named for this chamber. The radiating area is
-    the booked face. Conduction uses the top face, the contact, and
-    the printed height. The bottom face is not a radiator.
+    continuum limit named for this chamber. Conduction uses the top
+    face, the contact, and the printed height. The bottom face is
+    not a radiator.
+
+    ``species_rate_kg_hr_at_K`` is the evaporation step's booked kg/h
+    at the trial temperature, closed over the step-start composition.
+    None is a zero sink. The rates are not a second flux formula.
 
     Algebra::
 
         Q = eps * sigma * A_face * (T**4 - T_b**4)
             + k * A_top * (T - T_b) / H
             + Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b)
+            + sum_i J_i(T) * dH_i(T)
 
         T_b = 300 K
         Nu = 2
@@ -1733,36 +1970,129 @@ def pellet_energy_loss_W(
     Units: T kelvin, areas m2, k W m-1 K-1, H and d metres, Q watts.
 
     Sanity at 1800 C (2073.15 K), d = 13 mm, H = 10 mm, k = 1,
-    A_top = 1.327e-4 m2, T_b = 300 K. Conduction is 23.5 W. The
-    investigation's 24 W is the same term at a 1773 K rise. Argon
-    conductivity at the film is 0.0498, and Q_gas at Nu = 2 is
-    7.2 W. Coupled to the peak focal power, alpha 0.85, and the hot
-    upper face, the root is 2072 C. The full side at the same power
-    is 1816 C.
+    A_top = 1.327e-4 m2, T_b = 300 K, no evaporation. Conduction is
+    23.5 W. The investigation's 24 W is the same term at a 1773 K
+    rise. Argon conductivity at the film is 0.0498, and Q_gas at
+    Nu = 2 is 7.2 W. Coupled to the peak focal power, alpha 0.85,
+    and the lumped hot-upper area at one temperature, the root is
+    2072 C. The full side at the same power is 1816 C.
     """
 
     boundary_K = COLD_BOUNDARY_K
-    radiation = (
-        STEFAN_BOLTZMANN
-        * emissivity
-        * radiating_area_m2
-        * (temperature_K ** 4 - boundary_K ** 4)
+    radiation = _radiation_exchange_W(
+        temperature_K,
+        area_m2=radiating_area_m2,
+        emissivity=emissivity,
+        boundary_K=boundary_K,
     )
-    conduction = (
-        conductivity_W_m_K
-        * top_area_m2
-        * (temperature_K - boundary_K)
-        / height_m
+    conduction = _slab_conductance_W_per_K(
+        conductivity_W_m_K,
+        top_area_m2,
+        height_m,
+    ) * (temperature_K - boundary_K)
+    gas = _argon_loss_W(
+        temperature_K,
+        diameter_m=diameter_m,
+        boundary_K=boundary_K,
     )
-    film_K = 0.5 * (temperature_K + boundary_K)
-    gas = (
-        NU_STILL_SPHERE
-        * argon_conductivity_W_m_K(film_K)
-        * math.pi
-        * diameter_m
-        * (temperature_K - boundary_K)
+    rates = _species_rates_kg_hr(temperature_K, species_rate_kg_hr_at_K)
+    evaporative = evaporative_enthalpy_sink_W(
+        temperature_K,
+        rates,
+        vapor_pressures=vapor_pressures,
     )
-    return radiation + conduction + gas
+    return radiation + conduction + gas + evaporative
+
+
+def two_node_pellet_loss_W(
+    temperature_top_K: float,
+    *,
+    top_area_m2: float,
+    side_area_m2: float,
+    emissivity: float,
+    conductivity_W_m_K: float,
+    height_m: float,
+    diameter_m: float,
+    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
+    vapor_pressures: Mapping[str, Any] | None = None,
+) -> tuple[float, float]:
+    """External watts from the two-node pellet, and the side temperature.
+
+    Premise: Fig. 3 shows the top molten and the lower half solid, so
+    the wall is not at the brightness temperature. Node 1 is that
+    molten layer. It absorbs the beam, radiates from the top face,
+    loses continuum argon, carries the evaporative sink, and conducts
+    into node 2. Node 2 radiates from the full cylindrical wall
+    (``A_side = pi * d * H``, not half of it) and conducts to the
+    holder. The lumped hot-upper area put half the wall at the peak
+    temperature; that is the idealization this split replaces.
+
+    Gas is on node 1. A hot free surface keeps that sink. At high
+    conductivity the nodes are one temperature, so which node owns
+    the gas does not move the merged sum.
+
+    Algebra, external sum (the inter-node flux cancels)::
+
+        Q = eps * sigma * A_top * (T_top**4 - T_b**4)
+            + Q_gas(T_top)
+            + sum_i J_i(T_top) * dH_i(T_top)
+            + eps * sigma * A_side * (T_side**4 - T_b**4)
+            + G_half * (T_side - T_b)
+
+        G_half = 2 * k * A_top / H
+        T_side from _side_node_temperature_K
+
+    Units: watts, and T_side in kelvin. High-k limit: both nodes sit
+    on ``pellet_energy_loss_W`` evaluated with radiating area
+    A_top + A_side. With k = 1 the half-slab cannot carry the beam,
+    so T_top runs hotter than the lumped hot-upper root and near the
+    top-face-only balance.
+    """
+
+    boundary_K = COLD_BOUNDARY_K
+    half = 2.0 * _slab_conductance_W_per_K(
+        conductivity_W_m_K,
+        top_area_m2,
+        height_m,
+    )
+    side_K = _side_node_temperature_K(
+        temperature_top_K,
+        side_area_m2=side_area_m2,
+        emissivity=emissivity,
+        boundary_K=boundary_K,
+        half_conductance_W_per_K=half,
+    )
+    rates = _species_rates_kg_hr(
+        temperature_top_K,
+        species_rate_kg_hr_at_K,
+    )
+    evaporative = evaporative_enthalpy_sink_W(
+        temperature_top_K,
+        rates,
+        vapor_pressures=vapor_pressures,
+    )
+    radiation_top = _radiation_exchange_W(
+        temperature_top_K,
+        area_m2=top_area_m2,
+        emissivity=emissivity,
+        boundary_K=boundary_K,
+    )
+    radiation_side = _radiation_exchange_W(
+        side_K,
+        area_m2=side_area_m2,
+        emissivity=emissivity,
+        boundary_K=boundary_K,
+    )
+    gas = _argon_loss_W(
+        temperature_top_K,
+        diameter_m=diameter_m,
+        boundary_K=boundary_K,
+    )
+    holder = half * (side_K - boundary_K)
+    return (
+        radiation_top + gas + evaporative + radiation_side + holder,
+        side_K,
+    )
 
 
 def _resolve_pellet_conductivity(
@@ -1904,6 +2234,7 @@ def solve_power_driven_melt_temperature_C(
     solar_absorptance: float | None = None,
     window_transmittance: float | None = None,
     conductivity_W_m_K: float | None = None,
+    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
 ) -> dict[str, Any]:
     """Solve one end-of-step melt temperature from furnace power.
 
@@ -1918,16 +2249,17 @@ def solve_power_driven_melt_temperature_C(
 
     The charge stores sensible heat at
     ``EquipmentDesigner.MELT_CP_J_KG_K``. A printed pellet diameter
-    and height use ``pellet_face_areas_m2`` and ``pellet_energy_loss_W``:
-    radiation to the 300 K water-cooled boundary, slab conduction
-    through the top face, and continuum argon at Nu = 2. The booked
-    face is the declared set. An unset face set below 1 kg takes the
-    hot upper surface and is noticed. The other of ``hot_upper`` and
-    ``full_side`` is solved beside it, with the same conductivity,
-    boundary, and gas term, and does not replace the booked
-    temperature. A missing conductivity takes the basalt-band midpoint
-    and is noticed. The 300 K boundary is a typed unknown. The preset
-    holder series is not a temperature this solver reads.
+    and height use ``pellet_face_areas_m2``. The hot-upper face, and
+    an unset face below 1 kg, is the two-node balance: the molten top
+    radiates from the top face at T_top, the lower body radiates from
+    the full side wall at T_side, and the nodes conduct through the
+    pellet. The booked temperature is T_top. The full side and an
+    explicit area stay one node, ``pellet_energy_loss_W``, which is
+    also the high-conductivity limit of the two nodes. The other of
+    those two solutions is reported beside the booked temperature and
+    does not replace it. A missing conductivity takes the basalt-band
+    midpoint and is noticed. The 300 K boundary is a typed unknown.
+    The preset holder series is not a temperature this solver reads.
     With no printed cylinder the loss stays ``_tonne_sky_loss_W``:
     sigma * emissivity * area * T**4, sky at 0 K, and no gas term.
     A missing emissivity takes the silicate default and is noticed.
@@ -1938,13 +2270,21 @@ def solve_power_driven_melt_temperature_C(
     1, an upper bound, and is noticed. None of these is tuned to a
     printed peak.
 
-    Algebra, both sides watts, losses at the unknown end temperature.
-    Printed pellet::
+    ``species_rate_kg_hr_at_K`` is the evaporation step's booked kg/h
+    at the trial kelvin, closed over the step-start composition. The
+    root evaluates that sink at the same temperature as the other
+    losses. None is a zero sink. The tonne sky has no pellet surface;
+    a callback there is noticed and not applied.
 
-        m * cp * (T - T_prev) / dt = P_abs
-            - eps * sigma * A_face * (T**4 - T_b**4)
-            - k * A_top * (T - T_b) / H
-            - Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b)
+    Algebra, both sides watts, losses at the unknown end temperature.
+    One node (full side, explicit area, or the high-k limit)::
+
+        m * cp * (T - T_prev) / dt = P_abs - pellet_energy_loss_W(T)
+
+    Two nodes, hot upper, sensible heat on the top node only::
+
+        m * cp * (T_top - T_prev) / dt = P_abs
+            - two_node_pellet_loss_W(T_top)
 
     No cylinder::
 
@@ -1959,7 +2299,9 @@ def solve_power_driven_melt_temperature_C(
     1740.1373551492054 W at sigma 5.670374e-8 and emissivity 0.85.
     A 13 mm pellet in a 20 mm spot intercepts 0.4225 of the focal watts.
     At the digitized peak, alpha 0.85, k = 1, Nu = 2, and T_b = 300 K,
-    the hot upper root is 2072 °C and the full side is 1816 °C.
+    the one-node lumped hot-upper area is 2072 °C and the full side
+    is 1816 °C. The booked hot-upper path is the two-node root, which
+    runs hotter than that lumped area because the wall is not at T_top.
     """
 
     power = _declared_finite(
@@ -2106,7 +2448,9 @@ def solve_power_driven_melt_temperature_C(
                 "1500 C is not T_sur."
             ),
         })
-        top_area_m2 = pellet_face_areas_m2(pellet_d, height_m)["top"]
+        faces = pellet_face_areas_m2(pellet_d, height_m)
+        top_area_m2 = faces["top"]
+        side_area_m2 = faces["side"]
 
         def loss_for(radiating_area_m2: float) -> Callable[[float], float]:
             def loss(temperature_K: float) -> float:
@@ -2118,17 +2462,64 @@ def solve_power_driven_melt_temperature_C(
                     top_area_m2=top_area_m2,
                     height_m=height_m,
                     diameter_m=pellet_d,
+                    species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
                 )
             return loss
 
-        root_loss = loss_for(area)
-        other_loss = loss_for(other_area) if other_area is not None else None
+        def two_node_loss(temperature_K: float) -> float:
+            watts, _side_K = two_node_pellet_loss_W(
+                temperature_K,
+                top_area_m2=top_area_m2,
+                side_area_m2=side_area_m2,
+                emissivity=eps,
+                conductivity_W_m_K=conductivity,
+                height_m=height_m,
+                diameter_m=pellet_d,
+                species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
+            )
+            return watts
+
+        # hot_upper is the two-node brightness temperature. full_side
+        # and an explicit area stay one node. The sensitivity is the
+        # other solution and does not replace the booked temperature.
+        if face_set == FACE_HOT_UPPER:
+            nodes = "two_node"
+            area = top_area_m2
+            root_loss = two_node_loss
+            other_loss = (
+                loss_for(faces[FACE_FULL_SIDE])
+                if other_area is not None
+                else None
+            )
+        elif face_set == FACE_FULL_SIDE:
+            nodes = "one_node"
+            root_loss = loss_for(area)
+            other_loss = two_node_loss if other_area is not None else None
+            other_area = top_area_m2
+        else:
+            nodes = "one_node"
+            root_loss = loss_for(area)
+            other_loss = None
     else:
+        top_area_m2 = None
+        side_area_m2 = None
+        nodes = "sky"
         if conductivity_W_m_K is not None:
             raise PowerTemperatureRefusal(
                 "pellet_geometry_incomplete",
                 "conductivity applies only to a printed pellet diameter and height",
             )
+        if species_rate_kg_hr_at_K is not None:
+            notices.append({
+                "kind": TYPED_UNKNOWN,
+                "knob": "species_rate_kg_hr_at_K",
+                "value": "not_applied",
+                "unit": "1",
+                "source": (
+                    "the tonne sky balance has no pellet evaporation "
+                    "surface, so the rate callback is not a sink here"
+                ),
+            })
 
         def sky_loss(temperature_K: float) -> float:
             return _tonne_sky_loss_W(
@@ -2145,6 +2536,28 @@ def solve_power_driven_melt_temperature_C(
         capacity_W_per_K=capacity,
         loss_W=root_loss,
     )
+    if nodes == "two_node":
+        _watts, side_K = two_node_pellet_loss_W(
+            root_K,
+            top_area_m2=top_area_m2,
+            side_area_m2=side_area_m2,
+            emissivity=eps,
+            conductivity_W_m_K=conductivity,
+            height_m=height_m,
+            diameter_m=pellet_d,
+            species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
+        )
+    elif nodes == "one_node":
+        side_K = root_K
+    else:
+        side_K = None
+    if nodes == "sky":
+        evaporative_sink_W = None
+    else:
+        evaporative_sink_W = evaporative_enthalpy_sink_W(
+            root_K,
+            _species_rates_kg_hr(root_K, species_rate_kg_hr_at_K),
+        )
     sensitivity = None
     if other_loss is not None:
         other_K = _bisect_power_temperature_K(
@@ -2158,17 +2571,23 @@ def solve_power_driven_melt_temperature_C(
             "area_m2": other_area,
             "temperature_C": other_K - CELSIUS_TO_KELVIN_OFFSET,
             "temperature_K": other_K,
+            "nodes": "one_node" if nodes == "two_node" else "two_node",
             "role": "sensitivity",
         }
     return {
         "temperature_C": root_K - CELSIUS_TO_KELVIN_OFFSET,
         "temperature_K": root_K,
+        "temperature_side_C": (
+            None if side_K is None else side_K - CELSIUS_TO_KELVIN_OFFSET
+        ),
+        "temperature_side_K": side_K,
         "power_W": absorbed,
         "focal_power_W": power if intercept is not None else None,
         "intercept": intercept,
         "solar_absorptance": alpha,
         "window_transmittance": tau,
         "face_set": face_set,
+        "nodes": nodes,
         "sensitivity": sensitivity,
         "cold_boundary_K": cold_boundary_K,
         "surroundings_K": surroundings_K,
@@ -2176,6 +2595,9 @@ def solve_power_driven_melt_temperature_C(
         "dt_s": step_s,
         "mass_kg": charge_kg,
         "area_m2": area,
+        "top_area_m2": top_area_m2,
+        "side_area_m2": side_area_m2,
+        "evaporative_sink_W": evaporative_sink_W,
         "emissivity": eps,
         "role": "prediction",
         "source_class": "engine_prediction",
@@ -2191,6 +2613,7 @@ def melt_temperature_from_furnace_power(
     previous_temperature_C: float,
     dt_s: float,
     live_mass_kg: float | None = None,
+    species_rate_kg_hr_at_K: Callable[[float], Mapping[str, float]] | None = None,
 ) -> dict[str, Any]:
     """Prediction for one step. The live melt mass wins when it is set.
 
@@ -2200,6 +2623,10 @@ def melt_temperature_from_furnace_power(
     Neither is invented when both are missing. A holder temperature on
     the driver is not read. The pellet boundary stays the water-cooled
     typed unknown inside the solver.
+
+    ``species_rate_kg_hr_at_K`` is not a driver field. The step passes
+    the evaporation booking at the trial temperature, closed over the
+    step-start composition. None leaves the evaporative sink at zero.
     """
 
     if not isinstance(driver, Mapping):
@@ -2228,6 +2655,7 @@ def melt_temperature_from_furnace_power(
         solar_absorptance=driver.get("solar_absorptance"),
         window_transmittance=driver.get("window_transmittance"),
         conductivity_W_m_K=driver.get("conductivity_W_m_K"),
+        species_rate_kg_hr_at_K=species_rate_kg_hr_at_K,
     )
     record["time_s"] = _declared_finite(
         time_s,
@@ -2426,7 +2854,15 @@ def _bisect_power_temperature_K(
     """
 
     def residual(temperature_K: float) -> float:
-        loss = loss_W(temperature_K)
+        try:
+            loss = loss_W(temperature_K)
+        except PowerTemperatureRefusal as exc:
+            if (
+                exc.reason == "evaporative_flux_above_bracket"
+                and temperature_K >= EVAPORATIVE_BRACKET_CEILING_K
+            ):
+                return math.inf
+            raise
         if not math.isfinite(loss):
             return math.inf
         return (
@@ -2436,9 +2872,19 @@ def _bisect_power_temperature_K(
         )
 
     lower = 0.0
-    upper = previous_K + power_W / capacity_W_per_K
-    if not math.isfinite(upper) or upper > 1.0e7:
-        upper = max(previous_K, 1.0e7)
+    adiabatic = previous_K + power_W / capacity_W_per_K
+    if not math.isfinite(adiabatic) or adiabatic > 1.0e7:
+        adiabatic = max(previous_K, 1.0e7)
+    upper = adiabatic
+    # A steady pellet has a tiny heat capacity, so the adiabatic cap is
+    # the 1e7 K ceiling. The evaporative callback is the booked flux
+    # law, which is not a 1e7 K evaluation. Probe a few thousand kelvin
+    # above the previous temperature and double, which is the expansion
+    # below. Eighty bisections of either bracket close the watts inside
+    # the 1e-6 relative tolerance.
+    modest = max(previous_K, COLD_BOUNDARY_K) + 5000.0
+    if upper > modest:
+        upper = modest
     if upper < lower:
         upper = lower
     f_lower = residual(lower)
