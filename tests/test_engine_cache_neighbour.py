@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from simulator import engine_cache
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.reduced_real_determinism import (
     ControlQuantization,
     _quantize,
@@ -59,6 +60,7 @@ def test_coarse_cell_snaps_with_the_owner_quantizer() -> None:
         "pressure_bar": 1.0004,
         "fO2_log": -11.234,
         "po2": 0.02146,
+        "temperature_C": 1427.2,
         "composition_wt_pct": {"SiO2": 50.14},
         "engine_settings": {"model": "a", "temperature_K": 1700.2},
     }
@@ -66,6 +68,13 @@ def test_coarse_cell_snaps_with_the_owner_quantizer() -> None:
     assert cell["temperature_K"] == _quantize(
         1700.2, preset.t_k_quantum, preset.t_k_decimals,
     )
+    snapped_c = _quantize(
+        1427.2 + CELSIUS_TO_KELVIN_OFFSET,
+        preset.t_k_quantum,
+        preset.t_k_decimals,
+    )
+    assert snapped_c is not None
+    assert cell["temperature_C"] == snapped_c - CELSIUS_TO_KELVIN_OFFSET
     assert cell["pressure_bar"] == _quantize(
         1.0004, preset.pressure_bar_quantum, preset.pressure_bar_decimals,
     )
@@ -178,24 +187,29 @@ def test_scoring_call_never_returns_a_neighbour(
     assert "neighbour_hit" not in result
 
 
-def test_fine_store_is_visible_to_a_later_coarse_pass(
+def test_fine_store_does_not_write_a_neighbour_cell(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _use_cache(monkeypatch, tmp_path)
+    path = _use_cache(monkeypatch, tmp_path)
     base = _request(1700.0)
     nearby = _request(1700.2)
     with optimizer_engine_neighbour({"control_quantization": "fine"}):
         _call(base, {"answer": "fine-stored"})
-        fine_nearby = _call(nearby, {"answer": "not-a-neighbour"})
-    assert fine_nearby == {"answer": "not-a-neighbour"}
+        fine_nearby = _call(nearby, {"answer": "fine-own"})
+    assert fine_nearby == {"answer": "fine-own"}
+    with sqlite3.connect(path) as connection:
+        names = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+    assert "engine_neighbour_cells" not in names
     further = _request(1700.4)
     with optimizer_engine_neighbour({"control_quantization": "coarse"}):
-        hit = engine_cache.cached_engine_call(
-            "openimcc", further, lambda: pytest.fail("coarse pass solved a filled cell"),
-        )
-    assert "neighbour_hit" not in hit
-    assert hit.neighbour_hit == "coarse"
-    assert hit["answer"] in {"fine-stored", "not-a-neighbour"}
+        solved = _call(further, {"answer": "coarse-solved"})
+    assert solved == {"answer": "coarse-solved"}
+    assert "neighbour_hit" not in solved
 
 
 def test_coarser_preset_reaches_farther_than_coarse(
@@ -306,6 +320,79 @@ def test_readonly_serves_a_neighbour_and_a_missing_index_stays_exact(
     assert "engine_neighbour_cells" not in names
 
 
+def test_refusal_mask_and_false_mask_witness_block_neighbour_lookup(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _use_cache(monkeypatch, tmp_path)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    target = None
+    for index in range(400):
+        candidate = _request(1000.0 + index * 0.001)
+        key = engine_cache.engine_cache_key("alphamelts", version, candidate)
+        if not engine_cache.mask_verify_selected(key):
+            target = candidate
+            break
+    assert target is not None
+    mask_cell = engine_cache.refusal_mask_cell(target)
+    assert mask_cell is not None
+    refusal = engine_cache.cached_engine_call(
+        "alphamelts",
+        target,
+        lambda: {"status": "refusal", "refusal_reason": "engine_crash"},
+    )
+    assert refusal["refusal_reason"] == "engine_crash"
+
+    base = _request(float(target["temperature_K"]) + 4.0)
+    with optimizer_engine_neighbour({"control_quantization": "xx_coarse"}):
+        _call(base, {"answer": "neighbour"})
+    engine_cache._MEMORY_CACHE.clear()
+
+    with optimizer_engine_neighbour({"control_quantization": "xx_coarse"}):
+        masked = engine_cache.cached_engine_call(
+            "alphamelts", target, lambda: pytest.fail("mask cell was not served"),
+        )
+    assert masked["mask_hit"] == "refusal:engine_crash"
+    assert "neighbour_hit" not in masked
+
+    cache_path = engine_cache._configured_engine_cache_path() or str(path)
+    engine_cache._deny_mask_cell(cache_path, "alphamelts", str(version), mask_cell)
+    engine_cache._MEMORY_CACHE.clear()
+    solved: list[int] = []
+
+    def live_solve() -> dict[str, str]:
+        solved.append(1)
+        return {"answer": "live"}
+
+    with optimizer_engine_neighbour({"control_quantization": "xx_coarse"}):
+        live = engine_cache.cached_engine_call("alphamelts", target, live_solve)
+    assert live == {"answer": "live"}
+    assert solved == [1]
+
+
+def test_disabled_cache_path_does_not_serve_a_neighbour(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _use_cache(monkeypatch, tmp_path)
+    base = _request(1700.0)
+    nearby = _request(1700.2)
+    with optimizer_engine_neighbour({"control_quantization": "coarse"}):
+        _call(base, {"answer": "base"})
+    cache_path = engine_cache._configured_engine_cache_path() or str(path)
+    engine_cache._disable_unopenable(cache_path, OSError("disabled by test"))
+    engine_cache._MEMORY_CACHE.clear()
+    calls: list[int] = []
+
+    def live_solve() -> dict[str, str]:
+        calls.append(1)
+        return {"answer": "live"}
+
+    with optimizer_engine_neighbour({"control_quantization": "coarse"}):
+        result = engine_cache.cached_engine_call("openimcc", nearby, live_solve)
+    assert result == {"answer": "live"}
+    assert "neighbour_hit" not in result
+    assert calls == [1]
+
+
 def test_exact_store_does_not_create_the_side_table(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -331,7 +418,7 @@ def test_optimizer_evaluate_runs_inside_the_neighbour_scope() -> None:
     tree = ast.parse(source_path.read_text(encoding="utf-8"))
     wrapped = False
     for node in ast.walk(tree):
-        if not isinstance(node, ast.FunctionDef) or node.name != "evaluate":
+        if not isinstance(node, ast.FunctionDef) or node.name != "_evaluate_impl":
             continue
         for child in ast.walk(node):
             if not isinstance(child, ast.With):
@@ -350,3 +437,245 @@ def test_optimizer_evaluate_runs_inside_the_neighbour_scope() -> None:
                 for stmt in child.body
             )
     assert wrapped
+    source = source_path.read_text(encoding="utf-8")
+    assert "def evaluate(" in source
+    assert "_NEIGHBOUR_STAMP" in source
+
+
+def test_presetless_scope_does_not_write_a_neighbour_cell(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _use_cache(monkeypatch, tmp_path)
+    with optimizer_engine_neighbour(None):
+        _call(_request(1700.0), {"answer": "plain"})
+    with optimizer_engine_neighbour({}):
+        _call(_request(1710.0), {"answer": "empty"})
+    with sqlite3.connect(path) as connection:
+        names = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+    assert "engine_neighbour_cells" not in names
+
+
+def test_expire_prune_and_drop_delete_neighbour_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = _use_cache(monkeypatch, tmp_path)
+    with optimizer_engine_neighbour({"control_quantization": "coarse"}):
+        _call(_request(1700.0), {"answer": "base"})
+    with sqlite3.connect(path) as connection:
+        connection.execute(
+            "INSERT INTO engine_neighbour_cells "
+            "(engine, chem_version, preset, cell, key) VALUES (?,?,?,?,?)",
+            ("openimcc", "999", "coarse", b"stale-cell", b"stale-key"),
+        )
+        connection.commit()
+    engine_cache.prune_cache_file(path, apply=True)
+    with sqlite3.connect(path) as connection:
+        stale = connection.execute(
+            "SELECT COUNT(*) FROM engine_neighbour_cells WHERE chem_version='999'"
+        ).fetchone()[0]
+        kept = connection.execute(
+            "SELECT COUNT(*) FROM engine_neighbour_cells"
+        ).fetchone()[0]
+    assert stale == 0
+    assert kept >= 1
+    engine_cache.expire_cache_file(path, engine="openimcc", all_rows=True, apply=True)
+    with sqlite3.connect(path) as connection:
+        left = connection.execute(
+            "SELECT COUNT(*) FROM engine_neighbour_cells WHERE engine='openimcc'"
+        ).fetchone()[0]
+    assert left == 0
+
+    bare = tmp_path / "bare.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(bare))
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    _call(_request(1800.0), {"answer": "exact"})
+    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+
+
+def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A real evaluate() at coarse reuses a neighbour and is not certified.
+
+    The analytical profile is the one evaluate() already runs without a melt
+    domain refusal. The coarse preset is attached where a cached-real run
+    puts reduced_real_cache, so the scope, the stamp, and the cache key are
+    the production ones. A fine request with the same profile_id does not
+    reuse that score.
+    """
+
+    from types import MappingProxyType
+
+    import simulator.optimize.evaluate as evaluate_module
+    from simulator.fidelity_vocabulary import EvidenceClass
+    from simulator.optimize.evalspec import cache_key
+    from simulator.optimize.evaluate import evaluate
+    from simulator.optimize.honesty import optimizer_tier_label
+    from simulator.optimize.recipe import RecipePatch, RecipeSchema
+    from simulator.optimize.study import (
+        Candidate,
+        StudyRecord,
+        _exact_recipe_winner,
+        _light_backend_status_trace,
+        _lookup_cached,
+        neighbour_scored_result_reusable,
+    )
+    from tests.test_optimizer_evaluate import PROFILE, _execution
+
+    _use_cache(monkeypatch, tmp_path)
+    quantum = ControlQuantization.from_name("coarse").t_k_quantum
+    nearby = _request(1700.0 + quantum * 0.2)
+    with optimizer_engine_neighbour({"control_quantization": "coarse"}):
+        _call(_request(1700.0), {"answer": "base"})
+    original_run_options = evaluate_module._run_options
+
+    def install(preset: str) -> None:
+        def wrapped(profile: object, fidelity: str) -> MappingProxyType:
+            options = dict(original_run_options(profile, fidelity))
+            cache = dict(options.get("reduced_real_cache") or {})
+            cache["control_quantization"] = preset
+            options["reduced_real_cache"] = cache
+            return MappingProxyType(options)
+
+        monkeypatch.setattr(evaluate_module, "_run_options", wrapped)
+
+    class _CallingExecutor:
+        def __init__(self, request: dict[str, object]) -> None:
+            self.request = request
+            self.calls = 0
+            self.solved = 0
+
+        def execute(self, config: object) -> object:
+            self.calls += 1
+            self.config = config
+
+            def solve() -> dict[str, str]:
+                self.solved += 1
+                return {"answer": "solved"}
+
+            engine_cache.cached_engine_call("openimcc", self.request, solve)
+            return _execution()
+
+    patch = RecipePatch({("campaigns", "C0", "temp_range_C"): [20.0, 950.0]})
+    install("coarse")
+    coarse_executor = _CallingExecutor(nearby)
+    coarse = evaluate(
+        patch,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=coarse_executor,
+    )
+    assert coarse.feasible
+    assert coarse_executor.calls == 1
+    assert coarse_executor.solved == 0
+    assert coarse.neighbour_hits >= 1
+    assert coarse.neighbour_preset == "coarse"
+    assert coarse.eval_spec is not None
+    assert coarse.eval_spec.control_quantization == "coarse"
+    assert coarse.eval_spec.profile_id == PROFILE["profile_id"]
+    trace = coarse.run_reference.trace
+    assert trace["neighbour_hits"] == coarse.neighbour_hits
+    assert trace["neighbour_preset"] == "coarse"
+    light = _light_backend_status_trace(coarse)
+    assert light is not None
+    assert light["neighbour_hits"] == coarse.neighbour_hits
+    carrier = {
+        "cache_state": "live_fill",
+        "backend_name": "alphamelts",
+        "backend_status": "ok",
+        "backend_authoritative": True,
+        "evidence_class": EvidenceClass.MELTS.value,
+        "neighbour_hits": coarse.neighbour_hits,
+        "neighbour_preset": coarse.neighbour_preset,
+    }
+    label = optimizer_tier_label(carrier, dict(light))
+    assert label["ux_label"] == "COARSE_NEIGHBOUR"
+    assert label["certification_allowed"] is False
+    certified = dict(carrier)
+    certified["neighbour_hits"] = 0
+    certified.pop("neighbour_preset")
+    assert optimizer_tier_label(certified, {})["ux_label"] == "CERTIFIED"
+
+    install("fine")
+    fine_executor = _CallingExecutor(nearby)
+    fine = evaluate(
+        patch,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=fine_executor,
+    )
+    assert fine.feasible
+    assert fine_executor.calls == 1
+    assert fine_executor.solved == 1
+    assert fine.neighbour_hits == 0
+    assert fine.eval_spec is not None
+    assert fine.eval_spec.control_quantization == "fine"
+    assert fine.eval_spec.profile_id == coarse.eval_spec.profile_id
+    assert cache_key(fine.eval_spec) != cache_key(coarse.eval_spec)
+    assert neighbour_scored_result_reusable(coarse, requested="coarse")
+    assert not neighbour_scored_result_reusable(coarse, requested="fine")
+    assert neighbour_scored_result_reusable(fine, requested="fine")
+
+    class _ReplayStore:
+        def __init__(self, row: object) -> None:
+            self.row = row
+            self.lookups = 0
+
+        def lookup(self, spec: object) -> object:
+            self.lookups += 1
+            return self.row
+
+    store = _ReplayStore(coarse)
+    missed = _lookup_cached(
+        Candidate("fine-replay", patch),
+        PROFILE,
+        "lunar_mare_low_ti",
+        "fast",
+        RecipeSchema(),
+        store,
+        None,
+    )
+    assert missed is None
+    assert store.lookups == 1
+    install("coarse")
+    replayed = _lookup_cached(
+        Candidate("coarse-replay", patch),
+        PROFILE,
+        "lunar_mare_low_ti",
+        "fast",
+        RecipeSchema(),
+        store,
+        None,
+    )
+    assert replayed is not None
+    assert replayed.neighbour_hits >= 1
+
+    neighbour_row = StudyRecord(
+        candidate_id="neighbour",
+        patch=patch,
+        feasible=True,
+        status="ok",
+        objectives={"oxygen_kg": 1.0},
+        feasibility_margins={},
+        trace_summary={"neighbour_hits": coarse.neighbour_hits, "neighbour_preset": "coarse"},
+    )
+    exact_row = StudyRecord(
+        candidate_id="exact",
+        patch=patch,
+        feasible=True,
+        status="ok",
+        objectives={"oxygen_kg": 1.0},
+        feasibility_margins={},
+        trace_summary={},
+    )
+    assert _exact_recipe_winner((neighbour_row, exact_row)).candidate_id == "exact"
+    assert _exact_recipe_winner((neighbour_row,)) is None
+    assert _exact_recipe_winner((exact_row,)).candidate_id == "exact"

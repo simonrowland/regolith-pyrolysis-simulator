@@ -5128,14 +5128,14 @@ def _quantize_decimals(quantum: float) -> int:
 
 
 # Engine-request fields the coarse cell snaps. engine_settings stays exact:
-# a different model is not a nearby control. temperature_C uses the Kelvin
-# quantum, the same bucket the refusal mask copies, so a coarse preset names
-# one cell. _sigfig_snap is a different rule and is not used here.
+# a different model is not a nearby control. temperature_C is snapped in
+# Kelvin with the same offset quantized_controls uses, then converted back.
+# _sigfig_snap is a different rule and is not used here.
 _COARSE_NEIGHBOUR_PRESETS = frozenset({"xx_coarse", "coarse", "medium"})
 _NEIGHBOUR_COMPOSITION_FIELDS = frozenset({
     "composition_wt_pct", "composition_mol", "composition_kg", "composition",
 })
-_NEIGHBOUR_TEMPERATURE_FIELDS = frozenset({"temperature_K", "temperature_C"})
+_NEIGHBOUR_TEMPERATURE_K_FIELDS = frozenset({"temperature_K"})
 _NEIGHBOUR_PRESSURE_FIELDS = frozenset({"pressure_bar", "physical_pressure_bar"})
 _NEIGHBOUR_LOG_FO2_FIELDS = frozenset({"fO2_log"})
 _NEIGHBOUR_PO2_FIELDS = frozenset({
@@ -5185,8 +5185,17 @@ def _coarse_cell_value(
     if not _neighbour_number(value):
         return value
     number = float(value)
-    if field in _NEIGHBOUR_TEMPERATURE_FIELDS:
+    if field in _NEIGHBOUR_TEMPERATURE_K_FIELDS:
         return _quantize(number, quantization.t_k_quantum, quantization.t_k_decimals)
+    if field == "temperature_C":
+        snapped = _quantize(
+            number + CELSIUS_TO_KELVIN_OFFSET,
+            quantization.t_k_quantum,
+            quantization.t_k_decimals,
+        )
+        if snapped is None:
+            return None
+        return float(snapped) - CELSIUS_TO_KELVIN_OFFSET
     if field in _NEIGHBOUR_PRESSURE_FIELDS:
         return _quantize(
             number,
@@ -5231,11 +5240,25 @@ def _named_coarse_preset(quantization: ControlQuantization) -> str | None:
     return None
 
 
+class _NeighbourCounter:
+    """Process-local hit count for one optimizer evaluation.
+
+    The cache increments ``hits`` when it serves a neighbour. ``preset`` is
+    the coarse name, or None when this run stays exact and writes no cells.
+    """
+
+    __slots__ = ("hits", "preset")
+
+    def __init__(self, preset: str | None) -> None:
+        self.hits = 0
+        self.preset = preset
+
+
 def optimizer_neighbour_preset(reduced_real_cache: Any) -> str | None:
     """Coarse preset name for an optimizer run, or None when lookup stays exact.
 
     fine, production, and a quantization that is not one of the three coarse
-    presets return None. The caller still indexes those stores.
+    presets return None. Those runs do not coarsen and do not write cells.
     """
 
     if not isinstance(reduced_real_cache, Mapping):
@@ -5267,22 +5290,88 @@ def optimizer_neighbour_preset(reduced_real_cache: Any) -> str | None:
     return None
 
 
-@contextmanager
-def optimizer_engine_neighbour(reduced_real_cache: Any) -> Iterator[None]:
-    """Fill the neighbour index for one optimizer evaluation.
+def _quantization_identity_token(quantization: ControlQuantization) -> str:
+    for name, preset in _CONTROL_QUANTIZATION_PRESETS.items():
+        if quantization == preset:
+            return name
+    return (
+        "custom:"
+        f"{quantization.t_k_quantum}:"
+        f"{quantization.pressure_bar_quantum}:"
+        f"{quantization.log_fo2_quantum}:"
+        f"{quantization.composition_sig_figs}"
+    )
 
-    Lookup is on only for a coarse preset. Battery scoring does not call
-    this, so a score stays on the exact key. The cache packs the cell; the
-    snap stays here.
+
+def control_quantization_identity(reduced_real_cache: Any) -> str:
+    """EvalSpec token for the control preset. Empty when the run has none.
+
+    fine and coarse are different tokens. A missing preset stays empty so
+    a preset-less spec keeps its existing cache key. Neighbour lookup is a
+    separate question: fine is a token here and is not a neighbour preset.
     """
 
+    if not isinstance(reduced_real_cache, Mapping):
+        return ""
+    raw = reduced_real_cache.get("control_quantization")
+    if raw in (None, ""):
+        return ""
+    if isinstance(raw, ControlQuantization):
+        return _quantization_identity_token(raw)
+    if isinstance(raw, str):
+        text = raw.strip()
+        if text.startswith("{"):
+            try:
+                parsed = json.loads(text)
+            except json.JSONDecodeError:
+                return text
+            if not isinstance(parsed, Mapping):
+                return text
+            raw = parsed
+        else:
+            try:
+                return _normalize_control_quantization_name(text)
+            except ValueError:
+                return ""
+    if isinstance(raw, Mapping):
+        try:
+            quantization = ControlQuantization(
+                t_k_quantum=raw["t_k_quantum"],
+                pressure_bar_quantum=raw["pressure_bar_quantum"],
+                log_fo2_quantum=raw["log_fo2_quantum"],
+                composition_sig_figs=raw["composition_sig_figs"],
+            )
+        except (KeyError, TypeError, ValueError):
+            return ""
+        return _quantization_identity_token(quantization)
+    return ""
+
+
+@contextmanager
+def optimizer_engine_neighbour(
+    reduced_real_cache: Any,
+    counter: Any = None,
+) -> Iterator[Any]:
+    """Count neighbour hits for one optimizer evaluation.
+
+    Lookup and the cell index are on only for a coarse preset. fine and a
+    missing preset yield a counter and do not coarsen. Battery scoring does
+    not call this, so a score stays on the exact key. The cache packs the
+    cell; the snap stays here.
+    """
+
+    preset = optimizer_neighbour_preset(reduced_real_cache)
+    if counter is None:
+        counter = _NeighbourCounter(preset)
+    else:
+        counter.preset = preset
+    if preset is None:
+        yield counter
+        return
     from simulator.engine_cache import optimizer_neighbour_scope
 
-    with optimizer_neighbour_scope(
-        optimizer_neighbour_preset(reduced_real_cache),
-        coarsen_engine_requests,
-    ):
-        yield
+    with optimizer_neighbour_scope(preset, coarsen_engine_requests, counter):
+        yield counter
 
 
 def _sigfig_quantum(value: float, sig_figs: float) -> float:
