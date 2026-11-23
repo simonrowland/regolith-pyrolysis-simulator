@@ -669,14 +669,21 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
                 f"malformed_preset: {exc.reason}: {exc}",
                 provenance=provenance,
             ) from exc
+        radiating_face_set = lengths.get("radiating_face_set")
+        # The exposed melt area is the evaporation/equipment area. A
+        # separately declared radiating face set owns the power balance
+        # area; passing both to the solver would be ambiguous.
+        power_area_m2 = (
+            None if radiating_face_set is not None else exposed_area_m2
+        )
         schedule[FURNACE_POWER_DRIVER_KEY] = furnace_power_driver_payload(
             power_trace,
             mass_kg=mass_kg,
-            exposed_area_m2=exposed_area_m2,
+            exposed_area_m2=power_area_m2,
             pellet_diameter_m=lengths.get("pellet_diameter_m"),
             pellet_height_m=lengths.get("pellet_height_m"),
             focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),
-            radiating_face_set=lengths.get("radiating_face_set"),
+            radiating_face_set=radiating_face_set,
         )
     return PresetRunSpec(
         feedstock_id=feedstock_id,

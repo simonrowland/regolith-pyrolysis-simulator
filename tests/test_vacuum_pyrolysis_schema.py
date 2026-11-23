@@ -24,6 +24,7 @@ ROBINOT_FLOW_NL_MIN = pytest.approx(0.3)
 ROBINOT_SAMPLE_MASS_G = pytest.approx(3.38)
 ROBINOT_DURATION_H = pytest.approx(1.0)
 ROBINOT_RUN_DURATION_H = pytest.approx(59.0 / 60.0)
+ROBINOT_EXPOSED_MELT_AREA_M2 = pytest.approx(0.00013273228961416876)
 ROBINOT_PEAK_TEMPERATURE_C = pytest.approx(1800.0)
 ROBINOT_O2_RELEASED_MG = pytest.approx(35.0)
 ROBINOT_GLASSY_LUMP_G = pytest.approx(1.82)
@@ -402,7 +403,18 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert pO2_cover["effective_pO2_achieved_mbar"] == pO2_cover["setpoint_mbar"]
     assert pO2_cover["status"] == "achieved_as_setpoint"
 
-    assert preset["lab_geometry"]["sample"]["mass_g"] == ROBINOT_SAMPLE_MASS_G
+    sample = preset["lab_geometry"]["sample"]
+    assert sample["mass_g"] == ROBINOT_SAMPLE_MASS_G
+    assert sample["exposed_melt_area_m2"] == ROBINOT_EXPOSED_MELT_AREA_M2
+    assert sample["exposed_melt_area_basis"] == (
+        "assumed_pellet_top_face_from_reported_diameter"
+    )
+    assert sample["exposed_melt_area_source_class"] == (
+        "assumption_with_sensitivity_marker"
+    )
+    assert sample["exposed_melt_area_notice"]["kind"] == "knob_defaulted"
+    assert sample["exposed_melt_area_notice"]["policy_class"] == "DP-007"
+    assert "exposed_melt_area_m2" not in sample["named_missing_fields"]
     assert "sample_mass_g" not in preset["lab_geometry"]["sample"]["named_missing_fields"]
     assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_RUN_DURATION_H
     assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_RUN_DURATION_H
