@@ -830,20 +830,37 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
 
     assert flagged_strata(residual.notices) == (
         score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
+        score_mod.FLAGGED_STRATUM_PROPOSED_POLICY,
     )
     assert [
-        (row["stratum"], row.get("policy_id"), row["n"])
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
         for row in flagged_stratum_rows(
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
-    ] == [(score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", 1)]
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
+        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+    ]
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
     )
     assert [
-        (row["stratum"], row.get("policy_id"), row["n"])
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
         for row in serialized_strata
-    ] == [(score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", 1)]
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-101", "proposed", 1),
+        (score_mod.FLAGGED_STRATUM_PROPOSED_POLICY, "DP-101", "proposed", 1),
+    ]
     clean_residual = replace(
         residual,
         notices=tuple(
@@ -1291,8 +1308,6 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value,
-        NoticeKind.METHOD_IMPLIED.value,
     )
 
     diagnostic = flagged_stratum_rows(
@@ -1301,8 +1316,6 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert {row["stratum"]: row["n"] for row in diagnostic} == {
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value: 1,
-        NoticeKind.METHOD_IMPLIED.value: 1,
     }
     assert all(row["median_dex"] is not None for row in diagnostic)
     assert all(row["rms_dex"] is not None for row in diagnostic)
@@ -1314,15 +1327,16 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert {row["stratum"]: row["n"] for row in summary_rows} == {
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED: 1,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value: 1,
-        NoticeKind.METHOD_IMPLIED.value: 1,
     }
     assert all(row["median_dex"] is not None for row in summary_rows)
     assert all(row["rms_dex"] is not None for row in summary_rows)
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
-    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+    assert (
+        "| calibration-not-grounded | vapour | internal-analytical | — | — | 1 |"
+        in report
+    )
 
 
 def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
@@ -1360,8 +1374,6 @@ def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag()
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value,
-        NoticeKind.METHOD_IMPLIED.value,
         FLAGGED_STRATUM_FIGURE_ONLY,
     )
 
@@ -1479,8 +1491,6 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     assert flagged_strata(openimcc.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value,
-        NoticeKind.METHOD_IMPLIED.value,
     )
     assert flagged_strata(internal_analytical.notices) == flagged_strata(
         openimcc.notices
@@ -4682,14 +4692,7 @@ def test_thermo_unknown_method_is_not_underdetermined_apparatus() -> None:
     assert residual.score_eligible is True
 
 
-def test_unknown_method_on_vapour_scores_with_assumed_equilibrium_pressure() -> None:
-    from simulator.battery.score import (
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        flagged_stratum_rows,
-        headline_payloads,
-        headline_rows,
-    )
-
+def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     exp = _unknown_method_experiment()
     gate = underdetermined_apparatus(exp, Quantity.P_SAT)
     assert gate.passed is False
@@ -4707,82 +4710,11 @@ def test_unknown_method_on_vapour_scores_with_assumed_equilibrium_pressure() -> 
         source_id="work-1",
     )
     residual, _ = _compile(ref, exp, _predict(Decimal("0.1"), ident))
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.score_eligible is False
-    assert residual.refusal is None
-    method_notice = next(
-        notice
-        for notice in residual.notices
-        if notice.kind is NoticeKind.METHOD_ASSUMED
-    )
-    assert method_notice.reason.startswith("method_assumed;")
-    assert "assumed_method=equilibrium_partial_pressure" in method_notice.reason
-    assert "original_reason=source does not state method" in method_notice.reason
-    assert '"source_method_text": "source does not state method"' in method_notice.reason
-    assert '"unit": "Pa"' in method_notice.reason
-    assert method_notice.policy == {
-        "id": "DP-011",
-        "version": "v1",
-        "status": "canonical",
-        "value": "equilibrium_partial_pressure",
-        "units": "method",
-    }
-    assert headline_rows(
-        (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
-    )[0]["n"] == 0
-    assert {
-        row["stratum"]: row["n"]
-        for row in flagged_stratum_rows(
-            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
-        )
-    } == {
-        NoticeKind.METHOD_ASSUMED.value: 1,
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS: 1,
-    }
-    plain_residual = residual_to_plain(residual)
-    plain_method_notice = next(
-        notice
-        for notice in plain_residual["notices"]
-        if notice["kind"] == NoticeKind.METHOD_ASSUMED.value
-    )
-    assert plain_method_notice["policy"] == dict(method_notice.policy)
-    assert "policy_id" not in plain_method_notice["reason"]
-    assert headline_payloads(
-        (plain_residual,),
-        (Engine.INTERNAL_ANALYTICAL,),
-        tier="measured",
-    )[0]["n"] == 0
-
-
-def test_unknown_method_with_printed_kems_text_flags_effusion_assumption() -> None:
-    exp = replace(
-        F.kems_experiment(kn=None),
-        method=State.unknown("source text identifies Knudsen effusion (KEMS)"),
-    )
-    ident = F.psat_identity("Na")
-    ref = F.observation(
-        "printed-kems-method-token-missing",
-        exp.experiment_id,
-        ident,
-        Decimal("0.1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="work-1",
-    )
-    ref = replace(ref, point_conditions=None)
-
-    gates = run_validity_gates(exp, ref, point_observations=(ref,))
-    method_check = next(check for check in gates.checks if check.name == "method")
-    regime_check = next(
-        check
-        for check in gates.checks
-        if check.name == "in_cell_partial_pressure_sum"
-    )
-    assert method_check.passed
-    assert method_check.detail["flag"] == "method_assumed"
-    assert method_check.detail["assumed_method"] == "equilibrium_partial_pressure"
-    assert regime_check.detail["flag"] == "effusion_regime_assumed"
-    assert "not stated" not in regime_check.detail["reason"]
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
 
 
 def _browning_potter_pa(temperature_K: float) -> float:
@@ -5485,7 +5417,7 @@ def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:
 @pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
-def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
+def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unknown_method_still_refuses(
     quantity: Quantity,
 ) -> None:
     from simulator.battery.score import (
@@ -5518,18 +5450,23 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
         review="reviewed",
     )
 
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+        return
+
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.score_eligible is False
     notice = next(
         item
         for item in residual.notices
-        if item.kind is NoticeKind.METHOD_ASSUMED
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     )
-    assert "assumed_method=quantity_defined_equilibrium_activity" in notice.reason
+    assert "method_unknown" in notice.reason
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.METHOD_ASSUMED.value,
     )
 
     pressure_identities = (
@@ -5545,20 +5482,15 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id="published-pressure-work",
         )
-        predicted, _candidate = _compile(
+        refused, _candidate = _compile(
             pressure,
             experiment,
             _predict(value, pressure_identity),
             review="reviewed",
         )
-        assert predicted.status is not ResidualStatus.REFUSED
-        assert predicted.numeric is not None
-        assert predicted.score_eligible is False
-        assert any(
-            notice.kind is NoticeKind.METHOD_ASSUMED
-            and "assumed_method=equilibrium_partial_pressure" in notice.reason
-            for notice in predicted.notices
-        )
+        assert refused.status is ResidualStatus.REFUSED
+        assert refused.refusal is not None
+        assert refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
 
     untyped_identity = replace(
         identity,
@@ -5578,10 +5510,9 @@ def test_published_typed_activity_and_pressure_unknown_method_score_flagged(
         _predict(Decimal("0.3"), untyped_identity),
         review="reviewed",
     )
-    assert not (
-        untyped_refused.refusal is not None
-        and untyped_refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
-    )
+    assert untyped_refused.status is ResidualStatus.REFUSED
+    assert untyped_refused.refusal is not None
+    assert untyped_refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
 
 
 def test_richter_langmuir_alpha_still_fails_exposed_area() -> None:
@@ -5894,19 +5825,12 @@ def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
     apparatus_notices = [
         item
         for item in residual.notices
-        if item.kind
-        in {
-            NoticeKind.EFFUSION_REGIME_ASSUMED,
-            NoticeKind.METHOD_IMPLIED,
-            NoticeKind.UNVERIFIED_APPARATUS,
-        }
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     ]
     assert any(
-        item.kind is NoticeKind.EFFUSION_REGIME_ASSUMED
-        and '"check": "in_cell_partial_pressure_sum"' in item.reason
+        item.reason.startswith("apparatus_unverified:in_cell_partial_pressure_sum")
         for item in apparatus_notices
     )
-    assert any(item.kind is NoticeKind.METHOD_IMPLIED for item in apparatus_notices)
     assert any(
         item.reason == "apparatus_unverified:geometry_determinants"
         for item in apparatus_notices
@@ -5914,7 +5838,6 @@ def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
     assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(
         residual.notices
     )
-    assert "method_implied" in flagged_strata(residual.notices)
     assert headline_rows(
         (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
     )[0]["n"] == 0
@@ -6262,14 +6185,7 @@ def test_kems_activity_with_possible_geometry_ranges_stays_flagged(
     assert residual.score_eligible is False
     assert residual.refusal is None
     assert any(
-        notice.kind
-        in {
-            NoticeKind.EFFUSION_REGIME_ASSUMED,
-            NoticeKind.EFFUSION_REGIME_VIOLATED,
-            NoticeKind.METHOD_IMPLIED,
-            NoticeKind.UNVERIFIED_APPARATUS,
-        }
-        for notice in residual.notices
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
     )
 
 
@@ -6351,14 +6267,14 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
 @pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
-def test_kems_activity_pressure_sum_over_limit_scores_flagged(
+def test_kems_activity_pressure_sum_over_limit_still_refuses(
     quantity: Quantity,
 ) -> None:
     identity = replace(
         F.activity_identity(formula="NaO0.5"), quantity=quantity
     )
     experiment = F.kems_experiment(
-        kn=None, calibrated=True
+        orifice_area=None, clausing=None, kn=None, calibrated=False
     )
     activity = F.observation(
         "uncalibrated-over-limit-activity",
@@ -6408,7 +6324,6 @@ def test_kems_activity_pressure_sum_over_limit_scores_flagged(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
     assert pressure_check.passed is False
-    assert pressure_check.detail["flag"] == "effusion_regime_violated"
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
 
@@ -6425,18 +6340,14 @@ def test_kems_activity_pressure_sum_over_limit_scores_flagged(
         ),
         point_observations=(activity, sodium, silicon),
     )
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.score_eligible is False
-    assert residual.refusal is None
-    assert any(
-        notice.kind is NoticeKind.EFFUSION_REGIME_VIOLATED
-        and "effusion_regime_violated" in notice.reason
-        for notice in residual.notices
-    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_sum_Pa"] == "11"
+    assert residual.refusal.detail["limit_Pa"] == "10"
 
 
-def test_d274_incomplete_printed_pressure_lower_bound_over_limit_scores_flagged() -> None:
+def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses() -> None:
     composition = Composition(
         basis="ordered_complete_mole_inventory",
         components=(
@@ -6448,7 +6359,7 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_scores_flagged(
     )
     identity = F.activity_identity(composition=composition)
     experiment = F.kems_experiment(
-        kn=None, calibrated=True
+        orifice_area=None, clausing=None, kn=None, calibrated=False
     )
     activity = F.observation(
         "d274-incomplete-over-limit-activity",
@@ -6514,14 +6425,16 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_scores_flagged(
         ),
         point_observations=point_observations,
     )
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.score_eligible is False
-    assert residual.refusal is None
-    assert any(
-        notice.kind is NoticeKind.EFFUSION_REGIME_VIOLATED
-        and "effusion_regime_violated" in notice.reason
-        and '"check": "in_cell_partial_pressure_sum"' in notice.reason
+    # d-274 preserves refusal when the printed lower bound alone exceeds the limit.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_lower_bound_Pa"] == "11"
+    assert residual.refusal.detail["limit_Pa"] == "10"
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
         for notice in residual.notices
     )
 
@@ -6533,7 +6446,11 @@ def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
     composition_source: str,
 ) -> None:
     experiment = F.kems_experiment(
-        f"d274-{composition_source}-own-pressure", kn=None, calibrated=True
+        f"d274-{composition_source}-own-pressure",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
     )
     if composition_source == "absent_point_conditions":
         identity = replace(
@@ -6592,28 +6509,20 @@ def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
         ]
 
     context = _context(F.work(), experiment, pressure, review="reviewed")
-    if composition_source == "proxy":
-        residual, _ = compile_residual(
-            pressure,
-            Engine.INTERNAL_ANALYTICAL,
-            context=context,
-            comparison_ids={pressure.observation_id},
-            predict=lambda _engine, _reference, **_kwargs: _predict(
-                Decimal("0.2"), identity
-            ),
-            point_observations=point_observations,
-        )
-    else:
-        residual, _ = compile_residual(
-            pressure,
-            Engine.INTERNAL_ANALYTICAL,
-            context=context,
-            point_observations=point_observations,
-        )
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert residual.refusal is not None
-    assert residual.refusal.reason is not RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 @pytest.mark.parametrize(
@@ -6722,7 +6631,11 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
     pressure_text: str,
 ) -> None:
     experiment = F.kems_experiment(
-        f"d274-unknown-fo2-{pressure_text}", kn=None, calibrated=True
+        f"d274-unknown-fo2-{pressure_text}",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
     )
     composition = Composition(
         basis="ordered_complete_mole_inventory",
@@ -6783,8 +6696,12 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
         assert residual.status is ResidualStatus.REFUSED
         assert residual.numeric is None
         assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-        assert residual.refusal.detail["fields"] == ["fO2_Pa"]
+        assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert (
+            residual.refusal.detail["in_cell_pressure_lower_bound_Pa"]
+            == pressure_text
+        )
+        assert residual.refusal.detail["limit_Pa"] == "10"
     else:
         # SiO(g) from SiO2(l) needs pO2. Unknown fO2 is a missing identity
         # input and refuses before the apparatus flag. The gate above is what
@@ -6808,7 +6725,11 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     experiment = F.kems_experiment(
-        f"d274-{composition_source}-over-limit-pressure", kn=None, calibrated=True
+        f"d274-{composition_source}-over-limit-pressure",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
     )
     identity = _partial_identity()
     if composition_source == "proxy":
@@ -6867,53 +6788,29 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
         assert "skipped_composition_candidates" not in pressure_check.detail
 
     context = _context(F.work(), experiment, pressure, review="reviewed")
-    if composition_source == "proxy":
-        residual, _ = compile_residual(
-            pressure,
-            Engine.INTERNAL_ANALYTICAL,
-            context=context,
-            comparison_ids={pressure.observation_id},
-            predict=lambda _engine, _reference, **_kwargs: _predict(
-                Decimal("0.2"), identity
-            ),
-            point_observations=point_observations,
-        )
-        assert residual.status is not ResidualStatus.REFUSED
-        assert residual.numeric is not None
-        assert residual.refusal is None
-        assert any(
-            notice.kind
-            in {
-                NoticeKind.EFFUSION_REGIME_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_VIOLATED,
-                NoticeKind.METHOD_IMPLIED,
-                NoticeKind.UNVERIFIED_APPARATUS,
-            }
-            for notice in residual.notices
-        )
-    else:
-        # Exercise the real engine input path: a pressure-sum violation can be
-        # flagged, but it cannot make the malformed or absent composition usable.
-        residual, _ = compile_residual(
-            pressure,
-            Engine.INTERNAL_ANALYTICAL,
-            context=context,
-            comparison_ids={pressure.observation_id},
-            point_observations=point_observations,
-        )
-        assert residual.status is ResidualStatus.REFUSED
-        assert residual.numeric is None
-        assert residual.refusal is not None
-        assert residual.refusal.reason is not RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        if composition_source == "malformed_own":
-            assert residual.refusal.reason is RefusalReason.INVALID_SOURCE
-            assert residual.refusal.detail["composition_scope_details"] == [
-                "composition component amount is not a decimal"
-            ]
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
 
 
 @pytest.mark.parametrize("incomplete_coverage", (False, True))
-def test_d274_uncalibrated_partial_pressure_over_limit_scores_flagged(
+def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
     incomplete_coverage: bool,
 ) -> None:
     components = (
@@ -6963,14 +6860,10 @@ def test_d274_uncalibrated_partial_pressure_over_limit_scores_flagged(
         predict=_partial_prediction,
         point_observations=(reference,),
     )
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.refusal is None
-    assert any(
-        notice.kind is NoticeKind.EFFUSION_REGIME_VIOLATED
-        and notice.reason.startswith("effusion_regime_violated;")
-        for notice in residual.notices
-    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> None:
@@ -7056,8 +6949,7 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
         context=context,
         prediction=prediction,
     )
-    # The uncomputable sum becomes a molecular-regime assumption with its
-    # pressure bound and source reason attached.
+    # d-274 scores an uncomputable printed sum with an apparatus notice.
     assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.score_eligible is False
@@ -7065,15 +6957,15 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
     notice = next(
         notice
         for notice in residual.notices
-        if notice.kind is NoticeKind.EFFUSION_REGIME_ASSUMED
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
     )
-    assert notice.reason.startswith("effusion_regime_assumed;")
     assert (
         "original_reason=incomplete printed species coverage; pressure sum is only a lower bound"
         in notice.reason
     )
+    assert "authority=extrapolated" in notice.reason
     pressure_limit = pressure_check.detail["pressure_limit_Pa"]
-    assert f'"pressure_limit_Pa": "{pressure_limit}"' in notice.reason
+    assert f"regime_limit={pressure_limit} Pa" in notice.reason
     assert notice.authority is Authority.EXTRAPOLATED
     assert notice.band == (
         f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
@@ -7093,11 +6985,7 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
         for row in flagged_stratum_rows(
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
-    ] == [
-        (NoticeKind.EFFUSION_REGIME_ASSUMED.value, 1),
-        ("method_implied", 1),
-        (FLAGGED_STRATUM_UNVERIFIED_APPARATUS, 1),
-    ]
+    ] == [(FLAGGED_STRATUM_UNVERIFIED_APPARATUS, 1)]
     payload = residual_to_plain(residual)
     for tier in ("measured", "compilation"):
         assert headline_payloads(
@@ -7338,10 +7226,12 @@ def test_binary_complement_notice_requires_composition_consumption(
     )
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
-    if effusion_refusal:
-        assert residual.refusal.detail["reason"] == "species_unmatched_in_engine_output"
-    else:
+    assert residual.refusal.reason is (
+        RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        if effusion_refusal
+        else RefusalReason.UNSUPPORTED
+    )
+    if not effusion_refusal:
         assert residual.refusal.detail["reason"] == "not_a_vapour_quantity"
     assert all(
         notice.kind is not NoticeKind.COMPOSITION_BINARY_COMPLEMENT
@@ -8483,26 +8373,19 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         ) is not None
         and point.series == "stolyarova_1996_table2_pCa_1933k"
     ]
-    assert len(selected) == 30
-    # c2-effusion's printed-pressure fallback and the newly scored 10+ Pa
-    # source row put eight Table 2 pCa points in an apparatus stratum.
+    assert len(selected) == 29
+    # c2-effusion's d-274 printed-pressure fallback makes these seven
+    # existing Table 2 pCa points scoreable with an apparatus notice.
     unverified_keys = {
         residual.reference.rsplit(":", 1)[-1]
         for residual, _point in selected
         if any(
-            notice.kind
-            in {
-                NoticeKind.EFFUSION_REGIME_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_VIOLATED,
-                NoticeKind.METHOD_IMPLIED,
-                NoticeKind.UNVERIFIED_APPARATUS,
-            }
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
             for notice in residual.notices
         )
     }
     # The :h= suffixes moved when the Table 2 run conditions were recorded.
-    # The :h=337916c30ca0 row is included because its 11 Pa pressure sum
-    # is explicitly flagged as outside the molecular-effusion regime.
+    # len(selected) is 29 and the slope below is still 5.19.
     assert unverified_keys == {
         "h=15e3aebeca85",
         "h=1b65d2b9485a",
@@ -8510,7 +8393,6 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         "h=306f8c55d11e",
         "h=485a267bf37a",
         "h=63f27b05b715",
-        "h=337916c30ca0",
         "h=e37db2ee7220",
     }
     e15_residual = selected[0][0]
@@ -8531,13 +8413,12 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
     # t-1534 (742704443) labels Table 2's 55 calculated oxygen columns
-    # quoted_attributed (eqs 7–9; d-110). resolve_source_oxygen commands the
-    # printed cell pO as fO2. The newly admitted regime-violated row moves the
-    # diagnostic slope to 4.82 dex per x(CaO); this is not a paper-reported
-    # value. 6.76 was the
+    # quoted_attributed (eqs 7–9; d-110). The 29 measured pCa rows are
+    # unchanged. resolve_source_oxygen then commands that printed cell pO
+    # as fO2, so this residual slope is 5.19 dex per x(CaO). 6.76 was the
     # engine oxygen-balance slope while those columns were model_derived
     # (e54df70c40). The paper prints the pressures, not this slope.
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("4.82")
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("5.19")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -8556,12 +8437,12 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         and row["series"] == "stolyarova_1996_table2_pCa_1933k"
         and row["statistic"] == "shape"
     )
-    assert production_shape["n"] == 30
+    assert production_shape["n"] == 29
     assert production_shape["population"] == "liquid"
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("4.82")
+    ) == Decimal("5.19")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -8579,11 +8460,11 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         for residual, point in selected
     )
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
-    # Same residuals on x(SiO2). The newly admitted, flagged row shifts this
-    # diagnostic slope to -4.21 for the same oxygen-condition change.
+    # Same residuals on x(SiO2). -4.34 replaces -5.58 for the same
+    # oxygen-condition change.
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-4.21")
+    ) == Decimal("-4.34")
 
     contested_payload = next(
         payload
@@ -8694,173 +8575,6 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         assert flagged_strata((notice,)) == (stratum,)
         assert _is_flagged_stratum_notice(notice) is True
         assert _flagged_payload_strata(payload) == (stratum,)
-
-
-def test_d460_flag_tokens_and_assumption_bases_stay_distinct() -> None:
-    from simulator.battery.score import (
-        FLAGGED_STRATUM_METHOD_IMPLIED,
-        FLAGGED_STRATUM_PROPOSED_POLICY,
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        _flagged_payload_strata,
-        flagged_strata,
-    )
-    from simulator.battery.validity import apparatus_prediction_notices
-
-    assert NoticeKind.METHOD_ASSUMED.value == "method_assumed"
-    assert NoticeKind.METHOD_IMPLIED.value == "method_implied"
-    assert NoticeKind.ALPHA_ASSUMED.value == "alpha_assumed"
-    assert NoticeKind.EFFUSION_REGIME_ASSUMED.value == "effusion_regime_assumed"
-    assert NoticeKind.EFFUSION_REGIME_VIOLATED.value == "effusion_regime_violated"
-
-    method_assumed = Notice(
-        kind=NoticeKind.METHOD_ASSUMED,
-        affected_quantities=(Quantity.P_PARTIAL,),
-        reason="method_assumed; assumed_method=equilibrium_partial_pressure; original_reason=method not stated",
-        origin="d460-method-assumed",
-        policy={
-            "id": "DP-011",
-            "version": "v1",
-            "status": "canonical",
-            "value": "equilibrium_partial_pressure",
-            "units": "method",
-        },
-    )
-    assert flagged_strata((method_assumed,)) == (
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.METHOD_ASSUMED.value,
-    )
-
-    regime_notices = apparatus_prediction_notices(
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value,
-        {
-            "flag": NoticeKind.EFFUSION_REGIME_ASSUMED.value,
-            "original_reason": "orifice was not printed",
-            "pressure_limit_Pa": "10",
-        },
-        check_name="in_cell_partial_pressure_sum",
-        quantity=Quantity.P_PARTIAL,
-        origin="d460-regime-assumed",
-    )
-    assert tuple(notice.kind for notice in regime_notices) == (
-        NoticeKind.EFFUSION_REGIME_ASSUMED,
-        NoticeKind.METHOD_IMPLIED,
-    )
-    assert regime_notices[0].policy == {
-        "id": "DP-004",
-        "version": "v1",
-        "status": "canonical",
-        "value": (
-            "molecular effusion inside the cell; vacuum outside; "
-            "total pressure is the sum of partials in the cell, NOT 1 atm"
-        ),
-        "units": "regime; pressure in Pa",
-    }
-    assert regime_notices[1].policy == {
-        "id": "DP-018",
-        "version": "v1",
-        "status": "canonical",
-        "value": "vacuum outside; total pressure is the sum of partials in the cell, NOT 1 atm",
-        "units": "pressure in Pa",
-    }
-    assert flagged_strata(regime_notices) == (
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.EFFUSION_REGIME_ASSUMED.value,
-        FLAGGED_STRATUM_METHOD_IMPLIED,
-    )
-    payload = {
-        "notices": [
-            {
-                "kind": notice.kind.value,
-                "reason": notice.reason,
-                "policy": dict(notice.policy) if notice.policy else None,
-            }
-            for notice in regime_notices
-        ]
-    }
-    assert _flagged_payload_strata(payload) == flagged_strata(regime_notices)
-    assert all("original_reason=orifice was not printed" in notice.reason
-               for notice in regime_notices)
-    assert all("policy_id" not in notice.reason for notice in regime_notices)
-
-    violated_notices = apparatus_prediction_notices(
-        NoticeKind.EFFUSION_REGIME_VIOLATED.value,
-        {
-            "flag": NoticeKind.EFFUSION_REGIME_VIOLATED.value,
-            "original_reason": "orifice Kn is below the molecular-flow threshold",
-            "knudsen_number_orifice": "0.1",
-        },
-        check_name="orifice_knudsen",
-        quantity=Quantity.P_PARTIAL,
-        origin="d460-regime-violated",
-    )
-    assert violated_notices[0].policy == {
-        "id": "DP-100",
-        "version": "v1",
-        "status": "proposed",
-        "value": "retain numeric pressure residual; measured pressure is below equilibrium pressure",
-        "units": "Pa",
-    }
-    assert flagged_strata(violated_notices) == (
-        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
-        NoticeKind.EFFUSION_REGIME_VIOLATED.value,
-        FLAGGED_STRATUM_PROPOSED_POLICY,
-        FLAGGED_STRATUM_METHOD_IMPLIED,
-    )
-
-    from simulator.battery.validity import _method_assumption_detail
-
-    experiment = _unknown_method_experiment()
-    rate_reference = F.observation(
-        "unknown-method-mass-loss-rate",
-        experiment.experiment_id,
-        F.psat_identity("Na"),
-        Decimal("0.1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="mass-loss-rate-work",
-    )
-    rate_detail = _method_assumption_detail(
-        experiment, rate_reference, Quantity.MASS_LOSS_RATE
-    )
-    rate_notices = apparatus_prediction_notices(
-        rate_detail["flag"],
-        rate_detail,
-        check_name="method",
-        quantity=Quantity.MASS_LOSS_RATE,
-        origin=rate_reference.observation_id,
-    )
-    assert tuple(notice.kind for notice in rate_notices) == (
-        NoticeKind.METHOD_ASSUMED,
-        NoticeKind.ALPHA_ASSUMED,
-    )
-    assert rate_notices[1].policy == {
-        "id": "DP-005",
-        "version": "v1",
-        "status": "canonical",
-        "value": "1",
-        "units": "dimensionless",
-    }
-
-    from simulator.battery.records import Located, State
-
-    sourced_rate = replace(
-        rate_reference,
-        point_conditions={
-            "sticking_coefficient": Located(State.of(Decimal("0.4")))
-        },
-    )
-    sourced_detail = _method_assumption_detail(
-        experiment, sourced_rate, Quantity.MASS_LOSS_RATE
-    )
-    sourced_notices = apparatus_prediction_notices(
-        sourced_detail["flag"],
-        sourced_detail,
-        check_name="method",
-        quantity=Quantity.MASS_LOSS_RATE,
-        origin=sourced_rate.observation_id,
-    )
-    assert len(sourced_notices) == 1
-    assert sourced_detail["alpha"] == "0.4"
-    assert sourced_detail["alpha_source"]["condition"] == "sticking_coefficient"
 
 
 def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
@@ -9064,9 +8778,7 @@ def test_studio_dispatch_uses_caller_host(
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
-    # Dispatch passes the cache path as an argument. It must not publish or
-    # clear the runner cache in this process. CI sets that variable on purpose.
-    cache_before = os.environ.get("REGOLITH_ENGINE_CACHE")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
@@ -9098,7 +8810,7 @@ def test_studio_dispatch_uses_caller_host(
                 str(engine_cache_path),
             ]
         )
-    assert os.environ.get("REGOLITH_ENGINE_CACHE") == cache_before
+    assert "REGOLITH_ENGINE_CACHE" not in os.environ
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
@@ -11987,8 +11699,6 @@ def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
     assert prediction.refusal_detail["reason"] == reason
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
     (
@@ -19361,7 +19071,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
+        f"{residual.rail.value} | {Engine.OPENIMCC.value} | — | — | 1 |"
     ) in report
 
     source_point_reference = replace(
@@ -19882,14 +19592,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             sum(
                 row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
                 and any(
-                    notice.kind
-                    in {
-                        NoticeKind.METHOD_ASSUMED,
-                        NoticeKind.EFFUSION_REGIME_ASSUMED,
-                        NoticeKind.EFFUSION_REGIME_VIOLATED,
-                        NoticeKind.METHOD_IMPLIED,
-                        NoticeKind.UNVERIFIED_APPARATUS,
-                    }
+                    notice.kind is NoticeKind.UNVERIFIED_APPARATUS
                     for notice in row.notices
                 )
                 for row in allibert_rows
@@ -20236,17 +19939,7 @@ def test_ms2000_admitted_alkali_activities_score_with_liquid_sample_phase(
         for row in scored_rows
     )
     assert all(
-        any(
-            notice.kind
-            in {
-                NoticeKind.METHOD_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_ASSUMED,
-                NoticeKind.EFFUSION_REGIME_VIOLATED,
-                NoticeKind.METHOD_IMPLIED,
-                NoticeKind.UNVERIFIED_APPARATUS,
-            }
-            for notice in row.notices
-        )
+        any(notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in row.notices)
         for row in scored_rows
     )
 

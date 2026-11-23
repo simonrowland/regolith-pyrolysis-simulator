@@ -14,7 +14,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Quantity,
 )
-from simulator.battery.records import Notice
+from simulator.battery.records import Notice, NoticePolicy
 from simulator.battery.migrate import to_plain
 from simulator.battery.records import union_notices
 from simulator.battery.score import (
@@ -23,8 +23,6 @@ from simulator.battery.score import (
     flagged_stratum_payloads,
     headline_payloads,
 )
-from simulator.battery.score_report import format_default_policy_census_report
-from simulator.battery.score_report_data import default_policy_census
 from simulator.state import MeltState
 
 
@@ -124,13 +122,13 @@ def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
 
 def test_vacuum_pressure_uses_the_runtime_owner_constant() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import (
-        _DEFAULT_PRESSURE_BAR,
+        DP_019_VACUUM_BOUNDARY_BAR,
     )
     from simulator.physical_constants import PA_PER_BAR
 
-    assert resolve("DP-019").value == Decimal(str(_DEFAULT_PRESSURE_BAR)) * Decimal(
-        str(PA_PER_BAR)
-    )
+    assert resolve("DP-019").value == Decimal(
+        str(DP_019_VACUUM_BOUNDARY_BAR)
+    ) * Decimal(str(PA_PER_BAR))
     assert resolve("DP-019").value == Decimal("0.1")
     assert resolve("DP-019").units == "Pa"
     assert resolve("DP-019").flag is NoticeKind.METHOD_IMPLIED
@@ -194,18 +192,19 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
     assert resolved.payload["evidence"] == ["fixture row and source"]
 
     notice_policy = resolved.payload["policy"]
+    typed_policy = NoticePolicy(**notice_policy)
     notice = Notice(
         kind=resolved.flag,
         affected_quantities=(Quantity.P_SAT,),
         reason="the fixture's original missing-knob reason",
         origin="fixture-observation",
-        policy=notice_policy,
+        policy=typed_policy,
     )
     assert to_plain(notice)["policy"] == notice_policy
     assert len(
         union_notices(
             (notice,),
-            (replace(notice, policy={**notice_policy, "value": "different"}),),
+            (replace(notice, policy=replace(typed_policy, value="different")),),
         )
     ) == 2
     row = {
@@ -215,21 +214,27 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
         "status": "no_band",
         "numeric": {"operation": "dex", "value": "0.25"},
         "exclusions": [],
-        "notices": [
-            {
-                "kind": notice.kind.value,
-                "reason": notice.reason,
-                "policy": notice.policy,
-            }
-        ],
+        "notices": [to_plain(notice)],
     }
 
     headlines = headline_payloads([row], [Engine.INTERNAL_ANALYTICAL])
     assert not any(int(headline["n_candidates"]) for headline in headlines)
-    assert _flagged_payload_strata(row) == ("proposed-policy",)
+    assert _flagged_payload_strata(row) == (
+        "knob_defaulted",
+        "proposed-policy",
+    )
     assert not _headline_payload_admits(row, tier="measured")
     flagged = flagged_stratum_payloads([row], [Engine.INTERNAL_ANALYTICAL])
-    assert [item["stratum"] for item in flagged] == ["proposed-policy"]
+    assert [item["stratum"] for item in flagged] == [
+        "knob_defaulted",
+        "proposed-policy",
+    ]
+    assert all(item["policy_id"] == policy_id for item in flagged)
+    assert all(item["policy_status"] == "proposed" for item in flagged)
+    from simulator.battery.default_policy import (
+        default_policy_census,
+        format_default_policy_census_report,
+    )
     census = default_policy_census([row])
     assert census.rows == ((policy_id, "proposed", 1),)
     assert "| policy_id | status | flagged residuals |" in (
@@ -240,14 +245,29 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
     canonical_row = {
         **row,
         "reference": "canonical-fixture-observation",
-        "notices": [{**row["notices"][0], "policy": canonical_policy}],
+        "notices": [
+            {**row["notices"][0], "policy": canonical_policy}
+        ],
     }
     assert _flagged_payload_strata(canonical_row) == ("knob_defaulted",)
     assert not _headline_payload_admits(canonical_row, tier="measured")
-    assert default_policy_census([row, canonical_row]).rows == (
-        (policy_id, "canonical", 1),
-        (policy_id, "proposed", 1),
+    rejected_row = {
+        **canonical_row,
+        "reference": "rejected-fixture-observation",
+        "notices": [
+            {
+                **canonical_row["notices"][0],
+                "policy": {**notice_policy, "status": "rejected"},
+            }
+        ],
+    }
+    status_groups = flagged_stratum_payloads(
+        [canonical_row, rejected_row], [Engine.INTERNAL_ANALYTICAL]
     )
+    assert [(item["policy_id"], item["policy_status"], item["n"]) for item in status_groups] == [
+        (policy_id, "canonical", 1),
+        (policy_id, "rejected", 1),
+    ]
 
     # A policy-bearing notice cannot silently lose its typed flag.
     with pytest.raises(ValueError, match="policy notice kind"):
@@ -256,7 +276,7 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
             affected_quantities=(Quantity.P_SAT,),
             reason="the fixture's original missing-knob reason",
             origin="fixture-observation",
-            policy=notice_policy,
+            policy=typed_policy,
         )
 
     # Mutation evidence: removing the table flag from a serialized, defaulted
@@ -269,8 +289,8 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
     }
     with pytest.raises(ValueError, match="must name its default-policy flag"):
         _headline_payload_admits(flagless_row, tier="measured")
-    with pytest.raises(ValueError, match="notice kind is not a table flag"):
-        default_policy_census([flagless_row])
+    with pytest.raises(ValueError, match="must name its default-policy flag"):
+        flagged_stratum_payloads([flagless_row], [Engine.INTERNAL_ANALYTICAL])
 
 
 def test_proposals_choose_next_free_id_and_refuse_duplicate_ids(
