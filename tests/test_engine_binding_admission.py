@@ -876,6 +876,8 @@ def test_alpha_python_api_probe_refuses_resolved_transport_mismatch(
         )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_binding_probe_forwards_redox_state_to_request(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

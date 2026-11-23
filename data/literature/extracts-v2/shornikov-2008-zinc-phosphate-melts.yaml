@@ -91,7 +91,18 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Panel a, line 5. Continuous calculated lg a(P4O10) at 1300 K.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_curve_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2008-zinc-phosphate-melts
   locator:
     page: 2
@@ -212,7 +223,19 @@ observations:
         figure: '1'
         note: Panel a, open squares, legend symbol 2. Thirteen data squares on the 600 dpi crop; the legend glyph is not a
           point.
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - activity
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_series_2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: shornikov-2008-zinc-phosphate-melts
   locator:
     page: 2
@@ -332,7 +355,18 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Panel a, line 4. Continuous calculated lg a(ZnO) at 1300 K.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_curve_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2008-zinc-phosphate-melts
   locator:
     page: 2
@@ -453,7 +487,19 @@ observations:
         figure: '1'
         note: Panel a, filled triangles, legend symbol 1. Ten data triangles on the 600 dpi crop; the legend glyph is not
           a point.
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - activity
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_series_1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: shornikov-2008-zinc-phosphate-melts
   locator:
     page: 2
@@ -566,6 +612,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -672,6 +729,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -778,6 +846,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -885,6 +964,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -991,6 +1081,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1097,6 +1198,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1204,6 +1316,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1310,6 +1433,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1416,6 +1550,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1523,6 +1668,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1629,6 +1785,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1735,6 +1902,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1842,6 +2020,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1948,6 +2137,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2054,6 +2254,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2160,6 +2371,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r08_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2266,6 +2488,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r09_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2372,6 +2605,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r10_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2478,6 +2722,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r11_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2584,6 +2839,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r12_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2690,6 +2956,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r13_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2796,6 +3073,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r14_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2902,6 +3190,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r15_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3008,6 +3307,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r16_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3114,6 +3424,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r17_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3220,6 +3541,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r18_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3326,6 +3658,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r19_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3432,6 +3775,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r20_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3538,6 +3892,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r21_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3644,6 +4009,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG

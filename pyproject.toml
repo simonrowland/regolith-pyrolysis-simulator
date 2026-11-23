@@ -123,6 +123,7 @@ markers = [
     "xdist_group(name): run marked tests on the same xdist worker under --dist loadgroup",
     "browser_e2e: requires the optional Playwright browser test dependency",
     "live_engine: requires a responsive optional live chemistry engine",
+    "engine_cache_off: do not use the runner engine cache; the test owns a cache or must run a real engine solve",
     "nightly: campaign-length physics; full coverage nightly; excluded from the PR tier",
     "cpu_budget(seconds): process CPU seconds allowed per test; wall hang guard scales by six unless timeout(seconds) overrides it",
 ]

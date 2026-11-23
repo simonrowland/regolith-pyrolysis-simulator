@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82,7 +81,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -165,12 +176,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -236,7 +246,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -319,12 +341,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -390,7 +411,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -473,12 +506,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -544,7 +576,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -627,12 +671,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -698,7 +741,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -781,12 +836,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -852,7 +906,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -935,12 +1001,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1006,7 +1071,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -1089,12 +1166,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1160,7 +1236,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -1243,12 +1331,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1314,7 +1401,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -1397,12 +1496,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1468,7 +1566,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -1551,12 +1661,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1622,7 +1731,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -1705,12 +1826,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1776,7 +1896,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -1859,12 +1991,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1930,7 +2061,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2013,12 +2156,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2084,7 +2226,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2167,12 +2321,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2238,7 +2391,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2321,12 +2486,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2392,7 +2556,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2475,12 +2651,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2546,7 +2721,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2629,12 +2816,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2700,7 +2886,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2783,12 +2981,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2854,7 +3051,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -2937,12 +3146,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3008,7 +3216,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -3091,12 +3311,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3162,7 +3381,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -3245,12 +3476,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3316,7 +3546,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -3399,12 +3641,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3470,7 +3711,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -3553,12 +3806,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3624,7 +3876,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -3707,12 +3971,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3778,7 +4041,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -3861,12 +4136,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3932,7 +4206,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4015,12 +4301,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4086,7 +4371,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4169,12 +4466,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4240,7 +4536,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4323,12 +4631,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4394,7 +4701,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4477,12 +4796,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4548,7 +4866,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4631,12 +4961,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4702,7 +5031,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4785,12 +5126,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4856,7 +5196,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -4939,12 +5291,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5010,7 +5361,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -5093,12 +5456,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5164,7 +5526,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -5247,12 +5621,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5318,7 +5691,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -5401,12 +5786,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5472,7 +5856,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -5555,12 +5951,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5626,7 +6021,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -5709,12 +6116,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5780,7 +6186,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -5863,12 +6281,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5934,7 +6351,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -6017,12 +6446,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6088,7 +6516,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -6171,12 +6611,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6242,7 +6681,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5
@@ -6325,12 +6776,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO_powder_evaporating_as_SiO_g' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6396,7 +6846,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO_powder_evaporating_as_SiO_g'' is not in the closed automatic map'
+    origin: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::ferguson_nuth_2008_table1_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   locator:
     page: 5

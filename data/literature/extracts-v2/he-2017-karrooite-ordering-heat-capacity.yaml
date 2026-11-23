@@ -91,7 +91,18 @@ observations:
         pdf_page_index: 14
         table: '5'
         note: Experimental X = 0.14(1) total entropy; row=1; column=S_total_J_mol-1_K-1_as_printed
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: he-2017-karrooite-ordering-heat-capacity::he2017_table5_standard_entropy_x014
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: he-2017-karrooite-ordering-heat-capacity
   locator:
     page: 15
@@ -213,7 +224,18 @@ observations:
         pdf_page_index: 14
         table: '5'
         note: Experimental X = 0.37(1) total entropy; row=2; column=S_total_J_mol-1_K-1_as_printed
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: he-2017-karrooite-ordering-heat-capacity::he2017_table5_standard_entropy_x037
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: he-2017-karrooite-ordering-heat-capacity
   locator:
     page: 15

@@ -3,7 +3,11 @@ from pathlib import Path
 import subprocess
 import sys
 
+import pytest
+
 from simulator import engine_cache
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_bloom_definite_miss_skips_the_disk_lookup(tmp_path, monkeypatch):
@@ -19,7 +23,7 @@ def test_bloom_definite_miss_skips_the_disk_lookup(tmp_path, monkeypatch):
         before_solve.extend(queries)
         return {"answer": 2}
     engine_cache.cached_engine_call("openimcc", {"temperature_K": 1701.0}, solve)
-    assert not any(query.startswith("SELECT value, provenance_id FROM engine_outputs") for query in before_solve)
+    assert not any("engine_outputs" in query for query in before_solve)
 
 
 def test_readonly_reader_sees_external_wal_inserts(tmp_path, monkeypatch):

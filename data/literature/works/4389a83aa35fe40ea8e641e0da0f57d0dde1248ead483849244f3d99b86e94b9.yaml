@@ -40,9 +40,8 @@ experiments:
 - experiment_id: 4389a83aa35fe40ea8e641e0da0f57d0dde1248ead483849244f3d99b86e94b9::experiment::shornikov-1997-cao-al2o3-formation
   kind: literature
   method:
-    tag: unknown
-    reason: regime "Integral formation values per 1 mol of compound. Method V is the Knudsen effusion reduction. Method III
-      is this paper's calculation from literature data." is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
@@ -75,9 +74,8 @@ experiments:
 - experiment_id: 4389a83aa35fe40ea8e641e0da0f57d0dde1248ead483849244f3d99b86e94b9::experiment::shornikov-1997-cao-al2o3-fusion
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'H_fus = H_T(liq) − H_T(sol), and H_fus = T_fus (S_T(liq) − S_T(sol)). Tfus is cited from Nurse et al.,
-      Chatterjee and Zhmoidin, and Chemekova and Udalov.' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -110,10 +108,8 @@ experiments:
 - experiment_id: 4389a83aa35fe40ea8e641e0da0f57d0dde1248ead483849244f3d99b86e94b9::experiment::shornikov-1997-cao-al2o3-partials
   kind: literature
   method:
-    tag: unknown
-    reason: regime "The approach of the authors' 1996 mass-spectrometric study was used to estimate partial enthalpies and
-      entropies from the temperature dependences of the chemical potentials, assuming those partials constant over 1833–2033
-      K. This paper does not reprint the ion currents." is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:

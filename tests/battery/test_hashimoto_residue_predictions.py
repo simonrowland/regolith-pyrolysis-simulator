@@ -169,6 +169,8 @@ def test_isolated_openimcc_worker_still_times_out():
         _evaluate_openimcc_isolated(_hanging_openimcc_engine, timeout_s=0.05)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_isolated_openimcc_worker_startup_is_outside_call_deadline(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -364,6 +366,8 @@ def test_hashimoto_residue_requires_24_distinct_physical_runs(
     assert exc_info.value.reason == "hashimoto_cohort_invalid"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -727,6 +731,8 @@ def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
     assert refusal_detail["engine_floor_inversion_diagnostics"] == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -945,6 +951,8 @@ def test_hashimoto_primary_policy_cannot_choose_the_arm_closest_to_residues(
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

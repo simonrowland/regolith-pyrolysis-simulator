@@ -2595,13 +2595,19 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
     }
 
 
-def test_transitional_missing_pressure_notice_is_pinned() -> None:
+@pytest.mark.parametrize("string_version", [False, True])
+def test_transitional_missing_pressure_notice_is_pinned(string_version: bool) -> None:
     notice = score_mod._assumption_notice(
         Quantity.P_PARTIAL,
         "observation does not carry total_pressure_Pa",
         1e-6,
     )
     assert notice.kind is NoticeKind.METHOD_IMPLIED
+    assert notice.policy is not None
+    assert type(notice.policy.version) is int
+    expected_version = "1" if string_version else 1
+    if string_version:
+        notice = replace(notice, policy=replace(notice.policy, version=expected_version))
     residual = replace(
         F.residual(
             "assumed-pressure::partial",
@@ -2615,11 +2621,18 @@ def test_transitional_missing_pressure_notice_is_pinned() -> None:
     assert payload["notices"][0]["kind"] == NoticeKind.METHOD_IMPLIED.value
     assert payload["notices"][0]["policy"] == {
         "id": "DP-101",
-        "version": 1,
+        "version": expected_version,
         "status": "rejected",
         "value": "1e-6",
         "units": "bar",
     }
     from simulator.battery.migrate import _notice_from_plain
 
-    assert _notice_from_plain(payload["notices"][0]) == notice
+    decoded = _notice_from_plain(payload["notices"][0])
+    assert decoded == notice
+    assert decoded.policy is not None
+    assert type(decoded.policy.version) is type(expected_version)
+
+    payload["notices"][0]["policy"]["version"] = True
+    with pytest.raises(TypeError, match="notice policy version"):
+        _notice_from_plain(payload["notices"][0])

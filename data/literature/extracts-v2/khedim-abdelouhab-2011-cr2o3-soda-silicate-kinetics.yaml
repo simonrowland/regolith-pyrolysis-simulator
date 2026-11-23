@@ -92,7 +92,30 @@ observations:
         page: 10
         pdf_page_index: 9
         paragraph: chromium oxide crystal volatilisation mass balance
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=l; evidence=printed phase role ''melt'' identifies ''l''; original_reason=source does not
+      state phase'
+    origin: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::khedim_abdelouhab_2011_reference3_chromia_saturation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::khedim_abdelouhab_2011_reference3_chromia_saturation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
   locator:
     page: 10

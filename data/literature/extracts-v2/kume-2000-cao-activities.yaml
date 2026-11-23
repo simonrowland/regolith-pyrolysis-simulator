@@ -469,12 +469,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -495,7 +494,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_10_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -869,12 +879,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -895,7 +904,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_11_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -1269,12 +1289,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1295,7 +1314,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_12_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -1447,12 +1477,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1473,7 +1502,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_1_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -1847,12 +1887,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1873,7 +1912,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_2_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -2247,12 +2297,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2273,7 +2322,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_3_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -2647,12 +2707,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2673,7 +2732,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_4_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -3047,12 +3117,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3073,7 +3142,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_5_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -3447,12 +3527,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3473,7 +3552,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_6_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -3847,12 +3937,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3873,7 +3962,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_7_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -4247,12 +4347,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4273,7 +4372,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_8_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -4647,12 +4757,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4673,7 +4782,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table1_sample_9_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 562
@@ -5074,12 +5194,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5100,7 +5219,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_101_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -5503,12 +5633,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5529,7 +5658,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_102_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -5932,12 +6072,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5958,7 +6097,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_103_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -6361,12 +6511,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6387,7 +6536,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_104_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -6790,12 +6950,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6816,7 +6975,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_105_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -7219,12 +7389,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7245,7 +7414,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_106_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -7648,12 +7828,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7674,7 +7853,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_107_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -8077,12 +8267,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8103,7 +8292,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_108_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -8506,12 +8706,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8532,7 +8731,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_109_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -8935,12 +9145,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8961,7 +9170,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_110_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -9364,12 +9584,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9390,7 +9609,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_111_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -9793,12 +10023,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9819,7 +10048,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_112_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -10222,12 +10462,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10248,7 +10487,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_113_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -10651,12 +10901,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10677,7 +10926,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_114_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -11080,12 +11340,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11106,7 +11365,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_115_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -11509,12 +11779,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11535,7 +11804,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_116_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -11938,12 +12218,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11964,7 +12243,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_117_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -12367,12 +12657,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12393,7 +12682,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_118_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -12796,12 +13096,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12822,7 +13121,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_119_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -13225,12 +13535,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13251,7 +13560,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_120_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -13654,12 +13974,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13680,7 +13999,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_121_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -14083,12 +14413,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14109,7 +14438,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_122_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -14512,12 +14852,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14538,7 +14877,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_123_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -14941,12 +15291,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14967,7 +15316,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_124_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -15370,12 +15730,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15396,7 +15755,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_125_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -15799,12 +16169,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15825,7 +16194,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_126_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -16228,12 +16608,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16254,7 +16633,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_127_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -16657,12 +17047,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16683,7 +17072,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_128_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -17086,12 +17486,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17112,7 +17511,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_129_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -17515,12 +17925,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17541,7 +17950,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_130_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -17944,12 +18364,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17970,7 +18389,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_131_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -18373,12 +18803,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18399,7 +18828,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_132_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -18802,12 +19242,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18828,7 +19267,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_133_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -19231,12 +19681,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19257,7 +19706,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_134_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -19660,12 +20120,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19686,7 +20145,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_135_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -20089,12 +20559,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20115,7 +20584,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_136_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -20518,12 +20998,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20544,7 +21023,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_137_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -20947,12 +21437,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20973,7 +21462,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_138_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -21376,12 +21876,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21402,7 +21901,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_139_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -21805,12 +22315,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21831,7 +22340,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_140_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -22234,12 +22754,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22260,7 +22779,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_141_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -22663,12 +23193,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22689,7 +23218,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_142_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -23092,12 +23632,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23118,7 +23657,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_143_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -23521,12 +24071,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23547,7 +24096,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_144_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -23950,12 +24510,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23976,7 +24535,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_145_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -24379,12 +24949,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24405,7 +24974,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_146_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -24808,12 +25388,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24834,7 +25413,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table2_sample_147_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 563
@@ -25237,12 +25827,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25263,7 +25852,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_201_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -25802,12 +26402,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25828,7 +26427,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_202_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -26367,12 +26977,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26393,7 +27002,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_203_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -26932,12 +27552,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26958,7 +27577,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_204_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -27497,12 +28127,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27523,7 +28152,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_205_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -28062,12 +28702,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28088,7 +28727,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_206_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -28627,12 +29277,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28653,7 +29302,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_207_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -29192,12 +29852,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29218,7 +29877,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_208_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -29757,12 +30427,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29783,7 +30452,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_209_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -30322,12 +31002,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30348,7 +31027,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_210_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -30887,12 +31577,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30913,7 +31602,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_211_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -31452,12 +32152,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -31478,7 +32177,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_212_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -32017,12 +32727,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -32043,7 +32752,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_213_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -32582,12 +33302,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -32608,7 +33327,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_214_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -33147,12 +33877,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -33173,7 +33902,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_215_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -33712,12 +34452,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -33738,7 +34477,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_216_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -34277,12 +35027,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34303,7 +35052,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_217_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -34842,12 +35602,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34868,7 +35627,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_218_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -35407,12 +36177,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35433,7 +36202,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_219_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -35972,12 +36752,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35998,7 +36777,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_220_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -36537,12 +37327,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36563,7 +37352,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_221_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -37102,12 +37902,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37128,7 +37927,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_222_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -37667,12 +38477,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37693,7 +38502,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_223_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -38232,12 +39052,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38258,7 +39077,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_224_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -38797,12 +39627,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38823,7 +39652,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_225_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -39362,12 +40202,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39388,7 +40227,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_226_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -39927,12 +40777,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39953,7 +40802,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table3_sample_227_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 564
@@ -40754,12 +41614,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40780,7 +41639,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_301_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -41129,6 +41999,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_301_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -41795,12 +42676,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41821,7 +42701,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_302_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -42170,6 +43061,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_302_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -42836,12 +43738,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -42862,7 +43763,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_303_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -43211,6 +44123,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_303_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -43877,12 +44800,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -43903,7 +44825,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_304_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -44252,6 +45185,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_304_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -44918,12 +45862,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -44944,7 +45887,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_305_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -45293,6 +46247,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_305_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -45959,12 +46924,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45985,7 +46949,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_306_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -46334,6 +47309,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_306_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -47000,12 +47986,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -47026,7 +48011,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_307_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -47375,6 +48371,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_307_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -48041,12 +49048,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -48067,7 +49073,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_308_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -48416,6 +49433,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_308_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -49082,12 +50110,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -49108,7 +50135,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_309_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -49457,6 +50495,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_309_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -50123,12 +51172,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -50149,7 +51197,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_310_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -50498,6 +51557,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_310_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -51164,12 +52234,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -51190,7 +52259,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_311_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -51539,6 +52619,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_311_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -52205,12 +53296,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -52231,7 +53321,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_312_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -52580,6 +53681,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_312_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -53246,12 +54358,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -53272,7 +54383,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_313_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -53621,6 +54743,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_313_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -54287,12 +55420,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -54313,7 +55445,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_314_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -54662,6 +55805,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_314_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -55328,12 +56482,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -55354,7 +56507,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_315_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -55703,6 +56867,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_315_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -56369,12 +57544,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -56395,7 +57569,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_316_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -56744,6 +57929,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_316_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -57410,12 +58606,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -57436,7 +58631,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_317_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -57785,6 +58991,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_317_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -58451,12 +59668,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -58477,7 +59693,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_318_metal_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kume-2000-cao-activities
   locator:
     page: 565
@@ -58826,6 +60053,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kume-2000-cao-activities::kume_2000_table4_sample_318_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity

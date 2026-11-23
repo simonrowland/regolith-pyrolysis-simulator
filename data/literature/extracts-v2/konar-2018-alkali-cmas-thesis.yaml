@@ -11,12 +11,11 @@ observations:
     species:
       formula: Li2O-CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -80,6 +79,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -113,12 +135,11 @@ observations:
     species:
       formula: Li2O-CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -182,6 +203,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -215,12 +259,11 @@ observations:
     species:
       formula: Li2O-CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -284,6 +327,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -317,12 +383,11 @@ observations:
     species:
       formula: Li2O-CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -386,6 +451,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -419,12 +507,11 @@ observations:
     species:
       formula: Li2O-CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -488,6 +575,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -521,12 +631,11 @@ observations:
     species:
       formula: Li2O-CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -590,6 +699,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -623,12 +755,11 @@ observations:
     species:
       formula: Li2O-MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -692,6 +823,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -725,12 +879,11 @@ observations:
     species:
       formula: Li2O-MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -794,6 +947,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -827,12 +1003,11 @@ observations:
     species:
       formula: Li2O-MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -896,6 +1071,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -929,12 +1127,11 @@ observations:
     species:
       formula: Li2O-MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -998,6 +1195,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1031,12 +1251,11 @@ observations:
     species:
       formula: Li2O-MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1100,6 +1319,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1133,12 +1375,11 @@ observations:
     species:
       formula: Li2O-MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1202,6 +1443,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1235,12 +1499,11 @@ observations:
     species:
       formula: Li2SiO3
       phase:
-        tag: unknown
-        reason: phase string 'congruent melting' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1304,6 +1567,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''congruent melting'' is not in the closed automatic map'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1437,6 +1723,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm3_li2mg_sio4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1568,6 +1865,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm4_li2mg_sio4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1699,6 +2007,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_li2mg_sio4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1830,6 +2149,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_melting
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2411,6 +2741,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s0_3_melting_point
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2514,6 +2855,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s2_3_li3nasi4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2617,6 +2969,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s3_3_li3nasi4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2720,6 +3083,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li3nasi4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2823,6 +3197,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li4sio4_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature

@@ -56924,12 +56924,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Cristobalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -56993,7 +56992,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Cristobalite'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_t5_e040_cristobalite_unavailable
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: cheng-2021-fe-ca-si-o-phase-equilibria
   locator:
     page: 18
@@ -59525,12 +59536,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Cristobalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -59594,7 +59604,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Cristobalite'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_t5_e042_cristobalite_unavailable
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: cheng-2021-fe-ca-si-o-phase-equilibria
   locator:
     page: 18
@@ -95590,12 +95612,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string "α'-C2S" is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -95659,7 +95680,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      "α''-C2S" is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_t5_e066_c2s_unavailable
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: cheng-2021-fe-ca-si-o-phase-equilibria
   locator:
     page: 19
@@ -212165,12 +212198,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -212234,6 +212266,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Liq'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_table3_a_liq_cao
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -212362,12 +212406,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -212431,6 +212474,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Liq'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_table3_a_liq_feo1p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -212559,12 +212614,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -212628,6 +212682,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Liq'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_table3_a_liq_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -212756,12 +212822,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -212825,6 +212890,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Liq'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_table3_b_liq_cao
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -212953,12 +213030,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -213022,6 +213098,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Liq'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_table3_b_liq_feo1p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -213150,12 +213238,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -213219,6 +213306,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Liq'' is not in the closed automatic map'
+    origin: cheng-2021-fe-ca-si-o-phase-equilibria::cheng21_table3_b_liq_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition

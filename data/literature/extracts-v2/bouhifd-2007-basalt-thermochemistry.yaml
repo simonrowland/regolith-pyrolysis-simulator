@@ -80,6 +80,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_inferred: value=dta_dsc; evidence=source text names ''differential thermal analysis''; original_reason=source
+      does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_liquidus_temperature_dta
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: dta_dsc
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -191,6 +203,18 @@ observations:
     - transition_temperature
     reason: 'missing input: printed air fO2 requires stated total pressure'
     origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
+  - kind: method_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_inferred: value=dta_dsc; evidence=source text names ''differential thermal analysis''; original_reason=source
+      does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: dta_dsc
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -320,6 +344,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -424,6 +459,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -528,6 +574,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_anorthite_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -632,6 +689,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_anorthite_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -736,6 +804,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_diopside_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -840,6 +919,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_diopside_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -944,6 +1034,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_fayalite_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1048,6 +1149,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_fayalite_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1152,6 +1264,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_forsterite_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1256,6 +1379,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_forsterite_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1360,6 +1494,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_ilmenite_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1464,6 +1609,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_ilmenite_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1568,6 +1724,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_orthoclase_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1672,6 +1839,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_orthoclase_heat_of_fusion_at_1430k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion

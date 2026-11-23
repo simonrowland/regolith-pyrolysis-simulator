@@ -11,12 +11,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -79,7 +78,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -121,12 +132,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -189,7 +199,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -231,12 +253,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -299,7 +320,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -341,12 +374,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -409,7 +441,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -451,12 +495,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -519,7 +562,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -561,12 +616,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -629,7 +683,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -671,12 +737,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -739,7 +804,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -781,12 +858,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -849,7 +925,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -891,12 +979,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -959,7 +1046,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1001,12 +1100,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1069,7 +1167,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1111,12 +1221,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1179,7 +1288,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1221,12 +1342,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1289,7 +1409,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1331,12 +1463,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1399,7 +1530,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1441,12 +1584,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1509,7 +1651,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1551,12 +1705,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1619,7 +1772,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1661,12 +1826,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1729,7 +1893,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1771,12 +1947,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1839,7 +2014,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1881,12 +2068,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1949,7 +2135,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -1991,12 +2189,11 @@ observations:
     species:
       formula: CO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2059,7 +2256,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2101,12 +2310,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2169,7 +2377,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2211,12 +2431,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2279,7 +2498,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2321,12 +2552,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2389,7 +2619,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2431,12 +2673,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2499,7 +2740,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2541,12 +2794,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2609,7 +2861,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2651,12 +2915,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2719,7 +2982,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2761,12 +3036,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2829,7 +3103,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2871,12 +3157,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2939,7 +3224,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -2981,12 +3278,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3049,7 +3345,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3091,12 +3399,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3159,7 +3466,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3201,12 +3520,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3269,7 +3587,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3311,12 +3641,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3379,7 +3708,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3421,12 +3762,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3489,7 +3829,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3531,12 +3883,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3599,7 +3950,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3641,12 +4004,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3709,7 +4071,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3751,12 +4125,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3819,7 +4192,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3861,12 +4246,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3929,7 +4313,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -3971,12 +4367,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4039,7 +4434,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4081,12 +4488,11 @@ observations:
     species:
       formula: H
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4149,7 +4555,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4191,12 +4609,11 @@ observations:
     species:
       formula: H
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4259,7 +4676,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4301,12 +4730,11 @@ observations:
     species:
       formula: H
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4369,7 +4797,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4411,12 +4851,11 @@ observations:
     species:
       formula: H
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4479,7 +4918,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4521,12 +4972,11 @@ observations:
     species:
       formula: H
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4589,7 +5039,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4631,12 +5093,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4699,7 +5160,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4741,12 +5214,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4809,7 +5281,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o2_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4851,12 +5335,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4919,7 +5402,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -4961,12 +5456,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5029,7 +5523,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -5071,12 +5577,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5139,7 +5644,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -5181,12 +5698,11 @@ observations:
     species:
       formula: OH
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5249,7 +5765,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -5291,12 +5819,11 @@ observations:
     species:
       formula: OH
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5359,7 +5886,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -5401,12 +5940,11 @@ observations:
     species:
       formula: OH
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5469,7 +6007,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28
@@ -5511,12 +6061,11 @@ observations:
     species:
       formula: OH
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5579,7 +6128,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: pahlevan-2026-protolunar-volatile-outflows
   locator:
     page: 28

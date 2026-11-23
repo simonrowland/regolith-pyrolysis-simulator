@@ -1518,9 +1518,10 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     )
 
 
-def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migration(
+def test_plante_k_partial_pressure_rows_stay_out_of_clean_band_after_phase_inference(
     tmp_path: Path,
 ) -> None:
+    from simulator.battery.enums import NoticeKind
     from simulator.battery.score import derive_kems_partial_pressure_band, score_store
     from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 
@@ -1531,8 +1532,7 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
         migrated.experiments,
         benches=migrated.benches,
     )
-    assert expected is not None
-    assert expected.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+    assert expected is None
 
     context = ScoreContext(
         works=migrated.works,
@@ -1568,22 +1568,13 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
     )
     scored = [row for row in residuals if row.reference in references]
     assert len(scored) == 162
-    missing_or_changed = [
-        (
-            row.reference,
-            None
-            if row.numeric is None or row.numeric.decision_band is None
-            else row.numeric.decision_band.value,
-        )
+    assert all(
+        row.numeric is not None
+        and row.numeric.decision_band is None
+        and row.status is ResidualStatus.NO_BAND
+        and any(notice.kind is NoticeKind.PHASE_INFERRED for notice in row.notices)
         for row in scored
-        if (
-            row.numeric is None
-            or row.numeric.decision_band is None
-            or row.numeric.decision_band.value.quantize(Decimal("0.000001"))
-            != expected.value.quantize(Decimal("0.000001"))
-        )
-    ]
-    assert not missing_or_changed, missing_or_changed[:5]
+    )
 
 
 @pytest.mark.parametrize(
@@ -1600,10 +1591,10 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
         ),
     ),
 )
-def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
+def test_kems_partial_pressure_band_ignores_flagged_plante_rows(
     tmp_path: Path, source_name: str, expected_rail: Rail
 ) -> None:
-    """The source-wide KEMS pressure band survives cell-note parse refusals."""
+    """A phase-inferred source cannot contribute to the clean KEMS band."""
     from simulator.battery.enums import Quantity
     from simulator.battery.score import (
         _printed_uncertainty_band,
@@ -1634,8 +1625,10 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
     band = derive_kems_partial_pressure_band(
         observations, experiments, benches=benches
     )
-    assert band is not None
-    assert band.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+    target_band = derive_kems_partial_pressure_band(
+        target.observations, target.experiments, benches=target.benches
+    )
+    assert band == target_band
     reference_value = point_magnitude(target_reference.value)
     assert reference_value is not None
     printed = _printed_uncertainty_band(
@@ -1646,6 +1639,8 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
         method=experiments[target_reference.experiment_id].method.value,
     )
     assert printed.refusal is not None
+    if band is None:
+        return
     numeric, reason, detail = populate_numeric(
         quantity=Quantity.P_PARTIAL,
         candidate=reference_value,
@@ -1659,12 +1654,13 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
     assert numeric.decision_band == band
 
 
-def test_plante_kems_pressure_envelope_reports_unstated_confidence(
+def test_plante_kems_pressure_envelope_does_not_enter_clean_band_when_phase_inferred(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.enums import NoticeKind, Quantity
     from simulator.battery.score import (
         _printed_uncertainty_band,
+        _printed_pressure_uncertainty_dex,
         derive_kems_partial_pressure_band,
         point_magnitude,
     )
@@ -1684,15 +1680,36 @@ def test_plante_kems_pressure_envelope_reports_unstated_confidence(
     band = derive_kems_partial_pressure_band(
         observations, experiments, benches=plante.benches
     )
-    assert band is not None
-    assert band.value == Decimal("0.1461280356782380259259551535")
-    assert "source-printed" in band.rule
-    assert "log10(1.40)" in band.rule
-    assert "page-280 1500 K sentence" in band.rule
-    assert "upper multiplicative edge" in band.rule
-    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
-    assert "+/-40% relative band" in band.rule
-    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
+    assert band is None
+    assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in observation.notices)
+    expected_row_width = Decimal("0.1461280356782380259259551533")
+    assert _printed_pressure_uncertainty_dex(observation) == expected_row_width
+
+    phase_cleared_observations = {
+        observation_id: replace(
+            row,
+            notices=tuple(
+                notice
+                for notice in row.notices
+                if notice.kind is not NoticeKind.PHASE_INFERRED
+            ),
+        )
+        for observation_id, row in observations.items()
+    }
+    printed_band = derive_kems_partial_pressure_band(
+        phase_cleared_observations,
+        experiments,
+        benches=plante.benches,
+    )
+    assert printed_band is not None
+    # Decimal rounding in the aggregate RMS's square and root shifts the final digits.
+    expected_aggregate_width = Decimal("0.1461280356782380259259551535")
+    assert printed_band.value == expected_aggregate_width
+    assert "Plante width log10(1.40)" in printed_band.rule
+    assert "printed page-280 1500 K sentence" in printed_band.rule
+    assert "[1/1.40, 1.40] (-28.6%..+40%)" in printed_band.rule
+    assert "not a symmetric +/-40% relative band" in printed_band.rule
+    assert "single 1500 K figure is applied across the tabulated T range" in printed_band.rule
 
     printed = _printed_uncertainty_band(
         Quantity.P_PARTIAL,
@@ -4170,15 +4187,83 @@ def test_species_formula_parser_accepts_published_typography() -> None:
     ) == (("Cl", 1.0), ("H", 1.0))
 
 
-def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
-    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
-        assert parse_species_formula(formula) is None
+def test_species_formula_parser_accepts_ascii_dot_adducts_and_decimal_counts() -> None:
+    assert parse_species_formula("Al₂O₃.3H₂O") == parse_species_formula("Al2O3·3H2O")
+    assert parse_species_formula("$Al_2O_3.3H_2O$") == parse_species_formula(
+        "Al2O3·3H2O"
+    )
+    assert parse_species_formula("CoSO₄.7H₂O") == parse_species_formula("CoSO4·7H2O")
+    assert parse_species_formula("Al2O3.3H2O") == parse_species_formula("Al2O3·3H2O")
+    assert parse_species_formula("ZnSO4.6H2O") == parse_species_formula(
+        "ZnSO4·6H2O"
+    )
+    alumina = dict(score_mod.formula_composition("Al2O3"))
+    silica = dict(score_mod.formula_composition("SiO2"))
+    assert parse_species_formula("3Al2O3.2SiO2") == tuple(
+        sorted(
+            (symbol, 3 * alumina.get(symbol, 0.0) + 2 * silica.get(symbol, 0.0))
+            for symbol in alumina.keys() | silica.keys()
+        )
+    )
+    assert parse_species_formula("SrHgO.4CO2.5H2O") == (
+        ("C", 4.0), ("H", 10.0), ("Hg", 1.0), ("O", 14.0), ("Sr", 1.0)
+    )
 
-    for formula in ("Fe0.947O", "Al2O3.3H2O"):
-        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula("Fe0.947O") == score_mod.formula_composition(
+        "Fe0.947O"
+    )
+    assert parse_species_formula("Fe.9470") == score_mod.formula_composition("Fe0.9470")
+    assert parse_species_formula("NbC.98") == score_mod.formula_composition("NbC0.98")
+    assert parse_species_formula("VC.88") == score_mod.formula_composition("VC0.88")
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_iron_oxide_conventions_and_polymorphs() -> None:
+    feo = score_mod.formula_composition("FeO")
+    assert parse_species_formula("Fe(1-x)O") == feo
+    assert parse_species_formula("Fe_tO") == feo
+    assert parse_species_formula(
+        "Fe(1-x)O(l)", species=Species("Fe(1-x)O", Phase.L)
+    ) == feo
+    assert parse_species_formula(
+        "Fe_tO(l)", species=Species("Fe_tO", Phase.L)
+    ) == feo
+    assert parse_species_formula(
+        "$P(white)$", species=Species("P", Phase.CR, State.of(Polymorph.WHITE))
+    ) == score_mod.formula_composition("P")
+    assert parse_species_formula("Aegirine natural sample") is None
+
+
+def test_species_formula_parser_requires_liquid_axis_for_melt_suffix() -> None:
+    assert parse_species_formula("Na2O_melt") is None
+    assert parse_species_formula(
+        "Na2O_melt", species=Species("Na2O", Phase.CR)
+    ) is None
+    assert parse_species_formula(
+        "Na2O_melt", species=Species("Na2O", Phase.L)
+    ) == score_mod.formula_composition("Na2O")
+
+
+def test_species_formula_parser_accepts_bullet_hydrates_and_unicode_phase() -> None:
+    copper_oxide = dict(score_mod.formula_composition("CuO"))
+    copper_sulfate = dict(score_mod.formula_composition("CuSO4"))
+    assert parse_species_formula("CuO•CuSO₄") == tuple(
+        sorted(
+            (
+                symbol,
+                copper_oxide.get(symbol, 0.0) + copper_sulfate.get(symbol, 0.0),
+            )
+            for symbol in copper_oxide.keys() | copper_sulfate.keys()
+        )
+    )
+    assert parse_species_formula(
+        "H2SO4·6.5H2O(l)", species=Species("H2SO4", Phase.L)
+    ) == (("H", 15.0), ("O", 10.5), ("S", 1.0))
+    assert parse_species_formula("H2SO4.6.5H2O") == (
+        ("H", 15.0), ("O", 10.5), ("S", 1.0)
+    )
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:
@@ -4344,6 +4429,10 @@ def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> No
     assert parse_species_formula(
         "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=0)
     ) is None
+    assert parse_species_formula("AgE-1") is None
+    assert parse_species_formula(
+        "AgE-1", species=Species("AgE-1", Phase.G, charge=-1)
+    ) == score_mod.formula_composition("Ag")
 
 
 def test_species_formula_parser_keeps_deuterium_distinct() -> None:
@@ -8511,6 +8600,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
@@ -8529,6 +8619,16 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     )
 
     cases = (
+        (
+            FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
+            NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+            "total_iron_basis: default=Fe_tO; original_reason=printed formula",
+        ),
+        (
+            FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
+            NoticeKind.WUSTITE_REFERENCE_CONVERSION,
+            "wustite_reference_conversion: default=Fe(1-x)O; original_reason=printed formula",
+        ),
         (
             FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
             NoticeKind.UNVERIFIED_APPARATUS,
@@ -8606,6 +8706,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
 
 def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
@@ -8626,6 +8727,14 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     )
 
     facts = (
+        (
+            NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+            "total_iron_basis: default=Fe_tO; original_reason=printed formula",
+        ),
+        (
+            NoticeKind.WUSTITE_REFERENCE_CONVERSION,
+            "wustite_reference_conversion: default=Fe(1-x)O; original_reason=printed formula",
+        ),
         (NoticeKind.UNVERIFIED_APPARATUS, "calibration_not_grounded:probe"),
         (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
         (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
@@ -8670,6 +8779,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         for kind, reason in facts
     )
     expected = (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
@@ -8805,7 +8915,9 @@ def test_studio_dispatch_uses_caller_host(
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    # Dispatch passes the cache path as an argument. It must not publish or
+    # clear the runner cache in this process. CI sets that variable on purpose.
+    cache_before = os.environ.get("REGOLITH_ENGINE_CACHE")
     engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
@@ -8837,7 +8949,7 @@ def test_studio_dispatch_uses_caller_host(
                 str(engine_cache_path),
             ]
         )
-    assert "REGOLITH_ENGINE_CACHE" not in os.environ
+    assert os.environ.get("REGOLITH_ENGINE_CACHE") == cache_before
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
@@ -9328,8 +9440,15 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
 
 
 def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None:
+    from simulator.battery.default_policy import load_policy_table
     from simulator.battery.records import ResidualRefusal
-    from simulator.battery.score import dumps_residual_line
+    from simulator.battery.records import NoticePolicy
+    from simulator.battery.score import (
+        _headline_payload_admits,
+        _flagged_payload_strata,
+        dumps_residual_line,
+        flagged_strata,
+    )
 
     work = F.work()
     experiment = F.tabulation_experiment(work_id=work.work_id)
@@ -9344,10 +9463,43 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
         )
         for name in ("a", "b", "flagged", "refused")
     )
-    context = _context(work, experiment, *observations)
     engine = Engine.INTERNAL_ANALYTICAL
     unit = "dimensionless"
     band = DecisionBand(Decimal("20"), unit, "fixture band")
+
+    phase_entry = load_policy_table()["DP-016"]
+    phase_policy = {
+        "id": phase_entry["id"],
+        "version": phase_entry["version"],
+        "status": phase_entry["status"],
+        "value": Phase.UNSPECIFIED.value,
+        "units": phase_entry["units"],
+    }
+    flagged_notice = Notice(
+        NoticeKind.PHASE_INFERRED,
+        (Quantity.P_SAT,),
+        "phase_inferred: value=unspecified; original_reason=source does not state phase",
+        "engine:fixture",
+        policy=NoticePolicy(**phase_policy),
+    )
+    flagged_species = observations[2].identity.species
+    assert flagged_species is not None
+    observations = (
+        observations[0],
+        observations[1],
+        replace(
+            observations[2],
+            identity=replace(
+                observations[2].identity,
+                species=replace(flagged_species, phase=State.of(Phase.UNSPECIFIED)),
+            ),
+            notices=(flagged_notice,),
+        ),
+        observations[3],
+    )
+    assert observations[2].identity.species.phase == State.of(Phase.UNSPECIFIED)
+    assert observations[2].notices == (flagged_notice,)
+    context = _context(work, experiment, *observations)
 
     def measured(index: int, value: str) -> Residual:
         return F.residual(
@@ -9359,12 +9511,48 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
             numeric=ResidualNumeric(MetricOperation.DEX, unit, Decimal(value), band),
         )
 
-    flagged_notice = Notice(
-        NoticeKind.OUT_OF_CERTIFIED_BAND,
+    method_entry = load_policy_table()["DP-106"]
+    proposed_method_policy = {
+        "id": method_entry["id"],
+        "version": method_entry["version"],
+        "status": method_entry["status"],
+        "value": MethodToken.UNSPECIFIED.value,
+        "units": method_entry["units"],
+    }
+    proposed_method_notice = Notice(
+        NoticeKind.METHOD_UNSTATED,
         (Quantity.P_SAT,),
-        "fixture outside certified domain",
+        "method_unstated: default=unspecified; original_reason=source does not state method",
         "engine:fixture",
+        policy=NoticePolicy(**proposed_method_policy),
     )
+    assert flagged_strata((proposed_method_notice,)) == (
+        NoticeKind.METHOD_UNSTATED.value,
+        "proposed-policy",
+    )
+    serialized_proposed = json.loads(
+        dumps_residual_line(
+            replace(measured(2, "10"), notices=(proposed_method_notice,))
+        )
+    )
+    assert _flagged_payload_strata(serialized_proposed) == (
+        NoticeKind.METHOD_UNSTATED.value,
+        "proposed-policy",
+    )
+    assert not _headline_payload_admits(serialized_proposed, tier="all-numeric")
+    method_notice_removed = json.loads(
+        dumps_residual_line(replace(measured(2, "10"), notices=()))
+    )
+    assert _headline_payload_admits(method_notice_removed, tier="all-numeric")
+
+    assert flagged_strata((flagged_notice,)) == (NoticeKind.PHASE_INFERRED.value,)
+    serialized_flagged = json.loads(
+        dumps_residual_line(
+            replace(measured(2, "10"), notices=(flagged_notice,))
+        )
+    )
+    assert serialized_flagged["notices"][0]["policy"] == phase_policy
+    assert serialized_proposed["notices"][0]["policy"] == proposed_method_policy
     residuals = (
         measured(0, "3"),
         measured(1, "4"),
@@ -9405,6 +9593,27 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     assert metric["unit"] == "dex"
     assert metric["certified"]["n"] == 2
     assert metric["flagged"]["n"] == 1
+
+    # Mutation check: removing the default flag moves this residual into the
+    # clean headline. The expected 2/1 certified/flagged counts above then fail.
+    unflagged_residuals = (
+        *residuals[:2],
+        replace(residuals[2], notices=()),
+        residuals[3],
+    )
+    unflagged_row = next(
+        candidate
+        for candidate in measured_engine_rail_records(
+            tuple(json.loads(dumps_residual_line(item)) for item in unflagged_residuals),
+            context=context,
+            engines=(engine,),
+        )
+        if candidate["rail"] == Rail.VAPOUR.value
+        and candidate["source_relation"] == SourceRelation.INDEPENDENT.value
+        and candidate["candidates"]
+    )
+    assert unflagged_row["certified_numeric"] == 3
+    assert unflagged_row["flagged_numeric"] == 0
     from scripts.battery_score import _measured_report
 
     report = _measured_report(
@@ -11762,6 +11971,8 @@ def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
     assert prediction.refusal_detail["reason"] == reason
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
     (
@@ -20025,6 +20236,8 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
 
     from simulator.battery.identity import quantity_token
     from simulator.battery.score import compile_residual
+    from simulator.battery.enums import NoticeKind, Phase
+    from simulator.battery.records import State
     from tests.battery.test_migrate import _migrate_real_extract
 
     result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
@@ -20069,9 +20282,11 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
         extract_review={"kems-051-allibert-1981": "reviewed"},
     )
     for observation in rows:
-        assert observation.identity.species.phase.is_unknown
-        assert "bulk_composition_in_two_phase_region" in (
-            observation.identity.species.phase.reason or ""
+        assert observation.identity.species.phase == State.of(Phase.UNSPECIFIED)
+        assert any(
+            notice.kind is NoticeKind.PHASE_INFERRED
+            and "bulk_composition_in_two_phase_region" in notice.reason
+            for notice in observation.notices
         )
         for engine in (Engine.OPENIMCC,):
             residual, _candidate = compile_residual(

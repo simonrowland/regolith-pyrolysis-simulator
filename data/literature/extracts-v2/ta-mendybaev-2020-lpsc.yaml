@@ -11,12 +11,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'molten_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,7 +82,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''molten_SiO2'' is not in the closed automatic map'
+    origin: ta-mendybaev-2020-lpsc::mendybaev_2020_gamma_si_from_tga
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ta-mendybaev-2020-lpsc
   locator:
     pdf_page_index: 2
@@ -108,12 +119,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'molten_SiO2_or_SiO2_plus_Ir' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,7 +147,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''molten_SiO2_or_SiO2_plus_Ir'' is not in the closed automatic map'
+    origin: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_knudsen_rate_cell
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ta-mendybaev-2020-lpsc
   locator:
     pdf_page_index: 2
@@ -162,12 +183,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'molten_SiO2_with_1wtpct_Ir' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -191,7 +211,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''molten_SiO2_with_1wtpct_Ir'' is not in the closed automatic map'
+    origin: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_langmuir_rate_loop
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ta-mendybaev-2020-lpsc
   locator:
     pdf_page_index: 2

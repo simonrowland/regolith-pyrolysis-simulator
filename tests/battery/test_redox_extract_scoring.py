@@ -155,6 +155,8 @@ def _printed_fraction_sigma_r(observation):
     return converted / confidence_scale
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
@@ -226,6 +228,8 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
@@ -360,6 +364,8 @@ def _openimcc_row_with_mass_composition(components):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     """Fe3O4 is iron for OpenIMCC and not a Kress FeOt component.
 
@@ -440,6 +446,8 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
     assert prediction.coefficient_sources == ()
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
 

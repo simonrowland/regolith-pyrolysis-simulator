@@ -11,12 +11,11 @@ observations:
     species:
       formula: K2O_gas
       phase:
-        tag: unknown
-        reason: phase string 'condensed_K2O_to_K_O_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -78,7 +77,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''condensed_K2O_to_K_O_gas'' is not in the closed automatic map'
+    origin: ref-052-k-o-gas::anchor_K2O_gas_deltafG
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ref-052-k-o-gas::anchor_K2O_gas_deltafG
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ref-052-k-o-gas
   locator:
     note: Lamoreaux & Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent

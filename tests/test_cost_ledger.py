@@ -845,10 +845,6 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
     assert fe.thermal_flux_h == pytest.approx(1273.15)
 
 
-# Same session fixture as the ungrouped runner-golden consumers. The
-# collection hook puts those on magemin_golden, so this consumer joins
-# them. One worker builds runner_golden_loader once.
-@pytest.mark.xdist_group("magemin_golden")
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
     runner_golden_loader,
 ):

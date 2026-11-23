@@ -11,12 +11,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -87,7 +86,30 @@ observations:
         published_page: 52
         pdf_page_index: 74
         section: Thermodynamic Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_carter_macfarlane_reference_lime_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_carter_macfarlane_reference_lime_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gibbons-1963-thesis-cas-slags-cas
   locator:
     published_page: 52
@@ -103,12 +125,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -189,7 +210,30 @@ observations:
         published_page: 63
         pdf_page_index: 98
         section: Thermodynamic Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_lime_activity_rejected
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_lime_activity_rejected
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gibbons-1963-thesis-cas-slags-cas
   locator:
     published_page: 63
@@ -332,12 +376,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -418,7 +461,30 @@ observations:
         published_page: 63
         pdf_page_index: 98
         section: Thermodynamic Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_silica_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_silica_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gibbons-1963-thesis-cas-slags-cas
   locator:
     published_page: 63
@@ -561,12 +627,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -637,7 +702,30 @@ observations:
         published_page: 52
         pdf_page_index: 74
         section: Thermodynamic Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_later_reference_lime_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_later_reference_lime_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gibbons-1963-thesis-cas-slags-cas
   locator:
     published_page: 52
@@ -653,12 +741,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -739,7 +826,30 @@ observations:
         published_page: 63
         pdf_page_index: 98
         section: Thermodynamic Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_lime_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_lime_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gibbons-1963-thesis-cas-slags-cas
   locator:
     published_page: 63
@@ -882,12 +992,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -968,7 +1077,30 @@ observations:
         published_page: 63
         pdf_page_index: 98
         section: Thermodynamic Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_silica_activity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_silica_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gibbons-1963-thesis-cas-slags-cas
   locator:
     published_page: 63

@@ -11,12 +11,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -102,7 +101,19 @@ observations:
         published_page: 2597
         pdf_page_index: 4
         section: Results and Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: willenborg-2006-alkali-removal-thermodynamics::willenborg_2006_alsi8mg8na1_na2o_activity_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: willenborg-2006-alkali-removal-thermodynamics
   locator:
     page: 5
@@ -297,12 +308,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -386,7 +396,19 @@ observations:
         published_page: 2597
         pdf_page_index: 4
         section: Results and Discussion
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: willenborg-2006-alkali-removal-thermodynamics::willenborg_2006_alsi8na1_na2o_activity_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: willenborg-2006-alkali-removal-thermodynamics
   locator:
     page: 5

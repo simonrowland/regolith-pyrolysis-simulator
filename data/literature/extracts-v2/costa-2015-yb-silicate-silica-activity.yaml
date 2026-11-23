@@ -89,7 +89,18 @@ observations:
         published_page: 4265
         pdf_page_index: 6
         paragraph: discussion following Fig. 8
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: costa-2015-yb-silicate-silica-activity::costa_2015_literature_delta_fH_yb2sio5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: costa-2015-yb-silicate-silica-activity
   locator:
     page: 7

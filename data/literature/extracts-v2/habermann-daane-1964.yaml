@@ -33,7 +33,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: habermann-daane-1964::Hab64_Eu_metal_third_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: habermann-daane-1964
   locator:
     note: Hab64_Eu_metal_third_law
@@ -119,7 +129,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: habermann-daane-1964::Hab64_Yb_metal_antoine
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: habermann-daane-1964
   locator:
     note: Hab64_Yb_metal_antoine

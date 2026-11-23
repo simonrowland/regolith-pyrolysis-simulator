@@ -11,12 +11,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45,7 +44,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_deltaG_henrian_1wt_pct
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 559
@@ -72,12 +82,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101,6 +110,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_fig1_ion_intensity_A4_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -122,12 +142,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -151,6 +170,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_fig2_low_Mo_procedure_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -181,12 +211,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -210,6 +239,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_fig3_Ag_standard_procedure_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -240,12 +280,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -269,6 +308,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_fig4_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -299,12 +349,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -332,6 +381,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_fig5_ln_gamma_Fe_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -362,12 +422,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -395,6 +454,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_fig6_error_estimate_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -425,12 +495,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -464,7 +533,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_infinite_dilution_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 558
@@ -491,12 +571,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -567,7 +646,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_interaction_parameters_liquid
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 559
@@ -594,12 +685,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -623,7 +713,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 553
@@ -650,12 +751,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -735,6 +835,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_quoted_Mo_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -778,12 +890,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -848,7 +959,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -877,12 +1000,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -947,7 +1069,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -976,12 +1110,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1046,7 +1179,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1075,12 +1220,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1145,7 +1289,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1174,12 +1330,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1244,7 +1399,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1273,12 +1440,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1343,7 +1509,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1372,12 +1550,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1442,7 +1619,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1471,12 +1660,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1541,7 +1729,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1570,12 +1770,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1640,7 +1839,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1669,12 +1880,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1739,7 +1949,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1768,12 +1990,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1838,7 +2059,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1867,12 +2100,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1937,7 +2169,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -1966,12 +2210,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2036,7 +2279,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2065,12 +2320,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2135,7 +2389,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2164,12 +2430,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2234,7 +2499,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2263,12 +2540,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2333,7 +2609,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table1_lambda
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2362,12 +2650,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2446,7 +2733,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2505,12 +2804,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2589,7 +2887,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2648,12 +2958,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2732,7 +3041,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2791,12 +3112,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2875,7 +3195,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -2934,12 +3266,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3018,7 +3349,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3077,12 +3420,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3161,7 +3503,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3220,12 +3574,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3304,7 +3657,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3363,12 +3728,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3447,7 +3811,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3506,12 +3882,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3590,7 +3965,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3649,12 +4036,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3733,7 +4119,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3792,12 +4190,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3876,7 +4273,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -3935,12 +4344,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4019,7 +4427,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4078,12 +4498,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4162,7 +4581,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4221,12 +4652,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4305,7 +4735,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4364,12 +4806,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4448,7 +4889,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4507,12 +4960,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4591,7 +5043,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4650,12 +5114,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4734,7 +5197,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4793,12 +5268,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4877,7 +5351,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -4936,12 +5422,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5020,7 +5505,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -5079,12 +5576,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5163,7 +5659,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -5222,12 +5730,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5306,7 +5813,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -5365,12 +5884,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5449,7 +5967,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -5508,12 +6038,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5592,7 +6121,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 555
@@ -5651,12 +6192,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5679,7 +6219,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 556
@@ -5708,12 +6259,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5736,7 +6286,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 556
@@ -5765,13 +6326,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5796,7 +6355,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -5880,13 +6450,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5911,7 +6479,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -5995,13 +6574,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6026,7 +6603,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6110,13 +6698,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6141,7 +6727,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6225,13 +6822,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6256,7 +6851,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6340,13 +6946,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6371,7 +6975,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6455,13 +7070,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6486,7 +7099,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6570,13 +7194,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6601,7 +7223,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6685,13 +7318,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6716,7 +7347,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6800,13 +7442,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6831,7 +7471,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -6915,13 +7566,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6946,7 +7595,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7030,13 +7690,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7061,7 +7719,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7145,13 +7814,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7176,7 +7843,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7260,13 +7938,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7291,7 +7967,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7375,13 +8062,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7406,7 +8091,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7490,13 +8186,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7521,7 +8215,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7605,13 +8310,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7636,7 +8339,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7720,13 +8434,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7751,7 +8463,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7835,13 +8558,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7866,7 +8587,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -7950,13 +8682,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7981,7 +8711,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8065,13 +8806,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8096,7 +8835,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8180,13 +8930,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8211,7 +8959,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GexMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8295,13 +9054,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8326,7 +9083,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8410,13 +9178,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8441,7 +9207,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8525,13 +9302,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8556,7 +9331,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8640,13 +9426,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8671,7 +9455,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8755,13 +9550,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8786,7 +9579,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8870,13 +9674,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8901,7 +9703,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -8985,13 +9798,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9016,7 +9827,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9100,13 +9922,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9131,7 +9951,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9215,13 +10046,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9246,7 +10075,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9330,13 +10170,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9361,7 +10199,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9445,13 +10294,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9476,7 +10323,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9560,13 +10418,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9591,7 +10447,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9675,13 +10542,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9706,7 +10571,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9790,13 +10666,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9821,7 +10695,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -9905,13 +10790,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9936,7 +10819,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10020,13 +10914,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10051,7 +10943,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10135,13 +11038,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10166,7 +11067,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10250,13 +11162,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10281,7 +11191,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10365,13 +11286,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10396,7 +11315,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10480,13 +11410,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10511,7 +11439,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10595,13 +11534,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10626,7 +11563,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10710,13 +11658,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10741,7 +11687,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_GmixMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10825,13 +11782,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10912,7 +11867,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -10994,13 +11962,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11081,7 +12047,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -11163,13 +12142,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11250,7 +12227,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -11332,13 +12322,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11419,7 +12407,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -11501,13 +12502,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11588,7 +12587,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -11670,13 +12682,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11757,7 +12767,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -11839,13 +12862,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11926,7 +12947,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -12008,13 +13042,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12095,7 +13127,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -12177,13 +13222,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12264,7 +13307,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -12346,13 +13402,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12433,7 +13487,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -12515,13 +13582,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12602,7 +13667,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_aMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -12684,12 +13762,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe liquid solution' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12771,6 +13848,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Fe liquid solution; original_reason=phase
+      string ''Fe liquid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_0
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12818,12 +13907,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe liquid solution' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12905,6 +13993,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Fe liquid solution; original_reason=phase
+      string ''Fe liquid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12952,12 +14052,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe liquid solution' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13042,6 +14141,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Fe liquid solution; original_reason=phase
+      string ''Fe liquid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13089,12 +14200,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe liquid solution' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13176,6 +14286,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Fe liquid solution; original_reason=phase
+      string ''Fe liquid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13223,12 +14345,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe liquid solution' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13313,6 +14434,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Fe liquid solution; original_reason=phase
+      string ''Fe liquid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13360,12 +14493,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'σ' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13448,6 +14580,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''σ'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_484
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13516,12 +14660,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'σ' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13604,6 +14747,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''σ'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13672,12 +14827,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'σ' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13760,6 +14914,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''σ'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_554
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13828,12 +14994,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Mo solid solution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13918,6 +15083,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_81
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13965,12 +15142,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Mo solid solution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14052,6 +15228,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_0_9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14099,12 +15287,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Mo solid solution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14186,6 +15373,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mo solid solution'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_activity_Fe_x_Mo_1_0
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14233,13 +15432,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14319,7 +15516,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -14401,13 +15611,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14487,7 +15695,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -14569,13 +15790,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14655,7 +15874,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -14737,13 +15969,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14823,7 +16053,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -14905,13 +16148,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14991,7 +16232,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -15073,13 +16327,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15159,7 +16411,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -15241,13 +16506,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15327,7 +16590,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -15409,13 +16685,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15495,7 +16769,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -15577,13 +16864,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15663,7 +16948,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -15745,13 +17043,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15831,7 +17127,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -15913,13 +17222,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15999,7 +17306,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaFe_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -16081,13 +17401,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16168,7 +17486,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -16250,13 +17581,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16337,7 +17666,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -16419,13 +17761,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16506,7 +17846,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -16588,13 +17941,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16675,7 +18026,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -16757,13 +18121,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16844,7 +18206,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -16926,13 +18301,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17013,7 +18386,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -17095,13 +18481,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17182,7 +18566,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -17264,13 +18661,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17351,7 +18746,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -17433,13 +18841,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17520,7 +18926,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -17602,13 +19021,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17689,7 +19106,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -17771,13 +19201,11 @@ observations:
     species:
       formula: Mo
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution'' is not in the closed automatic
-          map'
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17858,7 +19286,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: multi-phase table: Fe liquid
+      solution; σ; Mo solid solution; original_reason=phase string ''multi-phase table: Fe liquid solution; σ; Mo solid solution''
+      is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table4_gammaMo_1823K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 557
@@ -17940,12 +19381,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17971,7 +19411,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Mo_alloy'' is not in the closed automatic map'
+    origin: kems-111-ichise-1982::ichise_1982_table5_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-111-ichise-1982
   locator:
     published_page: 558

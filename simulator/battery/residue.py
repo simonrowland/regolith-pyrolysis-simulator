@@ -130,6 +130,21 @@ class ResidueEngineNonconvergence(RuntimeError):
         }
 
 
+class IsolatedOpenImccWorkerError(RuntimeError):
+    """OpenIMCC exception reported across the residue worker pipe.
+
+    The child sends the class name and the message, not the package
+    ``code``. ``error_name`` is that class name. Deterministic input
+    names are stored by ``_cached_isolated_openimcc_state``; callers
+    still see this exception after a hit.
+    """
+
+    def __init__(self, error_name: str, detail: str) -> None:
+        self.error_name = str(error_name)
+        self.detail = str(detail)
+        super().__init__(f"isolated OpenIMCC {self.error_name}: {self.detail}")
+
+
 class ResidueEngineTransportError(ResidueEngineNonconvergence):
     """Infrastructure failure moving an engine result across its worker pipe."""
 
@@ -354,10 +369,84 @@ def _evaluate_openimcc_isolated(
             raise ResidueEngineTransportError(str(detail))
         if error_name == "ImccNonconvergenceError":
             raise ResidueEngineNonconvergence("openimcc", str(detail))
-        raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
+        raise IsolatedOpenImccWorkerError(error_name, str(detail))
     finally:
         if not process.is_alive():
             _close_openimcc_evaluation_worker()
+
+
+def _cached_isolated_openimcc_state(
+    composition_mol: Mapping[str, float],
+    temperature_K: float,
+    *,
+    timeout_s: float,
+    allow_extrapolation: bool,
+    allow_out_of_envelope: bool,
+) -> Any:
+    """Cache one isolated OpenIMCC evaluation and re-raise a stored refusal.
+
+    Both residue pressure models call this. A deterministic input refusal
+    is stored, then raised again so the caller still sees the worker error.
+    Nonconvergence, transport errors, and timeouts propagate unstored.
+    """
+
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES, cached_engine_call
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.openimcc_bridge import (
+        ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
+        OpenImccBridgeResult,
+        _evaluate_request_vector,
+    )
+
+    def solve() -> Any:
+        try:
+            return _evaluate_openimcc_isolated(
+                openimcc_bridge._evaluate_uncached,
+                timeout_s=timeout_s,
+                composition_mol=composition_mol,
+                temperature_K=temperature_K,
+                allow_extrapolation=allow_extrapolation,
+                allow_out_of_envelope=allow_out_of_envelope,
+            ).to_hot()
+        except IsolatedOpenImccWorkerError as exc:
+            code = ISOLATED_OPENIMCC_CACHEABLE_ERRORS.get(exc.error_name)
+            if code is None or code not in CACHEABLE_REFUSAL_CODES:
+                raise
+            return {
+                "status": "refusal",
+                "refusal_reason": code,
+                "engine_status": "out_of_domain",
+                "detail": exc.detail,
+            }
+
+    payload = cached_engine_call(
+        "openimcc",
+        _evaluate_request_vector(
+            composition_mol=composition_mol,
+            temperature_K=temperature_K,
+            allow_extrapolation=allow_extrapolation,
+            allow_out_of_envelope=allow_out_of_envelope,
+        ),
+        solve,
+    )
+    if (
+        isinstance(payload, Mapping)
+        and payload.get("status") == "refusal"
+        and payload.get("refusal_reason")
+    ):
+        code = str(payload["refusal_reason"])
+        error_name = next(
+            (
+                name
+                for name, mapped in ISOLATED_OPENIMCC_CACHEABLE_ERRORS.items()
+                if mapped == code
+            ),
+            code,
+        )
+        raise IsolatedOpenImccWorkerError(
+            error_name, str(payload.get("detail") or ""),
+        )
+    return OpenImccBridgeResult.from_hot(payload)
 
 
 def _component_exhaustion_floor_mol(sample_total_mol: float) -> float:
@@ -1732,29 +1821,13 @@ def _make_residue_pressure_model(
                 }
                 try:
                     timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                    from simulator.engine_cache import cached_engine_call
-                    from simulator.melt_backend.openimcc_bridge import (
-                        OpenImccBridgeResult,
+                    state = _cached_isolated_openimcc_state(
+                        current_composition,
+                        temperature_K,
+                        timeout_s=timeout_s,
+                        allow_extrapolation=True,
+                        allow_out_of_envelope=True,
                     )
-
-                    state_payload = cached_engine_call(
-                        "openimcc",
-                        openimcc_bridge._evaluate_request_vector(
-                            composition_mol=current_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        ),
-                        lambda: _evaluate_openimcc_isolated(
-                            openimcc_bridge._evaluate_uncached,
-                            timeout_s=timeout_s,
-                            composition_mol=current_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        ).to_hot(),
-                    )
-                    state = OpenImccBridgeResult.from_hot(state_payload)
                 except ImccNonconvergenceError as exc:
                     raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                 except TimeoutError as exc:
@@ -2035,6 +2108,14 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
     if not any(amount > 0.0 for amount in amounts.values()):
         raise ResidueInventoryRefusal("initial_composition_invalid")
     return _hashimoto_project_oxide_wt_pct(amounts)
+
+
+def _oxide_wt_percent_to_mol_inventory(wt_percent: Mapping[str, float]) -> dict[str, float]:
+    """Convert oxide wt% to a scale-free inventory on a 100 g basis."""
+    return {
+        oxide: weight / 100.0 / _formula_terms(oxide)[1]
+        for oxide, weight in wt_percent.items()
+    }
 
 
 def _mass_loss_sourced_alphas(
@@ -2620,9 +2701,9 @@ def predict_knudsen_residue_composition(
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
     use_loader_cutoff = engine == "internal-analytical"
     measured_charge_kg = _located_point(experiment.sample.mass_kg)
-    # OpenIMCC uses relative composition. The analytical loader applies an
-    # absolute mass cutoff, so it needs the scale of the weighed charge.
-    charge_kg = 1.0
+    # The shared converter uses a 100 g reference basis. The analytical loader
+    # applies an absolute mass cutoff, so scale that basis to the weighed charge.
+    charge_kg = 0.1
     assumed_charge = use_loader_cutoff and (measured_charge_kg is None or measured_charge_kg <= 0.0)
     charge_default = None
     if assumed_charge:
@@ -2635,7 +2716,10 @@ def predict_knudsen_residue_composition(
         charge_kg = float(charge_default.value)
     elif use_loader_cutoff:
         charge_kg = measured_charge_kg
-    initial = {oxide: charge_kg * weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
+    initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
+    if use_loader_cutoff:
+        scale = charge_kg / 0.1
+        initial = {oxide: amount * scale for oxide, amount in initial.items()}
     anchors = {}
     for row in rows:
         if (row.experiment_id != reference.experiment_id or row.source_id != reference.source_id
@@ -2874,6 +2958,243 @@ def _trace_tail_precision_threshold(
     if divisor != 1.0:
         return 0.1 * float(printed_quantum) / divisor
     return float(printed_quantum) / 10.0
+
+
+def predict_langmuir_residue_composition(
+    engine: str, reference, experiment, observations,
+) -> dict[str, object]:
+    """Predict one Langmuir residue at its same-bead printed gravimetric extent."""
+    from dataclasses import replace
+
+    from simulator.battery.enums import (
+        AdmissionStatus, MEASURED_EVIDENCE, MethodToken, NoticeKind, Quantity,
+        ValueKind,
+    )
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.records import Notice, Value
+    from simulator.battery.source_oxygen import source_oxygen_closure_notice
+
+    if engine not in {"openimcc", "internal-analytical"}:
+        raise ResidueInventoryRefusal("engine_capability_unsupported", engine)
+    if (
+        experiment is None or not experiment.method.is_value
+        or experiment.method.value is not MethodToken.LANGMUIR_FREE_EVAPORATION
+    ):
+        raise ResidueInventoryRefusal("langmuir_free_evaporation_required")
+    if quantity_token(reference.identity) is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        raise ResidueInventoryRefusal("residue_composition_required")
+
+    locator = reference.locator
+    if locator is None or not locator.table or not locator.note:
+        raise ResidueInventoryRefusal("measured_mass_loss_fraction_missing_or_invalid")
+    anchors = [
+        row for row in observations
+        if row.experiment_id == reference.experiment_id
+        and row.source_id == reference.source_id
+        and row.engine is None
+        and row.admission.status is AdmissionStatus.ADMITTED
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.locator is not None
+        and row.locator.table == locator.table
+        and row.locator.note == locator.note
+        and row.evidence.class_.is_value
+        and row.evidence.class_.value in MEASURED_EVIDENCE
+        and row.value.kind is ValueKind.POINT
+        and row.value.point is not None
+    ]
+    if len(anchors) != 1:
+        raise ResidueInventoryRefusal("measured_mass_loss_fraction_missing_or_invalid")
+    anchor = anchors[0]
+    xi = float(anchor.value.point)
+    temperature = reference.identity.temperature_K
+    if (
+        temperature is None or not temperature.is_value
+        or not math.isfinite(float(temperature.value))
+        or float(temperature.value) <= 0.0
+    ):
+        raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
+    temperature_K = float(temperature.value)
+    wt_pct = _initial_oxide_wt_percent(experiment.sample)
+    initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
+
+    pressure_environment = experiment.pressure_environment
+    pressure_record = next(
+        (
+            candidate
+            for candidate in (
+                (reference.point_conditions or {}).get("total_pressure_Pa"),
+                (experiment.conditions or {}).get("total_pressure_Pa"),
+                pressure_environment.total_pressure_Pa,
+            )
+            if candidate is not None and candidate.state.is_value
+        ),
+        None,
+    )
+    pressure_value = (
+        pressure_record.state.value
+        if pressure_record is not None and pressure_record.state.is_value
+        else None
+    )
+    if isinstance(pressure_value, Value) and pressure_value.kind is ValueKind.POINT:
+        pressure_source = f"printed point {pressure_value.point} Pa"
+    elif (
+        isinstance(pressure_value, Value)
+        and pressure_value.kind is ValueKind.BOUND
+        and pressure_value.bound_operator == "<"
+        and pressure_value.bound_value is not None
+        and pressure_value.bound_value > 0
+    ):
+        pressure_source = f"printed ceiling <{pressure_value.bound_value} Pa"
+        if not 0.0 < float(pressure_value.bound_value):
+            raise ResidueInventoryRefusal("printed_pressure_ceiling_invalid")
+    else:
+        pressure_source = "unprinted; defaulted to 0 Pa"
+    # The extent integrator uses vacuum driving pressures. Keep the actual
+    # modeled background explicit even when an exact pressure was printed.
+    p_bulk_Pa = 0.0
+    if (
+        isinstance(pressure_value, Value)
+        and pressure_value.kind is ValueKind.BOUND
+        and pressure_value.bound_operator == "<"
+        and pressure_value.bound_value is not None
+        and pressure_value.bound_value > 0
+    ):
+        pressure_notice_reason = (
+            f"extent uses p_bulk=0 Pa within printed ceiling <"
+            f"{pressure_value.bound_value} Pa (vacuum driving pressure)."
+        )
+    else:
+        pressure_notice_reason = (
+            f"{pressure_source}; extent uses p_bulk=0 Pa (vacuum driving pressure)."
+        )
+
+    notices = [
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "DP-005 alpha_assumed: alpha_i = 1 is a ratio assumption, not a "
+                "one-sided flux ceiling; the two-sided MgO and SiO2 residuals "
+                "are sensitive to relative alpha."
+            ),
+            origin="Langmuir residue extent",
+        ),
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "melt_well_mixed_assumed: R^2/D is about 1e3–4e4 s for a mm-scale "
+                "bead and D of order 1e-10 to 1e-9 m2/s (order-of-magnitude "
+                "premise, not sourced here); the printed 2.5 mm loop is not the "
+                "bead radius, which is unprinted."
+            ),
+            origin="Langmuir residue extent",
+        ),
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "xi includes the furnace ramp; the scored extent path is isothermal "
+                "at 1900 C and does not model ramp evaporation."
+            ),
+            origin="Langmuir residue extent",
+        ),
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=pressure_notice_reason,
+            origin="Langmuir residue pressure",
+        ),
+    ]
+    fallback_row = replace(
+        reference,
+        provenance={
+            **(reference.provenance or {}),
+            "source_oxygen_fallback": "no_oxygen_condition_printed",
+        },
+    )
+    notices.append(
+        source_oxygen_closure_notice(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION, fallback_row
+        )
+    )
+
+    try:
+        try:
+            from openimcc import load_gas_datapack
+        except ImportError as exc:
+            raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _openimcc_gas_channels_and_omission_notices,
+        )
+
+        gas_pack = load_gas_datapack()
+        gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
+            tuple(initial), gas_pack
+        )
+        if omissions:
+            raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
+        channels = tuple(
+            ResidueChannel(
+                str(species), str(species), parent, 1.0,
+                "DP-005 assumed common alpha=1 for a composition ratio",
+            )
+            for species, (parent, _, _) in gas_channels
+        )
+        flags: set[str] = set()
+        metadata: dict[str, str] = {}
+        base_pressure_model = _make_residue_pressure_model(
+            engine,
+            gas_channels,
+            gas_pack,
+            temperature_K=temperature_K,
+            total_pressure_Pa=p_bulk_Pa,
+            engine_metadata=metadata,
+            engine_flags=flags,
+            missing_channels_reason="residue_pressure_channels_missing",
+            caller="Langmuir residue prediction",
+        )
+
+        def pressure_model(inventory, logp, _temperature_K):
+            return base_pressure_model(inventory, logp)
+
+        result = integrate_knudsen_residue_inventory(
+            initial,
+            channels,
+            pressure_model,
+            temperature_path=[(xi, temperature_K)],
+            measured_mass_loss_fraction=xi,
+            near_saturated=True,
+            source_fO2_log_by_interval=[None],
+        )
+        composition = _hashimoto_project_oxide_wt_pct(result.residue_mol)
+        provenance = {
+            "mass_loss_observation_id": anchor.observation_id,
+            "measured_mass_loss_fraction": xi,
+            "temperature_path": [(xi, temperature_K)],
+            "p_bulk_Pa": p_bulk_Pa,
+            "printed_pressure": pressure_source,
+            "initial_inventory_mol": dict(initial),
+            "final_inventory_mol": dict(result.residue_mol),
+            "atom_closure_mol": dict(result.atom_closure_mol),
+            "engine_flags": tuple(sorted(flags)),
+            "engine_metadata": metadata,
+        }
+        return {
+            "composition_wt_pct": composition,
+            "notices": tuple(notices),
+            **provenance,
+        }
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        exc.provenance = {
+            "mass_loss_observation_id": anchor.observation_id,
+            "measured_mass_loss_fraction": xi,
+            "temperature_path": [(xi, temperature_K)],
+            "p_bulk_Pa": p_bulk_Pa,
+            "printed_pressure": pressure_source,
+        }
+        exc.notices = tuple(notices)
+        raise
 
 
 def predict_mass_loss_fraction(
@@ -4751,29 +5072,13 @@ def _predict_sossi_residue_cohort(
                         )
                         melt_activity_input_policy.update(activity_input_policy)
                         timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                        from simulator.engine_cache import cached_engine_call
-                        from simulator.melt_backend.openimcc_bridge import (
-                            OpenImccBridgeResult,
+                        state = _cached_isolated_openimcc_state(
+                            activity_composition,
+                            temperature_K,
+                            timeout_s=timeout_s,
+                            allow_extrapolation=True,
+                            allow_out_of_envelope=True,
                         )
-
-                        state_payload = cached_engine_call(
-                            "openimcc",
-                            openimcc_bridge._evaluate_request_vector(
-                                composition_mol=activity_composition,
-                                temperature_K=temperature_K,
-                                allow_extrapolation=True,
-                                allow_out_of_envelope=True,
-                            ),
-                            lambda: _evaluate_openimcc_isolated(
-                                openimcc_bridge._evaluate_uncached,
-                                timeout_s=timeout_s,
-                                composition_mol=activity_composition,
-                                temperature_K=temperature_K,
-                                allow_extrapolation=True,
-                                allow_out_of_envelope=True,
-                            ).to_hot(),
-                        )
-                        state = OpenImccBridgeResult.from_hot(state_payload)
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                     except TimeoutError as exc:

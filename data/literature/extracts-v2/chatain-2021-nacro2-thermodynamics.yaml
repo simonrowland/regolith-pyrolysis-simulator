@@ -82,6 +82,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - S
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_298
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S
@@ -219,6 +231,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - S
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_29815
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S
@@ -355,6 +379,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -498,7 +534,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_experimental_cp_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 14
@@ -610,7 +658,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_formation_gibbs_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 15
@@ -725,6 +785,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_gross_formation_enthalpy_298
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -826,6 +898,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_jain_dft_formation_enthalpy_298
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -927,7 +1011,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_iyer_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 4
@@ -1015,7 +1111,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_sreedharan_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 4
@@ -1103,7 +1211,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref10_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1192,7 +1311,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1282,7 +1413,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1372,7 +1515,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1461,7 +1616,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref3_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1550,7 +1716,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_average
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1640,7 +1817,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_i
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1730,7 +1918,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_ii
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1819,7 +2018,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref5_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1908,7 +2118,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref6_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1997,7 +2218,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_gibbs_fit_i
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2087,7 +2319,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_ii
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2177,7 +2420,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_emf_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2266,7 +2520,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2356,7 +2622,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref9_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2445,6 +2722,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_29815
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -2581,7 +2870,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 13

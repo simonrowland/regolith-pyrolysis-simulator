@@ -11,12 +11,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=018ddfd7c4ab
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -86,12 +106,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -112,7 +131,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=0c9f5d0f80f8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -161,12 +201,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -187,7 +226,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=0fbd671404c5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -236,12 +296,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -262,7 +321,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=3df159ec563e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -311,12 +391,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -337,7 +416,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=3e8bca9c31f9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -386,12 +486,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -412,7 +511,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=7176c5540a5e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -461,12 +581,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -487,7 +606,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=88f75734fb3e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -536,12 +676,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -562,7 +701,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=b1228c263c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -611,12 +771,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -637,7 +796,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=cff23b8946c2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -686,12 +866,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -712,7 +891,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=d24ee18b77e2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -761,12 +961,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -787,7 +986,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=e8b3c629b3ac
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -836,12 +1056,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -862,7 +1081,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxii_sulphur_melt_values::rows:h=fd99c2b732d0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 92
@@ -911,12 +1151,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -937,7 +1176,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=00c22bec2c8f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -986,12 +1246,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1012,7 +1271,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=10bd7209372c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1061,12 +1341,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1087,7 +1366,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=19b631a2127a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1136,12 +1436,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1162,7 +1461,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=425ea43bf4c7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1211,12 +1531,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1237,7 +1556,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=497c8c991f03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1286,12 +1626,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1312,7 +1651,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=556c2817b418
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1361,12 +1721,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1387,7 +1746,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=5ce498006288
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1436,12 +1816,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1462,7 +1841,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=6baa516a8edb
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1511,12 +1911,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1537,7 +1936,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=86ad66e25585
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1586,12 +2006,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1612,7 +2031,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=88b8a48c0be4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1661,12 +2101,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1687,7 +2126,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=8c04d975a0d4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1736,12 +2196,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1762,7 +2221,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=9566b882da1d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1811,12 +2291,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1837,7 +2316,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=a29ea5113b0c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1886,12 +2386,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1912,7 +2411,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=ab9ee52b88f6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -1961,12 +2481,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1987,7 +2506,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=acfe4df82f9e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2036,12 +2576,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2062,7 +2601,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=ad2abeaa080c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2111,12 +2671,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2137,7 +2696,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=b5c1a987e0bf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2186,12 +2766,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2212,7 +2791,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=b74bd048a7ba
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2261,12 +2861,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2287,7 +2886,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=bb74f1b75078
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2336,12 +2956,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2362,7 +2981,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=c10c75457dc6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2411,12 +3051,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2437,7 +3076,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=c4091fb44bca
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2486,12 +3146,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2512,7 +3171,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=c6b93d469a72
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2561,12 +3241,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2587,7 +3266,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=e2cdda8c45b7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2636,12 +3336,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2662,7 +3361,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiii_sulphur_melt_values::rows:h=effe43b9a90e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 93
@@ -2805,7 +3525,18 @@ observations:
         published_page: 94
         pdf_page_index: 94
         table: XXIV
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiv_cas_sat_lime_activities::T=1773:h=496a7a098edd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 94
@@ -2936,7 +3667,18 @@ observations:
         published_page: 94
         pdf_page_index: 94
         table: XXIV
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxiv_cas_sat_lime_activities::T=1773:h=b5bde09ebf68
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 94
@@ -2973,12 +3715,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2996,7 +3737,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=03a20b0a2a71
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3012,12 +3774,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3035,7 +3796,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=0e0078416c9d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3051,12 +3833,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3074,7 +3855,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=1403dade9920
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3090,12 +3892,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3113,7 +3914,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=212d179a4123
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3129,12 +3951,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3152,7 +3973,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=21dadbe53865
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3168,12 +4010,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3191,7 +4032,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=292698913aa2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3207,12 +4069,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3230,7 +4091,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=434f46af7d66
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3246,12 +4128,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3269,7 +4150,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=475de8675606
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3285,12 +4187,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3308,7 +4209,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=603c3e958245
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3324,12 +4246,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3347,7 +4268,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=644813a84811
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3363,12 +4305,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3386,7 +4327,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=6e0159fd0b5d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3402,12 +4364,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3425,7 +4386,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=7c565f01bff9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3441,12 +4423,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3464,7 +4445,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=8a13a7d5031d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3480,12 +4482,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3503,7 +4504,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=97f2348a0075
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3519,12 +4541,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3542,7 +4563,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=b878b7b9a627
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3558,12 +4600,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3581,7 +4622,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=bffcd9454dbd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3597,12 +4659,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3620,7 +4681,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=ec96033f1d93
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97
@@ -3636,12 +4718,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3659,7 +4740,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kor-1967-thesis-sulphur-oxides-slags::kor_1967_table_xxv_sulphur_solid_aluminates::rows:h=eca73ada9ccf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kor-1967-thesis-sulphur-oxides-slags
   locator:
     published_page: 97

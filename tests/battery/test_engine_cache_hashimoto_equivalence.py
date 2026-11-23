@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from tests.battery.engine_cache_score_equivalence import (
     assert_residue_score_cache_equivalence,
 )
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_scored_hashimoto_residues_match_off_cold_warm_and_parallel_cache(

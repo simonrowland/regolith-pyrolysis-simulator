@@ -238,6 +238,8 @@ def test_sossi_selected_experiments_match_full_rows_and_integrate_only_selected(
     assert set(integrated_experiments) == {target_id}
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_residue_cohort_caches_are_scoped_by_selected_experiments(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

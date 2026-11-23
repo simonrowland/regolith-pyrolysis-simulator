@@ -675,13 +675,13 @@ class Species:
 
 
 def phase_token(species: Species) -> Phase | None:
-    """Closed Phase token when the axis is a value; None for unknown / n/a."""
+    """Closed physical phase; ``unspecified`` is an unresolved axis."""
 
     phase = species.phase
     if isinstance(phase, Phase):
-        return phase
+        return None if phase is Phase.UNSPECIFIED else phase
     if isinstance(phase, State) and phase.is_value:
-        return phase.value
+        return None if phase.value is Phase.UNSPECIFIED else phase.value
     return None
 
 
@@ -1028,10 +1028,10 @@ class NoticePolicy:
             isinstance(self.version, bool)
             or not isinstance(self.version, (str, int))
             or not str(self.version)
-            or not all(
-                isinstance(value, str) and value
-                for value in (self.value, self.units)
-            )
+            or not isinstance(self.value, str)
+            or not self.value
+            or not isinstance(self.units, str)
+            or not self.units
         ):
             raise ValueError("notice policy requires id, version, value, and units")
         if self.status not in {"canonical", "proposed", "rejected"}:
@@ -1057,13 +1057,18 @@ class Notice:
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
-            # These row labels may survive a typed quantity_unknown refusal.
+            # Row-level migration facts remain useful when quantity is unknown.
             if self.kind not in {
                 NoticeKind.FIGURE_ONLY,
                 NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
                 NoticeKind.ADMISSION_FROM_LEGACY_TOKEN,
+                NoticeKind.METHOD_UNSTATED,
+                NoticeKind.METHOD_INFERRED,
+                NoticeKind.PHASE_INFERRED,
             }:
                 raise ValueError("Notice.affected_quantities is required")
+        if self.policy is not None and not isinstance(self.policy, NoticePolicy):
+            raise TypeError("Notice.policy must be NoticePolicy or absent")
         if not self.reason:
             raise ValueError("Notice.reason is required")
         if not self.origin:

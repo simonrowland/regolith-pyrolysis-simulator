@@ -11,12 +11,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'anorthosite_NU_LHT_2M_feedstock' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,6 +82,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthosite_NU_LHT_2M_feedstock'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_anorthosite_water_mass_loss_0p1_pct
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -105,12 +116,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_powders_in_alumina_crucibles' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -129,7 +139,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_powders_in_alumina_crucibles'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_apparatus_n2_tga_dta
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -148,12 +169,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1AF_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -178,7 +198,18 @@ observations:
         published_page: 4
         pdf_page_index: 8
         figure: '1'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1AF_powder'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_fig1_jsc1af_dta_tga_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 4
@@ -196,12 +227,11 @@ observations:
     species:
       formula: NU-LHT-2M
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -226,7 +256,18 @@ observations:
         published_page: 5
         pdf_page_index: 9
         figure: '3'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_powder'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_fig3_nulht2m_dta_tga_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 5
@@ -244,12 +285,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1AF_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -268,7 +308,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1AF_powder'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_jsc1af_tga_ftir_windows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 1
@@ -286,12 +337,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1AF' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -309,7 +359,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1AF'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_quoted_jsc1af_mineralogy_carpenter_taylor
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 6
@@ -327,12 +388,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -396,7 +456,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -415,12 +487,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -484,7 +555,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -503,12 +586,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -572,7 +654,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -591,12 +685,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -660,7 +753,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -679,12 +784,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -748,7 +852,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -767,12 +883,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -836,7 +951,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3
@@ -855,12 +982,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -924,7 +1050,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''simulant_and_feedstock_powders'' is not in the closed automatic map'
+    origin: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 3

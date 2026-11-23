@@ -62,6 +62,7 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     EnginePrediction,
     Execution,
+    FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
     FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
     FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
@@ -85,6 +86,8 @@ _ANCHORS = (
 )
 _WINDOW = "1649.15-1766.15 K"
 _EXTRAPOLATED = "D&G iron-boundary line extrapolated"
+_DARKEN_GURRY = "darken-gurry-1946-iron-oxygen-ii"
+_SAITO = "saito-2021-fexo-cao-silica-activity"
 _HOLZHEID = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
 _DISTIN = "distin-1971-ferrous-silicate-melts"
 _BANYA_1980 = "banya-chiba-hikosaka-1980-feto-binary-solid-iron"
@@ -341,6 +344,90 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
     assert fusion_comparison_reference(other, engine=Engine.INTERNAL_ANALYTICAL) is other
 
 
+def test_fe_1_minus_x_identity_uses_existing_d420_wustite_conversion() -> None:
+    temperature = Decimal("1673.15")
+    reference = _wustite_row(temperature)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, formula="Fe(1-x)O"),
+        ),
+    )
+
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert converted.value.point == reference.value.point * _independent_factor(
+        temperature
+    )
+    assert converted.identity.species.formula == "Fe(1-x)O"
+    assert any(
+        notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+        and "original_reason=species_formula=Fe(1-x)O" in notice.reason
+        for notice in converted.notices
+    )
+    wustite_notice = next(
+        notice
+        for notice in converted.notices
+        if notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+    )
+    assert "mapped=typed Fe(1-x)O reference" in wustite_notice.reason
+    assert "default=" not in wustite_notice.reason
+    assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+        converted.notices
+    )
+
+
+def test_feox_identity_uses_only_its_typed_wustite_reference() -> None:
+    temperature = Decimal("1673.15")
+    reference = _wustite_row(temperature)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, formula="FeOx"),
+        ),
+    )
+
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert converted.value.point == reference.value.point * _independent_factor(
+        temperature
+    )
+    assert converted.identity.species.formula == "FeO"
+    assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+        converted.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+        and "original_reason=species_formula=FeOx" in notice.reason
+        and "standard_formula=Fe(1-x)O" in notice.reason
+        for notice in converted.notices
+    )
+
+    standard = reference.identity.reference_state.value
+    assert isinstance(standard, StandardState)
+    stoichiometric_standard = replace(
+        standard,
+        endmember=replace(standard.endmember, formula="FeO"),
+        component_basis="FeO",
+    )
+    untyped_alias = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reference_state=State.of(stoichiometric_standard),
+        ),
+    )
+    assert fusion_comparison_reference(
+        untyped_alias, engine=Engine.INTERNAL_ANALYTICAL
+    ) is untyped_alias
+
+
 def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
     temperature = Decimal("1673.15")
     work = F.work()
@@ -395,6 +482,7 @@ def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
     assert residual.score_eligible is False
     assert "not_flagged_stratum" in residual.exclusions
     assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     )
 
@@ -425,6 +513,41 @@ def migration():
         migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
     migrator.finalize()
     return migrator.result
+
+
+@pytest.fixture(scope="module")
+def wustite_formula_migration():
+    migrator = Migrator(root=ROOT)
+    for name in (_DARKEN_GURRY, _SAITO):
+        migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator.finalize()
+    return migrator.result
+
+
+def test_every_migrated_fe_1_minus_x_source_row_parses(
+    wustite_formula_migration,
+) -> None:
+    rows_by_source = {source: [] for source in (_DARKEN_GURRY, _SAITO)}
+    for observation in wustite_formula_migration.observations.values():
+        identity = observation.identity
+        species = getattr(identity, "species", None)
+        if (
+            observation.source_id in rows_by_source
+            and species is not None
+            and species.formula == "Fe(1-x)O"
+        ):
+            rows_by_source[observation.source_id].append(observation)
+
+    assert {source: len(rows) for source, rows in rows_by_source.items()} == {
+        _DARKEN_GURRY: 89,
+        _SAITO: 42,
+    }
+    for rows in rows_by_source.values():
+        for observation in rows:
+            species = observation.identity.species
+            assert score_module.parse_species_formula(
+                species.formula, species=species
+            ) == (("Fe", 1.0), ("O", 1.0))
 
 
 @pytest.fixture(scope="module")
@@ -1305,6 +1428,9 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
         )
         assert converted.identity.species.formula == "FeO"
         assert converted.identity.reference_state.value.endmember.formula == "FeO"
+        assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+            converted.notices
+        )
         conversion = next(
             notice
             for notice in converted.notices
@@ -1342,9 +1468,19 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
     assert yuge_expected.quantize(Decimal("1e-8")) == Decimal("0.07685536")
     for source_id, rows in rows_by_source.items():
         for observation in rows:
+            assert observation.identity.species.formula == "FeO"
             converted = fusion_comparison_reference(
                 observation, engine=Engine.OPENIMCC
             )
+            assert any(
+                notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+                and (
+                    "Ban-ya a_FetO on a total-iron basis "
+                    "(printed species Fe_tO, stored formula FeO)"
+                )
+                in notice.reason
+                for notice in converted.notices
+            ), observation.observation_id
             temperature_K = temperature_of(observation.identity)
             assert temperature_K is not None
             expected = observation.value.point * (
@@ -1368,6 +1504,141 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
                 and "FeO(R.S.)" in notice.reason
                 for notice in converted.notices
             ), source_id
+
+
+def test_banya_total_iron_flag_excludes_measured_headline(banya_migration) -> None:
+    printed_reference = next(
+        observation
+        for observation in banya_migration.observations.values()
+        if observation.observation_id.endswith("bch80_t2_c_a_1_activity")
+    )
+    # This printed row has no identity composition, so supply a fixture
+    # composition to exercise the flagged residual path independently of that
+    # separate missing-input refusal.
+    composition = F.activity_identity(formula="FeO").composition
+    reference = replace(
+        printed_reference,
+        identity=replace(printed_reference.identity, composition=composition),
+    )
+    context = _context(banya_migration)
+    context = replace(
+        context,
+        observations={
+            **context.observations,
+            reference.observation_id: reference,
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+        predict=_predict,
+    )
+
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
+        residual.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+        for notice in residual.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
+        for notice in residual.notices
+    )
+
+
+def test_total_iron_notice_uses_stored_banya_iron_identity(
+    banya_migration, monkeypatch
+) -> None:
+    observations = banya_migration.observations.values()
+    takezoe_na2o = next(
+        observation
+        for observation in observations
+        if observation.observation_id.endswith(
+            "banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"
+        )
+    )
+    banya_feto_activity = next(
+        observation
+        for observation in banya_migration.observations.values()
+        if observation.observation_id.endswith("bch80_t2_c_a_1_activity")
+        and observation.identity.species is not None
+        and quantity_token(observation.identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    )
+    assert banya_feto_activity.source_id == _BANYA_1980
+    assert banya_feto_activity.identity.species.formula == "FeO"
+    standard = banya_feto_activity.identity.reference_state.value
+    assert isinstance(standard, StandardState)
+    assert standard.endmember.formula == "Fe(1-x)O"
+
+    def assert_identity_scoped_notice() -> None:
+        assert takezoe_na2o.identity.species.formula == "Na2O"
+        # The extract row is type activity_coefficient but prints values.quantity: activity
+        # (a_Na2O upper bound), and migrate.map_quantity resolves the alias first, so the
+        # stored token is ACTIVITY (extracts-v2 agrees). Pin the stored identity.
+        assert quantity_token(takezoe_na2o.identity) is Quantity.ACTIVITY
+        assert score_module._total_iron_formula_notice(takezoe_na2o) is None
+        banya_notice = score_module._total_iron_formula_notice(banya_feto_activity)
+        assert banya_notice is not None
+        assert banya_notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+        assert (
+            "Ban-ya a_FetO on a total-iron basis "
+            "(printed species Fe_tO, stored formula FeO)"
+        ) in banya_notice.reason
+
+    assert_identity_scoped_notice()
+
+    production_notice = score_module._total_iron_formula_notice
+
+    def source_wide_mutation(reference):
+        quantity = quantity_token(reference.identity)
+        if (
+            reference.source_id in score_module._BANYA_FETO_ACTIVITY_RELATIONS
+            and quantity is not None
+        ):
+            return Notice(
+                kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+                affected_quantities=(quantity,),
+                reason="regression mutation: source-id-only total-iron flag",
+                origin=reference.observation_id,
+            )
+        return production_notice(reference)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score_module, "_total_iron_formula_notice", source_wide_mutation
+        )
+        with pytest.raises(AssertionError):
+            assert_identity_scoped_notice()
+
+    def missing_iron_identity_mutation(reference):
+        quantity = quantity_token(reference.identity)
+        if (
+            quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and reference.source_id in score_module._BANYA_FETO_ACTIVITY_RELATIONS
+        ):
+            return Notice(
+                kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+                affected_quantities=(quantity,),
+                reason="regression mutation: missing iron-oxide identity condition",
+                origin=reference.observation_id,
+            )
+        return production_notice(reference)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score_module,
+            "_total_iron_formula_notice",
+            missing_iron_identity_mutation,
+        )
+        with pytest.raises(AssertionError):
+            assert_identity_scoped_notice()
 
 
 def test_banya_source_relation_pins_reject_the_old_dg_janaf_conversion(

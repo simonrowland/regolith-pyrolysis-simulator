@@ -11,12 +11,11 @@ observations:
     species:
       formula: MgAl2O4
       phase:
-        tag: unknown
-        reason: phase string 'MgAl2O4 spinel' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -93,7 +92,19 @@ observations:
         published_page: 1
         pdf_page_index: 0
         section: Results
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgAl2O4 spinel'' is not in the closed automatic map'
+    origin: shornikov-2002-spinel-mgal2o4::shornikov_2002_spinel_formation_enthalpy_estimate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2002-spinel-mgal2o4
   locator:
     page: 1
