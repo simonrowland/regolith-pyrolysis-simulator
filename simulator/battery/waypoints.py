@@ -1472,7 +1472,7 @@ def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
 
 
 def pressure_boundary(
-    experiment: Experiment, bench: Bench, observation: Observation | None = None
+    experiment: Experiment, bench: Bench | None, observation: Observation | None = None
 ) -> WaypointResult:
     routes: list[Waypoint] = []
     point = _point_condition(experiment, observation, "total_pressure_Pa", "pressure_boundary")
@@ -1484,8 +1484,15 @@ def pressure_boundary(
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
             WaypointAuthority.DERIVED if run_pressure.inference else WaypointAuthority.PRINTED,
             ("experiment.pressure_environment.total_pressure_Pa",)))
-    speed = _value(bench.pumping_speed_m3_s)
-    gas_load = next((fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"), None)
+    speed = None if bench is None else _value(bench.pumping_speed_m3_s)
+    gas_load = (
+        None
+        if bench is None
+        else next(
+            (fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"),
+            None,
+        )
+    )
     if speed is not None and gas_load is not None:
         load_value = _value(gas_load.value)
         if load_value is not None:

@@ -19404,11 +19404,6 @@ def load_score_context(
             )
             continue
         experiment = experiments.get(observation.experiment_id)
-        method = (
-            experiment.method.value
-            if experiment is not None and experiment.method.is_value
-            else None
-        )
         pressure_pa = None
         pressure_source = None
         pressure_state = getattr(observation.identity, "total_pressure_Pa", None)
@@ -19419,7 +19414,7 @@ def load_score_context(
                 if experiment is None or experiment.bench_id is None
                 else benches.get(experiment.bench_id)
             )
-            if experiment is not None and bench is not None:
+            if experiment is not None:
                 pressure = _prediction_pressure_waypoint(
                     pressure_boundary(experiment, bench, observation),
                     experiment.method,
@@ -19434,7 +19429,11 @@ def load_score_context(
                 observation,
                 pressure_pa=pressure_pa,
                 pressure_source=pressure_source,
-                method=method,
+                ambient_pressure_evidence=(
+                    None
+                    if experiment is None
+                    else experiment.ambient_pressure_evidence
+                ),
             )
         )
     observations = resolved_observations

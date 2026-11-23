@@ -19,7 +19,9 @@ import re
 
 import pytest
 
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.enums import (
+    AmbientPressureEvidenceClass,
     Authority,
     Engine,
     NoticeKind,
@@ -37,8 +39,15 @@ from simulator.battery.migrate import (
     _log_fO2_to_pa,
     load_migrated_store,
 )
-from simulator.battery.records import Located, Value, nominal_pressure_pa
+from simulator.battery.records import (
+    AmbientPressureEvidence,
+    Located,
+    Locator,
+    Value,
+    nominal_pressure_pa,
+)
 from simulator.battery.oxygen_identity import (
+    _dp002_applicability,
     _printed_buffer_offset,
     _resolve_score_time_buffer_identity,
 )
@@ -1467,13 +1476,16 @@ def test_every_marked_numeric_identity_resolves_with_dp112() -> None:
             notice
             for notice in resolved.notices
             if notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
         )
         assert notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
         assert notice.policy is not None
         assert notice.policy.id == "DP-112"
         assert notice.policy.version == 1
         assert notice.policy.status == "proposed"
-        assert notice.policy.value == format(actual.value, "f")
+        expected_policy = resolve_default_policy("DP-112", formula_result=actual.value)
+        assert notice.policy.value == expected_policy.payload["policy"]["value"]
         assert notice.policy.units == (
             "printed offset and log10(fO2/bar) in dex; P in bar; output in Pa"
         )
@@ -1538,7 +1550,11 @@ def test_every_marked_numeric_identity_resolves_with_dp112() -> None:
             else format(evaluation.band_dex, "f")
         )
         resolved_notice = next(
-            notice for notice in resolved.notices if notice.origin == "score:DP-112"
+            notice
+            for notice in resolved.notices
+            if notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
         )
         assert resolved_notice.band == expected_band
 
@@ -1621,7 +1637,7 @@ def test_load_score_context_applies_dp112_before_scoring() -> None:
     )
 
 
-def test_neuman_dp112_numeric_output_pin_before_pressure_policy_fix() -> None:
+def test_neuman_dp112_numeric_output_pin() -> None:
     context = load_score_context(
         ROOT,
         sources=("neuman-2026-levitation-k-isotopes",),
@@ -1632,24 +1648,29 @@ def test_neuman_dp112_numeric_output_pin_before_pressure_policy_fix() -> None:
         if observation.source_id == "neuman-2026-levitation-k-isotopes"
         and observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
-        and any(notice.origin == "score:DP-112" for notice in observation.notices)
+        and any(
+            notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in observation.notices
+        )
         and observation.identity.fO2_Pa is not None
         and observation.identity.fO2_Pa.is_value
     )
 
     assert values == sorted(
         [
-            "26.58488923637160070975759567",
-            "0.002658488923637160070975759567",
-            "0.002658488923637160070975759567",
-            "26.58488923637160070975759567",
-            "26.58488923637160070975759567",
-            "0.002658488923637160070975759567",
+            "26.58486771855459565668361043",
+            "0.002658486771855459565668361043",
+            "0.002658486771855459565668361043",
+            "26.58486771855459565668361043",
+            "26.58486771855459565668361043",
+            "0.002658486771855459565668361043",
         ]
     )
 
 
-def test_neuman_levitation_uses_the_method_pressure_policy() -> None:
+def test_neuman_pressure_policy_requires_registered_applicability() -> None:
     context = load_score_context(
         ROOT,
         sources=("neuman-2026-levitation-k-isotopes",),
@@ -1662,26 +1683,118 @@ def test_neuman_levitation_uses_the_method_pressure_policy() -> None:
         and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
         and any(
             notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
             for notice in observation.notices
         )
     ]
     assert len(targets) == 6
     for observation in targets:
+        experiment = context.experiments[observation.experiment_id]
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+        assert experiment.ambient_pressure_evidence is None
+        assert not any(
+            notice.origin == "score:DP-002" for notice in observation.notices
+        )
         pressure_notice = next(
             notice
             for notice in observation.notices
-            if notice.origin == "score:DP-002"
+            if notice.origin == "score:DP-112"
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         )
-        assert pressure_notice.kind is NoticeKind.METHOD_IMPLIED
-        assert pressure_notice.policy is not None
-        assert pressure_notice.policy.id == "DP-002"
-        assert pressure_notice.policy.status == "canonical"
-        assert pressure_notice.policy.value == "101325"
+        assert "no applicable pressure policy resolves it" in pressure_notice.reason
         dp112 = next(
-            notice for notice in observation.notices if notice.origin == "score:DP-112"
+            notice
+            for notice in observation.notices
+            if notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
         )
-        assert "P_bar=1.01325" in dp112.reason
-        assert "pressure_route=method_policy:DP-002" in dp112.reason
+        assert "P_bar=not supplied (term omitted at one-bar reference)" in dp112.reason
+
+
+def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
+    locator = Locator(page=2, section="Methods")
+    cases = (
+        (
+            AmbientPressureEvidenceClass.GAS_MIXING,
+            "Experiments were conducted in a gas-mixing furnace.",
+            "gas-mixing furnace",
+        ),
+        (
+            AmbientPressureEvidenceClass.GAS_FLOW,
+            "Samples were equilibrated on a wire-loop.",
+            "wire-loop equilibration",
+        ),
+        (
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            "Experiments were conducted in air.",
+            'experiment "in air"',
+        ),
+    )
+    for evidence_class, quote, expected in cases:
+        evidence = AmbientPressureEvidence(evidence_class, quote, locator)
+        assert _dp002_applicability(evidence) == expected
+
+    flowing_levitation_gas = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.GAS_FLOW,
+        "Levitation used flowing Ar with CO and CO2 mixtures.",
+        locator,
+    )
+    assert _dp002_applicability(flowing_levitation_gas) is None
+
+
+def test_neuman_printed_run_pressure_resolves_without_a_bench(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+
+    source_id = "neuman-2026-levitation-k-isotopes"
+    works, experiments, observations = load_migrated_store(
+        ROOT, sources=(source_id,)
+    )
+    target = next(
+        row
+        for row in observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and any(
+            notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    experiment = experiments[target.experiment_id]
+    assert experiment.bench_id is None
+    pressure_environment = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=Located(
+            State.of(Value.point_of(Decimal("33300"))),
+            locator=experiment.pressure_environment.total_pressure_Pa.locator,
+        ),
+    )
+    injected_experiments = dict(experiments)
+    injected_experiments[experiment.experiment_id] = replace(
+        experiment, pressure_environment=pressure_environment
+    )
+    monkeypatch.setattr(
+        score_module,
+        "load_migrated_store",
+        lambda _root, sources=None: (works, injected_experiments, observations),
+    )
+    monkeypatch.setattr(score_module, "load_migrated_benches", lambda _root: {})
+
+    context = score_module.load_score_context(ROOT, sources=(source_id,))
+    resolved = context.observations[target.observation_id]
+    buffer_notice = next(
+        notice
+        for notice in resolved.notices
+        if notice.origin == "score:DP-112"
+        and notice.kind
+        is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+
+    assert "P_bar=0.333" in buffer_notice.reason
+    assert "pressure_route=printed_run_pressure" in buffer_notice.reason
+    assert not any(notice.origin == "score:DP-002" for notice in resolved.notices)
 
 
 def test_nonqualifying_dp112_markers_keep_the_row_level_path() -> None:
@@ -1792,7 +1905,12 @@ def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> 
         if row.source_id == source_id
         and row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.ACTIVITY
-        and any(notice.origin == "score:DP-112" for notice in row.notices)
+        and any(
+            notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
     )
     experiment = context.experiments[observation.experiment_id]
     baseline_request = activity_request_for_engine(
@@ -1810,7 +1928,7 @@ def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> 
     )
     resolved = _resolve_score_time_buffer_identity(
         unresolved,
-        method=experiment.method.value if experiment.method.is_value else None,
+        ambient_pressure_evidence=experiment.ambient_pressure_evidence,
     )
     mutated_request = activity_request_for_engine(
         experiment, resolved, Engine.INTERNAL_ANALYTICAL.value

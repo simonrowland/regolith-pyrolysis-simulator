@@ -22,9 +22,15 @@ from typing import Any, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.default_policy import resolve as resolve_default_policy
-from simulator.battery.enums import MethodToken, NoticeKind, Quantity, ValueKind
+from simulator.battery.enums import (
+    AmbientPressureEvidenceClass,
+    NoticeKind,
+    Quantity,
+    ValueKind,
+)
 from simulator.battery.identity import Identity
 from simulator.battery.records import (
+    AmbientPressureEvidence,
     Located,
     Notice,
     NoticePolicy,
@@ -74,6 +80,25 @@ def _printed_buffer_offset(reason: str) -> tuple[str, Decimal] | None:
     return buffer, offset
 
 
+def _dp002_applicability(
+    evidence: AmbientPressureEvidence | None,
+) -> str | None:
+    if evidence is None:
+        return None
+    if evidence.evidence_class is AmbientPressureEvidenceClass.GAS_MIXING:
+        return "gas-mixing furnace"
+    if (
+        evidence.evidence_class
+        is AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT
+    ):
+        return 'experiment "in air"'
+    if evidence.evidence_class is AmbientPressureEvidenceClass.GAS_FLOW:
+        quote = " ".join(evidence.quote.casefold().replace("-", " ").split())
+        if "wire loop" in quote and "equilibr" in quote:
+            return "wire-loop equilibration"
+    return None
+
+
 def log10_fo2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = BAR_PA
 ) -> Decimal:
@@ -93,7 +118,7 @@ def _resolve_score_time_buffer_identity(
     *,
     pressure_pa: Decimal | None = None,
     pressure_source: str | None = None,
-    method: MethodToken | None = None,
+    ambient_pressure_evidence: AmbientPressureEvidence | None = None,
 ) -> Observation:
     """Resolve the eight numeric-source buffer markers for score-time use."""
 
@@ -161,7 +186,7 @@ def _resolve_score_time_buffer_identity(
     if pressure_pa is not None:
         if not pressure_pa.is_finite() or pressure_pa < 0:
             return observation
-    elif method is MethodToken.AERODYNAMIC_LEVITATION_LASER_HEATING:
+    elif (applicability := _dp002_applicability(ambient_pressure_evidence)) is not None:
         pressure_policy = resolve_default_policy("DP-002")
         pressure_pa = pressure_policy.value
         if not isinstance(pressure_pa, Decimal):
@@ -172,8 +197,8 @@ def _resolve_score_time_buffer_identity(
             kind=pressure_policy.flag,
             affected_quantities=(expected_quantity,),
             reason=(
-                "DP-002 method-implied ambient total pressure for aerodynamic "
-                "levitation with flowing gas; chamber pressure is unreported"
+                f"DP-002 applies to registered condition {applicability}; "
+                "chamber pressure is unreported"
             ),
             origin="score:DP-002",
             policy=NoticePolicy(**policy_metadata),
