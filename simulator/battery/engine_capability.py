@@ -155,7 +155,10 @@ def engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
 
 
 def any_declared_engine_covers(quantity: Quantity) -> bool:
-    return any(quantity in quantities for quantities in ENGINE_QUANTITIES.values())
+    return any(
+        engine_covers_scoring_route(engine, quantity)
+        for engine in ENGINE_QUANTITIES
+    )
 
 
 def _coverage_text(scored: int, callable_observations: int) -> str:
@@ -269,7 +272,9 @@ def capability_summary(
             n_outside_census_not_emitted += 1
     rows = [
         {
-            "covered": engine_covers_quantity(Engine(engine), Quantity(quantity)),
+            "covered": engine_covers_scoring_route(
+                Engine(engine), Quantity(quantity)
+            ),
             "engine": engine,
             "n_observations": n,
             "quantity": quantity,

@@ -80,7 +80,10 @@ def test_capability_table_names_the_score_engines() -> None:
 
 
 def test_capability_census_uses_the_dispatched_phase_route() -> None:
-    from simulator.battery.engine_capability import engine_covers_scoring_route
+    from simulator.battery.engine_capability import (
+        any_declared_engine_covers,
+        engine_covers_scoring_route,
+    )
 
     assert engine_covers_scoring_route(
         Engine.ALPHAMELTS, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -97,6 +100,7 @@ def test_capability_census_uses_the_dispatched_phase_route() -> None:
     assert not engine_covers_scoring_route(
         Engine.ALPHAMELTS, Quantity.SULFIDE_CAPACITY
     )
+    assert not any_declared_engine_covers(Quantity.SULFIDE_CAPACITY)
 
 
 def test_predict_time_capability_ladder_matches_the_pin() -> None:
