@@ -15,6 +15,8 @@ from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
 
+import pytest
+
 from simulator.battery.enums import (
     Engine,
     EvidenceClass,
@@ -780,6 +782,69 @@ def test_openimcc_formula_suffix_phases_resolve_inside_species_input() -> None:
         assert phase is expected_phase
 
 
+def test_openimcc_source_input_pr_sample_uses_real_compilation_rows() -> None:
+    """Sample hydrate, grouped gas, and unsupported aqueous source identities."""
+
+    from simulator.battery.compilation_tier import _openimcc_species_input
+
+    rows = (
+        (
+            (
+                "data/literature/compilations/kelley-king-1961-usbm-b592/"
+                "records/table-006-0500.json"
+            ),
+            "kelley-king-1961-usbm-b592",
+            "H2SO4·3H2O(l)",
+            "H8O7S",
+            Phase.L,
+            None,
+        ),
+        (
+            (
+                "data/literature/compilations/pankratz-1984-usbm-b677/"
+                "records/table-0270.json"
+            ),
+            "pankratz-1984-usbm-b677",
+            "(AlBr3)2",
+            "Al2Br6",
+            Phase.G,
+            None,
+        ),
+        (
+            (
+                "data/literature/compilations/kelley-king-1961-usbm-b592/"
+                "records/table-006-0062.json"
+            ),
+            "kelley-king-1961-usbm-b592",
+            "H2AsO2(aq)",
+            None,
+            None,
+            "pure-phase-phase-unsupported",
+        ),
+    )
+    for (
+        path,
+        source_id,
+        source_formula,
+        expected_formula,
+        expected_phase,
+        refusal_code,
+    ) in rows:
+        source, actual_formula, item = _source_formula_observation(path, source_id)
+        assert item.locator is not None
+        assert source["record_id"] == item.locator.record
+        assert actual_formula == source_formula
+
+        formula, phase, refusal = _openimcc_species_input(item)
+        if refusal_code is None:
+            assert refusal is None, (source_formula, refusal)
+            assert (formula, phase) == (expected_formula, expected_phase)
+        else:
+            assert formula is None and phase is None
+            assert refusal is not None and refusal.code == refusal_code
+            assert refusal.extra["formula"] == source_formula
+
+
 def test_openimcc_group_formula_matches_independent_janaf_source(monkeypatch) -> None:
     from simulator.battery.compilation_tier import predict_thermo_attempt
     from simulator.yaml_cache import load_cached_safe_yaml
@@ -1201,6 +1266,7 @@ def _openimcc_compilation_input_census(context) -> dict[str, object]:
     }
 
 
+@pytest.mark.nightly
 def test_openimcc_source_input_gate_covers_every_compilation_cp_s_h_cell() -> None:
     from simulator.battery.score import ScoreContext
 
