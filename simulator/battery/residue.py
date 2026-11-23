@@ -2587,7 +2587,7 @@ def predict_knudsen_residue_composition(
 
     from simulator.battery.enums import AdmissionStatus, MEASURED_EVIDENCE, MethodToken, NoticeKind, Quantity, RegimeClass, ValueKind
     from simulator.battery.identity import quantity_token
-    from simulator.battery.records import Notice
+    from simulator.battery.records import Notice, NoticePolicy
     from simulator.battery.source_oxygen import (
         SourceOxygenCondition, SourceOxygenFallback, _printed_source_oxygen_at_point, resolve_source_oxygen,
         source_oxygen_closure_notice,
@@ -2624,10 +2624,17 @@ def predict_knudsen_residue_composition(
     # absolute mass cutoff, so it needs the scale of the weighed charge.
     charge_kg = 1.0
     assumed_charge = use_loader_cutoff and (measured_charge_kg is None or measured_charge_kg <= 0.0)
-    if use_loader_cutoff:
+    charge_default = None
+    if assumed_charge:
+        from simulator.battery.default_policy import resolve
         from simulator.diagnostic_helpers.binary_pot_battery import DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG
 
-        charge_kg = DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG if assumed_charge else measured_charge_kg
+        charge_default = resolve(
+            "DP-008", runtime_default=Decimal(str(DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG)),
+        )
+        charge_kg = float(charge_default.value)
+    elif use_loader_cutoff:
+        charge_kg = measured_charge_kg
     initial = {oxide: charge_kg * weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
     anchors = {}
     for row in rows:
@@ -2683,12 +2690,14 @@ def predict_knudsen_residue_composition(
         reason="near-saturation and molecular effusion assumed from the printed Knudsen method; unprinted geometry cannot verify cell saturation",
         origin="Knudsen residue extent",
     )]
-    if assumed_charge:
+    if charge_default is not None:
         notices.append(Notice(
-            kind=NoticeKind.FALLBACK,
+            kind=charge_default.flag,
             affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
             reason=f"sample mass missing or nonpositive; assumed {charge_kg:g} kg for the analytical loader cutoff",
             origin="Knudsen residue extent",
+            # DP-008 leaves the unit to the runtime knob owner.
+            policy=NoticePolicy(**(charge_default.payload["policy"] | {"units": "kg"})),
         ))
     oxygen_sources, source_logs = [], []
     for x, t in path:

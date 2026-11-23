@@ -351,6 +351,31 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
+@pytest.mark.parametrize("mass_kg", (None, "0.002"))
+def test_analytical_knudsen_mass_default_reports_dp008(extent_point, mass_kg):
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.records import NoticePolicy
+    from simulator.battery.residue import _formula_terms
+    from simulator.battery.score import ScoreContext, compile_residual
+
+    reference, experiment, rows = extent_point
+    if mass_kg is not None:
+        experiment = replace(experiment, sample=replace(
+            experiment.sample, mass_kg=Located(State.of(Value.point_of(mass_kg)), reference.locator),
+        ))
+    context = ScoreContext({}, {experiment.experiment_id: experiment},
+                           {row.observation_id: row for row in (reference, *rows)})
+    residual, candidate = compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=context)
+    assert residual.numeric is not None and candidate is not None
+    notices = tuple(notice for notice in residual.notices if notice.kind is NoticeKind.KNOB_DEFAULTED)
+    expected = () if mass_kg is not None else (NoticePolicy("DP-008", 1, "canonical", "0.001", "kg"),)
+    assert tuple(notice.policy for notice in notices) == expected
+    inventory = candidate.provenance["initial_inventory_mol"]
+    assert sum(amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()) == pytest.approx(
+        float(mass_kg or "0.001")
+    )
+
+
 @pytest.mark.parametrize("printed_resolution", (True, False, "component"))
 def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monkeypatch, printed_resolution):
     from simulator.battery import residue, score
