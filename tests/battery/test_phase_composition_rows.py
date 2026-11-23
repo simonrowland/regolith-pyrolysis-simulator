@@ -33,6 +33,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExecutionState,
     MetricOperation,
+    MethodToken,
     NoticeKind,
     Phase,
     PhaseRole,
@@ -1165,6 +1166,88 @@ def test_compile_residual_passes_resolved_phase_composition_to_engine(
         ),
     )
     assert melt_activity_row((without_phase_input_flag,))["n_candidates"] == 1
+
+
+def test_compile_mass_percent_start_keeps_migrator_notices(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    work = F.work()
+    experiment = F.tabulation_experiment(
+        experiment_id="phase-input-open-start",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+    )
+    start = Composition(
+        basis="printed_oxides",
+        components=(("SiO2", Decimal("60")), ("MgO", Decimal("40"))),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=Located(
+                State.of(start),
+                locator=F.loc(note="normalized to 100% anhydrous"),
+            ),
+        ),
+    )
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase-open-start",
+        experiment.experiment_id,
+        target_identity,
+        Decimal("40"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-input-open-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={target.observation_id: target},
+        extract_review={"phase-input-open-source": "reviewed"},
+        hostname="test",
+    )
+
+    def hook(_engine, *, composition_kg, **_kwargs):
+        return EquilibriumResult(
+            status="ok",
+            liquid_fraction=0.5,
+            phases_present=["metal"],
+            phase_compositions={"metal": {"MgO": 60.0}},
+        )
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    residual, _candidate = compile_residual(
+        target,
+        Engine.ALPHAMELTS,
+        context=context,
+        comparison_ids={target.observation_id},
+    )
+
+    open_notice = next(
+        notice
+        for notice in residual.notices
+        if notice.reason.startswith("open_system_starting_bulk:")
+    )
+    assert open_notice.reason == (
+        "open_system_starting_bulk: langmuir_free_evaporation"
+    )
+    assert open_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert open_notice.band == "open_system_starting_bulk"
+    assert open_notice.origin == target.observation_id
+
+    anhydrous_notice = next(
+        notice
+        for notice in residual.notices
+        if notice.reason.startswith("anhydrous_starting_bulk_omits_h2o:")
+    )
+    assert "identity.composition omits H2O" in anhydrous_notice.reason
+    assert anhydrous_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert anhydrous_notice.band == "anhydrous_starting_bulk_omits_h2o"
+    assert anhydrous_notice.origin == target.observation_id
 
 
 def _dex(candidate: Decimal, reference: Decimal) -> Decimal:

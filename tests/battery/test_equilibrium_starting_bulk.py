@@ -6,6 +6,7 @@ composition. The analysed glass is the measurement, not that input.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -13,6 +14,7 @@ import pytest
 
 from simulator.battery.enums import AmountBasis, NoticeKind, Quantity
 from simulator.battery.identity import profile_for
+from simulator.battery.input_provenance import _phase_row_composition_input
 from simulator.battery.migrate import migrate, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 
@@ -521,6 +523,7 @@ def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None
     result = migrate(root, write=False)
     filled = result.observations["fixture-source::glass-al"]
     blank = result.observations["fixture-source::glass-blank"]
+    experiment = result.experiments[blank.experiment_id]
     starting = _starting_mole_fraction()
     assert filled.identity.composition is not None
     assert filled.identity.composition.is_value
@@ -532,6 +535,22 @@ def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None
     identity = blank.identity.composition
     assert identity is not None and identity.is_unknown
     assert identity.reason == _BLANK_REASON
+
+    resolved = _phase_row_composition_input(blank, experiment, (filled, blank))
+    assert resolved.composition is None
+    assert resolved.notice is None
+
+    point_conditions = {
+        key: value
+        for key, value in (blank.point_conditions or {}).items()
+        if key not in {"composition", "initial_composition_as_published"}
+    }
+    identity_unknown_only = replace(blank, point_conditions=point_conditions)
+    resolved_identity_unknown = _phase_row_composition_input(
+        identity_unknown_only, experiment, (filled, identity_unknown_only)
+    )
+    assert resolved_identity_unknown.composition is None
+    assert resolved_identity_unknown.notice is None
 
 
 def test_partial_equilibrium_phase_child_refusal_keeps_green_parent_identity(
