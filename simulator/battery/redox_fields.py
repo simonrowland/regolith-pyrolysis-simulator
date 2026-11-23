@@ -1,10 +1,12 @@
 """Source fields and information flow for predictive redox controls."""
 
 from collections.abc import Callable, Mapping
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from decimal import Decimal
+from enum import Enum
 
 from simulator.battery.enums import FO2Channel, NoticeKind, Quantity, ValueKind
+from simulator.battery.identity import quantity_token
 from simulator.battery.records import Experiment, Located, Notice, Observation, State, Value
 from simulator.battery.printed_cells import (
     PrintedCell as _PrintedCell,
@@ -33,6 +35,41 @@ CONTROL_VARIABLE_FIELDS = {
                                   "oxygen_fugacity_buffer_relation"}),
     "duration": frozenset({"duration_h", "duration_s", "hold_duration_s"}),
 }
+
+
+class TargetRelation(str, Enum):
+    SAME_PRINTED_CELL = "same_printed_cell"
+    DERIVED_FROM_TARGET = "derived_from_target"
+    TARGET_ANALYTE_OPERAND = "target_analyte_operand"
+    INDEPENDENT_RUN_CONTROL = "independent_run_control"
+    IMPOSED_CONTROL_TARGET = "imposed_control_target"
+    INDEPENDENT = "independent"
+
+
+@dataclass(frozen=True)
+class CandidateInput:
+    field: str
+    condition: Located
+    axis: str | None = None
+    imposed_oxygen: bool = False
+    experiment: Experiment | None = None
+
+
+@dataclass(frozen=True)
+class TargetProvenance:
+    relation: TargetRelation
+    ambiguous_cell: bool = False
+    target_operand: bool = False
+
+    @property
+    def exclusion_reason(self) -> str | None:
+        if self.ambiguous_cell:
+            return "ambiguous"
+        return {
+            TargetRelation.SAME_PRINTED_CELL: "same",
+            TargetRelation.DERIVED_FROM_TARGET: "derived_from_target",
+            TargetRelation.TARGET_ANALYTE_OPERAND: "analyte_operand",
+        }.get(self.relation)
 
 
 def _condition_references(observation: Observation, field: str) -> set[str]:
@@ -75,67 +112,137 @@ def _match_target_cell(targets: tuple[_PrintedCell, ...], candidate: _PrintedCel
     return "same" if "same" in matches else "ambiguous" if "ambiguous" in matches else None
 
 
-def _is_imposed_oxygen_cell(
-    targets: tuple[_PrintedCell, ...], experiment: Experiment | None,
-    observation_id: str,
-) -> bool:
-    control = experiment.fO2_control if experiment is not None else None
-    return (
-        control is not None
-        and control.channel.is_value
-        and control.channel.value is not FO2Channel.INTRINSIC
-        and control.oxygen_partial_pressure_Pa is not None
-        and _target_dependency(
-            targets, control.oxygen_partial_pressure_Pa, observation_id
-        ) is not None
-    )
+def classify_target_provenance(
+    observation: Observation, candidate: CandidateInput,
+) -> TargetProvenance:
+    """Classify the information the candidate carries about the scored value."""
+    targets = _target_cells(observation)
+    conditions = observation.point_conditions or {}
+    scope = f"observation[{observation.observation_id}]"
+    seen: set[int] = set()
+    references_run_control = False
+    imposed_inputs = _imposed_oxygen_inputs(candidate.experiment)
 
-
-def _target_dependency(
-    target: tuple[_PrintedCell, ...], condition: Located, observation_id: str,
-) -> str | None:
-    inference = condition.inference
-    match = _match_target_cell(target, _printed_cell(
-        condition, address_only=inference is not None,
-    ))
-    if match is not None:
-        return match
-    if inference is not None:
-        # A bare observation ID is a supported derivation reference, and
-        # identifies the scored value even when no parameter is expanded.
-        target_reference = f"observation[{observation_id}]"
-        if any(
-            reference == observation_id
-            or reference == target_reference
-            or reference.startswith(f"{target_reference}.")
-            for reference in inference.inputs
-        ):
-            return "derived_from_target"
-        for _, operand in inference.parameters:
-            match = _target_dependency(target, operand, observation_id)
+    def derivation_match(condition: Located) -> str | None:
+        nonlocal references_run_control
+        inference = condition.inference
+        if inference is None or id(condition) in seen:
+            return None
+        seen.add(id(condition))
+        operands = [operand for _, operand in inference.parameters]
+        for reference in inference.inputs:
+            path = reference.removeprefix(f"{scope}.")
+            if reference in {observation.observation_id, scope} or (
+                path != reference and path.partition(".")[0] in {"value", "values"}
+            ):
+                return "same"
+            field = path.removeprefix("point_conditions.")
+            if (operand := conditions.get(field) or _referenced_run_input(candidate.experiment, path)) is not None:
+                operands.append(operand)
+                references_run_control |= _is_run_control(
+                    CandidateInput(field, operand, field.rsplit(".", 1)[-1], field in imposed_inputs),
+                )
+        for operand in operands:
+            match = derivation_match(operand) or _match_target_cell(
+                targets, _printed_cell(operand, address_only=operand.inference is not None),
+            )
             if match is not None:
-                return "ambiguous" if match == "ambiguous" else "derived_from_target"
-    return None
+                return match
+        return None
 
+    condition = candidate.condition
+    dependency = derivation_match(condition)
+    if dependency is not None:
+        return TargetProvenance(TargetRelation.DERIVED_FROM_TARGET, dependency == "ambiguous")
 
-def _operand_fields(observation: Observation, conditions: Mapping[str, Located]) -> set[str]:
+    cell = _printed_cell(condition, address_only=condition.inference is not None)
+    match = _match_target_cell(targets, cell)
     derivation = observation.derivation
-    if derivation is None:
-        return set()
-    inputs = set(derivation.inputs)
-    inputs.update(
-        reference
-        for name, original in derivation.parameters
-        if name == "original" and original.inference is not None
-        for reference in original.inference.inputs
+    field = candidate.field
+    references = _condition_references(observation, field)
+    if candidate.imposed_oxygen and (
+        match is not None or (derivation is not None and (
+            field in derivation.inputs
+            or (field.startswith("experiment.fO2_control.") and "experiment.fO2_control" in derivation.inputs)
+        ))
+    ):
+        species = observation.identity.species
+        if species is not None and species.formula == "O2" and quantity_token(observation.identity) in {
+            Quantity.FUGACITY, Quantity.P_PARTIAL,
+        }:
+            return TargetProvenance(TargetRelation.IMPOSED_CONTROL_TARGET)
+    if match is not None:
+        return TargetProvenance(TargetRelation.SAME_PRINTED_CELL, match == "ambiguous")
+    target_operand = derivation is not None and (
+        not references.isdisjoint(derivation.inputs)
+        or any(
+            name == field or name == f"original_{field}"
+            or (name == "original" and operand.inference is not None
+                and not references.isdisjoint(operand.inference.inputs))
+            or (name != "original" and same_printed_cell(cell, _printed_cell(operand)) is not None)
+            for name, operand in derivation.parameters
+        )
     )
+    is_oxygen_control = candidate.axis == "fO2_Pa" and any(
+        same_printed_cell(cell, _printed_cell(operand)) is not None
+        and derivation_match(operand) is None
+        for field, operand in imposed_inputs.items()
+        if field == "experiment.fO2_control.oxygen_partial_pressure_Pa"
+    )
+    if _is_run_control(candidate) or is_oxygen_control:
+        return TargetProvenance(TargetRelation.INDEPENDENT_RUN_CONTROL, target_operand=target_operand)
+    if target_operand:
+        return TargetProvenance(TargetRelation.TARGET_ANALYTE_OPERAND)
+    if references_run_control:
+        return TargetProvenance(TargetRelation.INDEPENDENT_RUN_CONTROL)
+    return TargetProvenance(TargetRelation.INDEPENDENT)
+
+
+def _is_run_control(candidate: CandidateInput) -> bool:
+    field = candidate.field.rsplit(".", 1)[-1]
+    axis = candidate.axis or field
+    return (
+        candidate.imposed_oxygen
+        or CONTROL_VARIABLE_FIELDS.get(axis) == frozenset()
+        or any(field in fields for fields in CONTROL_VARIABLE_FIELDS.values())
+    )
+
+
+def _imposed_oxygen_inputs(experiment: Experiment | None) -> dict[str, Located]:
+    if experiment is None:
+        return {}
+    control = experiment.fO2_control
+    if control is not None and control.channel.is_value and control.channel.value is FO2Channel.INTRINSIC:
+        return {}
+    inputs = {"experiment.sample.container": experiment.sample.container}
+    if control is not None:
+        inputs.update({
+            "experiment.fO2_control.oxygen_partial_pressure_Pa": control.oxygen_partial_pressure_Pa,
+            "experiment.fO2_control.buffer": control.buffer,
+            "experiment.fO2_control.gas_ratio": control.gas_ratio.value if control.gas_ratio is not None else None,
+        })
     return {
-        field for field in conditions
-        if not _condition_references(observation, field).isdisjoint(inputs)
-    } | {
-        name.removeprefix("original_") for name, _ in derivation.parameters
-        if name.startswith("original_")
+        field: condition for field, condition in inputs.items()
+        if condition is not None and condition.state.is_value
     }
+
+
+def _referenced_run_input(experiment: Experiment | None, reference: str) -> Located | None:
+    scope, _, path = reference.partition(".")
+    if experiment is None or scope != "experiment":
+        return None
+    group, _, field = path.partition(".")
+    if group == "conditions":
+        return experiment.conditions.get(field)
+    if group in {"sample", "pressure_environment", "fO2_control"}:
+        if field == "gas_ratio":
+            field = "gas_ratio.value"
+        name, _, member = field.partition(".")
+        value = getattr(getattr(experiment, group), name, None)
+        if member:
+            value = getattr(value, member, None)
+        return value if isinstance(value, Located) else None
+    return None
 
 
 def independent_redox_conditions(
@@ -152,50 +259,45 @@ def independent_redox_conditions(
     """Build the one permitted input view and retain the reason for each exclusion."""
     conditions = observation.point_conditions or {}
     identity = observation.identity
-    target = _target_cells(observation)
-    imposed = imposed_oxygen_target(observation, experiment, quantity)
+    imposed_inputs = _imposed_oxygen_inputs(experiment)
     derivation = observation.derivation
     parameters = dict(derivation.parameters) if derivation is not None else {}
     excluded: dict[str, str] = {}
     correction_axes = set()
     correction_pressure = None
     temperature_operand = False
-    for field in _operand_fields(observation, conditions):
+
+    def classify(field: str, condition: Located) -> TargetProvenance:
+        return classify_target_provenance(observation, CandidateInput(
+            field, condition, condition_identity_axis(field.rsplit(".", 1)[-1]),
+            imposed_oxygen=field in imposed_inputs, experiment=experiment,
+        ))
+
+    point_inputs = {
+        field: classify(field, condition) for field, condition in conditions.items()
+        if field not in {"sample_id", "quench_state", "quench_direction"}
+    }
+    for field in conditions.keys() | {
+        name.removeprefix("original_") for name in parameters if name.startswith("original_")
+    }:
         axis = condition_identity_axis(field)
-        condition = conditions.get(field)
-        if not (
-            axis in CONTROL_VARIABLE_FIELDS and not CONTROL_VARIABLE_FIELDS[axis]
-            or any(field in fields for fields in CONTROL_VARIABLE_FIELDS.values())
-            or (
-                axis == "fO2_Pa" and condition is not None
-                and _is_imposed_oxygen_cell(
-                    _printed_cells(condition), experiment, observation.observation_id
-                )
-            )
-        ):
-            excluded[field] = "analyte_operand"
-            continue
         original = parameters.get(f"original_{field}")
-        if axis == "temperature_K" and field in conditions:
+        if axis == "temperature_K" and field in point_inputs and point_inputs[field].target_operand:
             temperature_operand = True
         if (
             original is None or not original.state.is_value
             or axis not in {"temperature_K", "total_pressure_Pa"}
         ):
             continue
-        original_value = condition_identity_value(
-            field, original.state.value, conditions
-        )
+        original_value = condition_identity_value(field, original.state.value, conditions)
         projected = getattr(identity, axis)
         if original_value is None:
             continue
         axis_conditions = {
-            key: condition_identity_value(
-                key, condition.state.value, conditions
-            )
+            key: condition_identity_value(key, condition.state.value, conditions)
             for key, condition in conditions.items()
             if condition.state.is_value and condition_identity_axis(key) == axis
-            and _target_dependency(target, condition, observation.observation_id) is None
+            and point_inputs[key].exclusion_reason is None
         }
         projected_value = (
             projected.value if projected is not None and projected.is_value else None
@@ -204,7 +306,7 @@ def independent_redox_conditions(
         if experiment is not None:
             run_conditions = {
                 key: condition for key, condition in experiment.conditions.items()
-                if _target_dependency(target, condition, observation.observation_id) is None
+                if classify(f"experiment.conditions.{key}", condition).exclusion_reason is None
             }
             if axis == "temperature_K":
                 selected = temperature_selection(run_conditions)
@@ -212,9 +314,9 @@ def independent_redox_conditions(
                     run_value = selected.value
             else:
                 pressure = experiment.pressure_environment.total_pressure_Pa
-                if pressure.state.is_value and _target_dependency(
-                    target, pressure, observation.observation_id
-                ) is None:
+                if pressure.state.is_value and classify(
+                    "experiment.pressure_environment.total_pressure_Pa", pressure,
+                ).exclusion_reason is None:
                     run_conditions[axis] = pressure
                 run_value = pressure_selection(run_conditions)
         if any(
@@ -230,15 +332,14 @@ def independent_redox_conditions(
                 if axis == "total_pressure_Pa":
                     correction_pressure = run_value
 
-    for field, condition in conditions.items():
+    for field, provenance in point_inputs.items():
+        condition = conditions[field]
+        if provenance.exclusion_reason is not None:
+            excluded[field] = provenance.exclusion_reason
+            continue
         if not condition.state.is_value:
             continue
-        if field in {"sample_id", "quench_state", "quench_direction"}:
-            continue
-        relation = _target_dependency(target, condition, observation.observation_id)
-        if relation is not None:
-            excluded[field] = relation
-        elif ferric_target and field in _FERRIC_CONDITION_FIELDS and (
+        if ferric_target and field in _FERRIC_CONDITION_FIELDS and (
             condition.locator is None or observation.locator is None
         ):
             excluded[field] = "unlocated_ferric_assay"
@@ -248,9 +349,7 @@ def independent_redox_conditions(
     excluded_sources = {f"point_conditions.{field}" for field in excluded}
     if experiment is not None:
         def independent_control(field: str, condition: Located | None) -> Located | None:
-            if condition is None or (reason := _target_dependency(
-                target, condition, observation.observation_id
-            )) is None:
+            if condition is None or (reason := classify(field, condition).exclusion_reason) is None:
                 return condition
             excluded[field] = reason
             located_inputs[field] = condition
@@ -268,7 +367,7 @@ def independent_redox_conditions(
         sweep = independent_control("experiment.pressure_environment.sweep_gas",
                                     environment.sweep_gas)
         oxygen = experiment.fO2_control
-        if oxygen is not None and not imposed:
+        if oxygen is not None:
             gas = oxygen.gas_ratio
             if gas is not None and independent_control("experiment.fO2_control.gas_ratio", gas.value) is None:
                 gas = None
@@ -348,23 +447,11 @@ def independent_redox_conditions(
     ), experiment, notices
 
 
-def imposed_oxygen_target(observation: Observation, experiment: Experiment | None, quantity: Quantity) -> bool:
+def imposed_oxygen_target(observation: Observation, experiment: Experiment | None) -> bool:
     """Identify a setpoint observation by its recorded control provenance."""
-    species = observation.identity.species
-    if quantity not in {Quantity.FUGACITY, Quantity.P_PARTIAL} or species is None or species.formula != "O2":
-        return False
-    control = experiment.fO2_control if experiment is not None else None
-    derivation = observation.derivation
-    if control is not None and control.channel.is_value and control.channel.value is FO2Channel.INTRINSIC:
-        return False
-    if _is_imposed_oxygen_cell(_target_cells(observation), experiment):
-        return True
-    if derivation is None or experiment is None:
-        return False
     return any(
-        (control is not None and (
-            name == "experiment.fO2_control" or name.startswith("experiment.fO2_control.")
-        ))
-        or (name == "experiment.sample.container" and experiment.sample.container is not None)
-        for name in derivation.inputs
+        classify_target_provenance(
+            observation, CandidateInput(field, condition, imposed_oxygen=True, experiment=experiment),
+        ).relation is TargetRelation.IMPOSED_CONTROL_TARGET
+        for field, condition in _imposed_oxygen_inputs(experiment).items()
     )

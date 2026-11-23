@@ -31,7 +31,9 @@ def normalize_printed_unit(unit: str) -> str:
         "atmosphere": "atm", "atmospheres": "atm", "bar": "bar",
         "bars": "bar", "mbar": "mbar", "millibar": "mbar",
         "pa": "Pa", "pascal": "Pa", "pascals": "Pa",
-        "mpa": "MPa", "mm": "mm", "cm": "cm", "cm3": "cm3",
+        "kpa": "kPa", "mpa": "MPa", "gpa": "GPa",
+        "kbar": "kbar", "kilobar": "kbar",
+        "mm": "mm", "cm": "cm", "cm3": "cm3",
         "mg": "mg", "g": "g", "gram": "g", "grams": "g",
         "kg": "kg", "s": "s", "sec": "s", "second": "s",
         "seconds": "s", "min": "min", "minute": "min",
@@ -121,12 +123,10 @@ def same_printed_cell(a: PrintedCell | None, b: PrintedCell | None) -> str | Non
         return "same"
     if a.value is None or b.value is None:
         return None
+    if a.unit is not None and b.unit is not None and normalize_printed_unit(a.unit) != normalize_printed_unit(b.unit):
+        return None
     try:
         first, second = Decimal(a.value), Decimal(b.value)
     except InvalidOperation:
-        units_agree = (a.unit is None or b.unit is None
-                       or normalize_printed_unit(a.unit) == normalize_printed_unit(b.unit))
-        return "ambiguous" if a.value == b.value and units_agree else None
-    units_agree = (a.unit is None or b.unit is None
-                   or normalize_printed_unit(a.unit) == normalize_printed_unit(b.unit))
-    return "ambiguous" if first.is_finite() and second.is_finite() and first == second and units_agree else None
+        return "ambiguous" if a.value == b.value else None
+    return "ambiguous" if first.is_finite() and second.is_finite() and first == second else None

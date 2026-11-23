@@ -14873,9 +14873,7 @@ def _predict_with_engine(
         return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    if quantity is not None and experiment is not None and imposed_oxygen_target(
-        observation, experiment, quantity,
-    ):
+    if quantity is not None and experiment is not None and imposed_oxygen_target(observation, experiment):
         from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
 
         input_view, run_view, exclusion_notices = _redox_input_view(observation, quantity, experiment)

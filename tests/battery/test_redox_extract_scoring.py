@@ -4,14 +4,17 @@ import math
 import shutil
 import subprocess
 import sys
+from collections import defaultdict
 from dataclasses import replace
 from decimal import Decimal
+from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 import simulator.battery.score as score_module
+from simulator.battery import redox_fields as provenance
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -2585,6 +2588,163 @@ def test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline(column)
     assert candidate is not None
     assert residual.numeric is not None and residual.numeric.value == 0, residual.refusal
     assert not score_module._headline_payload_admits(residual_to_plain(residual), tier="all_numeric")
+
+
+@pytest.mark.parametrize("relation", [
+    "same_printed_cell", "derived_from_target", "target_analyte_operand",
+    "independent_run_control", "imposed_control_target", "independent",
+])
+@pytest.mark.parametrize("locator_form", ["column", "record", "physical-page"])
+@pytest.mark.parametrize(("unit", "alias"), [
+    ("Pa", "pascal"), ("Pa", "pascals"), ("bar", "bars"), ("kbar", "kilobar"),
+    ("kPa", "kpa"), ("MPa", "mpa"), ("GPa", "gpa"), ("atm", "atmosphere"),
+    ("atm", "atmospheres"), ("Torr", "mmHg"), ("mbar", "millibar"),
+])
+def test_target_provenance_matrix(relation, locator_form, unit, alias):
+    location = Locator(page=3, table="2", record="run 1", note="column=result")
+    candidate_location = {
+        "column": replace(location, note="annotation; column=result"),
+        "record": Locator(table="2", record="run 1"),
+        "physical-page": Locator(pdf_page_index=2, table="2", note="row=run 1; column=result"),
+    }[locator_form]
+    if relation not in {"same_printed_cell", "imposed_control_target"}:
+        candidate_location = replace(candidate_location, record="run 2", note="column=input")
+    run = F.tabulation_experiment()
+    identity = replace(F.psat_identity("O2"), quantity=State.of(Quantity.FUGACITY))
+    target = replace(
+        F.observation("target", run.experiment_id, identity, Decimal("10")),
+        locator=located_printed_cell(location, "10", unit),
+    )
+    temperature = Located(State.of(Decimal("1500")), Locator(page=3, record="run setup"))
+    field = "temperature_K" if relation == "independent_run_control" else "assay"
+    inputs = ()
+    if relation == "derived_from_target":
+        inputs = (f"observation[{target.observation_id}].value",)
+    elif relation == "independent_run_control":
+        inputs = (f"observation[{target.observation_id}].point_conditions.temperature_K",)
+        field = "projected_temperature"
+    elif relation == "target_analyte_operand":
+        target = replace(target, derivation=Derivation("assay conversion", ("point_conditions.assay",), (), "Pa"))
+    elif relation == "independent":
+        inputs = ("observation[another].value",)
+    condition = Located(
+        State.of(Decimal("10")), located_printed_cell(candidate_location, "10", alias),
+        Derivation("input conversion", inputs, (), "Pa") if inputs else None,
+    )
+    target = replace(target, point_conditions={"temperature_K": temperature, field: condition})
+    imposed = relation == "imposed_control_target"
+    candidate = provenance.CandidateInput(field, condition, imposed_oxygen=imposed)
+
+    result = provenance.classify_target_provenance(target, candidate)
+
+    assert result.relation.value == relation
+    if relation == "same_printed_cell":
+        assert result.ambiguous_cell is (locator_form == "record")
+
+
+@pytest.mark.parametrize("reference", ["target", "observation[target].value", "observation[target].point_conditions.temperature_K"])
+def test_target_derived_commanded_oxygen_cannot_use_setpoint_exemption(reference):
+    run = F.tabulation_experiment()
+    location = Locator(page=3, table="2", record="run 1", note="column=result")
+    temperature = Located(State.of(Decimal("1500")), inference=Derivation("from target", ("target",), (), "K"))
+    row = replace(
+        F.observation("target", run.experiment_id, replace(
+            F.psat_identity("O2"), quantity=State.of(Quantity.FUGACITY),
+            reservoir=None, total_pressure_Pa=None,
+        ), Decimal("10")),
+        locator=location,
+        point_conditions={"temperature_K": temperature},
+        derivation=Derivation("declared setpoint", ("experiment.fO2_control",), (), "Pa"),
+    )
+    pressure = Located(State.of(Value.point_of(Decimal("10"))), location,
+                       Derivation("copied pressure", (reference,), (), "Pa"))
+    run = replace(run, fO2_control=FO2Control(State.of(FO2Channel.COMMANDED), oxygen_partial_pressure_Pa=pressure))
+
+    assert not provenance.imposed_oxygen_target(row, run)
+    _, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
+    assert filtered.fO2_control.oxygen_partial_pressure_Pa is None
+    assert any(n.reason == "experiment.fO2_control.oxygen_partial_pressure_Pa: derived_from_target" for n in notices)
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row, experiment=run, isolated=False)
+    assert prediction.execution.call_evidence != "experiment.fO2_control"
+    assert NoticeKind.TARGET_IS_IMPOSED_CONTROL not in {n.kind for n in prediction.notices}
+
+
+def test_redox_keeps_a_reference_to_its_independent_run_temperature():
+    row = _without_printed_fo2(_borisov_row4())
+    temperature = Located(State.of(Decimal("1500")), Locator(page=7, record="thermocouple"))
+    oxygen = Located(
+        State.of(Decimal("-0.68")), Locator(page=7, record="oxygen setup"),
+        Derivation("temperature-dependent setpoint", (
+            f"observation[{row.observation_id}].point_conditions.temperature_K",
+        ), (), "1"),
+    )
+    row = replace(row, point_conditions={"temperature_K": temperature, "fO2_log": oxygen})
+
+    view, _, notices = score_module._redox_input_view(row, Quantity.FE3_FE2_RATIO, None)
+
+    assert view.point_conditions["fO2_log"] == oxygen
+    assert not notices
+
+
+@pytest.mark.parametrize("source", [
+    "borisov-2018-compilation",
+    "kress-carmichael-1988-iron-oxidation-stoichiometry",
+    "sossi-2020-magma-ocean-redox",
+    "aithala-2026-magmatic-iron-redox-to-2100c",
+])
+def test_redox_target_provenance_census(source, capsys, monkeypatch):
+    root = Path(__file__).resolve().parents[2]
+    migrator = migrate_one_extract(root, root / f"data/literature/extracts/{source}.yaml")
+    migrator.finalize()
+    counts = defaultdict(set)
+    original = provenance.classify_target_provenance
+
+    def count_relation(target, candidate):
+        result = original(target, candidate)
+        counts[result.relation].add(target.observation_id)
+        return result
+
+    monkeypatch.setattr(provenance, "classify_target_provenance", count_relation)
+    for row in migrator.result.observations.values():
+        quantity = score_module.quantity_token(row.identity)
+        if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO, Quantity.FUGACITY, Quantity.P_PARTIAL}:
+            run = migrator.result.experiments.get(row.experiment_id)
+            score_module._redox_input_view(row, quantity, run)
+            provenance.imposed_oxygen_target(row, run)
+    assert counts[provenance.TargetRelation.INDEPENDENT_RUN_CONTROL]
+    with capsys.disabled():
+        print(source, {relation.value: len(counts[relation]) for relation in provenance.TargetRelation})
+
+
+@pytest.mark.parametrize("consumer", ["redox-input", "printed-cell", "setpoint-exemption", "scorer"])
+def test_provenance_regressions_detect_bypassing_each_consumer(consumer, monkeypatch, borisov_redox_row):
+    original = provenance.classify_target_provenance
+    if consumer == "redox-input":
+        check = partial(test_redox_excludes_condition_derived_from_named_target_observation, "bare")
+        bypass = provenance.TargetRelation.DERIVED_FROM_TARGET
+    elif consumer == "printed-cell":
+        check = partial(
+            test_redox_routes_share_printed_cell_identity, borisov_redox_row,
+            "scalar-unit-bars", None, True, True, True,
+        )
+        bypass = provenance.TargetRelation.SAME_PRINTED_CELL
+    else:
+        check = partial(test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline, "O2 setpoint")
+        bypass = provenance.TargetRelation.IMPOSED_CONTROL_TARGET
+    check()
+
+    def skip_relation(target, candidate):
+        result = original(target, candidate)
+        if result.relation is bypass:
+            return provenance.TargetProvenance(provenance.TargetRelation.INDEPENDENT)
+        return result
+
+    if consumer == "scorer":
+        monkeypatch.setattr(score_module, "imposed_oxygen_target", lambda *_: False)
+    else:
+        monkeypatch.setattr(provenance, "classify_target_provenance", skip_relation)
+    with pytest.raises(AssertionError):
+        check()
 
 
 @pytest.fixture(scope="module")

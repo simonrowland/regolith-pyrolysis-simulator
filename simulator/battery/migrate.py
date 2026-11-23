@@ -4953,27 +4953,27 @@ def convert_pressure_to_pa(
     if units is None or not str(units).strip():
         return None, "missing pressure unit"
     unit = str(units).strip()
-    lowered = _normalize_printed_unit(unit).lower().replace(" ", "")
-    if lowered == "pa":
+    normalized = _normalize_printed_unit(unit)
+    if normalized == "Pa":
         return amount, "identity:Pa"
-    if lowered in {"kpa"}:
+    if normalized == "kPa":
         # Premise: 1 kPa = 1000 Pa exactly (SI).
         return amount * Decimal("1000"), "kPa_to_Pa"
-    if lowered in {"gpa"}:
+    if normalized == "GPa":
         # Premise: 1 GPa = 1e9 Pa exactly (SI).
         return amount * Decimal("1000000000"), "GPa_to_Pa"
-    if lowered == "mpa":
+    if normalized == "MPa":
         return amount * _CONVERSION_META["MPa_to_Pa"][0], "MPa_to_Pa"
-    if lowered in {"kbar", "kilobar"}:
+    if normalized == "kbar":
         # Premise: 1 kbar = 100 MPa exactly (SI).
         return amount * _CONVERSION_META["kbar_to_Pa"][0], "kbar_to_Pa"
-    if lowered in {"bar"}:
+    if normalized == "bar":
         return bar_to_pa(amount), "bar_to_Pa"
-    if lowered in {"atm", "atmosphere", "atmospheres"}:
+    if normalized == "atm":
         return atm_to_pa(amount), "atm_to_Pa"
-    if lowered in {"torr", "mmhg", "mmhg"}:
+    if normalized == "Torr":
         return torr_to_pa(amount), "Torr_to_Pa"
-    if lowered in {"mbar", "millibar"}:
+    if normalized == "mbar":
         # Premise: 1 mbar = 100 Pa = 0.001 bar (IUPAC bar = 1e5 Pa).
         return amount * Decimal("100"), "mbar_to_Pa"
     return None, f"unmapped pressure unit {unit!r}"
