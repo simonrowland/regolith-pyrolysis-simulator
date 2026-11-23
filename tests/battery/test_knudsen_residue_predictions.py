@@ -351,6 +351,53 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
+@pytest.mark.parametrize("printed_resolution", (True, False))
+def test_microgram_loader_tail_stays_numeric_in_flagged_tier(extent_point, monkeypatch, printed_resolution):
+    from simulator.battery import residue, score
+
+    reference, experiment, rows = extent_point
+    locator = reference.locator
+    composition = Composition(
+        "trace", (("FeO", Decimal("0.0005")), ("MgO", Decimal("0.9995"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    reference = replace(reference, identity=replace(reference.identity, composition=State.of(composition)))
+    experiment = replace(experiment, sample=replace(
+        experiment.sample,
+        mass_kg=Located(State.of(Value.point_of("1e-9")), locator),
+        initial_composition=Located(State.of(composition), locator),
+    ))
+    rows = (*rows[:1], replace(rows[-1], value=replace(
+        Value.point_of("0.20000"), approximate=not printed_resolution,
+    )))
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    monkeypatch.setattr(battery, "_openimcc_gas_channels_and_omission_notices",
+                        lambda *a: ([("FeO", ("FeO", 1, 0)), ("MgO", ("MgO", 1, 0)),
+                                     ("O2", (None, 1, -1))], ()))
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *a, **k:
+                        lambda n, p: {"FeO": 1.0, "MgO": 1.0, "O2": 0.0})
+    oxygen = Located(State.of(Value.point_of("0.00001")), locator)
+    reference = replace(reference, point_conditions={"fO2_Pa": oxygen})
+    rows = tuple(replace(row, point_conditions={"fO2_Pa": oxygen}) for row in rows)
+    context = score.ScoreContext({}, {experiment.experiment_id: experiment},
+                                 {row.observation_id: row for row in (reference, *rows)})
+    residual, candidate = score.compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=context)
+    assert residual.numeric is not None and candidate is not None
+    assert not residual.score_eligible
+    assert "trace_tail_below_loader_cutoff" in score.flagged_strata(residual.notices)
+    tail = candidate.provenance["trace_tail"]
+    # FeO accounts for 0.0005 mol/mol with these two formula masses.
+    feo_kg = 1e-9 * (0.0005 * 71.844) / (0.0005 * 71.844 + 0.9995 * 40.304)
+    assert tail["retained_kg_by_parent"] == pytest.approx({"FeO": feo_kg}, rel=1e-10, abs=0)
+    assert tail["fraction_of_measured_mass_loss"] == pytest.approx(feo_kg / 2e-10)
+    assert tail["bound_wt_pct_by_component"] == pytest.approx(
+        dict.fromkeys(("FeO", "MgO"), 100 * feo_kg / 8e-10)
+    )
+    assert tail["material_threshold"] == (pytest.approx(5e-6) if printed_resolution else 1e-6)
+    assert candidate.provenance["atom_closure_mol"]["Fe"] == 0.0
+    assert candidate.provenance["final_inventory_mol"]["FeO"] == candidate.provenance["initial_inventory_mol"]["FeO"]
+
+
 @pytest.mark.parametrize("change,reason", (
     ("no_path", "printed_temperature_path_missing_or_invalid"),
     ("no_extent", "measured_mass_loss_fraction_missing_or_invalid"),

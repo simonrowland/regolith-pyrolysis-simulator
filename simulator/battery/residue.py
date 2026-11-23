@@ -8,7 +8,7 @@ import math
 import multiprocessing
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from multiprocessing.util import Finalize
 from pathlib import Path
@@ -16,6 +16,7 @@ from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
+from simulator.accounting.lots import EMPTY_KG_TOLERANCE
 from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     _CHROMIUM_OXYGEN_PER_CR_CANDIDATES,
@@ -51,6 +52,8 @@ _KRESS91_UNAVAILABLE_STOICHIOMETRIC_FEO_SOURCE = (
 _KNUDSEN_MAX_RHS_EVALUATIONS = 1024
 _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
 _KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
+TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
+_KNUDSEN_DEFAULT_CHARGE_KG = 1e-3
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
 _HASHIMOTO_GEOMETRIES = (
@@ -1244,6 +1247,7 @@ class KnudsenResidueResult:
     atom_closure_mol: Mapping[str, float]
     pO2_bar_by_step: tuple[float, ...]
     pressure_law_diagnostics: tuple[PressureLawChannelDiagnostic, ...] = ()
+    trace_tail_kg: Mapping[str, float] = field(default_factory=dict)
 
 
 def integrate_knudsen_residue_inventory(
@@ -1256,6 +1260,7 @@ def integrate_knudsen_residue_inventory(
     near_saturated: bool,
     source_fO2_log_by_interval: Sequence[float | None],
     linear_temperature: bool = False,
+    analytical_loader_cutoff: bool = False,
 ) -> KnudsenResidueResult:
     """Integrate molecular effusion on the measured *total* mass-loss extent.
 
@@ -1323,6 +1328,20 @@ def integrate_knudsen_residue_inventory(
     active_parents = {
         k for k in parents if k in volatile_parents and inventory[k] > 0.0
     }
+    # EMPTY_KG_TOLERANCE matches the analytical core loader's 1e-12 kg
+    # provider-input cutoff. This is not physical exhaustion. If the shared
+    # loader cutoff is lowered as a general contract, adjust this treatment here.
+    parent_cutoffs = {
+        k: EMPTY_KG_TOLERANCE / _formula_terms(k)[1]
+        for k in active_parents
+        if analytical_loader_cutoff
+    }
+    trace_tail_kg = {
+        k: n * _formula_terms(k)[1]
+        for k, n in inventory.items()
+        if k in parent_cutoffs and n <= parent_cutoffs[k]
+    }
+    active_parents.difference_update(trace_tail_kg)
     evaluation_limit = (
         _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS if linear_temperature else _KNUDSEN_MAX_RHS_EVALUATIONS
     )
@@ -1345,11 +1364,12 @@ def integrate_knudsen_residue_inventory(
                     f"ending at mass-loss fraction {stop:g}",
                 )
             evaluations += 1
-            # A trial stage can overshoot zero. Omit those parents from the
-            # pressure solve and let the accepted zero event deactivate them.
+            # A trial stage can overshoot the event. Only an accepted event
+            # deactivates its channel and books the retained tail.
             current = {
                 k: float(v) for k, v in zip(parents, amounts)
-                if v > 0.0 and (k in active_parents or k not in volatile_parents)
+                if v > parent_cutoffs.get(k, 0.0)
+                and (k in active_parents or k not in volatile_parents)
             }
             current_temperature = temperature
             if linear_temperature:
@@ -1411,8 +1431,9 @@ def integrate_knudsen_residue_inventory(
                 event_indices.append(oxygen_index)
             events = []
             for index in event_indices:
-                def exhausted(extent, amounts, index=index):
-                    return amounts[index]
+                cutoff = parent_cutoffs.get(parents[index], 0.0) if index < oxygen_index else 0.0
+                def exhausted(extent, amounts, index=index, cutoff=cutoff):
+                    return amounts[index] - cutoff
                 exhausted.terminal = True
                 exhausted.direction = -1
                 events.append(exhausted)
@@ -1435,9 +1456,15 @@ def integrate_knudsen_residue_inventory(
                         )
                     if len(hits):
                         state[index] = 0.0
-                elif len(hits) or state[index] <= 0.0:
-                    state[index] = 0.0
-                    active_parents.remove(parents[index])
+                else:
+                    parent = parents[index]
+                    cutoff = parent_cutoffs.get(parent, 0.0)
+                    if len(hits) or state[index] <= cutoff:
+                        active_parents.remove(parent)
+                        if cutoff > 0.0:
+                            trace_tail_kg[parent] = state[index] * _formula_terms(parent)[1]
+                        else:
+                            state[index] = 0.0
             state = [max(0.0, v) for v in state]
         previous_endpoint, previous_temperature = endpoint, temperature
         if xi >= target:
@@ -1455,6 +1482,7 @@ def integrate_knudsen_residue_inventory(
         closure,
         tuple(pO2_steps),
         tuple(pressure_law_diagnostics.values()),
+        trace_tail_kg,
     )
 
 
@@ -2590,9 +2618,15 @@ def predict_knudsen_residue_composition(
     if (regime.regime_class.is_value and regime.regime_class.value is not RegimeClass.MOLECULAR) or contradicted:
         raise ResidueInventoryRefusal("knudsen_near_saturation_invalid", "non-molecular orifice regime")
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
-    # A unit reference mass fixes only the mol normalization; no sample mass
-    # or apparatus scale is inferred from it. xi is invariant to this scale.
-    initial = {oxide: weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
+    use_loader_cutoff = engine == "internal-analytical"
+    measured_charge_kg = _located_point(experiment.sample.mass_kg)
+    # OpenIMCC uses relative composition. The analytical loader applies an
+    # absolute mass cutoff, so it needs the scale of the weighed charge.
+    charge_kg = 1.0
+    assumed_charge = use_loader_cutoff and (measured_charge_kg is None or measured_charge_kg <= 0.0)
+    if use_loader_cutoff:
+        charge_kg = _KNUDSEN_DEFAULT_CHARGE_KG if assumed_charge else measured_charge_kg
+    initial = {oxide: charge_kg * weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
     anchors = {}
     for row in rows:
         if (row.experiment_id != reference.experiment_id or row.source_id != reference.source_id
@@ -2647,6 +2681,13 @@ def predict_knudsen_residue_composition(
         reason="near-saturation and molecular effusion assumed from the printed Knudsen method; unprinted geometry cannot verify cell saturation",
         origin="Knudsen residue extent",
     )]
+    if assumed_charge:
+        notices.append(Notice(
+            kind=NoticeKind.FALLBACK,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason="sample mass missing or nonpositive; assumed 1 g for the analytical loader cutoff",
+            origin="Knudsen residue extent",
+        ))
     oxygen_sources, source_logs = [], []
     for x, t in path:
         anchor = anchors[t][1]
@@ -2713,7 +2754,8 @@ def predict_knudsen_residue_composition(
         # OpenIMCC freezes parent activities and applies the stoichiometric
         # power. Internal-analytical pressures are the engine's own law.
         kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
-                      near_saturated=True, source_fO2_log_by_interval=source_logs)
+                      near_saturated=True, source_fO2_log_by_interval=source_logs,
+                      analytical_loader_cutoff=use_loader_cutoff)
         primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
         composition = _hashimoto_project_oxide_wt_pct(primary.residue_mol)
         diagnostic = {}
@@ -2728,6 +2770,45 @@ def predict_knudsen_residue_composition(
         _append_redox_pressure_notices(
             notices, primary.pressure_law_diagnostics, pressure_callbacks,
         )
+        initial_mass_kg = math.fsum(n * _formula_terms(s)[1] for s, n in initial.items())
+        trace_tail = {}
+        if primary.trace_tail_kg:
+            # The omitted flux can remove at most its remaining mass. For a
+            # trace mass m_trace the relative loss error is <= m_trace / m_loss
+            # and every oxide's absolute wt% error is <= 100*m_trace/m_residue.
+            # For gram-scale masses 1e-12 kg is about a part per billion.
+            # At 1000 micrograms it is about 1e-6; at a single microgram
+            # (1e-9 kg) it can reach 1e-3. Use this run's actual denominators.
+            measured_loss_kg = initial_mass_kg * target
+            residue_mass_kg = initial_mass_kg - measured_loss_kg
+            tail_mass_kg = math.fsum(primary.trace_tail_kg.values())
+            loss_fraction = tail_mass_kg / measured_loss_kg
+            wt_pct_bound = 100.0 * tail_mass_kg / residue_mass_kg
+            mass_loss_value = anchors[target_temperature][1].value
+            threshold = (
+                1e-6 if mass_loss_value.approximate else
+                0.1 * float(Decimal(1).scaleb(mass_loss_value.point.as_tuple().exponent)) / target
+            )
+            material = loss_fraction > threshold
+            trace_tail = {
+                "retained_kg_by_parent": dict(primary.trace_tail_kg),
+                "fraction_of_measured_mass_loss": loss_fraction,
+                "bound_wt_pct_by_component": dict.fromkeys(composition, wt_pct_bound),
+                "material": material,
+                "material_threshold": threshold,
+            }
+            for parent, mass_kg in primary.trace_tail_kg.items():
+                notices.append(Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT if material else NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason=TRACE_TAIL_BELOW_LOADER_CUTOFF,
+                    origin="Knudsen residue extent",
+                    original=Decimal(str(mass_kg)),
+                    dropped=(parent,),
+                    dropped_mass_fraction=Decimal(str(mass_kg / measured_loss_kg)),
+                    band=f"absolute bound for every residue component: {100.0 * mass_kg / residue_mass_kg:.17g} wt%",
+                    certification="material" if material else "immaterial",
+                ))
         formula_oxygen_atoms_mol = math.fsum(
             amount * _formula_terms(oxide)[0].get("O", 0.0)
             for oxide, amount in primary.residue_mol.items()
@@ -2736,6 +2817,7 @@ def predict_knudsen_residue_composition(
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
             "oxygen_sources": oxygen_sources, "notices": tuple(notices),
+            "trace_tail": trace_tail,
             "initial_inventory_mol": dict(initial),
             "final_inventory_mol": dict(primary.residue_mol),
             "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
@@ -2743,7 +2825,7 @@ def predict_knudsen_residue_composition(
                 primary.retained_oxygen_atoms_mol - formula_oxygen_atoms_mol
             ) * _formula_terms("O")[1],
             "atom_closure_mol": dict(primary.atom_closure_mol),
-            "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
+            "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / initial_mass_kg,
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
         }
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:

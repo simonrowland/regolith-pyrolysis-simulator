@@ -2481,6 +2481,7 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
 def _classify_flagged_notice_facts(
     notices: Sequence[tuple[str, object]],
 ) -> tuple[str, ...]:
+    from simulator.battery.residue import TRACE_TAIL_BELOW_LOADER_CUTOFF
     from simulator.vacuum_oxygen_balance import (
         RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
         RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
@@ -2521,6 +2522,8 @@ def _classify_flagged_notice_facts(
         for _kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_RESIDUE_REDOX)
+    if (NoticeKind.ENGINE_MODEL_CAVEAT.value, TRACE_TAIL_BELOW_LOADER_CUTOFF) in notices:
+        strata.append(TRACE_TAIL_BELOW_LOADER_CUTOFF)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):

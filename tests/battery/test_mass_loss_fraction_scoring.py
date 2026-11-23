@@ -317,7 +317,12 @@ def test_markova_knudsen_extent_prediction_uses_migrated_panel_and_ignores_scale
     mass_result = predict_knudsen_residue_composition(
         engine.value, reference, mass_experiment, observations
     )
-    assert mass_result["composition_wt_pct"] == composition
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        # Before a trace is truncated, only integration roundoff changes
+        # when the analytical loader receives a different charge mass.
+        assert mass_result["composition_wt_pct"] == pytest.approx(composition, rel=1e-8)
+    else:
+        assert mass_result["composition_wt_pct"] == composition
 
     area_experiment = replace(
         experiment,
@@ -528,6 +533,7 @@ def _markova_vi_silica(context, temperature_K):
 
 
 def test_markova_analytical_vi_2207_scores_after_exhaustion(fresh_mass_loss_extracts) -> None:
+    from simulator.accounting.formulas import parse_formula
     _richter_result, markova = fresh_mass_loss_extracts
     context = score_module.ScoreContext(markova.works, markova.experiments, markova.observations)
     reference = _markova_vi_silica(context, Decimal("2480.15"))
@@ -537,8 +543,8 @@ def test_markova_analytical_vi_2207_scores_after_exhaustion(fresh_mass_loss_extr
     assert residual.numeric.unit == "subtype_defined"
     assert residual.numeric.operation is MetricOperation.ABSOLUTE
     assert residual.numeric.decision_band is None
-    assert residual.numeric.value == Decimal(0)
-    assert candidate is not None and candidate.value.point == Decimal(0)
+    assert candidate is not None and candidate.value.point is not None
+    assert residual.numeric.value == candidate.value.point
     assert {NoticeKind.OUT_OF_CERTIFIED_BAND, NoticeKind.UNVERIFIED_APPARATUS, NoticeKind.INPUT_OMITTED} <= {
         notice.kind for notice in residual.notices
     }
@@ -546,10 +552,32 @@ def test_markova_analytical_vi_2207_scores_after_exhaustion(fresh_mass_loss_extr
     assert not any(notice.reason == "residue_fe_speciation_kress91_fallback" for notice in residual.notices)
 
     provenance = candidate.provenance
+    tail = provenance["trace_tail"]
+    assert tail["material"] is False
+    assert "trace_tail_below_loader_cutoff" not in score_module.flagged_strata(residual.notices)
+    # The source leaves the charge mass unknown, so the stated 1 g default
+    # puts the measured escaped mass at 0.9551 g.
+    retained = tail["retained_kg_by_parent"]
+    assert retained
+    notices = {notice.dropped[0]: notice for notice in residual.notices
+               if notice.reason == "trace_tail_below_loader_cutoff"}
+    assert set(notices) == set(retained)
+    for oxide, mass in retained.items():
+        notice = notices[oxide]
+        assert notice.certification == "immaterial"
+        assert notice.original == Decimal(str(mass))
+        assert float(notice.dropped_mass_fraction) == pytest.approx(mass / 0.0009551, rel=1e-10, abs=0)
+        assert mass == pytest.approx(
+            provenance["final_inventory_mol"][oxide] * parse_formula(oxide).molar_mass_kg_per_mol(),
+            rel=1e-10, abs=0,
+        )
+    assert tail["fraction_of_measured_mass_loss"] == pytest.approx(
+        sum(retained.values()) / 0.0009551, rel=1e-10, abs=0,
+    )
+    assert float(candidate.value.point) <= tail["bound_wt_pct_by_component"]["SiO2"]
     assert provenance["composition_wt_pct"]["Al2O3"] == pytest.approx(82.3847957590, abs=1e-4)
     assert provenance["escaped_mass_fraction"] == pytest.approx(0.9551, abs=1e-10)
     assert max(map(abs, provenance["atom_closure_mol"].values())) < 1e-10
-    assert all(provenance["final_inventory_mol"][oxide] == 0.0 for oxide in ("SiO2", "FeO", "MgO"))
     assert provenance["linear_temperature_diagnostic"]["refusal"] == "knudsen_extent_evaluation_limit"
 
 
