@@ -290,6 +290,7 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     multivalent_components,
 )
+from simulator.scalar_boundary import finite_float
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
@@ -11819,31 +11820,52 @@ def _printed_fo2_log10_bar(identity: Identity) -> float | None:
 
 
 def _select_phase_composition(
-    result: EquilibriumResult, role: PhaseRole
-) -> tuple[Mapping[str, float] | None, str | None]:
+    engine: Engine, result: EquilibriumResult, role: PhaseRole, quantity: Quantity | None,
+) -> tuple[Mapping[str, float] | None, tuple[RefusalReason, dict[str, object]] | None]:
+    def gap(
+        issue: str, reason: RefusalReason = RefusalReason.UNSUPPORTED,
+    ) -> tuple[None, tuple[RefusalReason, dict[str, object]]]:
+        return None, (
+            reason,
+            {"reason": issue, "phase_role": role.value, "engine": engine.value},
+        )
+
     comps = dict(result.phase_compositions or {})
+    if (
+        engine is Engine.MAGEMIN
+        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and not any(
+            amount is not None and amount > 0
+            for composition in comps.values()
+            for amount in map(finite_float, composition.values())
+        )
+    ):
+        return gap(
+            "phase_composition_unavailable",
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+        )
     exact = [name for name in comps if name.casefold() == role.value]
     if len(exact) > 1:
-        return None, "ambiguous_phase"
+        return gap("ambiguous_phase")
     if len(exact) == 1:
         return comps[exact[0]], None
     if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
         liquids = [name for name in comps if name.casefold() in _LIQUID_PHASE_NAMES]
         if len(liquids) > 1:
-            return None, "ambiguous_phase"
+            return gap("ambiguous_phase")
         if len(liquids) == 1:
             return comps[liquids[0]], None
         liquid = dict(result.liquid_composition_wt_pct or {})
         if liquid:
             return liquid, None
-        return None, "phase_not_in_assemblage"
+        return gap("phase_not_in_assemblage")
     needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
     hits = [name for name in comps if any(needle in name.casefold() for needle in needles)]
     if len(hits) > 1:
-        return None, "ambiguous_phase"
+        return gap("ambiguous_phase")
     if len(hits) == 1:
         return comps[hits[0]], None
-    return None, "phase_not_in_assemblage"
+    return gap("phase_not_in_assemblage")
 
 
 def _component_wt(
@@ -12490,17 +12512,10 @@ def _predict_element_mass_fraction_phase(
             },
             notices=notices,
         )
-    phase_map, phase_issue = _select_phase_composition(result, role)
-    if phase_map is None:
-        return refused(
-            RefusalReason.UNSUPPORTED,
-            {
-                "reason": phase_issue or "phase_not_in_assemblage",
-                "phase_role": role.value,
-                "engine": engine.value,
-            },
-            notices=notices,
-        )
+    phase_map, phase_gap = _select_phase_composition(engine, result, role, quantity)
+    if phase_gap is not None:
+        return refused(*phase_gap, notices=notices)
+    assert phase_map is not None
     charge_mass = decision.charge_mass_g_per_100g
     if charge_mass is None:
         return refused(
@@ -12977,6 +12992,13 @@ def _predict_phase_row(
             notices=exclusion_notices,
         )
 
+    phase_map, phase_gap = _select_phase_composition(engine, result, role, quantity)
+    if (
+        phase_gap is not None
+        and phase_gap[0] is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+    ):
+        return refused(*phase_gap, notices=exclusion_notices)
+
     liquid_fraction = _engine_liquid_fraction(result)
     provenance = _composition_provenance(identity)
     if (
@@ -13023,17 +13045,9 @@ def _predict_phase_row(
         )
 
     formula = identity.species.formula
-    phase_map, phase_issue = _select_phase_composition(result, role)
-    if phase_map is None:
-        return refused(
-            RefusalReason.UNSUPPORTED,
-            {
-                "reason": phase_issue or "phase_not_in_assemblage",
-                "phase_role": role.value,
-                "engine": engine.value,
-            },
-            notices=exclusion_notices,
-        )
+    if phase_gap is not None:
+        return refused(*phase_gap, notices=exclusion_notices)
+    assert phase_map is not None
     # Capacity uses the solute weight percent, including an elemental label.
     # Oxide matching would drop raw S and Cl.
     oxide = solute is None and role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
@@ -13063,17 +13077,10 @@ def _predict_phase_row(
         )
     if quantity is Quantity.DISTRIBUTION_RATIO:
         assert counter is not None
-        counter_map, counter_issue = _select_phase_composition(result, counter)
-        if counter_map is None:
-            return refused(
-                RefusalReason.UNSUPPORTED,
-                {
-                    "reason": counter_issue or "phase_not_in_assemblage",
-                    "phase_role": counter.value,
-                    "engine": engine.value,
-                },
-                notices=notices,
-            )
+        counter_map, counter_gap = _select_phase_composition(engine, result, counter, quantity)
+        if counter_gap is not None:
+            return refused(*counter_gap, notices=notices)
+        assert counter_map is not None
         counter_oxide = counter in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
         counter_amount, counter_warnings = _component_wt(
             formula,

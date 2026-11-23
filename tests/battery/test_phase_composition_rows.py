@@ -1151,6 +1151,52 @@ def test_fe_free_phase_and_element_condition_rows_omit_dp010(
     )
 
 
+@pytest.mark.parametrize("element", (False, True), ids=("oxide", "element"))
+@pytest.mark.parametrize("phase_compositions", ({}, {"liq": {}}, {"liq": {"SiO2": 0.0}}))
+def test_magemin_mass_only_phase_response_is_a_capability_gap(
+    monkeypatch, element, phase_compositions,
+):
+    identity = _phase_identity(
+        "Si" if element else "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="element_wt_percent" if element else "wt_percent",
+    )
+    row = F.observation("magemin-mass-only", "exp", identity, Decimal("60"))
+    if element:
+        row = replace(row, point_conditions={"element_wt_percent": F.located(
+            Composition(
+                basis="element_wt_percent",
+                components=(("Si", Decimal("28.085")), ("O", Decimal("31.998"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        )})
+    calls = []
+
+    def mass_only(*args, **kwargs):
+        calls.append(args[0])
+        return EquilibriumResult(
+            status="ok",
+            phases_present=["liq"],
+            phase_masses_kg={"liq": 1.0},
+            phase_compositions=phase_compositions,
+            liquid_fraction=1.0,
+        )
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", mass_only)
+    prediction = predict_with_engine(Engine.MAGEMIN, row)
+
+    assert calls == [Engine.MAGEMIN]
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+    assert prediction.refusal_detail == {
+        "reason": "phase_composition_unavailable",
+        "engine": "magemin",
+        "phase_role": "melt",
+    }
+
+
 def test_magemin_iron_free_phase_uses_declared_transport_oxygen(monkeypatch):
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
     from simulator.melt_backend.magemin import MAGEMinBackend

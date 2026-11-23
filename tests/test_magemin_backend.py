@@ -4475,7 +4475,14 @@ def _run_magemin_adapter_buffer_probe(
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_iron_free_phase_output_is_oxygen_insensitive(request):
+def test_magemin_live_iron_free_phase_output_is_oxygen_insensitive(request, monkeypatch):
+    from decimal import Decimal
+
+    from simulator.battery import score
+    from simulator.battery.enums import Engine, PhaseRole, Quantity, RefusalReason
+    from tests.battery import factories as F
+    from tests.battery.test_phase_composition_rows import _phase_identity
+
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
     assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
@@ -4488,17 +4495,25 @@ def test_magemin_live_iron_free_phase_output_is_oxygen_insensitive(request):
         )
         for log_fo2 in (-12.0, -4.0)
     ]
+    identity = _phase_identity("SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT)
+    row = F.observation("magemin-native-mass-only", "exp", identity, Decimal("60"))
+    native_responses = iter(results)
+    monkeypatch.setattr(
+        score, "_equilibrate_phase_assemblage", lambda *args, **kwargs: next(native_responses),
+    )
     for result in results:
         assert result.status == "ok", result.diagnostics
         assert result.phases_present and result.phase_masses_kg
-        assert any(
-            result.phase_compositions.get(phase) for phase in result.phases_present
-        )
+        assert result.liquid_fraction is not None
+        prediction = score.predict_with_engine(Engine.MAGEMIN, row)
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+        assert prediction.refusal_detail["reason"] == "phase_composition_unavailable"
+        assert prediction.refusal_detail["engine"] == "magemin"
         assert result.fO2_log is None
     reduced, oxidized = results
     assert reduced.phases_present == oxidized.phases_present
     assert reduced.phase_masses_kg == oxidized.phase_masses_kg
-    assert reduced.phase_compositions == oxidized.phase_compositions
     assert reduced.liquid_fraction == oxidized.liquid_fraction
 
 
