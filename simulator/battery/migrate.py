@@ -3557,7 +3557,7 @@ def _notice_from_plain(payload: object) -> Notice:
             raise TypeError("notice policy must be a mapping")
         policy = NoticePolicy(
             id=str(policy_payload["id"]),
-            version=str(policy_payload["version"]),
+            version=policy_payload["version"],
             status=str(policy_payload["status"]),
             value=str(policy_payload["value"]),
             units=str(policy_payload["units"]),

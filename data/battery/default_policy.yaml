@@ -153,7 +153,7 @@ policies:
     canonized_at: "2026-11-23"
     history: []
   - id: DP-010
-    condition: "fO2 unprinted on a redox or activity row"
+    condition: "fO2 unprinted on a phase, redox, or activity row after printed and registered source evidence"
     formula: "the oxygen ladder's existing last rung: intrinsic melt fO2 (fo2_tier_notice, tier 4)"
     formula_owner: "simulator.battery.fo2_ladder.fo2_tier_notice"
     units: "log10(bar)"

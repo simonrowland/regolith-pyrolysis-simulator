@@ -1800,8 +1800,16 @@ def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
         )
 
     calls = _patch_melts_cell(monkeypatch, cell_for)
-    printed = score_module._printed_fe_redox_fo2_log(row4, row4.identity)
+    _resolved_identity, printed, oxygen_notices = score_module._resolve_row_fo2(
+        row4.identity,
+        row4,
+        None,
+        {},
+        Decimal(0),
+        Quantity.FE3_FE2_RATIO,
+    )
     assert printed is not None
+    assert oxygen_notices == ()
     for engine in (Engine.THERMOENGINE, Engine.ALPHAMELTS):
         prediction = predict_with_engine(engine, row4, isolated=False)
         assert prediction.value == expected

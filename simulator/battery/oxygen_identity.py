@@ -82,21 +82,98 @@ def _printed_buffer_offset(reason: str) -> tuple[str, Decimal] | None:
 
 def _dp002_applicability(
     evidence: AmbientPressureEvidence | None,
+    *,
+    atmosphere_condition: Located[Any] | None = None,
 ) -> str | None:
     if evidence is None:
-        return None
+        return (
+            'experiment "in air"'
+            if _air_composition_quote(
+                None, atmosphere_condition=atmosphere_condition
+            )
+            is not None
+            else None
+        )
     if evidence.evidence_class is AmbientPressureEvidenceClass.GAS_MIXING:
         return "gas-mixing furnace"
-    if (
-        evidence.evidence_class
-        is AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT
-    ):
-        return 'experiment "in air"'
     if evidence.evidence_class is AmbientPressureEvidenceClass.GAS_FLOW:
         quote = " ".join(evidence.quote.casefold().replace("-", " ").split())
         if "wire loop" in quote and "equilibr" in quote:
             return "wire-loop equilibration"
+    if _air_composition_quote(
+        evidence, atmosphere_condition=atmosphere_condition
+    ) is not None:
+        return 'experiment "in air"'
     return None
+
+
+def _air_composition_quote(
+    evidence: AmbientPressureEvidence | None,
+    *,
+    atmosphere_condition: Located[Any] | None = None,
+) -> str | None:
+    """Return printed evidence that explicitly names an air atmosphere."""
+
+    if (
+        isinstance(atmosphere_condition, Located)
+        and atmosphere_condition.inference is None
+        and atmosphere_condition.state.is_value
+    ):
+        value = atmosphere_condition.state.value
+        if isinstance(value, Value):
+            value = (
+                value.categorical
+                if value.kind is ValueKind.CATEGORICAL
+                else None
+            )
+        if not isinstance(value, str):
+            return None
+        quote = value
+    elif evidence is not None:
+        quote = evidence.quote
+    else:
+        return None
+    source_quote = quote
+    normalized_quote = " ".join(quote.split())
+    match = re.search(
+        r"\b(?:ambient\s+air|in\s+air|air)\b",
+        normalized_quote,
+        re.IGNORECASE,
+    )
+    if match is not None and not re.search(
+        r"\b(?:not|no|without)\s+(?:in\s+)?$",
+        normalized_quote[: match.start()],
+        re.IGNORECASE,
+    ):
+        return source_quote
+    return None
+
+
+def _dp002_pressure_default(
+    evidence: AmbientPressureEvidence | None,
+    quantity: Quantity,
+    *,
+    atmosphere_condition: Located[Any] | None = None,
+) -> tuple[Decimal | None, Notice | None]:
+    applicability = _dp002_applicability(
+        evidence, atmosphere_condition=atmosphere_condition
+    )
+    if applicability is None:
+        return None, None
+    policy = resolve_default_policy("DP-002")
+    pressure_pa = policy.value
+    if not isinstance(pressure_pa, Decimal):
+        return None, None
+    return pressure_pa, Notice(
+        kind=policy.flag,
+        affected_quantities=(quantity,),
+        reason=(
+            f"DP-002 applies to registered condition {applicability}; "
+            "chamber pressure is unreported"
+        ),
+        origin="score:DP-002",
+        policy=NoticePolicy(**policy.payload["policy"]),
+    )
 
 
 def log10_fo2_to_pa(
@@ -174,7 +251,6 @@ def _resolve_score_time_buffer_identity(
 
     pressure_state = observation.identity.total_pressure_Pa
     pressure_route = pressure_source or "pressure_boundary"
-    pressure_policy = None
     pressure_notice = None
     if pressure_state is not None and pressure_state.is_value:
         resolved_pressure_pa = nominal_pressure_pa(pressure_state)
@@ -186,34 +262,27 @@ def _resolve_score_time_buffer_identity(
     if pressure_pa is not None:
         if not pressure_pa.is_finite() or pressure_pa < 0:
             return observation
-    elif (applicability := _dp002_applicability(ambient_pressure_evidence)) is not None:
-        pressure_policy = resolve_default_policy("DP-002")
-        pressure_pa = pressure_policy.value
-        if not isinstance(pressure_pa, Decimal):
-            return observation
-        pressure_route = "method_policy:DP-002"
-        policy_metadata = pressure_policy.payload["policy"]
-        pressure_notice = Notice(
-            kind=pressure_policy.flag,
-            affected_quantities=(expected_quantity,),
-            reason=(
-                f"DP-002 applies to registered condition {applicability}; "
-                "chamber pressure is unreported"
-            ),
-            origin="score:DP-002",
-            policy=NoticePolicy(**policy_metadata),
-        )
     else:
-        pressure_notice = Notice(
-            kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
-            affected_quantities=(expected_quantity,),
-            reason=(
-                "DP-112 total pressure is unreported and no applicable pressure "
-                "policy resolves it; evaluate_buffer pressure term omitted at its "
-                "one-bar reference"
+        pressure_pa, pressure_notice = _dp002_pressure_default(
+            ambient_pressure_evidence,
+            expected_quantity,
+            atmosphere_condition=(observation.point_conditions or {}).get(
+                "atmosphere"
             ),
-            origin="score:DP-112",
         )
+        if pressure_pa is not None:
+            pressure_route = "method_policy:DP-002"
+        else:
+            pressure_notice = Notice(
+                kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+                affected_quantities=(expected_quantity,),
+                reason=(
+                    "DP-112 total pressure is unreported and no applicable pressure "
+                    "policy resolves it; evaluate_buffer pressure term omitted at its "
+                    "one-bar reference"
+                ),
+                origin="score:DP-112",
+            )
     pressure_bar = None if pressure_pa is None else pressure_pa / BAR_PA
     try:
         evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
