@@ -334,6 +334,69 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
                 ] == [0]
                 backend.reset_mock()
 
+            # 1300 °C / 16 h is measured and in band once the ambient-pressure
+            # caveat is removed. Missing oxygen must stay out of that headline.
+            equilibrium_row = _row_at(observations, "1300", "16")
+            assert "non_equilibrium_run" not in score.flagged_strata(
+                equilibrium_row.notices
+            )
+            assert "crystal_bearing_bulk_composition" not in score.flagged_strata(
+                equilibrium_row.notices
+            )
+            clean = replace(
+                equilibrium_row,
+                point_conditions={
+                    key: value
+                    for key, value in equilibrium_row.point_conditions.items()
+                    if key not in {"fO2_control", "fO2_Pa", "fO2_log"}
+                },
+                identity=replace(
+                    equilibrium_row.identity,
+                    fO2_Pa=State.unknown(
+                        "source does not print fO2 for this run"
+                    ),
+                ),
+                notices=tuple(
+                    notice
+                    for notice in equilibrium_row.notices
+                    if notice.kind
+                    is not NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+                ),
+            )
+            backend.reset_mock()
+            residual, candidate = score.compile_residual(
+                clean, engine, context=context
+            )
+            backend.assert_called_once()
+            assert residual.numeric is not None, residual.refusal
+            oxygen_notices = [
+                notice
+                for notice in residual.notices
+                if notice.origin == "fo2_ladder"
+            ]
+            assert len(oxygen_notices) == 1
+            assert oxygen_notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            assert Quantity.FE3_FE2_RATIO in oxygen_notices[0].affected_quantities
+            assert "selected_fO2_Pa=" in oxygen_notices[0].reason
+            assert (
+                "source does not print fO2 for this run" in oxygen_notices[0].reason
+            )
+            assert "out_of_certified_band" in score.flagged_strata(residual.notices)
+            payload = score.residual_to_plain(residual)
+            headline = score.headline_payloads([payload], [engine])
+            assert [
+                item["n_scored"] for item in headline if item["rail"] == "redox"
+            ] == [0]
+            selected = score._selected_shared_ladder_oxygen(candidate)
+            assert selected is not None
+            _pressure, tier, _rung, route = selected
+            assert tier == 4
+            assert route == "intrinsic_melt_fO2"
+            assert "kress_inverse" not in route
+            assert "selected_fO2_Pa" not in route
+            assert "original_reason" not in route
+            assert "borrowed" not in route
+
 
 def test_kennedy_fractional_oxygen_requires_located_printed_evidence(tmp_path: Path):
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))

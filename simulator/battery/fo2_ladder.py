@@ -3,7 +3,9 @@
 The general ladder is the seeding order from d-160/d-163:
 
 1. printed fO2;
-2. printed Fe3+/ΣFe through the Kress91 inverse;
+2. printed Fe3+/ΣFe through the Kress91 inverse, except when ``quantity``
+   is that ferric result: inverting the point being scored is not an
+   independent oxygen condition (SC-458 / DP-017);
 3. the experiment's controlled atmosphere or buffer, including the
    effusion oxygen-mass-balance closure; unsupported FeO(l) metal-saturation
    activity targets are refused under d-305;
@@ -48,6 +50,7 @@ from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
+    SCORED_REDOX_QUANTITIES,
 )
 from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
@@ -227,7 +230,8 @@ def resolve_row_fo2(
     only when the caller does not pass one.
 
     ``quantity`` selects the effusion closure. Activity callers omit it, so
-    a melt-activity row never takes the vapour closure.
+    a melt-activity row never takes the vapour closure. A scored ferric
+    quantity also skips tier 2, so the ladder does not invert that point.
     """
 
     identity = _identity(observation)
@@ -273,7 +277,10 @@ def resolve_row_fo2(
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
     # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
     # does not replace the cell's explicit oxygen control or effusion balance.
-    if not knudsen_vapour:
+    # A tier-2 inverse of the point's own ferric fraction is not an independent
+    # oxygen condition (SC-458 / DP-017). Omitting quantity keeps the inverse.
+    scored_ferric_target = quantity in SCORED_REDOX_QUANTITIES
+    if not knudsen_vapour and not scored_ferric_target:
         tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
         if tier2 is not None:
             return tier2

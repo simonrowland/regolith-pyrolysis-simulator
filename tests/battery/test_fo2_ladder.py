@@ -310,6 +310,75 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
     assert _fo2_input(changed) == _fo2_input(resolved)
 
 
+def test_scored_ferric_quantity_does_not_invert_its_own_fraction() -> None:
+    """Tier 2 stays for an omitted quantity and yields to an independent buffer."""
+
+    _experiment, _bench, observation = _feo_case()
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    weights = {"SiO2": 50.0, "FeO": 9.94, "Fe2O3": 1.60}
+    temperature_K = 1673.15
+    inverted = resolve_row_fo2(
+        None,
+        None,
+        observation,
+        composition_wt=weights,
+        temperature_K=temperature_K,
+    )
+    assert inverted is not None
+    assert inverted.tier == 2
+    assert inverted.route.startswith("kress_inverse:Fe3_over_sum_Fe")
+    assert inverted.borrowed is False
+    for quantity in (Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO):
+        scored = resolve_row_fo2(
+            None,
+            None,
+            observation,
+            composition_wt=weights,
+            temperature_K=temperature_K,
+            quantity=quantity,
+        )
+        assert scored is not None
+        assert scored.tier == 4
+        assert scored.route == "intrinsic_melt_fO2"
+        assert scored.borrowed is True
+
+    experiment, bench, buffer_observation = _feo_case(
+        temperature=Decimal("1200"),
+        pressure=Value.point_of(Decimal("100000")),
+    )
+    experiment = replace(
+        experiment,
+        method=F.State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        fO2_control=FO2Control(
+            channel=F.State.of(FO2Channel.BUFFER),
+            buffer=F.located("IW"),
+        ),
+    )
+    buffer_observation = replace(
+        buffer_observation,
+        point_conditions={
+            **buffer_observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    kept = resolve_row_fo2(
+        experiment,
+        bench,
+        buffer_observation,
+        quantity=Quantity.FE3_FE2_RATIO,
+    )
+    assert kept is not None
+    assert kept.tier == 3
+    assert kept.route == "buffer_relation"
+    assert kept.borrowed is False
+
+
 def test_tier2_kress_inverse_uses_banded_identity_nominal_pressure() -> None:
     experiment, bench, observation = _feo_case()
     observation = replace(

@@ -316,6 +316,8 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
 
 
 def test_openimcc_redox_without_printed_fo2_still_refuses():
+    """Missing printed fO2 is a flagged borrowed default, not a self-inverse."""
+
     pytest.importorskip("openimcc")
     _context, observations = _sossi_aithala_redox_context()
     observation = observations[
@@ -332,12 +334,26 @@ def test_openimcc_redox_without_printed_fo2_still_refuses():
 
     prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    assert prediction.value is not None
+    assert prediction.refusal_reason is None
+    oxygen = [
+        notice for notice in prediction.notices if notice.origin == "fo2_ladder"
+    ]
+    assert len(oxygen) == 1
+    assert oxygen[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert Quantity.FE3_FE2_RATIO in oxygen[0].affected_quantities
+    assert "selected_fO2_Pa=" in oxygen[0].reason
+    assert "source does not print fO2 for this run" in oxygen[0].reason
+    assert "out_of_certified_band" in score_module.flagged_strata(prediction.notices)
+    selected = score_module._selected_shared_ladder_oxygen(prediction)
+    assert selected is not None
+    _pressure, tier, _rung, route = selected
+    assert tier == 4
+    assert route == "intrinsic_melt_fO2"
+    assert not route.startswith("kress_inverse")
+    assert "selected_fO2_Pa" not in route
+    assert "original_reason" not in route
+    assert "borrowed" not in route
 
 
 def _openimcc_row_with_mass_composition(components):
@@ -417,7 +433,10 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
 
 
 def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
-    """Silica with no fO2 is a printed-oxygen refusal, not a Kress FeOt refusal."""
+    """Silica with no printed fO2 reaches the iron check after a borrowed default.
+
+    The shared ladder can name oxygen without iron. The refusal is total_iron.
+    """
 
     row = _openimcc_row_with_mass_composition((("SiO2", Decimal("100")),))
     conditions = dict(row.point_conditions or {})
@@ -435,7 +454,7 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {
         "reason": "missing_input",
-        "input": "printed_fO2",
+        "input": "total_iron",
     }
     assert prediction.coefficient_sources == ()
 
@@ -1033,12 +1052,30 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         identity=replace(row4.identity, fO2_Pa=None),
     )
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing_fo2)
-    assert missing_prediction.value is None
-    assert missing_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    assert missing_prediction.value is not None
+    assert missing_prediction.refusal_reason is None
+    oxygen = [
+        notice
+        for notice in missing_prediction.notices
+        if notice.origin == "fo2_ladder"
+    ]
+    assert len(oxygen) == 1
+    assert "selected_fO2_Pa=" in oxygen[0].reason
+    assert "source does not print fO2 for this run" in oxygen[0].reason
+    assert Quantity.FE3_FE2_RATIO in oxygen[0].affected_quantities
+    selected = score_module._selected_shared_ladder_oxygen(missing_prediction)
+    assert selected is not None
+    _pressure, tier, _rung, route = selected
+    assert not route.startswith("kress_inverse")
+    assert "selected_fO2_Pa" not in route
+    assert "original_reason" not in route
+    assert "borrowed" not in route
+    if tier == 4:
+        assert route == "intrinsic_melt_fO2"
+        assert oxygen[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        assert "out_of_certified_band" in score_module.flagged_strata(
+            missing_prediction.notices
+        )
 
     unsupported = predict_with_engine(Engine.MAGEMIN, row4)
     assert unsupported.value is None
@@ -1964,6 +2001,67 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
     prediction = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
     assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+
+
+def test_melts_takes_fo2_without_intrinsic_uses_flagged_shared_default(monkeypatch):
+    """A MELTS handle that accepts imposed oxygen gets the shared default.
+
+    The default is not an inverse of the scored ferric fraction. The shared
+    mock leaves takes_fo2 unset, so AlphaMELTS still requires printed oxygen.
+    """
+
+    row4 = _without_printed_fo2(_borisov_row4())
+    calls = []
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            backend=object(),
+            supports_intrinsic_fo2=False,
+            takes_fo2=True,
+        )
+
+    def _cell(handle, pot, **kwargs):
+        calls.append({"handle": handle, "pot": pot, **kwargs})
+        return _ok_cell(
+            fe_redox_split={"FeO_wt_pct": 9.0, "Fe2O3_wt_pct": 1.0},
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert prediction.value == fe3_fe2_ratio_from_oxide_wt_pct(
+        Decimal("1.0"), Decimal("9.0")
+    )
+    assert len(calls) == 1
+    assert calls[0]["po2"].mode == "commanded"
+    assert calls[0]["po2"].po2_bar is not None
+    oxygen = [
+        notice for notice in prediction.notices if notice.origin == "fo2_ladder"
+    ]
+    assert len(oxygen) == 1
+    assert oxygen[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert Quantity.FE3_FE2_RATIO in oxygen[0].affected_quantities
+    assert "selected_fO2_Pa=" in oxygen[0].reason
+    assert "source does not print fO2 for this run" in oxygen[0].reason
+    selected = score_module._selected_shared_ladder_oxygen(prediction)
+    assert selected is not None
+    _pressure, tier, _rung, route = selected
+    assert tier == 4
+    assert route == "intrinsic_melt_fO2"
+    assert "kress_inverse" not in route
+    assert "selected_fO2_Pa" not in route
+    assert "original_reason" not in route
+    assert "borrowed" not in route
+    assert "out_of_certified_band" in score_module.flagged_strata(prediction.notices)
 
 
 def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(monkeypatch):

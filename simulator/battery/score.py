@@ -8744,6 +8744,22 @@ def _comparison_identity(
     return replace(identity, **updates)
 
 
+_SHARED_LADDER_QUALIFICATION = re.compile(
+    r"; selected_fO2_Pa=(?P<pa>[^;]*); original_reason=(?P<why>.*)\Z"
+)
+_SHARED_LADDER_REASON = re.compile(
+    r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)"
+)
+
+
+def _ladder_route_text(reason: str) -> re.Match[str] | None:
+    """Route text with the scorer's pressure qualification removed."""
+
+    return _SHARED_LADDER_REASON.fullmatch(
+        _SHARED_LADDER_QUALIFICATION.sub("", reason)
+    )
+
+
 def _selected_shared_ladder_oxygen(
     prediction: EnginePrediction,
 ) -> tuple[Decimal | None, int, int | None, str] | None:
@@ -8752,7 +8768,7 @@ def _selected_shared_ladder_oxygen(
     The prediction identity is the pressure passed to the engine. The ladder
     notice records generic tier and physics rung separately. Effusion balance
     has no commanded pressure, so use its solver output when the engine
-    reports one.
+    reports one. The selected-pressure qualification is not part of the route.
     """
 
     for notice in prediction.notices:
@@ -8761,10 +8777,7 @@ def _selected_shared_ladder_oxygen(
             or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
         ):
             continue
-        match = re.fullmatch(
-            r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)",
-            notice.reason,
-        )
+        match = _ladder_route_text(notice.reason)
         if match is None:
             continue
         route = match.group(3)
@@ -9593,6 +9606,46 @@ def _predict_distin_closed_feo_activity(
     )
 
 
+def _unprinted_redox_oxygen(
+    experiment: Experiment | None,
+    observation: Observation,
+    material: _FeRedoxMaterial,
+) -> tuple[float, State, Notice] | None:
+    """Shared-ladder oxygen when the source does not print fO2.
+
+    The quantity is the scored ferric ratio, so the ladder does not invert
+    this point. None means no independent oxygen condition can be called.
+    """
+
+    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+
+    resolved = resolve_row_fo2(
+        experiment,
+        None,
+        observation,
+        composition_wt=material.composition_wt,
+        temperature_K=float(material.temperature),
+        quantity=Quantity.FE3_FE2_RATIO,
+    )
+    if resolved is None:
+        return None
+    fo2_log = resolved.log10_fO2_bar
+    commanded = State.of(
+        Decimal(str(resolved.po2_bar)) * PA_PER_BAR_DEC
+        if resolved.po2_bar is not None
+        else log10_fo2_to_pa(Decimal(str(fo2_log)))
+    )
+    notice = fo2_tier_notice(Quantity.FE3_FE2_RATIO, resolved)
+    qualified = replace(
+        notice,
+        reason=(
+            f"{notice.reason}; selected_fO2_Pa={commanded.value}; "
+            "original_reason=source does not print fO2 for this run"
+        ),
+    )
+    return fo2_log, commanded, qualified
+
+
 def _predict_redox(
     engine: Engine,
     observation: Observation,
@@ -9689,8 +9742,9 @@ def _predict_redox(
     fo2_log, commanded_fo2_pa = _printed_fe_redox_oxygen(observation, identity)
     handle: object | None = None
     if fo2_log is None and melts:
-        # Missing printed fO2 is a refusal unless this engine computes its own.
-        # The flag is on the opened handle, not a hardcoded engine name.
+        # Missing printed fO2 is a refusal unless this engine computes its own
+        # or can take an imposed shared-ladder default. The flag is on the
+        # opened handle, not a hardcoded engine name.
         handle, _owns_handle = _open_cached_battery_handle(engine, handles)
         if not getattr(handle, "available", False) or getattr(
             handle, "backend", None
@@ -9708,43 +9762,32 @@ def _predict_redox(
                     f"open_battery_engine:{getattr(handle, 'name', engine.value)}"
                 ),
             )
+        # An intrinsic engine keeps its own oxygen. A handle that can take
+        # imposed oxygen gets the same flagged shared default as the other
+        # redox engines. Otherwise the printed pressure is still required.
         if not getattr(handle, "supports_intrinsic_fo2", False):
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "printed_fO2"},
-            )
+            if not getattr(handle, "takes_fo2", False):
+                return refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            selected = _unprinted_redox_oxygen(experiment, observation, material)
+            if selected is None:
+                return refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            fo2_log, commanded_fo2_pa, oxygen_notice = selected
+            material_notices.append(oxygen_notice)
     elif fo2_log is None:
-        from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
-
-        resolved_fo2 = resolve_row_fo2(
-            experiment,
-            None,
-            observation,
-            composition_wt=material.composition_wt,
-            temperature_K=float(material.temperature),
-            quantity=Quantity.FE3_FE2_RATIO,
-        )
-        if resolved_fo2 is None:
+        selected = _unprinted_redox_oxygen(experiment, observation, material)
+        if selected is None:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "printed_fO2"},
             )
-        fo2_log = resolved_fo2.log10_fO2_bar
-        commanded_fo2_pa = State.of(
-            Decimal(str(resolved_fo2.po2_bar)) * PA_PER_BAR_DEC
-            if resolved_fo2.po2_bar is not None
-            else log10_fo2_to_pa(Decimal(str(fo2_log)))
-        )
-        oxygen_notice = fo2_tier_notice(Quantity.FE3_FE2_RATIO, resolved_fo2)
-        material_notices.append(
-            replace(
-                oxygen_notice,
-                reason=(
-                    f"{oxygen_notice.reason}; selected_fO2_Pa={commanded_fo2_pa.value}; "
-                    "original_reason=source does not print fO2 for this run"
-                ),
-            )
-        )
+        fo2_log, commanded_fo2_pa, oxygen_notice = selected
+        material_notices.append(oxygen_notice)
 
     if engine is Engine.OPENIMCC:
         assert fo2_log is not None
