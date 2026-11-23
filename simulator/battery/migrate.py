@@ -98,6 +98,7 @@ from simulator.battery.oxygen_identity import (
     _ATM_BAR,
     _atmosphere_kind,
     _display_fo2_dex,
+    _dry_air_log10_fo2,
     _gas_mixture_evaluation_temperature,
     _last_printed_digit,
     _oxygen_pressure_point,
@@ -10614,36 +10615,41 @@ _TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region
 _PRINTED_SINGLE_MELT_PHASES = frozenset({"melt"})
 
 
-def _printed_point_phase_text(item: Mapping[str, Any]) -> str | None:
-    raw = item.get("phase_as_printed")
-    if raw is None:
-        point_conditions = item.get("point_conditions")
-        if isinstance(point_conditions, Mapping):
-            raw = point_conditions.get("phase_as_printed")
-    if isinstance(raw, Mapping):
-        state = raw.get("state")
-        raw = state.get("value") if isinstance(state, Mapping) else raw.get("value")
+def _printed_point_phase_text(
+    item: Mapping[str, Any], locator: Locator | None
+) -> str | None:
+    conditions = item.get("point_conditions")
+    if isinstance(conditions, Mapping) and "phase_as_printed" in conditions:
+        phase = _located_from_plain(conditions["phase_as_printed"], str)
+        if phase.locator is None or phase.inference is not None:
+            return None
+        raw = phase.state.value if phase.state.is_value else None
+    elif locator is not None and (
+        item.get("locator")
+        or (locator.table and item.get("table_row_number") is not None)
+    ):
+        raw = item.get("phase_as_printed")
+    else:
+        return None
     if not isinstance(raw, str):
         return None
     text = " ".join(raw.split())
     return text or None
 
 
-def _printed_point_phase_kind(text: str) -> str | None:
+def _printed_point_phase_kind(text: str, *, located_statement: bool = False) -> str | None:
     """Type a printed per-point phase. None means leave the parent phase.
 
-    ``melt`` is the printed single liquid. A printed point label containing
-    melt with a named crystal phase is a two-phase assemblage; the broader
-    wording is read only from the explicitly located ``phase_as_printed``
-    field.
+    Recognize whole phase labels. Only an explicitly located phase statement
+    can also use the affirmative "melt containing ..." assemblage form.
     """
 
     parts = " ".join(text.split()).casefold().split(" ")
     if len(parts) == 1 and parts[0] in _PRINTED_SINGLE_MELT_PHASES:
         return "liquid"
-    if "melt" in parts and re.search(
-        r"\b(?:magnetite|feldspar|hypersthene-enstatite|crystallized)\b", text,
-        re.IGNORECASE,
+    if located_statement and re.fullmatch(
+        r"melt containing [a-z-]+(?:, [a-z-]+)*,? and (?:calcium )?[a-z-]+",
+        " ".join(parts),
     ):
         return "two_phase"
     if (
@@ -22523,8 +22529,7 @@ def _printed_fo2_interval(
                     ),
                     reason,
                 )
-            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
-            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
+            log_bar = _dry_air_log10_fo2(total_pa, _AIR_O2_MOLE_FRACTION)
             condition = value_condition(
                 {
                     "kind": ValueKind.INTERVAL.value,
@@ -31160,12 +31165,16 @@ class Migrator:
                         if item.startswith("identity.reservoir")
                     )
         printed_phase_text = (
-            _printed_point_phase_text(raw_item)
+            _printed_point_phase_text(raw_item, point_locator)
             if isinstance(raw_item, Mapping)
             else None
         )
         printed_phase_kind = (
-            _printed_point_phase_kind(printed_phase_text)
+            _printed_point_phase_kind(
+                printed_phase_text,
+                located_statement=isinstance(raw_item.get("point_conditions"), Mapping)
+                and "phase_as_printed" in raw_item["point_conditions"],
+            )
             if printed_phase_text is not None
             else None
         )
@@ -32222,6 +32231,26 @@ class Migrator:
             if oxygen_applied and refreshed_oxygen.state.is_value:
                 identity = replace(identity, fO2_Pa=refreshed_oxygen.state)
         child_notices = list(notices)
+        regime = (row_point_conditions or {}).get("regime_as_printed")
+        if (
+            q_token_point is Quantity.FE3_FE2_RATIO
+            and regime is not None
+            and regime.locator is not None
+            and regime.inference is None
+            and regime.state.is_value
+            and isinstance(regime.state.value, str)
+            and regime.state.value.casefold().startswith(
+                ("transient;", "transient before ", "no equilibrium was reached")
+            )
+        ):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(q_token_point,),
+                    reason=f"non_equilibrium_run: {regime.state.value}",
+                    origin=point_id,
+                )
+            )
         if gas_volume_bases and isinstance(q_token_point, Quantity):
             child_notices.append(
                 Notice(

@@ -319,7 +319,8 @@ class NoticeKind(StrEnum):
     TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
-    # reason carries detail; it adds no stratum and does not change authority.
+    # reason carries detail. Source comparability caveats can select a
+    # flagged stratum without changing the prediction's authority.
     ENGINE_MODEL_CAVEAT = "engine_model_caveat"
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.

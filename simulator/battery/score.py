@@ -46,7 +46,11 @@ import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
-from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.oxygen_identity import (
+    _DP_003_AIR_O2_MOLE_FRACTION,
+    _dry_air_log10_fo2,
+    log10_fo2_to_pa,
+)
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
@@ -2545,6 +2549,15 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
+    # These two caveats qualify comparison against a liquid equilibrium model.
+    for caveat in ("non_equilibrium_run", "crystal_bearing_bulk_composition"):
+        if any(
+            kind == NoticeKind.ENGINE_MODEL_CAVEAT.value
+            and isinstance(reason, str)
+            and reason.startswith(f"{caveat}:")
+            for kind, reason in notices
+        ):
+            strata.append(caveat)
     return tuple(strata)
 
 
@@ -8677,10 +8690,9 @@ def _comparison_identity(
     if melt_identity is not identity:
         updates["species"] = melt_identity.species
     if redox and isinstance(prediction.identity, Identity):
-        # Redox predictions consume the row's printed composition and oxygen
-        # condition; compare both sides at those exact point conditions.
-        # fO2_Pa on both identities is log10_fo2_to_pa of that printed log.
-        # Exact equality is the check; this does not rebuild or relax it.
+        # Compare both sides at the composition and oxygen used by the solver.
+        # A default oxygen input carries its prediction notice. Existing
+        # source values still take precedence in the exact equality check.
         for field_name in ("composition", "fO2_Pa", "total_pressure_Pa"):
             actual = getattr(identity, field_name)
             used = getattr(prediction.identity, field_name)
@@ -9669,6 +9681,38 @@ def _predict_redox(
             return refused(kress_basis.reason, kress_basis.detail)
 
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    ambient = experiment.ambient_pressure_evidence if experiment is not None else None
+    total_pressure = identity.total_pressure_Pa
+    point_conditions = observation.point_conditions or {}
+    if (
+        fo2_log is None
+        and not melts
+        and quantity_token(identity) is Quantity.FE3_FE2_RATIO
+        and not {"fO2_Pa", "fO2_log", "fO2_control"}.intersection(point_conditions)
+        and not _derived_fo2_condition(observation)
+        and ambient is not None
+        and ambient.locator is not None
+        and "exposed to the air" in ambient.quote.casefold()
+        and total_pressure is not None
+        and total_pressure.is_value
+        and total_pressure.value > 0
+    ):
+        fo2_log = _dry_air_log10_fo2(
+            as_decimal(total_pressure.value), _DP_003_AIR_O2_MOLE_FRACTION
+        )
+        material_notices.append(
+            Notice(
+                kind=NoticeKind.APPROXIMATE_PRESSURE,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=(
+                    "DP-003: no row-specific oxygen pressure; assumed ideal dry air "
+                    f"with O2 mole fraction {_DP_003_AIR_O2_MOLE_FRACTION} "
+                    f"at {total_pressure.value} Pa "
+                    f"from the air-exposure statement on folio {ambient.locator.published_page}"
+                ),
+                origin=observation.observation_id,
+            )
+        )
     handle: object | None = None
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.
@@ -9699,6 +9743,18 @@ def _predict_redox(
         return refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "printed_fO2"},
+        )
+
+    commanded_fo2_pa = None
+    if fo2_log is not None:
+        # Keep a printed pressure exact across the log conversion sent to the solver.
+        printed_pa = (
+            printed_source_pressure(observation)
+            if _printed_condition_decimal(observation, "fO2_log") is None
+            else None
+        )
+        commanded_fo2_pa = State.of(
+            printed_pa if printed_pa is not None else log10_fo2_to_pa(fo2_log)
         )
 
     if engine is Engine.OPENIMCC:
@@ -9816,7 +9872,7 @@ def _predict_redox(
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            fO2_Pa=commanded_fo2_pa,
         )
         return EnginePrediction(
             engine=engine,
@@ -9857,8 +9913,7 @@ def _predict_redox(
             kress91_temperature_band_case,
         )
 
-        # Identity fO2_Pa is log10_fo2_to_pa of that printed log. The predictor
-        # still receives the printed log, with no frame shift.
+        # The predictor receives log10(fO2/bar) with no frame shift.
         assert fo2_log is not None
         band = kress91_temperature_band_case(float(material.temperature) - 273.15)
         try:
@@ -9933,7 +9988,7 @@ def _predict_redox(
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            fO2_Pa=commanded_fo2_pa,
             total_pressure_Pa=pressure_pa,
         )
         return EnginePrediction(
@@ -9996,7 +10051,7 @@ def _predict_redox(
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
-            fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
+            fO2_Pa=commanded_fo2_pa,
             total_pressure_Pa=pressure_pa,
         )
     else:
@@ -17768,6 +17823,39 @@ def _compile_residual_with_lineage(
         geometry_interval_notices,
         _quench_notices(reference),
     )
+    bulk_not_liquid = (
+        engine in SINGLE_LIQUID_ENGINES
+        and _is_bulk_not_liquid_composition(reference)
+    )
+    point_conditions = reference.point_conditions or {}
+    phase = point_conditions.get("phase_as_printed")
+    flagged_bulk_redox = (
+        bulk_not_liquid
+        and engine in (Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC)
+        and quantity is Quantity.FE3_FE2_RATIO
+        and phase is not None
+        and phase.state.is_value
+        and phase.locator is not None
+        and phase.inference is None
+    )
+    if quantity is Quantity.FE3_FE2_RATIO:
+        if flagged_bulk_redox:
+            notices = union_notices(notices, (Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(quantity,),
+                reason=(
+                    "crystal_bearing_bulk_composition: prediction uses "
+                    "the starting bulk composition as liquid"
+                ),
+                origin=reference.observation_id,
+            ),))
+        if any(n.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE for n in notices):
+            notices = union_notices(notices, (Notice(
+                kind=NoticeKind.APPROXIMATE_PRESSURE,
+                affected_quantities=(quantity,),
+                reason="total pressure inferred from ambient apparatus evidence",
+                origin=reference.observation_id,
+            ),))
     liquid_sample_domain_notice = (
         liquid_model_subsolidus_sample_notice(
             identity,
@@ -17945,7 +18033,7 @@ def _compile_residual_with_lineage(
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
         )
-    if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
+    if bulk_not_liquid and not flagged_bulk_redox:
         bulk_detail: dict[str, object] = {
             "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
             "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
