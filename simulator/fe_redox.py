@@ -495,7 +495,6 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
                 )
             return math.exp(log_value)
 
-        temperature_ratio = edge_T_K / temperature_K
         # Premise: regular-solution RT ln(gamma) = W with T-independent excess
         # enthalpy. Holding W at the nearest edge gives
         # ln(gamma(T)) = ln(gamma(T_edge)) * T_edge/T; W is J/mol, R is
@@ -504,14 +503,18 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         # 2.822; the 1600 C edge gives W=16.157 kJ/mol. Since the ratio
         # T_edge/T is one at the edge, this joins continuously to the
         # unchanged linear interpolation over 1300-1600 C.
-        central_log = math.log(edge_gamma) * temperature_ratio
+        central_log = (math.log(edge_gamma) * edge_T_K) / temperature_K
         central = exp_representable(central_log, "central gamma")
         multiplier = central / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
 
         # Carry the nearest edge's printed uncertainty limits through the same
         # regular-solution relation and preserve the adjacent printed spread.
-        scaled_low_log = math.log(edge_gamma - edge_sigma) * temperature_ratio
-        scaled_high_log = math.log(edge_gamma + edge_sigma) * temperature_ratio
+        scaled_low_log = (
+            math.log(edge_gamma - edge_sigma) * edge_T_K
+        ) / temperature_K
+        scaled_high_log = (
+            math.log(edge_gamma + edge_sigma) * edge_T_K
+        ) / temperature_K
         edge_points = points[:2] if below else points[-2:]
         edge_segment_spread = abs(
             HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
