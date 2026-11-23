@@ -8,11 +8,13 @@ from dataclasses import replace
 
 import pytest
 
+from simulator.battery import composition_roles
 from simulator.battery import migrate as battery_migrate
 import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 from simulator.diagnostic_helpers.extract_reproduction import (
     _literature_pressure_points,
     _melt_recipe_mol,
+    _resolve_melt_recipe,
     evaluate_observation,
     load_adopted_observations,
     observation_admission_reason,
@@ -36,15 +38,16 @@ def test_bischof_unknown_mixed_basis_point_keeps_parent_recipe() -> None:
         "Ga",
         "bischof_2023_ga_psat_s1_1low_polytherm",
     )
-    parent, parent_source, parent_error = _melt_recipe_mol(obs)
-    assert parent is not None and parent_error is None
+    parent_role, parent_source = _resolve_melt_recipe(obs)
+    parent = parent_role.composition.value
+    assert parent_role.callable
     point = obs.values["points"][0]
     assert point["point_conditions"]["composition"]["state"]["tag"] == "unknown"
 
-    recipe, source, error = _melt_recipe_mol(obs, point=point)
+    role, source = _resolve_melt_recipe(obs, point=point)
 
-    assert recipe == pytest.approx(parent)
-    assert error is None
+    assert role.composition.value == pytest.approx(parent)
+    assert role.callable
     assert "initial_charge_only" in source
     assert "initial_charge_only" in parent_source
 
@@ -109,30 +112,46 @@ def test_located_mole_fraction_composition_overrides_parent_recipe() -> None:
     }
 
 
-def test_effective_point_role_defaults_only_unknown_usable_composition() -> None:
-    effective = battery_migrate._effective_point_composition_role
-    assert effective(
-        "datum_state", None, usable_composition=True
-    ) == ("datum_state", None, None)
-    assert effective(
-        "initial_charge_only", None, usable_composition=True
-    ) == ("initial_charge_only", None, None)
-    assert effective(
-        None,
-        "composition_role 'unreported' is unknown",
-        usable_composition=False,
-    ) == (None, None, None)
-    assert effective(
-        None,
-        "composition_role 'unreported' is unknown",
-        usable_composition=True,
-    ) == (
-        "initial_charge_only",
-        "composition_role_defaulted_to_initial_charge_only",
-        "typed-refusal:composition_role_defaulted_to_initial_charge_only: "
-        "default=initial_charge_only; original_reason=composition_role "
-        "'unreported' is unknown",
+@pytest.mark.parametrize("shape", ["parent", "point", "flat", "pressure"])
+@pytest.mark.parametrize(
+    ("token", "usable", "status", "flags"),
+    [
+        ("datum_state", True, composition_roles.RoleStatus.DECLARED, ()),
+        ("unreported", True, composition_roles.RoleStatus.DEFAULTED,
+         (composition_roles.ROLE_DEFAULT_FLAG,)),
+        ("unreported", False, composition_roles.RoleStatus.UNKNOWN, ()),
+    ],
+)
+def test_role_resolution_matrix(shape, token, usable, status, flags) -> None:
+    from types import SimpleNamespace
+
+    amounts = {"SiO2": 60, "MgO": 40} if usable else {"SiO2": "bad", "MgO": 40}
+    values = {"composition_role": {"value": token}}
+    point = None
+    if shape == "parent":
+        values["composition_wt_pct"] = amounts
+    elif shape == "point":
+        point = {"composition_wt_pct": amounts, "composition_role": token}
+        values["composition_role"] = "initial_charge_only"
+    elif shape == "flat":
+        point = amounts
+        values["composition_wt_pct"] = {"SiO2": 50, "MgO": 50}
+    else:
+        point = {"composition_wt_pct": amounts, "T_K": 1500, "p_Pa": 1.0}
+    role, source = _resolve_melt_recipe(
+        SimpleNamespace(values=values, units=None), point=point
     )
+    assert role.status is status
+    assert role.flags == flags
+    assert role.callable is usable
+    if not usable:
+        assert role.composition.is_unknown
+    elif shape == "flat":
+        assert source == "extract flat run composition"
+    if status is composition_roles.RoleStatus.DEFAULTED:
+        assert role.initial_charge_only
+        assert "default=initial_charge_only" in role.reason
+        assert "'unreported'" in role.original_reason
 
 
 def test_mapping_backed_composition_role_is_resolved_after_admission() -> None:
@@ -141,17 +160,45 @@ def test_mapping_backed_composition_role_is_resolved_after_admission() -> None:
         "Fe",
         "costa_2015_fe_vaporization_coefficient_alpha_digitized",
     )
-    point = next(
-        point
-        for point in obs.values["points"]
-        if isinstance(point.get("composition_role"), Mapping)
-    )
-
-    assert battery_migrate._declared_composition_role(point) == (
-        "initial_charge_only",
-        None,
-    )
+    # The role is printed on the parent of the digitized points.
+    assert isinstance(obs.values["composition_role"], Mapping)
+    assert obs.values["admission_status"] == "admitted"
     assert observation_admission_reason(obs) is None
+    role, _source = _resolve_melt_recipe(obs, point=obs.values["points"][0])
+    assert role.initial_charge_only
+    assert role.status is composition_roles.RoleStatus.DECLARED
+
+
+def test_pressure_with_inherited_unknown_role_predicts_in_flagged_tier(monkeypatch) -> None:
+    obs = _adopted_observation(
+        "kems-022-demaria-1971", "K", "demaria_1971_k_psat_figure2_digitized"
+    )
+    obs = replace(
+        obs,
+        values={
+            **obs.values,
+            "composition_role": {"value": "unreported"},
+            "points": [{
+                "T_K": 1500.0,
+                "p_Pa": 1.0,
+                "composition_mol": {"SiO2": 0.6, "MgO": 0.4},
+            }],
+        },
+    )
+    calls = []
+
+    def melt_stub(_species, _temperature, _po2, _data, *, account_mol):
+        calls.append(account_mol)
+        return 1.0, None, {"provider_status": "ok"}
+
+    monkeypatch.setattr(extract_reproduction, "_engine_melt_psat_pa", melt_stub)
+    assert observation_admission_reason(obs) is None
+    result = extract_reproduction._evaluate_psat(
+        obs, extract_reproduction.ObservationEvaluation(obs), {}, 5e-9
+    )
+    assert calls == [{"SiO2": 0.6, "MgO": 0.4}]
+    assert [record.status for record in result.records] == ["assumed-input"]
+    assert composition_roles.is_role_default_reason(result.skip_reason)
 
 
 def test_unknown_point_composition_role_defaults_for_usable_assays(monkeypatch) -> None:
@@ -824,5 +871,43 @@ def test_flat_run_unknown_role_is_flagged_at_scorer_boundary(tmp_path) -> None:
         if "composition_role_defaulted_to_initial_charge_only" in notice.reason
     )
     assert len(role_notices) == 1
-    assert flagged_strata(row.notices)
-    assert blocking_qualifications(Quantity.P_PARTIAL, row.notices)
+    assert flagged_strata(role_notices)
+    assert blocking_qualifications(Quantity.P_PARTIAL, role_notices) == role_notices
+
+
+def test_scorer_reads_a_persisted_role_default_without_a_legacy_proxy() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import Engine, EvidenceClass, Quantity
+    from simulator.battery.score import compile_residual
+    from tests.battery import factories as F
+    from tests.battery.test_score import _context, _predict
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        "role-default", experiment.experiment_id, identity, Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT, source_id="work-1",
+    )
+    role = composition_roles.resolve_composition_role(
+        {"composition_role": "unreported"},
+        composition=identity.composition,
+        quantity=Quantity.ACTIVITY,
+        origin=reference.observation_id,
+    )
+    reference = replace(
+        reference,
+        notices=tuple(
+            notice for notice in role.notices
+            if composition_roles.is_role_default_reason(notice.reason)
+        ),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference, Engine.INTERNAL_ANALYTICAL, context=context,
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert residual.numeric.decision_band is None

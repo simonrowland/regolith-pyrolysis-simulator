@@ -63,7 +63,10 @@ from simulator.physical_constants import (
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
 )
+from simulator.battery import composition_roles
 from simulator.battery import migrate as battery_migrate
+from simulator.battery.composition_roles import RoleResolution, RoleStatus
+from simulator.state_types import State
 from simulator.battery.enums import Quantity
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
@@ -502,8 +505,6 @@ _EVIDENCE_VOCABULARY = {
     })},
     "measurement_status": dict(_MARKER_REFUSALS),
     "alpha_role": dict(_MARKER_REFUSALS),
-    # composition_role is intentionally absent: migrate.py's typed role reader
-    # resolves it after observation admission, including mapping-backed roles.
     "review_status": {
         "draft": None,  # ames-walsh-white-1967: source review pending.
         "reviewed": None,  # ivtan-mno-coo-thermo: source reviewed.
@@ -1001,32 +1002,12 @@ def _literature_pressure_points(
                 )
                 continue
             parsed_point = {
+                **pt,
                 "T_K": T_f,
                 "P_Pa": P_f,
                 "units": units_hint,
                 "point_index": idx,
-                "note": pt.get("note"),
             }
-            parsed_point.update(
-                {
-                    key: pt[key]
-                    for key in (
-                        "composition_mol",
-                        "melt_composition_mol",
-                        "composition_wt_pct",
-                        "melt_composition_wt_pct",
-                        "sample_oxide_composition_wt_pct",
-                        "sample_Na2O_wt_pct",
-                        "sample_K2O_wt_pct",
-                        "composition_source_observation_id",
-                        "composition_source_gap",
-                        "composition_role",
-                        "point_conditions",
-                        "sample",
-                    )
-                    if key in pt
-                }
-            )
             out.append(parsed_point)
         if out:
             return out, None, drops
@@ -3141,9 +3122,8 @@ def _evaluate_psat(
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
     for pt in points:
-        melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(
-            obs, point=pt
-        )
+        role, melt_recipe_source = _resolve_melt_recipe(obs, point=pt)
+        melt_recipe = role.composition.value
         T_K = float(pt["T_K"])
         expected = float(pt["P_Pa"])
         unc = resolve_uncertainty(obs, point=pt, kind_hint="psat")
@@ -3156,44 +3136,9 @@ def _evaluate_psat(
             "standard_state_kind": standard_state_kind,
             "melt_recipe_source": melt_recipe_source,
         }
-        composition_role, composition_role_refusal = (
-            battery_migrate._declared_composition_role(pt, obs.values)
-        )
-        (
-            effective_composition_role,
-            role_default_flag,
-            role_default_reason,
-        ) = battery_migrate._effective_point_composition_role(
-            composition_role,
-            composition_role_refusal,
-            usable_composition=melt_recipe is not None,
-        )
-        initial_charge_only = (
-            effective_composition_role
-            == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG
-        )
-        defaulted_composition_role = role_default_flag is not None
-        typed_input_reason: str | None = None
+        typed_input_reason = _record_composition_role(runtime, role, include_declared=True)
         point_melt_only_assumption: str | None = None
-        if defaulted_composition_role:
-            runtime["input_assumption"] = {
-                "flag": role_default_flag,
-                "default_role": effective_composition_role,
-                "original_reason": composition_role_refusal,
-            }
-            typed_input_reason = role_default_reason
-            runtime["typed_input_reason"] = typed_input_reason
-        if initial_charge_only:
-            if not defaulted_composition_role:
-                role_reason = battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE
-                runtime["input_assumption"] = {
-                    "flag": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG,
-                    "reason": role_reason,
-                }
-                typed_input_reason = (
-                    f"typed-refusal:{battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
-                    f"{role_reason}"
-                )
+        if role.initial_charge_only and typed_input_reason is not None:
             pairing = obs.values.get("fO2_pairing")
             if (
                 pO2 is not None
@@ -3237,8 +3182,8 @@ def _evaluate_psat(
                 last_refusal = "missing_condition:standard_state_boundary"
                 runtime["refusal"] = last_refusal
                 continue
-            if melt_recipe is None:
-                last_refusal = melt_recipe_error or "missing_condition:melt_composition"
+            if not role.callable:
+                last_refusal = role.composition.reason
                 runtime["refusal"] = last_refusal
                 continue
             point_pO2 = pO2
@@ -3462,8 +3407,7 @@ def _evaluate_psat(
             unsupported_speciation=unsupported and actual is None,
             out_of_domain=out_of_domain and actual is None,
             assumed_input=(
-                initial_charge_only
-                or defaulted_composition_role
+                bool(role.flags)
                 or point_melt_only_assumption is not None
             )
             and actual is not None,
@@ -3474,12 +3418,6 @@ def _evaluate_psat(
                 evaluation.skip_reason = typed_input_reason
             if typed_input_reason not in evaluation.skip_reasons:
                 evaluation.skip_reasons.append(typed_input_reason)
-        if composition_role_refusal is not None and not defaulted_composition_role:
-            role_reason = f"{_TYPED_SKIP_PREFIX}{composition_role_refusal}"
-            if evaluation.skip_reason is None:
-                evaluation.skip_reason = role_reason
-            if role_reason not in evaluation.skip_reasons:
-                evaluation.skip_reasons.append(role_reason)
         if record.status == "mismatch":
             residual_dex = None
             if expected > 0 and actual is not None and actual > 0:
@@ -3557,10 +3495,11 @@ def _evaluate_rate(
         return _rate_payload_skip(obs, evaluation, reason)
 
     candidates = _engine_species_candidates(obs)
-    melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(obs)
+    role, melt_recipe_source = _resolve_melt_recipe(obs)
+    melt_recipe = role.composition.value
     condition_gaps: list[str] = []
     if melt_recipe is None:
-        condition_gaps.append(melt_recipe_error or "missing_condition:melt_composition")
+        condition_gaps.append(role.composition.reason or "missing_condition:melt_composition")
     if pO2 is None:
         condition_gaps.append("missing_condition:pO2_boundary")
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
@@ -3570,6 +3509,7 @@ def _evaluate_rate(
             + "; ".join(condition_gaps)
         )
     any_numeric = False
+    role_reason = None
     last_refusal = "missing_capability:vapor_rail_species_or_hkl_inputs"
     for point in points:
         T_K = float(point["T_K"])
@@ -3591,6 +3531,7 @@ def _evaluate_rate(
                 "components are not jointly quantified"
             ),
         }
+        role_reason = _record_composition_role(runtime, role)
         for species in candidates:
             if melt_recipe is not None and pO2 is not None:
                 pressure, refusal, pressure_runtime = _engine_melt_psat_pa(
@@ -3662,7 +3603,7 @@ def _evaluate_rate(
             units="mol m^-2 s^-1",
             runtime=runtime,
             unsupported_speciation=actual is None,
-            assumed_input=bool(condition_gaps and actual is not None),
+            assumed_input=bool((condition_gaps or role_reason) and actual is not None),
         )
         evaluation.records.append(record)
         if actual is not None:
@@ -3675,6 +3616,8 @@ def _evaluate_rate(
                 f"residual_dex={dex:.6g} budget={uncertainty}"
             )
 
+    if any_numeric and role_reason is not None:
+        condition_gaps.append(role_reason)
     if condition_gaps:
         typed_gaps = [
             gap if gap.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{gap}"
@@ -3907,6 +3850,53 @@ def _evaluate_alpha(
     return evaluation
 
 
+def _resolve_melt_recipe(
+    obs: AdoptedObservation,
+    *,
+    point: Mapping[str, Any] | None = None,
+) -> tuple[RoleResolution[dict[str, float]], str]:
+    recipe, source, error = (
+        _melt_recipe_mol(obs, point=point) if point is not None else _melt_recipe_mol(obs)
+    )
+    composition = (
+        State.of(recipe) if recipe is not None
+        else State.unknown(error or "missing_condition:melt_composition")
+    )
+    role = composition_roles.resolve_composition_role(
+        point, obs.values, composition=composition
+    )
+    if role.initial_charge_only and source.startswith((
+        "extract composition_wt_pct",
+        "extract sample_oxide_composition_wt_pct",
+        "extract point_conditions.composition",
+    )):
+        label, separator, overlay = source.partition("+")
+        source = f"{label} ({role.role}){separator}{overlay}"
+    return role, source
+
+
+def _record_composition_role(
+    runtime: dict[str, Any],
+    role: RoleResolution[dict[str, float]],
+    *,
+    include_declared: bool = False,
+) -> str | None:
+    if (
+        not role.flags
+        or not role.callable
+        or (not include_declared and role.status is not RoleStatus.DEFAULTED)
+    ):
+        return None
+    flag = role.flags[0]
+    runtime["input_assumption"] = (
+        {"flag": flag, "default_role": role.role, "original_reason": role.original_reason}
+        if role.status is RoleStatus.DEFAULTED
+        else {"flag": flag, "reason": role.reason.split(": ", 1)[1]}
+    )
+    runtime["typed_input_reason"] = role.reason
+    return role.reason
+
+
 def _melt_recipe_mol(
     obs: AdoptedObservation,
     *,
@@ -3938,10 +3928,27 @@ def _melt_recipe_mol(
             isinstance(located_state, Mapping)
             and located_state.get("tag") == "value"
         )
-        if point_has_located_composition or any(
+        point_has_named_recipe = any(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
             for key in point_recipe_keys
+        )
+        if (
+            not point_has_located_composition
+            and not point_has_named_recipe
+            and battery_migrate._flat_run_composition_columns(
+                point, obs.values, getattr(obs, "units", None)
+            )
         ):
+            errors: list[str] = []
+            flat = battery_migrate._oxide_map_from_mapping(
+                point, declared_map=True, refusal_reason=errors
+            )
+            source = "extract flat run composition"
+            if flat is None:
+                return None, source, errors[0] if errors else "missing_condition:melt_composition"
+            composition = battery_migrate.wt_pct_to_mole_fraction(flat)
+            return {oxide: float(amount) for oxide, amount in composition.components}, source, None
+        if point_has_located_composition or point_has_named_recipe:
             # A measured row's own suite takes precedence over parent-level defaults.
             for key in (
                 *point_recipe_keys,
@@ -3967,8 +3974,6 @@ def _melt_recipe_mol(
         )
         if point_has_located_composition:
             values["point_conditions"] = point_conditions
-        if "composition_role" in point:
-            values["composition_role"] = point["composition_role"]
     for key in ("composition_mol", "melt_composition_mol"):
         raw = values.get(key)
         if isinstance(raw, Mapping) and raw:
@@ -4017,22 +4022,6 @@ def _melt_recipe_mol(
             None,
             "extract composition_source_gap",
             "missing_condition:melt_composition",
-        )
-    composition_role, role_refusal = battery_migrate._declared_composition_role(
-        point, obs.values
-    )
-    point_role_is_unknown = (
-        isinstance(point, Mapping)
-        and "composition_role" in point
-        and role_refusal is not None
-    )
-    if role_refusal is not None and not point_role_is_unknown:
-        return None, "extract composition_role", role_refusal
-    if composition_role == battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG and (
-        located_composition is not None or isinstance(raw_wt, Mapping)
-    ):
-        provenance = (
-            f"{provenance} ({battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG})"
         )
     # Prefer the printed alkali overlay when an extract gives it alongside a
     # complete melt recipe.
@@ -4682,7 +4671,10 @@ def _evaluate_ordering(
         # Class/form gates still exclude pin-bearing credit even on a PASS.
         status_override = status
         out_of_domain = False
-        if verdict in {"pass", "fail"} and not pin_ok and axes_typed is not None:
+        assumed_input = verdict in {"pass", "fail"} and "typed_input_reason" in payload
+        if assumed_input:
+            payload["skip_reason"] = payload["typed_input_reason"]
+        elif verdict in {"pass", "fail"} and not pin_ok and axes_typed is not None:
             out_of_domain = True
             status_override = "out-of-domain"
             payload["ordering_verdict_unscored"] = verdict
@@ -4699,9 +4691,14 @@ def _evaluate_ordering(
                 units="ordering_pairs",
                 runtime=payload,
                 out_of_domain=out_of_domain,
-                status_override=status_override if not out_of_domain else None,
+                assumed_input=assumed_input,
+                status_override=status_override if not out_of_domain and not assumed_input else None,
             )
         )
+        if assumed_input:
+            evaluation.skip_reason = payload["skip_reason"]
+            evaluation.skip_reasons.append(evaluation.skip_reason)
+            return evaluation
         if verdict == "pass" and pin_ok:
             evaluation.runtime_notes.append(
                 f"ordering PASS: {claim.get('asserted') if claim else obs.observation_id}"
@@ -4800,7 +4797,9 @@ def _evaluate_ordering(
             extra={"unmapped": missing_map},
         )
 
-    melt_recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
+    role, recipe_source = _resolve_melt_recipe(obs)
+    melt_recipe = role.composition.value
+    _record_composition_role(runtime, role)
     runtime["melt_recipe_source"] = recipe_source
     # No feedstock proxy. A silicate-melt ordering that names no composition
     # refuses, the same as _melt_recipe_mol on the psat path. lunar_mare_low_ti
@@ -4808,7 +4807,7 @@ def _evaluate_ordering(
     if melt_recipe is None:
         return _emit(
             verdict="not_evaluable",
-            reason=recipe_error or "missing_condition:melt_composition",
+            reason=role.composition.reason,
         )
 
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
@@ -4903,8 +4902,10 @@ def _evaluate_relative_volatility(
             "missing_capability:relative_volatility_species_map",
         )
     pin_ok, axes_skip, axes_runtime = rail_alpha_comparability(obs)
-    melt_recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
-    if melt_recipe is None:
+    role, recipe_source = _resolve_melt_recipe(obs)
+    melt_recipe = role.composition.value
+    recipe_error = role.composition.reason
+    if not role.callable:
         evaluation.records.append(
             _compare_point(
                 obs=obs,
@@ -4946,6 +4947,7 @@ def _evaluate_relative_volatility(
         "melt_recipe_source": recipe_source,
         **axes_runtime,
     }
+    role_reason = _record_composition_role(runtime, role)
     if num_v is None or den_v is None or den_v == 0.0:
         runtime["skip_reason"] = (
             f"{_TYPED_SKIP_PREFIX}missing_capability:relative_volatility_engine_rank"
@@ -4994,9 +4996,14 @@ def _evaluate_relative_volatility(
         actual=actual,
         units="dimensionless",
         runtime=runtime,
-        out_of_domain=not pin_ok,
+        assumed_input=role_reason is not None,
+        out_of_domain=not pin_ok and role_reason is None,
     )
     evaluation.records.append(record)
+    if role_reason is not None:
+        evaluation.skip_reason = role_reason
+        evaluation.skip_reasons.append(role_reason)
+        return evaluation
     if not pin_ok and axes_skip is not None:
         typed = f"{_TYPED_SKIP_PREFIX}{axes_skip}"
         evaluation.skip_reason = typed
@@ -5137,13 +5144,17 @@ def _evaluate_activity(
         runtime["citation"] = coefficient.citation
         runtime["engine_gamma"] = actual
     else:
-        recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
+        role, recipe_source = _resolve_melt_recipe(obs)
+        recipe = role.composition.value
+        role_reason = _record_composition_role(runtime, role)
+        if role_reason is not None:
+            assumption_gaps.append(role_reason.removeprefix(_TYPED_SKIP_PREFIX))
         runtime["recipe_source"] = recipe_source
         if recipe is None:
             return _activity_skip(
                 obs,
                 evaluation,
-                recipe_error or "missing_condition:melt_composition",
+                role.composition.reason or "missing_condition:melt_composition",
                 expected=expected,
                 observable=observable_kind,
             )

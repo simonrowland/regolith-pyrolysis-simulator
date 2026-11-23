@@ -222,9 +222,10 @@ from simulator.battery.stable_ids import (
     series_row_extra,
     temperature_token,
 )
+from simulator.battery import composition_roles
+from simulator.battery.composition_roles import COMPOSITION_ROLE_FIELD, DATUM_STATE
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     AmbientPressureEvidence,
     Admission,
     AdmissionDecision,
@@ -269,7 +270,6 @@ from simulator.battery.records import (
     Work,
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
-    initial_charge_only_proxy_notice,
     _value_has_numeric_value,
     approx_pressure_from_mapping,
     approximate_derived_total_reason,
@@ -3720,7 +3720,7 @@ def _sample_from_plain(
     printed_from_initial = printed_located is None and initial is not None
     if printed_from_initial:
         printed_located = _mass_percent_printed_from_plain(initial)
-    composition_role, _role_refusal = _declared_composition_role(payload)
+    composition_role = composition_roles.resolve_composition_role(payload).role
     owner_initial = None
     if (
         not (initial_located is not None and initial_located.state.is_value)
@@ -5754,7 +5754,7 @@ def _composition_source_locator(
             locator = _locator_from_plain(printed.get("locator"))
             if locator is not None:
                 return locator
-    role = payload.get("composition_role")
+    role = payload.get(COMPOSITION_ROLE_FIELD)
     if isinstance(role, Mapping):
         locator = _locator_from_plain(role.get("locator"))
         if locator is not None:
@@ -8526,9 +8526,10 @@ def _composition_located_from_values(
     """
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
-    role, _refusal = _declared_composition_role(values)
-    if _refusal is not None and role_refusal is not None:
-        role_refusal.append(_refusal)
+    resolution = composition_roles.resolve_composition_role(values)
+    role = resolution.role
+    if resolution.original_reason is not None and role_refusal is not None:
+        role_refusal.append(resolution.original_reason)
     wt = _initial_oxide_map_from_values(
         values,
         declared_map=_declared_wt_composition_point_map(values, None),
@@ -8537,7 +8538,7 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    if not has_feot and role not in _COMPOSITION_ROLE_TOKENS:
+    if not has_feot and role is None:
         return None
     complement_note = (
         isinstance(source_note, str)
@@ -8546,7 +8547,7 @@ def _composition_located_from_values(
         and "100" in source_note
     )
     pass_note = role == INITIAL_CHARGE_ONLY_PROXY_FLAG or has_feot or (
-        role == "datum_state" and complement_note
+        role == DATUM_STATE and complement_note
     )
     derivation_notes = []
     declared_component_map = _named_printed_composition_map(values)
@@ -8848,58 +8849,6 @@ def _located_printed_and_initial(
         )
     )
     return printed, initial
-
-
-_COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, "datum_state"})
-_UNKNOWN_POINT_ROLE_DEFAULT_FLAG = (
-    "composition_role_defaulted_to_initial_charge_only"
-)
-
-
-def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
-    """Return (role, refusal) from the first ``composition_role`` declared.
-
-    The row is read before its parent values block. ``initial_charge_only``
-    marks a printed starting charge that may supply a later datum as a flagged
-    proxy. ``datum_state`` marks the sample composition
-    at this datum's measurement state, including a bulk two-phase sample; it
-    applies to the observation's point conditions and never marks the
-    experiment's starting charge. Each typed declaration is a bare token or a
-    mapping with its page locator and quote. A token outside the closed set is
-    a refusal, never a guess.
-    """
-
-    for root in roots:
-        if not isinstance(root, Mapping) or "composition_role" not in root:
-            continue
-        raw = root.get("composition_role")
-        token = raw.get("value") if isinstance(raw, Mapping) else raw
-        token = str(token).strip() if token is not None else ""
-        if token in _COMPOSITION_ROLE_TOKENS:
-            return token, None
-        return None, (
-            f"composition_role {token!r} is not one of "
-            f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
-        )
-    return None, None
-
-
-def _effective_point_composition_role(
-    role: str | None,
-    refusal: str | None,
-    *,
-    usable_composition: bool,
-) -> tuple[str | None, str | None, str | None]:
-    """Default an unknown role only when a usable point recipe can be carried."""
-
-    if refusal is None or not usable_composition:
-        return role, None, None
-    flag = _UNKNOWN_POINT_ROLE_DEFAULT_FLAG
-    typed_reason = (
-        f"typed-refusal:{flag}: default={INITIAL_CHARGE_ONLY_PROXY_FLAG}; "
-        f"original_reason={refusal}"
-    )
-    return INITIAL_CHARGE_ONLY_PROXY_FLAG, flag, typed_reason
 
 
 # A closed-system equilibrium experiment's printed starting bulk is the
@@ -9528,7 +9477,8 @@ def _initial_charge_only_composition_proxy(
     point_conditions: Mapping[str, Located[Any]] | None,
     notices: Sequence[Notice],
     *,
-    role: str | None,
+    row: object,
+    parent: object = None,
     quantity: Quantity | None,
     quantity_as_printed: object,
     locator: Locator | None,
@@ -9543,7 +9493,6 @@ def _initial_charge_only_composition_proxy(
     point_declared_component_map: Mapping[str, Any] | None = None,
     point_composition_map_declared: bool = False,
     run_composition_columns_declared: bool = False,
-    role_default_flag: str | None = None,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
@@ -9554,19 +9503,23 @@ def _initial_charge_only_composition_proxy(
         and isinstance(point_composition.state.value, Composition)
         else None
     )
-    existing_initial_charge_proxy = (
-        identity.composition is not None
-        and identity.composition.is_value
-        and isinstance(identity.composition.value, Composition)
-        and identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-    ) or (
-        point_composition_value is not None
-        and point_composition_value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    resolution = composition_roles.resolve_composition_role(
+        row,
+        parent,
+        composition=identity.composition,
+        point_composition=point_composition.state if point_composition_value is not None else None,
     )
-    outside_initial_charge_proxy_scope = (
-        role != INITIAL_CHARGE_ONLY_PROXY_FLAG
-        and not existing_initial_charge_proxy
-    )
+    outside_initial_charge_proxy_scope = not resolution.initial_charge_only
+    if (
+        resolution.original_reason is not None
+        and isinstance(point_composition, Located)
+        and _reason_is_invalid_run_composition(
+            point_composition.state.reason or "",
+            declared_map=point_composition_map_declared,
+        )
+    ):
+        # A malformed run assay cannot borrow a callable starting charge.
+        outside_initial_charge_proxy_scope = False
     if outside_initial_charge_proxy_scope:
         malformed_state_reason = None
         incoming_compositions = (
@@ -9671,6 +9624,25 @@ def _initial_charge_only_composition_proxy(
             list(notices),
         )
 
+    def bind(
+        located: Located[Composition], *, flags_for_declared_proxy: bool = False
+    ) -> tuple[Identity, Mapping[str, Located[Any]], list[Notice]]:
+        resolved = composition_roles.resolve_composition_role(
+            row,
+            parent,
+            composition=located.state,
+            quantity=quantity,
+            origin=origin,
+        )
+        if resolved.status is composition_roles.RoleStatus.DEFAULTED:
+            located = replace(located, state=resolved.composition)
+        if resolved.status is composition_roles.RoleStatus.DEFAULTED or flags_for_declared_proxy:
+            updated = [*notices, *resolved.notices]
+        else:
+            updated = list(notices)
+        conditions["composition"] = located
+        return replace(identity, composition=located.state), conditions, updated
+
     if run_composition_columns_declared:
         classification = _CompositionProxyInputClass.VALID_RUN
     if classification is _CompositionProxyInputClass.VALID_RUN:
@@ -9678,6 +9650,8 @@ def _initial_charge_only_composition_proxy(
             point_composition_value is not None
             and point_composition_value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
         ):
+            if resolution.status is composition_roles.RoleStatus.DEFAULTED:
+                return bind(point_composition)
             return (
                 replace(identity, composition=point_composition.state),
                 point_conditions,
@@ -9699,22 +9673,13 @@ def _initial_charge_only_composition_proxy(
         ):
             run = replace(
                 initial.state.value,
-                proxy_flag=(
-                    INITIAL_CHARGE_ONLY_PROXY_FLAG
-                    if role_default_flag is not None
-                    else None
-                ),
+                proxy_flag=None,
                 input_provenance=None,
             )
             located_run = Located(
                 State.of(run), locator=initial.locator or locator
             )
-            conditions["composition"] = located_run
-            return (
-                replace(identity, composition=located_run.state),
-                conditions,
-                list(notices),
-            )
+            return bind(located_run)
         reason = (
             initial.state.reason
             if initial is not None and initial.state.is_unknown
@@ -9842,11 +9807,7 @@ def _initial_charge_only_composition_proxy(
         input_provenance=PRINTED_STARTING_BULK,
     )
     located_proxy = Located(State.of(composition), locator=composition_locator)
-    conditions["composition"] = located_proxy
-    updated_identity = replace(identity, composition=State.of(composition))
-    if quantity is not None:
-        updated_notices.append(initial_charge_only_proxy_notice(quantity, origin))
-    return updated_identity, conditions, updated_notices
+    return bind(located_proxy, flags_for_declared_proxy=True)
 
 
 def _owner_initial_from_printed(
@@ -19706,7 +19667,7 @@ def _printed_map_is_typed_initial(
         return False
     if _is_printed_initial_charge(printed, values, declared_map=declared_map):
         return True
-    role, _refusal = _declared_composition_role(equipment, values)
+    role = composition_roles.resolve_composition_role(equipment, values).role
     if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
         return True
     target = _printed_fingerprint(printed.state.value)
@@ -20215,7 +20176,7 @@ def sample_from_equipment(
 
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
-    role, _role_refusal = _declared_composition_role(equipment, values)
+    role = composition_roles.resolve_composition_role(equipment, values).role
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
@@ -26768,7 +26729,9 @@ class Migrator:
         composition_axis_required = identity_profile_uses_composition
         identity_profile_known = q_token is not None
         declared_printed_map = _named_printed_composition_map(values)
-        composition_role, composition_role_error = _declared_composition_role(values)
+        role_resolution = composition_roles.resolve_composition_role(values)
+        composition_role = role_resolution.role
+        composition_role_error = role_resolution.original_reason
         declares_composition_datum = _has_explicit_composition_field(values) or (
             q_token is None
             and any(
@@ -26784,7 +26747,7 @@ class Migrator:
                     declared_printed_map is not None
                     and (
                         q_token in _BULK_PROPERTY_QUANTITIES
-                        or composition_role == "datum_state"
+                        or composition_role == DATUM_STATE
                     )
                 )
             )
@@ -27121,9 +27084,11 @@ class Migrator:
             and composition_role_error is None
             and not _declared_wt_composition_point_map(values, obs.get("units"))
         ):
-            composition_role, composition_role_error = _declared_composition_role(
+            role_resolution = composition_roles.resolve_composition_role(
                 obs.get("equipment")
             )
+            composition_role = role_resolution.role
+            composition_role_error = role_resolution.original_reason
         composition_located = (
             _composition_located_from_values(
                 values,
@@ -28250,10 +28215,8 @@ class Migrator:
                 "composition": catalogue_composition,
             }
         elif (
-            (projected_oxide_map or has_elemental_phase_components)
-            and not composition_role_refusal
+            projected_oxide_map or has_elemental_phase_components
         ):
-            # A refused composition_role is queued and left unstamped (b716).
             oxide_components = projected_oxide_map or {}
             if has_elemental_phase_components:
                 located_composition = _mass_percent_composition_located(
@@ -28408,7 +28371,7 @@ class Migrator:
                 and "composition" not in (point_conditions or {})
             ):
                 source_order_map = initial_oxide_map
-                if source_order_map is None and composition_role == "datum_state":
+                if source_order_map is None and composition_role == DATUM_STATE:
                     source_order_map = _initial_oxide_map_from_values(
                         values,
                         declared_map=True,
@@ -29909,7 +29872,12 @@ class Migrator:
                 identity,
                 point_conditions,
                 observation_notices,
-                role=composition_role,
+                row=values,
+                parent=(
+                    obs.get("equipment")
+                    if not _declared_wt_composition_point_map(values, obs.get("units"))
+                    else None
+                ),
                 initial_charge_context=(
                     values if isinstance(values, Mapping) else None
                 ),
@@ -30522,9 +30490,11 @@ class Migrator:
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
         row_bound_redox_composition = False
-        point_composition_role, point_composition_role_refusal = (
-            _declared_composition_role(raw_item, parent_values)
+        point_role_resolution = composition_roles.resolve_composition_role(
+            raw_item, parent_values
         )
+        point_composition_role = point_role_resolution.role
+        point_composition_role_refusal = point_role_resolution.original_reason
         if isinstance(raw_item, Mapping):
             q_for_species = (
                 quantity.value
@@ -30758,7 +30728,7 @@ class Migrator:
                 q_for_species is Quantity.P_PARTIAL
                 and point_composition_located is None
                 and (
-                    point_composition_role == "datum_state"
+                    point_composition_role == DATUM_STATE
                     or point_composition_role_refusal is not None
                 )
             ):
@@ -32231,31 +32201,13 @@ class Migrator:
                     origin=point_id,
                 )
             )
-        point_composition_is_usable = isinstance(q_token_point, Quantity) and (
-            point_composition_located is not None
-            and point_composition_located.state.is_value
-            and isinstance(point_composition_located.state.value, Composition)
-            or (
-                point_map_explicit
-                and identity.composition is not None
-                and identity.composition.is_value
-                and isinstance(identity.composition.value, Composition)
-            )
-        )
-        effective_point_composition_role, role_default_flag, role_default_reason = (
-            _effective_point_composition_role(
-                point_composition_role,
-                point_composition_role_refusal,
-                usable_composition=point_composition_is_usable,
-            )
-        )
         identity, point_conditions, child_notices = (
             _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 child_notices,
-                role=effective_point_composition_role,
-                role_default_flag=role_default_flag,
+                row=raw_item,
+                parent=parent_values,
                 initial_charge_context=(
                     parent_values if isinstance(parent_values, Mapping) else None
                 ),
@@ -32297,19 +32249,6 @@ class Migrator:
                 ),
             )
         )
-        if (
-            role_default_flag is not None
-            and role_default_reason is not None
-            and isinstance(q_token_point, Quantity)
-        ):
-            child_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(q_token_point,),
-                    reason=role_default_reason,
-                    origin=point_id,
-                )
-            )
         if notice_composition_located is None:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"

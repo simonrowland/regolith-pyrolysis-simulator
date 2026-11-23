@@ -28,8 +28,11 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.identity import _composition_is_fixed_valence
+from simulator.battery.composition_roles import (
+    is_role_default_reason,
+    resolve_composition_role,
+)
 from simulator.battery.migrate import (
-    _declared_composition_role,
     _catalogue_composition_located_from_values,
     _initial_charge_only_composition_proxy,
     REPO_ROOT,
@@ -161,10 +164,10 @@ def test_every_usable_typed_initial_charge_only_row_gets_proxy_and_notice(
         role_parent_ids = set()
         for raw in _extract_observations(f"{source_id}.yaml"):
             values = raw.get("values")
-            role, _refusal = _declared_composition_role(raw, values)
+            role = resolve_composition_role(raw, values).role
             points = values.get("points") if isinstance(values, dict) else None
             point_role = any(
-                _declared_composition_role(point, values)[0] == INITIAL_CHARGE_ONLY
+                resolve_composition_role(point, values).role == INITIAL_CHARGE_ONLY
                 for point in points or ()
                 if isinstance(point, dict)
             )
@@ -384,7 +387,7 @@ def test_initial_charge_only_composition_quantities_are_not_promoted_to_proxies(
             identity,
             None,
             (),
-            role=INITIAL_CHARGE_ONLY,
+            row={"composition_role": INITIAL_CHARGE_ONLY},
             quantity=quantity,
             quantity_as_printed=quantity_as_printed,
             locator=None,
@@ -435,7 +438,9 @@ def test_unknown_values_composition_role_is_queued_for_plante_row(tmp_path) -> N
         if observation_id.endswith(row_id)
     )
 
-    assert "composition" not in (observation.point_conditions or {})
+    assert observation.identity.composition.is_value
+    assert observation.identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY
+    assert any(is_role_default_reason(notice.reason) for notice in observation.notices)
     assert any(
         entry.observation_id == observation.observation_id
         and "composition_role 'not_a_role' is not one of" in entry.why
@@ -443,14 +448,8 @@ def test_unknown_values_composition_role_is_queued_for_plante_row(tmp_path) -> N
     )
 
 
-def test_unknown_basu_feo_row_role_is_queued_without_composition(tmp_path) -> None:
-    """A refused role on Basu Table II solution 1 stays untyped.
-
-    The Plante quoted row repeats the declared sample map, so it never
-    reaches the observation-attach fallback. This row prints its own slag
-    analysis. Dropping ``and not composition_role_refusal`` stamps a
-    mole-fraction composition (proxy None) and keeps the queue entry.
-    """
+def test_unknown_basu_feo_row_with_partial_composition_is_queued(tmp_path) -> None:
+    """A role default cannot make the incomplete Table II assay callable."""
 
     import yaml
 
@@ -476,7 +475,8 @@ def test_unknown_basu_feo_row_role_is_queued_without_composition(tmp_path) -> No
         if observation_id.endswith(row_id)
     )
     point = observation.point_conditions or {}
-    assert "composition" not in point
+    assert "composition" not in point or not point["composition"].state.is_value
+    assert not any(is_role_default_reason(notice.reason) for notice in observation.notices)
     assert any(
         entry.observation_id == observation.observation_id
         and "composition_role 'not_a_role' is not one of" in entry.why

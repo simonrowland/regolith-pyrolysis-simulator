@@ -14,6 +14,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     AdoptedObservation,
     _literature_pressure_points,
     _melt_recipe_mol,
+    _resolve_melt_recipe,
     evaluate_observation,
     geometry_assumption_text,
     load_cached_safe_yaml,
@@ -73,7 +74,7 @@ def test_na_12022_uses_located_charge_and_12065_stays_missing(monkeypatch) -> No
     assert error is None
     assert recipe is not None
     assert "point_conditions.composition" in source
-    assert "initial_charge_only" in source
+    assert _resolve_melt_recipe(sample_12022, point=points_12022[0])[0].initial_charge_only
     composition_payload = points_12022[0]["point_conditions"]["composition"][
         "state"
     ]["value"]
@@ -325,7 +326,7 @@ def test_pressure_points_use_located_or_same_sample_oxide_suites() -> None:
     assert error is None
     assert recipe_12022 is not None
     assert "point_conditions.composition" in source_12022
-    assert "initial_charge_only" in source_12022
+    assert _resolve_melt_recipe(obs, point=point_12022)[0].initial_charge_only
     composition_payload = point_12022["point_conditions"]["composition"]["state"][
         "value"
     ]

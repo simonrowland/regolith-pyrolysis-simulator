@@ -201,8 +201,8 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
+from simulator.battery import composition_roles
 from simulator.battery.records import (
-    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Bench,
     CandidateRequest,
     Composition,
@@ -223,8 +223,6 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
-    initial_charge_only_proxy_notice,
-    is_initial_charge_only_proxy_notice,
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
@@ -2037,43 +2035,9 @@ def _catalogue_composition_notice(reference: Observation) -> Notice | None:
 
 
 def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
-    """Predict with an initial-charge composition, then flag the residual.
+    """Return the first scoring qualification for a composition proxy."""
 
-    ``proxy_flag == initial_charge_only`` marks a printed starting charge
-    standing in for a later (depleted) state. The residual joins the existing
-    source-internally-inconsistent diagnostic stratum (b-716).
-    """
-
-    identity = reference.identity
-    if not isinstance(identity, Identity):
-        return None
-    quantity = quantity_token(identity)
-    if quantity is None:
-        return None
-    point = (reference.point_conditions or {}).get("composition")
-    states = (identity.composition, point.state if isinstance(point, Located) else None)
-    if not any(
-        state is not None
-        and state.is_value
-        and isinstance(state.value, Composition)
-        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        for state in states
-    ):
-        return None
-    existing_proxy_notice = next(
-        (
-            notice
-            for notice in reference.notices
-            if is_initial_charge_only_proxy_notice(notice)
-        ),
-        None,
-    )
-    if existing_proxy_notice is not None:
-        # The persisted notice is also the scoring flag that strips bands from
-        # this proxy-backed residual. Keep it in flagged_notices so the band
-        # policy sees it; union_notices deduplicates it in the final row.
-        return existing_proxy_notice
-    return initial_charge_only_proxy_notice(quantity, reference.observation_id)
+    return next(iter(composition_roles.resolve_composition_role(reference).notices), None)
 
 
 def _require_gate_check(check: object) -> GateCheck:
@@ -2382,11 +2346,7 @@ def _flagged_stratum_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
         _cell_apparatus_inference_notices(reference, experiment, bench),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
-        (
-            ()
-            if (notice := _initial_charge_composition_notice(reference)) is None
-            else (notice,)
-        ),
+        composition_roles.resolve_composition_role(reference).notices,
     )
 
 
@@ -2492,6 +2452,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
+        or (
+            kind == NoticeKind.SOURCE_DISAGREEMENT.value
+            and composition_roles.is_role_default_reason(reason)
+        )
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
@@ -19115,11 +19079,7 @@ def _compile_residual_with_lineage(
         and numeric.decision_band.band_basis == "row_printed"
         and evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
-        and reference.identity.composition is not None
-        and reference.identity.composition.is_value
-        and isinstance(reference.identity.composition.value, Composition)
-        and reference.identity.composition.value.proxy_flag
-        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        and composition_roles.is_initial_charge_composition(reference.identity.composition)
     )
     if initial_charge_figure_band:
         band_preserving_kinds.update(
