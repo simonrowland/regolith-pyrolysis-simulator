@@ -20,8 +20,8 @@ PROXY_BRIDGE_ALPHA_STATUS = "proxy/bridge"
 ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
 
 # DP-005 is the one-sided fallback for an unsourced evaporation coefficient.
-# Keep the scalar and its authority provenance beside the shared alpha
-# validation rules so the engine adapter and battery scorer use one owner.
+# Keep the scalar and authority provenance beside the shared alpha validation
+# rules so the engine adapter and battery scorer use one owner.
 _DP_005_ALPHA = {
     "form": "scalar",
     "value": 1.0,

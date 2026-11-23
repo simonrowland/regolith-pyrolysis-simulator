@@ -2343,11 +2343,13 @@ def predict_mass_loss_fraction(
                 alpha = at_fits[species]["alpha"]
                 provenance = at_fits[species]["source_observation_id"]
             else:
-                # The built-in HKL provider owns this value. Since 0 <= alpha
-                # <= 1 and flux is linear in alpha, alpha=1 is the upper flux
-                # bound (dimensionless alpha leaves kg m⁻² s⁻¹ unchanged).
-                # alpha=0 is the zero-flux limit; the stated upper bound is
-                # therefore conservative without fitting the measured loss.
+                # For the non-negative evaporation drive here, HKL gives
+                # J_mol = alpha * (p_eq - p_bulk) / sqrt(2*pi*M*R*T), then
+                # mass_flux = M * J_mol. The accommodation coefficient obeys
+                # 0 <= alpha <= 1, so setting it to 1 maximizes flux; alpha is
+                # dimensionless, so the mass-flux unit remains kg m^-2 s^-1.
+                # At alpha=0 the flux is zero. This upper bound is conservative
+                # and is not selected to fit the measured loss.
                 alpha = default_alpha
                 provenance = str(_DP_005_ALPHA["source"])
                 flags.add(
@@ -2493,22 +2495,25 @@ def predict_mass_loss_fraction(
             if exc.reason == "preheat_bound_not_negligible":
                 preheat_diagnostics = diagnostics
                 preheat_diagnostics["original_reason"] = exc.reason
-            else:
-                # Alpha=1 is already the flagged point default. Test preheat
-                # independently so its bound can flag the point without being
-                # conflated with the unsourced-alpha envelope.
-                try:
-                    _mass_loss_bound_gate(
-                        preheat_bound_kg, point_loss_kg, uncertainty_kg,
-                        channels=(), preheat_bound_kg=preheat_bound_kg,
-                    )
-                except ResidueInventoryRefusal as preheat_exc:
-                    if preheat_exc.reason != "preheat_bound_not_negligible":
-                        raise
-                    preheat_diagnostics = json.loads(preheat_exc.detail)
-                    preheat_diagnostics.update(evidence)
-                    preheat_diagnostics["original_reason"] = preheat_exc.reason
         diagnostics.update(evidence)
+        if preheat_bound_kg > 0.0 and preheat_diagnostics is None:
+            # The preheat interval is omitted from the point schedule even
+            # when its bounded contribution falls below the refusal threshold.
+            try:
+                preheat_diagnostics = _mass_loss_bound_gate(
+                    preheat_bound_kg, point_loss_kg, uncertainty_kg,
+                    channels=(), preheat_bound_kg=preheat_bound_kg,
+                )
+            except ResidueInventoryRefusal as preheat_exc:
+                if preheat_exc.reason != "preheat_bound_not_negligible":
+                    raise
+                preheat_diagnostics = json.loads(preheat_exc.detail)
+                preheat_diagnostics["original_reason"] = preheat_exc.reason
+            else:
+                preheat_diagnostics["original_reason"] = (
+                    "preheat_omitted_from_point_schedule"
+                )
+            preheat_diagnostics.update(evidence)
         flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
         if preheat_diagnostics is not None:
             # The point model omits preheat. If a real run includes it, the

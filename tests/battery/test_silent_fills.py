@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     BenchIdentityBasis,
     CellMaterial,
     Engine,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
@@ -45,7 +46,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EngineHandle,
     Po2Request,
     _DEFAULT_FO2_LOG,
-    _DEFAULT_PRESSURE_BAR,
+    DP_019_VACUUM_BOUNDARY_BAR,
     _fo2_log_for_request,
     equilibrate_cell,
 )
@@ -818,17 +819,28 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
     seen = _capture_cell(monkeypatch)
     ident = F.psat_identity("Na")
     obs = F.observation("na-psat", "exp", ident, Decimal("1"))
-    prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
+    experiment = F.tabulation_experiment(
+        "exp", method=MethodToken.LANGMUIR_FREE_EVAPORATION
+    )
+    prediction = predict_with_engine(
+        Engine.VAPOROCK, obs, isolated=False, experiment=experiment
+    )
     assert seen["wt"] == {"Na": 100.0}
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
-    assert seen["pressure_bar"] == pytest.approx(_DEFAULT_PRESSURE_BAR)
+    assert seen["pressure_bar"] == pytest.approx(DP_019_VACUUM_BOUNDARY_BAR)
     reasons = [notice.reason for notice in prediction.notices]
     assert any("pure condensed substance Na (l)" in reason for reason in reasons)
     assert any("p_sat does not take oxygen" in reason and "omitted" in reason for reason in reasons)
     assert any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-        and f"{_DEFAULT_PRESSURE_BAR:g} bar" in notice.reason
+        notice.kind is NoticeKind.METHOD_IMPLIED
+        and "observation does not carry total_pressure_Pa" in notice.reason
+        and notice.policy is not None
+        and notice.policy.id == "DP-019"
+        and notice.policy.version == 1
+        and notice.policy.status == "canonical"
+        and notice.policy.value == "0.1"
+        and notice.policy.units == "Pa"
         for notice in prediction.notices
     )
 
@@ -836,24 +848,36 @@ def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> 
 def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
     seen = _capture_cell(monkeypatch)
     ident = replace(
-        _melt((("Na2O", "0.4"), ("SiO2", "0.6")), "SiO2", fO2_Pa=Decimal("1e-4"), total_P=Decimal("1")),
-        total_pressure_Pa=State.unknown("no total_pressure_Pa mapped from source"),
+        F.psat_identity("Na"),
+        total_pressure_Pa=State.unknown(
+            "no total_pressure_Pa mapped from source"
+        ),
     )
     obs = F.observation("no-p", "exp", ident, Decimal("0.2"))
-    prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
-    assert seen["pressure_bar"] == pytest.approx(_DEFAULT_PRESSURE_BAR)
+    experiment = F.tabulation_experiment("exp", method=MethodToken.TABULATION)
+    prediction = predict_with_engine(
+        Engine.VAPOROCK, obs, isolated=False, experiment=experiment
+    )
+    assert seen["pressure_bar"] == pytest.approx(1.01325)
     assert seen["mode"] == PO2_NOT_AN_INPUT
+    assert seen["po2_bar"] is None
+    assert seen["wt"] == {"Na": 100.0}
     assert seen["po2_bar"] is None
     assert any(
         notice.kind is NoticeKind.INPUT_OMITTED
-        and "melt has no multivalent element" in notice.reason
+        and "p_sat does not take oxygen" in notice.reason
         and "oxygen is not an input and was omitted" in notice.reason
         for notice in prediction.notices
     )
     assert any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        notice.kind is NoticeKind.ASSUMED_PRESSURE
         and "does not carry total_pressure_Pa" in notice.reason
-        and f"assumes {_DEFAULT_PRESSURE_BAR:g} bar" in notice.reason
+        and notice.policy is not None
+        and notice.policy.id == "DP-001"
+        and notice.policy.version == 1
+        and notice.policy.status == "canonical"
+        and notice.policy.value == "101325"
+        and notice.policy.units == "Pa"
         for notice in prediction.notices
     )
 

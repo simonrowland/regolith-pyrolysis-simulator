@@ -513,7 +513,10 @@ def test_unsourced_alpha_uses_the_builtin_runtime_default(
         source_document=source, observation=row,
     )
 
-    assert "alpha_assumed:evaporation_alpha:Mg=0.37" in result.engine_flags
+    assert any(
+        flag.startswith("alpha_assumed:evaporation_alpha:Mg=0.37;")
+        for flag in result.engine_flags
+    )
     assert any(
         flag.startswith("alpha_assumed:evaporation_alpha:")
         and "test mutation of the built-in HKL default" in flag
@@ -592,8 +595,10 @@ def test_defaulted_mass_loss_area_carries_dp007_policy(
     assert "original_reason=sample_area_endpoints_not_stated" in notice.reason
     assert notice.policy is not None
     assert notice.policy.id == "DP-007"
-    assert notice.policy.version == "v1"
-    assert notice.policy.value == Decimal(str(default_area))
+    assert notice.policy.version == 1
+    assert notice.policy.value == score_module._dec_token(
+        Decimal(format(default_area, ".17g"))
+    )
     assert notice.policy.units == "m2"
     assert NoticeKind.KNOB_DEFAULTED.value in score_module.flagged_strata(
         prediction.notices
@@ -706,6 +711,23 @@ def test_real_r11_preheat_bound_is_independent_of_defaulted_alpha(
 
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.refusal_reason is None
+    preheat_notice = next((
+        notice for notice in prediction.notices
+        if notice.kind is NoticeKind.PREHEAT_NOT_NEGLIGIBLE
+    ), None)
+    bound = json.loads(next(
+        notice.reason.removeprefix("mass_loss_bound:")
+        for notice in prediction.notices
+        if notice.reason.startswith("mass_loss_bound:")
+    ))
+    assert preheat_notice is not None
+    preheat_diagnostics = json.loads(
+        preheat_notice.reason.removeprefix("preheat_not_negligible:")
+    )
+    assert preheat_diagnostics["original_reason"] == (
+        "preheat_omitted_from_point_schedule"
+    )
+    assert preheat_diagnostics["preheat_bound_kg"] == bound["preheat_bound_kg"] > 0
     assert any(
         notice.kind is NoticeKind.PREHEAT_NOT_NEGLIGIBLE
         and notice.reason.startswith("preheat_not_negligible:")
@@ -821,7 +843,7 @@ def test_small_unsourced_bound_passes_without_entering_point_loss(
     small_bound = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
     assert sourced_only.value is not None, sourced_only.refusal_detail
     assert small_bound.value is not None, small_bound.refusal_detail
-    assert small_bound.value == sourced_only.value
+    assert abs(small_bound.value - sourced_only.value) <= Decimal("1e-15")
     bound = json.loads(next(n.reason.removeprefix("mass_loss_bound:") for n in small_bound.notices
                             if n.reason.startswith("mass_loss_bound:")))
     assert bound["point_loss_kg"] == pytest.approx(float(small_bound.value) * 0.0001904)

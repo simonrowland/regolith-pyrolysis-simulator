@@ -118,16 +118,16 @@ _KEMS_REDUCED_QUANTITIES = frozenset(
         Quantity.PARTIAL_MOLAR_ENTHALPY,
     }
 )
+
 _DP_004_REGIME_CONDITION = (
     "molecular effusion inside the cell; vacuum outside; "
-    "P_total(cell) = Σ measured partials; never 1 atm"
+    "P_total(cell) = Σ measured partials. Never 1 atm"
 )
-# DP-011 uses the quantity definition: equilibrium pressure is compared as an
-# equilibrium value, while a flux or mass-loss rate uses HKL with DP-005.
 _DP_011_METHOD_INFERENCE = (
-    "infer from printed quantity: equilibrium pressure -> equilibrium comparison; "
-    "flux or mass-loss rate -> HKL with DP-005"
+    "infer from the printed quantity: equilibrium partial/saturation pressure "
+    "→ equilibrium comparison; flux or mass-loss rate → HKL with DP-005"
 )
+_DP_012_SOURCE_REDUCED_VALUE = "no calibration needed; use the printed reduced value"
 
 
 @dataclass(frozen=True)
@@ -212,14 +212,14 @@ def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None
     return value if _positive_decimal(value) else None
 
 
-_CLAUSING_FACTOR_MAX = Decimal("1")
+_DP_006_CLAUSING_FACTOR = Decimal("1")
 
 
 def _clausing_value_ok(value: Decimal | None) -> bool:
     return (
         _positive_decimal(value)
         and value is not None
-        and value <= _CLAUSING_FACTOR_MAX
+        and value <= _DP_006_CLAUSING_FACTOR
     )
 
 
@@ -310,7 +310,7 @@ def _impossible_kems_geometry_value(
         if not clausing_factor:
             return False
         extent = _positive_extent(located)
-        return extent is not None and low > _CLAUSING_FACTOR_MAX
+        return extent is not None and low > _DP_006_CLAUSING_FACTOR
     if raw.kind is ValueKind.BOUND:
         bound = raw.bound_value
         if bound is None:
@@ -326,8 +326,8 @@ def _impossible_kems_geometry_value(
             return not _positive_decimal(bound)
         if not clausing_factor:
             return False
-        return bound > _CLAUSING_FACTOR_MAX or (
-            bound == _CLAUSING_FACTOR_MAX
+        return bound > _DP_006_CLAUSING_FACTOR or (
+            bound == _DP_006_CLAUSING_FACTOR
             and inclusivity is BoundInclusivity.EXCLUDED
         )
     # Geometry extracts use POINT, INTERVAL, and legacy scalar values; BOUND
@@ -439,6 +439,9 @@ def _kems_calibration_check(
             **(
                 {
                     "flag": "kems_calibration_by_source",
+                    "policy_id": "DP-012",
+                    "policy_value": _DP_012_SOURCE_REDUCED_VALUE,
+                    "policy_units": "printed quantity units",
                     "calibration_record_status": (
                         None
                         if ungrounded_detail is None
@@ -977,8 +980,15 @@ def effusion_regime_unverified(
                 "condition": (
                     _DP_004_REGIME_CONDITION
                     if method_implies_effusion
-                    else "equilibrium_comparison_from_printed_pressure_quantity"
+                    else _DP_011_METHOD_INFERENCE
                 ),
+                "policy_id": "DP-004" if method_implies_effusion else "DP-011",
+                "policy_value": (
+                    _DP_004_REGIME_CONDITION
+                    if method_implies_effusion
+                    else _DP_011_METHOD_INFERENCE
+                ),
+                "policy_units": "Pa" if method_implies_effusion else "method token",
                 "reason": reason or "orifice and in-cell pressure sum are not printed",
             },
         )
@@ -1726,9 +1736,6 @@ class KnudsenEffusionPressure:
     notice: Notice | None
 
 
-_DP_006_CLAUSING_FACTOR = Decimal("1")
-
-
 def _orifice_area_m2(diameter_m: Decimal) -> Decimal:
     """pi d^2 / 4. pi matches the float Hertz-Knudsen helper."""
 
@@ -1846,9 +1853,9 @@ def knudsen_effusion_pressure_from_mass_rate(
             origin=origin,
             policy=NoticePolicy(
                 id="DP-006",
-                version="v1",
+                version=1,
                 status="canonical",
-                value=clausing,
+                value=str(clausing.normalize()),
                 units="dimensionless",
             ),
         )

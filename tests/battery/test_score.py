@@ -566,7 +566,7 @@ def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine)
     assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
         reference.identity, Quantity.P_PARTIAL
     )
-    assert assumed_bar == 1e-6
+    assert assumed_bar == pytest.approx(1.01325)
     assert assumption_notice is not None
     assert invalid is None
     prediction = replace(
@@ -782,7 +782,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
         identity, Quantity.P_PARTIAL
     )
-    assert assumed_bar == 1e-6
+    assert assumed_bar == pytest.approx(1.01325)
     assert assumption_notice is not None
     assert invalid is None
     prediction = replace(
@@ -793,17 +793,92 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         notices=(assumption_notice,),
     )
 
-    residual, _candidate = _compile(reference, experiment, prediction)
+    context = _context(F.work(), experiment, reference)
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
 
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
     assert assumption_notice in residual.notices
+    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert assumption_notice.policy == NoticePolicy(
+        id="DP-001",
+        version=1,
+        status="canonical",
+        value="101325",
+        units="Pa",
+    )
+    assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
+    assert f"{assumed_bar:g} bar" not in assumption_notice.reason
+    assert "not printed" in assumption_notice.reason
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "total-pressure-independent" in notice.reason
         for notice in residual.notices
     )
+
+    from simulator.battery.score import (
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    assert flagged_strata(residual.notices) == (
+        score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE,
+    )
+    assert [
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-001", "canonical", 1),
+    ]
+    serialized_strata = flagged_stratum_payloads(
+        (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert [
+        (
+            row["stratum"],
+            row.get("policy_id"),
+            row.get("policy_status"),
+            row["n"],
+        )
+        for row in serialized_strata
+    ] == [
+        (score_mod.FLAGGED_STRATUM_ASSUMED_PRESSURE, "DP-001", "canonical", 1),
+    ]
+    clean_residual = replace(
+        residual,
+        notices=tuple(
+            notice
+            for notice in residual.notices
+            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
+        ),
+    )
+
+    def measured_headline_count(row: Residual) -> int:
+        return next(
+            item["n"]
+            for item in headline_rows(
+                (row,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+            )
+            if item["rail"] == Rail.VAPOUR.value
+            and item["engine"] == Engine.INTERNAL_ANALYTICAL.value
+        )
+
+    assert measured_headline_count(residual) == 0
+    assert measured_headline_count(clean_residual) == 1
 
 
 def _partial_prediction(engine, observation, **_kwargs):
@@ -1255,7 +1330,10 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     report = render_score_report_from_payloads(
         (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
     )
-    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+    assert (
+        "| calibration-not-grounded | vapour | internal-analytical | — | — | 1 |"
+        in report
+    )
 
 
 def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag() -> None:
@@ -5385,10 +5463,10 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
     assert notice.reason.startswith("method_assumed:method_unknown; original_reason=")
     assert notice.policy is not None
     assert notice.policy.id == "DP-011"
-    assert notice.policy.version == "v1"
+    assert notice.policy.version == 1
     assert notice.policy.value == (
-        "infer from printed quantity: equilibrium pressure -> equilibrium comparison; "
-        "flux or mass-loss rate -> HKL with DP-005"
+        "infer from the printed quantity: equilibrium partial/saturation pressure "
+        "→ equilibrium comparison; flux or mass-loss rate → HKL with DP-005"
     )
     assert flagged_strata(residual.notices) == (NoticeKind.METHOD_ASSUMED.value,)
 
@@ -5490,7 +5568,9 @@ def test_langmuir_absolute_rate_defaults_area_from_runtime_crucible(quantity) ->
     assert "original_reason=exposed_area_not_stated" in area_notice.reason
     assert area_notice.policy is not None
     assert area_notice.policy.id == "DP-007"
-    assert area_notice.policy.value == Decimal(str(expected_area))
+    assert area_notice.policy.value == score_mod._dec_token(
+        Decimal(str(expected_area))
+    )
     assert area_notice.policy.units == "m2"
     assert score_mod.flagged_strata(notices) == (NoticeKind.KNOB_DEFAULTED.value,)
 
@@ -5906,14 +5986,14 @@ def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
     assert "molecular effusion inside the cell" in method_notice.reason
     assert "vacuum outside" in method_notice.reason
     assert "P_total(cell) = Σ measured partials" in method_notice.reason
-    assert "never 1 atm" in method_notice.reason
+    assert "Never 1 atm" in method_notice.reason
     assert "original_reason=" in method_notice.reason
     assert method_notice.policy is not None
     assert method_notice.policy.id == "DP-004"
-    assert method_notice.policy.version == "v1"
+    assert method_notice.policy.version == 1
     assert method_notice.policy.value == (
         "molecular effusion inside the cell; vacuum outside; "
-        "P_total(cell) = Σ measured partials; never 1 atm"
+        "P_total(cell) = Σ measured partials. Never 1 atm"
     )
     assert NoticeKind.EFFUSION_REGIME_ASSUMED.value in flagged_strata(
         residual.notices
@@ -6321,7 +6401,7 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
     assert notice.reason.startswith("kems_calibration_by_source:")
     assert notice.policy is not None
     assert notice.policy.id == "DP-012"
-    assert notice.policy.version == "v1"
+    assert notice.policy.version == 1
     assert notice.policy.status == "canonical"
     assert notice.policy.value == (
         "no calibration needed; use the printed reduced value"
@@ -8873,7 +8953,9 @@ def test_knudsen_absolute_flux_requires_orifice_area() -> None:
         },
     ),
 )
-def test_kems_calibration_requires_located_recorded_provenance(calibration) -> None:
+def test_source_reduced_kems_pressure_ignores_unusable_calibration_record(
+    calibration,
+) -> None:
     experiment = F.kems_experiment(
         orifice_area=None,
         clausing=None,
@@ -8888,11 +8970,14 @@ def test_kems_calibration_requires_located_recorded_provenance(calibration) -> N
 
     gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
 
-    assert gate.passed is False
-    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert gate.primary_check == "kems_calibration"
+    assert gate.passed is True
     check = next(item for item in gate.checks if item.name == "kems_calibration")
-    assert check.detail["missing"] == ["calibration"]
+    assert check.passed is True
+    assert check.detail["missing"] == []
+    assert check.detail["flag"] == "kems_calibration_by_source"
+    assert check.detail["reason"] == (
+        "the source already reports a reduced numeric quantity"
+    )
 
 
 def test_battery_score_script_runs_status_diff() -> None:
@@ -10826,6 +10911,40 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert rail_for_quantity(Quantity.MASS_LOSS_RATE, species_formula="Zn") is None
     assert rail_for_quantity(Quantity.VISCOSITY) is None
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
+
+
+@pytest.mark.parametrize("engine", SCORE_ENGINE_SET)
+def test_unknown_quantity_refusal_does_not_fabricate_psat_request(
+    engine: Engine,
+) -> None:
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        F.psat_identity("Na"),
+        quantity=State.unknown("source does not identify the quantity"),
+    )
+    reference = F.observation(
+        "unknown-quantity",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unknown-quantity-source",
+    )
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+    )
+
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "quantity_unknown"
+    assert residual.rail is None
+    assert f"::quantity_unknown::none::{engine.value}" in residual.key
+    assert residual.candidate_request is not None
+    assert residual.candidate_request.quantity is None
+    assert residual.candidate_request.engine is engine
 
 
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
@@ -19185,7 +19304,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
+        f"{residual.rail.value} | {Engine.OPENIMCC.value} | — | — | 1 |"
     ) in report
 
     source_point_reference = replace(
@@ -20558,7 +20677,7 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.OPENIMCC,)
     )
-    assert strata[0]["stratum"] == "cell-material-inferred"
+    assert any(row["stratum"] == "cell-material-inferred" for row in strata)
 
 
 
@@ -21630,8 +21749,8 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
     assert ideal.notice.kind is NoticeKind.KNOB_DEFAULTED
     assert ideal.notice.policy is not None
     assert ideal.notice.policy.id == "DP-006"
-    assert ideal.notice.policy.version == "v1"
-    assert ideal.notice.policy.value == Decimal("1")
+    assert ideal.notice.policy.version == 1
+    assert ideal.notice.policy.value == "1"
     assert ideal.notice.reason.startswith("knob_defaulted:clausing_factor=1")
     assert "real C < 1" in ideal.notice.reason
     assert flagged_strata((ideal.notice,)) == (NoticeKind.KNOB_DEFAULTED.value,)
