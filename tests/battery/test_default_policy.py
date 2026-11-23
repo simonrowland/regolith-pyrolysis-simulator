@@ -163,6 +163,12 @@ def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
         ),
     ):
         resolve("DP-007")
+    for invalid_mass_kg in (0.0, -sample_mass_kg):
+        with pytest.raises(
+            ValueError,
+            match="DP-007 sample_mass_kg must be positive",
+        ):
+            resolve("DP-007", sample_mass_kg=invalid_mass_kg)
 
 
 def test_vacuum_pressure_uses_the_runtime_owner_constant() -> None:
