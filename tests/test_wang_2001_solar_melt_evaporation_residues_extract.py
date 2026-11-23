@@ -9,7 +9,7 @@ import re
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -20,12 +20,12 @@ TABLE1_SAMPLES = [
     "SC7", "SC2", "SC16", "SC6", "SC3", "SC15", "SC10", "SC9",
 ]
 TABLE1_RENDER = """
-EM.MgO 24.4~0.3|25.3~0.4|26.1~0.5|29.7~0.2|32.6~0.1|35.2~0.1|42.7~0.1|43.2~0.1|44.9~0.1|43.0~0.1|42.7~0.1|37.2~0.1|30.8~0.2|26.7~0.2|26.0~0.1|0.001
+EM.MgO 24.4~0.3|25.3~0.4|26.1~0.5|29.7~0.2|32.6~0.1|35.2~0.1|42.7~0.1|43.2~0.1|44.9~0.1|43.0~0.1|42.7~0.1|37.2~0.1|30.8~0.2|26.7~0.2|26.0~0.1|0.001~0.000
 EM.Al2O3 2.73~0.08|2.64~0.07|2.90~0.09|3.61~0.04|3.34~0.02|4.00~0.02|5.60~0.02|6.75~0.04|6.69~0.05|8.49~0.07|8.65~0.05|13.8~0.1|17.4~0.2|20.2~0.2|22.3~0.2|53.0~0.1
-EM.SiO2 35.1~0.2|34.8~0.2|36.2~0.1|40.5~0.1|40.6~0.1|44.9|46.7|45.0|43.0|41.9|41.7|37.3~0.1|36.7~0.1|35.4~0.1|32.2~0.1|4.33~0.01
+EM.SiO2 35.1~0.2|34.8~0.2|36.2~0.1|40.5~0.1|40.6~0.1|44.9~0.0|46.7~0.0|45.0~0.0|43.0~0.0|41.9~0.0|41.7~0.0|37.3~0.1|36.7~0.1|35.4~0.1|32.2~0.1|4.33~0.01
 EM.CaO 2.24~0.08|2.08~0.06|2.27~0.08|2.58~0.03|2.70~0.01|3.09~0.01|4.00~0.01|4.79~0.03|4.88~0.02|6.29~0.03|6.59~0.03|11.2~0.1|14.5~0.1|17.0~0.2|18.7~0.2|41.1~0.1
 EM.TiO2 0.097~0.004|0.097~0.003|0.106~0.004|0.141~0.002|0.150~0.001|0.173~0.001|0.218~0.002|0.252~0.002|0.260~0.002|0.311~0.002|0.325~0.002|0.506~0.004|0.597~0.006|0.681~0.004|0.779~0.004|1.57~0.01
-EM.FeO 35.5~0.3|35.2~0.4|32.4~0.4|23.5~0.2|20.6~0.2|12.6|0.808~0.003|0.069~0.002|0.284~0.002|0.012~0.002|0.007~0.001|0.015~0.002|0.007~0.002|0.005~0.002|0.013~0.002|0.003~0.002
+EM.FeO 35.5~0.3|35.2~0.4|32.4~0.4|23.5~0.2|20.6~0.2|12.6~0.0|0.808~0.003|0.069~0.002|0.284~0.002|0.012~0.002|0.007~0.001|0.015~0.002|0.007~0.002|0.005~0.002|0.013~0.002|0.003~0.002
 IM.MgO 24.0~0.4|25.3~1.8|23.8~1.5|28.1~0.2|33.7~0.2|34.1~0.2|39.6~0.4|42.0~0.2|43.3~0.7|41.7~0.2|40.3~0.5|36.4~0.9|30.2~0.2|24.4~0.1|25.2~0.5|0.00244~0.00022
 IM.Al2O3 2.28~0.15|2.51~0.49|3.26~0.19|3.61~0.23|3.95~0.26|5.26~0.05|6.90~0.40|7.16~0.25|7.41~0.21|9.29~0.17|9.91~0.57|14.2|18.48~0.55|21.1~0.7|23.9~0.5|55.3~1.7
 IM.SiO2 35.1|34.6|36.1|40.1|40.3|44.4|46.3|44.8|42.7|41.7|41.4|37.0|36.4|34.9|31.8|4.20~0.01
@@ -105,6 +105,16 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         row["values"]["analytical_method"]: row["values"]["series"]
         for row in table1
     }
+    electron_probe = next(
+        row for row in table1
+        if row["values"]["analytical_method"] == "electron microprobe"
+    )
+    assert len(electron_probe["values"]["series"]) == 96
+    assert electron_probe["uncertainty"]["confidence_level"] == "one_sigma"
+    assert electron_probe["uncertainty"]["locator"]["page"] == 5
+    assert electron_probe["uncertainty"]["locator"]["published_page"] == 483
+    assert electron_probe["uncertainty"]["locator"]["pdf_page_index"] == 4
+    zero_width_cells = set()
     for label, expected_cells in rendered.items():
         group, formula = label.split(".", maxsplit=1)
         if group == "REE":
@@ -124,12 +134,37 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         assert len(expected_cells) == len(TABLE1_SAMPLES)
         for sample, raw_cell in zip(TABLE1_SAMPLES, expected_cells, strict=True):
             expected_value, expected_error = split_value_and_error(raw_cell)
-            point = next(point for point in points if point["sample"] == sample)
+            matching_points = [
+                point for point in points
+                if point["sample"] == sample and value_field in point
+            ]
+            assert len(matching_points) == 1, (label, sample)
+            point = matching_points[0]
             assert point[value_field] == expected_value, (label, sample)
-            if error_field is not None:
+            if group == "EM":
+                assert expected_error is not None
+                assert point["sigma"] == expected_error, (label, sample)
+                assert point["value_as_published"] == f"{expected_value} ± {expected_error}", (label, sample)
+                page = 4 if TABLE1_SAMPLES.index(sample) < 8 else 5
+                assert point["locator"]["page"] == page, (label, sample)
+                assert point["locator"]["published_page"] == page + 478, (label, sample)
+                assert point["locator"]["pdf_page_index"] == page - 1, (label, sample)
+                assert point["locator"]["table"] == "1", (label, sample)
+                assert point["locator"]["row"] == sample, (label, sample)
+                assert point["locator"]["column"] == formula, (label, sample)
+                if expected_error in {"0.0", "0.000"}:
+                    zero_width_cells.add((sample, formula))
+            elif error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
             else:
                 assert point.get("standard_errors", {}).get(formula) == expected_error, (label, sample)
+                if expected_error is None:
+                    assert "sigma" not in point, (label, sample)
+    assert zero_width_cells == {
+        ("SC4", "SiO2"), ("SC14", "SiO2"), ("SC1", "SiO2"),
+        ("SC7", "SiO2"), ("SC2", "SiO2"), ("SC16", "SiO2"),
+        ("SC4", "FeO"), ("SC9", "MgO"),
+    }
 
 
 def test_rendered_table_grids_and_cell_mutations() -> None:
@@ -144,6 +179,23 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
 
     changed_extract = deepcopy(extract)
     changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["MgO_wt_pct"] = "999"
+    with pytest.raises(AssertionError):
+        assert_table1_grid_matches_render(changed_extract, rendered)
+    changed_extract = deepcopy(extract)
+    changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["sigma"] = "9.9"
+    with pytest.raises(AssertionError):
+        assert_table1_grid_matches_render(changed_extract, rendered)
+    changed_extract = deepcopy(extract)
+    ion_probe = next(
+        row for row in changed_extract["species"]["SiO2"]["observations"]
+        if row["values"].get("analytical_method") == "ion microprobe"
+        and row["values"].get("quantity") == "residue_composition_vs_time"
+    )
+    missing_error_point = next(
+        point for point in ion_probe["values"]["series"]
+        if point["sample"] == "SC12"
+    )
+    missing_error_point["sigma"] = "0.0"
     with pytest.raises(AssertionError):
         assert_table1_grid_matches_render(changed_extract, rendered)
 
@@ -269,6 +321,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         if observation["values"].get("quantity") == "mass_loss_fraction"
         for point in observation["values"]["points"]
     }
+    expected_electron_probe_cells = {
+        (sample, formula): split_value_and_error(raw_cell)
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label.startswith("EM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -288,6 +347,10 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     actual_by_quantity: dict[Quantity, Counter[str]] = defaultdict(Counter)
     actual_by_sample: dict[tuple[Quantity, str], Counter[str]] = defaultdict(Counter)
     migrated_mass_loss_samples: set[str] = set()
+    migrated_electron_probe_cells: set[tuple[str, str]] = set()
+    electron_probe_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_electron_microprobe_residue_compositions::"
+    )
     temperature_c = {
         "SC1": "1800", "SC2": "1800", "SC3": "1800", "SC4": "1800",
         "SC5": "1800", "SC6": "2000", "SC7": "2000", "SC8": "2000",
@@ -304,6 +367,14 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         sample = match.group(1) if match else None
         assert sample is not None, note
         actual_by_sample[(quantity, sample)][formula] += 1
+        if row.observation_id.startswith(electron_probe_prefix):
+            expected_sigma = expected_electron_probe_cells[(sample, formula)][1]
+            assert expected_sigma is not None
+            assert row.uncertainty.kind is UncertaintyKind.PRINTED
+            assert isinstance(row.uncertainty.verbatim, dict)
+            assert row.uncertainty.verbatim["sigma"] == expected_sigma
+            assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            migrated_electron_probe_cells.add((sample, formula))
 
         expected_temperature = Decimal(temperature_c[sample]) + Decimal("273.15")
         assert row.identity.temperature_K.value == expected_temperature, (quantity, sample, formula)
@@ -341,6 +412,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     for quantity, expected in expected_by_quantity.items():
         assert actual_by_quantity[quantity] == Counter(expected)
     assert migrated_mass_loss_samples == set(mass_loss_fraction_by_sample)
+    assert migrated_electron_probe_cells == set(expected_electron_probe_cells)
     component_formulas = ("MgO", "Al2O3", "SiO2", "CaO", "TiO2", "FeO")
     trace_formulas = "La Ce Pr Nd Sm Eu Gd Tb Dy Ho Er Tm Yb Lu".split()
     for sample in TABLE1_SAMPLES:
