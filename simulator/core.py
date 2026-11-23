@@ -9903,6 +9903,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # k = 2. M is mol and eps is dimensionless, so the slack is mol.
             # At M ≈ 10 mol, the bound is 4.44e-15 mol, above the walk's
             # 1.78e-15 mol (two ulp at 5.09 mol).
+            # Limit: as M tends to zero, the absolute noop remains the floor.
             roundoff_slack_mol = max(
                 OXYGEN_RESERVOIR_NOOP_MOL,
                 2 * sys.float_info.epsilon * roundoff_magnitude_mol,
