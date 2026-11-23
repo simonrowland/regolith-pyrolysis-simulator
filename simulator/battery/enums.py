@@ -330,6 +330,13 @@ class NoticeKind(StrEnum):
     PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"
     SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE = "source_value_outside_physical_range"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
+    # d-460 scorer defaults. These typed flags remain distinct from the
+    # method-implied basis in flagged-stratum reports.
+    METHOD_ASSUMED = "method_assumed"
+    METHOD_IMPLIED = "method_implied"
+    ALPHA_ASSUMED = "alpha_assumed"
+    EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
+    EFFUSION_REGIME_VIOLATED = "effusion_regime_violated"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     # t-1593: a named material's cited bulk analysis varies by lot

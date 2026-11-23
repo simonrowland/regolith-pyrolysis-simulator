@@ -115,6 +115,7 @@ from simulator.accounting.formulas import (
     parse_formula,
 )
 from simulator.battery.validity import (
+    APPARATUS_PREDICTION_NOTICE_KINDS,
     _partial_pressure_observations_by_experiment,
     run_validity_gates,
 )
@@ -157,7 +158,7 @@ _PRESSURE_BLOCKING_NOTICES = frozenset(
         NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
         NoticeKind.UNVERIFIED_APPARATUS,
     }
-)
+) | APPARATUS_PREDICTION_NOTICE_KINDS
 _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
     {NoticeKind.OUT_OF_GAMMA_DOMAIN, NoticeKind.OUT_OF_CERTIFIED_BAND}
 )
@@ -2593,6 +2594,7 @@ def _validate_residual_with_indexes(
                 primary_check = gates.primary_check
                 apparatus_flagged = any(
                     notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                    or notice.kind in APPARATUS_PREDICTION_NOTICE_KINDS
                     for notice in residual.notices
                 )
                 wrong_shape = (
@@ -2774,6 +2776,7 @@ def _validate_residual_with_indexes(
                     NoticeKind.UNVERIFIED_APPARATUS,
                     NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
                 }
+                or notice.kind in APPARATUS_PREDICTION_NOTICE_KINDS
                 or _is_source_internally_inconsistent(notice.kind, notice.reason)
                 for notice in residual.notices
             ):

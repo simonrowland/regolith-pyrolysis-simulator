@@ -1994,7 +1994,11 @@ def predict_knudsen_residue_composition(
         SourceOxygenCondition, SourceOxygenFallback, _printed_source_oxygen_at_point, resolve_source_oxygen,
         source_oxygen_closure_notice,
     )
-    from simulator.battery.validity import effusion_regime_unverified
+    from simulator.battery.validity import (
+        APPARATUS_PREDICTION_FLAGS,
+        apparatus_prediction_notices,
+        effusion_regime_unverified,
+    )
 
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("engine_capability_unsupported", engine)
@@ -2010,15 +2014,40 @@ def predict_knudsen_residue_composition(
         experiment, Quantity.P_PARTIAL, observation=reference,
         point_observations=rows,
     )
-    contradicted = any(
-        not check.passed and (
-            check.name == "orifice_pressure_to_diameter"
-            or "knudsen_number_orifice" in check.detail
-            or "printed_partial_pressure_sum_Pa" in check.detail
-        ) for check in gas_regime.checks
-    )
-    if (regime.regime_class.is_value and regime.regime_class.value is not RegimeClass.MOLECULAR) or contradicted:
-        raise ResidueInventoryRefusal("knudsen_near_saturation_invalid", "non-molecular orifice regime")
+    regime_notices: tuple[Notice, ...] = ()
+    if (
+        regime.regime_class.is_value
+        and regime.regime_class.value is not RegimeClass.MOLECULAR
+    ):
+        regime_detail = {
+            "flag": NoticeKind.EFFUSION_REGIME_VIOLATED.value,
+            "original_reason": "printed_regime_class_is_not_molecular",
+            "regime_class": regime.regime_class.value.value,
+        }
+        regime_notices = apparatus_prediction_notices(
+            regime_detail["flag"],
+            regime_detail,
+            check_name="printed_regime_class",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            origin="Knudsen residue extent",
+        )
+    else:
+        flagged_check = next(
+            (
+                check
+                for check in gas_regime.checks
+                if check.detail.get("flag") in APPARATUS_PREDICTION_FLAGS
+            ),
+            None,
+        )
+        if flagged_check is not None:
+            regime_notices = apparatus_prediction_notices(
+                flagged_check.detail.get("flag"),
+                flagged_check.detail,
+                check_name=flagged_check.name,
+                quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                origin="Knudsen residue extent",
+            )
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
     # A unit reference mass fixes only the mol normalization; no sample mass
     # or apparatus scale is inferred from it. xi is invariant to this scale.
@@ -2066,17 +2095,27 @@ def predict_knudsen_residue_composition(
     if schedule is None or schedule.method is None or not schedule.method.state.is_value:
         raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid", "thermal_schedule.method")
 
-    notices = [Notice(
-        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-        reason="T path is the printed step temperatures held over each mass-loss interval; ramp time between steps not modelled",
-        origin="Knudsen residue extent",
-    ), Notice(
-        kind=NoticeKind.UNVERIFIED_APPARATUS,
-        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-        reason="near-saturation and molecular effusion assumed from the printed Knudsen method; unprinted geometry cannot verify cell saturation",
-        origin="Knudsen residue extent",
-    )]
+    notices = [
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "T path is the printed step temperatures held over each mass-loss "
+                "interval; ramp time between steps not modelled"
+            ),
+            origin="Knudsen residue extent",
+        ),
+        Notice(
+            kind=NoticeKind.UNVERIFIED_APPARATUS,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "near-saturation assumed for the printed Knudsen residue extent; "
+                "unprinted geometry cannot verify cell saturation"
+            ),
+            origin="Knudsen residue extent",
+        ),
+    ]
+    notices.extend(regime_notices)
     oxygen_sources, source_logs = [], []
     for x, t in path:
         anchor = anchors[t][1]
@@ -2344,6 +2383,7 @@ def predict_mass_loss_fraction(
                         "kind": notice.kind.value,
                         "reason": notice.reason,
                         "origin": notice.origin,
+                        **({"policy": dict(notice.policy)} if notice.policy else {}),
                     }
                     for notice in omission_notices
                 ],
@@ -3292,6 +3332,8 @@ def _predict_hashimoto_residue_cohort(
                 )
             for notice in getattr(pressure_model, "below_threshold_omission_notices", ()):
                 row = {"reason": notice.reason, "kind": str(notice.kind.value)}
+                if notice.policy:
+                    row["policy"] = dict(notice.policy)
                 if row not in refinement_notices:
                     refinement_notices.append(row)
             band = {

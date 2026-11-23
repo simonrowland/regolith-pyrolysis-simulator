@@ -218,6 +218,7 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     reasons = [n.reason for n in result["notices"]]
     assert any("SC-360" in r and "3 dex (W) / 2.5 dex (Mo)" in r and "pO2^-nu" in r for r in reasons)
     assert any("printed step temperatures held" in r for r in reasons)
+    assert any("effusion_regime_assumed" in r for r in reasons)
     assert {r["source"] for r in result["oxygen_sources"]} == {"d142_closure"}
 
 
@@ -301,17 +302,19 @@ def test_compile_residual_produces_extent_numeric_without_time_mass_or_pressure(
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
-@pytest.mark.parametrize("change,reason", (
+@pytest.mark.parametrize("change,expected", (
     ("no_path", "printed_temperature_path_missing_or_invalid"),
     ("no_extent", "measured_mass_loss_fraction_missing_or_invalid"),
     ("no_initial", "initial_composition_not_stated"),
-    ("nonmolecular", "knudsen_near_saturation_invalid"),
-    ("bad_orifice_kn", "knudsen_near_saturation_invalid"),
-    ("bad_printed_pressure", "knudsen_near_saturation_invalid"),
+    ("nonmolecular", "effusion_regime_violated"),
+    ("bad_orifice_kn", "effusion_regime_violated"),
+    ("bad_printed_pressure", "effusion_regime_violated"),
 ))
-def test_prediction_boundary_refuses_missing_inputs(extent_point, change, reason):
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
+def test_prediction_boundary_refuses_missing_inputs_and_flags_regime(
+    extent_point, change, expected
+):
     reference, experiment, rows = extent_point
     if change == "no_path":
         experiment = replace(experiment, thermal_schedule=None)
@@ -331,9 +334,17 @@ def test_prediction_boundary_refuses_missing_inputs(extent_point, change, reason
             orifice_diameter_m=Located(State.of(Value.point_of("0.001")), reference.locator))))
         reference = replace(reference, point_conditions={
             "total_pressure_Pa": Located(State.of(Value.point_of(10)), reference.locator)})
-    with pytest.raises(ResidueInventoryRefusal) as exc:
-        predict_knudsen_residue_composition("internal-analytical", reference, experiment, rows)
-    assert exc.value.reason == reason
+    if expected == "effusion_regime_violated":
+        result = predict_knudsen_residue_composition(
+            "internal-analytical", reference, experiment, rows
+        )
+        assert any(expected in notice.reason for notice in result["notices"])
+    else:
+        with pytest.raises(ResidueInventoryRefusal) as exc:
+            predict_knudsen_residue_composition(
+                "internal-analytical", reference, experiment, rows
+            )
+        assert exc.value.reason == expected
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
@@ -363,9 +374,9 @@ def test_conflicting_printed_interval_oxygen_is_flagged(extent_point):
     assert any("several_candidates_survive" in n.reason for n in result["notices"])
 
 
+@pytest.mark.parametrize("engine_failure", (False, True))
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
-@pytest.mark.parametrize("engine_failure", (False, True))
 def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point, monkeypatch, engine_failure):
     import simulator.battery.residue as residue
     from simulator.battery.residue import ResidueEngineNonconvergence
@@ -414,24 +425,7 @@ def _read_markova_residue_cache_in_fresh_process(
     temperature_K: float,
     inventory: dict[str, float],
 ) -> None:
-    # This child reads the cache file the parent stored. Same request, same
-    # answer. Put the previous value back so the assignment does not leak.
-    previous = os.environ.get("REGOLITH_ENGINE_CACHE")
     os.environ["REGOLITH_ENGINE_CACHE"] = cache_path
-    try:
-        _read_markova_residue_cache(result_path, temperature_K, inventory)
-    finally:
-        if previous is None:
-            os.environ.pop("REGOLITH_ENGINE_CACHE", None)
-        else:
-            os.environ["REGOLITH_ENGINE_CACHE"] = previous
-
-
-def _read_markova_residue_cache(
-    result_path: str,
-    temperature_K: float,
-    inventory: dict[str, float],
-) -> None:
     from simulator import engine_cache
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -635,6 +629,7 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusa
     (1748.15, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     temperature_K,
@@ -653,7 +648,6 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
         internal_analytical_residue_vapor_pressure,
     )
 
-    # First call is the live solve. The file below is this test's own cache.
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
     inventory, _channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)

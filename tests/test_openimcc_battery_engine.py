@@ -2113,7 +2113,7 @@ import simulator.battery.score
 import engines.engine_commissioning
 
 from simulator.battery.enums import Engine
-from simulator.battery.score import headline_rows, score_store
+from simulator.battery.score import flagged_stratum_rows, headline_rows, score_store
 
 test_helpers = runpy.run_path("tests/test_openimcc_battery_engine.py")
 context = test_helpers["_plante_score_context"]()
@@ -2158,17 +2158,24 @@ summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
 )
-# d-128 keeps the printed band score-eligible and adds an informational notice.
-assert summary["n_score_eligible"] == 160
+# KEMS regime assumptions are kept in the flagged tier beside the clean row.
+assert summary["n_score_eligible"] == 0
+flagged = next(
+    row
+    for row in flagged_stratum_rows(residuals, engines=engines)
+    if row["stratum"] == "unverified-apparatus"
+    and row["rail"] == "vapour"
+    and row["engine"] == Engine.OPENIMCC.value
+)
+assert flagged["n"] == 162
 assert all(
     any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
     for residual, candidate in engine_rows
     if candidate.observation_id.startswith("engine:openimcc:")
 )
-assert summary["n_inside_band"] == 56
-assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
-assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
-print(json.dumps({"headline": summary, "lineage": "independent"}))
+assert abs(float(flagged["median_dex"]) - (-0.193144973432544415)) < 0.00000001
+assert abs(float(flagged["rms_dex"]) - 0.2097386994979764836) < 0.00000001
+print(json.dumps({"headline": summary, "flagged": flagged, "lineage": "independent"}))
 '''
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -2187,13 +2194,12 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
-    # d-128 keeps the printed band score-eligible and adds an informational notice.
-    assert result["headline"]["n_score_eligible"] == 160
-    assert result["headline"]["n_inside_band"] == 56
-    assert float(result["headline"]["median_dex"]) == pytest.approx(
+    assert result["headline"]["n_score_eligible"] == 0
+    assert result["flagged"]["n"] == 162
+    assert float(result["flagged"]["median_dex"]) == pytest.approx(
         -0.193144973432544415, abs=1e-8
     )
-    assert float(result["headline"]["rms_dex"]) == pytest.approx(
+    assert float(result["flagged"]["rms_dex"]) == pytest.approx(
         0.2097386994979764836, abs=1e-8
     )
     assert result["lineage"] == "independent"
@@ -2751,20 +2757,24 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         residual for residual, candidate in rows
         if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
     ]
-    assert openimcc["n_score_eligible"] == 160
+    assert openimcc["n_score_eligible"] == 0
     assert len(openimcc_rows) == 162
     assert all(
         any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
         for residual in openimcc_rows
     )
-    assert openimcc["n_inside_band"] == 56
-    assert float(openimcc["band_width_dex"]) == pytest.approx(
-        0.14612803567823803, abs=1e-12
+    flagged = next(
+        row
+        for row in flagged_stratum_rows(residuals, engines=engines)
+        if row["stratum"] == "unverified-apparatus"
+        and row["rail"] == "vapour"
+        and row["engine"] == Engine.OPENIMCC.value
     )
-    assert float(openimcc["median_dex"]) == pytest.approx(
+    assert flagged["n"] == 162
+    assert float(flagged["median_dex"]) == pytest.approx(
         -0.193144973432544415, abs=1e-8
     )
-    assert float(openimcc["rms_dex"]) == pytest.approx(
+    assert float(flagged["rms_dex"]) == pytest.approx(
         0.209738699497976484, abs=1e-8
     )
 
@@ -3001,7 +3011,13 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
     assert all(
         residual.score_eligible is False
         and any(
-            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            notice.kind
+            in {
+                NoticeKind.EFFUSION_REGIME_ASSUMED,
+                NoticeKind.EFFUSION_REGIME_VIOLATED,
+                NoticeKind.METHOD_IMPLIED,
+                NoticeKind.UNVERIFIED_APPARATUS,
+            }
             and "in_cell_partial_pressure_sum" in notice.reason
             for notice in residual.notices
         )

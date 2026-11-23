@@ -40,6 +40,7 @@ Ambiguity resolutions:
 
 from __future__ import annotations
 
+import json
 import math
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
@@ -47,12 +48,14 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    Authority,
     BoundDirection,
     BoundInclusivity,
     EvidenceClass,
     MEASURED_EVIDENCE,
     MethodToken,
     NoticeKind,
+    QUANTITY_UNITS,
     Quantity,
     RefusalReason,
     StateTag,
@@ -92,6 +95,205 @@ KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
 # from an unsourced collision diameter. Without a located diameter, use the
 # ~10 Pa ceiling alone.
 KEMS_CELL_PRESSURE_MAX_PA = Decimal("10")
+
+# Policy ids stay here until the shared DP registry lands. Each value has one
+# owner and can then be replaced mechanically by the registry resolver.
+DP_004_POLICY_ID = "DP-004"
+_KNUDSEN_FIXED_PRESSURE_CONDITIONS = (
+    "vacuum outside",
+    "total pressure is the sum of partials in the cell, NOT 1 atm",
+)
+DP_004_METHOD_IMPLICATION = (
+    "molecular effusion inside the cell",
+    *_KNUDSEN_FIXED_PRESSURE_CONDITIONS,
+)
+DP_005_POLICY_ID = "DP-005"
+DP_005_ALPHA = "1"
+DP_011_POLICY_ID = "DP-011"
+DP_011_METHOD_EQUILIBRIUM_PRESSURE = "equilibrium_partial_pressure"
+DP_011_METHOD_HKL = "hertz_knudsen_langmuir"
+DP_018_POLICY_ID = "DP-018"
+DP_018_METHOD_IMPLICATION = _KNUDSEN_FIXED_PRESSURE_CONDITIONS
+DP_100_POLICY_ID = "DP-100"
+DP_POLICY_VERSION = "v1"
+
+EFFUSION_REGIME_PREDICTION_FLAGS = frozenset(
+    {
+        NoticeKind.EFFUSION_REGIME_ASSUMED.value,
+        NoticeKind.EFFUSION_REGIME_VIOLATED.value,
+    }
+)
+APPARATUS_REGIME_NOTICE_KINDS = frozenset(
+    {
+        NoticeKind.METHOD_IMPLIED,
+        NoticeKind.EFFUSION_REGIME_ASSUMED,
+        NoticeKind.EFFUSION_REGIME_VIOLATED,
+    }
+)
+APPARATUS_PREDICTION_NOTICE_KIND_BY_FLAG = {
+    NoticeKind.METHOD_ASSUMED.value: NoticeKind.METHOD_ASSUMED,
+    NoticeKind.ALPHA_ASSUMED.value: NoticeKind.ALPHA_ASSUMED,
+    NoticeKind.EFFUSION_REGIME_ASSUMED.value: NoticeKind.EFFUSION_REGIME_ASSUMED,
+    NoticeKind.EFFUSION_REGIME_VIOLATED.value: NoticeKind.EFFUSION_REGIME_VIOLATED,
+}
+APPARATUS_PREDICTION_FLAGS = frozenset(
+    APPARATUS_PREDICTION_NOTICE_KIND_BY_FLAG
+)
+APPARATUS_PREDICTION_NOTICE_KINDS = frozenset(
+    APPARATUS_PREDICTION_NOTICE_KIND_BY_FLAG.values()
+) | frozenset({NoticeKind.METHOD_IMPLIED})
+
+
+def apparatus_prediction_notices(
+    flag: object,
+    detail: Mapping[str, Any],
+    *,
+    check_name: str,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Notice, ...]:
+    """Serialize typed defaults and method-implied evidence consistently."""
+
+    kind = (
+        APPARATUS_PREDICTION_NOTICE_KIND_BY_FLAG.get(flag)
+        if isinstance(flag, str)
+        else None
+    )
+    if kind is None:
+        return ()
+    evidence = {
+        "check": check_name,
+        **{
+            key: value
+            for key, value in detail.items()
+            if key not in {"flag", "original_reason"}
+        },
+    }
+    assumed_method = detail.get("assumed_method")
+    assumed_method_text = (
+        "" if assumed_method is None else f"; assumed_method={assumed_method}"
+    )
+    original_reason = (
+        detail.get("original_reason") or detail.get("reason") or "not stated"
+    )
+    pressure_limit = detail.get("pressure_limit_Pa")
+    band = (
+        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+        if check_name == "in_cell_partial_pressure_sum" and pressure_limit is not None
+        else None
+    )
+    evidence_text = json.dumps(
+        evidence, ensure_ascii=False, sort_keys=True, default=str
+    )
+    notices = [
+        Notice(
+            kind=kind,
+            affected_quantities=(quantity,),
+            reason=(
+                f"{flag}{assumed_method_text}; original_reason={original_reason}; "
+                f"evidence={evidence_text}"
+            ),
+            origin=origin,
+            band=band,
+            authority=Authority.EXTRAPOLATED,
+            policy=_apparatus_policy(flag, detail),
+        )
+    ]
+    alpha_assumption = detail.get("alpha_assumption")
+    if isinstance(alpha_assumption, Mapping):
+        alpha_detail = {**alpha_assumption, "original_reason": original_reason}
+        alpha_evidence = {
+            "check": check_name,
+            **alpha_assumption,
+        }
+        notices.append(
+            Notice(
+                kind=NoticeKind.ALPHA_ASSUMED,
+                affected_quantities=(quantity,),
+                reason=(
+                    "alpha_assumed; "
+                    f"original_reason={original_reason}; evidence="
+                    + json.dumps(
+                        alpha_evidence,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        default=str,
+                    )
+                ),
+                origin=origin,
+                authority=Authority.EXTRAPOLATED,
+                policy=_apparatus_policy(
+                    NoticeKind.ALPHA_ASSUMED.value, alpha_detail
+                ),
+            )
+        )
+    if flag in EFFUSION_REGIME_PREDICTION_FLAGS:
+        # DP-018 records the Knudsen method's fixed external vacuum and
+        # in-cell total pressure convention separately from the DP-004 regime.
+        notices.append(
+            Notice(
+                kind=NoticeKind.METHOD_IMPLIED,
+                affected_quantities=(quantity,),
+                reason=(
+                    "method_implied; condition=Knudsen effusion implies "
+                    f"{'; '.join(DP_018_METHOD_IMPLICATION)}; "
+                    f"original_reason={original_reason}; evidence={evidence_text}"
+                ),
+                origin=origin,
+                band=band,
+                authority=Authority.EXTRAPOLATED,
+                policy={
+                    "id": DP_018_POLICY_ID,
+                    "version": DP_POLICY_VERSION,
+                    "status": "canonical",
+                    "value": "; ".join(DP_018_METHOD_IMPLICATION),
+                    "units": "pressure in Pa",
+                },
+            )
+        )
+    return tuple(notices)
+
+
+def _apparatus_policy(
+    flag: object, detail: Mapping[str, Any]
+) -> Mapping[str, str] | None:
+    """Attach the DP table identity to the notice that carries its flag."""
+
+    if flag == NoticeKind.METHOD_ASSUMED.value:
+        return {
+            "id": DP_011_POLICY_ID,
+            "version": DP_POLICY_VERSION,
+            "status": "canonical",
+            "value": str(detail.get("assumed_method") or "inferred_from_quantity"),
+            "units": "method",
+        }
+    if flag == NoticeKind.ALPHA_ASSUMED.value:
+        return {
+            "id": DP_005_POLICY_ID,
+            "version": DP_POLICY_VERSION,
+            "status": "canonical",
+            "value": DP_005_ALPHA,
+            "units": "dimensionless",
+        }
+    if flag == NoticeKind.EFFUSION_REGIME_ASSUMED.value:
+        return {
+            "id": DP_004_POLICY_ID,
+            "version": DP_POLICY_VERSION,
+            "status": "canonical",
+            "value": "; ".join(DP_004_METHOD_IMPLICATION),
+            "units": "regime; pressure in Pa",
+        }
+    if flag == NoticeKind.EFFUSION_REGIME_VIOLATED.value:
+        # DP-100 is proposed because the v1 table has no entry for contrary
+        # regime evidence; these rows stay in their own proposed-policy tier.
+        return {
+            "id": DP_100_POLICY_ID,
+            "version": DP_POLICY_VERSION,
+            "status": "proposed",
+            "value": "retain numeric pressure residual; measured pressure is below equilibrium pressure",
+            "units": "Pa",
+        }
+    return None
 
 _CALIBRATION_STANDARD_FIELDS = frozenset(
     {
@@ -543,6 +745,27 @@ def underdetermined_apparatus(
     checks: list[GateCheck] = []
     if method_state.tag is not StateTag.VALUE or method_state.value is None:
         if _quantity_scopes_apparatus_by_method(quantity):
+            if (
+                method_state.tag is not StateTag.VALUE
+                and observation is not None
+                and observation.value.kind is ValueKind.POINT
+                and observation.value.point is not None
+                and observation.value.point.is_finite()
+            ):
+                method_detail = _method_assumption_detail(
+                    experiment, observation, quantity
+                )
+                if "invalid_alpha_source" in method_detail:
+                    checks.append(GateCheck("method", False, method_detail))
+                    return _fail(RefusalReason.INVALID_SOURCE, checks, "method")
+                checks.append(
+                    GateCheck(
+                        "method",
+                        True,
+                        method_detail,
+                    )
+                )
+                return _pass(checks)
             checks.append(
                 GateCheck(
                     "method",
@@ -799,6 +1022,118 @@ def underdetermined_apparatus(
     return _pass(checks)
 
 
+def _method_assumption_detail(
+    experiment: Experiment,
+    observation: Observation,
+    quantity: Quantity,
+) -> dict[str, Any]:
+    """Describe the quantity-based comparison used when source method is absent."""
+
+    method_class = observation.evidence.original_method_class
+    method_reason = experiment.method.reason or "source method is not stated"
+    source_text = _source_method_text(method_class, method_reason)
+    alpha_assumption = None
+    alpha_source_evidence = None
+    if quantity in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
+        # DP-005 sets alpha=1 as the maximum HKL flux. J = alpha*P_eq /
+        # sqrt(2*pi*M*R*T); with M in kg/mol, units reduce to mol m^-2 s^-1.
+        # alpha=0 gives zero flux and alpha=1 gives the one-sided upper bound.
+        assumed_method = DP_011_METHOD_HKL
+        alpha_value, alpha_source_evidence, invalid_alpha = (
+            _sourced_evaporation_alpha(observation)
+        )
+        if invalid_alpha is not None:
+            return {
+                "reason": "printed evaporation coefficient is not in [0, 1]",
+                "quantity": quantity.value,
+                "invalid_alpha_source": invalid_alpha,
+                "original_reason": method_reason,
+            }
+        if alpha_value is None:
+            alpha = DP_005_ALPHA
+            alpha_assumption = {
+                "alpha": DP_005_ALPHA,
+                "physical_basis": "Hertz-Knudsen-Langmuir maximum flux",
+                "bias": "upper_bound_on_flux",
+            }
+        else:
+            alpha = str(alpha_value)
+    elif quantity in {
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+        Quantity.P_REFERENCE,
+    }:
+        # The identity is already a pressure observable, so the scorer compares
+        # it with the engine equilibrium pressure without inventing an apparatus
+        # reduction. The absent experimental method remains visible in the flag.
+        assumed_method = DP_011_METHOD_EQUILIBRIUM_PRESSURE
+        alpha = None
+    elif "knudsen" in source_text or "kems" in source_text:
+        assumed_method = MethodToken.KNUDSEN_EFFUSION.value
+        alpha = None
+    elif "langmuir" in source_text or "free evaporation" in source_text:
+        assumed_method = DP_011_METHOD_HKL
+        alpha = None
+    elif quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        # Activity and its coefficient are thermodynamic quantities; the engine
+        # computes the same quantity on the typed reference state directly.
+        assumed_method = "quantity_defined_equilibrium_activity"
+        alpha = None
+    else:
+        # Other recognized quantities keep their quantity-defined engine path;
+        # no measurement-apparatus conversion is inferred for them here.
+        assumed_method = "quantity_defined_engine_comparison"
+        alpha = None
+    return {
+        "flag": NoticeKind.METHOD_ASSUMED.value,
+        "assumed_method": assumed_method,
+        "alpha": alpha,
+        **({"alpha_assumption": alpha_assumption} if alpha_assumption else {}),
+        **({"alpha_source": alpha_source_evidence} if alpha_source_evidence else {}),
+        "quantity": quantity.value,
+        "unit": QUANTITY_UNITS.get(quantity),
+        "evidence": {
+            "quantity": quantity.value,
+            "unit": QUANTITY_UNITS.get(quantity),
+            "source_method_class": method_class,
+            "source_method_text": method_reason,
+        },
+        "original_reason": method_reason,
+    }
+
+
+def _sourced_evaporation_alpha(
+    observation: Observation,
+) -> tuple[Decimal | None, dict[str, Any] | None, dict[str, Any] | None]:
+    """Read the existing row-level HKL coefficient conditions, if printed."""
+
+    for key in ("sticking_coefficient", "alpha_s"):
+        located = (observation.point_conditions or {}).get(key)
+        if not isinstance(located, Located) or not located.state.is_value:
+            continue
+        raw = located.state.value
+        if isinstance(raw, bool) or not isinstance(raw, (Decimal, int, float, str)):
+            return None, None, {"condition": key, "value": str(raw)}
+        try:
+            value = as_decimal(raw)
+        except (InvalidOperation, TypeError, ValueError):
+            return None, None, {"condition": key, "value": str(raw)}
+        if not value.is_finite() or not Decimal("0") <= value <= Decimal("1"):
+            return None, None, {"condition": key, "value": str(raw)}
+        return value, {
+            "condition": key,
+            "value": str(value),
+            "locator": str(located.locator) if located.locator is not None else None,
+        }, None
+    return None, None, None
+
+
+def _source_method_text(method_class: object, method_reason: object) -> str:
+    return " ".join(
+        value for value in (method_class, method_reason) if isinstance(value, str)
+    ).casefold()
+
+
 def effusion_regime_unverified(
     experiment: Experiment,
     quantity: Quantity,
@@ -810,30 +1145,25 @@ def effusion_regime_unverified(
 
     method_state = experiment.method
     checks: list[GateCheck] = []
-    if method_state.is_unknown:
-        evidence_state = None if observation is None else observation.evidence.class_
-        pressure_quantity = quantity in {
-            Quantity.P_SAT,
-            Quantity.P_PARTIAL,
-            Quantity.P_REFERENCE,
-        }
-        evidence_needs_regime_check = (
-            evidence_state is not None
-            and (
-                evidence_state.is_unknown
-                or (
-                    evidence_state.is_value
-                    and evidence_state.value is EvidenceClass.FIGURE_ONLY
-                )
+    if not method_state.is_value:
+        source_text = (
+            ""
+            if observation is None
+            else _source_method_text(
+                observation.evidence.original_method_class,
+                method_state.reason,
             )
         )
-        if not pressure_quantity or not evidence_needs_regime_check:
+        if "knudsen" not in source_text and "kems" not in source_text:
+            # A pressure quantity alone does not establish a Knudsen cell.
             return _pass(checks)
-        # A figure-only or evidence-unknown pressure claim cannot rule out
-        # effusion. Require the conservative same-point in-cell fallback.
-    elif method_state.tag is not StateTag.VALUE or method_state.value is None:
-        return _pass(checks)
-    elif method_state.value is not MethodToken.KNUDSEN_EFFUSION:
+        # When source text identifies KEMS but the method token is absent,
+        # run the same regime checks and leave the textual inference flagged
+        # by the method gate.
+    elif (
+        method_state.value is None
+        or method_state.value is not MethodToken.KNUDSEN_EFFUSION
+    ):
         return _pass(checks)
     if quantity not in {
         Quantity.P_SAT,
@@ -859,8 +1189,11 @@ def effusion_regime_unverified(
             )
         )
         if not molecular:
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen"
+            return _effusion_regime_flag(
+                checks,
+                "orifice_knudsen",
+                flag=NoticeKind.EFFUSION_REGIME_VIOLATED.value,
+                reason="orifice_knudsen_below_free_molecular_threshold",
             )
         return _pass(checks)
 
@@ -899,10 +1232,11 @@ def effusion_regime_unverified(
             )
         )
         if not passed:
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            return _effusion_regime_flag(
                 checks,
                 "orifice_pressure_to_diameter",
+                flag=NoticeKind.EFFUSION_REGIME_VIOLATED.value,
+                reason="printed_in_cell_pressure_exceeds_free_molecular_limit",
             )
         return _pass(checks)
 
@@ -921,10 +1255,11 @@ def effusion_regime_unverified(
                     True,
                     {
                         "reason": (
-                            "orifice Knudsen number not published; calibrated KEMS "
-                            "pressure and a wholly low background interval are retained"
+                            "orifice Knudsen number not published; the molecular "
+                            "effusion assumption cannot be checked"
                         ),
-                        "flag": "orifice_knudsen_not_published",
+                        "flag": NoticeKind.EFFUSION_REGIME_ASSUMED.value,
+                        "original_reason": "orifice_knudsen_not_published",
                         "background_upper_bound_Pa": str(upper),
                     },
                 )
@@ -980,14 +1315,24 @@ def effusion_regime_unverified(
                 pressure_detail,
             )
         )
-        return _fail(
-            (
-                RefusalReason.METHOD_UNKNOWN
-                if method_state.is_unknown
-                else RefusalReason.EFFUSION_REGIME_UNVERIFIED
-            ),
+        lower_bound = pressure_detail.get("printed_partial_pressure_lower_bound_Pa")
+        violated = lower_bound is not None and Decimal(str(lower_bound)) > pressure_limit
+        return _effusion_regime_flag(
             checks,
             "in_cell_partial_pressure_sum",
+            flag=(
+                NoticeKind.EFFUSION_REGIME_VIOLATED.value
+                if violated
+                else NoticeKind.EFFUSION_REGIME_ASSUMED.value
+            ),
+            reason=(
+                "printed_partial_pressure_lower_bound_exceeds_free_molecular_limit"
+                if violated
+                else str(
+                    pressure_detail.get("reason")
+                    or "orifice or in-cell pressure was not printed"
+                )
+            ),
         )
     passed = pressure_sum <= pressure_limit
     if passed:
@@ -1018,12 +1363,36 @@ def effusion_regime_unverified(
         GateCheck("in_cell_partial_pressure_sum", passed, gate_detail)
     )
     if not passed:
-        return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+        return _effusion_regime_flag(
             checks,
             "in_cell_partial_pressure_sum",
+            flag=NoticeKind.EFFUSION_REGIME_VIOLATED.value,
+            reason="printed_in_cell_pressure_sum_exceeds_free_molecular_limit",
         )
     return _pass(checks)
+
+
+def _effusion_regime_flag(
+    checks: list[GateCheck],
+    primary: str,
+    *,
+    flag: str,
+    reason: str,
+) -> GateOutcome:
+    """Retain a typed failure for diagnostics and mark it nonblocking for scoring."""
+
+    for index in range(len(checks) - 1, -1, -1):
+        check = checks[index]
+        if check.name == primary:
+            details = {**check.detail, "flag": flag, "original_reason": reason}
+            checks[index] = GateCheck(check.name, check.passed, details)
+            break
+    else:
+        raise ValueError(f"missing effusion regime check: {primary}")
+    # A collisional orifice impedes molecular effusion. Reducing its signal as
+    # a molecular-cell pressure therefore underestimates the equilibrium P.
+    # The scorer converts this typed diagnostic into a flagged residual.
+    return _fail(RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, primary)
 
 
 def _partial_pressure_observations_by_experiment(

@@ -29,14 +29,17 @@ from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from tests.battery.test_migrate import _migrate_real_extract
 from simulator.battery.score import (
     _evidence_class_notice,
-    _missing_apparatus_fact,
     _printed_uncertainty_band,
     _unverified_apparatus_notices,
     ScoreContext,
     compile_residual,
     predict_with_engine,
 )
-from simulator.battery.validity import effusion_regime_unverified, run_validity_gates
+from simulator.battery.validity import (
+    effusion_regime_unverified,
+    run_validity_gates,
+    underdetermined_apparatus,
+)
 
 
 SOURCE_ID = "kems-020-hastie-1981-nbsir"
@@ -157,7 +160,7 @@ def test_figure_only_without_digitization_uncertainty_has_no_zero_band(
     assert notice.origin == row.observation_id
 
 
-def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
+def test_hastie_figure_rows_flag_unverified_regime_and_keep_unknown_quantity_refusals(
     tmp_path,
 ) -> None:
     _works, experiments, observations = _hastie_store(tmp_path)
@@ -171,7 +174,14 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
         regime = effusion_regime_unverified(
             experiment, Quantity.P_PARTIAL, observation=row
         )
-        assert regime.reason is RefusalReason.METHOD_UNKNOWN
+        assert not regime.passed
+        assert regime.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        regime_check = next(
+            check
+            for check in regime.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        assert regime_check.detail["flag"] == "effusion_regime_assumed"
 
         for engine in SCORING_ENGINES:
             prediction = predict_with_engine(engine, row, experiment=experiment)
@@ -195,10 +205,10 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
             assert prediction.refusal_detail["reason"] == "quantity_unknown"
 
 
-def test_hastie_unknown_kms_regime_rows_still_refuse_with_their_reason(
+def test_hastie_unknown_kms_regime_is_separate_from_apparatus_determinants(
     tmp_path,
 ) -> None:
-    works, experiments, observations = _hastie_store(tmp_path)
+    _works, experiments, observations = _hastie_store(tmp_path)
     rows = tuple(
         row
         for row in observations.values()
@@ -209,14 +219,6 @@ def test_hastie_unknown_kms_regime_rows_still_refuse_with_their_reason(
         is MethodToken.KNUDSEN_EFFUSION
     )
     assert len(rows) == 18
-    context = ScoreContext(
-        works=works,
-        experiments=experiments,
-        observations=observations,
-        extract_review={SOURCE_ID: "reviewed"},
-        root=ROOT,
-    )
-
     for row in rows:
         experiment = experiments[row.experiment_id]
         gates = run_validity_gates(
@@ -227,16 +229,17 @@ def test_hastie_unknown_kms_regime_rows_still_refuse_with_their_reason(
         assert not gates.passed
         assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
         assert gates.primary_check == "in_cell_partial_pressure_sum"
-        for engine in SCORING_ENGINES:
-            residual, _candidate = compile_residual(
-                row,
-                engine,
-                context=context,
-                point_observations=tuple(observations.values()),
-            )
-            assert residual.numeric is None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        regime_check = next(
+            check
+            for check in gates.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        assert regime_check.detail["flag"] == "effusion_regime_assumed"
+        apparatus = underdetermined_apparatus(
+            experiment, Quantity.ACTIVITY_COEFFICIENT, observation=row
+        )
+        assert not apparatus.passed
+        assert apparatus.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
 def test_hastie_fig5_points_use_the_printed_initial_glass_proxy(tmp_path) -> None:
@@ -270,7 +273,7 @@ def test_hastie_fig5_points_use_the_printed_initial_glass_proxy(tmp_path) -> Non
     assert all(components == proxy_compositions[0] for components in proxy_compositions)
 
 
-def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
+def test_hastie_fig4_rows_score_flagged_when_method_and_pressure_sum_are_missing(
     tmp_path,
 ) -> None:
     works, experiments, observations = _hastie_store(tmp_path)
@@ -291,46 +294,13 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
             gates = run_validity_gates(
                 experiment, row, point_observations=point_observations
             )
-            pressure_sum_check = next(
-                check
-                for check in gates.checks
-                if check.name == "in_cell_partial_pressure_sum"
-            )
-            assert not gates.passed
-            assert gates.reason is RefusalReason.METHOD_UNKNOWN
-            assert gates.primary_check == "in_cell_partial_pressure_sum"
-            assert [
-                check.name for check in gates.checks if not check.passed
-            ] == ["in_cell_partial_pressure_sum", "method"]
             method_check = next(
                 check for check in gates.checks if check.name == "method"
             )
-            assert not method_check.passed
-            assert method_check.detail["reason"] == experiment.method.reason
-            assert (
-                _missing_apparatus_fact(
-                    method_check,
-                    allow_calibration=False,
-                    allow_unknown_method=True,
-                )
-                == "method_unknown"
-            )
-            assert not pressure_sum_check.passed
-            assert (
-                pressure_sum_check.detail["reason"]
-                == "no admitted printed partial pressures at this exact point"
-            )
-            assert (
-                pressure_sum_check.detail.get("printed_partial_pressure_sum_Pa")
-                is None
-            )
-            assert (
-                _missing_apparatus_fact(
-                    pressure_sum_check,
-                    allow_calibration=False,
-                    allow_unknown_method=True,
-                )
-                == "in_cell_partial_pressure_sum"
+            assert method_check.passed
+            assert method_check.detail["flag"] == "method_assumed"
+            assert method_check.detail["assumed_method"] == (
+                "equilibrium_partial_pressure"
             )
             apparatus_notices = _unverified_apparatus_notices(
                 row, experiment, gates
@@ -342,23 +312,13 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 prediction=prediction,
                 point_observations=point_observations,
             )
-            assert residual.status is ResidualStatus.REFUSED
-            assert residual.numeric is None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
-            assert residual.refusal.detail["primary_check"] == (
-                "in_cell_partial_pressure_sum"
-            )
-            assert residual.refusal.detail["checks"] == [
-                "in_cell_partial_pressure_sum",
-                "method",
-            ]
-            assert residual.refusal.detail["missing_facts"] == {
-                "method": experiment.method.reason,
-                "in_cell_partial_pressure_sum": pressure_sum_check.detail["reason"],
-            }
-            assert not any(
-                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            assert residual.status is not ResidualStatus.REFUSED
+            assert residual.numeric is not None
+            assert residual.score_eligible is False
+            assert residual.refusal is None
+            assert any(
+                notice.kind is NoticeKind.METHOD_ASSUMED
+                and "method_assumed" in notice.reason
                 for notice in apparatus_notices
             ), (row.observation_id, gates.checks, apparatus_notices)
             assert any(
@@ -370,13 +330,14 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
                 for notice in residual.notices
             )
-            assert not any(
-                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            assert any(
+                notice.kind is NoticeKind.METHOD_ASSUMED
+                and "method_assumed" in notice.reason
                 for notice in residual.notices
             )
 
 
-def test_hastie_evidence_unknown_pressure_keeps_method_unknown_refusal(
+def test_hastie_evidence_unknown_pressure_scores_with_method_flag(
     tmp_path,
 ) -> None:
     works, experiments, observations = _hastie_store(tmp_path)
@@ -404,6 +365,11 @@ def test_hastie_evidence_unknown_pressure_keeps_method_unknown_refusal(
         point_observations=tuple(observations.values()),
     )
 
-    assert residual.numeric is None
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert residual.refusal is None
+    assert any(
+        notice.kind is NoticeKind.METHOD_ASSUMED
+        and "method_assumed" in notice.reason
+        for notice in residual.notices
+    )
