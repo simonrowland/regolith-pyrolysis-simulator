@@ -6,7 +6,9 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery import score
+from simulator.battery.enums import Phase, Quantity
+from simulator.battery.fo2_ladder import has_printed_fo2
 from simulator.battery.migrate import Migrator
 from simulator.yaml_cache import yaml_mapping_source_issues
 from tools.validate_literature_extracts import validate_extract_file
@@ -32,13 +34,15 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
     result = _migrate_extract()
     assert len(result.observations) == 22
     assert result.registry_issues == []
-    assert result.queue == []
+    assert len(result.queue) == 1
+    assert result.queue[0].axes == ["phase"]
+    assert result.queue[0].why == "missing phase"
     observations = list(result.observations.values())
     assert all(o.identity.quantity.value is Quantity.FE3_FE2_RATIO for o in observations)
     assert all(o.value.kind.value == "point" for o in observations)
     assert all(o.identity.temperature_K.is_value for o in observations)
     assert all(o.identity.composition.is_value for o in observations)
-    assert all(o.identity.species.phase.value.value == "glass" for o in observations)
+    assert all(o.admission.status.value == "pending" for o in observations)
     assert all(
         o.point_conditions["T_C"].state.is_value
         and o.point_conditions["T_C"].locator.pdf_page_index == 5
@@ -60,18 +64,90 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
         assert pressure.state.is_value
         assert pressure.state.value.point == Decimal("20265")
         assert pressure.inference is not None
-        assert "(1/5 atm)*(101325 Pa/atm)" in pressure.inference.relation
-        assert "fO2=pO2 under the ideal-gas convention" in pressure.inference.relation
-        assert "atm_to_Pa" in pressure.inference.relation
+        assert pressure.inference.relation == "atm_to_Pa"
+        assert "P_Pa = P_atm × 101325" in pressure.inference.inputs
+        assert "as_published=1/5 atmosphere of oxygen" in pressure.inference.inputs
         assert "printed=point_conditions.fO2_control" in pressure.inference.inputs
+        assert "convention=ideal-gas:fO2=pO2" in pressure.inference.inputs
+        factor = dict(pressure.inference.parameters)["factor"]
+        assert factor.state.value == Decimal("101325")
+        assert factor.locator.published_page == 532
         assert pressure.locator.pdf_page_index == 3
         assert pressure.locator.published_page == 532
+        assert has_printed_fo2(observation, observation.identity)
+        assert score._printed_fe_redox_fo2_log(
+            observation, observation.identity
+        ) == Decimal("-0.6932533919222882")
     assert all(
         o.point_conditions["duration_h"].state.is_value
         and o.point_conditions["duration_h"].locator.table == "II"
         for o in observations
     )
     assert len(source["species"]["Fe"]["observations"][0]["values"]["rows"]) == 22
+
+    def row_at(temperature: str, duration: str):
+        matches = [
+            observation
+            for observation in observations
+            if observation.point_conditions["T_C"].state.value
+            == Decimal(temperature)
+            and observation.point_conditions["duration_h"].state.value
+            == Decimal(duration)
+        ]
+        assert len(matches) == 1
+        return matches[0]
+
+    transient = row_at("1300", "2")
+    equilibrium = row_at("1300", "16")
+    crystal_bearing = row_at("1200", "16")
+    non_equilibrium = row_at("1100", "240")
+    assert transient.identity.species.phase.value is Phase.L
+    assert "transient" in transient.point_conditions["regime_as_printed"].state.value
+    assert (
+        transient.point_conditions["regime_as_printed"].locator.published_page
+        == 534
+    )
+    assert equilibrium.identity.species.phase.value is Phase.L
+    assert "equilibrium" in equilibrium.point_conditions["regime_as_printed"].state.value
+    assert (
+        equilibrium.point_conditions["regime_as_printed"].locator.published_page
+        == 534
+    )
+    assert crystal_bearing.identity.species.phase.is_unknown
+    assert (
+        "bulk_composition_in_two_phase_region"
+        in crystal_bearing.identity.species.phase.reason
+    )
+    assert (
+        "magnetite"
+        in crystal_bearing.point_conditions["phase_as_printed"].state.value
+    )
+    assert (
+        crystal_bearing.point_conditions["phase_as_printed"].locator.published_page
+        == 541
+    )
+    assert "transient" in crystal_bearing.point_conditions["regime_as_printed"].state.value
+    assert non_equilibrium.identity.species.phase.is_unknown
+    assert "not at equilibrium" in non_equilibrium.point_conditions["regime_as_printed"].state.value
+    assert (
+        non_equilibrium.point_conditions["phase_as_printed"].locator.published_page
+        == 534
+    )
+    assert all(
+        o.admission.status.value == "pending"
+        for o in (transient, crystal_bearing, non_equilibrium)
+    )
+
+    experiment = next(iter(result.experiments.values()))
+    ambient = experiment.ambient_pressure_evidence
+    assert ambient is not None
+    assert ambient.locator.published_page == 539
+    assert ambient.locator.pdf_page_index == 10
+    assert "surface exposed to the air" in ambient.quote
+    assert all(
+        o.identity.total_pressure_Pa.value == Decimal("101325")
+        for o in observations
+    )
 
 
 def test_kennedy_fidelity_pin_detects_a_changed_table2_cell(tmp_path: Path):

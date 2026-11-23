@@ -10616,6 +10616,13 @@ _PRINTED_SINGLE_MELT_PHASES = frozenset({"melt"})
 
 def _printed_point_phase_text(item: Mapping[str, Any]) -> str | None:
     raw = item.get("phase_as_printed")
+    if raw is None:
+        point_conditions = item.get("point_conditions")
+        if isinstance(point_conditions, Mapping):
+            raw = point_conditions.get("phase_as_printed")
+    if isinstance(raw, Mapping):
+        state = raw.get("state")
+        raw = state.get("value") if isinstance(state, Mapping) else raw.get("value")
     if not isinstance(raw, str):
         return None
     text = " ".join(raw.split())
@@ -10625,14 +10632,20 @@ def _printed_point_phase_text(item: Mapping[str, Any]) -> str | None:
 def _printed_point_phase_kind(text: str) -> str | None:
     """Type a printed per-point phase. None means leave the parent phase.
 
-    ``melt`` is the printed single liquid. ``X + melt`` / ``melt + X`` is a
-    two-phase assemblage. The whole string must be that phrase: a sentence
-    that merely mentions the words is not a phase.
+    ``melt`` is the printed single liquid. A printed point label containing
+    melt with a named crystal phase is a two-phase assemblage; the broader
+    wording is read only from the explicitly located ``phase_as_printed``
+    field.
     """
 
     parts = " ".join(text.split()).casefold().split(" ")
     if len(parts) == 1 and parts[0] in _PRINTED_SINGLE_MELT_PHASES:
         return "liquid"
+    if "melt" in parts and re.search(
+        r"\b(?:magnetite|feldspar|hypersthene-enstatite|crystallized)\b", text,
+        re.IGNORECASE,
+    ):
+        return "two_phase"
     if (
         len(parts) == 3
         and parts[1] == "+"
@@ -23255,13 +23268,19 @@ def _walk_printed_oxygen(
                             printed_key="point_conditions.fO2_control",
                             published=control_text,
                             quote=control_text,
-                            source_derivation=(
-                                "printed; "
-                                f"({numerator}/{denominator} atm)*"
-                                "(101325 Pa/atm); atm_to_Pa; "
-                                "fO2=pO2 under the ideal-gas convention"
-                            ),
+                            source_derivation=None,
                         )
+                        if pressure is not None and pressure.inference is not None:
+                            pressure = replace(
+                                pressure,
+                                inference=replace(
+                                    pressure.inference,
+                                    inputs=(
+                                        *pressure.inference.inputs,
+                                        "convention=ideal-gas:fO2=pO2",
+                                    ),
+                                ),
+                            )
                         if pressure is not None and pressure.state.is_value:
                             raw_pressure = pressure.state.value
                             if (
