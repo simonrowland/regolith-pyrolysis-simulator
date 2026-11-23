@@ -10175,7 +10175,6 @@ def total_pressure_bar_for_score(
         else "DP-001"
     )
     from simulator.battery import default_policy
-    from simulator.physical_constants import PA_PER_BAR
 
     resolved = default_policy.resolve(policy_id)
     pressure_pa = Decimal(str(resolved.value))
