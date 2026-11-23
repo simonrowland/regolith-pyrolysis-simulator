@@ -3585,7 +3585,11 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     )
     # Exact HOT rows and refusal-mask outcomes both have priority. The
     # neighbour lookup is reached only after the mask confirms no cell hit.
-    if masked is None and mask_allows_neighbour:
+    # Readonly caches may be shared across machines and runs. Their
+    # optimizer-neighbour contents must not influence the result; exact HOT
+    # lookup above remains available. Writable misses index neighbours in
+    # _finish_cache_miss after its readonly return.
+    if not readonly and masked is None and mask_allows_neighbour:
         lookup_preset, neighbour_cells = _scope_neighbour_cells(request)
         if lookup_preset is not None and lookup_preset in neighbour_cells:
             neighbour = _read_neighbour(

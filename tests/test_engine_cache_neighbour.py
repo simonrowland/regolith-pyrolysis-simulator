@@ -276,7 +276,7 @@ def test_list_hot_keeps_its_length_and_carries_the_preset(
     assert hit.neighbour_hit == "medium"
 
 
-def test_readonly_serves_a_neighbour_and_a_missing_index_stays_exact(
+def test_readonly_skips_neighbour_index_and_a_missing_index_stays_exact(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     path = _use_cache(monkeypatch, tmp_path)
@@ -287,16 +287,34 @@ def test_readonly_serves_a_neighbour_and_a_missing_index_stays_exact(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
     engine_cache._MEMORY_CACHE.clear()
     engine_cache._close_connections()
+    engine_cache.engine_cache_counters(reset=True)
+
+    # Readonly mode still serves exact HOT rows.
+    exact = engine_cache.cached_engine_call(
+        "openimcc", base, lambda: pytest.fail("readonly exact hit solved"),
+    )
+    assert exact == {"answer": "base"}
+    assert not hasattr(exact, "neighbour_hit")
+
+    calls = {"nearby": 0}
+
+    def solve_nearby() -> dict[str, object]:
+        calls["nearby"] += 1
+        return {"answer": "readonly-live"}
+
     with optimizer_engine_neighbour({"control_quantization": "coarse"}):
-        hit = engine_cache.cached_engine_call(
-            "openimcc", nearby, lambda: pytest.fail("readonly coarse pass solved"),
-        )
-    assert hit["answer"] == "base"
-    assert "neighbour_hit" not in hit
-    assert hit.neighbour_hit == "coarse"
+        result = engine_cache.cached_engine_call("openimcc", nearby, solve_nearby)
+    assert result == {"answer": "readonly-live"}
+    assert not hasattr(result, "neighbour_hit")
+    assert calls["nearby"] == 1
+    assert engine_cache.engine_cache_counters()["openimcc"].get("neighbour_hits", 0) == 0
     with sqlite3.connect(path) as connection:
         rows = connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0]
+        neighbour_rows = connection.execute(
+            "SELECT COUNT(*) FROM engine_neighbour_cells"
+        ).fetchone()[0]
     assert rows == 1
+    assert neighbour_rows == 1
 
     bare = tmp_path / "exact-only.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(bare))
