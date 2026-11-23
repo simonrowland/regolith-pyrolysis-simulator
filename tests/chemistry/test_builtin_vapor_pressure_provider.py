@@ -1291,10 +1291,21 @@ def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch)
 
 
 @pytest.mark.parametrize("temperature_K", [400.0, 410.0])
-def test_sodium_provider_refuses_unavailable_saturation_cap(
+def test_sodium_provider_flags_extrapolated_saturation_cap(
     vapor_pressure_data,
     temperature_K,
 ):
+    """400 K and 410 K stay on the flagged tier.
+
+    Browning-Potter saturation is certified on 864–2499 K (Tm 370.98 K)
+    and now evaluates instead of refusing. This dispatch is also outside
+    the Na standard-reaction domain, so the provider's own extrapolation
+    notice is that domain, and the computed Na pressure is recorded as an
+    omission below the reporting threshold. A missing saturation record
+    is still a refusal. The retired Antoine-unavailable refusal aborted
+    every temperature.
+    """
+
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -1307,11 +1318,19 @@ def test_sodium_provider_refuses_unavailable_saturation_cap(
         control_inputs={"pO2_bar": 1e-9},
     )
 
-    with pytest.raises(
-        ellingham_graph.EllinghamPressureRefusal,
-        match="Antoine saturation pressure unavailable",
-    ):
-        provider.dispatch(request)
+    result = provider.dispatch(request)
+    assert result.status == "ok"
+    notice = result.diagnostic["extrapolated_beyond_valid_range_K"]["Na"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == "metal_vapor_pressure_out_of_validated_range"
+    low, high = notice["valid_range_K"]
+    assert temperature_K < low or temperature_K > high
+    assert any("extrapolated" in warning for warning in result.warnings)
+    omission = result.diagnostic["below_reporting_threshold_omissions"]["Na"]
+    assert omission["pressure_rail"] == "liquid_oxide_standard_reaction"
+    computed = omission["computed_pressure_Pa"]
+    assert math.isfinite(computed) and 0.0 < computed <= omission["reporting_threshold_Pa"]
+    assert "Na" not in result.diagnostic["vapor_pressures_Pa"]
 
 
 def test_phosphorus_hot_train_scope_survives_compatibility_projection(

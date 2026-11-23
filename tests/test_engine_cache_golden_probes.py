@@ -29,10 +29,12 @@ from simulator import engine_cache
 # Each value pins the current cache chemistry version with one live solver
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
-    # openimcc stays at b271f chemistry v1. The pin car's pair
-    # (4, fb0d744f...) is not a v4 golden: that digest is the v3 FeO-SiO2
-    # probe and was not re-measured. Re-measure this digest on bae51f7.
-    "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
+    # openimcc stays at chemistry v1 (d-459). Studio gates on this tree
+    # measured the feo_sio2_40_60 probe as fb0d744f (bae51f7 and 045e025).
+    # 0656d169 is the pre-merge pair for openimcc 66ec4a3. The move is the
+    # FeO activity-standard normalization in that FeO–SiO2 pot; 045e025's
+    # new liquid rows are outside the pot and did not move the digest.
+    "openimcc": (1, "fb0d744f1937ef198d1e615d13df838b39dfa66804a0d8f5513b363de99a1dad"),
     "internal-analytical": (3, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),

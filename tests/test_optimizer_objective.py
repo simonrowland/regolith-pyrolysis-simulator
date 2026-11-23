@@ -8220,6 +8220,7 @@ def _kernel_vapour_host(
         ),
         _evaluated_transport_pO2_bar=None,
         _evaluated_transport_pO2_recorded=False,
+        _melt_metal_saturation_fO2_floor_log=lambda _temperature_K: None,
     )
     return host, calls
 

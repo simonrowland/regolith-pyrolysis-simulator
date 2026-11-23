@@ -551,7 +551,14 @@ def equilibrium_to_hot(
         if (numeric := _cold_numbers(values.get(name))) is not None
     }
     status = values.get('status')
-    if engine_id == 'vaporock' and status not in {'ok', 'non_authoritative'}:
+    # A commissioning notice is attached before the engine writes status.
+    # Missing status is the already-built hot projection. A present status
+    # outside {ok, non_authoritative} is still a refusal or uncacheable.
+    if (
+        engine_id == 'vaporock'
+        and status is not None
+        and status not in {'ok', 'non_authoritative'}
+    ):
         refusal_reason = None
         if isinstance(diagnostics, Mapping):
             refusal_reason = (
