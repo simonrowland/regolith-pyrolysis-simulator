@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -33,14 +34,34 @@ def test_kilinc_extract_fidelity_and_source_mapping() -> None:
             assert isinstance(row["FeO_wt_pct"], str)
             assert row["cell_locators"]["Fe2O3_wt_pct"] == "Fe2O3"
             assert row["cell_locators"]["FeO_wt_pct"] == "FeO"
+            assert row["Fe2O3_wt_pct"] == row["oxide_wt_percent"]["Fe2O3"]
+            assert row["FeO_wt_pct"] == row["oxide_wt_percent"]["FeO"]
+            assert row["cell_locators"]["sample_identifier_as_printed"] == "Identifier"
+            assert row["cell_locators"]["run_id_as_printed"] == "Sample #"
             assert row["point_conditions"]["T_C"]["state"]["value"] == row["T_C"]
             assert row["point_conditions"]["T_C"]["locator"] == row["locator"] | {"column": "T °C"}
             assert row["point_conditions"]["composition"]["state"]["value"]["components"] == row["oxide_wt_percent"]
+            assert row["point_conditions"]["fO2_log"]["state"]["tag"] == "unknown"
+            assert "locator" not in row["point_conditions"]["fO2_log"]
+    table1_rows = observations[0]["values"]["rows"]
+    table1_by_sample = {row["run_id_as_printed"]: row for row in table1_rows}
+    assert table1_by_sample["9"]["locator"]["published_page"] == 138
+    assert table1_by_sample["9"]["locator"]["pdf_page_index"] == 2
+    for sample in ("22", "27"):
+        assert table1_by_sample[sample]["locator"]["published_page"] == 137
+        assert table1_by_sample[sample]["locator"]["pdf_page_index"] == 1
     timed_rows = observations[2]["values"]["rows"]
     assert all("Cr2O3" not in row["oxide_wt_percent"] for row in timed_rows)
     assert all(isinstance(row["T_C"], str) for row in timed_rows)
     assert all(isinstance(row["T_C_as_printed"], str) for row in timed_rows)
     assert all(isinstance(value, str) for row in timed_rows for value in row["oxide_wt_percent"].values())
+    for row in timed_rows:
+        assert row["Fe2O3_wt_pct"] == row["oxide_wt_percent"]["Fe2O3"]
+        assert row["FeO_wt_pct"] == row["oxide_wt_percent"]["FeO"]
+        assert row["FeO_method_as_printed"] == "volumetric and colorimetric procedure of Wilson (1960)"
+        assert row["FeO_method_locator"]["published_page"] == 137
+        assert row["FeO_method_locator"]["pdf_page_index"] == 1
+        assert "column" not in row["FeO_method_locator"]
 
 
 def test_kilinc_row_coordinates_reach_every_migrated_observation() -> None:
@@ -58,11 +79,14 @@ def test_kilinc_row_coordinates_reach_every_migrated_observation() -> None:
         assert conditions["composition"].state.is_value
         assert conditions["atmosphere"].state.value == "air"
         assert conditions["fO2_log"].state.is_unknown
+        assert observation.identity.total_pressure_Pa.is_unknown
         assert observation.identity.quantity.value.value == "fe3_fe2_ratio"
+    first = next(iter(result.observations.values()))
+    assert first.value.point == Decimal("1.588727479381540137894756618")
 
 
 def test_kilinc_fidelity_pin_detects_changed_primary_cell() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     mutated = deepcopy(document)
-    mutated["species"]["Fe"]["observations"][0]["values"]["rows"][0]["oxide_wt_percent"]["FeO"] = "0.65"
+    mutated["species"]["Fe"]["observations"][0]["values"]["rows"][0]["FeO_wt_pct"] = "0.65"
     assert validate_extract_document(mutated, expected_source_id=SOURCE_ID, check_fidelity_match=True)
