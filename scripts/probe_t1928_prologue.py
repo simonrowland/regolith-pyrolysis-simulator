@@ -2,8 +2,9 @@
 
 No arguments. The import root is the current working directory. The
 controller runs this on a studio. It does not score engines.
-``key_pure_phase_on`` hashes the ThermoEngine tree and the MAGEMin
-binary and does not call them. The cold and warm passes use
+``key_pure_phase_on`` hashes the ThermoEngine tree, the dylibs
+``setup_thermoengine_dylib_path`` resolves, and the MAGEMin binary.
+It does not call them. The cold and warm passes use
 ``invoke_pure_phase`` false, so the measured rows do not call a live
 backend. The warm-score probe covers the production flag.
 

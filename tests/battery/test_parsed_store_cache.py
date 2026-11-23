@@ -77,6 +77,7 @@ def _stub_installed_trees(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
     monkeypatch.setattr(cache_mod, "_python_tree_token", lambda _root: "code-stub")
     monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-stub")
+    monkeypatch.setattr(cache_mod, "_thermoengine_dylib_token", lambda: "dylib-stub")
     monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "magemin-stub")
 
 
@@ -159,6 +160,8 @@ def test_prologue_key_changes_for_every_declared_input_and_a_python_file(
     # The installed package is not the tmp copy. Pin it so this test's
     # mutations are the declared inputs and the Python files.
     monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
+    # Vaporock engines hash the dylibs. This test mutates repo data only.
+    monkeypatch.setattr(cache_mod, "_thermoengine_dylib_token", lambda: "dylib-stub")
     root = _layout(tmp_path / "copy")
     base = _key(root)
     targets = []
@@ -190,6 +193,7 @@ def test_directory_token_and_installed_packages_change_the_key(
 
     monkeypatch.setattr(cache_mod, "_python_tree_token", lambda _root: "code-stub")
     monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-stub")
+    monkeypatch.setattr(cache_mod, "_thermoengine_dylib_token", lambda: "dylib-stub")
     monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "magemin-stub")
     root = _layout(tmp_path / "copy")
     monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "one")
@@ -210,6 +214,74 @@ def test_directory_token_and_installed_packages_change_the_key(
     assert calls["n"] == 2
     monkeypatch.setattr(cache_mod, "_magemin_binary_token", lambda: "other-binary")
     assert _key(root, invoke_pure_phase=True) != pure
+
+
+def test_native_artifact_bytes_change_the_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The dylib directory and the MAGEMin binary are hashed, not stubbed.
+
+    ``setup_thermoengine_dylib_path`` is the config seam: engines.local.toml
+    ``[paths].thermoengine_dylib_dir``. The lock names every artifact that
+    directory must contain, including libphaseobjc.dylib. A VapoRock engine
+    set loads those dylibs even when pure phase is off. OpenIMCC does not.
+    """
+
+    import simulator.battery.parsed_store_cache as cache_mod
+    from simulator.engine_local_config import (
+        EngineLocalConfig,
+        EnginePaths,
+        load_engine_lock,
+        thermoengine_artifact_names,
+        write_config,
+    )
+
+    monkeypatch.setattr(cache_mod, "_vaporock_token", lambda: "vaporock-stub")
+    monkeypatch.setattr(cache_mod, "_python_tree_token", lambda _root: "code-stub")
+    monkeypatch.setattr(cache_mod, "_thermoengine_token", lambda: "thermo-py-stub")
+    monkeypatch.setattr(
+        "simulator.engine_local_config.config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    dylib_dir = tmp_path / "lib"
+    dylib_dir.mkdir()
+    names = thermoengine_artifact_names(load_engine_lock())
+    phase_name = next(name for name in names if name.startswith("libphaseobjc."))
+    for name in names:
+        (dylib_dir / name).write_bytes(b"native-a")
+    write_config(
+        EngineLocalConfig(
+            paths=EnginePaths(thermoengine_dylib_dir=dylib_dir),
+            identities={},
+        )
+    )
+    binary = tmp_path / "MAGEMin"
+    binary.write_bytes(b"magemin-a")
+    monkeypatch.setenv("REGOLITH_MAGEMIN_BINARY", str(binary))
+    monkeypatch.setenv("DYLD_LIBRARY_PATH", "")
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "")
+    root = _layout(tmp_path / "copy")
+
+    base = _key(root, invoke_pure_phase=True)
+    (dylib_dir / phase_name).write_bytes(b"native-b")
+    assert _key(root, invoke_pure_phase=True) != base
+    (dylib_dir / phase_name).write_bytes(b"native-a")
+    assert _key(root, invoke_pure_phase=True) == base
+    binary.write_bytes(b"magemin-b")
+    assert _key(root, invoke_pure_phase=True) != base
+
+    vaporock = _key(root, engines=("vaporock",), invoke_pure_phase=False)
+    (dylib_dir / phase_name).write_bytes(b"native-c")
+    assert _key(root, engines=("vaporock",), invoke_pure_phase=False) != vaporock
+    after_dylib = _key(root, engines=("vaporock",), invoke_pure_phase=False)
+    binary.write_bytes(b"magemin-c")
+    # Pure phase is off, so the MAGEMin binary is not an input.
+    assert _key(root, engines=("vaporock",), invoke_pure_phase=False) == after_dylib
+
+    quiet = _key(root, engines=("openimcc",), invoke_pure_phase=False)
+    (dylib_dir / phase_name).write_bytes(b"native-d")
+    binary.write_bytes(b"magemin-d")
+    assert _key(root, engines=("openimcc",), invoke_pure_phase=False) == quiet
 
 
 def test_runtime_token_names_the_interpreter_and_pyyaml() -> None:

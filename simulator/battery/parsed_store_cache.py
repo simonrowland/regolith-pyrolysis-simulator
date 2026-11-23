@@ -65,12 +65,6 @@ PROLOGUE_DATA_INPUTS: tuple[str, ...] = (
     # reference_data/nasa_glenn.py load_all_record_documents reads
     # records/NG-*.json and manifest.yaml.
     "data/literature/compilations/nasa-glenn",
-    # compilation_tier._b677_printed_ideal_gas_h298 reads one records/*.json
-    # while a VapoRock H−H298 row is classified.
-    "data/literature/compilations/pankratz-1984-usbm-b677",
-    # generators/usgs_b1259.py reference_enthalpy_zero_is_ideal_gas_span
-    # reads records/{id}.json on that same classification.
-    "data/literature/compilations/robie-waldbaum-1968-usgs-b1259",
     # diagnostic_helpers/gibbs_battery.py cea_polynomial reads this extract
     # for score_cea_point.
     "data/literature/extracts/nasa-cea-thermo.yaml",
@@ -202,18 +196,23 @@ def prologue_key(
     # VapoRock's package and JANAF-vapor-data-full.csv live outside this
     # repo. compilation_tier._vaporock_gas_attempt loads both.
     add("vaporock", _vaporock_token())
+    # ``vaporock.equil`` constructs ThermoEngine, and pure-phase NASA-9
+    # rows load the same dylibs. Both go through
+    # ``setup_thermoengine_dylib_path``. Engines here are ``.value`` strings.
+    if invoke_pure_phase or "vaporock" in engines:
+        add("thermoengine-dylibs", _thermoengine_dylib_token())
     if invoke_pure_phase:
-        # Live pure-phase calls read the ThermoEngine tree (every file, not
-        # only .py) and the MAGEMin binary. The env string is part of the
-        # key even when the path is missing, so two different missing
-        # binaries do not share a row. Concurrency knobs
+        # Live pure-phase calls also read the ThermoEngine Python tree
+        # (every file, not only .py) and the MAGEMin binary. The env
+        # string is part of the key even when the path is missing, so two
+        # different missing binaries do not share a row. Concurrency knobs
         # (REGOLITH_MAGEMIN_MAX_CONCURRENCY, REGOLITH_MAGEMIN_SLOTS) are not
         # hashed: they do not change the bytes the body writes.
         add("thermoengine", _thermoengine_token())
         add("magemin", _magemin_binary_token())
         add("magemin-env", os.environ.get("REGOLITH_MAGEMIN_BINARY") or "")
     else:
-        # False never calls those backends and must not read their paths.
+        # False never calls MAGEMin or the ThermoEngine Python tree.
         add("pure", "off")
     add("runtime", runtime_token())
     args = canonical_material(
@@ -589,6 +588,31 @@ def _vaporock_token() -> str:
     if csv_path is None:
         return "absent"
     return _directory_token(csv_path.parent.parent)
+
+
+def _thermoengine_dylib_token() -> str:
+    """Bytes of the artifacts ``setup_thermoengine_dylib_path`` resolves.
+
+    ``engines.lock.toml`` names ``libphaseobjc.dylib`` and the other
+    dylibs. ``setup_thermoengine_dylib_path`` is the only search. A
+    missing install is ``absent``; the body then refuses the call.
+    """
+
+    from simulator.engine_local_config import (
+        load_engine_lock,
+        setup_thermoengine_dylib_path,
+        thermoengine_artifact_names,
+    )
+
+    try:
+        directory = setup_thermoengine_dylib_path()
+        names = thermoengine_artifact_names(load_engine_lock())
+    except ImportError:
+        return "absent"
+    try:
+        return hash_relative_files(directory, [directory / name for name in names])
+    except OSError:
+        return "absent"
 
 
 def _thermoengine_token() -> str:
