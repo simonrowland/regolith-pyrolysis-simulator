@@ -1022,6 +1022,9 @@ def _tier4(
 ) -> ResolvedFo2 | None:
     if temperature_K is None or not weights:
         return None
+    # Last-rung premise: without a printed/control fO2, an oxide melt's own
+    # composition and temperature supply the existing intrinsic closure. The
+    # result is independent of the target value and is typed DP-010 downstream.
     from simulator.fe_redox import intrinsic_melt_fO2
 
     log = float(intrinsic_melt_fO2(weights, temperature_K))

@@ -9445,6 +9445,10 @@ def _resolve_score_total_pressure(
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
         }
     ):
+        # Premise: these evidence classes identify a gas-mixing furnace or an
+        # explicit atmospheric setup, whose total pressure is ambient (about
+        # 101325 Pa). This pressure is in Pa; a vacuum limit is outside this
+        # evidence class and is handled by the vacuum branch above.
         implied_pressure = (
             "gas-mixing furnace implies 1 atm"
             if experiment.ambient_pressure_evidence.evidence_class
