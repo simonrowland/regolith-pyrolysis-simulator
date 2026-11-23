@@ -15893,6 +15893,56 @@ class SourceSelection:
         return self.value.kind is not ValueKind.UNAVAILABLE
 
 
+def _uncertainty_for_value_selection(
+    uncertainty: Uncertainty,
+    selection: SourceSelection | None,
+    printed_units: str | None,
+) -> Uncertainty:
+    """Carry a percent-to-fraction conversion through its printed width."""
+
+    if (
+        selection is None
+        or not selection.available
+        or selection.unit_trail != "percent_to_fraction"
+        or selection.value.kind is not ValueKind.POINT
+    ):
+        return uncertainty
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        verbatim = dict(raw)
+        width = uncertainty.value
+        if width is None:
+            for key in ("sigma", "value", "amount", "error_value", "uncertainty_value"):
+                if key in verbatim:
+                    width = _as_dec_or_none(verbatim[key])
+                    if width is not None:
+                        break
+    else:
+        return uncertainty
+    if width is None:
+        return uncertainty
+    if isinstance(width, tuple):
+        scaled: Decimal | tuple[Decimal, Decimal] = tuple(
+            _percent_to_fraction(value) for value in width
+        )
+    else:
+        scaled = _percent_to_fraction(width)
+    if uncertainty.basis is not None and uncertainty.basis not in {
+        "fraction",
+        "relative",
+    }:
+        verbatim.setdefault("printed_basis", uncertainty.basis)
+    if printed_units:
+        verbatim.setdefault("printed_units", printed_units)
+    verbatim["units"] = "fraction"
+    return replace(
+        uncertainty,
+        verbatim=verbatim,
+        value=scaled,
+        basis="fraction",
+    )
+
+
 def _quantity_token(declared: Quantity | State[Quantity] | str | None) -> Quantity | None:
     if isinstance(declared, Quantity):
         return declared
@@ -29840,8 +29890,12 @@ class Migrator:
                 value_sel.reason or "source values have no printed scalar/series point"
             )
 
+        uncertainty = uncertainty_for(obs.get("uncertainty"))
+        uncertainty = _uncertainty_for_value_selection(
+            uncertainty, value_sel, str(obs.get("units") or "")
+        )
         uncertainty = _uncertainty_as_log10_dex(
-            uncertainty_for(obs.get("uncertainty")), value_sel.printed_form
+            uncertainty, value_sel.printed_form
         )
         t_m_unc = values.get("T_m_uncertainty_K") if isinstance(values, Mapping) else None
         if q_token is Quantity.TRANSITION_TEMPERATURE and t_m_unc is not None:
@@ -31288,6 +31342,7 @@ class Migrator:
                         basis="log10_dex",
                     )
         if value_sel is not None:
+            unc = _uncertainty_for_value_selection(unc, value_sel, units)
             unc = _uncertainty_as_log10_dex(unc, value_sel.printed_form)
         point_conditions = None
         if coord is not None:
