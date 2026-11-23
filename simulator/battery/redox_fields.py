@@ -53,6 +53,7 @@ class CandidateInput:
     axis: str | None = None
     imposed_oxygen: bool = False
     experiment: Experiment | None = None
+    resolve_identity_sources: Callable[[], Mapping[str, tuple[str, ...]]] | None = None
 
 
 @dataclass(frozen=True)
@@ -136,12 +137,20 @@ def classify_target_provenance(
                 path != reference and path.partition(".")[0] in {"value", "values"}
             ):
                 return "same"
-            field = path.removeprefix("point_conditions.")
-            if (operand := conditions.get(field) or _referenced_run_input(candidate.experiment, path)) is not None:
-                operands.append(operand)
-                references_run_control |= _is_run_control(
-                    CandidateInput(field, operand, field.rsplit(".", 1)[-1], field in imposed_inputs),
-                )
+            axis = None
+            sources = (path,)
+            if path != reference and path.startswith("identity."):
+                axis = path.removeprefix("identity.")
+                resolve_sources = candidate.resolve_identity_sources
+                sources = () if resolve_sources is None else resolve_sources().get(axis, ())
+            for source in sources:
+                field = source.removeprefix("point_conditions.")
+                operand = conditions.get(field) or _referenced_run_input(candidate.experiment, source)
+                if operand is not None:
+                    operands.append(operand)
+                    references_run_control |= _is_run_control(
+                        CandidateInput(field, operand, axis, field in imposed_inputs),
+                    )
         for operand in operands:
             match = derivation_match(operand) or _match_target_cell(
                 targets, _printed_cell(operand, address_only=operand.inference is not None),
@@ -157,14 +166,29 @@ def classify_target_provenance(
 
     cell = _printed_cell(condition, address_only=condition.inference is not None)
     match = _match_target_cell(targets, cell)
+    if match == "ambiguous":
+        return TargetProvenance(TargetRelation.SAME_PRINTED_CELL, ambiguous_cell=True)
+
     derivation = observation.derivation
     field = candidate.field
     references = _condition_references(observation, field)
     if candidate.imposed_oxygen and (
-        match is not None or (derivation is not None and (
-            field in derivation.inputs
-            or (field.startswith("experiment.fO2_control.") and "experiment.fO2_control" in derivation.inputs)
-        ))
+        match == "same" or (
+            derivation is not None
+            and derivation.inputs == (field,)
+            and not derivation.parameters
+            and observation.value.point is not None
+            and condition.state.value in (observation.value, observation.value.point)
+            # The named scalar copy establishes provenance. If both locators
+            # are present, they must agree with that provenance.
+            and (
+                observation.locator is None or condition.locator is None
+                or same_printed_cell(
+                    _printed_cell(Located(State.of(observation.value), observation.locator)),
+                    _printed_cell(condition),
+                ) is not None
+            )
+        )
     ):
         species = observation.identity.species
         if species is not None and species.formula == "O2" and quantity_token(observation.identity) in {
@@ -172,7 +196,7 @@ def classify_target_provenance(
         }:
             return TargetProvenance(TargetRelation.IMPOSED_CONTROL_TARGET)
     if match is not None:
-        return TargetProvenance(TargetRelation.SAME_PRINTED_CELL, match == "ambiguous")
+        return TargetProvenance(TargetRelation.SAME_PRINTED_CELL)
     target_operand = derivation is not None and (
         not references.isdisjoint(derivation.inputs)
         or any(
@@ -271,6 +295,7 @@ def independent_redox_conditions(
         return classify_target_provenance(observation, CandidateInput(
             field, condition, condition_identity_axis(field.rsplit(".", 1)[-1]),
             imposed_oxygen=field in imposed_inputs, experiment=experiment,
+            resolve_identity_sources=lambda: identity_sources,
         ))
 
     point_inputs = {
@@ -447,11 +472,17 @@ def independent_redox_conditions(
     ), experiment, notices
 
 
-def imposed_oxygen_target(observation: Observation, experiment: Experiment | None) -> bool:
+def imposed_oxygen_target(
+    observation: Observation, experiment: Experiment | None, *,
+    resolve_identity_sources: Callable[[Observation, Experiment | None], Mapping[str, tuple[str, ...]]],
+) -> bool:
     """Identify a setpoint observation by its recorded control provenance."""
     return any(
         classify_target_provenance(
-            observation, CandidateInput(field, condition, imposed_oxygen=True, experiment=experiment),
+            observation, CandidateInput(
+                field, condition, imposed_oxygen=True, experiment=experiment,
+                resolve_identity_sources=lambda: resolve_identity_sources(observation, experiment),
+            ),
         ).relation is TargetRelation.IMPOSED_CONTROL_TARGET
         for field, condition in _imposed_oxygen_inputs(experiment).items()
     )
