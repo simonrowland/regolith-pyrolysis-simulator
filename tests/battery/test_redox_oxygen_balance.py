@@ -14,7 +14,6 @@ from simulator.battery.residue import (
     ResidueChannel,
     ResidueInventoryRefusal,
     _channel_terms,
-    _engine_fe_speciation,
     _inherit_residue_pressure_contract,
     _make_residue_pressure_model,
     _mass_loss_corner_bounds,
@@ -23,6 +22,7 @@ from simulator.battery.residue import (
     integrate_knudsen_residue_inventory,
     integrate_residue_inventory,
 )
+from simulator.fe_redox import _engine_fe_speciation
 from simulator.vacuum_oxygen_balance import PressureEvaluation
 
 
