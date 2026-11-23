@@ -2119,6 +2119,46 @@ def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> N
     assert upper_endpoint.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
 
 
+def test_dex_printed_interval_domain_uses_original_coverage_width() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    # The original pressure interval [0.4, 1.6] Pa is in-domain. k=0.5
+    # widens the implied standard uncertainty, but does not change whether
+    # the printed interval itself can be represented in log space.
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"value": "0.6", "unit": "Pa", "k": "0.5"},
+    )
+    half_factor = _printed_uncertainty_band(
+        Quantity.P_PARTIAL, uncertainty, Decimal("1")
+    )
+    assert half_factor.refusal is None
+    assert half_factor.band is not None
+    assert half_factor.band.value == Decimal(
+        "1.559896170009500952197931536"
+    )
+
+    one_sigma = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        replace(uncertainty, verbatim={"value": "0.6", "unit": "Pa", "k": "1"}),
+        Decimal("1"),
+    )
+    assert one_sigma.refusal is None
+    assert one_sigma.band is not None
+    assert one_sigma.band.value == Decimal(
+        "0.7799480850047504760989657678"
+    )
+
+    crossing = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        replace(uncertainty, verbatim={"value": "1", "unit": "Pa", "k": "0.5"}),
+        Decimal("1"),
+    )
+    assert crossing.band is None
+    assert crossing.refusal is not None
+    assert crossing.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+
+
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
     quantity = Quantity.DELTA_FH
     identity = Identity(

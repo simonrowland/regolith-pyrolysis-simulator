@@ -7323,12 +7323,19 @@ def _printed_uncertainty_band(
             )
         standard_width = converted / k_print if k_print is not None else converted
 
-    metric_standard_width = _metric_uncertainty_width(
-        operation,
-        quantity,
-        reference,
-        standard_width,
-        converted_unit or QUANTITY_UNITS[quantity],
+    metric_standard_width = (
+        _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            standard_width,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if has_ferric_fraction
+        else printed_interval_metric_width
+        / k_print
+        if k_print is not None
+        else printed_interval_metric_width
     )
     ticket = metric_standard_width
     exact_ticket_input = (

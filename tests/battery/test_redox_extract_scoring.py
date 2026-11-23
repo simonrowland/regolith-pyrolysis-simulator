@@ -568,6 +568,30 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
         residual for residual in residuals if residual.reference in sossi_sd_ids
     ]
     assert len(sossi_sd_residuals) == 11
+    expected_statuses = {
+        "aithala_2026_1800_30_xanes": ResidualStatus.MATCH,
+        "aithala_2026_1900_30_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_10_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_120_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_30_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2100_30_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_1_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_2_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_3_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_6_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_7_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_8_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_9_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_10_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_f_o2_11_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_f_o2_12_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_ts1_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_ts2_xanes": ResidualStatus.MISMATCH,
+    }
+    assert {
+        residual.reference.rsplit("::", 1)[-1]: residual.status
+        for residual in residuals
+    } == expected_statuses
     boundary_refusals = []
     for residual in sossi_sd_residuals:
         assert residual.numeric is not None
@@ -622,16 +646,24 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # d-341 (t-1646) assumes 1 sigma only where neither metadata nor printed
     # text states the level; the Sossi rows' printed SD caption keeps their
     # primary 1-sigma verdicts without the assumption/alternative notices.
-    # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
-    # r=0; the remaining source widths use the transformed log-ratio metric.
+    # t-1646 round 5 refused Sossi (11)/(12) because the normalized standard
+    # width crossed r=0. Their original one-sigma intervals are in-domain, so
+    # each now has a printed band and no refusal. Relative to round 10's
+    # 0140d9de... payload, serialization changes each row's status from NO_BAND
+    # to MATCH, numeric.decision_band from None to its printed-width-derived
+    # ticket, and refusal from the typed ferric linearization refusal to None.
+    # Those fields follow directly from the original printed interval passing
+    # the domain gate; the remaining sixteen rows' statuses remain unchanged.
     # fam13 binds the six Aithala Table S-1 Fe rows to the physical SI PDF
     # (page 13, SI-7; SHA-256 ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa).
     # Their printed redox values and decisions are unchanged; the serialized
     # locator changes from source_path=None to that PDF path. The combined
     # payload hash therefore moves from 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862
-    # to 0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50.
+    # Round-10 pin 0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50
+    # is refreshed from the serialized payload to
+    # 3fc087feb0df00013c1632d3a5bf05aea7448739fc17f7e82d18f7bc95dac925.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50"
+        "3fc087feb0df00013c1632d3a5bf05aea7448739fc17f7e82d18f7bc95dac925"
     )
 
 
