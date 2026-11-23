@@ -14,6 +14,7 @@ from __future__ import annotations
 from collections import Counter
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
+import re
 
 import pytest
 
@@ -26,13 +27,24 @@ from simulator.battery.migrate import (
     _BOUNDED_FO2_REASON,
     _band_text,
     _log_fO2_to_pa,
+    load_migrated_store,
 )
-from simulator.battery.records import Located, Value
+from simulator.battery.records import Located, Value, nominal_pressure_pa
 from simulator.chemistry.fo2_buffers import evaluate_buffer
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
 ROOT = Path(__file__).resolve().parents[2]
 _UNMAPPED = "no fO2_Pa mapped from source"
+_BUFFER_IDENTITY_PIN_COUNTS = {
+    "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas": 28,
+    "jugo-2010-sulfur-xanes": 7,
+    "gaillard-2003-hydrous-silicic-melt-activity": 96,
+    "borisov-veksler-2021-k-fe-supplement": 6672,
+    "zagrtdenov-2020-chromite-magnesiochromite-solubility": 132,
+    "neuman-2026-levitation-k-isotopes": 6,
+    "lu-2026-mercury-sulfur-liquidus": 61,
+    "jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation": 117,
+}
 
 # 10^-9.56 bar × 1e5 Pa/bar, computed as Decimal arithmetic.
 # The brief rounds this to 2.754e-5 Pa.
@@ -1317,3 +1329,89 @@ def test_activity_without_printed_oxygen_stays_unknown(tmp_path: Path) -> None:
     )
     assert all("fO2_log" not in (observation.point_conditions or {}) for observation in rows)
     assert all("fO2_Pa" not in (observation.point_conditions or {}) for observation in rows)
+
+
+def test_every_numeric_canonical_buffer_identity_matches_the_owner() -> None:
+    _, _, observations = load_migrated_store(
+        ROOT, sources=tuple(_BUFFER_IDENTITY_PIN_COUNTS)
+    )
+    counts: Counter[str] = Counter()
+    mismatches = []
+    for observation in observations.values():
+        marker = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind
+                is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            ),
+            None,
+        )
+        identity = observation.identity
+        oxygen = getattr(identity, "fO2_Pa", None)
+        if (
+            observation.source_id not in _BUFFER_IDENTITY_PIN_COUNTS
+            or marker is None
+            or oxygen is None
+            or not oxygen.is_value
+            or not isinstance(oxygen.value, Decimal)
+        ):
+            continue
+        counts[observation.source_id] += 1
+        match = re.search(
+            r"(?:^|\s)buffer=([^\s]+).*?(?:^|\s)offset=([^\s]+)",
+            marker.reason,
+        )
+        if match is None:
+            mismatches.append(
+                (observation.source_id, observation.observation_id, "missing buffer/offset")
+            )
+            continue
+        buffer, raw_offset = match.groups()
+        temperature_state = identity.temperature_K
+        pressure_state = identity.total_pressure_Pa
+        pressure_pa = (
+            nominal_pressure_pa(pressure_state)
+            if pressure_state is not None and pressure_state.is_value
+            else None
+        )
+        temperature = (
+            temperature_state.value
+            if temperature_state is not None and temperature_state.is_value
+            else None
+        )
+        if temperature is None or (
+            pressure_pa is None
+            and pressure_state is not None
+            and pressure_state.is_value
+        ):
+            mismatches.append(
+                (observation.source_id, observation.observation_id, "invalid T/P")
+            )
+            continue
+        pressure_bar = (
+            None if pressure_pa is None else pressure_pa / Decimal("100000")
+        )
+        evaluation = evaluate_buffer(
+            buffer,
+            temperature,
+            pressure_bar=pressure_bar,
+        )
+        output = _log_fO2_to_pa(
+            evaluation.log10_fO2_bar + Decimal(raw_offset.replace("−", "-"))
+        )
+        if output != oxygen.value:
+            mismatches.append(
+                (
+                    observation.source_id,
+                    observation.observation_id,
+                    str(temperature),
+                    buffer,
+                    raw_offset,
+                    str(output),
+                    str(oxygen.value),
+                )
+            )
+
+    assert dict(counts) == _BUFFER_IDENTITY_PIN_COUNTS
+    assert not mismatches, mismatches
