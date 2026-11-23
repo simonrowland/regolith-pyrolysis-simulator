@@ -209,6 +209,11 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     changed = replace(reference, value=Value.point_of(1), point_conditions={"composition": Located(State.unknown("must not read"))})
     same = predict_knudsen_residue_composition("internal-analytical", changed, experiment, rows)
     assert result["escaped_mass_fraction"] == pytest.approx(0.2)
+    # Golden pin for the Knudsen adapter's wt%-to-mol inventory conversion.
+    assert result["composition_wt_pct"] == pytest.approx({
+        "FeO": 55.077219388664986,
+        "MgO": 44.92278061133502,
+    }, abs=1e-12)
     assert first["escaped_mass_fraction"] == pytest.approx(0.1)
     assert first["composition_wt_pct"] != result["composition_wt_pct"]
     assert same["composition_wt_pct"] == result["composition_wt_pct"]
