@@ -219,7 +219,7 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
 CACHE_SITES: dict[str, dict[str, Any]] = {
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 112,
+        "line": 126,
         "kind": 'lru',
         "name": '_string_bytes',
         "carries_disclosure": False,
@@ -227,7 +227,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:_key_float_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 122,
+        "line": 136,
         "kind": 'lru',
         "name": '_key_float_bytes',
         "carries_disclosure": False,
@@ -235,7 +235,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 1574,
+        "line": 1654,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -259,7 +259,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 741,
+        "line": 757,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -267,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 1771,
+        "line": 1851,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
@@ -787,7 +787,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:engines/alphamelts/thermoengine.py:_health_cache': {
         "path": 'engines/alphamelts/thermoengine.py',
-        "line": 1078,
+        "line": 1109,
         "kind": 'store',
         "name": '_health_cache',
         "carries_disclosure": False,
