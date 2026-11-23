@@ -181,7 +181,13 @@ def test_pressure_with_inherited_unknown_role_predicts_in_flagged_tier(monkeypat
             "points": [{
                 "T_K": 1500.0,
                 "p_Pa": 1.0,
-                "composition_mol": {"SiO2": 0.6, "MgO": 0.4},
+                "point_conditions": {
+                    "composition": {"state": {"tag": "value", "value": {
+                        "basis": "oxide_mole_fractions",
+                        "amount_basis": "mole_fraction",
+                        "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+                    }}},
+                },
             }],
         },
     )
@@ -878,6 +884,7 @@ def test_scorer_reads_a_persisted_role_default_without_a_legacy_proxy() -> None:
     from decimal import Decimal
 
     from simulator.battery.enums import Engine, EvidenceClass, Quantity
+    from simulator.battery.records import DecisionBand
     from simulator.battery.score import compile_residual
     from tests.battery import factories as F
     from tests.battery.test_score import _context, _predict
@@ -894,18 +901,27 @@ def test_scorer_reads_a_persisted_role_default_without_a_legacy_proxy() -> None:
         quantity=Quantity.ACTIVITY,
         origin=reference.observation_id,
     )
-    reference = replace(
+    defaulted_reference = replace(
         reference,
         notices=tuple(
             notice for notice in role.notices
             if composition_roles.is_role_default_reason(notice.reason)
         ),
     )
-    context = _context(F.work(), experiment, reference, review="reviewed")
-    residual, _ = compile_residual(
-        reference, Engine.INTERNAL_ANALYTICAL, context=context,
-        prediction=_predict(Decimal("0.3"), identity),
-    )
+    def score(row):
+        context = _context(F.work(), experiment, row, review="reviewed")
+        return compile_residual(
+            row,
+            Engine.INTERNAL_ANALYTICAL,
+            context=context,
+            prediction=_predict(Decimal("0.3"), identity),
+            derived_band=DecisionBand(Decimal("1"), "dimensionless", "test-dex"),
+        )[0]
+
+    control = score(reference)
+    assert control.numeric is not None
+    assert control.numeric.decision_band is not None
+    residual = score(defaulted_reference)
     assert residual.numeric is not None
     assert residual.score_eligible is False
     assert "not_flagged_stratum" in residual.exclusions
