@@ -38,6 +38,80 @@ def test_every_shipped_vacuum_pyrolysis_preset_loads() -> None:
         runner_module._load_preset_run_spec(preset_path, "faithful")
 
 
+def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> None:
+    preset_path = (
+        REPO_ROOT
+        / "data"
+        / "presets"
+        / "vacuum_pyrolysis"
+        / "robinot_2026.yaml"
+    )
+    preset = runner_module._load_preset_run_spec(preset_path, "faithful")
+
+    assert preset.process_dt_s == 60.0
+    assert preset.step_count == 59
+    sample = preset.lab_geometry["sample"]
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        0.00013273228961416876
+    )
+    assert sample["exposed_melt_area_basis"] == (
+        "assumed_pellet_top_face_from_reported_diameter"
+    )
+    assert preset.provenance["notice"]["kind"] == "deck_declared_assumption"
+    assert preset.provenance["notice"]["ruling_ref"] == "t-1892_2026-11-22"
+    assert preset.provenance["notice"]["derivation"] == (
+        "pi*(D/2)^2 from the reported D=13 mm"
+    )
+    assert preset.provenance["notice"]["reason"] == (
+        "liquid_footprint_not_printed"
+    )
+    driver = preset.lab_schedule[runner_module.FURNACE_POWER_DRIVER_KEY]
+    assert driver["exposed_area_m2"] is None
+    assert driver["radiating_face_set"] == "hot_upper"
+    trace = driver["trace"]
+    fields = trace["point_fields"]
+    last_time_s = float(trace["points"][-1][fields.index("time_min")]) * 60.0
+    step_end_samples_s = [
+        index * preset.process_dt_s
+        for index in range(1, preset.step_count + 1)
+    ]
+    assert all(sample_s <= last_time_s for sample_s in step_end_samples_s)
+    assert step_end_samples_s[-1] == 59.0 * 60.0
+
+    run = PyrolysisRun(
+        feedstock_id=preset.feedstock_id,
+        campaign="C0",
+        hours=preset.hours,
+        mass_kg=preset.mass_kg,
+        process_dt_s=preset.process_dt_s,
+        lab_schedule=copy.deepcopy(preset.lab_schedule),
+        setpoints_patch={"lab_geometry": copy.deepcopy(preset.lab_geometry)},
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    first_step = session.advance()
+
+    assert first_step.per_hour_summary["t_s"] == 60.0
+    notice = run._lab_area_bridge()["notice"]
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(
+        0.00013273228961416876
+    )
+    assert session.simulator.campaign_mgr._power_temperature_for_step[
+        "time_s"
+    ] == 60.0
+    assert notice["kind"] == "deck_declared_assumption"
+    assert notice["field"] == "exposed_melt_area_m2"
+    assert notice["value"] == pytest.approx(0.00013273228961416876)
+    assert notice["unit"] == "m2"
+    assert notice["basis"] == "assumed_pellet_top_face_from_reported_diameter"
+    assert notice["ruling_ref"] == "t-1892_2026-11-22"
+    assert notice["derivation"] == "pi*(D/2)^2 from the reported D=13 mm"
+    assert notice["reason"] == "liquid_footprint_not_printed"
+    assert "policy" not in notice
+    assert "policy_class" not in notice
+
+
 def _assert_subhour_preset_refuses(preset_path: Path) -> None:
     try:
         runner_module._load_preset_run_spec(preset_path, "faithful")
@@ -308,7 +382,7 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
 
 
 def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
-    for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
+    for name in ("sesko_2024.yaml",):
         preset = _vacuum_preset(name)
         assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
             None,

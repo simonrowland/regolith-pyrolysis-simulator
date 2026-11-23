@@ -225,7 +225,7 @@ def test_replacing_frozen_catalog_payload_refuses_hot_train(payload):
 def test_route_catalog_payload_refuses_mid_batch_mutation(payload, monkeypatch):
     model = _configured_model(payload, "Na")
 
-    def mutating_route(*args):
+    def mutating_route(*args, **kwargs):
         assert _antoine_psat_pa(
             "Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data,
         ) is not None
@@ -247,7 +247,7 @@ def test_route_distinguishes_catalog_payloads(payload, monkeypatch):
     _set_applicability(other, "Na", "not_applicable")
     other = _freeze_catalog_value(other)
 
-    def probing_route(*args):
+    def probing_route(*args, **kwargs):
         first = _condensation_catalog(
             model.vapor_pressure_data, model.vapor_pressure_data.catalog_payload,
         )
@@ -269,7 +269,7 @@ def test_route_catalog_payload_refuses_equal_valued_type_mutation(payload, monke
         "species"
     ]["Na"]["pressure_models"][0]
 
-    def probing_route(*args):
+    def probing_route(*args, **kwargs):
         _condensation_catalog(model.vapor_pressure_data, owned)
         with pytest.raises(TypeError, match="catalog payload is immutable"):
             pressure_model["activity_exponent"] = True
@@ -282,7 +282,7 @@ def test_route_catalog_payload_refuses_equal_valued_type_mutation(payload, monke
 def test_route_failure_does_not_leave_a_stale_catalog(payload, monkeypatch):
     model = _configured_model(payload, "Na")
 
-    def failing_route(*args):
+    def failing_route(*args, **kwargs):
         _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
         raise RuntimeError("routing interrupted")
 

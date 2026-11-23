@@ -3861,6 +3861,18 @@ def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
                             "setpoint_mbar": 3.0,
                             "achieved_mbar": 1.0,
                             "limited_by_total_pressure": True,
+                            "pressure_domain_notices": [
+                                {
+                                    "kind": "lab_schedule_pressure_domain_notice",
+                                    "reason": "lab_schedule_pressure_below_implemented_floor",
+                                    "authority": "extrapolated",
+                                    "pressure_mbar": 1.0e-9,
+                                    "certified_band": {
+                                        "minimum_pressure_mbar": 1.0e-3,
+                                    },
+                                    "t_h": 1.0,
+                                },
+                            ],
                             "status": "clipped_to_total_pressure",
                         },
                     },
@@ -3877,6 +3889,18 @@ def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
             "setpoint_mbar": 3.0,
             "achieved_mbar": 1.0,
             "limited_by_total_pressure": True,
+            "pressure_domain_notices": [
+                {
+                    "kind": "lab_schedule_pressure_domain_notice",
+                    "reason": "lab_schedule_pressure_below_implemented_floor",
+                    "authority": "extrapolated",
+                    "pressure_mbar": 1.0e-9,
+                    "certified_band": {
+                        "minimum_pressure_mbar": 1.0e-3,
+                    },
+                    "t_h": 1.0,
+                },
+            ],
             "status": "clipped_to_total_pressure",
         }
     ]

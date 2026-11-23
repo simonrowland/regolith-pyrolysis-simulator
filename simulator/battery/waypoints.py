@@ -200,6 +200,8 @@ _AUTHORITY_RANK = {
 }
 _PI = Decimal("3.141592653589793238462643383279502884197")
 _R = GAS_CONSTANT_DECIMAL
+# This is a battery-readiness classification for the evidence band. Runtime
+# lab schedules below it are still executed and carry an extrapolation notice.
 RPS_PRESSURE_FLOOR_PA = as_decimal(LAB_SCHEDULE_PRESSURE_FLOOR_MBAR) * Decimal("100")
 ENGINE_POINT_CONSUMERS = (
     "internal-analytical",

@@ -328,6 +328,19 @@ class EquipmentDesigner:
             freeboard_pct=20.0,
         )
 
+    @staticmethod
+    def radiative_loss_area_m2(mass_kg: float) -> float:
+        """Crucible surface EQ-2 uses for radiative loss.
+
+        One owner of the rough-cylinder estimate. A 1-tonne charge is
+        0.2 m². This is not a printed melt face and not the opening
+        from ``size_crucible``. It is not the radiating area of a
+        sample under 1 kg. The power-driven pellet path refuses this
+        value there instead of taking it as a default.
+        """
+
+        return 0.2 * (mass_kg / 1000.0) ** 0.67
+
     def size_solar_concentrator(self, mass_kg: float,
                                   peak_T_C: float) -> ConcentratorSpec:
         """
@@ -348,9 +361,9 @@ class EquipmentDesigner:
         # Heating power
         P_heat_W = mass_kg * self.MELT_CP_J_KG_K * dT_dt
 
-        # Radiative loss from crucible surface
-        # Estimate surface area from mass (rough cylinder)
-        A_surface = 0.2 * (mass_kg / 1000.0) ** 0.67  # m²
+        # Radiative loss from the crucible surface. The area estimate
+        # has one owner; this sizer does not keep a second copy.
+        A_surface = self.radiative_loss_area_m2(mass_kg)
         P_rad_W = (STEFAN_BOLTZMANN * self.MELT_EMISSIVITY
                     * A_surface * T_K**4)
 

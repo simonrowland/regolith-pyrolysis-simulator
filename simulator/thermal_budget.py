@@ -13,8 +13,11 @@ Model scope:
   metal-conduction load after passive radiation to space.
 
 Assumptions and uncertified refinements:
-- process gas flow is never a cooling term; pO2 and neutral sweep remain
-  chemistry controls, not furnace-wall heat sinks;
+- process gas flow is never a cooling term on this furnace-sizing floor;
+  pO2 and neutral sweep remain chemistry controls, not furnace-wall heat
+  sinks. The benchtop power-driven pellet residual is a separate balance:
+  continuum argon at Nu = 2 is a sink there, because that pellet sits in
+  the printed low-pressure argon. That term is not part of this floor;
 - wall conductivity, wall thickness, wall area, solidus, outer-wall
   temperature, sky temperature, and view factor are caller-supplied unless a
   caller provides source tags;
@@ -24,15 +27,21 @@ Assumptions and uncertified refinements:
 
 from __future__ import annotations
 
+import copy
 import math
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from engines.antoine import _read_antoine_coefficients
+from simulator.diagnostic_helpers.timeseries_concordance import (
+    _interpolate,
+    _normalise_curve,
+)
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.process_timestep import PROCESS_HOUR_S
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
 
@@ -1181,3 +1190,1290 @@ def _finite(value: float, name: str) -> float:
     if not math.isfinite(number):
         raise ValueError(f"{name} must be finite")
     return number
+
+
+# A run deck opts into the power-driven melt temperature by carrying this
+# key on its lab schedule. Absent, the schedule's melt_temperature_C
+# series stays the target. The key is not part of the schedule digest.
+FURNACE_POWER_DRIVER_KEY = "furnace_power_driver"
+KNOB_DEFAULTED = "knob_defaulted"
+_POWER_TRACE_ROLE = "measured_driver"
+_POWER_TRACE_UNITS = "W"
+_POWER_TIME_FIELD = "time_min"
+_POWER_VALUE_FIELD = "expected_value"
+_MINUTE_S = float(PROCESS_HOUR_S) / 60.0
+_BISECTION_STEPS = 80
+_UNSCORED_TEMPERATURE_SOURCE_CLASSES = frozenset({
+    "assumption_with_sensitivity_marker",
+    "engine_prediction",
+    "not_reported",
+})
+# Gaier, Street and Gustafson 2010, NASA TM E-17366 / NTRS 20100025839.
+# Large-particle lunar-simulant total solar absorptance is 0.669 to 0.906.
+# The default is the midpoint of that measured band. It is not
+# EquipmentDesigner.MELT_EMISSIVITY: a solar absorptance and a thermal-IR
+# emissivity are not the same number, and 0.85 would only match by coincidence.
+# Robinot Fig. 3 calls the molten cap highly reflective. That cap was not
+# measured, so it is not folded into the midpoint.
+GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW = 0.669
+GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH = 0.906
+SOLAR_ABSORPTANCE_DEFAULT = (
+    GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW
+    + GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH
+) / 2.0
+# The glass-sphere transmittance is unprinted. 1 is the clean-window upper
+# bound. Opacification only lowers the power that reaches the pellet.
+WINDOW_TRANSMITTANCE_UPPER_BOUND = 1.0
+TYPED_UNKNOWN = "typed_unknown"
+# The tonne sketch is anchored at 1000 kg and is still the area default
+# at 1 kg (the solver docstring's sanity figure). Below 1 kg it is smaller
+# than the printed top face of a gram pellet, so it is not a default.
+TONNE_SIZER_DOMAIN_MIN_KG = 1.0
+FACE_HOT_UPPER = "hot_upper"
+FACE_FULL_SIDE = "full_side"
+_FACE_SETS = frozenset({FACE_HOT_UPPER, FACE_FULL_SIDE})
+# Water-cooled holder. The steel temperature is unprinted. 300 K is the
+# typed-unknown boundary shared by the enclosure, the slab cold end, and
+# the argon. It is not the preset holder series, which ends at 1500 C.
+COLD_BOUNDARY_K = 300.0
+# Molten and glassy basalt, used as a band. Büttner et al. report about
+# 1.0 W m-1 K-1 at 1200 C and about 0.6 at 1350 C. Hofmeister and
+# coworkers put basaltic melts near 1.4. Lesher and Spera, Encyclopedia
+# of Volcanoes ch. 5, quote about 0.6 in the summary and about 1.2 to
+# 1.5 in the compiled table. The default is 1.0, the midpoint of 0.6
+# and 1.4 and Büttner's 1200 C value. It is not tuned to a pyrometer
+# reading, and it is not THERMAL_BUDGET_WALL_CONDUCTIVITY_W_M_K.
+PELLET_CONDUCTIVITY_LOW_W_M_K = 0.6
+PELLET_CONDUCTIVITY_HIGH_W_M_K = 1.4
+PELLET_CONDUCTIVITY_DEFAULT_W_M_K = 1.0
+# Still-gas sphere. Continuum conduction at the printed diameter, not a
+# fitted Nusselt number and not a free-molecular flux.
+NU_STILL_SPHERE = 2.0
+# NIST argon thermal conductivity, lambda column, at 1000 K. Monatomic
+# conductivity tracks viscosity, so the exponent 0.75 is that scaling.
+ARGON_CONDUCTIVITY_ANCHOR_K = 1000.0
+ARGON_CONDUCTIVITY_1000K_W_M_K = 0.0438
+ARGON_CONDUCTIVITY_EXPONENT = 0.75
+_MM_TO_M = 1.0e-3
+_DECLARED_FOCAL_LENGTH_MM = (
+    ("pellet_diameter_mm", "pellet_diameter_m"),
+    ("pellet_height_mm", "pellet_height_m"),
+    ("focal_spot_diameter_mm", "focal_spot_diameter_m"),
+)
+
+
+class PowerTemperatureRefusal(ValueError):
+    """Typed refusal for a furnace-power temperature step.
+
+    A missing emissivity takes the sizer default and emits
+    ``knob_defaulted``. A missing area does that only at or above 1 kg.
+    Below 1 kg the tonne sizer is ``radiative_area_out_of_domain``.
+    On a printed pellet, a missing conductivity takes the basalt-band
+    midpoint and is noticed. The cold boundary is not read from a
+    holder series.
+    """
+
+    def __init__(self, reason: str, detail: str = "") -> None:
+        self.reason = str(reason)
+        message = self.reason if not detail else f"{self.reason}: {detail}"
+        super().__init__(message)
+
+
+def measured_furnace_power_trace(
+    document: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    """The one units=W measured_driver, or None when the deck has none.
+
+    Any other recorded trace is not this driver. Two watt drivers refuse
+    ``ambiguous_furnace_power_trace`` rather than picking one.
+    """
+
+    if not isinstance(document, Mapping):
+        return None
+    comparison = document.get("trajectory_comparison")
+    if comparison is None:
+        return None
+    if not isinstance(comparison, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trajectory_comparison must be a mapping",
+        )
+    traces = comparison.get("recorded_input_traces")
+    if traces is None:
+        return None
+    if isinstance(traces, (str, bytes)) or not isinstance(traces, Sequence):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "recorded_input_traces must be a sequence",
+        )
+    selected: list[Mapping[str, Any]] = []
+    for index, item in enumerate(traces):
+        if not isinstance(item, Mapping):
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_malformed",
+                f"recorded_input_traces[{index}] must be a mapping",
+            )
+        role = str(item.get("role") or "").strip()
+        units = str(item.get("units") or "").strip()
+        if role == _POWER_TRACE_ROLE and units == _POWER_TRACE_UNITS:
+            selected.append(item)
+    if not selected:
+        return None
+    if len(selected) > 1:
+        raise PowerTemperatureRefusal(
+            "ambiguous_furnace_power_trace",
+            f"{len(selected)} units=W measured_driver traces",
+        )
+    return selected[0]
+
+
+def furnace_power_driver_payload(
+    trace: Mapping[str, Any],
+    *,
+    mass_kg: float,
+    exposed_area_m2: float | None,
+    pellet_diameter_m: float | None = None,
+    pellet_height_m: float | None = None,
+    focal_spot_diameter_m: float | None = None,
+    radiating_face_set: str | None = None,
+    solar_absorptance: float | None = None,
+    window_transmittance: float | None = None,
+    conductivity_W_m_K: float | None = None,
+) -> dict[str, Any]:
+    """Schedule payload the stepper reads. Emissivity stays unset here.
+
+    The loader does not invent an emissivity. ``None`` tells the solver
+    to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it. A focal
+    spot is booked only when the deck declares both diameters. Absorptance,
+    window transmittance, and pellet conductivity stay unset so the solver
+    notices its own defaults. This function does not multiply the trace
+    and does not carry a holder temperature.
+    """
+
+    if not isinstance(trace, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trace must be a mapping",
+        )
+    return {
+        "trace": copy.deepcopy(trace),
+        "mass_kg": mass_kg,
+        "exposed_area_m2": exposed_area_m2,
+        "emissivity": None,
+        "pellet_diameter_m": pellet_diameter_m,
+        "pellet_height_m": pellet_height_m,
+        "focal_spot_diameter_m": focal_spot_diameter_m,
+        "radiating_face_set": radiating_face_set,
+        "solar_absorptance": solar_absorptance,
+        "window_transmittance": window_transmittance,
+        "conductivity_W_m_K": conductivity_W_m_K,
+    }
+
+
+def declared_benchtop_lengths_m(
+    sample: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Pellet cylinder, focal diameter, and face set the deck prints.
+
+    Lengths are metres. A missing key is omitted. A present length that
+    is not positive and finite refuses. This does not invent a spot
+    diameter, a height, or a face set, and it does not turn millimetres
+    into an area.
+    """
+
+    if sample is None:
+        return {}
+    if not isinstance(sample, Mapping):
+        raise PowerTemperatureRefusal(
+            "benchtop_geometry_malformed",
+            "lab geometry sample must be a mapping",
+        )
+    lengths: dict[str, Any] = {}
+    for source_key, dest_key in _DECLARED_FOCAL_LENGTH_MM:
+        if source_key not in sample or sample.get(source_key) in (None, ""):
+            continue
+        millimetres = _declared_finite(
+            sample.get(source_key),
+            missing="benchtop_length_not_positive",
+            invalid="benchtop_length_not_positive",
+        )
+        if millimetres <= 0.0:
+            raise PowerTemperatureRefusal(
+                "benchtop_length_not_positive",
+                f"{source_key} is {millimetres}",
+            )
+        lengths[dest_key] = millimetres * _MM_TO_M
+    face = sample.get("radiating_face_set")
+    if face not in (None, ""):
+        if not isinstance(face, str):
+            raise PowerTemperatureRefusal(
+                "radiating_face_set_unknown",
+                "radiating face set must be a string",
+            )
+        lengths["radiating_face_set"] = face.strip()
+    return lengths
+
+
+def pellet_face_areas_m2(
+    diameter_m: float,
+    height_m: float,
+) -> dict[str, float]:
+    """Printed-cylinder faces. The bottom is the holder contact.
+
+    Premise: Robinot section 3.2 prints a 13 mm by 10 mm cylinder on a
+    water-cooled holder. The contacted base conducts. It does not see
+    the chamber. Fig. 3 shows the lower half still solid, so that side
+    wall is not at the top temperature. The booked hot surface is the
+    top face plus the upper half of the side. The full side is the
+    bound that puts the whole wall at the top temperature.
+
+    Algebra::
+
+        A_top = pi * (d / 2) ** 2
+        A_side = pi * d * H
+        hot_upper = A_top + A_side / 2
+        full_side = A_top + A_side
+
+    Units: d and H in metres, areas in m².
+
+    Sanity: d = 13 mm, H = 10 mm gives A_top = 1.327×10⁻⁴ m²,
+    hot_upper = 3.369×10⁻⁴ m², full_side = 5.411×10⁻⁴ m². The tonne
+    sizer at 3.38 g is 4.32×10⁻⁵ m², smaller than the top face.
+    """
+
+    top = math.pi * (diameter_m / 2.0) ** 2
+    side = math.pi * diameter_m * height_m
+    return {
+        "top": top,
+        FACE_HOT_UPPER: top + 0.5 * side,
+        FACE_FULL_SIDE: top + side,
+    }
+
+
+def _booked_radiating_area(
+    *,
+    charge_kg: float,
+    area_m2: float | None,
+    pellet_diameter_m: float | None,
+    pellet_height_m: float | None,
+    radiating_face_set: str | None,
+) -> tuple[float, str | None, float | None, str | None, list[dict[str, Any]]]:
+    """Booked area, its face set, and the other face as a sensitivity.
+
+    An explicit area is the radiating area. A printed cylinder uses the
+    declared face set. Below 1 kg an unset face set is the hot upper
+    surface, noticed. The tonne sizer is the area only at or above 1 kg
+    and only when no cylinder is printed. Below 1 kg, reaching that
+    sizer refuses ``radiative_area_out_of_domain`` and does not use the
+    number.
+    """
+
+    face = None if radiating_face_set in (None, "") else str(radiating_face_set).strip()
+    if area_m2 is not None and face is not None:
+        raise PowerTemperatureRefusal(
+            "radiating_area_ambiguous",
+            "a declared area and a face set are two radiating areas",
+        )
+    if area_m2 is not None:
+        area = _declared_finite(
+            area_m2,
+            missing="melt_radiative_area_not_positive",
+            invalid="melt_radiative_area_not_positive",
+        )
+        if area <= 0.0:
+            raise PowerTemperatureRefusal(
+                "melt_radiative_area_not_positive",
+                f"area is {area} m2",
+            )
+        return area, None, None, None, []
+    cylinder = pellet_diameter_m is not None and pellet_height_m is not None
+    if face is not None and not cylinder:
+        raise PowerTemperatureRefusal(
+            "pellet_geometry_incomplete",
+            "a face set needs the printed pellet diameter and height",
+        )
+    if pellet_diameter_m is not None and pellet_height_m is None:
+        raise PowerTemperatureRefusal(
+            "pellet_geometry_incomplete",
+            "a printed pellet diameter needs its height",
+        )
+    if pellet_height_m is not None and pellet_diameter_m is None:
+        raise PowerTemperatureRefusal(
+            "pellet_geometry_incomplete",
+            "a printed pellet height needs its diameter",
+        )
+    if cylinder:
+        assert pellet_diameter_m is not None and pellet_height_m is not None
+        areas = pellet_face_areas_m2(pellet_diameter_m, pellet_height_m)
+        notices: list[dict[str, Any]] = []
+        if face is None:
+            if charge_kg < TONNE_SIZER_DOMAIN_MIN_KG:
+                face = FACE_HOT_UPPER
+                notices.append({
+                    "kind": KNOB_DEFAULTED,
+                    "knob": "radiating_face_set",
+                    "value": face,
+                    "unit": "1",
+                    "source": (
+                        "unset face set on a sample under 1 kg. "
+                        "Fig. 3 default is the top face plus the hot upper side."
+                    ),
+                })
+            else:
+                raise PowerTemperatureRefusal(
+                    "radiating_face_set_missing",
+                    "a printed cylinder at or above 1 kg needs a face set",
+                )
+        elif face not in _FACE_SETS:
+            raise PowerTemperatureRefusal(
+                "radiating_face_set_unknown",
+                f"face set {face!r} is not hot_upper or full_side",
+            )
+        other = FACE_FULL_SIDE if face == FACE_HOT_UPPER else FACE_HOT_UPPER
+        return areas[face], face, areas[other], other, notices
+    if charge_kg < TONNE_SIZER_DOMAIN_MIN_KG:
+        raise PowerTemperatureRefusal(
+            "radiative_area_out_of_domain",
+            "the tonne-sizer area is not a default for a sample under 1 kg",
+        )
+    area = EquipmentDesigner.radiative_loss_area_m2(charge_kg)
+    return area, None, None, None, [{
+        "kind": KNOB_DEFAULTED,
+        "knob": "melt_radiative_area_m2",
+        "value": area,
+        "unit": "m2",
+        "source": "EquipmentDesigner.radiative_loss_area_m2",
+    }]
+
+
+def absorbed_focal_power_W(
+    focal_power_W: float,
+    *,
+    pellet_diameter_m: float,
+    focal_spot_diameter_m: float,
+    solar_absorptance: float,
+    window_transmittance: float,
+) -> tuple[float, float]:
+    """Watts absorbed by a pellet in a uniform focal disk.
+
+    Premise: Robinot Eq. (6) is the power concentrated at the focal
+    point, not a sample calorimeter. The pellet is the printed 13 mm
+    disk. The spot is the paper's roughly 2 cm disk, the disk whose
+    area is the stated 1.5 kW divided by 4.8 MW m-2. Sunlight that
+    misses the pellet lands on the water-cooled holder and does not
+    enter the melt balance. Solar absorptance is not the thermal
+    emissivity. Window transmittance is a separate factor.
+
+    Algebra (uniform-disk area ratio)::
+
+        A_pellet / A_spot = (π d_pellet² / 4) / (π d_spot² / 4)
+        intercept = min(1, (d_pellet / d_spot) ** 2)
+        P_abs = P_focal * intercept * alpha * tau
+
+    Units: both diameters use metres, so their ratio and the intercept are
+    dimensionless; power remains watts after multiplying by alpha and tau.
+
+    Sanity: 13 mm in a 20 mm spot intercepts (13/20)**2 = 0.4225.
+    At the digitized peak 1468.819694 W, alpha 1 and tau 1, the pellet
+    absorbs 620.576 W. The other 848 W hits the holder annulus.
+    In the small-pellet limit the intercept tends to zero; at or above
+    the spot diameter the cap gives an intercept of 1, so the pellet
+    receives the whole focal disk, never more than it.
+    """
+
+    intercept = min(1.0, (pellet_diameter_m / focal_spot_diameter_m) ** 2)
+    absorbed = (
+        focal_power_W
+        * intercept
+        * solar_absorptance
+        * window_transmittance
+    )
+    return absorbed, intercept
+
+
+def _resolve_solar_absorptance(
+    value: float | None,
+) -> tuple[float, dict[str, Any] | None]:
+    """Gaier midpoint when the deck does not print an absorptance.
+
+    The notice records the band and that the molten cap was not measured.
+    A declared value is used as given and is not noticed.
+    """
+
+    if value is None:
+        alpha = float(SOLAR_ABSORPTANCE_DEFAULT)
+        return alpha, {
+            "kind": KNOB_DEFAULTED,
+            "knob": "solar_absorptance",
+            "value": alpha,
+            "unit": "1",
+            "band_low": GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
+            "band_high": GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
+            "source": (
+                "Gaier, Street and Gustafson 2010 large-particle "
+                "simulant band 0.669 to 0.906, midpoint. Not "
+                "MELT_EMISSIVITY. The reflective molten cap was not measured."
+            ),
+        }
+    alpha = _declared_finite(
+        value,
+        missing="solar_absorptance_not_numeric",
+        invalid="solar_absorptance_not_numeric",
+    )
+    if alpha < 0.0 or alpha > 1.0:
+        raise PowerTemperatureRefusal(
+            "solar_absorptance_out_of_range",
+            f"solar absorptance is {alpha}",
+        )
+    return alpha, None
+
+
+def _resolve_window_transmittance(
+    value: float | None,
+) -> tuple[float, dict[str, Any] | None]:
+    """Unprinted transmittance stays 1, the clean-window upper bound.
+
+    This is a typed unknown, not a d-456 in-domain default. A declared
+    value is used as given and is not noticed.
+    """
+
+    if value is None:
+        tau = float(WINDOW_TRANSMITTANCE_UPPER_BOUND)
+        return tau, {
+            "kind": TYPED_UNKNOWN,
+            "knob": "window_transmittance",
+            "value": tau,
+            "unit": "1",
+            "bound": "upper",
+            "source": (
+                "unprinted. 1 is the clean-window upper bound. "
+                "Opacification only lowers the absorbed power."
+            ),
+        }
+    tau = _declared_finite(
+        value,
+        missing="window_transmittance_not_numeric",
+        invalid="window_transmittance_not_numeric",
+    )
+    if tau < 0.0 or tau > 1.0:
+        raise PowerTemperatureRefusal(
+            "window_transmittance_out_of_range",
+            f"window transmittance is {tau}",
+        )
+    return tau, None
+
+
+def argon_conductivity_W_m_K(temperature_K: float) -> float:
+    """Monatomic extrapolation of the NIST argon conductivity.
+
+    Premise: the NIST semiconductor-gas table gives argon
+    lambda(1000 K) = 43.8 mW m-1 K-1. Monatomic conductivity tracks
+    viscosity, so k scales as T to the 0.75. The exponent is that
+    scaling. It is not fitted to a melt temperature.
+
+    Algebra::
+
+        k(T) = 0.0438 * (T / 1000) ** 0.75
+
+    Units: T in kelvin, k in W m-1 K-1.
+
+    Sanity: k(300 K) = 0.01775, which rounds to the accepted room
+    temperature value 0.0178. At the 1800 C film,
+    (2073.15 + 300) / 2 = 1186.6 K, k is 0.0498.
+    """
+
+    if temperature_K <= 0.0 or not math.isfinite(temperature_K):
+        raise PowerTemperatureRefusal(
+            "argon_conductivity_temperature_not_positive",
+            f"temperature is {temperature_K} K",
+        )
+    ratio = temperature_K / ARGON_CONDUCTIVITY_ANCHOR_K
+    return ARGON_CONDUCTIVITY_1000K_W_M_K * ratio ** ARGON_CONDUCTIVITY_EXPONENT
+
+
+def pellet_energy_loss_W(
+    temperature_K: float,
+    *,
+    radiating_area_m2: float,
+    emissivity: float,
+    conductivity_W_m_K: float,
+    top_area_m2: float,
+    height_m: float,
+    diameter_m: float,
+) -> float:
+    """Watts leaving a printed pellet: radiation, holder, continuum argon.
+
+    Premise: Robinot section 3.1 seats the pellet on a water-cooled
+    steel holder, and section 4.1 flows argon at about 13 mbar. The
+    mean free path at 13 mm and 13 mbar is tens of micrometres
+    (Knudsen number about 3e-3 at 2073 K), so the gas is continuum.
+    Free-molecular heat transfer does not apply. The enthalpy the
+    same argon stream could carry is the same physical loss and is
+    not added on top. Latent heat is not in this residual.
+
+    The cold boundary is the cooling water. T_sur, T_cold, and T_gas
+    are that one temperature, 300 K. The preset holder series that
+    ends at 1500 C is not read. Nu = 2 is the still-gas sphere on
+    the printed diameter. The pellet is a cylinder for the slab and
+    a sphere of that diameter for the gas term, which is the
+    continuum limit named for this chamber. The radiating area is
+    the booked face. Conduction uses the top face, the contact, and
+    the printed height. The bottom face is not a radiator.
+
+    Algebra::
+
+        Q = eps * sigma * A_face * (T**4 - T_b**4)
+            + k * A_top * (T - T_b) / H
+            + Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b)
+
+        T_b = 300 K
+        Nu = 2
+        k_Ar from argon_conductivity_W_m_K
+
+    Units: T kelvin, areas m2, k W m-1 K-1, H and d metres, Q watts.
+
+    Sanity at 1800 C (2073.15 K), d = 13 mm, H = 10 mm, k = 1,
+    A_top = 1.327e-4 m2, T_b = 300 K. Conduction is 23.5 W. The
+    investigation's 24 W is the same term at a 1773 K rise. Argon
+    conductivity at the film is 0.0498, and Q_gas at Nu = 2 is
+    7.2 W. Coupled to the peak focal power, alpha 0.85, and the hot
+    upper face, the root is 2072 C. The full side at the same power
+    is 1816 C.
+    """
+
+    boundary_K = COLD_BOUNDARY_K
+    radiation = (
+        STEFAN_BOLTZMANN
+        * emissivity
+        * radiating_area_m2
+        * (temperature_K ** 4 - boundary_K ** 4)
+    )
+    conduction = (
+        conductivity_W_m_K
+        * top_area_m2
+        * (temperature_K - boundary_K)
+        / height_m
+    )
+    film_K = 0.5 * (temperature_K + boundary_K)
+    gas = (
+        NU_STILL_SPHERE
+        * argon_conductivity_W_m_K(film_K)
+        * math.pi
+        * diameter_m
+        * (temperature_K - boundary_K)
+    )
+    return radiation + conduction + gas
+
+
+def _resolve_pellet_conductivity(
+    value: float | None,
+) -> tuple[float, dict[str, Any] | None]:
+    """Basalt-band midpoint when the deck does not print a conductivity.
+
+    The notice records the 0.6 to 1.4 band. A declared positive value
+    is used as given, including outside that band: poor contact is a
+    smaller conductivity, and the band is the citation of the default.
+    """
+
+    if value is None:
+        conductivity = float(PELLET_CONDUCTIVITY_DEFAULT_W_M_K)
+        return conductivity, {
+            "kind": KNOB_DEFAULTED,
+            "knob": "pellet_conductivity_W_m_K",
+            "value": conductivity,
+            "unit": "W/m/K",
+            "band_low": PELLET_CONDUCTIVITY_LOW_W_M_K,
+            "band_high": PELLET_CONDUCTIVITY_HIGH_W_M_K,
+            "source": (
+                "midpoint of the 0.6 to 1.4 W m-1 K-1 basalt band. "
+                "Büttner et al. report about 1.0 at 1200 C. "
+                "Not tuned to a pyrometer reading."
+            ),
+        }
+    conductivity = _declared_finite(
+        value,
+        missing="pellet_conductivity_not_numeric",
+        invalid="pellet_conductivity_not_numeric",
+    )
+    if conductivity <= 0.0:
+        raise PowerTemperatureRefusal(
+            "pellet_conductivity_not_positive",
+            f"conductivity is {conductivity} W m-1 K-1",
+        )
+    return conductivity, None
+
+
+def _tonne_sky_loss_W(
+    temperature_K: float,
+    *,
+    area_m2: float,
+    emissivity: float,
+) -> float:
+    """Tonne-path radiation to a 0 K sky.
+
+    Premise: the pre-pellet balance, and EQ-2's concentrator sizing,
+    book sigma * eps * A * T**4. A 300 K enclosure changes that flux
+    by (300 / T)**4, under 1 K at 1800 C. This path keeps the 0 K sky
+    so a call with no printed cylinder is the same balance as before.
+    Process gas is not a sink here.
+
+    Algebra: Q = sigma * eps * A * T**4.
+
+    Units: watts. Sanity: 1 kg, sizer area 0.001954474441911621 m2,
+    emissivity 0.85, 2073.15 K, is 1740.1373551492054 W.
+    """
+
+    return STEFAN_BOLTZMANN * emissivity * area_m2 * temperature_K ** 4
+
+
+def _optional_positive_length(
+    value: float | None,
+    *,
+    invalid: str,
+) -> float | None:
+    if value is None:
+        return None
+    number = _declared_finite(value, missing=invalid, invalid=invalid)
+    if number <= 0.0:
+        raise PowerTemperatureRefusal(invalid, f"length is {number} m")
+    return number
+
+
+def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
+    """Watts at ``time_s`` from the existing bracketing interpolator.
+
+    Times on the trace are minutes. The curve handed to
+    ``timeseries_concordance._interpolate`` is seconds. Outside the
+    first and last sample the interpolator raises; this wraps that as
+    ``power_trace_does_not_bracket`` and does not hold the last point.
+    ``reproduction_compare._interpolate_runtime_sample`` is a different
+    owner and is not called.
+    """
+
+    if not isinstance(trace, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trace must be a mapping",
+        )
+    role = str(trace.get("role") or "").strip()
+    units = str(trace.get("units") or "").strip()
+    if role != _POWER_TRACE_ROLE or units != _POWER_TRACE_UNITS:
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trace is not a units=W measured_driver",
+        )
+    if not is_declared_real_scalar(time_s, allow_numeric_str=True):
+        raise PowerTemperatureRefusal(
+            "power_trace_does_not_bracket",
+            "sample time is not numeric",
+        )
+    sample_s = float(time_s)
+    if not math.isfinite(sample_s):
+        raise PowerTemperatureRefusal(
+            "power_trace_does_not_bracket",
+            "sample time is not finite",
+        )
+    curve = _power_trace_curve_s(trace)
+    try:
+        return _interpolate(curve, sample_s, field_name="furnace power")
+    except ValueError as exc:
+        message = str(exc)
+        if "does not bracket" in message:
+            raise PowerTemperatureRefusal(
+                "power_trace_does_not_bracket",
+                message,
+            ) from exc
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            message,
+        ) from exc
+
+
+def solve_power_driven_melt_temperature_C(
+    *,
+    power_W: float,
+    previous_temperature_C: float,
+    dt_s: float,
+    mass_kg: float,
+    area_m2: float | None,
+    emissivity: float | None,
+    pellet_diameter_m: float | None = None,
+    pellet_height_m: float | None = None,
+    focal_spot_diameter_m: float | None = None,
+    radiating_face_set: str | None = None,
+    solar_absorptance: float | None = None,
+    window_transmittance: float | None = None,
+    conductivity_W_m_K: float | None = None,
+) -> dict[str, Any]:
+    """Solve one end-of-step melt temperature from furnace power.
+
+    Premise: ``power_W`` is frozen across the step. When both a pellet
+    diameter and a focal-spot diameter are set, ``power_W`` is the
+    focal-spot power (Robinot Eq. 6) and the residual uses
+    ``absorbed_focal_power_W``. One diameter without the other refuses.
+    Intercept is never defaulted to 1: that default is the bug that
+    booked the whole spot onto the pellet. When neither diameter is
+    set, ``power_W`` already enters the balance. That path is the
+    tonne-scale call, not a silent intercept.
+
+    The charge stores sensible heat at
+    ``EquipmentDesigner.MELT_CP_J_KG_K``. A printed pellet diameter
+    and height use ``pellet_face_areas_m2`` and ``pellet_energy_loss_W``:
+    radiation to the 300 K water-cooled boundary, slab conduction
+    through the top face, and continuum argon at Nu = 2. The booked
+    face is the declared set. An unset face set below 1 kg takes the
+    hot upper surface and is noticed. The other of ``hot_upper`` and
+    ``full_side`` is solved beside it, with the same conductivity,
+    boundary, and gas term, and does not replace the booked
+    temperature. A missing conductivity takes the basalt-band midpoint
+    and is noticed. The 300 K boundary is a typed unknown. The preset
+    holder series is not a temperature this solver reads.
+    With no printed cylinder the loss stays ``_tonne_sky_loss_W``:
+    sigma * emissivity * area * T**4, sky at 0 K, and no gas term.
+    A missing emissivity takes the silicate default and is noticed.
+    A missing area takes the tonne sizer only at or above 1 kg. Below
+    1 kg that sizer is out of domain and the step refuses.
+    A missing solar absorptance takes the Gaier large-particle midpoint
+    and is noticed. A missing window transmittance is the typed unknown
+    1, an upper bound, and is noticed. None of these is tuned to a
+    printed peak.
+
+    Algebra, both sides watts, losses at the unknown end temperature.
+    Printed pellet::
+
+        m * cp * (T - T_prev) / dt = P_abs
+            - eps * sigma * A_face * (T**4 - T_b**4)
+            - k * A_top * (T - T_b) / H
+            - Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b)
+
+    No cylinder::
+
+        m * cp * (T - T_prev) / dt = P - sigma * eps * A * T**4
+
+    Units: m kg, cp J/(kg·K), T kelvin, dt seconds, P watts, A m²,
+    k W m-1 K-1, sigma W/(m²·K⁴). The loss rises with T, so the root
+    is the bisection of the adiabatic bracket.
+
+    Sanity: 1 kg, no focal spot, has radiative area
+    0.001954474441911621 m². Steady state at 1800 °C (2073.15 K) needs
+    1740.1373551492054 W at sigma 5.670374e-8 and emissivity 0.85.
+    A 13 mm pellet in a 20 mm spot intercepts 0.4225 of the focal watts.
+    At the digitized peak, alpha 0.85, k = 1, Nu = 2, and T_b = 300 K,
+    the hot upper root is 2072 °C and the full side is 1816 °C.
+    """
+
+    power = _declared_finite(
+        power_W,
+        missing="furnace_power_not_finite",
+        invalid="furnace_power_not_finite",
+    )
+    if power < 0.0:
+        raise PowerTemperatureRefusal(
+            "furnace_power_not_nonnegative",
+            f"power is {power}",
+        )
+    previous_C = _declared_finite(
+        previous_temperature_C,
+        missing="previous_temperature_not_finite",
+        invalid="previous_temperature_not_finite",
+    )
+    previous_K = previous_C + CELSIUS_TO_KELVIN_OFFSET
+    if previous_K < 0.0:
+        raise PowerTemperatureRefusal(
+            "previous_temperature_below_absolute_zero",
+            f"previous temperature is {previous_C} C",
+        )
+    step_s = _declared_finite(
+        dt_s,
+        missing="process_dt_not_positive",
+        invalid="process_dt_not_positive",
+    )
+    if step_s <= 0.0:
+        raise PowerTemperatureRefusal(
+            "process_dt_not_positive",
+            f"dt_s is {step_s}",
+        )
+    charge_kg = _declared_finite(
+        mass_kg,
+        missing="charge_mass_missing",
+        invalid="charge_mass_not_positive",
+    )
+    if charge_kg <= 0.0:
+        raise PowerTemperatureRefusal(
+            "charge_mass_not_positive",
+            f"mass is {charge_kg} kg",
+        )
+    notices: list[dict[str, Any]] = []
+    pellet_d = _optional_positive_length(
+        pellet_diameter_m,
+        invalid="pellet_diameter_not_positive",
+    )
+    focal_d = _optional_positive_length(
+        focal_spot_diameter_m,
+        invalid="focal_spot_diameter_not_positive",
+    )
+    optical_requested = (
+        solar_absorptance is not None or window_transmittance is not None
+    )
+    absorbed = power
+    intercept: float | None = None
+    alpha: float | None = None
+    tau: float | None = None
+    if pellet_d is None and focal_d is None:
+        if optical_requested:
+            raise PowerTemperatureRefusal(
+                "focal_diameter_missing",
+                "solar absorptance and window transmittance apply only "
+                "to a declared focal spot",
+            )
+    elif pellet_d is None or focal_d is None:
+        raise PowerTemperatureRefusal(
+            "focal_diameter_missing",
+            "focal-spot power needs both the pellet diameter and the spot diameter",
+        )
+    else:
+        alpha, alpha_notice = _resolve_solar_absorptance(solar_absorptance)
+        tau, tau_notice = _resolve_window_transmittance(window_transmittance)
+        if alpha_notice is not None:
+            notices.append(alpha_notice)
+        if tau_notice is not None:
+            notices.append(tau_notice)
+        absorbed, intercept = absorbed_focal_power_W(
+            power,
+            pellet_diameter_m=pellet_d,
+            focal_spot_diameter_m=focal_d,
+            solar_absorptance=alpha,
+            window_transmittance=tau,
+        )
+    height_m = _optional_positive_length(
+        pellet_height_m,
+        invalid="pellet_height_not_positive",
+    )
+    area, face_set, other_area, other_face, area_notices = _booked_radiating_area(
+        charge_kg=charge_kg,
+        area_m2=area_m2,
+        pellet_diameter_m=pellet_d,
+        pellet_height_m=height_m,
+        radiating_face_set=radiating_face_set,
+    )
+    notices.extend(area_notices)
+    if emissivity is None:
+        eps = float(EquipmentDesigner.MELT_EMISSIVITY)
+        notices.append({
+            "kind": KNOB_DEFAULTED,
+            "knob": "melt_emissivity",
+            "value": eps,
+            "unit": "1",
+            "source": "EquipmentDesigner.MELT_EMISSIVITY",
+        })
+    else:
+        eps = _declared_finite(
+            emissivity,
+            missing="melt_emissivity_not_numeric",
+            invalid="melt_emissivity_not_numeric",
+        )
+        if eps < 0.0 or eps > 1.0:
+            raise PowerTemperatureRefusal(
+                "melt_emissivity_out_of_range",
+                f"emissivity is {eps}",
+            )
+    capacity = charge_kg * float(EquipmentDesigner.MELT_CP_J_KG_K) / step_s
+    if not math.isfinite(capacity) or capacity <= 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "charge heat capacity is not positive",
+        )
+    pellet_balance = pellet_d is not None and height_m is not None
+    cold_boundary_K: float | None = None
+    surroundings_K = 0.0
+    conductivity: float | None = None
+    if pellet_balance:
+        conductivity, conductivity_notice = _resolve_pellet_conductivity(
+            conductivity_W_m_K
+        )
+        if conductivity_notice is not None:
+            notices.append(conductivity_notice)
+        cold_boundary_K = float(COLD_BOUNDARY_K)
+        surroundings_K = cold_boundary_K
+        notices.append({
+            "kind": TYPED_UNKNOWN,
+            "knob": "cold_boundary_K",
+            "value": cold_boundary_K,
+            "unit": "K",
+            "source": (
+                "unprinted. The holder is water-cooled, so the boundary "
+                "is near ambient. The preset holder series that ends at "
+                "1500 C is not T_sur."
+            ),
+        })
+        top_area_m2 = pellet_face_areas_m2(pellet_d, height_m)["top"]
+
+        def loss_for(radiating_area_m2: float) -> Callable[[float], float]:
+            def loss(temperature_K: float) -> float:
+                return pellet_energy_loss_W(
+                    temperature_K,
+                    radiating_area_m2=radiating_area_m2,
+                    emissivity=eps,
+                    conductivity_W_m_K=conductivity,
+                    top_area_m2=top_area_m2,
+                    height_m=height_m,
+                    diameter_m=pellet_d,
+                )
+            return loss
+
+        root_loss = loss_for(area)
+        other_loss = loss_for(other_area) if other_area is not None else None
+    else:
+        if conductivity_W_m_K is not None:
+            raise PowerTemperatureRefusal(
+                "pellet_geometry_incomplete",
+                "conductivity applies only to a printed pellet diameter and height",
+            )
+
+        def sky_loss(temperature_K: float) -> float:
+            return _tonne_sky_loss_W(
+                temperature_K,
+                area_m2=area,
+                emissivity=eps,
+            )
+
+        root_loss = sky_loss
+        other_loss = None
+    root_K = _bisect_power_temperature_K(
+        power_W=absorbed,
+        previous_K=previous_K,
+        capacity_W_per_K=capacity,
+        loss_W=root_loss,
+    )
+    sensitivity = None
+    if other_loss is not None:
+        other_K = _bisect_power_temperature_K(
+            power_W=absorbed,
+            previous_K=previous_K,
+            capacity_W_per_K=capacity,
+            loss_W=other_loss,
+        )
+        sensitivity = {
+            "face_set": other_face,
+            "area_m2": other_area,
+            "temperature_C": other_K - CELSIUS_TO_KELVIN_OFFSET,
+            "temperature_K": other_K,
+            "role": "sensitivity",
+        }
+    return {
+        "temperature_C": root_K - CELSIUS_TO_KELVIN_OFFSET,
+        "temperature_K": root_K,
+        "power_W": absorbed,
+        "focal_power_W": power if intercept is not None else None,
+        "intercept": intercept,
+        "solar_absorptance": alpha,
+        "window_transmittance": tau,
+        "face_set": face_set,
+        "sensitivity": sensitivity,
+        "cold_boundary_K": cold_boundary_K,
+        "surroundings_K": surroundings_K,
+        "conductivity_W_m_K": conductivity,
+        "dt_s": step_s,
+        "mass_kg": charge_kg,
+        "area_m2": area,
+        "emissivity": eps,
+        "role": "prediction",
+        "source_class": "engine_prediction",
+        "scored_as_observed_temperature": False,
+        "notices": tuple(notices),
+    }
+
+
+def melt_temperature_from_furnace_power(
+    driver: Mapping[str, Any],
+    *,
+    time_s: float,
+    previous_temperature_C: float,
+    dt_s: float,
+    live_mass_kg: float | None = None,
+) -> dict[str, Any]:
+    """Prediction for one step. The live melt mass wins when it is set.
+
+    ``MeltState.total_mass_kg`` starts at 0, which means the inventory
+    has not been written yet. A positive finite live mass is the charge.
+    Otherwise the printed sample mass on the driver is the charge.
+    Neither is invented when both are missing. A holder temperature on
+    the driver is not read. The pellet boundary stays the water-cooled
+    typed unknown inside the solver.
+    """
+
+    if not isinstance(driver, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_driver_malformed",
+            "furnace power driver must be a mapping",
+        )
+    trace = driver.get("trace")
+    if not isinstance(trace, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_driver_malformed",
+            "furnace power driver is missing its trace",
+        )
+    power_W = sample_furnace_power_W(trace, time_s)
+    record = solve_power_driven_melt_temperature_C(
+        power_W=power_W,
+        previous_temperature_C=previous_temperature_C,
+        dt_s=dt_s,
+        mass_kg=_charge_mass_kg(driver.get("mass_kg"), live_mass_kg),
+        area_m2=driver.get("exposed_area_m2"),
+        emissivity=driver.get("emissivity"),
+        pellet_diameter_m=driver.get("pellet_diameter_m"),
+        pellet_height_m=driver.get("pellet_height_m"),
+        focal_spot_diameter_m=driver.get("focal_spot_diameter_m"),
+        radiating_face_set=driver.get("radiating_face_set"),
+        solar_absorptance=driver.get("solar_absorptance"),
+        window_transmittance=driver.get("window_transmittance"),
+        conductivity_W_m_K=driver.get("conductivity_W_m_K"),
+    )
+    record["time_s"] = _declared_finite(
+        time_s,
+        missing="power_trace_does_not_bracket",
+        invalid="power_trace_does_not_bracket",
+    )
+    return record
+
+
+def reported_temperature_observations(
+    points: Sequence[Mapping[str, Any]] | None,
+) -> tuple[Mapping[str, Any], ...]:
+    """Printed temperature points that may be scored as observations.
+
+    An engine prediction, an assumption, an unreported point, and a
+    qualifier that names a range are not a T(t) observation. Sesko's
+    1750–1900 K endpoints stay a range. A flagged power-driven
+    prediction is not an observation even if it is handed in here.
+    """
+
+    if points is None:
+        return ()
+    if isinstance(points, (str, bytes)) or not isinstance(points, Sequence):
+        raise PowerTemperatureRefusal(
+            "temperature_observations_malformed",
+            "temperature points must be a sequence",
+        )
+    kept: list[Mapping[str, Any]] = []
+    for index, point in enumerate(points):
+        if not isinstance(point, Mapping):
+            raise PowerTemperatureRefusal(
+                "temperature_observations_malformed",
+                f"point {index} must be a mapping",
+            )
+        if point.get("scored_as_observed_temperature") is False:
+            continue
+        source = str(point.get("source_class") or "").strip()
+        if not source:
+            raise PowerTemperatureRefusal(
+                "temperature_observation_missing_source_class",
+                f"point {index}",
+            )
+        if source in _UNSCORED_TEMPERATURE_SOURCE_CLASSES:
+            continue
+        qualifier = str(point.get("qualifier") or "")
+        if "range" in qualifier.casefold():
+            continue
+        kept.append(point)
+    return tuple(kept)
+
+
+def _charge_mass_kg(payload_mass: Any, live_mass_kg: Any) -> float:
+    if _is_set_live_mass(live_mass_kg):
+        live = _declared_finite(
+            live_mass_kg,
+            missing="charge_mass_not_positive",
+            invalid="charge_mass_not_positive",
+        )
+        if live <= 0.0:
+            raise PowerTemperatureRefusal(
+                "charge_mass_not_positive",
+                f"live mass is {live} kg",
+            )
+        return live
+    if payload_mass is None:
+        raise PowerTemperatureRefusal(
+            "charge_mass_missing",
+            "no printed sample mass and no live melt mass",
+        )
+    printed = _declared_finite(
+        payload_mass,
+        missing="charge_mass_missing",
+        invalid="charge_mass_not_positive",
+    )
+    if printed <= 0.0:
+        raise PowerTemperatureRefusal(
+            "charge_mass_not_positive",
+            f"printed mass is {printed} kg",
+        )
+    return printed
+
+
+def _is_set_live_mass(value: Any) -> bool:
+    if value is None or isinstance(value, bool):
+        return False
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return True
+    number = float(value)
+    if not math.isfinite(number):
+        return True
+    return number != 0.0
+
+
+def _declared_finite(value: Any, *, missing: str, invalid: str) -> float:
+    if value is None:
+        raise PowerTemperatureRefusal(missing, "value is missing")
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise PowerTemperatureRefusal(invalid, f"value {value!r} is not numeric")
+    number = float(value)
+    if not math.isfinite(number):
+        raise PowerTemperatureRefusal(invalid, f"value {value!r} is not finite")
+    return number
+
+
+def _power_trace_curve_s(
+    trace: Mapping[str, Any],
+) -> tuple[tuple[float, float], ...]:
+    fields = trace.get("point_fields")
+    if isinstance(fields, (str, bytes)) or not isinstance(fields, Sequence):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "point_fields must name time_min and expected_value",
+        )
+    names = [str(item) for item in fields]
+    if _POWER_TIME_FIELD not in names or _POWER_VALUE_FIELD not in names:
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "point_fields must name time_min and expected_value",
+        )
+    time_index = names.index(_POWER_TIME_FIELD)
+    value_index = names.index(_POWER_VALUE_FIELD)
+    points = trace.get("points")
+    if isinstance(points, (str, bytes)) or not isinstance(points, Sequence):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "points must be a sequence",
+        )
+    if len(points) == 0:
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_empty",
+            "furnace power trace needs points",
+        )
+    width = max(time_index, value_index) + 1
+    curve: list[tuple[float, float]] = []
+    for index, point in enumerate(points):
+        if (
+            isinstance(point, (str, bytes))
+            or not isinstance(point, Sequence)
+            or len(point) < width
+        ):
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_malformed",
+                f"point {index} does not carry time_min and expected_value",
+            )
+        time_min = _declared_finite(
+            point[time_index],
+            missing="furnace_power_trace_malformed",
+            invalid="furnace_power_trace_malformed",
+        )
+        watts = _declared_finite(
+            point[value_index],
+            missing="furnace_power_trace_malformed",
+            invalid="furnace_power_trace_malformed",
+        )
+        if watts < 0.0:
+            raise PowerTemperatureRefusal(
+                "furnace_power_not_nonnegative",
+                f"point {index} power is {watts}",
+            )
+        curve.append((time_min * _MINUTE_S, watts))
+    try:
+        return _normalise_curve(curve, field_name="furnace power")
+    except ValueError as exc:
+        message = str(exc)
+        if "unique" in message:
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_times_not_unique",
+                message,
+            ) from exc
+        if "at least one" in message:
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_empty",
+                message,
+            ) from exc
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            message,
+        ) from exc
+
+
+def _bisect_power_temperature_K(
+    *,
+    power_W: float,
+    previous_K: float,
+    capacity_W_per_K: float,
+    loss_W: Callable[[float], float],
+) -> float:
+    """Root of capacity * (T - T_prev) + loss(T) - power = 0.
+
+    ``loss_W`` is ``pellet_energy_loss_W`` or ``_tonne_sky_loss_W``.
+    Both rise with T above 0 K: the sky term is T**4, and the pellet
+    terms are T**4, a linear slab, and k_Ar(T) * (T - T_b) with
+    k_Ar proportional to T**0.75. The bracket is the adiabatic upper
+    bound, which ignores a non-negative high-T loss and so still
+    lies above the root.
+    """
+
+    def residual(temperature_K: float) -> float:
+        loss = loss_W(temperature_K)
+        if not math.isfinite(loss):
+            return math.inf
+        return (
+            loss
+            + capacity_W_per_K * (temperature_K - previous_K)
+            - power_W
+        )
+
+    lower = 0.0
+    upper = previous_K + power_W / capacity_W_per_K
+    if not math.isfinite(upper) or upper > 1.0e7:
+        upper = max(previous_K, 1.0e7)
+    if upper < lower:
+        upper = lower
+    f_lower = residual(lower)
+    f_upper = residual(upper)
+    guard = 0
+    while f_upper < 0.0 and upper < 1.0e7 and guard < 40:
+        upper = min(1.0e7, upper * 2.0 if upper > 0.0 else 1.0)
+        f_upper = residual(upper)
+        guard += 1
+    if f_lower > 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "residual has no root at or above 0 K",
+        )
+    if f_upper < 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "residual stays negative across the bracket",
+        )
+    for _step in range(_BISECTION_STEPS):
+        mid = 0.5 * (lower + upper)
+        if residual(mid) < 0.0:
+            lower = mid
+        else:
+            upper = mid
+    root = 0.5 * (lower + upper)
+    closed = residual(root)
+    scale = max(1.0, abs(power_W), abs(capacity_W_per_K * previous_K))
+    if (
+        not math.isfinite(root)
+        or not math.isfinite(closed)
+        or abs(closed) > 1.0e-6 * scale
+    ):
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "bisection did not close the watt balance",
+        )
+    return root

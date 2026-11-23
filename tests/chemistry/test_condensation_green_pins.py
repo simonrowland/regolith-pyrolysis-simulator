@@ -36,8 +36,8 @@ def route_totals(monkeypatch):
     }
     original = CondensationModel.route
 
-    def measure(model, flux, melt):
-        result = original(model, flux, melt)
+    def measure(model, flux, melt, **kwargs):
+        result = original(model, flux, melt, **kwargs)
         for species in SPECIES:
             row = totals[species]
             row["inlet"] += flux.species_kg_hr.get(species, 0.0)

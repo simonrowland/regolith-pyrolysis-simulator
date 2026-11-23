@@ -761,7 +761,7 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
     route_result = CondensationRouteResult(
         remaining_by_species={"Na": rate_kg_hr - condensed_kg},
     )
-    sim.condensation_model.route = lambda evap_flux, melt: route_result
+    sim.condensation_model.route = lambda evap_flux, melt, **kwargs: route_result
     original_dispatch_and_commit = sim._dispatch_and_commit
     seen = []
 
@@ -1309,7 +1309,7 @@ def test_committed_reactive_products_record_input_carrier_lineage(
             }
         },
     )
-    sim.condensation_model.route = lambda evap_flux, melt: route_result
+    sim.condensation_model.route = lambda evap_flux, melt, **kwargs: route_result
     transition_count_before = len(sim.atom_ledger.transitions)
 
     residual = sim._route_to_condensation(
@@ -1403,7 +1403,7 @@ def test_committed_reactive_products_record_input_carrier_lineage(
             }
         },
     )
-    sim.condensation_model.route = lambda evap_flux, melt: mg_route_result
+    sim.condensation_model.route = lambda evap_flux, melt, **kwargs: mg_route_result
     mg_residual = sim._route_to_condensation(
         EvaporationFlux(
             species_kg_hr={"Mg": mg_rate_kg_hr},
@@ -1574,7 +1574,7 @@ def test_condensation_proposal_ignores_tier_one_phase_context_fields(
 ):
     def _run(sim):
         rate_kg_hr = 1e-6
-        sim.condensation_model.route = lambda evap_flux, melt: (
+        sim.condensation_model.route = lambda evap_flux, melt, **kwargs: (
             CondensationRouteResult(remaining_by_species={"Na": 0.25e-6})
         )
         seen = []
@@ -1676,7 +1676,7 @@ def test_evaporation_caller_counts_condensation_degraded_path_engagement(
         setpoints_data,
     )
     rate_kg_hr = 1e-6
-    sim.condensation_model.route = lambda evap_flux, melt: CondensationRouteResult(
+    sim.condensation_model.route = lambda evap_flux, melt, **kwargs: CondensationRouteResult(
         remaining_by_species={"Na": rate_kg_hr},
         antoine_extrapolations={"Na:stage-1": {}},
         antoine_extrapolation_warnings=[
@@ -1712,7 +1712,7 @@ def test_evaporation_caller_deduplicates_record_backed_antoine_warning(
         setpoints_data,
     )
     rate_kg_hr = 1e-6
-    sim.condensation_model.route = lambda evap_flux, melt: CondensationRouteResult(
+    sim.condensation_model.route = lambda evap_flux, melt, **kwargs: CondensationRouteResult(
         remaining_by_species={"Na": rate_kg_hr},
         antoine_extrapolations={
             "Na:stage-1": {
@@ -3055,7 +3055,7 @@ def test_c4b_route_order_is_deterministic_for_cross_species_wall_reactions(
         )
         sim.condensation_model.pipe_segments = ordered_segments
 
-        def _route(evap_flux, melt):
+        def _route(evap_flux, melt, **kwargs):
             account_fractions = {account_order[0]: 0.5, account_order[1]: 0.5}
             return CondensationRouteResult(
                 remaining_by_species={
