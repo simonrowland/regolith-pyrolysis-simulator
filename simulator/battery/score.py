@@ -4413,19 +4413,45 @@ def _total_iron_formula_notice(reference: Observation) -> Notice | None:
     if not isinstance(identity, Identity) or identity.species is None:
         return None
     quantity = quantity_token(identity)
-    if (
-        quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
-        or identity.species.formula != "Fe_tO"
-    ):
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
-    return Notice(
-        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
-        affected_quantities=(quantity,),
-        reason=(
+
+    species_formula = identity.species.formula
+    banya_source = reference.source_id in _BANYA_FETO_ACTIVITY_RELATIONS
+    reference_state = identity.reference_state
+    standard_formula = (
+        reference_state.value.endmember.formula
+        if reference_state is not None
+        and reference_state.is_value
+        and isinstance(reference_state.value, StandardState)
+        else None
+    )
+    has_feto_identity = species_formula == "Fe_tO" or (
+        banya_source
+        and (
+            standard_formula in {_FEO_WUSTITE_FORMULA, "Fe_tO"}
+            or species_formula == _FEO_STOICHIOMETRIC_FORMULA
+        )
+    )
+    if not has_feto_identity:
+        return None
+
+    if banya_source:
+        reason = (
+            "total_iron_basis: Ban-ya a_FetO on a total-iron basis "
+            f"(printed species Fe_tO, stored formula {species_formula}); "
+            "all Fe is counted as FeO; d-420 basis convention"
+        )
+    else:
+        reason = (
             "total_iron_basis: default=Fe_tO interpreted as total Fe on an "
             "FeO basis; original_reason=printed species formula Fe_tO; "
             "d-420 basis convention"
-        ),
+        )
+    return Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason=reason,
         origin=reference.observation_id,
     )
 
