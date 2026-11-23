@@ -1793,6 +1793,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         alpha_authority_status_by_species: dict[str, str] = {}
         flux_uncertainty_pct: dict[str, float] = {}
+        evaporation_driving_delta_Pa: dict[str, float] = {}
         series_flux_diagnostics: dict[
             str, dict[str, float | str | bool | None]
         ] = {}
@@ -1856,12 +1857,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 gas_resistance_enabled
                 and species not in hkl_upper_bound_transport_species
             )
-            # Same helper as the gas-transport scan above. R_gas is off
-            # when the film is disabled or the carrier is an HKL upper
-            # bound. Overhead O2 stays a backpressure on those branches
-            # only when the surface root owns this evaluation. A closed
-            # gate uses green's film rule for O2 too, so a viscous
-            # partial does not suppress that drive.
+            # Keep the unclipped physical drive available to the reduced
+            # solver's kink instrumentation, including the zero-flux side.
             P_bulk_Pa = species_drive_bulk_Pa(
                 species,
                 float(overhead_partials.get(species, 0.0)),
@@ -1869,6 +1866,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 hkl_upper_bound=species in hkl_upper_bound_transport_species,
                 surface_oxygen_bound=surface_oxygen_bound,
             )
+            evaporation_driving_delta_Pa[str(species)] = (
+                P_eq_Pa - P_bulk_Pa
+            )
+
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
                 # P_eq <= P_bulk. Net flux is the computed zero of
@@ -2003,6 +2004,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     "missing_transport_parameters": missing_transport_parameters,
                     "temperature_C": T_C,
                     "evaporation_series_resistance": series_flux_diagnostics,
+                    "evaporation_driving_delta_Pa": evaporation_driving_delta_Pa,
                 },
                 warnings=(
                     "missing Chapman-Enskog transport parameters for sampled species: "
@@ -2016,6 +2018,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             "alpha_s_evaluation_by_species": alpha_evaluations_by_species,
             "flux_uncertainty_pct": flux_uncertainty_pct,
             "evaporation_series_resistance": series_flux_diagnostics,
+            "evaporation_driving_delta_Pa": evaporation_driving_delta_Pa,
             "temperature_C": T_C,
             # Matrix policy (i): source flux is HKL upper bound while R_m=0.
             "authority_class": "upper-bound",

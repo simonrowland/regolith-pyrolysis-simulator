@@ -101,6 +101,7 @@ class _DiagnosticLawSample:
             dict(law._last_redox_mol_s),
             law.paired_redox_mol_s,
             law.accepted_redox_key,
+            law._last_evaporation_drive_delta_Pa,
         )
         return self._sample.__enter__()
 
@@ -119,6 +120,7 @@ class _DiagnosticLawSample:
                     law._last_redox_mol_s,
                     law.paired_redox_mol_s,
                     law.accepted_redox_key,
+                    law._last_evaporation_drive_delta_Pa,
                 ) = saved
         finally:
             self._sample.__exit__(exc_type, exc, tb)
@@ -277,6 +279,17 @@ class CapacityShadowRefusal:
     reduced_resolver_warm_root_fallbacks: int | None = None
     reduced_resolver_bracket_fallbacks: int | None = None
     reduced_shut_branch_hits: int | None = None
+    reduced_evaporation_drive_probe_evaluations: int | None = None
+    reduced_evaporation_drive_near_zero_evaluations: int | None = None
+    reduced_evaporation_drive_near_zero_species_counts: dict[str, int] | None = None
+    reduced_evaporation_drive_jacobian_crossing_counts: dict[str, int] | None = None
+    reduced_evaporation_drive_stage_crossing_counts: dict[str, int] | None = None
+    reduced_rejections_with_evaporation_drive_crossing: int | None = None
+    reduced_rejection_evaporation_drive_crossing_fraction: float | None = None
+    reduced_rejection_evaporation_drive_crossing_species_counts: (
+        dict[str, int] | None
+    ) = None
+    reduced_evaporation_drive_band_Pa: float | None = None
     reduced_accepted_steps: int | None = None
     # Error-test rejections plus failed Newton collocation attempts.
     reduced_rejected_steps: int | None = None
@@ -1341,6 +1354,37 @@ def _hour_cost_payload(law: "_HeadspaceLaw") -> dict[str, Any]:
             law.reduced_resolver_bracket_fallbacks
         ),
         "reduced_shut_branch_hits": int(law.reduced_shut_branch_hits),
+        "reduced_evaporation_drive_probe_evaluations": int(
+            law.reduced_evaporation_drive_probe_evaluations
+        ),
+        "reduced_evaporation_drive_near_zero_evaluations": int(
+            law.reduced_evaporation_drive_near_zero_evaluations
+        ),
+        "reduced_evaporation_drive_near_zero_species_counts": dict(
+            sorted(law.reduced_evaporation_drive_near_zero_species_counts.items())
+        ),
+        "reduced_evaporation_drive_jacobian_crossing_counts": dict(
+            sorted(law.reduced_evaporation_drive_jacobian_crossing_counts.items())
+        ),
+        "reduced_evaporation_drive_stage_crossing_counts": dict(
+            sorted(law.reduced_evaporation_drive_stage_crossing_counts.items())
+        ),
+        "reduced_rejections_with_evaporation_drive_crossing": (
+            None
+            if law.reduced_rejections_with_evaporation_drive_crossing is None
+            else int(law.reduced_rejections_with_evaporation_drive_crossing)
+        ),
+        "reduced_rejection_evaporation_drive_crossing_fraction": (
+            law.reduced_rejection_evaporation_drive_crossing_fraction
+        ),
+        "reduced_rejection_evaporation_drive_crossing_species_counts": (
+            dict(
+                sorted(
+                    law.reduced_rejection_evaporation_drive_crossing_species_counts.items()
+                )
+            )
+        ),
+        "reduced_evaporation_drive_band_Pa": _SLOW_ATOL_PA,
         "reduced_accepted_steps": int(law.reduced_accepted_steps),
         "reduced_rejected_steps": int(law.reduced_rejected_steps),
         "reduced_step_size_min_s": reduced_step_min,
@@ -1569,6 +1613,15 @@ class _HeadspaceLaw:
         self.reduced_resolver_warm_root_fallbacks = 0
         self.reduced_resolver_bracket_fallbacks = 0
         self.reduced_shut_branch_hits = 0
+        self.reduced_evaporation_drive_probe_evaluations = 0
+        self.reduced_evaporation_drive_near_zero_evaluations = 0
+        self.reduced_evaporation_drive_near_zero_species_counts: dict[str, int] = {}
+        self.reduced_evaporation_drive_jacobian_crossing_counts: dict[str, int] = {}
+        self.reduced_evaporation_drive_stage_crossing_counts: dict[str, int] = {}
+        self.reduced_rejections_with_evaporation_drive_crossing = 0
+        self.reduced_rejection_evaporation_drive_crossing_fraction: float | None = None
+        self.reduced_rejection_evaporation_drive_crossing_species_counts: dict[str, int] = {}
+        self._last_evaporation_drive_delta_Pa: dict[str, float] | None = None
         self.reduced_accepted_steps = 0
         self.reduced_rejected_steps = 0
         self.reduced_step_sizes_s: list[float] = []
@@ -1783,6 +1836,7 @@ class _HeadspaceLaw:
                     flux_evaluations=self.flux_evaluations,
                     integrator_evaluations=self.integrator_evaluations,
                 )
+        self._last_evaporation_drive_delta_Pa = None
         try:
             raw = self.flux(partials)
         except EvaporationFluxRefusal:
@@ -1793,6 +1847,20 @@ class _HeadspaceLaw:
             raise _BalanceRefused(
                 f"evaporation_flux_refused:{type(exc).__name__}:{exc}"
             ) from exc
+        if isinstance(self.extent_holder, dict):
+            raw_drive = self.extent_holder.get(
+                "_evaporation_driving_delta_Pa"
+            )
+            if isinstance(raw_drive, Mapping):
+                drive_delta: dict[str, float] = {}
+                for species, value in raw_drive.items():
+                    try:
+                        delta = float(value)
+                    except (TypeError, ValueError, OverflowError):
+                        continue
+                    if math.isfinite(delta):
+                        drive_delta[str(species)] = delta
+                self._last_evaporation_drive_delta_Pa = drive_delta
         out: dict[str, float] = {}
         for name, rate in raw.items():
             if name not in self.masses or name not in self.redox_mol_s:
@@ -2835,7 +2903,7 @@ def _stiffness_collocation(*args, **kwargs):
         and result
         and result[0] is False
     ):
-        recorder.newton_failures += 1
+        recorder.note_newton_failure()
     return result
 
 
@@ -2903,6 +2971,10 @@ class _StiffnessRecord:
         self.last_y = None
         self.newton_failures = 0
         self._pending = False
+        self._drive_crossings_since_error_test: set[str] = set()
+        self._pending_drive_crossing_species: set[str] = set()
+        self.rejected_with_drive_crossing = 0
+        self.rejected_drive_crossing_species_counts: dict[str, int] = {}
         self._failed = False
         self._lines = _prepare_radau_error_lines()
         self._unavailable = self._lines is None or _RADAU_STEP_CODE is None
@@ -2913,6 +2985,29 @@ class _StiffnessRecord:
 
     def begin_step(self) -> None:
         self._pending = False
+        self._drive_crossings_since_error_test.clear()
+        self._pending_drive_crossing_species.clear()
+
+    def note_drive_crossings(self, species_names) -> None:
+        self._drive_crossings_since_error_test.update(
+            str(name) for name in species_names
+        )
+
+    def _record_rejected_drive_crossings(self, species_names) -> None:
+        names = set(species_names)
+        if not names:
+            return
+        self.rejected_with_drive_crossing += 1
+        for name in names:
+            self.rejected_drive_crossing_species_counts[name] = (
+                self.rejected_drive_crossing_species_counts.get(name, 0) + 1
+            )
+
+    def note_newton_failure(self) -> None:
+        self.newton_failures += 1
+        crossings = set(self._drive_crossings_since_error_test)
+        self._drive_crossings_since_error_test.clear()
+        self._record_rejected_drive_crossings(crossings)
 
     def accept(self, step_s: float, y) -> None:
         import numpy as np
@@ -2942,16 +3037,27 @@ class _StiffnessRecord:
         if lineno == second:
             pending = self._pending
             self._pending = False
+            crossings = self._pending_drive_crossing_species | (
+                self._drive_crossings_since_error_test
+            )
+            self._drive_crossings_since_error_test.clear()
             if pending and value > 1.0:
                 self._commit(frame, vector)
+                self._record_rejected_drive_crossings(crossings)
+            self._pending_drive_crossing_species.clear()
             return
         if lineno != first:
             return
+        crossings = set(self._drive_crossings_since_error_test)
+        self._drive_crossings_since_error_test.clear()
         if value > 1.0 and rejected:
             self._pending = True
+            self._pending_drive_crossing_species = crossings
             return
+        self._pending_drive_crossing_species.clear()
         if value > 1.0:
             self._commit(frame, vector)
+            self._record_rejected_drive_crossings(crossings)
 
     def _name(self, index: int):
         count = self.count
@@ -3979,12 +4085,70 @@ def _reduced_manifold(
     accepted_root = [float(root)]
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
+    recorder = _StiffnessRecord(
+        species,
+        ("n", "A", "B", "G", "R") if track_extent else ("n", "A", "B"),
+    )
+    last_stage_drive_delta_Pa: list[dict[str, float] | None] = [None]
 
-    def evaluate(state, root_hint: float) -> tuple[list[float], float]:
+    def record_drive_sample(
+        drive_delta_Pa: dict[str, float] | None,
+    ) -> None:
+        if drive_delta_Pa is None:
+            return
+        law.reduced_evaporation_drive_probe_evaluations += 1
+        near_zero_species = {
+            name
+            for name, delta in drive_delta_Pa.items()
+            if abs(delta) <= _SLOW_ATOL_PA
+        }
+        if near_zero_species:
+            law.reduced_evaporation_drive_near_zero_evaluations += 1
+            for name in near_zero_species:
+                law.reduced_evaporation_drive_near_zero_species_counts[name] = (
+                    law.reduced_evaporation_drive_near_zero_species_counts.get(
+                        name, 0,
+                    ) + 1
+                )
+
+    def crossing_species(
+        before: dict[str, float] | None,
+        after: dict[str, float] | None,
+    ) -> set[str]:
+        if before is None or after is None:
+            return set()
+        crossed: set[str] = set()
+        for name in before.keys() & after.keys():
+            left = before[name]
+            right = after[name]
+            if (
+                (left < 0.0 < right)
+                or (right < 0.0 < left)
+                or (left == 0.0 and right != 0.0)
+                or (right == 0.0 and left != 0.0)
+            ):
+                crossed.add(name)
+        return crossed
+
+    def record_crossings(
+        counts: dict[str, int],
+        before: dict[str, float] | None,
+        after: dict[str, float] | None,
+    ) -> None:
+        crossed = crossing_species(before, after)
+        for name in crossed:
+            counts[name] = counts.get(name, 0) + 1
+        if crossed:
+            recorder.note_drive_crossings(crossed)
+
+    def evaluate(
+        state,
+        root_hint: float,
+    ) -> tuple[list[float], float, dict[str, float] | None]:
         raw = [max(float(state[index]), 0.0) for index in range(count)]
         total = math.fsum(raw)
         if total <= 0.0:
-            return [0.0] * (blocks * count), float(root_hint)
+            return [0.0] * (blocks * count), float(root_hint), None
         evolved = {name: raw[index] / total for index, name in enumerate(species)}
         kind, found = _reduced_open_fixed_point(
             law, evolved, hint_Pa=root_hint,
@@ -3992,6 +4156,8 @@ def _reduced_manifold(
         if kind != "open" or found is None:
             raise _ManifoldLost()
         inflow, redox, gross = _manifold_rates(law, evolved, float(found))
+        drive_delta_Pa = law._last_evaporation_drive_delta_Pa
+        record_drive_sample(drive_delta_Pa)
         q_sum = math.fsum(inflow.values())
         if not math.isfinite(q_sum):
             raise _ManifoldLost()
@@ -4012,13 +4178,19 @@ def _reduced_manifold(
                 dg.append(gross[name])
                 dr.append(redox[name])
         if track_extent:
-            return dn + da + db + dg + dr, float(found)
-        return dn + da + db, float(found)
+            return dn + da + db + dg + dr, float(found), drive_delta_Pa
+        return dn + da + db, float(found), drive_delta_Pa
 
     def rhs(_time: float, state) -> list[float]:
         law.reduced_rhs_calls += 1
         law._note_rhs_flux()
-        rates, _found = evaluate(state, accepted_root[0])
+        rates, _found, drive_delta_Pa = evaluate(state, accepted_root[0])
+        record_crossings(
+            law.reduced_evaporation_drive_stage_crossing_counts,
+            last_stage_drive_delta_Pa[0],
+            drive_delta_Pa,
+        )
+        last_stage_drive_delta_Pa[0] = drive_delta_Pa
         return rates
 
     def jacobian(time: float, state):
@@ -4028,7 +4200,7 @@ def _reduced_manifold(
         # that RHS uses one IFT correction, not the bracketed warm solve.
         law._note_rhs_flux()
         base_hint = accepted_root[0]
-        base_rates, _base_root = evaluate(state, base_hint)
+        base_rates, _base_root, base_drive_delta_Pa = evaluate(state, base_hint)
         base = np.asarray(base_rates, dtype=float)
         matrix = np.zeros((len(y0), len(y0)), dtype=float)
         fd_scale = math.sqrt(np.finfo(float).eps)
@@ -4047,7 +4219,14 @@ def _reduced_manifold(
             sample = np.asarray(state, dtype=float).copy()
             sample[column] += step
             law._note_rhs_flux()
-            perturbed, _sample_root = evaluate(sample, base_hint)
+            perturbed, _sample_root, sample_drive_delta_Pa = evaluate(
+                sample, base_hint,
+            )
+            record_crossings(
+                law.reduced_evaporation_drive_jacobian_crossing_counts,
+                base_drive_delta_Pa,
+                sample_drive_delta_Pa,
+            )
             matrix[:, column] = (
                 np.asarray(perturbed, dtype=float) - base
             ) / step
@@ -4075,10 +4254,6 @@ def _reduced_manifold(
             raise _ManifoldLost()
         accepted_root[0] = float(found)
 
-    recorder = _StiffnessRecord(
-        species,
-        ("n", "A", "B", "G", "R") if track_extent else ("n", "A", "B"),
-    )
     if track_extent:
         atol = (
             [atol_mol] * (3 * count)
@@ -4106,6 +4281,23 @@ def _reduced_manifold(
         law.reduced_rejected_steps = (
             recorder.rejected + recorder.newton_failures
         )
+        if recorder._failed or recorder._unavailable:
+            law.reduced_rejections_with_evaporation_drive_crossing = None
+            law.reduced_rejection_evaporation_drive_crossing_species_counts = {}
+            law.reduced_rejection_evaporation_drive_crossing_fraction = None
+        else:
+            law.reduced_rejections_with_evaporation_drive_crossing = (
+                recorder.rejected_with_drive_crossing
+            )
+            law.reduced_rejection_evaporation_drive_crossing_species_counts = (
+                dict(recorder.rejected_drive_crossing_species_counts)
+            )
+            law.reduced_rejection_evaporation_drive_crossing_fraction = (
+                recorder.rejected_with_drive_crossing
+                / law.reduced_rejected_steps
+                if law.reduced_rejected_steps > 0
+                else None
+            )
     if not solution.success:
         return None
     end = solution.y[:, -1]

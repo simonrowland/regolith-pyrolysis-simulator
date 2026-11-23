@@ -8599,6 +8599,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'credit_mol': {},
             'debit_mol': {},
             'excess_mol': {},
+            'driving_delta_Pa': {},
             # None until one route at the reference pressure
             # publishes a remainder. The bracket scales that
             # remainder as C/P. It does not route per sample.
@@ -8671,6 +8672,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     str(diagnostic.get('reason') or result.status),
                     diagnostic,
                 )
+            diagnostic = dict(result.diagnostic or {})
+            raw_drive = diagnostic.get('evaporation_driving_delta_Pa') or {}
+            state['driving_delta_Pa'][_partial_key(partials_Pa)] = {
+                str(species): float(delta)
+                for species, delta in dict(raw_drive).items()
+                if isinstance(delta, (int, float))
+                and not isinstance(delta, bool)
+                and math.isfinite(float(delta))
+            }
             rates = {
                 species: max(0.0, float(rate)) * liquid_fraction_factor
                 for species, rate in dict(
@@ -9016,6 +9026,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'fractions',
                 'owned',
                 'gross',
+                'driving_delta_Pa',
                 'credit_mol',
                 'debit_mol',
                 'excess_mol',
@@ -9034,7 +9045,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             holder_is_dict = isinstance(holder, dict)
             saved_holder = {}
             if holder_is_dict:
-                for key in ('gross_kg_hr', '_capture_fractions'):
+                for key in (
+                    'gross_kg_hr',
+                    '_capture_fractions',
+                    '_evaporation_driving_delta_Pa',
+                ):
                     saved_holder[key] = (
                         _copy.deepcopy(holder[key]) if key in holder else absent
                     )
@@ -9081,6 +9096,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 gross = dict(frozen_gross)
             else:
                 gross = _dispatch_gross(partials_Pa)
+            holder = state.get('extent_holder')
+            if isinstance(holder, dict):
+                drive_delta = (
+                    None
+                    if frozen_gross is not None
+                    else state['driving_delta_Pa'].get(key)
+                )
+                if drive_delta is None:
+                    holder.pop('_evaporation_driving_delta_Pa', None)
+                else:
+                    holder['_evaporation_driving_delta_Pa'] = dict(
+                        drive_delta
+                    )
             # One route defines C. Later trials scale C/P inside G.
             # The condenser is not routed on every residual sample:
             # that made a shut-pipe hour a few hundred seconds.
@@ -10101,6 +10129,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         rates_cache = {}
+        drive_delta_cache = {}
+        extent_holder = {}
 
         def flux_at_partials(partials_Pa):
             cache_key = tuple(sorted(
@@ -10108,6 +10138,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 for species, pressure in partials_Pa.items()
             ))
             if cache_key in rates_cache:
+                extent_holder['_evaporation_driving_delta_Pa'] = dict(
+                    drive_delta_cache[cache_key]
+                )
                 return dict(rates_cache[cache_key])
             iteration_controls = dict(controls)
             iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
@@ -10149,6 +10182,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     str(diagnostic.get('reason') or result.status),
                     diagnostic,
                 )
+            diagnostic = dict(result.diagnostic or {})
+            raw_drive = diagnostic.get('evaporation_driving_delta_Pa') or {}
+            drive_delta_cache[cache_key] = {
+                str(species): float(delta)
+                for species, delta in dict(raw_drive).items()
+                if isinstance(delta, (int, float))
+                and not isinstance(delta, bool)
+                and math.isfinite(float(delta))
+            }
+            extent_holder['_evaporation_driving_delta_Pa'] = dict(
+                drive_delta_cache[cache_key]
+            )
             # Debit vector only. Rates at or below the 1e-12 kg/h floor
             # stay out of this solve so the partials stay on the published
             # flux closure. Wall supply reads the live publisher diagnostic
@@ -10243,6 +10288,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         'O2_BACKPRESSURE',
                     }
                 ),
+                extent_holder=extent_holder,
             )
         finally:
             assert self.atom_ledger.mol_by_account() == ledger_before
