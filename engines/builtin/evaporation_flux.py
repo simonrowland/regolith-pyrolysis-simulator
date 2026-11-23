@@ -2508,34 +2508,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             for species, value in overhead_partials.items()
             if str(species) in vapor_species_names and str(species) != "O2"
         )
-        oxygen_coproduct_moles_by_species = {
-            str(species): _oxygen_coproduct_moles_per_carrier_mole(
-                stoich_by_species.get(species) or {},
-                _finite_float(
-                    molar_masses_kg_mol.get(species),
-                    _finite_float(MOLAR_MASS.get(str(species)), 0.0) / 1000.0,
-                ),
-            )
-            for species in vapor_pressures
-        }
-        total_evolved_P_eq_Pa = (
-            bulk_o2_partial_pressure
-            + sum(
-                max(0.0, _finite_float(value, 0.0))
-                for value in vapor_pressures.values()
-            )
-            + sum(
-                oxygen_coproduct_moles_by_species.get(str(species), 0.0)
-                * max(
-                    0.0,
-                    _finite_float(value, 0.0)
-                    - max(
-                        0.0,
-                        _finite_float(overhead_partials.get(species), 0.0),
-                    ),
-                )
-                for species, value in vapor_pressures.items()
-            )
+        # Only carrier equilibrium pressures independently drive outflow.
+        # Headspace partials are boundary conditions; coproduct O2 is tied
+        # stoichiometrically to carrier flux and has no equilibrium pressure
+        # of its own. The ratio Σ_i p_eq,i / P is Pa/Pa, hence dimensionless.
+        # For example, SiO p_eq=400 Pa at P=1300 Pa gives 0.31 and is not
+        # flagged, whatever the bulk pO2. O2 is excluded from carrier keys.
+        total_evolved_P_eq_Pa = sum(
+            max(0.0, _finite_float(value, 0.0))
+            for species, value in vapor_pressures.items()
+            if str(species) != "O2"
         )
         total_evolved_P_eq_over_P_total = (
             total_evolved_P_eq_Pa / overhead_pressure_pa
@@ -2616,6 +2598,15 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                         "P_bulk_evolved_Pa": total_bulk_evolved_pressure,
                     },
                 )
+        surface_inert_mole_fraction = (
+            max(
+                0.0,
+                1.0 - total_bulk_evolved_pressure / overhead_pressure_pa,
+            )
+            * math.exp(-shared_stefan_log_E)
+            if overhead_pressure_pa > 0.0
+            else None
+        )
         for species, series_flux in stefan_series_by_species.items():
             rate_kg_hr = (
                 series_flux.flux_kg_s_m2 * melt_surface_area_m2 * 3600.0
@@ -2649,6 +2640,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             series_diagnostic["surface_O2_partial_pressure_Pa"] = (
                 surface_o2_partial_pressure
+            )
+            series_diagnostic["surface_inert_mole_fraction"] = (
+                surface_inert_mole_fraction
             )
             series_diagnostic["shared_stefan_log_E"] = shared_stefan_log_E
 
@@ -2723,6 +2717,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             "typed_flags": typed_flux_flags,
             "typed_flag_details": typed_flux_flag_details,
             "shared_surface_evolved_P_Pa": surface_evolved_pressure,
+            "surface_inert_mole_fraction": surface_inert_mole_fraction,
             "shared_stefan_log_E": shared_stefan_log_E,
             "shared_film_diffusion_m2_s": (
                 shared_film_diffusion_m2_s or None

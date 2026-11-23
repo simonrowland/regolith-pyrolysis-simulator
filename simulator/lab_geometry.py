@@ -306,7 +306,11 @@ def resolve_lab_gas_film_geometry(
 
     area_m2: float | None = None
     raw_area = sample.get("exposed_melt_area_m2")
-    if raw_area not in (None, ""):
+    melt_diameter_owns_area = length_method in {
+        "declared:crucible_inner_diameter_mm",
+        "declared:exposed_melt_diameter_mm",
+    }
+    if raw_area not in (None, "") and not melt_diameter_owns_area:
         area_m2 = read_gram_lab_exposed_melt_area(lab_geometry)
         if length_m is None:
             length_m = (

@@ -3,8 +3,8 @@
 The source extract supplies one admitted row per measured oxide. Runtime
 results are keyed by experiment id so one simulator trajectory can serve the
 oxide records from the same physical run. An unprinted free-evaporation area
-uses the runtime DP-007 crucible face and carries that run's typed flag into
-each residual record.
+uses the lab-geometry-resolved DP-007 sample face and carries that run's
+typed flag into each residual record.
 """
 
 from __future__ import annotations

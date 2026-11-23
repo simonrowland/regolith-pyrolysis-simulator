@@ -1438,12 +1438,98 @@ def test_provider_uses_equal_d_stefan_maxwell_and_flags_bulk_outflow():
     assert result.diagnostic["surface_O2_partial_pressure_Pa"] == pytest.approx(
         expected_surface_o2
     )
-    assert result.diagnostic["total_evolved_P_eq_over_P_total"] > 1600.0 / 1300.0
+    assert result.diagnostic["total_evolved_P_eq_over_P_total"] == pytest.approx(
+        1600.0 / 1300.0
+    )
+    expected_inert_fraction = (
+        (1300.0 - 15.0) / 1300.0 * math.exp(-sodium["stefan_log_E"])
+    )
+    assert result.diagnostic["surface_inert_mole_fraction"] == pytest.approx(
+        expected_inert_fraction
+    )
     assert "bulk_outflow_regime" in result.diagnostic["typed_flags"]
     assert "internal bubble boiling" in result.diagnostic[
         "typed_flag_details"
     ]["bulk_outflow_regime"]
     assert "gas_film_equal_d_stefan_maxwell" in sodium["typed_flags"]
+
+
+@pytest.mark.parametrize(
+    ("p_eq_pa", "expected_flag"),
+    ((900.0, False), (1299.0, False), (1300.0, True), (1301.0, True)),
+)
+@pytest.mark.xdist_group("serial")
+def test_bulk_outflow_flag_uses_carrier_equilibrium_pressure_only(
+    p_eq_pa: float,
+    expected_flag: bool,
+) -> None:
+    common = {
+        "vapour_batch_flux_pressures_Pa": {"SiO": p_eq_pa},
+        "overhead_pressure_pa": 1300.0,
+        "pipe_diameter_m": 0.013,
+        "gas_film_length_m": 0.013,
+        "gas_film_shape": "sphere_equivalent",
+        "gas_temperature_K": 2200.0,
+        "molar_mass_kg_mol": {"SiO": 0.044084},
+        "stoich_by_species": {
+            "SiO": {
+                "parent_oxide": "SiO2",
+                "oxide_per_product_kg": 1.0,
+                "O2_per_product_kg": 0.5 * 0.031998 / 0.044084,
+            },
+        },
+        "available_oxide_kg": {"SiO": 10.0},
+        "alpha": {"SiO": 0.1},
+    }
+    result = _w3_result_with_controls(
+        0.0,
+        **common,
+        overhead_partials_Pa={"O2": 0.01},
+    )
+    assert ("bulk_outflow_regime" in result.diagnostic["typed_flags"]) is (
+        expected_flag
+    )
+
+
+@pytest.mark.xdist_group("serial")
+def test_bulk_oxygen_does_not_change_carrier_flag_or_flux() -> None:
+    common = {
+        "vapour_batch_flux_pressures_Pa": {"SiO": 400.0},
+        "overhead_pressure_pa": 1300.0,
+        "pipe_diameter_m": 0.013,
+        "gas_film_length_m": 0.013,
+        "gas_film_shape": "sphere_equivalent",
+        "gas_temperature_K": 2200.0,
+        "molar_mass_kg_mol": {"SiO": 0.044084},
+        "stoich_by_species": {
+            "SiO": {
+                "parent_oxide": "SiO2",
+                "oxide_per_product_kg": 1.0,
+                "O2_per_product_kg": 0.5 * 0.031998 / 0.044084,
+            },
+        },
+        "available_oxide_kg": {"SiO": 10.0},
+        "alpha": {"SiO": 0.1},
+    }
+    dilute = _w3_result_with_controls(
+        0.0,
+        **common,
+        overhead_partials_Pa={"O2": 0.01},
+    )
+    rich = _w3_result_with_controls(
+        0.0,
+        **common,
+        overhead_partials_Pa={"O2": 1200.0},
+    )
+
+    assert "bulk_outflow_regime" not in dilute.diagnostic["typed_flags"]
+    assert "bulk_outflow_regime" not in rich.diagnostic["typed_flags"]
+    assert rich.diagnostic["evaporation_flux_kg_hr"]["SiO"] == pytest.approx(
+        dilute.diagnostic["evaporation_flux_kg_hr"]["SiO"]
+    )
+    assert rich.diagnostic["surface_inert_mole_fraction"] != pytest.approx(
+        dilute.diagnostic["surface_inert_mole_fraction"]
+    )
 
 
 @pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf")])

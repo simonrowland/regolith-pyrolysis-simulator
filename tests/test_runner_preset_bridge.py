@@ -665,6 +665,23 @@ def test_crucible_inner_diameter_selects_disk_shape_and_length() -> None:
     assert resolved.area_m2 == pytest.approx(math.pi * 0.02**2 / 4.0)
 
 
+def test_printed_crucible_diameter_owns_area_before_a_printed_area() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {
+            "mass_g": 10.0,
+            "crucible_inner_diameter_mm": 20.0,
+            "exposed_melt_area_m2": 0.000123,
+        },
+    }
+
+    resolved = resolve_lab_gas_film_geometry(geometry)
+
+    assert resolved is not None
+    assert resolved.length_m == pytest.approx(0.02)
+    assert resolved.area_m2 == pytest.approx(math.pi * resolved.length_m**2 / 4.0)
+
+
 def test_crucible_mass_uses_hemisphere_length_and_coherent_disk_area() -> None:
     geometry = {
         "scale": "gram_lab",
