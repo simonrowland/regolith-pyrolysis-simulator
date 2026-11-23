@@ -35,6 +35,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from engines.antoine import _read_antoine_coefficients
+from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.diagnostic_helpers.timeseries_concordance import (
     _interpolate,
     _normalise_curve,
@@ -1250,12 +1251,12 @@ PELLET_CONDUCTIVITY_DEFAULT_W_M_K = 1.0
 # Still-gas sphere. Continuum conduction at the printed diameter, not a
 # fitted Nusselt number and not a free-molecular flux.
 NU_STILL_SPHERE = 2.0
-# evaporation._calculate_evaporation: once catalog pressure exists,
-# T_K < 400 is a physical zero ("thermal physical zero"). The balance
-# does not call the flux callback below that floor. The bisection
-# bracket starts at 0 K, and an empty pressure map there raises
-# EvaporationFluxRefusal. This module does not import evaporation.
-EVAPORATIVE_FLUX_FLOOR_K = 400.0
+# engines.builtin.vapor_pressure.BUILTIN_VAPOR_BELOW_400K_LIMIT_K is
+# the thermal physical zero. The kinetic flux, the analytical vapor
+# loop, and this balance all treat a temperature below it as no
+# evaporation. The bisection bracket starts at 0 K, and an empty
+# pressure map there raises EvaporationFluxRefusal, so the callback
+# is not called below the limit.
 # Bracket ceiling, not a material limit. The 13 mm top face at
 # emissivity 0.85 radiates eps * sigma * A * T**4. A_top = pi*(6.5 mm)**2
 # = 1.327e-4 m². At 4000 K, T**4 = 2.56e14, sigma*T**4 = 1.45e7 W/m²,
@@ -1833,13 +1834,13 @@ def _species_rates_kg_hr(
 ) -> Mapping[str, float]:
     """Booked kg/h at this trial temperature, or an empty map.
 
-    Below ``EVAPORATIVE_FLUX_FLOOR_K`` the callback is not called.
-    That is the evaporation owner's physical zero, not a new cutoff.
+    Below ``BUILTIN_VAPOR_BELOW_400K_LIMIT_K`` the callback is not called.
+    That is the vapor-pressure owner's physical zero, not a new cutoff.
     """
 
     if (
         species_rate_kg_hr_at_K is None
-        or temperature_K < EVAPORATIVE_FLUX_FLOOR_K
+        or temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K
     ):
         return {}
     rates = species_rate_kg_hr_at_K(float(temperature_K))

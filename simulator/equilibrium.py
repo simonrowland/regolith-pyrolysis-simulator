@@ -372,6 +372,7 @@ class EquilibriumMixin:
         """
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
+            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
             FIT_TARGET_STANDARD_REACTION,
@@ -418,7 +419,7 @@ class EquilibriumMixin:
             )
 
         T_K = float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        if T_K < 400:
+        if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             # Reached only after the control guard: T_K is finite and > 0 K,
             # p_total_mbar is finite and >= 0. On this cold path the
             # vapor-pressure loop is skipped; empty vapors with

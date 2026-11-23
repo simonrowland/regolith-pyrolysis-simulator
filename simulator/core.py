@@ -8387,11 +8387,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species: 0.0
             for species in dict(equilibrium.vapor_pressures_Pa or {})
         }
-        # Same species the live path will price. The 400 K floor and a proven
-        # zero liquid return before that dispatch, so those hours keep the
-        # shadow's existing molar-mass order. Above those gates the batch map
-        # includes extrapolated species and the capacity solve prices that map
-        # with the extrapolation flag attached.
+        # Same species the live path will price. The vapor owner's thermal
+        # physical zero and a proven zero liquid return before that dispatch,
+        # so those hours keep the shadow's existing molar-mass order. Above
+        # those gates the batch map includes extrapolated species and the
+        # capacity solve prices that map with the extrapolation flag attached.
+        from engines.builtin.vapor_pressure import (
+            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+        )
         from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
 
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
@@ -8400,7 +8403,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not (
             liquid_fraction is not None
             and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
-        ) and temperature_K >= 400.0:
+        ) and temperature_K >= BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             batch_flux_pressures, _, _, _, _, _ = (
                 self._resolve_evaporation_batch_flux_state(
                     equilibrium,
@@ -11387,7 +11390,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 warning = f"{notice['code']}: T_gas={notice['temperature_K']:g} K; {notice['reason']}"
                 if warning not in result.warnings:
                     result.warnings.append(warning)
-        if T_C + 273.15 < 400:
+        from engines.builtin.vapor_pressure import (
+            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+        )
+
+        if T_C + 273.15 < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             restore_retained_backend_activity_sources()
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
@@ -17853,9 +17860,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # equilibrium and debits later, at the solved temperature.
         # The callback is not a campaign field: it is installed for this
         # call and removed before the ramp reads the step-start melt.
+        from engines.builtin.vapor_pressure import (
+            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+        )
         from simulator.thermal_budget import (
             EVAPORATIVE_BRACKET_CEILING_K,
-            EVAPORATIVE_FLUX_FLOOR_K,
             FURNACE_POWER_DRIVER_KEY,
         )
         schedule = self.campaign_mgr._lab_schedule(self.melt.campaign)
@@ -17871,7 +17880,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             def _rates(temperature_K: float) -> dict[str, float]:
                 return self._power_balance_species_rates_kg_hr(
                     temperature_K,
-                    floor_K=EVAPORATIVE_FLUX_FLOOR_K,
+                    floor_K=BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
                     ceiling_K=EVAPORATIVE_BRACKET_CEILING_K,
                     cache=cache,
                 )

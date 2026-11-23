@@ -9,6 +9,7 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
+from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     PROXY_BRIDGE_ALPHA_STATUS,
@@ -2336,7 +2337,7 @@ class EvaporationMixin:
 
         if not vapor_pressures:
             if (
-                0.0 < T_K < 400.0
+                0.0 < T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K
                 and getattr(equilibrium, 'status', None) == 'ok'
                 and (getattr(equilibrium, 'diagnostics', {}) or {}).get(
                     'vapor_pressure_zero_reason'
@@ -2519,7 +2520,8 @@ class EvaporationMixin:
                 reason,
                 diagnostic,
             )
-        if T_K < 400:  # Catalog pressure exists; thermal physical zero.
+        if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            # Catalog pressure exists; thermal physical zero.
             note_wall_supply_interval_physical_zero(
                 flux,
                 reason="below_400K",

@@ -20,6 +20,7 @@ from engines.builtin.evaporation_flux import (
     _evaluate_alpha_control,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
+from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.physical_constants import GAS_CONSTANT_6SIG
 from simulator.state import MOLAR_MASS
@@ -352,7 +353,7 @@ def test_high_conductivity_merges_the_two_nodes_with_the_one_node_bound():
 
 def test_the_flux_callback_is_not_called_below_the_evaporation_floor():
     def rates(temperature_K: float) -> dict[str, float]:
-        if temperature_K < 400.0:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             raise AssertionError(temperature_K)
         return {"SiO": 0.006}
 
