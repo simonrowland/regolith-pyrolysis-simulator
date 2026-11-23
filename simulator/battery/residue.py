@@ -1635,6 +1635,14 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
     return _hashimoto_project_oxide_wt_pct(amounts)
 
 
+def _oxide_wt_percent_to_mol_inventory(wt_percent: Mapping[str, float]) -> dict[str, float]:
+    """Convert oxide wt% to a scale-free inventory on a 100 g basis."""
+    return {
+        oxide: weight / 100.0 / _formula_terms(oxide)[1]
+        for oxide, weight in wt_percent.items()
+    }
+
+
 def _mass_loss_sourced_alphas(
     experiment: object,
     source_document: Mapping[str, Any],
@@ -1949,7 +1957,7 @@ def predict_knudsen_residue_composition(
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
     # A unit reference mass fixes only the mol normalization; no sample mass
     # or apparatus scale is inferred from it. xi is invariant to this scale.
-    initial = {oxide: weight / 100.0 / _formula_terms(oxide)[1] for oxide, weight in wt_pct.items()}
+    initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
     anchors = {}
     for row in rows:
         if (row.experiment_id != reference.experiment_id or row.source_id != reference.source_id
@@ -2156,10 +2164,7 @@ def predict_langmuir_residue_composition(
         raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
     temperature_K = float(temperature.value)
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
-    initial = {
-        oxide: weight / 100.0 / _formula_terms(oxide)[1]
-        for oxide, weight in wt_pct.items()
-    }
+    initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
 
     pressure_environment = experiment.pressure_environment
     pressure_record = next(
