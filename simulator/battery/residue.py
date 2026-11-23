@@ -2798,7 +2798,11 @@ def predict_knudsen_residue_composition(
             loss_fraction = tail_mass_kg / measured_loss_kg
             wt_pct_bound = 100.0 * tail_mass_kg / residue_oxide_mass_kg
             mass_loss_value = anchors[target_temperature][1].value
-            threshold = _trace_tail_precision_threshold(mass_loss_value) / target
+            if mass_loss_value.approximate:
+                threshold = 1e-6
+            else:
+                printed_quantum = Decimal(1).scaleb(mass_loss_value.point.as_tuple().exponent)
+                threshold = 0.1 * float(printed_quantum) / target
             trace_tail = {
                 "retained_kg_by_parent": dict(primary.trace_tail_kg),
                 "measured_loss_kg": measured_loss_kg,

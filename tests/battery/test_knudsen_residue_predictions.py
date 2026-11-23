@@ -378,8 +378,10 @@ def test_analytical_knudsen_mass_default_reports_dp008(extent_point, mass_kg):
 
 @pytest.mark.parametrize(
     ("printed_resolution", "precision_multiplier"),
-    ((True, 1), (False, 1), ("component", 1), ("component", 2)),
-    ids=("exact-mass-loss", "approximate-mass-loss", "exact-component", "shared-rule-mutation"),
+    ((True, 1), (False, 1), ("component-exact", 1),
+     ("component-approximate", 1), ("component-approximate", 2)),
+    ids=("exact-mass-loss", "approximate-mass-loss", "exact-component",
+         "approximate-component", "approximate-component-shared-rule-mutation"),
 )
 def test_microgram_loader_tail_stays_numeric_in_flagged_tier(
     extent_point, monkeypatch, printed_resolution, precision_multiplier,
@@ -394,6 +396,10 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(
         )
 
     reference, experiment, rows = extent_point
+    component_case = isinstance(printed_resolution, str)
+    approximate_component = printed_resolution == "component-approximate"
+    if approximate_component:
+        reference = replace(reference, value=replace(reference.value, approximate=True))
     locator = reference.locator
     composition = Composition(
         "trace", (("FeO", Decimal("0.0005")), ("MgO", Decimal("0.9995"))),
@@ -406,8 +412,8 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(
         initial_composition=Located(State.of(composition), locator),
     ))
     rows = (*rows[:1], replace(rows[-1], value=replace(
-        Value.point_of("0.2" if printed_resolution == "component" else "0.20000"),
-        approximate=not printed_resolution,
+        Value.point_of("0.2" if component_case or printed_resolution else "0.20000"),
+        approximate=not printed_resolution if not component_case else False,
     )))
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     monkeypatch.setattr(battery, "_openimcc_gas_channels_and_omission_notices",
@@ -432,18 +438,30 @@ def test_microgram_loader_tail_stays_numeric_in_flagged_tier(
     # Mg escapes as metal. Oxygen stays in the physical residue, while the
     # oxide projection removes one MgO equivalent per Mg atom lost.
     oxide_residue_kg = 1e-9 - 2e-10 * 40.304 / 24.305
+    expected_component_bound = 100 * feo_kg / oxide_residue_kg
+    assert tail["bound_wt_pct_by_component"] == pytest.approx({
+        "FeO": expected_component_bound,
+        "MgO": expected_component_bound,
+    })
     bound = tail["bound_wt_pct_by_component"]["FeO"]
-    assert bound == pytest.approx(100 * feo_kg / oxide_residue_kg)
     assert bound >= float(candidate.value.point)  # removing the FeO tail gives 0 wt% FeO
     assert bound > 100 * feo_kg / 8e-10
-    expected_threshold = (
-        {True: 5e-6, False: 1e-6, "component": 0.05}[printed_resolution]
-        * precision_multiplier
-    )
-    assert tail["material_threshold"] == pytest.approx(expected_threshold)
-    if printed_resolution == "component":
+    if printed_resolution is True:
+        expected_threshold = 0.1 * float(Decimal("0.1")) / 0.2
+    elif printed_resolution is False:
+        expected_threshold = 1e-6
+    else:
+        expected_threshold = 0.1 * float(Decimal("0.1")) / 0.2
+    assert tail["material_threshold"] == expected_threshold
+    if component_case:
+        expected_component_threshold = (
+            99e-6 if approximate_component else 0.1
+        ) * precision_multiplier
+        assert tail["component_material_threshold_wt_pct"] == pytest.approx(
+            expected_component_threshold
+        )
         assert tail["fraction_of_measured_mass_loss"] < expected_threshold
-        assert bound > tail["component_material_threshold_wt_pct"] == 0.1 * precision_multiplier
+        assert bound > expected_component_threshold
     assert candidate.provenance["atom_closure_mol"]["Fe"] == 0.0
     assert candidate.provenance["final_inventory_mol"]["FeO"] == candidate.provenance["initial_inventory_mol"]["FeO"]
 
@@ -477,6 +495,28 @@ def test_approximate_component_tail_uses_relative_effect_threshold():
     assert notices[0].certification == "material"
 
 
+def test_approximate_mass_loss_tail_between_tolerances_is_material():
+    from simulator.battery.residue import _knudsen_trace_tail_notices
+
+    trace_tail = {
+        "fraction_of_measured_mass_loss": 2e-6,
+        "material_threshold": 1e-6,
+        "bound_wt_pct_by_component": {},
+        "retained_kg_by_parent": {"FeO": 1e-12},
+        "measured_loss_kg": 1e-3,
+        "residue_oxide_mass_kg": 1e-2,
+    }
+    reference = SimpleNamespace(
+        value=SimpleNamespace(point=Decimal("0.2"), approximate=True),
+        identity=SimpleNamespace(species=SimpleNamespace(formula="FeO")),
+    )
+
+    notices = _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=False)
+
+    assert trace_tail["material"]
+    assert notices[0].certification == "material"
+
+
 def test_exact_component_tail_uses_tenth_of_last_printed_digit():
     from simulator.battery.residue import _knudsen_trace_tail_notices
 
@@ -496,6 +536,28 @@ def test_exact_component_tail_uses_tenth_of_last_printed_digit():
     _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=True)
 
     assert trace_tail["component_material_threshold_wt_pct"] == pytest.approx(1e-7)
+    assert not trace_tail["material"]
+
+
+def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic():
+    from simulator.battery.residue import _knudsen_trace_tail_notices
+
+    trace_tail = {
+        "fraction_of_measured_mass_loss": 0.05,
+        "material_threshold": 0.1 * float(Decimal("0.1")) / 0.2,
+        "bound_wt_pct_by_component": {"FeO": 0.0},
+        "retained_kg_by_parent": {"FeO": 1e-12},
+        "measured_loss_kg": 1e-3,
+        "residue_oxide_mass_kg": 1e-2,
+    }
+    reference = SimpleNamespace(
+        value=SimpleNamespace(point=Decimal("99"), approximate=False),
+        identity=SimpleNamespace(species=SimpleNamespace(formula="FeO")),
+    )
+
+    _knudsen_trace_tail_notices(trace_tail, reference, oxide_wt_pct=False)
+
+    assert trace_tail["material_threshold"] == 0.05000000000000001
     assert not trace_tail["material"]
 
 
