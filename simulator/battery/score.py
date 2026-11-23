@@ -6215,7 +6215,12 @@ def _printed_uncertainty_source(
     uncertainty: Uncertainty,
     *,
     exact_fields: Sequence[str] = (),
-) -> tuple[Decimal | tuple[Decimal, Decimal] | None, str, str | None]:
+) -> tuple[
+    Decimal | tuple[Decimal, Decimal] | None,
+    str,
+    str | None,
+    str | None,
+]:
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
     printed_unit = _mapping_uncertainty_unit(raw) if isinstance(raw, Mapping) else None
@@ -6225,6 +6230,7 @@ def _printed_uncertainty_source(
         else printed_unit
     )
     value: object | None = uncertainty.value
+    inline_unit: str | None = None
     shape = "scalar"
     if isinstance(value, tuple):
         shape = "range"
@@ -6232,6 +6238,7 @@ def _printed_uncertainty_source(
         value, mapped_unit = _mapping_uncertainty_value(
             raw, exact_fields=exact_fields
         )
+        inline_unit = mapped_unit if mapped_unit != "range" else None
         if mapped_unit == "range":
             shape = "range"
         elif mapped_unit is not None:
@@ -6281,8 +6288,10 @@ def _printed_uncertainty_source(
         locator = raw.get("locator")
         if isinstance(locator, Mapping):
             basis_evidence += " " + str(locator.get("note") or "")
-    _resolved_basis, conflict = resolve_width_unit_basis(
-        printed_unit or unit,
+    declared_unit = printed_unit or (None if isinstance(raw, Mapping) else unit)
+    resolved_basis, conflict = resolve_width_unit_basis(
+        declared_unit,
+        inline_unit=inline_unit,
         declared_basis=declared_basis,
         printed_value=None if printed_width is None else str(printed_width),
         basis_evidence=basis_evidence,
@@ -6290,19 +6299,19 @@ def _printed_uncertainty_source(
     if conflict is not None:
         raise UncertaintyConventionConflict(conflict)
     if value is None:
-        return None, shape, unit
+        return None, shape, unit, resolved_basis
     try:
         if isinstance(value, (tuple, list)) and len(value) == 2:
             lower, upper = as_decimal(value[0]), as_decimal(value[1])
             if not lower.is_finite() or not upper.is_finite() or upper < lower:
-                return None, "range", unit
-            return (lower, upper), "range", unit
+                return None, "range", unit, resolved_basis
+            return (lower, upper), "range", unit, resolved_basis
         parsed = abs(as_decimal(value))
     except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-        return None, shape, unit
+        return None, shape, unit, resolved_basis
     if not parsed.is_finite():
-        return None, shape, unit
-    return parsed, shape, unit
+        return None, shape, unit, resolved_basis
+    return parsed, shape, unit, resolved_basis
 
 
 def _temperature_envelope_value(
@@ -7052,9 +7061,12 @@ def _printed_uncertainty_band(
     else:
         exact_fields = uncertainty_exact_fields(quantity)
     try:
-        source_value, shape, mapped_unit = _printed_uncertainty_source(
-            uncertainty, exact_fields=exact_fields
-        )
+        (
+            source_value,
+            shape,
+            mapped_unit,
+            resolved_basis,
+        ) = _printed_uncertainty_source(uncertainty, exact_fields=exact_fields)
     except UncertaintyConventionConflict as exc:
         return _PrintedBandResolution(
             refusal={
@@ -7124,6 +7136,12 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
+    if (
+        resolved_basis == "dimensionless"
+        and converted_unit == "fraction"
+        and QUANTITY_UNITS[quantity] == "dimensionless"
+    ):
+        converted_unit = "dimensionless"
     if native_width:
         effective_convention = None
     else:

@@ -111,9 +111,11 @@ def _printed_fraction_width(observation):
     uncertainty = observation.uncertainty
     if uncertainty is None:
         return None
-    source_value, _shape, mapped_unit = score_module._printed_uncertainty_source(
-        uncertainty,
-        exact_fields=("Fe3_over_FeT", "Fe3_over_sum_Fe"),
+    source_value, _shape, mapped_unit, _basis = (
+        score_module._printed_uncertainty_source(
+            uncertainty,
+            exact_fields=("Fe3_over_FeT", "Fe3_over_sum_Fe"),
+        )
     )
     if source_value is None:
         return None

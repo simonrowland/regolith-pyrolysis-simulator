@@ -15954,6 +15954,7 @@ def _uncertainty_for_value_selection(
         basis_evidence = str(locator.get("note") or "")
     basis, conflict = resolve_width_unit_basis(
         source_unit,
+        inline_unit=unit_hint,
         expected_unit="dimensionless",
         declared_basis=str(verbatim.get("basis") or uncertainty.basis or ""),
         printed_value=str(verbatim.get("as_printed") or ""),

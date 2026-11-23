@@ -21698,6 +21698,83 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
     assert relative_fraction.basis == "relative"
 
 
+def test_existing_printed_width_field_census_and_unit_conflict_orders() -> None:
+    from simulator.battery.score import _printed_uncertainty_source
+    from simulator.battery.uncertainty_conventions import (
+        mapping_uncertainty_value,
+        printed_uncertainty_convention,
+        resolve_width_unit_basis,
+    )
+
+    expected = {
+        "T_m_uncertainty_K": "10",
+        "gamma_uncertainty": "1.7",
+        "two_sigma": "0.03",
+        "limits": ("0.1", "0.3"),
+    }
+    for field, width in expected.items():
+        selected, _unit = mapping_uncertainty_value({field: width})
+        assert selected == width
+    assert mapping_uncertainty_value(
+        {"sigma": "95% CI ±0.3 dex"}
+    ) == ("0.3", "dex")
+    assert _printed_uncertainty_source(
+        uncertainty_for({"sigma": "95% CI ±0.3 dex"})
+    ) == (Decimal("0.3"), "scalar", "dex", "dex")
+    assert printed_uncertainty_convention({"two_sigma": "0.03"}) == (
+        "two_sigma",
+        Decimal(2),
+    )
+
+    conflict = resolve_width_unit_basis("%", inline_unit="dex")
+    assert conflict[0] is None
+    assert conflict[1] == "width unit declarations disagree: '%' and 'dex'"
+    reverse = resolve_width_unit_basis("dex", inline_unit="%")
+    assert reverse[0] is None
+    assert reverse[1] == "width unit declarations disagree: 'dex' and '%'"
+
+
+def test_width_unit_disagreement_is_typed_in_migration_and_scoring() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    selection = select_declared_source(Quantity.VALENCE_RATIO, "%", {"value": "70"})
+    for width_mapping in (
+        {"sigma": "3 dex", "units": "%", "basis": "absolute"},
+        {"sigma": "3%", "units": "dex", "basis": "absolute"},
+    ):
+        migrated = _uncertainty_for_value_selection(
+            uncertainty_for(width_mapping),
+            selection,
+            Quantity.VALENCE_RATIO,
+            "70(3)%",
+        )
+        assert migrated.value is None
+        assert migrated.basis.startswith("uncertainty_convention_conflict:")
+        scored = _printed_uncertainty_band(
+            Quantity.VALENCE_RATIO, uncertainty_for(width_mapping), Decimal("0.7")
+        )
+        assert scored.band is None
+        assert scored.refusal["reason"] == "uncertainty_convention_conflict"
+
+
+def test_legacy_width_scoring_uses_shared_absolute_and_relative_basis() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    absolute = _printed_uncertainty_band(
+        Quantity.VALENCE_RATIO,
+        uncertainty_for({"sigma": "3%", "units": "%", "basis": "absolute"}),
+        Decimal("0.7"),
+    )
+    relative = _printed_uncertainty_band(
+        Quantity.VALENCE_RATIO,
+        uncertainty_for({"sigma": "3%", "units": "%", "basis": "relative"}),
+        Decimal("0.7"),
+    )
+    assert absolute.band is not None
+    assert relative.band is not None
+    assert absolute.band.value != relative.band.value
+
+
 def test_exploded_width_and_score_share_exact_derivation_field(tmp_path: Path) -> None:
     from simulator.battery.score import _printed_uncertainty_band
 

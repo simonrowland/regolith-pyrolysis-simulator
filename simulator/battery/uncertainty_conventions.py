@@ -47,6 +47,19 @@ UNCERTAINTY_PAIR_RE = re.compile(
     re.IGNORECASE,
 )
 UNCERTAINTY_SCALAR_RE = re.compile(UNCERTAINTY_NUMBER)
+_PRINTED_WIDTH_FIELDS = (
+    "T_m_uncertainty_K",
+    "gamma_uncertainty",
+    "two_sigma",
+    "limits",
+    "source_uncertainty",
+    "value_uncertainty",
+    "read_uncertainty",
+    "read_uncertainty_K",
+    "log10_K_star_uncertainty",
+    "S_298_over_R_uncertainty",
+    "invT_times_1e4_K_inv_absolute_uncertainty",
+)
 
 
 def uncertainty_scalar_from_text(raw: str) -> str | None:
@@ -112,11 +125,27 @@ def mapping_uncertainty_value(
                     return scalar, unit
             continue
         return value, None
+    for key in _PRINTED_WIDTH_FIELDS:
+        if key not in mapping:
+            continue
+        value = mapping[key]
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            if isinstance(value, str):
+                scalar = uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    return scalar, _unit_from_width_text(value)
+            continue
+        return value, None
     for key, value in mapping.items():
         name = str(key).casefold()
         if name in {
             "sigma", "std", "standard_deviation", "standard_error",
             "uncertainty", "error", "width", "range", "bounds", "interval",
+            "limits",
         }:
             if isinstance(value, (tuple, list)) and len(value) == 2:
                 return value, "range"
@@ -134,9 +163,15 @@ def mapping_uncertainty_value(
 
 
 def _unit_from_width_text(raw: str) -> str | None:
-    if re.search(r"%|percent", raw, re.IGNORECASE):
+    width = re.search(
+        rf"(?:±|\+/-)\s*{UNCERTAINTY_NUMBER}\s*([A-Za-z%]+)", raw
+    )
+    if width is None:
+        width = re.search(rf"{UNCERTAINTY_NUMBER}\s*([A-Za-z%]+)\s*$", raw)
+    unit_text = width.group(1) if width is not None else raw
+    if re.fullmatch(r"%|percent|percentage", unit_text, re.IGNORECASE):
         return "%"
-    match = re.search(r"\b(dex|dimensionless|fraction)\b", raw, re.IGNORECASE)
+    match = re.search(r"\b(dex|dimensionless|fraction)\b", unit_text, re.IGNORECASE)
     return None if match is None else match.group(1)
 
 
@@ -184,14 +219,42 @@ def uncertainty_exact_fields(
 def resolve_width_unit_basis(
     unit: str | None,
     *,
+    inline_unit: str | None = None,
     expected_unit: str | None = None,
     declared_basis: str | None = None,
     printed_value: str | None = None,
     paired_value: str | None = None,
     basis_evidence: str = "",
 ) -> tuple[str | None, str | None]:
-    """Classify a width from its own unit and stated basis; return basis/conflict."""
+    """Resolve width basis; the explicit mapping unit wins when it agrees.
+
+    Inline units fill a missing explicit unit. Disagreement is returned as a
+    typed conflict instead of choosing either declaration.
+    """
     normalized = (unit or "").strip().casefold()
+    inline_normalized = (inline_unit or "").strip().casefold()
+    unit_aliases = {
+        "%": "%",
+        "percent": "%",
+        "percentage": "%",
+        "atom%": "atom%",
+        "atom %": "atom%",
+        "dimensionless": "dimensionless",
+        "fraction": "fraction",
+        "1": "1",
+        "dex": "dex",
+    }
+    if (
+        normalized
+        and inline_normalized
+        and unit_aliases.get(normalized, normalized)
+        != unit_aliases.get(inline_normalized, inline_normalized)
+    ):
+        return None, (
+            "width unit declarations disagree: "
+            f"{unit!r} and {inline_unit!r}"
+        )
+    normalized = normalized or inline_normalized
     declared = (declared_basis or "").strip().casefold()
     if declared.startswith("uncertainty_convention_conflict:"):
         return None, declared.partition(":")[2]
@@ -204,11 +267,7 @@ def resolve_width_unit_basis(
         if relative:
             return "relative", None
         if absolute or (
-            paired_value is not None
-            and re.search(
-                r"\d\s*\(\s*(?:±|\+/-)?\s*\d+(?:\.\d+)?\s*\)\s*%",
-                paired_value,
-            )
+            paired_width_unit(paired_value) is not None
         ):
             return "dimensionless", None
         return None, None
@@ -269,6 +328,16 @@ def printed_uncertainty_convention(
             factors.append(mapped_factor)
         if confidence_token is None:
             confidence_token = canonical_token
+
+    if "two_sigma" in declaration:
+        try:
+            as_decimal(declaration["two_sigma"])
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            pass
+        else:
+            factors.append(Decimal(2))
+            if confidence_token is None:
+                confidence_token = "two_sigma"
 
     if confidence_token is None and fallback_token is not None:
         token = fallback_token.strip().lower()
