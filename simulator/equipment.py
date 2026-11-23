@@ -315,9 +315,15 @@ class EquipmentDesigner:
         """
         Size the crucible for the batch.
 
-        Volume = mass / density                                [EQ-1]
-        Geometry: height = 1.5 × diameter (cylindrical)
-        Add 20% freeboard for bubbling/stirring
+        Derivation [EQ-1]: V_melt = mass_kg / MELT_DENSITY_KG_M3 and
+        V_total = 1.20 * V_melt for 20% freeboard. For a cylinder with
+        h = 1.5 * d, V_total = π * d² * h / 4 = 1.5π * d³ / 4, so
+        d = (4 * V_total / (1.5π))**(1/3). The melt face area returned is
+        A = π * d² / 4.
+
+        Unit check: V_total is m³, d is m, and A is m². Since density and
+        geometry are fixed here, A ∝ mass_kg**(2/3): a 1000-fold smaller
+        batch has 100-fold smaller face area.
         """
         V_melt = mass_kg / self.MELT_DENSITY_KG_M3
         V_total = V_melt * 1.20  # 20% freeboard
