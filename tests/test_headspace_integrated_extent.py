@@ -28,6 +28,7 @@ from simulator.core import (
     FO2_BUFFER_ACCOUNT,
     OXYGEN_RESERVOIR_NOOP_MOL,
     OXYGEN_SPECIES,
+    _headspace_buffer_release_roundoff_slack_mol,
 )
 from simulator.evaporation import (
     headspace_buffer_release_stock_mol,
@@ -1747,3 +1748,59 @@ def test_buffer_release_roundoff_scales_with_stock_but_material_overdraw_refuses
         refusal.buffer_release["excess_integrated"]
         - refusal.buffer_release["fo2_buffer_after_settle_mol"]
     ) > 0.99e-9
+
+
+def test_buffer_release_roundoff_counts_the_reviewed_ten_postings():
+    """Ten sequential ledger additions stay within the posting-aware budget.
+
+    Mutation: with the prior fixed k=2 budget, this six-ulp stock/ledger
+    gap exceeds slack and falsely refuses despite matching transfers.
+    """
+
+    opening_mol = 5.04514324972239
+    changes_mol = (
+        4.440892098500626e-16,
+        4.440892098500626e-16,
+        9.103828801926284e-14,
+        1.7985439526579938e-13,
+        -8.24024618984072e-6,
+        -0.0005244570072657773,
+        3.9968028886505635e-15,
+        9.103655329578686e-14,
+        0.04495806865660912,
+        -0.001000000000000778,
+    )
+    ledger_mol = opening_mol
+    for change_mol in changes_mol:
+        ledger_mol += change_mol
+
+    vapour_changes = changes_mol[:-1]
+    credit_mol = math.fsum(
+        change for change in vapour_changes if change > 0.0
+    )
+    debit_mol = -math.fsum(
+        change for change in vapour_changes if change < 0.0
+    )
+    uptake_mol = -changes_mol[-1]
+    stock_mol = headspace_buffer_release_stock_mol(
+        opening_mol,
+        credit_mol,
+        debit_mol,
+        uptake_mol,
+        noop_mol=OXYGEN_RESERVOIR_NOOP_MOL,
+    )
+    assert len(changes_mol) == 10
+    assert ledger_mol == 5.088568621125905
+    assert stock_mol == 5.08856862112591
+
+    record = {
+        "n_open": opening_mol,
+        "n_credit": credit_mol,
+        "n_debit": debit_mol,
+        "n_uptake": uptake_mol,
+        "fo2_buffer_after_settle_mol": ledger_mol,
+        "buffer_postings": len(changes_mol),
+    }
+    slack_mol = _headspace_buffer_release_roundoff_slack_mol(record)
+    assert stock_mol > ledger_mol + OXYGEN_RESERVOIR_NOOP_MOL
+    assert stock_mol <= ledger_mol + slack_mol

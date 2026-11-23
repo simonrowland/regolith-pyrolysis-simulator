@@ -1106,6 +1106,46 @@ CHAR_LANCE_BASIS_CO2 = 'C_plus_O2_to_CO2'
 CHAR_LANCE_BASIS_CO = 'C_plus_half_O2_to_CO'
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
+
+
+def _headspace_buffer_release_roundoff_slack_mol(
+    buffer_release: Mapping[str, Any],
+) -> float:
+    uptake = buffer_release.get("n_uptake")
+    stock_operations = (
+        0
+        if uptake is None
+        else 2 + int(float(uptake) != 0.0)
+    )
+    operation_count = (
+        int(buffer_release.get("buffer_postings", 0)) + stock_operations
+    )
+    magnitude_mol = math.fsum(
+        abs(float(term))
+        for term in (
+            buffer_release.get("n_open"),
+            buffer_release.get("n_credit"),
+            buffer_release.get("n_debit"),
+            uptake,
+            buffer_release.get("fo2_buffer_after_settle_mol"),
+        )
+        if term is not None
+    )
+    # Premise: each nonzero buffer lot rounds one ledger addition; the stock
+    # formula rounds two nontrivial operations at zero uptake and three with
+    # uptake. N is those operations together. Each contributes at most half
+    # an ulp of a running magnitude bounded by M, or 0.5 eps M. The extra
+    # eps M covers the final comparison-side addition, giving (N/2 + 1) eps M.
+    # M and the slack are mol; eps is dimensionless. As M -> 0 the noop is
+    # still the floor. At M = 10.1802 mol and N = 11, slack is 1.47e-14 mol.
+    return max(
+        OXYGEN_RESERVOIR_NOOP_MOL,
+        (operation_count / 2.0 + 1.0)
+        * sys.float_info.epsilon
+        * magnitude_mol,
+    )
+
+
 # Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
 # samples implied and ledger speciation at the same boundary.
 # TODO(SSO-R ch2 re-speciation): replace with the final respeciation gate.
@@ -4585,7 +4625,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """One post-settle record of the buffer release.
 
         The inventory refusal and the hour notice both carry this dict.
-        Nothing here posts, and the refusal comparison does not read it.
+        Nothing here posts. The refusal reads the stock terms, the number
+        of nonzero buffer O2 lots posted this hour, and the post-settle buffer.
         n_open, n_credit, n_debit and n_uptake are the arguments the
         stock function last evaluated outside a diagnostic sample.
         n_uptake is None when that evaluation did not ask the Fe split.
@@ -4627,10 +4668,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         above_floor = 0.0
         subfloor = 0.0
+        buffer_postings = 0
         registry = self.atom_ledger.registry
         start = max(0, int(transition_at))
         for transition in self.atom_ledger.transitions[start:]:
             name = str(getattr(transition, "name", "") or "")
+            for lot in (*transition.debits, *transition.credits):
+                if str(lot.account) != FO2_BUFFER_ACCOUNT:
+                    continue
+                buffer_mol = lot.species_moles_for(registry).get(
+                    OXYGEN_SPECIES, 0.0,
+                )
+                if float(buffer_mol or 0.0) != 0.0:
+                    buffer_postings += 1
             if not name.startswith("condense_"):
                 continue
             o2_credit = 0.0
@@ -4670,6 +4720,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "fo2_buffer_open_mol": float(signed_open_mol),
             "fo2_buffer_after_vapour_mol": float(signed_after_vapour_mol),
             "fo2_buffer_after_settle_mol": float(signed_after_settle_mol),
+            "buffer_postings": buffer_postings,
             "fe_uptake_committed_mol": float(fe_uptake),
             "condensation_o2_return_above_floor_mol": float(above_floor),
             "condensation_o2_return_subfloor_mol": float(subfloor),
@@ -9885,28 +9936,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # and it is not posted through a negative balance.
             signed_after_mol = signed_after_settle_mol
             available_mol = max(0.0, signed_after_mol)
-            roundoff_terms = (
-                buffer_release.get("n_open"),
-                buffer_release.get("n_credit"),
-                buffer_release.get("n_debit"),
-                buffer_release.get("n_uptake"),
-                signed_after_mol,
-            )
-            roundoff_magnitude_mol = math.fsum(
-                abs(float(term))
-                for term in roundoff_terms
-                if term is not None
-            )
-            # Premise: the residual compares a signed sum of these five
-            # mol terms. Four additions, each at most 0.5 ulp of a running
-            # magnitude no larger than M, bound roundoff by 2 eps M. Thus
-            # k = 2. M is mol and eps is dimensionless, so the slack is mol.
-            # At M ≈ 10 mol, the bound is 4.44e-15 mol, above the walk's
-            # 1.78e-15 mol (two ulp at 5.09 mol).
-            # Limit: as M tends to zero, the absolute noop remains the floor.
-            roundoff_slack_mol = max(
-                OXYGEN_RESERVOIR_NOOP_MOL,
-                2 * sys.float_info.epsilon * roundoff_magnitude_mol,
+            roundoff_slack_mol = (
+                _headspace_buffer_release_roundoff_slack_mol(buffer_release)
             )
             if (
                 excess_integrated
