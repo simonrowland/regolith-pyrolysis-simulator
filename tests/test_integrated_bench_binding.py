@@ -165,6 +165,41 @@ def _rewrite(
     return path
 
 
+def test_one_preset_snapshot_feeds_admission_spec_and_cache_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _configure(monkeypatch, tmp_path)
+    original = (REPO / ROBINOT_PRESET).read_bytes()
+    edited = original.replace(b"mass_g: 3.38", b"mass_g: 3.39")
+    assert edited != original
+    path = tmp_path / "robinot.yaml"
+    path.write_bytes(original)
+    read_preset = integrated_bench._read_preset_bytes
+    read_count = {"n": 0}
+
+    def read_then_edit(target: Path) -> bytes:
+        read_count["n"] += 1
+        snapshot = read_preset(target)
+        target.write_bytes(edited)
+        return snapshot
+
+    monkeypatch.setattr(integrated_bench, "_read_preset_bytes", read_then_edit)
+    deck = build_deck_request(path)
+    assert read_count["n"] == 1
+    assert deck.run.mass_kg == pytest.approx(0.00338)
+    assert deck.cache_request["preset_sha256"] == hashlib.sha256(original).hexdigest()
+    assert deck.preset_digest == "sha256:" + hashlib.sha256(original).hexdigest()
+    solver_masses: list[float] = []
+
+    def solve(_request):
+        solver_masses.append(deck.run.mass_kg)
+        return _ok_document(deck.requested_steps)
+
+    run_cached_deck(deck, solve)
+    assert solver_masses == [pytest.approx(0.00338)]
+
+
 def _plain(value):
     if isinstance(value, Mapping):
         return {str(key): _plain(item) for key, item in value.items()}
@@ -193,7 +228,7 @@ def test_simulator_is_engine_number_7_and_not_a_score_engine() -> None:
         "simulator",
     ]
     assert list(engine_cache._ENGINE_NUMBERS.values()) == [1, 2, 3, 4, 5, 6, 7]
-    assert engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"] == 2
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"] == 3
     from simulator.battery.score import SCORE_ENGINE_SET
 
     assert "simulator" not in {engine.value for engine in SCORE_ENGINE_SET}
@@ -215,6 +250,14 @@ def test_simulator_runtime_identity_is_the_runner_source() -> None:
     assert engine_cache._compute_runtime_identity("simulator") == (
         "source-sha256:" + engine_cache._file_sha256(runner)
     )
+
+
+def test_simulator_runner_hash_is_not_a_declared_cache_pin(
+    robinot_deck: DeckRequest,
+) -> None:
+    assert "simulator" not in robinot_deck.cache_request[
+        "external_engines"
+    ]["engine_identities"]
 
 
 def test_deck_module_does_not_reown_mass_loss_area_or_scoring() -> None:
@@ -341,17 +384,18 @@ def test_robinot_request_carries_printed_inputs_and_not_measurements(
         "external_engines",
         "python_version",
     }
-    assert request["trees"] == integrated_bench._tree_ids()
+    assert request["trees"] == integrated_bench._tree_ids(
+        robinot_deck.source_commit
+    )
     raw = (REPO / ROBINOT_PRESET).read_bytes()
     assert request["preset_sha256"] == hashlib.sha256(raw).hexdigest()
     assert request["leg"] == "faithful"
     assert request["python_version"] == platform.python_version()
     external = request["external_engines"]
-    assert set(external) == {"engines_local_toml_sha256", "declared_pins"}
+    assert set(external) == {"engines_local_toml_sha256", "engine_identities"}
     local_hash = external["engines_local_toml_sha256"]
     assert local_hash == "absent" or len(local_hash) == 64
-    assert external["declared_pins"] == integrated_bench.declared_engine_pins()
-    assert external["declared_pins"]["openimcc"].startswith("commit:66ec4a3")
+    assert external["engine_identities"]["openimcc"].startswith("commit:66ec4a3")
     blob = _blob(request)
     for token in _MEASURED_YIELDS:
         assert token not in blob
@@ -1383,17 +1427,85 @@ def _identity(**overrides):
     """One coarse key. Each override changes a single identity part."""
 
     trees = {"simulator": "a" * 40, "engines": "b" * 40, "data": "c" * 40}
-    pins = {"openimcc": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"}
+    identities = {"openimcc": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"}
     document = {
         "tree_ids": trees,
         "preset_sha256": "d" * 64,
         "leg": "faithful",
         "engines_local_toml_sha256": "e" * 64,
-        "declared_pins": pins,
+        "external_engine_identities": identities,
         "python_version": "3.12.0",
     }
     document.update(overrides)
     return deck_cache_request(**document)
+
+
+def _write_openimcc_declaration(root: Path, commit: str) -> None:
+    (root / "pyproject.toml").write_text(
+        "[project]\n"
+        'name = "regolith-test"\n'
+        'version = "0.0.0"\n'
+        "dependencies = [\n"
+        '  "openimcc @ git+https://github.com/simonrowland/openimcc@'
+        f'{commit}"\n'
+        "]\n",
+        encoding="utf-8",
+    )
+
+
+def test_deck_key_uses_the_matching_installed_openimcc_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", tmp_path)
+    installed = {"commit": "1" * 40}
+    monkeypatch.setattr(
+        engine_cache,
+        "_compute_runtime_identity",
+        lambda _engine: f"commit:{installed['commit']}",
+    )
+    _write_openimcc_declaration(tmp_path, installed["commit"])
+    engine_cache.runtime_identity.cache_clear()
+    first = build_deck_request(REPO / ROBINOT_PRESET)
+
+    installed["commit"] = "2" * 40
+    _write_openimcc_declaration(tmp_path, installed["commit"])
+    engine_cache.runtime_identity.cache_clear()
+    second = build_deck_request(REPO / ROBINOT_PRESET)
+
+    first_identity = first.cache_request["external_engines"]["engine_identities"]
+    second_identity = second.cache_request["external_engines"]["engine_identities"]
+    assert first_identity == {"openimcc": "commit:" + "1" * 40}
+    assert second_identity == {"openimcc": "commit:" + "2" * 40}
+    assert first.cache_bypass is second.cache_bypass is None
+    assert _key(first.cache_request) != _key(second.cache_request)
+
+    installed["commit"] = "3" * 40
+    engine_cache.runtime_identity.cache_clear()
+    mismatched = build_deck_request(REPO / ROBINOT_PRESET)
+    assert mismatched.cache_bypass == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
+
+
+def test_unavailable_active_engine_identity_bypasses_cache_with_notice(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", tmp_path)
+    _write_openimcc_declaration(tmp_path, "1" * 40)
+    monkeypatch.setattr(engine_cache, "_compute_runtime_identity", lambda _engine: "unavailable")
+    engine_cache.runtime_identity.cache_clear()
+    deck = build_deck_request(REPO / ROBINOT_PRESET)
+    assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
+    monkeypatch.setattr(
+        integrated_bench,
+        "cached_engine_call",
+        lambda *_args, **_kwargs: pytest.fail("identity-unknown deck used cache"),
+    )
+    hot = run_cached_deck(
+        deck,
+        lambda _request: _ok_document(deck.requested_steps),
+    )
+    assert hot["notice"] == integrated_bench.DECK_UNCACHED_ENGINE_IDENTITY
 
 
 def test_cache_key_includes_trees_preset_engines_and_python() -> None:
@@ -1408,7 +1520,9 @@ def test_cache_key_includes_trees_preset_engines_and_python() -> None:
     assert _key(base) != _key(_identity(leg="remediation"))
     assert _key(base) != _key(_identity(engines_local_toml_sha256="absent"))
     assert _key(base) != _key(_identity(
-        declared_pins={"openimcc": "commit:0000000000000000000000000000000000000000"},
+        external_engine_identities={
+            "openimcc": "commit:0000000000000000000000000000000000000000"
+        },
     ))
     assert _key(base) != _key(_identity(python_version="3.11.9"))
 
@@ -1420,7 +1534,7 @@ def test_cache_request_cannot_be_mutated(robinot_deck: DeckRequest) -> None:
     with pytest.raises(TypeError):
         request["trees"]["data"] = "0" * 40
     with pytest.raises(TypeError):
-        request["external_engines"]["declared_pins"]["openimcc"] = "commit:0"
+        request["external_engines"]["engine_identities"]["openimcc"] = "commit:0"
 
 
 def test_dirty_tree_runs_uncached_with_notice(
@@ -1428,9 +1542,11 @@ def test_dirty_tree_runs_uncached_with_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     database = _configure(monkeypatch, tmp_path)
-    monkeypatch.setattr(integrated_bench, "_working_tree_dirty", lambda: True)
+    monkeypatch.setattr(
+        integrated_bench, "_working_tree_clean_against", lambda _commit: False
+    )
     deck = build_deck_request(REPO / ROBINOT_PRESET)
-    assert deck.cache_bypass == integrated_bench.DECK_UNCACHED_DIRTY_TREE
+    assert deck.cache_bypass is None
     seeded = _ok_document(deck.requested_steps)
     seeded["per_hour_summary"][0]["P_total_bar"] = 0.021
     version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
@@ -1460,6 +1576,28 @@ def test_dirty_tree_runs_uncached_with_notice(
     assert hot["notice"] == integrated_bench.DECK_UNCACHED_DIRTY_TREE
     assert hot["per_hour_summary"][0]["P_total_bar"] == pytest.approx(0.033)
     assert _stored_rows(database) == before
+
+
+def test_tree_that_becomes_dirty_during_miss_is_not_inserted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = _configure(monkeypatch, tmp_path)
+    deck = build_deck_request(REPO / ROBINOT_PRESET)
+    checks = {"n": 0}
+
+    def clean_once(_commit: str) -> bool:
+        checks["n"] += 1
+        return checks["n"] == 1
+
+    monkeypatch.setattr(integrated_bench, "_working_tree_clean_against", clean_once)
+    hot = run_cached_deck(
+        deck,
+        lambda _request: _ok_document(deck.requested_steps),
+    )
+    assert checks["n"] == 2
+    assert hot["notice"] == integrated_bench.DECK_UNCACHED_DIRTY_TREE
+    assert _stored_rows(database) == []
 
 
 def _git(args: list[str], *, env: dict[str, str] | None = None, data: bytes | None = None) -> str:
@@ -1522,16 +1660,17 @@ def test_a_vapour_table_byte_changes_the_data_tree_id(tmp_path: Path) -> None:
             check=False,
         )
         assert missing.returncode != 0
-    base_ids = integrated_bench._tree_ids()
+    commit = integrated_bench._git_text(["rev-parse", "HEAD"])
+    base_ids = integrated_bench._tree_ids(commit)
     changed = dict(base_ids)
     changed["data"] = new_tree
-    pins = integrated_bench.declared_engine_pins()
+    identities = {"openimcc": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"}
     left = deck_cache_request(
         tree_ids=base_ids,
         preset_sha256="ab" * 32,
         leg="faithful",
         engines_local_toml_sha256="absent",
-        declared_pins=pins,
+        external_engine_identities=identities,
         python_version=platform.python_version(),
     )
     right = deck_cache_request(
@@ -1539,7 +1678,7 @@ def test_a_vapour_table_byte_changes_the_data_tree_id(tmp_path: Path) -> None:
         preset_sha256="ab" * 32,
         leg="faithful",
         engines_local_toml_sha256="absent",
-        declared_pins=pins,
+        external_engine_identities=identities,
         python_version=platform.python_version(),
     )
     assert _key(left) != _key(right)
@@ -1972,14 +2111,13 @@ def _apply_shape_defect(payload: dict, defect: str) -> bool:
         "surface_empty",
     ],
 )
-def test_cold_and_validated_shape_agree(defect: str) -> None:
-    """Store and hit use one shape judgment, including a present null map."""
+def test_cold_projection_shape(defect: str) -> None:
+    """The store projection applies one shape judgment, including null maps."""
 
     payload = _ok_document(1)
     expect = _apply_shape_defect(payload, defect)
     hot, cacheable = project_whole_run(payload, requested_steps=1)
     assert cacheable is expect
-    assert integrated_bench._validated_ok_document(payload, 1) is expect
     if defect == "null":
         assert hot["per_hour_summary"][0]["vapor_species_kg_hr"] is None
     elif defect == "invalid_name":
@@ -2034,6 +2172,32 @@ def test_loaded_shape_defect_is_rejected_like_the_cold_row(
     assert error.value.reason == "cache_hit_not_ok"
 
 
+def test_loaded_measurement_slot_is_rejected_on_cache_hit(
+    robinot_deck: DeckRequest,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = _ok_document(robinot_deck.requested_steps)
+    payload["measurement_selectors"] = {"id": "uncertainty"}
+    assert project_whole_run(
+        payload, requested_steps=robinot_deck.requested_steps
+    )[1] is False
+    db_path = _configure(monkeypatch, tmp_path)
+    key = _key(robinot_deck.cache_request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["simulator"]
+    first_row = engine_cache.ENGINE_CACHE_BOX_RANGES["s2"][0]
+    assert engine_cache.load_cache_rows(
+        db_path,
+        [(key, payload, "simulator", version, "s2", first_row)],
+    ) == 1
+    with pytest.raises(IntegratedBenchContractError) as error:
+        run_cached_deck(
+            robinot_deck,
+            lambda *_args: pytest.fail("measurement payload should be rejected"),
+        )
+    assert error.value.reason == "cache_hit_not_ok"
+
+
 @pytest.mark.parametrize(
     "defect",
     ["empty_map", "pump_token", "surface_species", "surface_empty"],
@@ -2065,6 +2229,7 @@ def test_loaded_clean_shape_is_a_hit(
     hit = run_cached_deck(robinot_deck, unexpected)
     assert hit["status"] == "ok"
     assert "reason" not in hit
+    assert "note" not in hit
 
 
 @pytest.mark.parametrize("status", ["failed", "refused"])
@@ -2089,6 +2254,12 @@ def test_measurement_slot_on_the_prediction_is_refused() -> None:
     assert cacheable is True
     assert "trajectory_comparison" not in hot
     assert "measurement_selectors" not in hot
+    malformed = _ok_document(1)
+    malformed["measurement_selectors"] = {"id": "uncertainty"}
+    projected, cacheable = project_whole_run(malformed, requested_steps=1)
+    assert cacheable is False
+    assert projected["status"] == "partial"
+    assert projected["reason"] == "measurement_in_prediction"
 
 
 def test_dynamic_species_id_named_uncertainty_is_legal() -> None:
@@ -2110,7 +2281,7 @@ def test_setpoints_path_override_is_not_cached(tmp_path: Path) -> None:
 
 
 def test_config_bundle_reloads_when_any_path_changes(tmp_path: Path) -> None:
-    """An unfrozen run reloads when a path changes and ignores an in-place edit."""
+    """Unfrozen runs reload in place; frozen decks retain their first snapshot."""
 
     from simulator.runner import PyrolysisRun
 
@@ -2145,9 +2316,26 @@ def test_config_bundle_reloads_when_any_path_changes(tmp_path: Path) -> None:
     second = run._load_config_bundle()
     assert second.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == pytest.approx(2.0)
     high.write_bytes(high.read_bytes().replace(b"{Fe: 2.0}", b"{Fe: 3.0}"))
-    held = run._load_config_bundle()
-    assert held.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == pytest.approx(2.0)
+    reloaded = run._load_config_bundle()
+    assert reloaded.feedstocks["lunar_eac_1a"]["bulk_additions"]["Fe"] == pytest.approx(3.0)
     run.setpoints_path = setpoints
     assert run._load_config_bundle().source_paths["setpoints"] == setpoints
     run.vapor_pressures_path = vapor
     assert run._load_config_bundle().source_paths["vapor_pressures"] == vapor
+
+    frozen = PyrolysisRun(
+        feedstock_id="lunar_eac_1a",
+        campaign="C0",
+        hours=1,
+        mass_kg=0.00338,
+        feedstocks_path=high,
+    )
+    frozen.freeze_configuration()
+    frozen_snapshot = frozen._load_config_bundle()
+    high.write_bytes(high.read_bytes().replace(b"{Fe: 3.0}", b"{Fe: 4.0}"))
+    assert frozen._load_config_bundle().feedstocks["lunar_eac_1a"][
+        "bulk_additions"
+    ]["Fe"] == pytest.approx(3.0)
+    assert frozen_snapshot.feedstocks["lunar_eac_1a"]["bulk_additions"][
+        "Fe"
+    ] == pytest.approx(3.0)

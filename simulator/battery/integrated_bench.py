@@ -9,10 +9,10 @@ The chemistry version for engine ``simulator`` lives in
 changes. The cache key is the execution identity, not a walk of the
 resolved configuration:
 
-* git tree ids of ``simulator/``, ``engines/``, and ``data/`` at HEAD
+* git tree ids of ``simulator/``, ``engines/``, and ``data/`` at the captured commit
 * sha256 of the deck file bytes, plus the leg selected from that file
 * sha256 of ``engines/engines.local.toml`` (or ``absent``) and the
-  declared engine pins
+  installed external-engine identities checked against their declarations
 * the Python version
 
 A dirty tree under those three paths does not read or write the cache.
@@ -35,8 +35,9 @@ from typing import Any
 
 from simulator.condensation import LabGeometryError
 from simulator.engine_cache import (
-    ENGINE_CHEMISTRY_VERSION_IDENTITY_AT,
     EngineCacheValue,
+    RuntimeIdentityUnknown,
+    active_external_engine_identities,
     cached_engine_call,
     record_engine_open,
 )
@@ -97,6 +98,7 @@ MEASUREMENT_SLOT_KEYS = (
 _TREE_PREFIXES = ("simulator", "engines", "data")
 DECK_UNCACHED_DIRTY_TREE = "deck_uncached_dirty_tree"
 DECK_UNCACHED_PATH_OVERRIDE = "deck_uncached_path_override"
+DECK_UNCACHED_ENGINE_IDENTITY = "deck_uncached_engine_identity"
 
 
 def _readonly(value: Any) -> Any:
@@ -111,22 +113,13 @@ def _readonly(value: Any) -> Any:
     return value
 
 
-def declared_engine_pins() -> dict[str, str]:
-    """Identity strings declared for each engine, including OpenIMCC."""
-
-    return {
-        str(name): str(record["identity"])
-        for name, record in sorted(ENGINE_CHEMISTRY_VERSION_IDENTITY_AT.items())
-    }
-
-
 def deck_cache_request(
     *,
     tree_ids: Mapping[str, str],
     preset_sha256: str,
     leg: str,
     engines_local_toml_sha256: str,
-    declared_pins: Mapping[str, str],
+    external_engine_identities: Mapping[str, str],
     python_version: str,
 ) -> Mapping[str, Any]:
     """The lookup identity. Each argument is one part of the key."""
@@ -144,9 +137,9 @@ def deck_cache_request(
         "leg": str(leg),
         "external_engines": {
             "engines_local_toml_sha256": str(engines_local_toml_sha256),
-            "declared_pins": {
-                str(name): str(declared_pins[name])
-                for name in sorted(declared_pins)
+            "engine_identities": {
+                str(name): str(external_engine_identities[name])
+                for name in sorted(external_engine_identities)
             },
         },
         "python_version": str(python_version),
@@ -206,6 +199,7 @@ class DeckRequest:
     packs. ``lineage`` names the role of each boundary so a later score can
     flag it after lookup. ``run`` is the runner object the solve calls.
     ``requested_steps`` is the step count ``drive_session`` executes.
+    ``source_commit`` supplies all tree ids and cleanliness checks.
     ``cache_bypass`` is a typed notice when this deck must not touch the cache.
     """
 
@@ -213,6 +207,7 @@ class DeckRequest:
     resolved_configuration: dict[str, Any]
     lineage: dict[str, Any]
     preset_digest: str
+    source_commit: str
     run: PyrolysisRun
     requested_steps: int
     cache_bypass: str | None = None
@@ -499,15 +494,24 @@ def _git_text(args: list[str]) -> str:
     return completed.stdout.strip()
 
 
-def _working_tree_dirty() -> bool:
-    """True when ``simulator/``, ``engines/``, or ``data/`` is not a clean commit."""
+def _working_tree_clean_against(commit: str) -> bool:
+    """Check tracked and untracked cache inputs against the captured commit."""
 
-    return bool(_git_text(["status", "--porcelain", "--", *_TREE_PREFIXES]))
+    try:
+        return not any((
+            _git_text(["diff", "--name-only", commit, "--", *_TREE_PREFIXES]),
+            _git_text(["diff", "--cached", "--name-only", commit, "--", *_TREE_PREFIXES]),
+            _git_text([
+                "ls-files", "--others", "--exclude-standard", "--", *_TREE_PREFIXES
+            ]),
+        ))
+    except IntegratedBenchContractError:
+        return False
 
 
-def _tree_ids() -> dict[str, str]:
+def _tree_ids(commit: str) -> dict[str, str]:
     return {
-        name: _git_text(["rev-parse", f"HEAD:{name}"])
+        name: _git_text(["rev-parse", f"{commit}:{name}"])
         for name in _TREE_PREFIXES
     }
 
@@ -530,11 +534,10 @@ def _read_preset_bytes(path: Path) -> bytes:
         ) from exc
 
 
-def _read_preset_document(path: Path) -> Mapping[str, Any]:
+def _read_preset_document(path: Path, raw: bytes) -> Mapping[str, Any]:
     try:
-        raw = _read_preset_bytes(path)
         document = load_cached_safe_yaml(raw) or {}
-    except (OSError, UnicodeDecodeError) as exc:
+    except UnicodeDecodeError as exc:
         raise IntegratedBenchContractError(
             f"preset {path} is unreadable",
             kind="no_deck",
@@ -565,10 +568,15 @@ def build_deck_request(
     engine, and Python identity captured with that freeze.
     """
 
-    document = _read_preset_document(preset_path)
-    _refuse_uncacheable_preset(document)
+    source_commit = _git_text(["rev-parse", "HEAD"])
     preset_bytes = _read_preset_bytes(preset_path)
-    spec = _load_vacuum_preset_run_spec(preset_path, leg)
+    document = _read_preset_document(preset_path, preset_bytes)
+    _refuse_uncacheable_preset(document)
+    spec = _load_vacuum_preset_run_spec(
+        preset_path,
+        leg,
+        raw_bytes=preset_bytes,
+    )
     run = PyrolysisRun(
         feedstock_id=spec.feedstock_id,
         campaign="C0",
@@ -605,18 +613,20 @@ def build_deck_request(
             reason="no_usable_composition",
         ) from exc
     schedule_lineage = _schedule_lineage(run.lab_schedule)
+    engine_identities = active_external_engine_identities(SIMULATOR_ENGINE)
+    bypass: str | None = None
+    if isinstance(engine_identities, RuntimeIdentityUnknown):
+        engine_identities = {engine_identities.engine_id: "unavailable"}
+        bypass = DECK_UNCACHED_ENGINE_IDENTITY
     cache_request = deck_cache_request(
-        tree_ids=_tree_ids(),
+        tree_ids=_tree_ids(source_commit),
         preset_sha256=hashlib.sha256(preset_bytes).hexdigest(),
         leg=str(leg),
         engines_local_toml_sha256=_engines_local_toml_sha256(),
-        declared_pins=declared_engine_pins(),
+        external_engine_identities=engine_identities,
         python_version=platform.python_version(),
     )
-    bypass: str | None = None
-    if _working_tree_dirty():
-        bypass = DECK_UNCACHED_DIRTY_TREE
-    elif any(
+    if bypass is None and any(
         path is not None
         for path in (
             run.feedstocks_path,
@@ -648,6 +658,7 @@ def build_deck_request(
         resolved_configuration=resolved,
         lineage=lineage,
         preset_digest=digest,
+        source_commit=source_commit,
         run=run,
         requested_steps=int(run.hours),
         cache_bypass=bypass,
@@ -941,6 +952,12 @@ def project_whole_run(
     rows = document.get("per_hour_summary")
     projected_rows: list[dict[str, Any]] = []
     issues: list[str] = []
+    try:
+        assert_measurement_slots_outside_prediction(document)
+    except IntegratedBenchContractError as exc:
+        measurement_issue = exc.reason
+    else:
+        measurement_issue = None
     if isinstance(rows, list):
         for row in rows:
             projected, issue = _project_step(row)
@@ -966,7 +983,10 @@ def project_whole_run(
         else incoming if isinstance(incoming, str) else str(incoming)
     )
     if status_text == _SUCCESS_STATUS:
-        if "malformed_row" in issues:
+        if measurement_issue is not None:
+            status_text = "partial"
+            reason = measurement_issue
+        elif "malformed_row" in issues:
             status_text = "partial"
             reason = "malformed_row"
         elif "index_only_row" in issues:
@@ -1005,20 +1025,6 @@ def project_whole_run(
     return hot, cacheable
 
 
-def _validated_ok_document(result: Any, requested_steps: int) -> bool:
-    """True when the store projection calls this document a complete ok run.
-
-    Cold store and every hit, including rows inserted by ``load_cache_rows``,
-    use ``project_whole_run``. Shape, status, and reason are not checked
-    anywhere else.
-    """
-
-    if not isinstance(result, Mapping):
-        return False
-    _hot, cacheable = project_whole_run(result, requested_steps=requested_steps)
-    return cacheable
-
-
 def run_cached_deck(
     deck: DeckRequest,
     solve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
@@ -1036,14 +1042,18 @@ def run_cached_deck(
         return deck.run.run()
 
     solver = solve if solve is not None else _execute
-    if deck.cache_bypass:
+
+    def _run_uncached(reason: str) -> Any:
         document = solver(deck.cache_request)
         hot, _cacheable = project_whole_run(
             document,
             requested_steps=deck.requested_steps,
         )
-        hot["notice"] = deck.cache_bypass
+        hot["notice"] = reason
         return hot
+
+    if deck.cache_bypass:
+        return _run_uncached(deck.cache_bypass)
     session = deck.resolved_configuration.get("session")
     mitigation = session.get("mitigation") if isinstance(session, Mapping) else None
     cold = {
@@ -1068,16 +1078,27 @@ def run_cached_deck(
         identity = record_engine_open(SIMULATOR_ENGINE)
         if isinstance(identity, str):
             cold["runtime_identity"] = identity
+        if not _working_tree_clean_against(deck.source_commit):
+            hot["notice"] = DECK_UNCACHED_DIRTY_TREE
+            cacheable = False
         return EngineCacheValue(hot=hot, cold=dict(cold), cacheable=cacheable)
 
     record_engine_open(SIMULATOR_ENGINE)
+    if not _working_tree_clean_against(deck.source_commit):
+        return _run_uncached(DECK_UNCACHED_DIRTY_TREE)
     result = cached_engine_call(SIMULATOR_ENGINE, deck.cache_request, _solve)
-    if not solved and not _validated_ok_document(result, deck.requested_steps):
-        raise IntegratedBenchContractError(
-            "a cache hit returned a document that is not a complete ok run",
-            kind="no_deck",
-            reason="cache_hit_not_ok",
+    if not solved:
+        hot, cacheable = project_whole_run(
+            result,
+            requested_steps=deck.requested_steps,
         )
+        if not cacheable:
+            raise IntegratedBenchContractError(
+                "a cache hit returned a document that is not a complete ok run",
+                kind="no_deck",
+                reason="cache_hit_not_ok",
+            )
+        return hot
     return result
 
 

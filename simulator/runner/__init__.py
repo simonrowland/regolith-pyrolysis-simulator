@@ -386,7 +386,11 @@ def _load_preset_run_spec(
                 "preset_kind": preset_kind,
             },
         )
-    return _load_vacuum_preset_run_spec(path, str(leg or "faithful"))
+    return _load_vacuum_preset_run_spec(
+        path,
+        str(leg or "faithful"),
+        raw_bytes=raw_bytes,
+    )
 
 
 def _load_mre_preset_run_spec(
@@ -448,7 +452,12 @@ def _load_mre_preset_run_spec(
     )
 
 
-def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
+def _load_vacuum_preset_run_spec(
+    path: Path,
+    leg: str,
+    *,
+    raw_bytes: bytes | None = None,
+) -> PresetRunSpec:
     requested_leg = str(leg or "faithful").strip()
     base_provenance = {
         "path": str(path),
@@ -459,18 +468,19 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             "malformed_preset: --leg must be non-empty",
             provenance=base_provenance,
         )
-    try:
-        raw_bytes = path.read_bytes()
-    except FileNotFoundError as exc:
-        raise PresetRunnerError(
-            f"malformed_preset: preset file missing: {path}",
-            provenance=base_provenance,
-        ) from exc
-    except OSError as exc:
-        raise PresetRunnerError(
-            f"malformed_preset: could not read preset file {path}: {exc}",
-            provenance=base_provenance,
-        ) from exc
+    if raw_bytes is None:
+        try:
+            raw_bytes = path.read_bytes()
+        except FileNotFoundError as exc:
+            raise PresetRunnerError(
+                f"malformed_preset: preset file missing: {path}",
+                provenance=base_provenance,
+            ) from exc
+        except OSError as exc:
+            raise PresetRunnerError(
+                f"malformed_preset: could not read preset file {path}: {exc}",
+                provenance=base_provenance,
+            ) from exc
 
     digest = hashlib.sha256(raw_bytes).hexdigest()
     provenance = {
@@ -1620,20 +1630,19 @@ class PyrolysisRun:
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
-        """Load recipe files for the current path triple.
-
-        The same paths reuse the first snapshot, so a file edited in
-        place after that load is not read again. A reused run that
-        switches ``feedstocks_path``, ``setpoints_path``, or
-        ``vapor_pressures_path`` loads the new files.
-        """
+        """Load recipe files, retaining a snapshot only for frozen runs."""
 
         paths = (
             self.feedstocks_path,
             self.setpoints_path,
             self.vapor_pressures_path,
         )
-        if self._config_bundle is None or self._config_bundle_paths != paths:
+        frozen = getattr(self, "_configuration_frozen", False)
+        if (
+            not frozen
+            or self._config_bundle is None
+            or self._config_bundle_paths != paths
+        ):
             try:
                 bundle = load_config_bundle(
                     DATA_DIR,

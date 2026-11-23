@@ -360,11 +360,13 @@ ENGINE_CHEMISTRY_VERSION = {
     # Deck cache for integrated-bench runs. Not a melt engine and not a
     # SCORE_ENGINE_SET member. Owned by simulator/battery/integrated_bench.py.
     # v2 invalidates v1 keys that omitted feedstock sections and quoted area.
-    "simulator": 2,
+    # v3 binds the active installed external engine to the coarse deck key.
+    "simulator": 3,
 }
 
-# Bump only when an engine change can alter predictions. Runtime identity is
-# diagnostic and does not change cache keys or expire cached outputs.
+# Bump when an engine change can alter predictions. Runtime identities are
+# diagnostic for engine-output caches; integrated-bench keys separately bind
+# active external package identities in their request.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
 # thermoengine v1: 2026-11-08 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache version
@@ -384,6 +386,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
 # simulator v1: 2026-11-22 integrated_bench.py deck cache - bump when the runner projection, schedule interpretation, process timestep, session-config resolution, feedstocks, setpoints, vapor, species, materials, foulant, or nested melt-engine chemistry changes a cached number
 # simulator v2: 2026-11-23 deck key uses the inventory feedstock masses, the area reader, the power-driver curve, and the resolved process timestep - v1 entries are not reused
+# simulator v3: 2026-11-23 deck key binds the installed external engine identity and the preset execution snapshot
 
 
 @dataclass(frozen=True)
@@ -1144,6 +1147,75 @@ def _compute_runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
 def runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
     """Return the one per-process runtime identity captured at engine open."""
     return _compute_runtime_identity(engine_id)
+
+
+def active_external_engine_identities(
+    engine_id: str,
+) -> dict[str, str] | RuntimeIdentityUnknown:
+    """Read declared package pins and require the matching installed builds."""
+
+    try:
+        inputs = ENGINE_CACHE_INPUTS[engine_id]
+    except KeyError:
+        return RuntimeIdentityUnknown(
+            engine_id,
+            "declared_engine_inputs_missing",
+            "ENGINE_CACHE_INPUTS has no entry",
+        )
+
+    identities: dict[str, str] = {}
+    for input_ref in inputs:
+        if input_ref.kind != "pyproject-dependency":
+            continue
+        package_name = (input_ref.selector or "").replace("_", "-").lower()
+        try:
+            component = _cache_input_component(engine_id, input_ref)
+            dependency = json.loads(component)
+        except (EngineCacheInputIdentityError, json.JSONDecodeError) as exc:
+            return RuntimeIdentityUnknown(
+                package_name or engine_id,
+                "declared_dependency_unreadable",
+                str(exc),
+            )
+        match = (
+            re.fullmatch(
+                r"\s*([A-Za-z0-9._-]+)\s*@\s*(\S+)\s*",
+                dependency,
+            )
+            if isinstance(dependency, str)
+            else None
+        )
+        if match is None or match.group(1).replace("_", "-").lower() != package_name:
+            return RuntimeIdentityUnknown(
+                package_name or engine_id,
+                "dependency_not_commit_pinned",
+                f"{input_ref.path} does not declare a direct VCS pin",
+            )
+        revision = match.group(2).rsplit("@", 1)[-1].split("#", 1)[0]
+        if re.fullmatch(r"[0-9a-fA-F]{40}", revision) is None:
+            return RuntimeIdentityUnknown(
+                package_name,
+                "dependency_not_commit_pinned",
+                f"{input_ref.path} does not declare a full commit",
+            )
+        declared = f"commit:{revision.lower()}"
+        installed = runtime_identity(package_name)
+        if isinstance(installed, RuntimeIdentityUnknown):
+            return installed
+        if installed == "unavailable":
+            return RuntimeIdentityUnknown(
+                package_name,
+                "runtime_identity_unavailable",
+                "installed distribution has no readable identity",
+            )
+        if installed != declared:
+            return RuntimeIdentityUnknown(
+                package_name,
+                "declared_installed_identity_mismatch",
+                f"declared {declared}, installed {installed}",
+            )
+        identities[package_name] = installed
+    return identities
 
 
 def record_engine_open(engine_id: str, backend: Any | None = None) -> str | None:
