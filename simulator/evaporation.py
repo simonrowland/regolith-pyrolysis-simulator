@@ -1367,6 +1367,49 @@ def _load_evaporation_alpha_envelope_by_species(
     return envelope_by_species
 
 
+def gate_dispatch_curve_notices(
+    diagnostic: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Notices a single gate dispatch publishes on its own curve.
+
+    Module-level: the notices depend only on the dispatch diagnostic, not on
+    simulator state, so callers (including test stand-ins for the mixin) need
+    no bound method.
+    """
+
+    notices: dict[str, Any] = {}
+    fallback_provider = diagnostic.get('kernel_fallback_used')
+    if fallback_provider == 'alphamelts-diagnostic':
+        # Step 3 supplies measured-bracket validation. Until then this
+        # diagnostic prediction must not earn the primary MAGEMin
+        # binding's cache admission through the shared fallback slot.
+        notices['calibration_status'] = 'pending_validation'
+    step_down = diagnostic.get('gate_provider_step_down')
+    if step_down:
+        notices['gate_provider_step_down'] = step_down
+    backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
+    if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
+        for attempt in (step_down or {}).get('failed_providers', ()):
+            details = attempt['diagnostic'].get('backend_diagnostics') or {}
+            if 'condensed_phase_reference_pressure_bar' in details:
+                backend_diagnostic = details
+    if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
+        notices['alphamelts_reference_pressure'] = {
+            key: backend_diagnostic[key] for key in (
+                'physical_overhead_pressure_bar',
+                'condensed_phase_reference_pressure_bar',
+            )
+        }
+        for key in (
+            'solidus_bracket_C', 'liquidus_bracket_C', 'numerical_path_warning',
+            'commissioning_notice', 'authority', 'certified_band',
+        ):
+            if key in backend_diagnostic:
+                notices['alphamelts_reference_pressure'][key] = (
+                    backend_diagnostic[key]
+                )
+    return notices
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -4210,45 +4253,6 @@ class EvaporationMixin:
             amount_kg=sum(mass_by_species.values()),
         )
 
-    def _gate_dispatch_curve_notices(
-        self,
-        diagnostic: Mapping[str, Any],
-    ) -> dict[str, Any]:
-        """Notices a single gate dispatch publishes on its own curve."""
-
-        notices: dict[str, Any] = {}
-        fallback_provider = diagnostic.get('kernel_fallback_used')
-        if fallback_provider == 'alphamelts-diagnostic':
-            # Step 3 supplies measured-bracket validation. Until then this
-            # diagnostic prediction must not earn the primary MAGEMin
-            # binding's cache admission through the shared fallback slot.
-            notices['calibration_status'] = 'pending_validation'
-        step_down = diagnostic.get('gate_provider_step_down')
-        if step_down:
-            notices['gate_provider_step_down'] = step_down
-        backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
-        if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
-            for attempt in (step_down or {}).get('failed_providers', ()):
-                details = attempt['diagnostic'].get('backend_diagnostics') or {}
-                if 'condensed_phase_reference_pressure_bar' in details:
-                    backend_diagnostic = details
-        if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
-            notices['alphamelts_reference_pressure'] = {
-                key: backend_diagnostic[key] for key in (
-                    'physical_overhead_pressure_bar',
-                    'condensed_phase_reference_pressure_bar',
-                )
-            }
-            for key in (
-                'solidus_bracket_C', 'liquidus_bracket_C', 'numerical_path_warning',
-                'commissioning_notice', 'authority', 'certified_band',
-            ):
-                if key in backend_diagnostic:
-                    notices['alphamelts_reference_pressure'][key] = (
-                        backend_diagnostic[key]
-                    )
-        return notices
-
     def _abandoned_gate_environment_record(
         self,
         diagnostic: Mapping[str, Any],
@@ -4298,7 +4302,7 @@ class EvaporationMixin:
             'status': status,
             'hour': int(self.melt.hour),
         }
-        record.update(self._gate_dispatch_curve_notices(owned))
+        record.update(gate_dispatch_curve_notices(owned))
         return record
 
     def _freeze_gate_curve_from_gate_dispatch(
@@ -4390,7 +4394,7 @@ class EvaporationMixin:
         fallback_provider = diagnostic.get('kernel_fallback_used')
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
-        notices = self._gate_dispatch_curve_notices(diagnostic)
+        notices = gate_dispatch_curve_notices(diagnostic)
         if abandoned_environment is not None:
             notices[ENVIRONMENT_RETRIES_KEY] = abandoned_environment
         status_outcome = gate_curve_provider_outcome_for_status(
