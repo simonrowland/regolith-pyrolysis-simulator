@@ -379,10 +379,16 @@ def test_zaitsev_1999_table1_error_scope_and_scored_bands():
         assert after_residual.numeric.metric_uncertainty is not None
         assert after_residual.numeric.metric_uncertainty.kind is UncertaintyKind.PRINTED
         assert before_residual.numeric.value == after_residual.numeric.value
+        # Table 1 is an unknown-method activity point: car A's DP-011 path
+        # predicts it with a typed method_assumed notice whose basis is the
+        # registry sentence, and keeps it out of the clean headline.
         assert any(
-            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            notice.kind is NoticeKind.METHOD_ASSUMED
+            and "the quantity's definition fixes the comparison"
+            in f"{notice.reason} {getattr(notice.policy, 'value', '')}"
             for notice in after_residual.notices
         )
+        assert after_residual.score_eligible is False
         assert any(
             notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
             for notice in after_residual.notices

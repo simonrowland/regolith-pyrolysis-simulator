@@ -3002,7 +3002,10 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
     assert all(
         residual.score_eligible is False
         and any(
-            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            # The missing in-cell partial-pressure sum is now the flagged
+            # effusion-regime assumption (validity._effusion_regime_flag), not a
+            # generic unverified-apparatus notice. The reason still names the check.
+            notice.kind is NoticeKind.EFFUSION_REGIME_ASSUMED
             and "in_cell_partial_pressure_sum" in notice.reason
             for notice in residual.notices
         )
