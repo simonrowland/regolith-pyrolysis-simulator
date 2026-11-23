@@ -21,7 +21,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal
 
-from simulator.battery.default_policy import resolve as resolve_default_policy
+from simulator.battery.default_policy import load_policy_table
 from simulator.battery.decimal_tokens import _decimal_rounding_half_width
 from simulator.battery.enums import (
     AmountBasis,
@@ -58,6 +58,7 @@ SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE = (
 _PHASE_COMPOSITION_MISSING_ORIGINAL_REASON = (
     "identity_incomplete:missing_input:composition"
 )
+DP_017 = "DP-017"
 
 INPUT_PROVENANCE_TOKENS = frozenset(
     {
@@ -315,28 +316,21 @@ def _component_names(composition: Composition) -> set[str]:
     return {name for name, _amount in composition.components}
 
 
-def _phase_composition_policy(
-    composition: Composition, flag: NoticeKind
-) -> NoticePolicy:
+def _phase_composition_policy(composition: Composition) -> NoticePolicy:
     # DP-017 uses the system charge by mass balance; absent that, the
     # equilibrium liquid is only a proxy input for a different phase.
-    resolved = resolve_default_policy(
-        "DP-017",
-        value=(
-            f"{composition.basis}/{composition.amount_basis.value}: "
-            f"{composition.components!r}"
-        ),
-        flag=flag.value,
+    entry = load_policy_table()[DP_017]
+    value = ", ".join(
+        f"{name}={amount}" for name, amount in composition.components
     )
-    payload = resolved.payload["policy"]
-    if not isinstance(payload, Mapping):
-        raise TypeError("DP-017 resolved policy payload must be a mapping")
     return NoticePolicy(
-        id=str(payload["id"]),
-        version=payload["version"],
-        status=str(payload["status"]),
-        value=str(payload["value"]),
-        units=str(payload["units"]),
+        id=DP_017,
+        version=entry["version"],
+        status=str(entry["status"]),
+        value=(
+            f"{composition.basis}/{composition.amount_basis.value}: {value}"
+        ),
+        units=str(entry["units"]),
     )
 
 
@@ -470,9 +464,7 @@ def _phase_row_composition_input(
             composition=composition,
             notice=Notice(
                 kind=NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
-                policy=_phase_composition_policy(
-                    composition, NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS
-                ),
+                policy=_phase_composition_policy(composition),
                 affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
                 reason=(
                     f"{NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS.value}:"
@@ -663,9 +655,7 @@ def _phase_row_composition_input(
         composition=composition,
         notice=Notice(
             kind=NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
-            policy=_phase_composition_policy(
-                composition, NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE
-            ),
+            policy=_phase_composition_policy(composition),
             affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
             reason=(
                 f"{NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value}:"
