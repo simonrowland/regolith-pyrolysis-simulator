@@ -530,7 +530,7 @@ def _recipe_metadata(title: str, campaign: str = "C4") -> dict[str, object]:
 def _force_socketio_internal_analytical(monkeypatch) -> list[tuple[object, tuple, dict]]:
     captured_tasks: list[tuple[object, tuple, dict]] = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -875,7 +875,7 @@ def test_recipe_load_patch_does_not_mutate_active_cost_identity(
     original_costs = default_cost_parameters_block()
     emitted = []
     socketio = SimpleNamespace(
-        emit=lambda event, payload, **kwargs: emitted.append((event, payload, kwargs))
+        emit=lambda event, payload=None, *args, **kwargs: emitted.append((event, payload, kwargs))
     )
     monkeypatch.setattr(web_events, "_registered_socketio", socketio)
     _simulations[sid] = {
@@ -1023,13 +1023,13 @@ def test_submission_recipe_costs_apply_into_artifact_cost_block(
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     captured_payloads = []
 
-    def capture_persist(runner_payload, _run_id, *, store):
+    def capture_persist(runner_payload, run_id, *args, store=None, **kwargs):
         assert store is not None
         captured_payloads.append(copy.deepcopy(runner_payload))
         return {"execution_status": "ok"}
 
     monkeypatch.setattr(web_events, "persist_run_artifact", capture_persist)
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
     app = app_module.create_app()
     app.config["RECIPE_LIBRARY_DIR"] = tmp_path
     socket_sids_before = set(web_events._socket_client_ids)
@@ -1838,9 +1838,9 @@ def test_launcher_defaults_to_localhost_and_debug_off(monkeypatch):
     monkeypatch.delenv("REGOLITH_HOST", raising=False)
     monkeypatch.delenv("REGOLITH_PORT", raising=False)
     monkeypatch.delenv("REGOLITH_FLASK_DEBUG", raising=False)
-    monkeypatch.setattr(app_module, "create_app", lambda: object())
+    monkeypatch.setattr(app_module, "create_app", lambda *args, **kwargs: object())
 
-    def fake_run(app, **kwargs):
+    def fake_run(app, *args, **kwargs):
         call.update(kwargs)
 
     monkeypatch.setattr(app_module.socketio, "run", fake_run)
@@ -1859,9 +1859,9 @@ def test_launcher_does_not_allow_unsafe_werkzeug_on_public_host(monkeypatch):
     monkeypatch.setenv("REGOLITH_HOST", "0.0.0.0")
     monkeypatch.delenv("REGOLITH_ALLOW_UNSAFE_WERKZEUG", raising=False)
     monkeypatch.delenv("REGOLITH_FLASK_DEBUG", raising=False)
-    monkeypatch.setattr(app_module, "create_app", lambda: object())
+    monkeypatch.setattr(app_module, "create_app", lambda *args, **kwargs: object())
 
-    def fake_run(app, **kwargs):
+    def fake_run(app, *args, **kwargs):
         call.update(kwargs)
 
     monkeypatch.setattr(app_module.socketio, "run", fake_run)
@@ -1973,7 +1973,7 @@ def test_web_start_payload_exposes_backend_status():
 def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -2410,7 +2410,7 @@ def test_cached_real_misconfig_over_socket_is_input_not_backend_unavailable(
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
-        lambda event, payload, **kwargs: emitted.append(
+        lambda event, payload=None, *args, **kwargs: emitted.append(
             (event, payload, kwargs)
         ),
     )
@@ -2459,7 +2459,7 @@ def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
-        lambda event, payload, **kwargs: emitted.append(
+        lambda event, payload=None, *args, **kwargs: emitted.append(
             (event, payload, kwargs)
         ),
     )
@@ -2511,7 +2511,7 @@ def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
-        lambda event, payload, **kwargs: emitted.append(
+        lambda event, payload=None, *args, **kwargs: emitted.append(
             (event, payload, kwargs)
         ),
     )
@@ -2559,7 +2559,7 @@ def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
-        lambda event, payload, **kwargs: emitted.append(
+        lambda event, payload=None, *args, **kwargs: emitted.append(
             (event, payload, kwargs)
         ),
     )
@@ -2648,7 +2648,7 @@ def test_web_start_event_resolves_furnace_material_cap(
     )
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -2713,7 +2713,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
             return copy.deepcopy(setpoints)
         return original_load_yaml(filename)
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -2769,7 +2769,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
 def test_loaded_recipe_start_applies_patch_and_runtime_overrides(monkeypatch):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -2851,7 +2851,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 ):
     backend_called = False
 
-    def fail_if_backend_resolves(_backend_name):
+    def fail_if_backend_resolves(backend_name):
         nonlocal backend_called
         backend_called = True
         raise AssertionError("backend resolution should not run")
@@ -2894,7 +2894,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 
 
 def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch):
-    monkeypatch.setattr("web.events._get_backend", lambda _backend_name: InternalAnalyticalBackend())
+    monkeypatch.setattr("web.events._get_backend", lambda backend_name: InternalAnalyticalBackend())
     app = app_module.create_app()
     client = _identified_socket_client(app)
     assert client.is_connected()
@@ -2996,7 +2996,7 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
 ):
     backend_called = False
 
-    def fail_if_backend_resolves(_backend_name):
+    def fail_if_backend_resolves(backend_name):
         nonlocal backend_called
         backend_called = True
         raise AssertionError("backend resolution should not run")
@@ -3049,7 +3049,7 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
 def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -3105,7 +3105,7 @@ def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
 def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -3185,7 +3185,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
 ):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -3915,8 +3915,8 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
         session.completed = True
         return iter([step_result])
 
-    def capture_artifact(payload, _run_id, *, store):
-        captured_payloads.append(copy.deepcopy(payload))
+    def capture_artifact(runner_payload, run_id=None, *args, **kwargs):
+        captured_payloads.append(copy.deepcopy(runner_payload))
         return {"execution_status": "ok"}
 
     monkeypatch.setattr(web_events, "drive_session", drive_one)
@@ -3925,7 +3925,7 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
         "_tick_payload",
         lambda **kwargs: captured_tick_kwargs.append(kwargs) or {},
     )
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
     monkeypatch.setattr(web_events, "persist_run_artifact", capture_artifact)
 
     try:
@@ -4022,7 +4022,7 @@ def test_terminal_state_finishes_before_terminal_emit(
 
     monkeypatch.setattr(web_events, "_persist_terminal", persist_terminal)
     monkeypatch.setattr(web_events, "drive_session", drive)
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
     monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
 
     try:
@@ -4169,7 +4169,7 @@ def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, o
             return _terminal_runner_document(recorded_outcome)
 
     if outcome == "ok":
-        monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+        monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {"done": True})
     elif outcome == "refused":
         monkeypatch.setattr(
             web_events,
@@ -4337,13 +4337,13 @@ def test_web_run_payload_captures_effective_config_sources(monkeypatch):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     captured_payloads = []
 
-    def capture_persist(runner_payload, _run_id, *, store):
+    def capture_persist(runner_payload, run_id=None, *args, store=None, **kwargs):
         assert store is not None
         captured_payloads.append(copy.deepcopy(runner_payload))
         return {"execution_status": "ok"}
 
     monkeypatch.setattr(web_events, "persist_run_artifact", capture_persist)
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
     app = app_module.create_app()
     client = _identified_socket_client(app)
     before = set(_simulations)
@@ -4453,7 +4453,7 @@ def test_persist_failure_visible_on_all_terminal_paths(
             "ok" if terminal_path in {"ok", "c6_refused"} else "refused"
         ),
     )
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {"done": True})
     if terminal_path == "refused":
         monkeypatch.setattr(
             web_events,
@@ -4577,7 +4577,7 @@ def test_save_ok_completion_emit_failure_is_not_persistence_failure(
         return original_emit_if_current(socketio, sid, run_id, event, payload)
 
     monkeypatch.setattr(web_events, "_emit_if_current", fail_completion_emit)
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {"done": True})
 
     try:
         client.emit(
@@ -4770,9 +4770,9 @@ def test_reduced_terminal_payload_preserves_run_notices_after_projection_failure
     monkeypatch.setattr(run, "_build_output", fail_projection)
     captured = {}
 
-    def capture_artifact(payload, _run_id, **_kwargs):
-        captured["payload"] = copy.deepcopy(payload)
-        return {"execution_status": payload["status"]}
+    def capture_artifact(runner_payload, run_id=None, *args, **kwargs):
+        captured["payload"] = copy.deepcopy(runner_payload)
+        return {"execution_status": runner_payload["status"]}
 
     monkeypatch.setattr(web_events, "persist_run_artifact", capture_artifact)
     sid = "test-reduced-terminal-run-notices"
@@ -4842,7 +4842,7 @@ def test_loop_projection_and_emit_failures_stop_current_run(
         monkeypatch.setattr(
             web_events,
             "_completion_payload",
-            lambda _sim: (_ for _ in ()).throw(RuntimeError("completion failed")),
+            lambda sim: (_ for _ in ()).throw(RuntimeError("completion failed")),
         )
     elif failure_site == "tick":
         monkeypatch.setattr(
@@ -4897,7 +4897,7 @@ def test_completion_payload_marks_missing_metal_product_story_unavailable(
     monkeypatch.setattr(
         web_events,
         "classify_products",
-        lambda _sim: {
+        lambda sim: {
             "metals_plus_O2": {
                 "metals_kg": {},
                 "metals_total_kg": None,
@@ -5063,7 +5063,7 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
     monkeypatch.setattr(
         web_events,
         "_product_story_payload",
-        lambda _sim, **_kwargs: {
+        lambda sim, **_kwargs: {
             "refractory_ceramic": {
                 "species_kg": {
                     species: round(mass, 2)
@@ -5134,7 +5134,7 @@ def test_completion_rump_outputs_inherit_partial_exclusions(monkeypatch):
     monkeypatch.setattr(
         web_events,
         "classify_products",
-        lambda _sim: {
+        lambda sim: {
             "refractory_ceramic_rump": {
                 "status": "partial",
                 "class_total_kg": 60.0,
@@ -5467,7 +5467,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
     captured_tasks = []
     drive_calls = {"count": 0}
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -5625,7 +5625,7 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path
 ):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -5748,7 +5748,7 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
         "native_fe_vapor_escape_fraction_of_pool": 0.04,
     }
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -5844,7 +5844,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
     captured_tasks = []
     drive_calls = {"count": 0}
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -5921,7 +5921,7 @@ def test_socketio_c4_refusal_is_terminal_before_next_decision(
 ):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -6022,7 +6022,7 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
     that path exceed 300 s under liquidus)."""
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
@@ -6076,7 +6076,7 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
     monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr("web.events.drive_session", continues_after_c6_drive)
     monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {"hour": 0})
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {"done": True})
     monkeypatch.setattr(
         web_events,
         "persist_run_artifact",
@@ -6231,7 +6231,7 @@ def test_tick_keeps_trace_species_keys_in_pot_composition(monkeypatch):
 def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend

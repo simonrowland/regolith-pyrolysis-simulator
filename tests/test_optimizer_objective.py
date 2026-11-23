@@ -807,7 +807,7 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
     monkeypatch.setattr(
         objective_module,
         "_product_ledger",
-        lambda _sim: {"consumed_Fe_reagent": 2.0},
+        lambda sim: {"consumed_Fe_reagent": 2.0},
     )
     objective_profile = {
         "run": {"mass_kg": 1.0, "hours": 150},

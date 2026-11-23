@@ -3166,7 +3166,7 @@ def test_runner_completed_run_records_alkali_credit_failure(
 
 
 def test_sio_yield_report_records_silica_fume_stage_failure(monkeypatch):
-    def raise_silica_fume(_sim):
+    def raise_silica_fume(sim):
         raise LookupError("silica fume stage unavailable")
 
     monkeypatch.setattr(

@@ -133,7 +133,7 @@ def _install_fakes(
 ):
     """Replace the AlphaMELTS backend class with the test double."""
 
-    def make_alphamelts():
+    def make_alphamelts(*args, **kwargs):
         return _FakeAlphaMELTS(available=alphamelts_available)
 
     monkeypatch.setattr(events, 'AlphaMELTSBackend', make_alphamelts)
@@ -651,18 +651,18 @@ def test_autodetect_alphamelts_wins_even_when_vaporock_and_magemin_report_availa
         name = 'magemin'
 
     monkeypatch.setattr(events, 'AlphaMELTSBackend',
-                        lambda: _FakeAlphaMELTS(available=True))
+                        lambda *args, **kwargs: _FakeAlphaMELTS(available=True))
     # The selection logic must not probe these at all, but install them
     # under their module-level names so the test would catch any
     # regression that did probe them.
     monkeypatch.setattr(
         'simulator.melt_backend.vaporock.VapoRockBackend',
-        lambda: _AvailableVapoRock(available=True),
+        lambda *args, **kwargs: _AvailableVapoRock(available=True),
         raising=False,
     )
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.MAGEMinBackend',
-        lambda: _AvailableMAGEMin(available=True),
+        lambda *args, **kwargs: _AvailableMAGEMin(available=True),
         raising=False,
     )
 

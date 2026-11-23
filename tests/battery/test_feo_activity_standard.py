@@ -243,7 +243,7 @@ def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
 
     from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
 
-    def fail_gas_load():
+    def fail_gas_load(*args, **kwargs):
         raise RuntimeError("test gas datapack failure")
 
     monkeypatch.setattr(openimcc, "load_gas_datapack", fail_gas_load)

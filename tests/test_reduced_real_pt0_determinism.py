@@ -152,7 +152,7 @@ def _select_synthetic_gate_curve_binding(
     monkeypatch.setattr(
         admission,
         "selected_binding_identities",
-        lambda _sim, *, artifact, provider_role=None: (
+        lambda sim, *, artifact, provider_role=None: (
             (identity,) if artifact == "freeze_gate_curve" else ()
         ),
     )
@@ -1499,7 +1499,7 @@ def test_magemin_shadow_fallback_under_alphamelts_config_excludes_engine_version
     monkeypatch.setattr(
         rrd,
         "_cached_real_config",
-        lambda _sim: SimpleNamespace(authorized_backend_name="alphamelts"),
+        lambda sim: SimpleNamespace(authorized_backend_name="alphamelts"),
     )
     magemin_identity = {
         "resolved_provider_id": "magemin-shadow",

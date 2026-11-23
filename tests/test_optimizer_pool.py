@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from concurrent.futures import Future, ProcessPoolExecutor
+from concurrent.futures import ALL_COMPLETED, Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from dataclasses import replace
 import json
@@ -1614,10 +1614,10 @@ def test_process_pool_timeout_records_failure_and_continues(
             return None
 
     def fake_wait(
-        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
+        fs: object, timeout: object = None, return_when: object = ALL_COMPLETED
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del return_when
-        done = {future for future in futures if future.done()}
+        done = {future for future in fs if future.done()}
         if not done and timeout:
             time.sleep(float(timeout))
         return done, set()
@@ -1695,10 +1695,10 @@ def test_process_pool_timeout_records_failure_with_fake_executor(
             self.shutdown_calls.append({"wait": wait, "cancel_futures": cancel_futures})
 
     def fake_wait(
-        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
+        fs: object, timeout: object = None, return_when: object = ALL_COMPLETED
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del return_when
-        done = {future for future in futures if future.done()}
+        done = {future for future in fs if future.done()}
         if not done and timeout:
             time.sleep(float(timeout))
         return done, set()
@@ -1776,7 +1776,7 @@ def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
             return None
 
     def fake_wait(
-        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
+        fs: object, timeout: object = None, return_when: object = ALL_COMPLETED
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del return_when
         if timeout:
@@ -2586,10 +2586,10 @@ def test_worker_abort_survives_teardown_error(
         return executor
 
     def fake_wait(
-        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
+        fs: object, timeout: object = None, return_when: object = ALL_COMPLETED
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del timeout
-        return set(futures), set()
+        return set(fs), set()
 
     monkeypatch.setattr(pool_module, "ProcessPoolExecutor", executor_factory)
     monkeypatch.setattr(pool_module, "wait", fake_wait)
@@ -2853,16 +2853,16 @@ def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_
         return fake_executor
 
     def fake_wait(
-        futures: object, timeout: object = None, return_when: object = "ALL_COMPLETED"
+        fs: object, timeout: object = None, return_when: object = ALL_COMPLETED
     ) -> tuple[set[Future[object]], set[Future[object]]]:
         del timeout
-        future = next(iter(futures))
+        future = next(iter(fs))
         owner = future._owner
         if not future.done():
             outcome = pool_module._evaluate_pool_task(future._pool_task, future._evaluate_fn)
             future.set_result(outcome)
             owner.active -= 1
-        return {future}, set(futures) - {future}
+        return {future}, set(fs) - {future}
 
     monkeypatch.setattr(pool_module, "ProcessPoolExecutor", executor_factory)
     monkeypatch.setattr(pool_module, "wait", fake_wait)

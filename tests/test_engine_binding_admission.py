@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gc
 import hashlib
+import inspect
 import json
 import os
 import weakref
@@ -243,10 +244,12 @@ def test_install_provenance_distinguishes_selected_digest_from_optional_metadata
     ).resolve()
     original_is_file = Path.is_file
 
-    def missing_optional_catalog(path: Path, *, follow_symlinks=True) -> bool:
-        if path.resolve() == species_catalog:
+    def missing_optional_catalog(self: Path, *, follow_symlinks=True) -> bool:
+        if self.resolve() == species_catalog:
             return False
-        return original_is_file(path, follow_symlinks=follow_symlinks)
+        if "follow_symlinks" in inspect.signature(original_is_file).parameters:
+            return original_is_file(self, follow_symlinks=follow_symlinks)
+        return original_is_file(self)
 
     monkeypatch.setattr(Path, "is_file", missing_optional_catalog)
     provenance = install_provenance(identity, runtime_backend=backend)
@@ -1054,19 +1057,19 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
     monkeypatch.setattr(
         replay,
         "_gate_provider_roles_for_replay",
-        lambda _sim: ("authoritative", "fallback"),
+        lambda sim: ("authoritative", "fallback"),
     )
     monkeypatch.setattr(
         replay,
         "canonical_replay_key",
-        lambda _sim, **kwargs: {"provider_role": kwargs["provider_role"]},
+        lambda sim, **kwargs: {"provider_role": kwargs["provider_role"]},
     )
     store = PT0DeterminismStore("replay", db_path=tmp_path / "unused.db")
     authorized_roles = []
     authorized_artifacts = []
     lookup_keys = []
 
-    def authorize(_sim, *, provider_role=None, artifact=None):
+    def authorize(sim, *, provider_role=None, artifact="equilibrium_post_record"):
         authorized_roles.append(provider_role)
         authorized_artifacts.append(artifact)
         if provider_role == "fallback":
@@ -1075,7 +1078,7 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
                 "receipt missing",
             )
 
-    def lookup(_artifact, keys, *, sim):
+    def lookup(artifact, keys, *, sim=None):
         lookup_keys.extend(keys)
         return {
             "curve": {
@@ -1308,7 +1311,7 @@ def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
     monkeypatch.setattr(
         admission,
         "selected_binding_identities",
-        lambda _sim, *, artifact, provider_role=None: (
+        lambda sim, *, artifact, provider_role=None: (
             (SYNTHETIC_IDENTITY,)
             if artifact == "freeze_gate_curve"
             else ()
@@ -1317,7 +1320,7 @@ def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
     monkeypatch.setattr(
         admission,
         "selected_binding_provenance",
-        lambda _identity, _sim, backend=None: provenance,
+        lambda identity, sim, backend=None: provenance,
     )
     sim = SimpleNamespace()
 
@@ -1695,7 +1698,7 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
     monkeypatch.setattr(
         replay,
         "record_binding_producer_ids",
-        lambda _sim, *, artifact, **_kwargs: (
+        lambda sim, *, artifact, provider_role=None, **_kwargs: (
             ("builtin-vapor-pressure", "openimcc", "sulfsat")
             if artifact == "equilibrium_post_record"
             else ()

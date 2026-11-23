@@ -109,7 +109,7 @@ def producer_backed_operator_tick(monkeypatch):
     """Capture a UI payload through the same socket producer used in runtime."""
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend

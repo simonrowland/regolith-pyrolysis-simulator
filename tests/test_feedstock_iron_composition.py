@@ -191,7 +191,7 @@ def test_feedstock_json_round_trip_keeps_unknown_split_provenance(
     monkeypatch.setattr(
         routes,
         "get_visible_feedstock",
-        lambda _key, **_kwargs: entry,
+        lambda key, **_kwargs: entry,
     )
     app = Flask(__name__)
     app.register_blueprint(routes.bp)

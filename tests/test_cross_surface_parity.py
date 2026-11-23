@@ -443,7 +443,7 @@ def _run_web_session(monkeypatch) -> SurfaceResult:
 def _install_stepwise_web(monkeypatch) -> StepwiseWebDriver:
     stepwise_driver = StepwiseWebDriver()
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend

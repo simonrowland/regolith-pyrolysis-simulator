@@ -18,7 +18,7 @@ class DoubleSite:
     line: int
     call: ast.Call
     target: ast.AST
-    replacement: ast.AST
+    replacement: ast.AST | None
 
 
 @dataclass(frozen=True)
@@ -77,6 +77,49 @@ def _callable_definition(
                     return declaration
             scope = parents.get(scope)
     return None
+
+
+def _assigned_constructor(
+    name: str,
+    at: ast.AST,
+    parents: dict[ast.AST, ast.AST],
+) -> ast.AST | None:
+    scope: ast.AST | None = at
+    while scope is not None:
+        if isinstance(scope, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef)):
+            declarations = []
+            for item in ast.walk(ast.Module(body=getattr(scope, "body", []), type_ignores=[])):
+                if not isinstance(item, (ast.Assign, ast.AnnAssign)):
+                    continue
+                if not _within_direct_scope(item, scope, parents):
+                    continue
+                targets = item.targets if isinstance(item, ast.Assign) else [item.target]
+                if any(isinstance(target, ast.Name) and target.id == name for target in targets):
+                    value = item.value
+                    if isinstance(value, ast.Call):
+                        declarations.append(value.func)
+            if declarations:
+                return max(declarations, key=lambda item: item.lineno)
+        scope = parents.get(scope)
+    return None
+
+
+def _local_method(
+    node: ast.AST,
+    at: ast.AST,
+    parents: dict[ast.AST, ast.AST],
+) -> tuple[ast.AST | None, bool]:
+    """Resolve a method on a locally constructed object; bool means bound."""
+    if not isinstance(node, ast.Attribute) or not isinstance(node.value, ast.Name):
+        return None, False
+    constructor = _assigned_constructor(node.value.id, at, parents)
+    if constructor is None:
+        return None, False
+    cls = _callable_definition(constructor, at, parents, ast.Module(body=[], type_ignores=[]))
+    if isinstance(cls, ast.ClassDef):
+        method = next((item for item in cls.body if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == node.attr), None)
+        return method, True
+    return None, False
 
 
 def _within_direct_scope(node: ast.AST, scope: ast.AST, parents: dict[ast.AST, ast.AST]) -> bool:
@@ -155,7 +198,7 @@ def _sites(path: Path, tree: ast.Module) -> list[DoubleSite]:
                 replacement = call.args[1] if len(call.args) >= 2 else None
         if replacement is None:
             replacement = next((kw.value for kw in call.keywords if kw.arg in {"new", "side_effect"}), None)
-        if target is not None and replacement is not None and _callable_definition(replacement, call, parents, tree):
+        if target is not None and isinstance(replacement, (ast.Lambda, ast.Name, ast.Attribute, ast.Call)):
             found.append(DoubleSite(path, call.lineno, call, target, replacement))
     return found
 
@@ -169,11 +212,23 @@ def _resolve_alias(name: str, modules: dict[str, str], objects: dict[str, str]) 
     return name
 
 
-def _production_signature(target: ast.AST, modules: dict[str, str], objects: dict[str, str]):
+def _production_signature(
+    target: ast.AST,
+    modules: dict[str, str],
+    objects: dict[str, str],
+    call: ast.Call,
+    parents: dict[ast.AST, ast.AST],
+):
+    bound_target = False
     if isinstance(target, ast.Constant) and isinstance(target.value, str):
         dotted = target.value
     elif isinstance(target, ast.Tuple) and len(target.elts) == 2 and isinstance(target.elts[1], ast.Constant):
         base = _dotted(target.elts[0])
+        if isinstance(target.elts[0], ast.Name):
+            constructor = _assigned_constructor(target.elts[0].id, call, parents)
+            if constructor is not None:
+                base = _dotted(constructor)
+                bound_target = True
         if not base:
             return None
         dotted = f"{_resolve_alias(base, modules, objects)}.{target.elts[1].value}"
@@ -196,7 +251,12 @@ def _production_signature(target: ast.AST, modules: dict[str, str], objects: dic
             return None
         if callable(value):
             try:
-                return inspect.signature(value)
+                signature = inspect.signature(value)
+                if bound_target:
+                    parameters = list(signature.parameters.values())
+                    if parameters:
+                        signature = signature.replace(parameters=parameters[1:])
+                return signature
             except (TypeError, ValueError):
                 return None
         return None
@@ -248,18 +308,42 @@ def _compatible(production: inspect.Signature, double: inspect.Signature) -> boo
         return False
     if any(p.kind is inspect.Parameter.VAR_KEYWORD for p in production_params) and not accepts_var_kw:
         return False
-    positional = [
-        object() for p in production_params
-        if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
-    ]
-    keyword_only = {
-        p.name: object() for p in production_params
-        if p.kind is inspect.Parameter.KEYWORD_ONLY
-    }
-    try:
-        double.bind(*positional, **keyword_only)
-    except TypeError:
-        return False
+    positional_only = [p for p in production_params if p.kind is inspect.Parameter.POSITIONAL_ONLY]
+    positional_or_keyword = [p for p in production_params if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD]
+    keyword_only_params = [p for p in production_params if p.kind is inspect.Parameter.KEYWORD_ONLY]
+    optional = {p.name for p in production_params if p.default is not inspect.Parameter.empty and p.kind is not inspect.Parameter.VAR_POSITIONAL and p.kind is not inspect.Parameter.VAR_KEYWORD}
+    shapes: list[tuple[list[object], dict[str, object]]] = []
+
+    def shape(omitted: frozenset[str], positional_count: int) -> None:
+        args = [object() for param in positional_only if param.name not in omitted]
+        kwargs = {}
+        for index, param in enumerate(positional_or_keyword):
+            if param.name in omitted:
+                continue
+            if index < positional_count and not any(p.name in omitted for p in positional_or_keyword[:index]):
+                args.append(object())
+            else:
+                kwargs[param.name] = object()
+        for param in keyword_only_params:
+            if param.name not in omitted:
+                kwargs[param.name] = object()
+        shapes.append((args, kwargs))
+
+    # Probe the minimal valid call, every individual optional omission, and
+    # every positional/keyword split for positional-or-keyword parameters.
+    shape(frozenset(optional), 0)
+    for name in optional:
+        shape(frozenset({name}), 0)
+    for positional_count in range(len(positional_or_keyword) + 1):
+        shape(frozenset(), positional_count)
+    # Required positional-only parameters cannot be omitted; make sure the
+    # constructed minimal call still supplies them positionally.
+    for args, kwargs in shapes:
+        try:
+            production.bind(*args, **kwargs)
+            double.bind(*args, **kwargs)
+        except TypeError:
+            return False
     return True
 
 
@@ -281,9 +365,16 @@ def scan_tests(root: Path) -> Census:
         modules, objects = _aliases(tree)
         for site in _sites(path, tree):
             scanned += 1
-            production = _production_signature(site.target, modules, objects)
-            replacement_node = _callable_definition(site.replacement, site.call, parents, tree)
+            production = _production_signature(site.target, modules, objects, site.call, parents)
+            replacement_node = _callable_definition(site.replacement, site.call, parents, tree) if site.replacement is not None else None
+            bound_method = False
+            if replacement_node is None and site.replacement is not None:
+                replacement_node, bound_method = _local_method(site.replacement, site.call, parents)
             double = _replacement_signature(replacement_node) if replacement_node else None
+            if double is not None and bound_method:
+                parameters = list(double.parameters.values())
+                if parameters:
+                    double = double.replace(parameters=parameters[1:])
             if production is None or double is None:
                 skipped.append(f"{path}:{site.line}: SKIPPED-UNRESOLVABLE")
                 continue

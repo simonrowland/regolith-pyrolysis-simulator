@@ -2482,7 +2482,7 @@ def test_import_route_records_canonical_upload_filename(
         path = tmp_path / "imported"
         deduped = False
 
-    def fake_import(_source, _root, *, uploader_note, origin):
+    def fake_import(bundle_path, runs_root, *, uploader_note=None, origin=None, **kwargs):
         captured["uploader_note"] = uploader_note
         captured["origin"] = origin
         return Imported()
@@ -2491,7 +2491,7 @@ def test_import_route_records_canonical_upload_filename(
     monkeypatch.setattr(
         web_routes,
         "imported_study_model",
-        lambda _path, _root: {"study_id": "imported"},
+        lambda import_dir, runs_root=None, **kwargs: {"study_id": "imported"},
     )
 
     response = client.post(
@@ -4750,7 +4750,7 @@ def test_web_k_shuttle_counts_measured_ferric_iron(client, monkeypatch) -> None:
     monkeypatch.setattr(
         web_routes,
         "get_visible_feedstock",
-        lambda key, include_custom=True: feedstocks.get(key),
+        lambda key, *, include_custom=False, include_debug=None: feedstocks.get(key),
     )
 
     split_k = client.get("/api/additive-calc/measured_split?mass_kg=1000").get_json()["K"]

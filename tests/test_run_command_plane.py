@@ -273,9 +273,9 @@ def test_viewerless_run_auto_applies_decision_persists_and_reclaims(
         "_record_last_recipe_capture",
         lambda *_args, **_kwargs: None,
     )
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
 
-    def drive_decision(session, _hours, policy):
+    def drive_decision(session, hours, policy, *args, **kwargs):
         policies.append(policy)
         assert session.pending_decision() is not None
         if policy is web_events.DecisionPolicy.OPERATOR:
@@ -370,7 +370,7 @@ def test_http_headless_run_has_no_lifetime_cutoff_and_slots_refuse_typed_429(
     )
     monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
     monkeypatch.setattr(web_events, "_get_backend", force_backend)
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
     monkeypatch.setattr(
         web_events,
         "_full_runner_payload",
@@ -1030,7 +1030,7 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
     store = RunArtifactStore(tmp_path / "runs")
     backend = InternalAnalyticalBackend()
     backend.initialize({})
-    monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
+    monkeypatch.setattr(web_events, "_get_backend", lambda backend_name: backend)
     monkeypatch.setattr(web_events, "get_run_store", lambda: store)
     monkeypatch.setattr(
         app_module.socketio,
@@ -1152,7 +1152,7 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     store = RunArtifactStore(tmp_path / "runs")
     backend = InternalAnalyticalBackend()
     backend.initialize({})
-    monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
+    monkeypatch.setattr(web_events, "_get_backend", lambda backend_name: backend)
     monkeypatch.setattr(web_events, "get_run_store", lambda: store)
     launched = []
     monkeypatch.setattr(
@@ -1164,7 +1164,7 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
-        lambda event, payload, **kwargs: emitted.append((event, payload, kwargs)),
+        lambda event, payload=None, *args, **kwargs: emitted.append((event, payload, kwargs)),
     )
     app = app_module.create_app()
     payload = {
@@ -1320,7 +1320,7 @@ def test_http_natural_completion_with_zero_viewers_persists_and_reclaims_capacit
             return object()
 
     socket = CapturingSocket()
-    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda sim: {})
     release_transitions = []
     finish_terminal_state = web_events._finish_terminal_state
 
@@ -2168,13 +2168,13 @@ def test_global_active_run_cap_is_shared_by_http_and_socket(
     )
     backend = InternalAnalyticalBackend()
     backend.initialize({})
-    monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
+    monkeypatch.setattr(web_events, "_get_backend", lambda backend_name: backend)
     monkeypatch.setattr(web_events, "get_run_store", lambda: store)
     emitted = []
     monkeypatch.setattr(
         app_module.socketio,
         "emit",
-        lambda event, payload, **kwargs: emitted.append((event, payload, kwargs)),
+        lambda event, payload=None, *args, **kwargs: emitted.append((event, payload, kwargs)),
     )
     app = app_module.create_app()
     payload = {

@@ -1438,7 +1438,14 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
     expected = original({"Fe": 1.0, "O": 1.0}, 1700.0, "closed")
     calls = 0
 
-    def counted(inventory, temperature_K, mode, *, lambda_imposed=None):
+    def counted(
+        inventory,
+        temperature_K,
+        mode,
+        *args,
+        lambda_imposed=None,
+        **kwargs,
+    ):
         nonlocal calls
         calls += 1
         return expected
@@ -1492,9 +1499,10 @@ def test_candidate_redox_pack_keeps_the_raw_valence_amounts(
         inventory,
         temperature_K,
         mode,
-        *,
+        *args,
         lambda_imposed=None,
         redox_pack_path=None,
+        **kwargs,
     ):
         calls.append((inventory, temperature_K, mode, lambda_imposed, redox_pack_path))
         return expected

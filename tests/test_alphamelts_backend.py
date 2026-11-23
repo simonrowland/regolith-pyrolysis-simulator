@@ -654,7 +654,7 @@ def test_warm_petthermotools_bootstrap_preserves_model_code(
     )
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts.importlib.import_module',
-        lambda _module_name, package=None: module,
+        lambda name, package=None: module,
     )
     backend = AlphaMELTSBackend(model_name=model_name)
     _select_python_api_for_test(backend)
@@ -676,10 +676,10 @@ def test_warm_petthermotools_bootstrap_preserves_model_code(
 def test_petthermotools_warm_bootstrap_import_failure_is_typed(monkeypatch):
     from simulator.engine_pool import EngineWorkerRemoteError
 
-    def fail_library_import(module_name, package=None):
-        if module_name in {'petthermotools', 'PetThermoTools'}:
+    def fail_library_import(name, package=None):
+        if name in {'petthermotools', 'PetThermoTools'}:
             raise ModuleNotFoundError('external dependency absent')
-        raise AssertionError(f'unexpected import: {module_name}')
+        raise AssertionError(f'unexpected import: {name}')
 
     monkeypatch.setattr(
         alphamelts_module.importlib,
@@ -2426,7 +2426,7 @@ def test_builtin_subprocess_vapor_projection_separates_melt_fo2_from_transport_p
     monkeypatch.setattr(
         backend,
         '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        lambda engine_root: Path('/tmp/fake-alphamelts'),
     )
     assert backend.initialize({
         'mode': 'subprocess',
@@ -3954,9 +3954,9 @@ def test_alphamelts_python_api_not_an_input_omits_configured_buffer(monkeypatch)
     monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda comp: comp)
     monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
 
-    def run(operation, *, kwargs):
+    def run(operation, *, args=(), kwargs=None):
         captured['operation'] = operation
-        captured.update(kwargs)
+        captured.update(kwargs or {})
         return object()
 
     monkeypatch.setattr(backend, '_run_petthermotools_isolated', run)
@@ -4213,8 +4213,8 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     monkeypatch.setattr(
         backend,
         '_run_petthermotools_isolated',
-        lambda operation, *, kwargs: (
-            seen.update(operation=operation, **kwargs) or {'ok': True}
+        lambda operation, *, args=(), kwargs=None: (
+            seen.update(operation=operation, **(kwargs or {})) or {'ok': True}
         ),
     )
     monkeypatch.setattr(backend, '_parse_petthermotools_result', fake_parse)
@@ -4884,7 +4884,7 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     monkeypatch.setattr(
         backend,
         '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        lambda engine_root: Path('/tmp/fake-alphamelts'),
     )
     assert backend.initialize({'mode': 'subprocess', 'timeout_s': 37.5}) is True
     seen = {}
@@ -4926,7 +4926,7 @@ def test_alphamelts_timeout_config_must_be_finite_and_positive(
     monkeypatch.setattr(
         backend,
         '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        lambda engine_root: Path('/tmp/fake-alphamelts'),
     )
 
     with pytest.raises(
@@ -5207,7 +5207,7 @@ def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
     monkeypatch.setattr(
         backend,
         '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        lambda engine_root: Path('/tmp/fake-alphamelts'),
     )
 
     def fake_import(name, package=None):
@@ -5331,7 +5331,7 @@ def test_alphamelts_initialize_defaults_to_subprocess_when_binary_available(
     monkeypatch.setattr(
         backend,
         '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        lambda engine_root: Path('/tmp/fake-alphamelts'),
     )
 
     assert backend.initialize({}) is True
@@ -6386,7 +6386,7 @@ def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
     monkeypatch.setattr(
         backend,
         '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        lambda engine_root: Path('/tmp/fake-alphamelts'),
     )
 
     assert backend.initialize({'mode': 'subprocess'}) is True
@@ -10684,7 +10684,7 @@ def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
     else:
         monkeypatch.setattr(
             backend, '_find_project_binary',
-            lambda _engine_root: Path('/tmp/fake-alphamelts'),
+            lambda engine_root: Path('/tmp/fake-alphamelts'),
         )
     return backend.initialize(config)
 
@@ -12112,7 +12112,7 @@ def test_cold_worker_missing_loader_is_typed_absence(monkeypatch):
     monkeypatch.setattr(
         alphamelts_module.importlib,
         'import_module',
-        lambda _name, package=None: types.SimpleNamespace(),
+        lambda name, package=None: types.SimpleNamespace(),
     )
     sent = []
 

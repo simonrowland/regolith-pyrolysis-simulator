@@ -1062,7 +1062,7 @@ def test_completion_payload_degrades_when_product_classifier_raises(monkeypatch)
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("s_type")
-    def fail_product_classification(_sim, *, early_tap_mode=False):
+    def fail_product_classification(sim, *, early_tap_mode=False):
         raise ValueError("rump mismatch")
 
     monkeypatch.setattr(
@@ -1119,7 +1119,7 @@ def test_degraded_product_story_badge_uses_canonical_extraction_evidence(
     monkeypatch.setattr(
         web_events,
         "classify_products",
-        lambda _sim: (_ for _ in ()).throw(ValueError("rump mismatch")),
+        lambda sim, *, early_tap_mode=False: (_ for _ in ()).throw(ValueError("rump mismatch")),
     )
 
     zero_extraction = web_events._completion_payload(sim)
@@ -1471,7 +1471,7 @@ def test_product_story_uses_runner_classification_and_keeps_off_spec_capture(
     monkeypatch.setattr(
         web_events,
         "classify_products",
-        lambda _sim: {
+        lambda sim, *, early_tap_mode=False: {
             "ingots_metals": {
                 "species_kg": {"Ca": 6.0, "Fe": 3.0},
                 "source_accounts_by_species": {

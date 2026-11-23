@@ -167,7 +167,7 @@ def _required_events_present(trace):
 def _install_deterministic_web(monkeypatch):
     captured_tasks = []
 
-    def force_internal_analytical_backend(_backend_name):
+    def force_internal_analytical_backend(backend_name):
         backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend

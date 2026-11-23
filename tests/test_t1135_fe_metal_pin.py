@@ -158,7 +158,7 @@ def test_base_char_electrolysis_and_web_additive_outputs_are_pinned(
     monkeypatch.setattr(
         web_routes,
         "get_visible_feedstock",
-        lambda key, include_custom=True: entries.get(key),
+        lambda key, *, include_custom=False, include_debug=None: entries.get(key),
     )
     app = Flask(__name__)
     app.config["TESTING"] = True

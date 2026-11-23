@@ -12,6 +12,7 @@ reads a quarantined W value or produces a ranking.
 from __future__ import annotations
 
 import json
+import ctypes
 from pathlib import Path
 
 import pytest
@@ -548,7 +549,7 @@ def test_patched_transport_loads_library_from_build_prefix(tmp_path, monkeypatch
     monkeypatch.setattr(
         engine_local_config.ctypes,
         "CDLL",
-        lambda name, mode=4, handle=None, use_errno=False, use_last_error=False, winmode=None: loaded_paths.append(str(name)),
+        lambda name, mode=ctypes.DEFAULT_MODE, handle=None, use_errno=False, use_last_error=False, winmode=None: loaded_paths.append(str(name)),
     )
     monkeypatch.setattr(
         worker.ctypes.util,

@@ -457,7 +457,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         drive_with_large_hourly_diagnostics,
     )
 
-    def instrumented_emit(event, payload, *args, **kwargs):
+    def instrumented_emit(event, payload=None, *args, **kwargs):
         if isinstance(payload, dict):
             emitted = dict(payload)
             serialized = json.dumps(emitted, default=str)
