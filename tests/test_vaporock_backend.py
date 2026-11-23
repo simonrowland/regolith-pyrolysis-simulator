@@ -760,6 +760,7 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
     sim = object.__new__(PyrolysisSimulator)
     sim.melt = types.SimpleNamespace(temperature_C=1600.0, melt_fO2_log=-8.0)
     sim._allow_fallback_vapor = True
+    sim._melt_metal_saturation_fO2_floor_log = lambda _temperature_K: None
     sim._commanded_pO2_bar = lambda: 1e-6
     sim._compute_intrinsic_melt_fO2 = lambda: -8.0
 
@@ -778,11 +779,13 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
         return provider.dispatch(request)
 
     sim._dispatch_only = dispatch_only
+    # 1.0 is admitted liquid state; it isolates vapor-pressure authority.
     result = backend.equilibrate(
         1600.0,
         composition_mol={"Na2O": 1.0},
         fO2_log=-8.0,
         pressure_bar=1e-6,
+        liquid_fraction=1.0,
     )
     assert result.status == "non_authoritative"
     assert result.vapor_pressures_Pa == {}

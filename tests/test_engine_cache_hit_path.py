@@ -48,5 +48,6 @@ def test_drop_version_invalidates_the_process_hot_table(tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     engine_cache.cached_engine_call("openimcc", {}, lambda: {"answer": 1})
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    current_version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    assert engine_cache.drop_chemistry_version("openimcc", current_version) == 1
     assert engine_cache.cached_engine_call("openimcc", {}, lambda: {"answer": 2}) == {"answer": 2}

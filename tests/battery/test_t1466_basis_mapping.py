@@ -37,7 +37,7 @@ from simulator.battery.migrate import (
     migrate,
     to_plain,
 )
-from simulator.battery.records import State
+from simulator.battery.records import Species, State
 from simulator.state_types import StateTag
 
 from tests.battery.test_migrate import (
@@ -45,6 +45,7 @@ from tests.battery.test_migrate import (
     _migrate_real_extract,
     _write_min_tree,
 )
+from tests.battery import factories as F
 
 B677 = "pankratz-1984-usbm-b677"
 B592 = "kelley-king-1961-usbm-b592"
@@ -408,6 +409,32 @@ def test_b677_silver_converter_basis_reaches_model_refusals(tmp_path: Path) -> N
     assert gas.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
     assert formation.refusal_reason is RefusalReason.UNSUPPORTED
     assert formation.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+
+
+def test_openimcc_species_thermo_keeps_unknown_basis_unknown() -> None:
+    identity = F.o2_identity(Decimal("2000"))
+    identity = replace(
+        identity,
+        species=Species("FeO", Phase.G),
+        quantity=Quantity.CP,
+        per=State.unknown("source basis not stated"),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observation = F.observation(
+        "openimcc-feo-cp-basis-unknown",
+        "exp-1",
+        identity,
+        Decimal("1"),
+    )
+
+    attempt = predict_thermo_attempt(Engine.OPENIMCC, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-per-basis-mismatch"
+    assert attempt.refusal_detail["expected_per"] == PerBasis.MOL_SPECIES.value
+    assert attempt.refusal_detail["actual_per"] is None
 
 
 def test_b592_aluminum_gas_outside_interval_uses_converter_basis(tmp_path: Path) -> None:

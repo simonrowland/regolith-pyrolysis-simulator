@@ -5,7 +5,7 @@ import math
 from dataclasses import replace
 from itertools import permutations
 from types import MethodType, SimpleNamespace
-from typing import Mapping
+from typing import Any, Mapping
 
 import pytest
 
@@ -11435,7 +11435,9 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert partition_basis["native_fe_source_account"] == "process.metal_phase"
     assert partition_basis["native_fe_split_commit_status"] == "ok"
     assert partition_basis["native_fe_vapor_route_status"] == "committed"
-    assert partition["native_fe_saturation_split_count"] == 0
+    # This nine-hour recipe commits one native Fe saturation split before the
+    # later metal partition, so the split count is not expected to be zero.
+    assert partition["native_fe_saturation_split_count"] == 1
     assert partition["native_fe_metal_partition_count"] >= 1
     assert partition["native_fe_partition_transition_count"] >= 1
     assert partition["tap_basis"]["status"] == "available"

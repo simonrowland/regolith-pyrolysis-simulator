@@ -787,11 +787,12 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
         identity=replace(observation.identity, composition=State.of(composition)),
     )
     calls = []
+    evaluate_redox = openimcc.evaluate_redox
 
     def capture(*args, **kwargs):
-        calls.append((args, kwargs))
-        # 37 mol Cr(II) and 963 mol Cr(III): Cr(II)/total = 0.037.
-        return _candidate_redox_result(chromous_cr_mol=37.0, chromic_cr_mol=963.0)
+        output = evaluate_redox(*args, **kwargs)
+        calls.append((args, kwargs, output))
+        return output
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
@@ -801,13 +802,33 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert len(calls) == 1
-    args, kwargs = calls[0]
+    args, kwargs, output = calls[0]
     assert args[0]["Cr"] > 0.0
-    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    # Berry and O'Neill 2004, American Mineralogist 89, Table 3, published
-    # page 794 (PDF page 5), AD + En column, log fO2 = -0.68 (air): printed
-    # Cr2+/ΣCr = 0.037. The expected value is that printed fraction.
-    assert prediction.value == Decimal("0.037")
+    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate-v4.json"
+    expected_fraction = output.chromous_cr_mol / (
+        output.chromous_cr_mol + output.chromic_cr_mol
+    )
+    assert float(prediction.value) == pytest.approx(expected_fraction, rel=1e-12)
+
+    mocked_calls = []
+
+    def printed_redox(*args, **kwargs):
+        mocked_calls.append((args, kwargs))
+        # Berry and O'Neill 2004, American Mineralogist 89, Table 3,
+        # published page 794 (PDF page 5), AD + En, log fO2 = -0.68:
+        # printed Cr2+/ΣCr = 0.037.
+        return _candidate_redox_result(chromous_cr_mol=37.0, chromic_cr_mol=963.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", printed_redox)
+    printed_prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+    assert len(mocked_calls) == 1
+    assert (
+        mocked_calls[0][1]["redox_pack_path"].name
+        == "openimcc-redox-cr-ti-candidate-v4.json"
+    )
+    assert printed_prediction.value == Decimal("0.037")
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
@@ -894,11 +915,12 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
         identity=replace(observation.identity, composition=State.of(composition)),
     )
     calls = []
+    evaluate_redox = openimcc.evaluate_redox
 
     def capture(*args, **kwargs):
-        calls.append((args, kwargs))
-        # 23 mol Ti(III) and 1000 mol Ti(IV): Ti3+/Ti4+ = 0.023.
-        return _candidate_redox_result(titanous_ti_mol=23.0, titanic_ti_mol=1000.0)
+        output = evaluate_redox(*args, **kwargs)
+        calls.append((args, kwargs, output))
+        return output
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
@@ -909,13 +931,32 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
 
     assert prediction.value is not None, prediction.refusal_detail
     assert len(calls) == 1
-    args, kwargs = calls[0]
+    args, kwargs, output = calls[0]
     assert args[0]["Ti"] > 0.0
-    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    # Tranell, Ostrovski and Jahanshahi 2002, Metallurgical and Materials
-    # Transactions B 33B, Table I, published page 63 (PDF page 3), row CST1
-    # at 1843 K and pO2 = 10^-8 atm: printed Ti3+/Ti4+ = 0.023.
-    assert prediction.value == Decimal("0.023")
+    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate-v4.json"
+    expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
+    assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
+
+    mocked_calls = []
+
+    def printed_redox(*args, **kwargs):
+        mocked_calls.append((args, kwargs))
+        # Tranell et al. 2002, Table I, published page 63 (PDF page 3),
+        # row CST1 at 1843 K and pO2 = 10^-8 atm: Ti3+/Ti4+ = 0.023.
+        return _candidate_redox_result(titanous_ti_mol=23.0, titanic_ti_mol=1000.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", printed_redox)
+    printed_prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+    )
+    assert len(mocked_calls) == 1
+    assert (
+        mocked_calls[0][1]["redox_pack_path"].name
+        == "openimcc-redox-cr-ti-candidate-v4.json"
+    )
+    assert printed_prediction.value == Decimal("0.023")
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.

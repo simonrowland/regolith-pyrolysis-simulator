@@ -1422,6 +1422,9 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     sim.melt.campaign = CampaignPhase.C3_NA
     sim.melt.temperature_C = 1150.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -11.0
+    # This explicitly seeded fO2 is already at the current state temperature;
+    # do not tag it with a reference temperature below Kress91's 1200 C floor.
+    sim.melt.oxygen_reservoir.reference_T_K = None
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
@@ -1429,9 +1432,15 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
 
     sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
 
-    transition = sim.atom_ledger.transitions[-1]
-    assert len(sim.atom_ledger.transitions) == transitions_before + 1
-    assert transition.name == "c3_na_shuttle_reduction"
+    committed = sim.atom_ledger.transitions[transitions_before:]
+    transition = next(
+        item for item in committed
+        if item.name == "c3_na_shuttle_reduction"
+    )
+    assert len(committed) == 2
+    assert any(
+        item.reason == "melt_metal_saturation_buffer" for item in committed
+    ), "the accepted FeO saturation floor commits its native-metal buffer"
     feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
     expected_source = -0.5 * feo_mol
     label = "redox_source:c3_na_shuttle_reduction"
@@ -1447,13 +1456,30 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     )
     # Continuous freeze-gate liquid_fraction (0.5.9 / 6d72725) gives real mush
     # capacity at 1150 C for lunar mare (solidus ~916 C, liquidus ~1370 C), so
-    # the committed C3-Na O2-equiv source term applies through the integrator
-    # (delta_ln = n_O2 / C_m). The bbf0134 inversion to no_melt_redox_capacity
-    # was an env-dependent retune (floor fallback when MAGEMin was unavailable);
-    # with a real liquidus curve the applied path is the correct invariant.
+    # the committed C3-Na source acts through the redox-capacity integrator.
+    # The recorded delta below is the net state change after the separate
+    # native-metal buffer restores oxygen to the live FeO floor.
     assert reservoir.melt_redox_capacity_mol_per_ln_fO2 > OXYGEN_RESERVOIR_NOOP_MOL
+    # The Euler source candidate is below the live FeO floor. The committed
+    # saturation buffer returns oxygen to the reservoir, so the recorded
+    # delta is the net post-buffer state change rather than source/C_m alone.
+    floor_after_buffer = sim._melt_metal_saturation_fO2_floor_log(
+        sim.melt.temperature_C + 273.15
+    )
+    assert floor_after_buffer is not None
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        floor_after_buffer[0],
+        rel=0.0,
+        abs=1e-8,
+    )
+    expected_net_delta_ln = (
+        floor_after_buffer[0] - before_fO2
+    ) * math.log(10.0)
+    # Convert the planner's 1e-8 log10 floor bound to natural-log units.
     assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
-        expected_source / reservoir.melt_redox_capacity_mol_per_ln_fO2
+        expected_net_delta_ln,
+        rel=1e-12,
+        abs=2.4e-8,
     )
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skipped_terms_mol_o2_equiv == {}

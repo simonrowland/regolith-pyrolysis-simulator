@@ -317,12 +317,10 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         engine="openimcc",
     )
     predictions = copy.deepcopy(cohort)
-    # 8b8665343 removed provenance.code_revision and both integration CPU-time
-    # fields; this digest strips those timing fields, so only code_revision
-    # changes the digest. The primary numeric outputs remain pinned below as
-    # float.hex.
+    # 979adb2 -> bae51f7 moves this tuple digest via provenance.openimcc_pin.
+    # The float-hex primary pins below stay the numeric evidence.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
-        "3b1878ecf87665fde693e50342c568cfa276ab166eb936671ab6addc3e634642"
+        "29fbb2721e3dfe7837eb37d923ca8f6257e8eb6407755ae99cb1691b09f2a668"
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
@@ -334,11 +332,11 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         oxide: value.hex()
         for oxide, value in primary.primary_oxide_wt_pct.items()
     } == {
-        "SiO2": "0x1.5f0cdac992197p+5",
-        "Al2O3": "0x1.1b3cb0566fbffp+2",
-        "FeO": "0x1.10ec3b5604051p+4",
-        "MgO": "0x1.f179bb173dc7fp+4",
-        "CaO": "0x1.c5893f4ff0809p+1",
+        "SiO2": "0x1.6c50f5b58d934p+5",
+        "Al2O3": "0x1.2463317df0cf2p+2",
+        "FeO": "0x1.c200702b15732p+3",
+        "MgO": "0x1.015f883f95dfcp+5",
+        "CaO": "0x1.d42ffd059164ep+1",
     }
 
 
@@ -479,6 +477,7 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         "alpha_source",
         "author_alpha_assumption",
         "alpha_by_channel",
+        "gas_channel_omissions",
         "runtime_catalog_omissions",
         "oxygen_model",
         "oxygen_boundary",
@@ -632,6 +631,17 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         ]
         for run_id in common_by_run
     )
+    for prediction in runtime_by_run.values():
+        missing_catalog = {
+            notice["channel"]: notice
+            for notice in prediction.provenance["runtime_catalog_omissions"]
+            if notice["reason"] == "runtime_catalog_channel_missing"
+        }
+        assert {"AlSiO", "Si2O2"} <= set(missing_catalog)
+        assert all(
+            notice["kind"] == "input_omitted"
+            for notice in missing_catalog.values()
+        )
     fe_runtime_alpha = next(
         record["alpha_value"]
         for record in runtime_by_run[next(iter(runtime_by_run))].provenance["alpha_by_channel"]
@@ -771,6 +781,16 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
                 experiments[0]["sample"]["printed_composition"]["state"]["value"]
             ),
         )
+        common_species = {channel.species for channel in setup.common_channels}
+        assert {"AlSiO", "Si2O2"} <= common_species
+        assert not {"AlSiO", "Si2O2"} & set(setup.catalog_matches)
+        mixed_channel = next(
+            channel for channel in setup.common_channels if channel.species == "AlSiO"
+        )
+        assert mixed_channel.parent_oxide_stoich == {
+            "Al2O3": 0.5,
+            "SiO2": 1.0,
+        }
         residue._hashimoto_integrate_geometry(
             setup.initial_inventory_mol,
             setup.common_channels,

@@ -2517,15 +2517,19 @@ def test_mg_gas_fugacity_is_independent_of_antoine_coefficients(
     vapor_pressure_data,
     temperature_K,
 ):
-    """b-147: high-T gas_fugacity is independent of pure-component Antoine."""
+    """b-147 gas_fugacity ignores the dormant gas-rail Antoine metadata."""
     baseline_data = copy.deepcopy(vapor_pressure_data)
-    no_antoine_data = copy.deepcopy(vapor_pressure_data)
-    no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
+    without_gas_antoine_data = copy.deepcopy(vapor_pressure_data)
+    without_gas_antoine_data["metals"]["Mg"][
+        "gas_rail_standard_reaction"
+    ].pop("antoine")
 
     baseline = BuiltinVaporPressureProvider(baseline_data).dispatch(
         _mg_vapor_request_at_T_K(temperature_K)
     )
-    without_antoine = BuiltinVaporPressureProvider(no_antoine_data).dispatch(
+    without_antoine = BuiltinVaporPressureProvider(
+        without_gas_antoine_data
+    ).dispatch(
         _mg_vapor_request_at_T_K(temperature_K)
     )
 
@@ -2544,7 +2548,7 @@ def test_mg_gas_fugacity_is_independent_of_antoine_coefficients(
         "Mg",
         temperature_K,
         1e-9,
-        vapor_pressure_data=no_antoine_data,
+        vapor_pressure_data=without_gas_antoine_data,
         a_oxide=1.0,
     )
     baseline_graph_pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
@@ -2618,10 +2622,12 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1873.0),
     )._internal_analytical_equilibrium()
-    no_antoine_data = copy.deepcopy(vapor_pressure_data)
-    no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
+    without_gas_antoine_data = copy.deepcopy(vapor_pressure_data)
+    without_gas_antoine_data["metals"]["Mg"][
+        "gas_rail_standard_reaction"
+    ].pop("antoine")
     without_antoine = _LegacyInternalAnalyticalModel(
-        no_antoine_data,
+        without_gas_antoine_data,
         melt=_MgOnlyMelt(1873.0),
     )._internal_analytical_equilibrium()
 

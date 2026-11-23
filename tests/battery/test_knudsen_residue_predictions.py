@@ -392,13 +392,34 @@ def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point,
 
 def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels=()):
     openimcc = pytest.importorskip("openimcc")
-    from simulator.battery.residue import _make_residue_pressure_model
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.residue import (
+        _make_residue_pressure_model,
+        _openimcc_residue_channel_set,
+    )
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     pack = openimcc.load_gas_datapack()
     if inventory is None:
         inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
-    channels, omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
-    assert not omissions
+    raw_channels, source_omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
+    assert not source_omissions
+    channels, _residue_channels, omissions = _openimcc_residue_channel_set(
+        raw_channels,
+        source_omissions,
+        engine="internal-analytical",
+        alpha=1.0,
+        alpha_source="Knudsen regression",
+    )
+    catalog_omissions = {
+        omission["channel"]: omission
+        for omission in omissions
+        if omission["reason"] == "internal_analytical_vapor_pressure_catalog_missing"
+    }
+    assert set(catalog_omissions) == {"AlSiO", "Si2O2"}
+    assert all(
+        omission["kind"] == NoticeKind.INPUT_OMITTED.value
+        for omission in catalog_omissions.values()
+    )
     channels = tuple(channels) + tuple(extra_channels)
     pressure_model = _make_residue_pressure_model(
         "internal-analytical", channels, pack, temperature_K=temperature_K, total_pressure_Pa=0,

@@ -21,7 +21,6 @@ from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Mapping
 
 import pytest
 import yaml
@@ -4506,13 +4505,6 @@ def test_metric_domain_refuses_zero_and_negative_dex() -> None:
 def test_determinism_two_dumps_byte_identical() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
-    ref = F.observation(
-        "o2-ref",
-        exp.experiment_id,
-        ident,
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
     residual, candidate = _compile(
         F.observation(
             "o2-ref",
@@ -7823,14 +7815,38 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
     assert "level anchored to the x(SiO2)=0.25 row" in report
     assert "Table 2 partial pressures only; activities are figure_only" in report
     assert "level tied to the absolute p(Ca) and p(O) scales" in report
-    assert "0.473 ± 0.031 | x(SiO2) | 9 |" in report
+    assert "0.551 ± 0.031 | x(SiO2) | 9 |" in report
     assert "CaO(phase unspecified) -> Ca(g) + O(g)" in report
     assert (
         "not computed: reference phase not printed; binding has no CaO(cr) K at 1933 K"
         in report
     )
-    assert "not computed: no binding K° for CaO(cr) -> Ca(g) + O(g)" in report
-    assert "not computed: no binding K° for Al2O3(cr) -> 2 Al(g) + 3 O(g)" in report
+    # bae51f7's JANAF crystal fallback computes the Table 3 CaO(cr) row.
+    # Fig2 rows still refuse, now because no same-T pressure pair exists.
+    # Al2O3(cr) Table 3 also computes, near -3.0 dex. That level is a real
+    # E15 disagreement with Stolyarova 1996's absolute-pressure scale
+    # (ion-current a(Al2O3) versus absolute p(Al)/p(O)), a certification
+    # flag, not a target value.
+    # Diagnosis: regolith-engine controller note 2026-11-22 (E15 Al2O3, Stolyarova 1996 Table 2/3).
+    assert (
+        "stolyarova_1996_table3_cao_activity_column_1_1933k | method 1 | "
+        "CaO(cr) -> Ca(g) + O(g) | -0.227 ± 0.380 |"
+    ) in report
+    assert (
+        "stolyarova_1996_fig2_A_cao_series1_digitized | method 1 | "
+        "CaO(cr) -> Ca(g) + O(g) | not computed: no same-T "
+        "composition/run pressure pair for CaO(cr) -> Ca(g) + O(g) |"
+    ) in report
+    assert (
+        "stolyarova_1996_fig2_E_al2o3_series1_digitized | method 1 | "
+        "Al2O3(cr) -> 2 Al(g) + 3 O(g) | not computed: no same-T "
+        "composition/run pressure pair for Al2O3(cr) -> 2 Al(g) + 3 O(g) |"
+    ) in report
+    assert (
+        "stolyarova_1996_fig2_E_al2o3_series1_digitized | method 2 | "
+        "Al2O3(cr) -> 2 AlO(g) + O(g) | not computed: no same-T "
+        "composition/run pressure pair for Al2O3(cr) -> 2 AlO(g) + O(g) |"
+    ) in report
 
 
 @pytest.mark.parametrize(
@@ -9689,6 +9705,43 @@ def test_alphamelts_invalid_activity_notice_reaches_typed_score_notice() -> None
     assert [notice.kind for notice in scored_notices] == [NoticeKind.INPUT_OMITTED] * 2
     assert [notice.reason for notice in scored_notices] == list(repair_warnings)
     assert all(notice.origin == 'engine:alphamelts' for notice in scored_notices)
+
+
+def test_hashimoto_channel_omissions_become_row_input_omitted_notices() -> None:
+    from simulator.battery.score import _hashimoto_channel_omission_notices
+
+    gas_notices = _hashimoto_channel_omission_notices(
+        (
+            {
+                "kind": NoticeKind.INPUT_OMITTED.value,
+                "reason": "gas channel AlSiO omitted: missing active table row",
+            },
+        ),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="hashimoto-openimcc-gas-channel",
+    )
+    runtime_notices = _hashimoto_channel_omission_notices(
+        (
+            {
+                "kind": NoticeKind.INPUT_OMITTED.value,
+                "channel": "Si2O2",
+                "reason": "runtime_catalog_channel_missing",
+            },
+        ),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="hashimoto-runtime-catalog",
+    )
+
+    assert [notice.kind for notice in (*gas_notices, *runtime_notices)] == [
+        NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
+    ]
+    assert "AlSiO" in gas_notices[0].reason
+    assert runtime_notices[0].reason == "Si2O2: runtime_catalog_channel_missing"
+    assert all(
+        notice.affected_quantities == (Quantity.RESIDUE_COMPONENT_COMPOSITION,)
+        for notice in (*gas_notices, *runtime_notices)
+    )
 
 
 def _hero_deck_score_row(
@@ -12436,6 +12489,7 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
         unprinted.observation_id,
         table_reader.observation_id,
         "pin-table",
+        work.work_id,
     }
 
     def assert_alias_complete() -> None:
@@ -12601,13 +12655,16 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
         works, observations, experiments, indexes
     )
     assert indexed == expected
+    # DOI lineage retains each Work identity (fffb75bf, 60258145).
     # Work grouping and quoted-source lineage each resolve an experiment.
     assert experiments.lookups == 2 * len(observations)
     assert expected[first_work.work_id].ids == {
+        first_work.work_id,
         first_observation.observation_id,
         "nasa-cea-thermo",
     }
     assert expected[second_work.work_id].ids == {
+        second_work.work_id,
         second_observation.observation_id,
         "nasa-cea-thermo",
     }
@@ -13473,7 +13530,7 @@ def test_registered_read_from_stays_out_of_the_lineage() -> None:
     works = {work.work_id: work}
     table_ids = _table_ids(works)
     corpus = _asset_ids(works)
-    member_ids = frozenset({row.observation_id, "nasa-cea-thermo"})
+    member_ids = frozenset({row.observation_id, "nasa-cea-thermo", work.work_id})
 
     def check() -> None:
         direct = _observation_lineage(
@@ -13569,7 +13626,7 @@ def test_cross_work_registered_asset_resolves_on_both_paths() -> None:
     table_ids = _table_ids(works)
     corpus = _asset_ids(works)
     direct_ids = frozenset({child.observation_id, parent.observation_id})
-    alias_ids = direct_ids | {"wa-table"}
+    alias_ids = direct_ids | {"wa-table", wa.work_id}
 
     def check() -> None:
         direct = _observation_lineage(
@@ -13711,7 +13768,10 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
 
 
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
+    from importlib.resources import as_file, files
+
     from simulator.battery.score import (
+        COEFFICIENT_SOURCE_STORE_IDS,
         ENGINE_COEFFICIENT_SOURCES,
         expand_coefficient_sources,
         lineage_complete_for,
@@ -13737,6 +13797,433 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert "sf04-magma-companion-workbook" in expand_coefficient_sources(
         d066_source
     )
+    openimcc = pytest.importorskip("openimcc")
+    pack_resources = files(openimcc).joinpath("data", "packs")
+    manifest = json.loads(
+        pack_resources.joinpath("MANIFEST.json").read_text(encoding="utf-8")
+    )
+    default_melt_file = manifest["DEFAULT-COMBINATION"]["melt"]["file"]
+    packaged_default_files = tuple(
+        entry["file"]
+        for entry in manifest["packs"]
+        if entry.get("kind") == "melt" and entry.get("role") == "default"
+    )
+    assert packaged_default_files
+    assert default_melt_file in packaged_default_files
+    for default_file in packaged_default_files:
+        with as_file(pack_resources.joinpath(default_file)) as pack_path:
+            packaged_default = openimcc.load_datapack(pack_path)
+        packaged_default_sources = openimcc_pack_coefficient_sources(
+            packaged_default.version, packaged_default.binding_digest
+        )
+        assert packaged_default_sources
+        declared_source_refs = {
+            source_ref
+            for row_sources in packaged_default._row_source_refs.values()
+            for source_ref in row_sources
+        }
+        assert packaged_default_sources == tuple(
+            f"openimcc-source-ref:{source_ref}"
+            for source_ref in sorted(declared_source_refs)
+        )
+        assert all(
+            source in COEFFICIENT_SOURCE_STORE_IDS
+            for source in packaged_default_sources
+        )
+        assert lineage_complete_for(packaged_default_sources) is True
+
+
+def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contexts() -> None:
+    """Pack and Shornikov-only lineages resolve in source-filtered contexts."""
+
+    openimcc = pytest.importorskip("openimcc")
+    from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
+
+    pack = openimcc.load_datapack()
+    packaged_sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest
+    )
+    shornikov_source = "openimcc-source-ref:Shornikov2017"
+    assert shornikov_source in packaged_sources
+    coefficient_sources = packaged_sources
+    source_context = load_score_context(
+        sources=("shornikov-2017-spinel-thermodynamics",)
+    )
+    reference = next(
+        observation
+        for observation in source_context.observations.values()
+        if observation.source_id == "shornikov-2017-spinel-thermodynamics"
+    )
+    experiment = source_context.experiments[reference.experiment_id]
+    work = source_context.works[experiment.work_id]
+    restricted_stores = (
+        {work.work_id: work},
+        {reference.observation_id: reference},
+        {experiment.experiment_id: experiment},
+    )
+
+    contexts = (
+        (
+            source_context.works,
+            source_context.observations,
+            source_context.experiments,
+        ),
+        restricted_stores,
+    )
+    for sources in (coefficient_sources, (shornikov_source,)):
+        for works, observations, experiments in contexts:
+            complete = score_mod.lineage_complete_for(
+                sources,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            assert complete is True
+            assert resolve_source_relation(
+                reference,
+                sources,
+                complete,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ) is SourceRelation.SAME_INPUT
+
+
+def test_openimcc_canonical_doi_is_a_terminal_source_root() -> None:
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import AncestryFailure, _resolve_coefficient_sources
+
+    doi_root = "doi:10.1098/rspa.1965.0176"
+    works = {}
+    observations = {}
+    experiments = {}
+
+    resolved = _resolve_coefficient_sources(
+        (doi_root,), observations, works, experiments
+    )
+    assert resolved.complete
+    assert resolved.ids == frozenset({doi_root})
+    assert lineage_complete_for(
+        (doi_root,), works=works, observations=observations, experiments=experiments
+    )
+    malformed = _resolve_coefficient_sources(
+        ("doi:not-a-canonical-doi",), observations, works, experiments
+    )
+    assert malformed.failure is AncestryFailure.UNKNOWN_ALIAS
+
+
+def test_registered_doi_work_without_loaded_members_uses_work_identity() -> None:
+    from simulator.battery.validate import (
+        _build_validation_indexes,
+        _resolve_coefficient_sources,
+    )
+
+    doi = "10.1098/rspa.1965.0176"
+    work = replace(F.work("registered-doi-work-identity"), doi=doi)
+    experiment = F.tabulation_experiment(
+        experiment_id="registered-doi-work-identity-exp", work_id=work.work_id
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    resolved = _resolve_coefficient_sources(
+        (f"doi:{doi}",), {}, works, experiments
+    )
+
+    assert resolved.complete
+    assert resolved.ids == frozenset({work.work_id, "nasa-cea-thermo"})
+
+    reference = F.observation(
+        "registered-doi-work-identity-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    indexes = _build_validation_indexes(
+        works,
+        {reference.observation_id: reference},
+        experiments,
+    )
+    reference_lineage = score_mod._reference_lineage_with_work_doi(
+        reference, indexes
+    )
+    assert reference_lineage.complete
+    assert reference_lineage.ids is not None
+    assert work.work_id in reference_lineage.ids
+    assert (
+        score_mod._source_relation_from_lineages(reference_lineage, resolved)
+        is SourceRelation.SAME_INPUT
+    )
+
+
+def test_openimcc_doi_matching_a_registered_work_is_same_source() -> None:
+    doi = "10.1098/rspa.1965.0176"
+    work = replace(F.work("masson-1965-doi-lineage"), doi=doi)
+    experiment = F.tabulation_experiment(
+        experiment_id="masson-1965-doi-lineage-exp", work_id=work.work_id
+    )
+    reference = F.observation(
+        "masson-1965-doi-lineage-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+
+    assert resolve_source_relation(
+        reference,
+        (f"doi:{doi}",),
+        True,
+        works={work.work_id: work},
+        observations={reference.observation_id: reference},
+        experiments={experiment.experiment_id: experiment},
+    ) is SourceRelation.SAME_INPUT
+
+
+def test_registered_doi_work_resolves_its_member_ancestry() -> None:
+    from simulator.battery.validate import _resolve_coefficient_sources
+
+    doi = "10.1098/rspa.1965.0176"
+    upstream_work = F.work("upstream-doi-ancestry")
+    registered_work = replace(
+        F.work("registered-doi-ancestry"), doi=doi
+    )
+    upstream_experiment = F.tabulation_experiment(
+        experiment_id="upstream-doi-ancestry-exp",
+        work_id=upstream_work.work_id,
+    )
+    registered_experiment = F.tabulation_experiment(
+        experiment_id="registered-doi-ancestry-exp",
+        work_id=registered_work.work_id,
+    )
+    identity = F.o2_identity()
+    root = F.observation(
+        "doi-ancestry-root",
+        upstream_experiment.experiment_id,
+        identity,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=upstream_work.work_id,
+    )
+    member = F.observation(
+        "doi-ancestry-member",
+        upstream_experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=upstream_work.work_id,
+        derived_from=(root.observation_id,),
+        derivation=Derivation(
+            relation="derived from upstream observation",
+            inputs=(root.observation_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    registered_row = F.observation(
+        "doi-registered-work-row",
+        registered_experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=registered_work.work_id,
+        derived_from=(member.observation_id,),
+        derivation=Derivation(
+            relation="derived from registered work member",
+            inputs=(member.observation_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    works = {
+        upstream_work.work_id: upstream_work,
+        registered_work.work_id: registered_work,
+    }
+    observations = {
+        row.observation_id: row for row in (root, member, registered_row)
+    }
+    experiments = {
+        upstream_experiment.experiment_id: upstream_experiment,
+        registered_experiment.experiment_id: registered_experiment,
+    }
+
+    resolved = _resolve_coefficient_sources(
+        (f"doi:{doi}",), observations, works, experiments
+    )
+
+    assert resolved.complete
+    assert resolved.ids == frozenset(
+        {
+            "nasa-cea-thermo",
+            registered_work.work_id,
+            root.observation_id,
+            member.observation_id,
+            registered_row.observation_id,
+        }
+    )
+    assert f"doi:{doi}" not in resolved.ids
+
+
+def test_memberless_table_work_is_same_source_in_full_and_filtered_contexts() -> None:
+    import simulator.battery.score as score_module
+    from simulator.battery.validate import (
+        _build_validation_indexes,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+    )
+
+    doi = "10.1234/memberless-table-work"
+    source_work = replace(F.work("memberless-table-work"), doi=doi)
+    pdf, table = source_work.source_files.files
+    table_asset = "memberless-source-table"
+    source_work = replace(
+        source_work,
+        source_files=replace(
+            source_work.source_files,
+            files=(pdf, replace(table, asset_id=table_asset)),
+        ),
+    )
+    source_experiment = F.tabulation_experiment(
+        experiment_id="memberless-table-work-exp", work_id=source_work.work_id
+    )
+    reference_work = replace(
+        F.work("cross-work-table-reference"), doi=None
+    )
+    reference_experiment = F.tabulation_experiment(
+        experiment_id="cross-work-table-reference-exp",
+        work_id=reference_work.work_id,
+    )
+    reference = F.observation(
+        "cross-work-table-derived-reference",
+        reference_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0.1"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=reference_work.work_id,
+        derived_from=(),
+        derivation=Derivation(
+            relation="derived from a registered work table",
+            inputs=(table_asset,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    unrelated_work = F.work("unrelated-loaded-work")
+    unrelated_experiment = F.tabulation_experiment(
+        experiment_id="unrelated-loaded-work-exp", work_id=unrelated_work.work_id
+    )
+    unrelated = F.observation(
+        "unrelated-loaded-row",
+        unrelated_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=unrelated_work.work_id,
+    )
+    works = {
+        work.work_id: work
+        for work in (source_work, reference_work, unrelated_work)
+    }
+    experiments = {
+        experiment.experiment_id: experiment
+        for experiment in (
+            source_experiment,
+            reference_experiment,
+            unrelated_experiment,
+        )
+    }
+    source = (f"doi:{doi}",)
+
+    for observations in (
+        {reference.observation_id: reference, unrelated.observation_id: unrelated},
+        {reference.observation_id: reference},
+    ):
+        resolved = _resolve_coefficient_sources(
+            source, observations, works, experiments
+        )
+        assert resolved.complete
+        assert resolved.ids == frozenset({source_work.work_id, table_asset})
+        assert (
+            score_module.resolve_source_relation(
+                reference,
+                source,
+                True,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            is SourceRelation.SAME_INPUT
+        )
+
+        indexes = _build_validation_indexes(works, observations, experiments)
+        cached_reference = _observation_lineage(
+            reference.observation_id,
+            observations,
+            indexes.table_ids,
+            asset_ids=indexes.asset_ids,
+            _cache=indexes.observation_lineages,
+        )
+        assert cached_reference.complete
+        resolved_reference = score_module._reference_lineage_with_work_doi(
+            reference, indexes
+        )
+        assert resolved_reference.ids is not None
+        assert reference_work.work_id in resolved_reference.ids
+        resolver = score_module._ScoringLineageResolver(
+            score_module.ScoreContext(works, experiments, observations), indexes
+        )
+        complete, relation = resolver.for_reference(reference, source)
+        assert complete
+        assert relation is SourceRelation.SAME_INPUT
+
+
+@pytest.mark.parametrize(
+    "unknown_alias",
+    (
+        "openimcc-v9.9.9-unknown",
+        "openimcc-source-ref:FutureSource",
+    ),
+)
+def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal(
+    unknown_alias: str,
+) -> None:
+    experiment = F.tabulation_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        "unknown-openimcc-pack-alias-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    context = _context(F.work(), experiment, reference)
+    prediction = EnginePrediction(
+        engine=Engine.OPENIMCC,
+        channel="openimcc",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("0.2"),
+        unit=QUANTITY_UNITS[Quantity.ACTIVITY],
+        coefficient_sources=(unknown_alias,),
+        identity=identity,
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.LINEAGE_UNKNOWN
+    assert residual.refusal.detail == {
+        "reason": "openimcc_pack_coefficient_source_alias_missing",
+        "coefficient_source_aliases": (unknown_alias,),
+    }
 
 
 @pytest.mark.parametrize(
@@ -20700,7 +21187,6 @@ def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> 
         "stolyarova-1995-cao-alumina-kems.yaml",
     )
 
-    root = context.root
     expected_row_keys = {
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",
