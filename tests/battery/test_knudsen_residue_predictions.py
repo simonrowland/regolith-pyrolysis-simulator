@@ -517,10 +517,7 @@ def _predict_and_classify_mass_loss_tail(extent_point, monkeypatch, *, approxima
     ))
     experiment = replace(experiment, sample=replace(
         experiment.sample,
-        # At the exact 0.05 boundary, a 1e-3 kg charge retains
-        # 1e-3 * 0.2 * 0.05 = 1e-5 kg FeO (ratio 0.05), above the
-        # 1e-12 kg loader cutoff; the production threshold is 0.05000000000000001.
-        mass_kg=Located(State.of(Value.point_of("1e-3")), reference.locator),
+        mass_kg=Located(State.of(Value.point_of("1e-9")), reference.locator),
         initial_composition=Located(State.of(composition), reference.locator),
     ))
     rows = (*rows[:1], replace(rows[-1], value=replace(
@@ -576,15 +573,47 @@ def test_exact_component_tail_uses_tenth_of_last_printed_digit():
     assert not trace_tail["material"]
 
 
-def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic(extent_point, monkeypatch):
-    notices, tail = _predict_and_classify_mass_loss_tail(
-        extent_point, monkeypatch, approximate=False, loss_fraction=0.05,
-    )
+def test_exact_mass_loss_anchor_keeps_strict_boundary_arithmetic():
+    from simulator.battery import residue
+    from simulator.battery.enums import NoticeKind
 
-    assert tail["fraction_of_measured_mass_loss"] == pytest.approx(0.05, abs=1e-12)
-    assert tail["material_threshold"] == 0.05000000000000001
-    assert not tail["material"]
-    assert notices[0].certification == "immaterial"
+    value = Value.point_of("0.2")
+    divisor = 0.2
+    production_threshold = residue._trace_tail_precision_threshold(value, divisor=divisor)
+    round_eight_threshold = residue._trace_tail_precision_threshold(value) / divisor
+    chosen_tail = Decimal("0.05")
+
+    # The production threshold is 0.05000000000000001; round 8's division-first
+    # threshold is 0.049999999999999996. The exact decimal 0.05 lies strictly
+    # between them, so only the old arithmetic classifies this tail as material.
+    assert Decimal(str(round_eight_threshold)) < chosen_tail
+    assert chosen_tail < Decimal(str(production_threshold))
+
+    def classify(threshold):
+        tail = {
+            "fraction_of_measured_mass_loss": float(chosen_tail),
+            "material_threshold": threshold,
+            "retained_kg_by_parent": {"FeO": 1e-12},
+            "measured_loss_kg": 1e-3,
+            "residue_oxide_mass_kg": 1e-2,
+        }
+        notices = residue._knudsen_trace_tail_notices(
+            tail,
+            SimpleNamespace(value=value, identity=SimpleNamespace(
+                species=SimpleNamespace(formula="FeO"),
+            )),
+            oxide_wt_pct=False,
+        )
+        return tail, notices
+
+    production_tail, production_notices = classify(production_threshold)
+    round_eight_tail, round_eight_notices = classify(round_eight_threshold)
+    assert not production_tail["material"]
+    assert production_notices[0].kind is NoticeKind.INPUT_OMITTED
+    assert production_notices[0].certification == "immaterial"
+    assert round_eight_tail["material"]
+    assert round_eight_notices[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert round_eight_notices[0].certification == "material"
 
 
 def test_knudsen_tail_uses_the_real_ledger_loader_cutoff(monkeypatch):
