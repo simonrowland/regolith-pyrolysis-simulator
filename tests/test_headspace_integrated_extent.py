@@ -36,7 +36,7 @@ from simulator.evaporation import (
     production_vapor_molar_mass_g_per_mol,
 )
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
-from simulator.state import MOLAR_MASS, CampaignPhase
+from simulator.state import MOLAR_MASS, CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim, _load_yaml
 from tests.test_headspace_balance_hour import _hold_temperature, _seed
 
@@ -1694,13 +1694,11 @@ def test_hour22_buffer_stays_nonnegative_and_overdraw_refuses():
 
 
 def test_buffer_release_roundoff_scales_with_stock_but_material_overdraw_refuses():
-    """A few ulps of stock mismatch at five mol is roundoff, not a leak.
+    """A two-ulp stock mismatch at five mol is roundoff, not a leak.
 
-    The injected gap is two ulps. The 1e-6 Pa extent tolerance moves
-    the integrated release by one further ulp of that stock, so the
-    published gap is three ulps (2.66e-15 mol). Restoring the absolute
-    1e-15 mol slack still refuses that gap. A 1e-9 mol shortfall
-    remains a real overdraw and must still refuse.
+    Mutation: restoring the absolute 1e-15 mol slack refuses the first
+    hour because its two-ulp mismatch is 1.78e-15 mol. A 1e-9 mol
+    shortfall remains a real overdraw and must still refuse.
     """
 
     opening_pa = 27.174056558659704
@@ -1741,7 +1739,7 @@ def test_buffer_release_roundoff_scales_with_stock_but_material_overdraw_refuses
         release["excess_integrated"]
         - release["fo2_buffer_after_settle_mol"]
     )
-    assert mismatch == 3.0 * math.ulp(5.0)
+    assert mismatch == 2.0 * math.ulp(5.0)
     assert math.ulp(release["excess_integrated"]) == math.ulp(5.0)
 
     _sim_overdraw, refusal = _run_with_shortfall(1.0e-9)
@@ -2028,14 +2026,83 @@ def test_supersaturated_hour_commits_a_negative_vapour_extent():
         vapour_kg += float(dict(lot.species_kg).get("K", 0.0) or 0.0)
     assert parent_kg > 0.0
     assert vapour_kg == abs(extent)
+    # -5.6426e-7 kg/h of K at 258.485 kJ/mol is -3.730 J/h,
+    # which is -1.036e-6 kWh. The tracker starts at zero.
+    thermal_kWh = float(
+        sim.energy_tracker.evaporation_thermal_cumulative_kWh
+    )
+    assert abs(thermal_kWh - (-1.036e-6)) <= 1.0e-9
     _assert_closed(hour)
+
+
+def test_mixed_return_hour_commits_and_the_duct_inlet_is_forward():
+    """K returning beside forward SiO does not enter the duct.
+
+    The law is K at -1e-4 kg/h and SiO at 1e-6 kg/h. The signed net
+    is -9.9e-5. The inlet is the evolved SiO, total 1e-6.
+
+    The seed is 800 Pa. On this vessel that is about 2.3e-4 kg of K,
+    above the 1e-4 kg the hour returns. Downstream is 5000 Pa, so the
+    pipe stays shut and the return is the only K debit.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 5000.0)
+    seed_pa = 800.0
+    _seed_pa(sim, "K", seed_pa, "mixed K return")
+    mass = _molar_mass_kg(sim, "K")
+    per_mol = (
+        GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    assert seed_pa / per_mol * mass > 1.0e-4
+
+    def law(_partials):
+        return {"K": -1.0e-4, "SiO": 1.0e-6}
+
+    hour = _step(sim, law, lambda _species: 0.0)
+    committed = sim._ledger_committed_evap_flux_this_tick
+    assert float(committed.species_kg_hr["K"]) < 0.0
+    assert float(committed.total_kg_hr) < 0.0
+    inlet = sim._subsolidus_transport_inlet_flux(committed)
+    assert "K" not in inlet.species_kg_hr
+    assert abs(float(inlet.total_kg_hr) - 1.0e-6) <= 1.0e-9
+    assert abs(float(inlet.species_kg_hr["SiO"]) - 1.0e-6) <= 1.0e-9
+    _assert_closed(hour)
+
+
+def test_mixed_return_pipe_demand_is_the_forward_stream():
+    """F-317's pipe demand is the evolved stream, not the signed net.
+
+    {K: -1e-4, SiO: 1e-3} nets to 9e-4. The return has no duct species,
+    so the demand is SiO's 1e-3. A solid-host extra is added to that
+    forward part, and a negative ordinary rate stays out.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 100.0)
+    flux = EvaporationFlux(species_kg_hr={"K": -1.0e-4, "SiO": 1.0e-3})
+    flux.update_totals()
+    inlet = sim._subsolidus_transport_inlet_flux(flux)
+    demand = float(inlet.total_kg_hr)
+    assert demand == 1.0e-3
+    assert flux.total_kg_hr == -1.0e-4 + 1.0e-3
+    assert demand != flux.total_kg_hr
+    assert "K" not in inlet.species_kg_hr
+
+    sim._subsolidus_committed_kg_hr_by_species = {"Na": 2.0e-4, "K": -1.0}
+    merged = sim._subsolidus_transport_inlet_flux(flux)
+    assert merged.species_kg_hr["SiO"] == 1.0e-3
+    assert merged.species_kg_hr["Na"] == 2.0e-4
+    assert "K" not in merged.species_kg_hr
+    assert float(merged.total_kg_hr) == 1.0e-3 + 2.0e-4
 
 
 def test_nonfinite_vapour_extent_still_refuses():
     """A NaN gross is a failed integral. The partial floor still refuses.
 
     A finite negative extent past that floor is recondensation and is
-    returned. One inside the floor is the integrator tolerance.
+    returned. One inside the floor is dust, not the integrator
+    tolerance, and the booked extent is zero.
     """
 
     from types import SimpleNamespace

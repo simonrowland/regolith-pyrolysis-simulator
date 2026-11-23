@@ -56,6 +56,38 @@ def test_energy_tracker_adds_thermal_diagnostics_without_changing_mre_kwh():
     )
 
 
+def test_condenser_charges_only_the_forward_stream():
+    """A return has no duct species, so the condenser cools the forward part.
+
+    {K: -1e-4, Na: 1e-6} has a negative signed total. max(0, total)
+    would cool nothing. The forward kilogram is Na's 1e-6, and
+    1e-6 kg/h * 50 W per kg/h / 1000 is 5e-8 kWh.
+    """
+
+    tracker = EnergyTracker()
+    melt = MeltState(campaign=CampaignPhase.C2A)
+    overhead = OverheadGas(turbine_shaft_power_kW=0.0, turbine_flow_kg_hr=0.0)
+    evap_flux = EvaporationFlux(species_kg_hr={"K": -1.0e-4, "Na": 1.0e-6})
+    evap_flux.update_totals()
+
+    pressures = _na_vapor_pressures()
+    pressures["metals"]["K"] = {
+        "parent_oxide": "K2O",
+        "molar_mass_g_mol": 39.0983,
+    }
+    record = tracker.calculate_hour(
+        melt,
+        overhead,
+        evap_flux,
+        mre_kWh=0.0,
+        vapor_pressures=pressures,
+    )
+
+    assert evap_flux.total_kg_hr < 0.0
+    assert record.condenser_kWh == pytest.approx(1.0e-6 * 50.0 / 1000.0)
+    assert record.evaporation_thermal_kWh < 0.0
+
+
 @pytest.mark.parametrize(
     "shaft_power_kW", [-1.0, float("nan"), float("inf"), float("-inf")]
 )

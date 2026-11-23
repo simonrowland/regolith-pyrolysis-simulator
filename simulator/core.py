@@ -18051,14 +18051,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
 
     def _subsolidus_transport_inlet_flux(self, evap_flux: EvaporationFlux) -> EvaporationFlux:
-        """Ordinary gas plus admitted solid-host gas, for transport only.
+        """Forward gas plus admitted solid-host gas, for the duct only.
 
-        The returned object is not a condensation or melt-debit flux.
-        With no solid-host gas it is the ordinary flux itself.
-        A flux whose every rate returns to the melt has no duct load.
-        The inlet is that empty forward part, total zero. One forward
-        rate keeps the caller's object, negatives included.
+        F-317's m_dot_pipe is the evolved stream entering the duct.
+        A negative melt rate is vapour returning to the melt and has
+        no duct species. Solid-host gas is added to that forward part.
+        With no solid-host gas and no return, the caller's object is
+        the inlet.
         """
+        from engines.builtin.evaporation_transition import (
+            nonnegative_evaporation_view,
+        )
+
         solid = getattr(self, "_subsolidus_committed_kg_hr_by_species", None) or {}
         extra: Dict[str, float] = {}
         for species, rate in solid.items():
@@ -18067,22 +18071,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             number = float(rate)
             if number > 0.0:
                 extra[str(species)] = number
-        rates = getattr(evap_flux, "species_kg_hr", None) or {}
-        if (
-            not extra
-            and rates
-            and all(float(rate) < 0.0 for rate in rates.values())
-        ):
-            from engines.builtin.evaporation_transition import (
-                nonnegative_evaporation_view,
-            )
-
-            return nonnegative_evaporation_view(evap_flux)
+        view = nonnegative_evaporation_view(evap_flux)
         if not extra:
-            return evap_flux
+            return view
         species_kg_hr = {
             str(species): float(rate)
-            for species, rate in evap_flux.species_kg_hr.items()
+            for species, rate in view.species_kg_hr.items()
         }
         for species, rate in extra.items():
             species_kg_hr[species] = species_kg_hr.get(species, 0.0) + rate

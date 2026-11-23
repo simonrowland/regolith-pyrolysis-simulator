@@ -92,11 +92,20 @@ class EnergyTracker:
             record.turbine_kWh = O2_kg_hr * 0.02
 
         # --- Condenser cooling ---
-        # Radiation cooling is free (lunar vacuum).
-        # Active cooling needed only at lower-T stages where
-        # radiation is insufficient.  Small contribution.
-        condenser_heat_W = evap_flux.total_kg_hr * 50.0  # ~50 W per kg/hr
-        record.condenser_kWh = condenser_heat_W / 1000.0  # W → kWh (1 hr)
+        # Radiation cooling is free (lunar vacuum). Active cooling is
+        # the forward stream only. A return is vapour back to the melt
+        # and has no duct species, so it is not cooled.
+        # Premise: each forward kg/h draws 50 W for this hour.
+        # Algebra: kWh = (sum of rates > 0) * 50 / 1000.
+        # Unit check: (kg/h) * (W per kg/h) / (W/kW) * 1 h = kWh.
+        # The signed total would net a return against a neighbour.
+        forward_kg_hr = sum(
+            float(rate)
+            for rate in evap_flux.species_kg_hr.values()
+            if float(rate) > 0.0
+        )
+        condenser_heat_W = forward_kg_hr * 50.0
+        record.condenser_kWh = condenser_heat_W / 1000.0
 
         # --- MRE ---
         record.mre_kWh = mre_kWh

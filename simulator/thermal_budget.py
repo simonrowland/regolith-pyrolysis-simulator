@@ -299,6 +299,9 @@ def evaporation_enthalpy_budget(
     is a consistent low-order ESTIMATE of the evaporation enthalpy, not the full
     MOx(melt, T)->M(g)+1/2 O2 path enthalpy. Oxide vapors use a
     single cited melt-oxide->oxide-vapor(g) reaction instead of that two-leg form.
+
+    The charge is ΔH·ṁ. A negative rate is that reaction run backwards,
+    heat released to the melt, and is not skipped.
     """
 
     latent_by_species: dict[str, float] = {}
@@ -306,14 +309,24 @@ def evaporation_enthalpy_budget(
     sources: dict[str, str] = {}
 
     for species, raw_kg_hr in sorted(species_kg_hr.items()):
-        signed_kg_hr = float(raw_kg_hr)
-        # Recondensation is not an evaporation sink. The ledger posts
-        # that return. Refusing the sign here stops the hour.
-        if signed_kg_hr < 0.0:
+        # Premise: the charge is ΔH·ṁ. A return is the evaporation
+        # reaction run backwards, so a negative ṁ is heat released to
+        # the melt. Skipping it would drop that release.
+        # K uses this metal path. Latent K(l)->K(g) is 76.90 kJ/mol.
+        # K2O -> 2K + 1/2 O2 is 363.17 kJ/mol oxide. One K is half
+        # that oxide (OXIDE_TO_METAL n_metal = 2), so the dissociation
+        # leg is 0.5 * 363.17 = 181.585. ΔH = 76.90 + 181.585 = 258.485
+        # kJ/mol K.
+        # Algebra: mol/h = ṁ_kg/h * 1000 / M_g. kJ/h = mol/h * ΔH.
+        # kWh = kJ/h / KJ_PER_KWH, and KJ_PER_KWH is 3600.
+        # Unit check: (kg/h) * (g/kg) / (g/mol) * (kJ/mol) / (kJ/kWh) = kWh.
+        # Sanity: the measured K hour is -5.6426e-7 kg/h.
+        # M_K = 39.0983 g/mol gives -1.4432e-5 mol/h,
+        # * 258.485 = -3.730 J/h, which is -1.036e-6 kWh.
+        signed_kg_hr = _finite(raw_kg_hr, f"species_kg_hr[{species!r}]")
+        if signed_kg_hr == 0.0:
             continue
-        kg_hr = _non_negative(signed_kg_hr, f"species_kg_hr[{species!r}]")
-        if kg_hr <= 0.0:
-            continue
+        kg_hr = signed_kg_hr
 
         metadata = _vapor_metadata(species, vapor_pressures)
         product_mol = kg_hr * 1000.0 / _molar_mass_g_mol(species, metadata)
