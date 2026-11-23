@@ -30819,12 +30819,38 @@ class Migrator:
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
             if extra_unc is None and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                parent_uncertainty = uncertainty.verbatim
+                confidence_level = (
+                    parent_uncertainty.get("confidence_level")
+                    if isinstance(parent_uncertainty, Mapping)
+                    else None
+                )
+                declared_kind = (
+                    parent_uncertainty.get("kind")
+                    if isinstance(parent_uncertainty, Mapping)
+                    else None
+                )
+                declared_k = (
+                    parent_uncertainty.get("k")
+                    if isinstance(parent_uncertainty, Mapping)
+                    else None
+                )
+                normalized_confidence = (
+                    confidence_level.strip().lower()
+                    if isinstance(confidence_level, str)
+                    else ""
+                )
+                normalized_kind = (
+                    declared_kind.strip().lower()
+                    if isinstance(declared_kind, str)
+                    else ""
+                )
+                numeric_k = _as_dec_or_none(declared_k)
                 uncertainty_declares_convention = (
-                    isinstance(uncertainty.verbatim, Mapping)
-                    and any(
-                        uncertainty.verbatim.get(key) not in (None, "", "none")
-                        for key in ("kind", "confidence_level", "k")
-                    )
+                    normalized_confidence
+                    not in {"", "none", "not", "not_stated", "unknown", "unspecified"}
+                    or normalized_kind in {"one_sigma", "two_sigma"}
+                    or (numeric_k is not None and numeric_k > 0)
                 )
                 if uncertainty_declares_convention:
                     standard_errors = raw_item.get("standard_errors")
@@ -31274,9 +31300,10 @@ class Migrator:
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
             if isinstance(uncertainty.verbatim, Mapping):
-                confidence_level = uncertainty.verbatim.get("confidence_level")
-                if confidence_level is not None:
-                    verbatim["confidence_level"] = confidence_level
+                for convention_key in ("confidence_level", "k", "kind"):
+                    convention_value = uncertainty.verbatim.get(convention_key)
+                    if convention_value is not None:
+                        verbatim[convention_key] = convention_value
             if extra_unc_k is not None:
                 verbatim["k"] = extra_unc_k
                 numeric_extra_unc = _as_dec_or_none(extra_unc)

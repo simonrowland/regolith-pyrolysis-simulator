@@ -28,12 +28,12 @@ EM.CaO 2.24~0.08|2.08~0.06|2.27~0.08|2.58~0.03|2.70~0.01|3.09~0.01|4.00~0.01|4.7
 EM.TiO2 0.097~0.004|0.097~0.003|0.106~0.004|0.141~0.002|0.150~0.001|0.173~0.001|0.218~0.002|0.252~0.002|0.260~0.002|0.311~0.002|0.325~0.002|0.506~0.004|0.597~0.006|0.681~0.004|0.779~0.004|1.57~0.01
 EM.FeO 35.5~0.3|35.2~0.4|32.4~0.4|23.5~0.2|20.6~0.2|12.6~0.0|0.808~0.003|0.069~0.002|0.284~0.002|0.012~0.002|0.007~0.001|0.015~0.002|0.007~0.002|0.005~0.002|0.013~0.002|0.003~0.002
 IM.MgO 24.0~0.4|25.3~1.8|23.8~1.5|28.1~0.2|33.7~0.2|34.1~0.2|39.6~0.4|42.0~0.2|43.3~0.7|41.7~0.2|40.3~0.5|36.4~0.9|30.2~0.2|24.4~0.1|25.2~0.5|0.00244~0.00022
-IM.Al2O3 2.28~0.15|2.51~0.49|3.26~0.19|3.61~0.23|3.95~0.26|5.26~0.05|6.90~0.40|7.16~0.25|7.41~0.21|9.29~0.17|9.91~0.57|14.2|18.48~0.55|21.1~0.7|23.9~0.5|55.3~1.7
-IM.SiO2 35.1|34.6|36.1|40.1|40.3|44.4|46.3|44.8|42.7|41.7|41.4|37.0|36.4|34.9|31.8|4.20~0.01
+IM.Al2O3 2.28~0.15|2.51~0.49|3.26~0.19|3.61~0.23|3.95~0.26|5.26~0.05|6.90~0.40|7.16~0.25|7.41~0.21|9.29~0.17|9.91~0.57|14.2~0.0|18.48~0.55|21.1~0.7|23.9~0.5|55.3~1.7
+IM.SiO2 35.1~0.0|34.6~0.0|36.1~0.0|40.1~0.0|40.3~0.0|44.4~0.0|46.3~0.0|44.8~0.0|42.7~0.0|41.7~0.0|41.4~0.0|37.0~0.0|36.4~0.0|34.9~0.0|31.8~0.0|4.20~0.01
 IM.CaO 1.72~0.13|2.23~0.55|2.49~0.01|2.87~0.17|2.91~0.15|3.70~0.27|5.29~0.09|5.20~0.07|5.31~0.43|6.41~0.37|7.27~0.15|11.1~0.9|13.39~0.67|17.4~0.8|17.1~0.7|36.4~1.7
 IM.TiO2 0.090~0.010|0.084~0.022|0.094~0.018|0.167~0.007|0.163~0.011|0.202~0.032|0.286~0.010|0.270~0.010|0.264~0.032|0.302~0.019|0.365~0.014|0.462~0.039|0.493~0.037|0.652~0.026|0.647~0.027|1.11~0.07
-IM.FeO 36.7~0.3|34.9~0.8|34.0~1.4|24.1~0.2|18.2~0.3|11.3|0.803~0.033|0.114~0.014|0.259~0.009|0.059~0.023|0.076~0.016|0.073~0.027|0.055~0.030|0.0853~0.0087|0.080~0.020|0.066~0.016
-IM.WO3 0.010~0.002|0.201~0.010|0.096~0.008|0.729~0.070|0.592~0.074|0.781|0.357~0.030|0.174~0.007|0.355~0.006|0.119~0.013|0.092~0.006|0.119~0.017|0.061~0.002|0.069~0.003|0.103~0.011|0.061~0.010
+IM.FeO 36.7~0.3|34.9~0.8|34.0~1.4|24.1~0.2|18.2~0.3|11.3~0.0|0.803~0.033|0.114~0.014|0.259~0.009|0.059~0.023|0.076~0.016|0.073~0.027|0.055~0.030|0.0853~0.0087|0.080~0.020|0.066~0.016
+IM.WO3 0.010~0.002|0.201~0.010|0.096~0.008|0.729~0.070|0.592~0.074|0.781~0.000|0.357~0.030|0.174~0.007|0.355~0.006|0.119~0.013|0.092~0.006|0.119~0.017|0.061~0.002|0.069~0.003|0.103~0.011|0.061~0.010
 REE.La 80.3~4.1|97~18|100~13|123~7|121~6|152~2|293~27|237~11|247~1|293~12|401~32|539~6|640~41|975~53|914~89|2128~131
 REE.Ce 88.2~3.1|112~21|114~19|128~5|117~5|135~4|158~15|73.2~3.5|85.4~1.3|10.3~0.4|7.47~0.56|5.20~0.49|1.10~0.51|0.289~0.036|1.87~0.38|0.83~0.18
 REE.Pr 83.8~4.9|101~18|108~16|126~7|122~6|154~6|285~26|225~10|231~2|263~12|362~28|429~10|500~37|744~44|643~65|1182~89
@@ -134,6 +134,24 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         ("SC2", "SiO2"): "0.0", ("SC16", "SiO2"): "0.0",
         ("SC4", "FeO"): "0.0", ("SC9", "MgO"): "0.000",
     }
+    ion_probe = next(
+        row for row in table1
+        if row["values"]["analytical_method"] == "ion microprobe"
+    )
+    ion_zero_widths = {
+        (cell["sample"], cell["formula"]): cell["sigma"]
+        for cell in ion_probe["uncertainty"]["zero_width_cells"]
+    }
+    expected_ion_zero_widths = {
+        (sample, formula): error
+        for label, expected_cells in rendered.items()
+        if label.startswith("IM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, expected_cells, strict=True)
+        for _value, error in (split_value_and_error(raw_cell),)
+        if error == "0.0" or error == "0.000"
+    }
+    assert ion_zero_widths == expected_ion_zero_widths
     for label, expected_cells in rendered.items():
         group, formula = label.split(".", maxsplit=1)
         if group == "REE":
@@ -535,3 +553,52 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
         assert row.uncertainty.verbatim is not None
         assert row.uncertainty.verbatim["sigma"] == expected_sigma
         assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+
+
+@pytest.mark.parametrize(
+    ("declaration", "is_convention"),
+    [
+        ({"k": 2}, True),
+        ({"kind": "two_sigma"}, True),
+        ({"confidence_level": "not_stated"}, False),
+        ({"kind": "printed"}, False),
+    ],
+)
+def test_residue_component_parent_convention_controls_width_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+    declaration: dict[str, object],
+    is_convention: bool,
+) -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    ion_probe = next(
+        row
+        for row in extract["species"]["SiO2"]["observations"]
+        if row["observation_id"]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+    )
+    ion_probe["uncertainty"] = declaration
+    original_load_yaml = migrate_module.load_yaml
+
+    def load_mutated_extract(path: Path):
+        if Path(path) == EXTRACT:
+            return extract
+        return original_load_yaml(path)
+
+    monkeypatch.setattr(migrate_module, "load_yaml", load_mutated_extract)
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    row = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith("122b3beaa55d")
+    )
+    if is_convention:
+        assert row.uncertainty.kind is UncertaintyKind.PRINTED
+        assert row.uncertainty.verbatim is not None
+        assert row.uncertainty.verbatim["sigma"] == "0.4"
+        for key, value in declaration.items():
+            assert row.uncertainty.verbatim[key] == value
+    else:
+        assert row.uncertainty.verbatim is None or "sigma" not in row.uncertainty.verbatim

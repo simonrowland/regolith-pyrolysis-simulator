@@ -42,6 +42,10 @@ notes:
   observation-level `uncertainty.zero_width_cells` metadata, outside the row payload used by stable IDs. The footnote
   identifies all 96 widths as one-sigma standard errors from replicate analyses.
 - >
+  The ion-microprobe oxide grid has 16 bead rows × 7 oxide cells = 112 cells. Its 112 printed widths are retained
+  as 94 nonzero `standard_errors` and 18 zero widths in `uncertainty.zero_width_cells`. The shared Table 1 footnote
+  identifies these as one-sigma standard errors from replicate analyses.
+- >
   Locator audit: sample columns SC12, SC11, SC5, SC13, SC8, SC4, SC14, and SC1 use physical PDF page 4
   (index 3, published page 482); SC7, SC2, SC16, SC6, SC3, SC15, SC10, and SC9 use page 5 (index 4, published
   page 483). Page 4 proof: `44.9 ⫾ 0.0`; page 5 proofs: `43.0 ⫾ 0.0` and `0.001 ⫾ 0.000`. The confidence
@@ -1277,6 +1281,61 @@ species:
           pdf_page_index: 4
           table: '1'
           note: Table 1 footnote on replicate-analysis standard errors.
+        zero_width_cells:
+        - sample: SC12
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC11
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC5
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC13
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC8
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC4
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC14
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC1
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC7
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC2
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC16
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC6
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC3
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC15
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC10
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC4
+          formula: FeO
+          sigma: '0.0'
+        - sample: SC4
+          formula: WO3
+          sigma: '0.000'
+        - sample: SC6
+          formula: Al2O3
+          sigma: '0.0'
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
