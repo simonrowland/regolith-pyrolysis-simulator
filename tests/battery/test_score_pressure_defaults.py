@@ -6,12 +6,18 @@ from decimal import Decimal
 from simulator.battery.default_policy import resolve as resolve_policy
 from simulator.battery.enums import (
     AmbientPressureEvidenceClass,
+    DEFAULT_POLICY_NOTICE_KINDS,
     MethodToken,
     NoticeKind,
     Quantity,
 )
 from simulator.battery.identity import PA_PER_BAR_DEC
-from simulator.battery.records import AmbientPressureEvidence, NoticePolicy, State
+from simulator.battery.records import (
+    AmbientPressureEvidence,
+    Notice,
+    NoticePolicy,
+    State,
+)
 from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.score import (
     flagged_strata,
@@ -19,6 +25,25 @@ from simulator.battery.score import (
     total_pressure_bar_for_score,
 )
 from tests.battery import factories as F
+
+
+def test_each_default_policy_flag_has_one_matching_stratum() -> None:
+    policy = NoticePolicy("DP-001", 1, "canonical", "101325", "Pa")
+    notices = tuple(
+        Notice(
+            kind=kind,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="default policy flag",
+            origin="test",
+            policy=policy,
+        )
+        for kind in DEFAULT_POLICY_NOTICE_KINDS
+    )
+
+    strata = flagged_strata(notices)
+
+    for kind in DEFAULT_POLICY_NOTICE_KINDS:
+        assert strata.count(kind.value) == 1
 
 
 def _without_run_pressure(experiment):

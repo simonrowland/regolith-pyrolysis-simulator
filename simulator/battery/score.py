@@ -625,10 +625,12 @@ FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
-FLAGGED_STRATUM_ASSUMED_PRESSURE = "assumed_pressure"
-FLAGGED_STRATUM_ASSUMED_FO2 = "assumed_fo2"
-FLAGGED_STRATUM_METHOD_IMPLIED = "method_implied"
-FLAGGED_STRATUM_EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
+FLAGGED_STRATUM_ASSUMED_PRESSURE = NoticeKind.ASSUMED_PRESSURE.value
+FLAGGED_STRATUM_ASSUMED_FO2 = NoticeKind.ASSUMED_FO2.value
+FLAGGED_STRATUM_METHOD_IMPLIED = NoticeKind.METHOD_IMPLIED.value
+FLAGGED_STRATUM_EFFUSION_REGIME_ASSUMED = (
+    NoticeKind.EFFUSION_REGIME_ASSUMED.value
+)
 FLAGGED_STRATUM_PROPOSED_POLICY = "PROPOSED-POLICY"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
@@ -2556,23 +2558,12 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
-    if (
-        NoticeKind.ASSUMED_PRESSURE.value in kinds
-        and FLAGGED_STRATUM_ASSUMED_PRESSURE not in strata
-    ):
-        strata.append(FLAGGED_STRATUM_ASSUMED_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
-    if NoticeKind.ASSUMED_FO2.value in kinds:
-        strata.append(FLAGGED_STRATUM_ASSUMED_FO2)
-    if NoticeKind.METHOD_IMPLIED.value in kinds:
-        strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
-    if NoticeKind.EFFUSION_REGIME_ASSUMED.value in kinds:
-        strata.append(FLAGGED_STRATUM_EFFUSION_REGIME_ASSUMED)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:

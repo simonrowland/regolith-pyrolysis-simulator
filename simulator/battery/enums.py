@@ -401,11 +401,8 @@ class NoticeKind(StrEnum):
     # d-460 default-policy flags. Policy metadata is stored separately on
     # Notice.policy; each token names the applied table rule.
     ASSUMED_PRESSURE = "assumed_pressure"
-    METHOD_IMPLIED = "method_implied"
-    EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
     ALPHA_ASSUMED = "alpha_assumed"
     KNOB_DEFAULTED = "knob_defaulted"
-    ASSUMED_FO2 = "assumed_fo2"
     METHOD_ASSUMED = "method_assumed"
     KEMS_CALIBRATION_BY_SOURCE = "kems_calibration_by_source"
     BASIS_CONVERTED = "basis_converted"
