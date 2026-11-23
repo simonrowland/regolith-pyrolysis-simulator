@@ -23,6 +23,10 @@ from simulator.battery.oxygen_balance import (
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
+from simulator.vacuum_oxygen_balance import (
+    PressureEvaluation,
+    PressureLawChannelDiagnostic,
+)
 from simulator.battery.records import nominal_pressure_pa
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID,
@@ -558,6 +562,201 @@ class _ChannelTerms:
         )
 
 
+def mean_oxygen_per_metal_atom(
+    valence_fractions: Sequence[tuple[float, float]],
+) -> float:
+    """Melt mean oxygen per metal atom, o_bar_M = sum_v x_v * (v/2).
+
+    v is the cation charge and x_v is the fraction of metal atoms in that
+    charge. The result is O atoms per metal atom (dimensionless count).
+    Fe2+ (v = 2) contributes 1; Fe3+ (v = 3) contributes 3/2.
+    """
+
+    total = 0.0
+    for valence, fraction in valence_fractions:
+        total += float(fraction) * float(valence) / 2.0
+    return total
+
+
+def iron_mean_oxygen_per_atom(fe3_over_sum_fe: float) -> float:
+    """o_bar_Fe = 1 + q/2, q = Fe3+/sumFe. q = 0 is exactly 1 O per Fe."""
+
+    q = float(fe3_over_sum_fe)
+    if not math.isfinite(q) or q < 0.0 or q > 1.0:
+        raise ValueError(f"Fe3+/sumFe must be in [0, 1], got {fe3_over_sum_fe!r}")
+    return mean_oxygen_per_metal_atom(((2.0, 1.0 - q), (3.0, q)))
+
+
+def _mapping_float(mapping: Mapping[str, object], key: str) -> float | None:
+    if key not in mapping or mapping[key] is None:
+        return None
+    try:
+        value = float(mapping[key])  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return value if math.isfinite(value) else None
+
+
+def _engine_fe_speciation(
+    response: object,
+) -> tuple[float | None, float | None]:
+    """Read q and a ferrous activity from the same engine response, if present.
+
+    q is Fe3+/sumFe. Accepted activity keys are the engine's own a_FeO or the
+    ferrous fraction from that speciation. A frozen activity computed at
+    another pO2 is not this response.
+    """
+
+    mappings: list[Mapping[str, object]] = []
+    diagnostics = getattr(response, "diagnostics", None)
+    if isinstance(diagnostics, Mapping):
+        mappings.append(diagnostics)
+        nested = diagnostics.get("fe_redox_split")
+        if isinstance(nested, Mapping):
+            mappings.append(nested)
+    split = getattr(response, "fe_redox_split", None)
+    if isinstance(split, Mapping):
+        mappings.append(split)
+    q = None
+    activity = None
+    for mapping in mappings:
+        if q is None:
+            for key in ("fe3_over_sum_fe", "fe3"):
+                q = _mapping_float(mapping, key)
+                if q is not None:
+                    break
+        if activity is None:
+            for key in ("a_FeO", "a_FeO_authoritative", "x_feo"):
+                activity = _mapping_float(mapping, key)
+                if activity is not None:
+                    break
+    return q, activity
+
+
+def _kress91_fe_speciation(
+    inventory: Mapping[str, float],
+    log10_pO2_bar: float,
+    *,
+    temperature_K: float,
+    total_pressure_Pa: float,
+) -> tuple[float | None, float | None, str | None]:
+    """Kress91 q and x_FeO at this inventory and pO2.
+
+    x_FeO is the ferrous mole fraction from the same split, used as the
+    activity whose log slope corrects the Fe pressure exponent. It is not
+    the CALPHAD FeO activity. Both numbers are dimensionless. No iron means
+    no speciation. A Kress failure keeps the stoichiometric FeO demand and
+    names that default.
+    """
+
+    from simulator.fe_redox import (
+        Kress91InvalidControls,
+        floor_vacuum_pressure_bar,
+        kress91_split,
+        melt_mol_fractions_for_kress91,
+    )
+
+    try:
+        wt_pct = _hashimoto_project_oxide_wt_pct(inventory)
+        fractions = melt_mol_fractions_for_kress91(wt_pct)
+        feot = float(fractions.get("FeOt", 0.0) or 0.0)
+    except (
+        ResidueInventoryRefusal,
+        Kress91InvalidControls,
+        KeyError,
+        TypeError,
+        ValueError,
+        ZeroDivisionError,
+    ):
+        return None, None, "kress91_unavailable_stoichiometric_feo"
+    if not math.isfinite(feot) or feot <= 0.0:
+        return None, None, None
+    try:
+        split = kress91_split(
+            fO2_log=float(log10_pO2_bar),
+            mol_fractions=fractions,
+            T_K=float(temperature_K),
+            pressure_bar=floor_vacuum_pressure_bar(
+                float(total_pressure_Pa) / PA_PER_BAR
+            ),
+        )
+        q = float(split["fe3"])
+        activity = float(split["x_feo"])
+    except (
+        Kress91InvalidControls,
+        KeyError,
+        TypeError,
+        ValueError,
+        ZeroDivisionError,
+    ):
+        return None, None, "kress91_unavailable_stoichiometric_feo"
+    if not math.isfinite(q):
+        return None, None, "kress91_unavailable_stoichiometric_feo"
+    if not math.isfinite(activity):
+        activity = None
+    return q, activity, "kress91_fallback"
+
+
+def _record_fe_speciation_source(
+    model: object, source: str | None, engine_flags: set[str],
+) -> None:
+    """Record each speciation source once per pressure model, not per root probe."""
+
+    if not source:
+        return
+    seen = getattr(model, "fe_speciation_sources", None)
+    if not isinstance(seen, set):
+        seen = set()
+        setattr(model, "fe_speciation_sources", seen)
+    if source in seen:
+        return
+    seen.add(source)
+    if source == "kress91_fallback":
+        engine_flags.add("residue_fe_speciation_kress91_fallback")
+    elif source == "kress91_unavailable_stoichiometric_feo":
+        engine_flags.add("residue_fe_speciation_unavailable_stoichiometric_feo")
+
+
+def _pressure_with_fe_speciation(
+    model: object,
+    pressures: Mapping[str, float],
+    inventory: Mapping[str, float],
+    log10_pO2_bar: float,
+    *,
+    temperature_K: float,
+    total_pressure_Pa: float,
+    engine_flags: set[str],
+    engine_response: object | None = None,
+) -> PressureEvaluation:
+    """Attach Fe speciation from this evaluation to the species pressures.
+
+    The engine's own q at this pO2 wins. Otherwise Kress91 supplies q and
+    x_FeO and the call is flagged. No q leaves the stoichiometric demand.
+    """
+
+    q = None
+    activity = None
+    source = None
+    if engine_response is not None:
+        q, activity = _engine_fe_speciation(engine_response)
+        if q is not None:
+            source = "engine"
+    if source is None:
+        q, activity, source = _kress91_fe_speciation(
+            inventory,
+            log10_pO2_bar,
+            temperature_K=temperature_K,
+            total_pressure_Pa=total_pressure_Pa,
+        )
+    _record_fe_speciation_source(model, source, engine_flags)
+    return PressureEvaluation(
+        pressures,
+        fe3_over_sum_fe=q,
+        fe_activity=activity,
+        speciation_source=source,
+    )
+
+
 def _formula_terms(formula_text: str) -> tuple[dict[str, float], float]:
     try:
         formula = parse_formula(formula_text)
@@ -690,19 +889,36 @@ def _atom_totals(
 def _residue_oxygen_channels(
     terms: Sequence[_ChannelTerms], inventory: Mapping[str, float],
 ) -> tuple[_VacuumOxygenChannel, ...]:
-    return tuple(
-        _VacuumOxygenChannel(
-            species=term.source.species,
-            molar_mass_kg_per_mol=term.molar_mass_kg_mol,
-            oxygen_atoms=term.atom_counts.get("O", 0.0),
-            parent_oxygen_demand=term.parent_oxygen_demand,
-            pO2_exponent=(term.atom_counts.get("O", 0.0) - term.parent_oxygen_demand) / 2.0,
-            alpha=float(term.source.alpha),
-            alpha_source=term.source.alpha_source,
-            active=term.is_active(inventory),
+    channels: list[_VacuumOxygenChannel] = []
+    for term in terms:
+        metals = {
+            element: count
+            for element, count in term.atom_counts.items()
+            if element != "O"
+        }
+        redox_atoms = 0.0
+        oxygen_per_metal = None
+        # Iron is the redox-variable metal this balance owns. o_bar_Fe replaces
+        # the FeO formula demand inside the residual; the stored demand stays
+        # the q = 0 stoichiometry that sets the declared exponent.
+        if set(metals) == {"Fe"}:
+            redox_atoms = float(metals["Fe"])
+            oxygen_per_metal = iron_mean_oxygen_per_atom
+        channels.append(
+            _VacuumOxygenChannel(
+                species=term.source.species,
+                molar_mass_kg_per_mol=term.molar_mass_kg_mol,
+                oxygen_atoms=term.atom_counts.get("O", 0.0),
+                parent_oxygen_demand=term.parent_oxygen_demand,
+                pO2_exponent=(term.atom_counts.get("O", 0.0) - term.parent_oxygen_demand) / 2.0,
+                alpha=float(term.source.alpha),
+                alpha_source=term.source.alpha_source,
+                active=term.is_active(inventory),
+                oxygen_per_metal_atom=oxygen_per_metal,
+                redox_metal_atoms=redox_atoms,
+            )
         )
-        for term in terms
-    )
+    return tuple(channels)
 
 def _check_residue_atom_residual(element, residual, scale, context):
     """Shared atom-conservation acceptance; callers retain their arithmetic."""
@@ -940,6 +1156,12 @@ def integrate_residue_inventory(
             }
             return pressure_model(engine_inventory, float(log10_pO2_bar))
 
+        # The solver reads this on the callable it is given. Dropping it would
+        # demote a fixed-activity stoichiometry error to a diagnostic.
+        pressure_at.declares_fixed_activities = bool(
+            getattr(pressure_model, "declares_fixed_activities", False)
+        )
+
         def accepted_pressure_evaluation(log10_pO2_bar: float) -> None:
             accepted_callback = getattr(
                 pressure_model, "_on_accepted_evaluation", None
@@ -1126,6 +1348,7 @@ class KnudsenResidueResult:
     retained_oxygen_atoms_mol: float
     atom_closure_mol: Mapping[str, float]
     pO2_bar_by_step: tuple[float, ...]
+    pressure_law_diagnostics: tuple[PressureLawChannelDiagnostic, ...] = ()
 
 
 def integrate_knudsen_residue_inventory(
@@ -1194,6 +1417,9 @@ def integrate_knudsen_residue_inventory(
     gas_offset = oxygen_index + 1
     state = [inventory[k] for k in parents] + [initial_atoms.get("O", 0.0)] + [0.0] * len(gases)
     pO2_steps: list[float] = []
+    # Last root per species. solve_ivp probes rejected stages; the latest
+    # accepted evaluation overwrites them, matching pO2_steps' last entry.
+    pressure_law_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
     xi = 0.0
     previous_endpoint, previous_temperature = 0.0, path[0][1]
     absolute_tolerance = 1e-12 * math.fsum(inventory.values())
@@ -1215,6 +1441,10 @@ def integrate_knudsen_residue_inventory(
             def pressure_at(p):
                 return pressure_model(active, p, current_temperature)
 
+            pressure_at.declares_fixed_activities = bool(
+                getattr(pressure_model, "declares_fixed_activities", False)
+            )
+
             if logp is None:
                 try:
                     balance = _residue_oxygen_balance(terms, current, pressure_at, current_temperature)
@@ -1224,6 +1454,8 @@ def integrate_knudsen_residue_inventory(
                     raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
                 pressures = balance.pressures_Pa
                 pO2_steps.append(balance.pO2_bar)
+                for diagnostic in balance.pressure_law_diagnostics:
+                    pressure_law_diagnostics[diagnostic.species] = diagnostic
             else:
                 pressures = pressure_at(logp)
                 pO2_steps.append(10.0**logp)
@@ -1297,7 +1529,14 @@ def integrate_knudsen_residue_inventory(
     final_atoms = _atom_totals(inventory, evaporated)
     final_atoms["O"] = oxygen + _atom_totals({}, evaporated).get("O", 0.0)
     closure = _residue_atom_closure(initial_atoms, final_atoms)
-    return KnudsenResidueResult(dict(inventory), dict(evaporated), oxygen, closure, tuple(pO2_steps))
+    return KnudsenResidueResult(
+        dict(inventory),
+        dict(evaporated),
+        oxygen,
+        closure,
+        tuple(pO2_steps),
+        tuple(pressure_law_diagnostics.values()),
+    )
 
 
 def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
@@ -1419,6 +1658,59 @@ def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -
                 notices.append(notice)
 
 
+def _append_redox_pressure_notices(
+    notices: list[Any],
+    diagnostics: Sequence[PressureLawChannelDiagnostic],
+    callbacks: Mapping[Any, Any],
+) -> None:
+    """Surface the demoted exponent identity and the Kress91 speciation fallback.
+
+    A fixed-activity mismatch never reaches here: the solver still refuses it.
+    """
+
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    for diagnostic in diagnostics:
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    "residue_pressure_law_redox_active "
+                    f"species={diagnostic.species} "
+                    f"declared={diagnostic.declared!r} "
+                    f"observed={diagnostic.observed!r} "
+                    f"expected={diagnostic.expected!r}"
+                ),
+                origin="congruent vapour oxygen balance",
+            )
+        )
+    sources: set[str] = set()
+    for callback in callbacks.values():
+        seen = getattr(callback, "fe_speciation_sources", ())
+        if isinstance(seen, set):
+            sources.update(seen)
+    if "kress91_fallback" in sources:
+        notices.append(
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="residue_fe_speciation_kress91_fallback",
+                origin="simulator.fe_redox:kress91_split",
+            )
+        )
+    if "kress91_unavailable_stoichiometric_feo" in sources:
+        notices.append(
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="residue_fe_speciation_unavailable_stoichiometric_feo",
+                origin="simulator.fe_redox:kress91_split",
+            )
+        )
+
+
 def _make_residue_pressure_model(
     engine: str,
     gas_channels: Sequence[tuple[str, Sequence[Any]]],
@@ -1505,7 +1797,11 @@ def _make_residue_pressure_model(
                 )
                 pressure_state_cache[key] = base_pressure_bar
             pO2_bar = 10.0**float(log10_pO2_bar)
-            return {
+            # Activities are frozen at the reference state, then scaled by the
+            # stoichiometric power of pO2. That is a declared fixed-activity
+            # law: the hard exponent identity still applies. The frozen state
+            # is not Fe speciation at this trial pO2, so q comes from Kress91.
+            pressures = {
                 str(species): (
                     float(base_pressure_bar.get(species, 0.0))
                     * pO2_bar ** pressure_exponents[str(species)]
@@ -1513,7 +1809,17 @@ def _make_residue_pressure_model(
                 )
                 for species, _reaction in gas_channels
             }
+            return _pressure_with_fe_speciation(
+                pressure_model,
+                pressures,
+                inventory,
+                float(log10_pO2_bar),
+                temperature_K=temperature_K,
+                total_pressure_Pa=total_pressure_Pa,
+                engine_flags=engine_flags,
+            )
 
+        pressure_model.declares_fixed_activities = True
         return pressure_model
 
     if engine == "internal-analytical":
@@ -1545,6 +1851,10 @@ def _make_residue_pressure_model(
         omission_notices: list[Any] = []
         omission_records: dict[str, dict[str, Any]] = {}
         noticed_omissions: set[str] = set()
+        # Species this engine has already returned at a positive pressure.
+        # A later evaluation that drops one (trace parent, oxidizing bracket
+        # end) is a zero, not a new missing channel.
+        seen_positive_vapours: set[str] = set()
 
         def pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
@@ -1623,6 +1933,29 @@ def _make_residue_pressure_model(
                 accepted_diagnostics_by_logp[float(log10_pO2_bar)] = tuple(
                     evaluation_diagnostics
                 )
+            # An exhausted parent is not a missing calibration channel. The
+            # engine omits that parent's vapours; their flux is zero. OpenIMCC
+            # already returns 0 for an absent species. A vapour missing while
+            # its parent is still in the inventory stays a typed refusal.
+            for species, reaction in gas_channels:
+                name = str(species)
+                if name in pressures or not reaction:
+                    continue
+                parent_name = "" if reaction[0] is None else str(reaction[0])
+                if not parent_name:
+                    continue
+                try:
+                    parent_amount = float(inventory.get(parent_name, 0.0) or 0.0)
+                except (TypeError, ValueError):
+                    continue
+                if parent_amount <= 0.0:
+                    pressures[name] = 0.0
+            for species, _reaction in gas_channels:
+                name = str(species)
+                if name not in pressures and name in seen_positive_vapours:
+                    # Same engine, same channel, this pO2 omitted it.
+                    pressures[name] = 0.0
+                    engine_flags.add("residue_omitted_vapour_pressure_zero")
             missing = [
                 str(species)
                 for species, _reaction in gas_channels
@@ -1644,10 +1977,23 @@ def _make_residue_pressure_model(
                         separators=(",", ":"),
                     )
                 raise ResidueInventoryRefusal(missing_channels_reason, detail)
-            return {
+            evaluated = {
                 str(species): float(pressures[str(species)])
                 for species, _reaction in gas_channels
             }
+            for name, pressure in evaluated.items():
+                if pressure > 0.0:
+                    seen_positive_vapours.add(name)
+            return _pressure_with_fe_speciation(
+                pressure_model,
+                evaluated,
+                inventory,
+                float(log10_pO2_bar),
+                temperature_K=temperature_K,
+                total_pressure_Pa=total_pressure_Pa,
+                engine_flags=engine_flags,
+                engine_response=response,
+            )
 
         if floor_inversion_diagnostics is not None:
             pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
@@ -1931,9 +2277,15 @@ def _mass_loss_corner_bounds(
             if channel.species in unsourced else channel
             for channel in oxygen_channels
         )
+        def pressure_at(logp: float) -> Mapping[str, float]:
+            return pressure_model(inventory, logp)
+
+        pressure_at.declares_fixed_activities = bool(
+            getattr(pressure_model, "declares_fixed_activities", False)
+        )
         try:
             roots.append(_solve_vacuum_oxygen_balance(
-                lambda logp: pressure_model(inventory, logp), selected,
+                pressure_at, selected,
                 temperature_K=temperature_K,
             ).pO2_bar)
         except ValueError as exc:
@@ -2136,6 +2488,10 @@ def predict_knudsen_residue_composition(
                 )
             return pressure_callbacks[temperature_K](inventory, logp)
 
+        # OpenIMCC freezes parent activities and applies the stoichiometric
+        # power. Internal-analytical pressures are the engine's own law.
+        pressure_model.declares_fixed_activities = engine == "openimcc"
+
         kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
                       near_saturated=True, source_fO2_log_by_interval=source_logs)
         primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
@@ -2149,6 +2505,16 @@ def predict_knudsen_residue_composition(
         except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
             diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
         _append_omission_notices(notices, pressure_callbacks)
+        _append_redox_pressure_notices(
+            notices, primary.pressure_law_diagnostics, pressure_callbacks,
+        )
+        if "residue_omitted_vapour_pressure_zero" in flags:
+            notices.append(Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="residue_omitted_vapour_pressure_zero",
+                origin="internal analytical vapour bundle",
+            ))
         formula_oxygen_atoms_mol = math.fsum(
             amount * _formula_terms(oxide)[0].get("O", 0.0)
             for oxide, amount in primary.residue_mol.items()

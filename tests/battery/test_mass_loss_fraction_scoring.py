@@ -345,7 +345,7 @@ def test_markova_knudsen_extent_prediction_uses_migrated_panel_and_ignores_scale
     assert exc.value.reason == "measured_mass_loss_fraction_missing_or_invalid"
 
 
-def test_markova_partial_residue_score_records_exponent_refusal(
+def test_markova_partial_residue_score_carries_redox_diagnostic(
     fresh_mass_loss_extracts,
 ) -> None:
     from simulator.battery.score_metrics import metric_operation_for_identity
@@ -376,16 +376,26 @@ def test_markova_partial_residue_score_records_exponent_refusal(
         Engine.INTERNAL_ANALYTICAL,
         context=context,
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal is not None
-    assert (
-        residual.refusal.detail["reason"]
-        == "residue_pressure_law_exponent_mismatch"
-    )
-    assert str(residual.refusal.detail["detail"]).startswith(
-        "pressure law exponent mismatch for 'Fe': declared -0.5, observed "
-    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    iron = [
+        notice
+        for notice in residual.notices
+        if notice.reason.startswith("residue_pressure_law_redox_active species=Fe ")
+    ]
+    assert len(iron) == 1
+    assert iron[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert "declared=" in iron[0].reason
+    assert "observed=" in iron[0].reason
+    assert "expected=" in iron[0].reason
+    fallback = [
+        notice
+        for notice in residual.notices
+        if notice.reason == "residue_fe_speciation_kress91_fallback"
+    ]
+    assert len(fallback) == 1
+    assert fallback[0].kind is NoticeKind.FALLBACK
+    assert fallback[0].origin == "simulator.fe_redox:kress91_split"
     assert {
         NoticeKind.OUT_OF_CERTIFIED_BAND,
         NoticeKind.UNVERIFIED_APPARATUS,
