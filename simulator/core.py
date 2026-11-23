@@ -5431,6 +5431,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 isinstance(memoized_record, Mapping)
                 and isinstance(memoized_record.get('curve'), Mapping)
                 and memoized_record.get('disposition') in {'live', 'memo-hit'}
+                and self._freeze_gate_curve_is_solved(
+                    memoized_record['curve']
+                )
                 and gate_curve_memo_is_cacheable(
                     self,
                     memoized_record['curve'],
@@ -5590,6 +5593,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if (
             isinstance(memo, dict)
+            and self._freeze_gate_curve_is_solved(normalized_curve)
             and gate_curve_memo_is_cacheable(
                 self,
                 normalized_curve,
@@ -14671,6 +14675,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            gate_curve_memo = getattr(
+                self,
+                '_freeze_gate_liquid_fraction_curve_memo',
+                None,
+            )
+            if isinstance(gate_curve_memo, dict):
+                # This keyed memo contains only solved curves; per-hour held,
+                # floor, and refusal state remains private to each simulator.
+                memo[id(gate_curve_memo)] = gate_curve_memo
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             if live_store is not None:
