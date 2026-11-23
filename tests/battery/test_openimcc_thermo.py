@@ -76,7 +76,7 @@ class _Row:
 def _install_thermo(monkeypatch, rows: dict[str, _Row], basis):
     calls: list[tuple[str, str, float]] = []
 
-    def species_thermo(formula, phase, temperature):
+    def species_thermo(formula, phase, temperature, **_kwargs):
         calls.append((formula, phase, float(temperature)))
         row = rows[formula]
         return {
@@ -308,10 +308,7 @@ def test_unresolved_basis_and_crystal_do_not_emit_apparent_enthalpy(monkeypatch)
     assert crystal_attempt.value is None
     assert crystal_attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
 
-    monkeypatch.setattr(
-        "simulator.battery.generators.janaf._formation_basis_at_temperature",
-        lambda formula, product, temperature: _formation_basis(identity),
-    )
+    calls = _install_thermo(monkeypatch, _ROWS, _formation_basis(identity))
     missing_pressure = _attempt(
         replace(
             identity,
@@ -319,8 +316,23 @@ def test_unresolved_basis_and_crystal_do_not_emit_apparent_enthalpy(monkeypatch)
             standard_pressure_Pa=State.unknown("pressure not printed"),
         )
     )
-    assert missing_pressure.value is None
-    assert missing_pressure.refusal_detail["reason"] == "openimcc-standard-pressure-unknown"
+    _enthalpy, gibbs = _formation_energies(
+        _formation_basis(identity).reaction.value,
+        _ROWS,
+        Decimal("298.15"),
+        PA_PER_BAR_DEC,
+    )
+    assert calls
+    assert missing_pressure.value == gibbs
+    assert missing_pressure.refusal_reason is None
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason.startswith("standard-pressure-assumed:")
+        and "pressure_bar=1" in notice.reason
+        and "term=omitted" in notice.reason
+        and notice.band == "1 bar"
+        for notice in missing_pressure.notices
+    )
 
 
 def test_missing_species_on_a_formation_term_is_typed(monkeypatch) -> None:
@@ -361,6 +373,49 @@ def test_openimcc_source_relation_is_per_row() -> None:
         origin="compilations-janaf/SiO.yaml",
         provenance=("LH87-SiO", "row-2", None),
     )
+    tsiv_on_janaf, _tsiv_janaf_flag = openimcc_thermo_source_relation(
+        source_id="janaf-4th",
+        origin="compilations-janaf/ZnO.yaml",
+        provenance=("TSIV-1603", "TSIV-1603-LFS-CP-EXT-2250", None),
+    )
+    tsiv_on_ivtan, _tsiv_ivtan_flag = openimcc_thermo_source_relation(
+        source_id="tsiv",
+        origin="compilations-ivtan/ZnO.yaml",
+        provenance=("TSIV-1603", "TSIV-1603-LFS-CP-EXT-2250", None),
+    )
+    p672_on_janaf, _p672_janaf_flag = openimcc_thermo_source_relation(
+        source_id="janaf-4th",
+        origin="compilations-janaf/CdO.yaml",
+        provenance=("P672-T102", "P672-T102", None),
+    )
+    p672_on_bulletin, _p672_flag = openimcc_thermo_source_relation(
+        source_id="usbm-b672",
+        origin="compilations-pankratz-b672/CdO.yaml",
+        provenance=("P672-T102", "P672-T102", None),
+    )
+    mno_on_janaf, _mno_janaf_flag = openimcc_thermo_source_relation(
+        source_id="janaf-4th",
+        origin="compilations-janaf/MnO.yaml",
+        provenance=(
+            "MnO-liquid-construction",
+            "LFS[MnO-IVTAN-1435;Tf=2120]",
+            None,
+        ),
+    )
+    mno_on_ivtan, _mno_ivtan_flag = openimcc_thermo_source_relation(
+        source_id="ivtan",
+        origin="compilations-ivtan/MnO.yaml",
+        provenance=(
+            "MnO-liquid-construction",
+            "LFS[MnO-IVTAN-1435;Tf=2120]",
+            None,
+        ),
+    )
+    other_pankratz, _pankratz_flag = openimcc_thermo_source_relation(
+        source_id="b677",
+        origin="compilations-pankratz-1984-usbm-b677/oxides.yaml",
+        provenance=("B677-T1", "row", None),
+    )
     missing, missing_flag = openimcc_thermo_source_relation(
         source_id="janaf-4th",
         origin="compilations-janaf/Fe.yaml",
@@ -369,6 +424,13 @@ def test_openimcc_source_relation_is_per_row() -> None:
     assert exposed is SourceRelation.EXPOSED and flag is None
     assert held_out is SourceRelation.HELD_OUT and held_flag is None
     assert lamoreaux is SourceRelation.HELD_OUT and lam_flag is None
+    assert tsiv_on_janaf is SourceRelation.HELD_OUT
+    assert tsiv_on_ivtan is SourceRelation.EXPOSED
+    assert p672_on_janaf is SourceRelation.HELD_OUT
+    assert p672_on_bulletin is SourceRelation.EXPOSED
+    assert mno_on_janaf is SourceRelation.HELD_OUT
+    assert mno_on_ivtan is SourceRelation.EXPOSED
+    assert other_pankratz is SourceRelation.HELD_OUT
     assert missing is SourceRelation.EXPOSED
     assert missing_flag == _OPENIMCC_PROVENANCE_DEFAULTED
 
@@ -377,6 +439,15 @@ def test_openimcc_source_relation_is_per_row() -> None:
         Quantity.CP,
         refusal_reason="diagnostic_population",
         provenance=None,
+        source_id="janaf-4th",
+        origin="compilations-janaf/Fe.yaml",
+        lineage_relation=SourceRelation.INDEPENDENT,
+    )
+    nasa_diagnostic, nasa_diagnostic_flag = openimcc_thermo_relation_for_prediction(
+        Engine.NASA_CEA_9,
+        Quantity.CP,
+        refusal_reason="diagnostic_population",
+        provenance=("Fe-019", "row-1", None),
         source_id="janaf-4th",
         origin="compilations-janaf/Fe.yaml",
         lineage_relation=SourceRelation.INDEPENDENT,
@@ -390,8 +461,19 @@ def test_openimcc_source_relation_is_per_row() -> None:
         origin="compilations-janaf/Fe.yaml",
         lineage_relation=SourceRelation.INDEPENDENT,
     )
+    nasa_other, nasa_other_flag = openimcc_thermo_relation_for_prediction(
+        Engine.NASA_CEA_9,
+        Quantity.CP,
+        refusal_reason=None,
+        provenance=("Fe-019", "row-1", None),
+        source_id="robie",
+        origin="compilations-robie-hemingway/oxides.yaml",
+        lineage_relation=SourceRelation.INDEPENDENT,
+    )
     assert kept is SourceRelation.INDEPENDENT and kept_flag is None
-    assert nasa is SourceRelation.INDEPENDENT and nasa_flag is None
+    assert nasa_diagnostic is SourceRelation.INDEPENDENT and nasa_diagnostic_flag is None
+    assert nasa is SourceRelation.EXPOSED and nasa_flag is None
+    assert nasa_other is SourceRelation.INDEPENDENT and nasa_other_flag is None
 
 
 def test_tier_buckets_count_exposed_with_same_source_and_held_out_as_unseen() -> None:
@@ -424,16 +506,40 @@ def test_tier_buckets_count_exposed_with_same_source_and_held_out_as_unseen() ->
             derive_eligible=True,
         )
 
+    incomplete = _tier_cell_from_payload_fields(
+        {
+            "reference": "obs-incomplete",
+            "status": ResidualStatus.MATCH.value,
+            "source_relation": SourceRelation.HELD_OUT.value,
+            "exclusions": ("source_relation_independent_complete_ancestry",),
+            "candidate_request": {"engine": Engine.OPENIMCC.value},
+            "numeric": {"value": "1.5", "unit": "kJ/mol"},
+            "key": residual_key(
+                reference_id="obs-incomplete",
+                quantity=Quantity.DELTA_FH,
+                engine=Engine.OPENIMCC,
+                rail=Rail.THERMOCHEMISTRY,
+                temperature_K=Decimal("298.15"),
+            ),
+        },
+        family="janaf",
+        quantity=Quantity.DELTA_FH.value,
+        rail=Rail.THERMOCHEMISTRY.value,
+        uncertainty="none",
+        derive_eligible=True,
+    )
     aggregate = _TierAggregate()
     aggregate.add(cell(SourceRelation.EXPOSED.value, ResidualStatus.MATCH.value), keep_values=True)
     aggregate.add(cell(SourceRelation.HELD_OUT.value, ResidualStatus.MISMATCH.value), keep_values=True)
     aggregate.add(cell(SourceRelation.SAME_INPUT.value, ResidualStatus.MATCH.value), keep_values=False)
     aggregate.add(cell(SourceRelation.INDEPENDENT.value, ResidualStatus.MATCH.value), keep_values=False)
+    aggregate.add(incomplete, keep_values=True)
+    assert incomplete.lineage_complete is False
     assert aggregate.same_source_count == 2
     assert aggregate.matched_same_source == 2
     assert aggregate.independent_count == 2
     assert aggregate.matched_independent == 1
-    assert aggregate.numeric_count == 4
+    assert aggregate.numeric_count == 5
 
 
 def test_coverage_tally_absent_is_a_missing_openimcc_residual() -> None:

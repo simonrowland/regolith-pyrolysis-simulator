@@ -3619,11 +3619,9 @@ def janaf_tabulated_gas_thermo(
     )
 
 
-def _janaf_gas_dfh298_kJ_per_mol(formula: str, table_id: str) -> Decimal | None:
-    """Return the exact 298.15 K formation-enthalpy cell for one gas source."""
+def _janaf_table_dfh298_kJ_per_mol(table_id: str) -> Decimal | None:
+    """Exact 298.15 K formation-enthalpy cell, in kJ/mol. None if not one cell."""
 
-    if _janaf_gas_table_ids().get(formula) != (table_id,):
-        return None
     rows, _digest = _checked_fusion_table_rows(table_id)
     matches = []
     for row in rows:
@@ -3651,6 +3649,141 @@ def _janaf_gas_dfh298_kJ_per_mol(formula: str, table_id: str) -> Decimal | None:
     if len(matches) != 1 or not matches[0].is_finite():
         return None
     return matches[0]
+
+
+def _janaf_gas_dfh298_kJ_per_mol(formula: str, table_id: str) -> Decimal | None:
+    """Return the exact 298.15 K formation-enthalpy cell for one gas source."""
+
+    if _janaf_gas_table_ids().get(formula) != (table_id,):
+        return None
+    return _janaf_table_dfh298_kJ_per_mol(table_id)
+
+
+def _janaf_crystal_tables_for_polymorph(
+    formula: str, polymorph: str
+) -> tuple[str, ...]:
+    """Crystal tables named by this token or its printed qualifier.
+
+    ``alpha`` matches the Al2O3 qualifier and ``corundum`` matches the
+    dictionary token; both are Al-096. Several matches stay unresolved.
+    """
+
+    folded = polymorph.casefold()
+    found: list[str] = []
+    for (row_formula, qualifier), table_ids in JANAF_CRYSTAL_TABLE_IDS.items():
+        if row_formula != formula:
+            continue
+        token = JANAF_CRYSTAL_DICTIONARY[(row_formula, qualifier)]
+        if folded in {qualifier.casefold(), token.value.casefold()}:
+            found.extend(table_ids)
+    return tuple(dict.fromkeys(found))
+
+
+@lru_cache(maxsize=1)
+def _janaf_exact_phase_table_ids() -> dict[tuple[str, str], tuple[str, ...]]:
+    """Neutral tables whose manifest phase is exactly ``l`` or ``cr``.
+
+    ``cr,l`` is a combined table and is not a second crystal or liquid.
+    Al(cr) is Al-002; Al(l) is Al-003.
+    """
+
+    grouped: dict[tuple[str, str], list[str]] = {}
+    for entry in load_manifest().get("entries") or ():
+        if not isinstance(entry, Mapping) or entry.get("charge") not in (0, "0"):
+            continue
+        formula = str(entry.get("formula_normalised") or "")
+        table_id = str(entry.get("table_id") or "")
+        phase = str(entry.get("phase") or "")
+        if formula and table_id and phase in {"l", "cr"}:
+            grouped.setdefault((formula, phase), []).append(table_id)
+    return {key: tuple(table_ids) for key, table_ids in grouped.items()}
+
+
+def janaf_selected_thermo_table_id(
+    formula: str, phase: str, *, polymorph: str | None = None
+) -> str | None:
+    """One JANAF table for this formula and phase, or None when not unique.
+
+    A named crystal uses the crystal dictionary (qualifier or token). With
+    no polymorph, gas uses the unique neutral-gas table and a condensed
+    phase uses the unique exact ``l`` or ``cr`` table. Several crystal
+    tables and no polymorph do not guess.
+    """
+
+    phase_label = phase.casefold()
+    if phase_label == "cr" and polymorph:
+        tables = _janaf_crystal_tables_for_polymorph(formula, polymorph)
+    elif polymorph:
+        return None
+    elif phase_label == "g":
+        tables = _janaf_gas_table_ids().get(formula, ())
+    elif phase_label in {"l", "cr"}:
+        tables = _janaf_exact_phase_table_ids().get((formula, phase_label), ())
+    else:
+        return None
+    if len(tables) != 1:
+        return None
+    return tables[0]
+
+
+def janaf_tabulated_apparent_thermo(
+    formula: str,
+    phase: str,
+    temperature_K: Decimal,
+    *,
+    polymorph: str | None = None,
+) -> Mapping[str, Decimal | str] | None:
+    """Cp, S, apparent H, and apparent G from one printed JANAF table.
+
+    H_app = ΔfH(298.15 K) + (H−H298), both in kJ/mol. G is
+    ``1000*H_app − T*S`` in J/mol. The tabulated ΔfG column is not copied
+    into H_app. Returns None when no unique table is named, ΔfH(298.15 K)
+    is not one printed cell, or T is outside the printed nodes. The
+    polynomial is not continued past the table.
+    """
+
+    table_id = janaf_selected_thermo_table_id(
+        formula, phase, polymorph=polymorph
+    )
+    if table_id is None:
+        return None
+    temperature_K = Decimal(temperature_K)
+    if not temperature_K.is_finite() or temperature_K <= 0:
+        return None
+    dfh298 = _janaf_table_dfh298_kJ_per_mol(table_id)
+    if dfh298 is None:
+        return None
+    try:
+        values: dict[str, Decimal] = {}
+        low_K: Decimal | None = None
+        high_K: Decimal | None = None
+        for name in _GAS_THERMO_COLUMNS:
+            points, _digest, missing = _cached_table_property_points(table_id, name)
+            if not points or temperature_K < points[0][0] or temperature_K > points[-1][0]:
+                return None
+            if _missing_node_for_interpolation(points, missing, temperature_K) is not None:
+                return None
+            values[name] = _interpolate_table_points(points, temperature_K)
+            if name == "heat_capacity":
+                low_K = points[0][0]
+                high_K = points[-1][0]
+    except (ValueError, IndexError, KeyError, InvalidOperation):
+        return None
+    if low_K is None or high_K is None:
+        return None
+    enthalpy_increment = values["enthalpy_increment"]
+    entropy = values["entropy"]
+    h_app = dfh298 + enthalpy_increment
+    return {
+        "table_id": table_id,
+        "Cp_J_molK": values["heat_capacity"],
+        "S_J_molK": entropy,
+        "H_app_kJ_mol": h_app,
+        "G_J_mol": Decimal(1000) * h_app - temperature_K * entropy,
+        "T_min": low_K,
+        "T_max": high_K,
+        "dfH298_kJ_mol": dfh298,
+    }
 
 
 def _janaf_gas_formation_gibbs_J_per_mol(

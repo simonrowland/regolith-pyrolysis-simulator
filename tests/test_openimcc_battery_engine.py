@@ -648,10 +648,7 @@ def test_openimcc_species_thermo_scores_native_condensate_derivatives() -> None:
         assert "derivatives_fit_implied=True" in prediction.execution.call_evidence
 
 
-# This pin has no positive named-polymorph case to test: native crystal rows
-# expose generic ``state="s"`` plus source ids, but no named solid form. A
-# mocked polymorph would not test whether the selected OpenIMCC row matches.
-def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
+def test_openimcc_named_crystal_uses_the_janaf_polymorph_table() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
 
@@ -662,7 +659,7 @@ def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
     assert native.source_row_id == "LAM1987"
     assert native.source_table_id == "LH87 Table 2"
     observation = _openimcc_thermo_observation(
-        "openimcc-sio2-quartz-source-unresolved",
+        "openimcc-sio2-quartz",
         "SiO2",
         Phase.CR,
         Quantity.CP,
@@ -672,14 +669,13 @@ def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
 
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
-    assert prediction.refusal_detail["polymorph"] == Polymorph.QUARTZ.value
-    assert prediction.refusal_detail["source_row_id"] == native.source_row_id
-    assert prediction.refusal_detail["source_table_id"] == native.source_table_id
-    assert prediction.execution.call_evidence is not None
-    assert f"source_table_id={native.source_table_id}" in prediction.execution.call_evidence
+    assert prediction.execution.state is ExecutionState.PRODUCED, (
+        prediction.refusal_detail
+    )
+    assert prediction.openimcc_provenance is not None
+    assert prediction.openimcc_provenance[0] == "O-037"
+    assert prediction.value != Decimal(str(native.Cp_J_molK))
+    assert "source_table_id=O-037" in (prediction.execution.call_evidence or "")
 
 
 def test_openimcc_missing_crystal_polymorph_keeps_typed_refusal() -> None:
@@ -734,7 +730,7 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
     assert "H(T)-H(T_ref)" in prediction.execution.call_evidence
 
 
-def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -> None:
+def test_openimcc_species_thermo_out_of_interval_is_flagged() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
 
@@ -751,21 +747,79 @@ def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -
 
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED, (
+    assert prediction.execution.state is ExecutionState.PRODUCED, (
         prediction.refusal_detail
     )
-    assert prediction.execution.state is ExecutionState.UNSUPPORTED
-    assert prediction.refusal_detail["reason"] == "openimcc_species_thermo_outside_interval"
-    assert prediction.refusal_detail["species"] == "FeO"
-    assert prediction.refusal_detail["phase"] == "g"
-    assert prediction.refusal_detail["requested_T_K"] == str(outside_temperature)
-    assert prediction.refusal_detail["declared_interval_K"] == [
-        inside.T_min,
-        inside.T_max,
+    assert prediction.value is not None
+    assert prediction.authority is Authority.EXTRAPOLATED
+    flagged = [
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and str(notice.reason).startswith("openimcc-species-thermo-extrapolated")
     ]
-    assert prediction.refusal_detail["upstream_error"]
-    assert prediction.refusal_detail["certification_backlog"] is True
+    assert len(flagged) == 1
+    assert "species=FeO" in flagged[0].reason
+    assert "phase=g" in flagged[0].reason
+    assert f"requested_T_K={outside_temperature}" in flagged[0].reason
+    assert flagged[0].band == f"[{inside.T_min}, {inside.T_max}] K"
+    assert flagged[0].authority is Authority.EXTRAPOLATED
+
+
+def test_openimcc_al2o3_alpha_matches_nist_janaf_al096() -> None:
+    """Printed NIST-JANAF Al-096 nodes, not a second copy of the algebra.
+
+    Al and Al2O3(cr, alpha) are read from the tables. O2 stays on the pack
+    fit. At 298.15 K that fit is below its 500 K interval and is flagged.
+    The printed dfG / log10 Kf nodes are -1582.275 / 277.208 at 298.15 K
+    and -1196.617 / 41.670 at 1500 K. The stated tolerance is 0.02 kJ/mol
+    and 0.01 in log10 Kf: the O2 fit is not the printed O2 cell, and the
+    scorer's logarithm uses CODATA R rather than JANAF's 8.31441.
+    """
+
+    _require_openimcc()
+    from simulator.battery.polymorph_dictionary import resolve_formula_polymorph
+
+    polymorph = resolve_formula_polymorph("Al2O3", "alpha")
+    assert polymorph is Polymorph.CORUNDUM
+    printed = (
+        (Decimal("298.15"), Decimal("-1582.275"), Decimal("277.208"), True),
+        (Decimal("1500"), Decimal("-1196.617"), Decimal("41.670"), False),
+    )
+    for temperature, printed_g, printed_k, o2_extrapolated in printed:
+        gibbs_observation = _openimcc_thermo_observation(
+            f"openimcc-al2o3-alpha-dfg-{temperature}",
+            "Al2O3",
+            Phase.CR,
+            Quantity.DELTA_FG,
+            temperature,
+            polymorph=polymorph,
+        )
+        gibbs = predict_with_engine(Engine.OPENIMCC, gibbs_observation)
+        assert gibbs.execution.state is ExecutionState.PRODUCED, gibbs.refusal_detail
+        assert gibbs.openimcc_provenance is not None
+        assert gibbs.openimcc_provenance[0] == "Al-096"
+        assert abs(gibbs.value - printed_g) <= Decimal("0.02")
+        log_k = predict_with_engine(
+            Engine.OPENIMCC,
+            _openimcc_thermo_observation(
+                f"openimcc-al2o3-alpha-k-{temperature}",
+                "Al2O3",
+                Phase.CR,
+                Quantity.LOG10_KF,
+                temperature,
+                polymorph=polymorph,
+            ),
+        )
+        assert log_k.execution.state is ExecutionState.PRODUCED, log_k.refusal_detail
+        assert abs(log_k.value - printed_k) <= Decimal("0.01")
+        o2_flags = [
+            notice
+            for notice in gibbs.notices
+            if str(notice.reason).startswith("openimcc-species-thermo-extrapolated")
+            and "species=O2" in notice.reason
+        ]
+        assert bool(o2_flags) is o2_extrapolated
 
 
 def test_openimcc_species_thermo_entropy_uses_printed_pressure_only_for_gas() -> None:

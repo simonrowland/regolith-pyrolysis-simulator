@@ -1456,6 +1456,16 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
             },
         )
     ]
+    requests.clear()
+    openimcc_bridge.species_thermo(
+        "FeO", "g", 2000.0, allow_extrapolation=True, polymorph="corundum"
+    )
+    assert requests[0][1]["allow_extrapolation"] is True
+    assert requests[0][1]["polymorph"] == "corundum"
+    requests.clear()
+    openimcc_bridge.species_thermo("FeO", "g", 2000.0, allow_extrapolation=False)
+    assert "allow_extrapolation" not in requests[0][1]
+    assert "polymorph" not in requests[0][1]
 
 
 def test_species_thermo_recomputes_janaf_anchor_after_native_cache_hit(

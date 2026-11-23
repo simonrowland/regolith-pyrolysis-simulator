@@ -14,11 +14,13 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
 from importlib import resources
+import inspect
 import json
 import math
 import numbers
 from pathlib import Path
 import subprocess
+import threading
 from types import MappingProxyType
 from typing import Any
 
@@ -1340,6 +1342,9 @@ def evaluate_gas(
     )
 
 
+_SPECIES_THERMO_PATCH_LOCK = threading.Lock()
+
+
 def _species_thermo_source_dfh298(
     species: str, phase: str, source_row_id: object, source_table_id: object
 ) -> float | None:
@@ -1358,53 +1363,201 @@ def _species_thermo_source_dfh298(
     return float(value_kJ_mol * 1000)
 
 
-def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, Any]:
-    """Cached, JSON-safe view of OpenIMCC's selected pure-species function."""
+def _species_thermo_record(props: Any) -> dict[str, Any]:
+    source_row_id = getattr(props, "source_row_id", None)
+    source_table_id = getattr(props, "source_table_id", None)
+    interval = getattr(props, "T_interval", None)
+    return {
+        "Cp_J_molK": getattr(props, "Cp_J_molK", None),
+        "S_J_molK": getattr(props, "S_J_molK", None),
+        "H_app_kJ_mol": getattr(props, "H_app_kJ_mol", None),
+        "G_J_mol": getattr(props, "G_J_mol", None),
+        "source_row_id": source_row_id,
+        "source_table_id": source_table_id,
+        "T_interval": (
+            tuple(interval) if isinstance(interval, (tuple, list)) else None
+        ),
+        "T_min": getattr(props, "T_min", None),
+        "T_max": getattr(props, "T_max", None),
+        "derivatives_fit_implied": getattr(props, "derivatives_fit_implied", None),
+    }
+
+
+def _tabulated_species_thermo_record(record: Mapping[str, Any]) -> dict[str, Any]:
+    low = float(record["T_min"])
+    high = float(record["T_max"])
+    table_id = str(record["table_id"])
+    return {
+        "Cp_J_molK": float(record["Cp_J_molK"]),
+        "S_J_molK": float(record["S_J_molK"]),
+        "H_app_kJ_mol": float(record["H_app_kJ_mol"]),
+        "G_J_mol": float(record["G_J_mol"]),
+        "source_row_id": table_id,
+        "source_table_id": table_id,
+        "T_interval": (low, high),
+        "T_min": low,
+        "T_max": high,
+        "derivatives_fit_implied": False,
+    }
+
+
+def _invoke_pack_species_thermo(
+    module: Any,
+    species: str,
+    phase: str,
+    temperature_K: float,
+    *,
+    datapack: Any,
+    allow_extrapolation: bool,
+) -> Any:
+    """Call the packaged function. Extrapolation is patched when the pin lacks it."""
+
+    target = module.species_thermo
+    try:
+        parameters = inspect.signature(target).parameters
+    except (TypeError, ValueError):
+        parameters = {}
+    if "allow_extrapolation" in parameters:
+        return target(
+            species,
+            phase,
+            float(temperature_K),
+            datapack=datapack,
+            allow_extrapolation=allow_extrapolation,
+        )
+    if not allow_extrapolation:
+        return target(species, phase, float(temperature_K), datapack=datapack)
+    from importlib import import_module
+
+    try:
+        gas = import_module("openimcc.gas")
+    except ImportError:
+        return target(species, phase, float(temperature_K), datapack=datapack)
+    if target is not getattr(gas, "species_thermo", None):
+        return target(species, phase, float(temperature_K), datapack=datapack)
+    nearest = gas._nearest_interval_row
+    oxide = gas._oxide_row_for_T
+
+    def nearest_forced(frame, name, temperature, allow_extrapolation=False):
+        return nearest(frame, name, temperature, True)
+
+    def oxide_forced(frame, name, temperature, allow_extrapolation=False):
+        return oxide(frame, name, temperature, True)
+
+    with _SPECIES_THERMO_PATCH_LOCK:
+        gas._nearest_interval_row = nearest_forced
+        gas._oxide_row_for_T = oxide_forced
+        try:
+            return target(species, phase, float(temperature_K), datapack=datapack)
+        finally:
+            gas._nearest_interval_row = nearest
+            gas._oxide_row_for_T = oxide
+
+
+def _species_thermo_outside_interval(result: Mapping[str, Any], temperature_K: float) -> bool:
+    if result.get("extrapolated") is True:
+        return True
+    try:
+        low = float(result["T_min"])
+        high = float(result["T_max"])
+        temperature = float(temperature_K)
+    except (KeyError, TypeError, ValueError):
+        return False
+    return temperature < low or temperature > high
+
+
+def species_thermo(
+    species: str,
+    phase: str,
+    temperature_K: float,
+    *,
+    allow_extrapolation: bool = False,
+    polymorph: str | None = None,
+) -> dict[str, Any]:
+    """Cached, JSON-safe view of one pure-species function.
+
+    The pack row is kept when it serves the species and, for a named
+    crystal, its source table is the dictionary table. Otherwise the
+    printed JANAF table is used when exactly one table is named. A
+    species or phase that neither source serves still raises.
+    ``allow_extrapolation`` is part of the cache key only when true, and
+    ``polymorph`` only when set, so an in-interval pack call keeps its key.
+    """
+
+    from decimal import Decimal
 
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
     module = _require_openimcc()
     record_engine_open("openimcc")
-    request = {
+    request: dict[str, Any] = {
         "call": "species_thermo",
         "species": species,
         "phase": phase,
         "T_K": float(temperature_K),
         "datapack": DEFAULT_GAS_PACK_SELECTION,
     }
+    if allow_extrapolation:
+        request["allow_extrapolation"] = True
+    if polymorph:
+        request["polymorph"] = polymorph
 
     def solve() -> dict[str, Any]:
-        datapack = module.load_gas_datapack()
-        props = module.species_thermo(
-            species, phase, float(temperature_K), datapack=datapack
+        from simulator.battery.generators.janaf import (
+            janaf_selected_thermo_table_id,
+            janaf_tabulated_apparent_thermo,
         )
-        source_row_id = getattr(props, "source_row_id", None)
-        source_table_id = getattr(props, "source_table_id", None)
-        interval = getattr(props, "T_interval", None)
-        return {
-            "Cp_J_molK": getattr(props, "Cp_J_molK", None),
-            "S_J_molK": getattr(props, "S_J_molK", None),
-            "H_app_kJ_mol": getattr(props, "H_app_kJ_mol", None),
-            "G_J_mol": getattr(props, "G_J_mol", None),
-            "source_row_id": source_row_id,
-            "source_table_id": source_table_id,
-            "T_interval": (
-                tuple(interval)
-                if isinstance(interval, (tuple, list))
-                else None
-            ),
-            "T_min": getattr(props, "T_min", None),
-            "T_max": getattr(props, "T_max", None),
-            "derivatives_fit_implied": getattr(
-                props, "derivatives_fit_implied", None
-            ),
-        }
+
+        datapack = module.load_gas_datapack()
+        props = None
+        pack_error: BaseException | None = None
+        try:
+            props = _invoke_pack_species_thermo(
+                module,
+                species,
+                phase,
+                float(temperature_K),
+                datapack=datapack,
+                allow_extrapolation=allow_extrapolation,
+            )
+        except Exception as exc:
+            if not (
+                isinstance(exc, KeyError)
+                or type(exc).__name__ == "ImccGasSpeciesNotFoundError"
+            ):
+                raise
+            pack_error = exc
+        selected = janaf_selected_thermo_table_id(
+            species, phase, polymorph=polymorph
+        )
+        pack_table = None if props is None else getattr(props, "source_table_id", None)
+        named_crystal = bool(polymorph) and phase == "cr"
+        use_pack = props is not None and not (
+            named_crystal and (selected is None or pack_table != selected)
+        )
+        if use_pack:
+            return _species_thermo_record(props)
+        tabulated = janaf_tabulated_apparent_thermo(
+            species,
+            phase,
+            Decimal(str(temperature_K)),
+            polymorph=polymorph,
+        )
+        if tabulated is None:
+            if pack_error is not None:
+                raise pack_error
+            raise KeyError(species)
+        return _tabulated_species_thermo_record(tabulated)
 
     result = dict(cached_engine_call("openimcc", request, solve))
     result["dfH298_J_mol"] = _species_thermo_source_dfh298(
         species, phase, result.get("source_row_id"), result.get("source_table_id")
     )
+    result["extrapolated"] = _species_thermo_outside_interval(
+        result, float(temperature_K)
+    )
     return result
+
 
 def evaluate_redox(
     inventory: Mapping[str, float],

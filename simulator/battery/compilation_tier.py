@@ -2544,32 +2544,15 @@ def _pure_phase_attempt(
         call_evidence += ":P_bar=1:assumed"
         if quantity is Quantity.H_MINUS_H298:
             bound_J, bound_term = _pressure_effect_bound_J(props, second, t_ref_props)
-            pressure_reason = (
-                "standard-pressure-assumed: declared=unknown; "
-                f"pressure_bar=1; bound_J_mol_per_bar={format(bound_J, 'f')}; "
-                f"authority={Authority.BRIDGE.value}; term={bound_term}"
+            pressure_notice = _assumed_standard_pressure_notice(
+                quantity, origin, bound_J=bound_J, bound_term=bound_term
             )
-            pressure_original = bound_J
         else:
             # Enthalpy bound only. Cp and S need alpha or d²V/dT², which
             # these property objects do not carry. The value stays the
             # 1 bar engine value.
-            pressure_reason = (
-                "standard-pressure-assumed: declared=unknown; "
-                f"pressure_bar=1; authority={Authority.BRIDGE.value}; term=omitted"
-            )
-            pressure_original = None
-        notices = notices + (
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(quantity,),
-                reason=pressure_reason,
-                origin=origin,
-                band="1 bar",
-                authority=Authority.BRIDGE,
-                original=pressure_original,
-            ),
-        )
+            pressure_notice = _assumed_standard_pressure_notice(quantity, origin)
+        notices = notices + (pressure_notice,)
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
@@ -2592,49 +2575,98 @@ class _OpenIMCCBridgeRefusal:
         self.extra = extra
 
 
+def _assumed_standard_pressure_notice(
+    quantity: Quantity,
+    origin: str,
+    *,
+    bound_J: Decimal | None = None,
+    bound_term: str | None = None,
+) -> Notice:
+    """Stated 1 bar default. The omitted and enthalpy-bound reasons share this."""
+
+    if bound_J is not None:
+        reason = (
+            "standard-pressure-assumed: declared=unknown; "
+            f"pressure_bar=1; bound_J_mol_per_bar={format(bound_J, 'f')}; "
+            f"authority={Authority.BRIDGE.value}; term={bound_term}"
+        )
+        original = bound_J
+    else:
+        reason = (
+            "standard-pressure-assumed: declared=unknown; "
+            f"pressure_bar=1; authority={Authority.BRIDGE.value}; term=omitted"
+        )
+        original = None
+    return Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin=origin,
+        band="1 bar",
+        authority=Authority.BRIDGE,
+        original=original,
+    )
+
+
+def _openimcc_extrapolation_notice(
+    outcome: Mapping[str, object],
+    *,
+    formula: str,
+    phase_label: str,
+    temperature_K: Decimal,
+    quantity: Quantity,
+    origin: str,
+) -> Notice | None:
+    """One flag when the returned interval does not contain the requested T."""
+
+    low = _finite_number(outcome.get("T_min"))
+    high = _finite_number(outcome.get("T_max"))
+    requested = float(temperature_K)
+    outside = outcome.get("extrapolated") is True or (
+        low is not None and high is not None and (requested < low or requested > high)
+    )
+    if not outside:
+        return None
+    return Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(quantity,),
+        reason=(
+            "openimcc-species-thermo-extrapolated: "
+            f"species={formula}; phase={phase_label}; "
+            f"declared_interval_K=[{outcome.get('T_min')}, {outcome.get('T_max')}]; "
+            f"requested_T_K={temperature_K}"
+        ),
+        origin=origin,
+        band=f"[{outcome.get('T_min')}, {outcome.get('T_max')}] K",
+        authority=Authority.EXTRAPOLATED,
+    )
+
+
 def _openimcc_bridge_species_thermo(
-    formula: str, phase_label: str, temperature_K: Decimal
+    formula: str,
+    phase_label: str,
+    temperature_K: Decimal,
+    *,
+    polymorph: str | None = None,
 ) -> Mapping[str, object] | _OpenIMCCBridgeRefusal:
-    """One species_thermo call. The pure path and formation share this ladder."""
+    """One species_thermo call. The pure path and formation share this ladder.
+
+    Scoring asks for the flagged continuation outside the pack interval.
+    A species or phase the pack and the JANAF table both cannot serve is
+    still a typed refusal. A named crystal polymorph is part of the call.
+    """
 
     from simulator.melt_backend import openimcc_bridge
 
     try:
         result = openimcc_bridge.species_thermo(
-            formula, phase_label, float(temperature_K)
+            formula,
+            phase_label,
+            float(temperature_K),
+            allow_extrapolation=True,
+            polymorph=polymorph,
         )
     except Exception as exc:  # OpenIMCC engine boundary
-        if type(exc).__name__ == "ImccGasTemperatureOutsideDomainError":
-            interval = getattr(exc, "declared_interval_K", None)
-            if not isinstance(interval, (tuple, list)):
-                interval = getattr(exc, "T_interval", None)
-            if not isinstance(interval, (tuple, list)):
-                low = getattr(exc, "T_min", None)
-                high = getattr(exc, "T_max", None)
-                interval = None if low is None or high is None else (low, high)
-            if not isinstance(interval, (tuple, list)):
-                bounds = re.search(r"\[([^,\]]+),\s*([^\]]+)\]", str(exc))
-                if bounds is not None:
-                    low = _finite_number(bounds.group(1))
-                    high = _finite_number(bounds.group(2))
-                    interval = None if low is None or high is None else (low, high)
-            row_id = getattr(exc, "source_row_id", getattr(exc, "row_id", None))
-            # The current pin refuses outside the declared interval; a
-            # later species_thermo(..., allow_extrapolation=True) API can
-            # replace this refusal with its native flagged continuation.
-            return _OpenIMCCBridgeRefusal(
-                RefusalReason.UNSUPPORTED,
-                "openimcc_species_thermo_outside_interval",
-                {
-                    "species": formula,
-                    "phase": phase_label,
-                    "requested_T_K": str(temperature_K),
-                    "declared_interval_K": None if interval is None else list(interval),
-                    "source_row_id": row_id,
-                    "upstream_error": f"{type(exc).__name__}: {exc}",
-                    "certification_backlog": True,
-                },
-            )
         if (
             isinstance(exc, KeyError)
             or type(exc).__name__ == "ImccGasSpeciesNotFoundError"
@@ -2711,10 +2743,12 @@ def _openimcc_formation_from_species_thermo(
     ΔfH(species, 298.15 K) = H_app and ΔfG = G/1000. O2(g) at 298.15 K
     is ~0 when O2 is that reference. Ideal-gas ΔfG then adds
     ``standard_pressure_delta_g_kJ_per_mol`` from 1 bar to the stated
-    standard pressure. A mol_O2 row rescales those energies with
-    ``rescale_energy_per_basis``. log10 Kf is
-    ``log10K_from_delta_fG_kJ_mol`` of that rescaled ΔfG, not a
-    rescaled logarithm.
+    standard pressure. A missing standard pressure is that same 1 bar
+    (``PA_PER_BAR_DEC``, the JANAF p°), flagged, not refused. A mol_O2
+    row rescales those energies with ``rescale_energy_per_basis``.
+    log10 Kf is ``log10K_from_delta_fG_kJ_mol`` of that rescaled ΔfG,
+    not a rescaled logarithm. A term outside its declared interval is
+    still evaluated and flagged ``openimcc-species-thermo-extrapolated``.
     """
 
     def refuse(
@@ -2788,18 +2822,19 @@ def _openimcc_formation_from_species_thermo(
         )
     reaction = basis.reaction.value
     pressure = None
+    pressure_assumed = False
     if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
         pressure = _openimcc_standard_pressure_Pa(identity)
         if pressure is None:
-            return refuse(
-                RefusalReason.IDENTITY_UNKNOWN,
-                "openimcc-standard-pressure-unknown",
-            )
+            pressure = PA_PER_BAR_DEC
+            pressure_assumed = True
     try:
         enthalpy = Decimal(0)
         gibbs_J = Decimal(0)
         provenance = None
         evidence = "openimcc.species_thermo"
+        term_notices: list[Notice] = []
+        extrapolated = False
         for term in reaction.terms:
             term_phase = phase_token(term.species)
             if term_phase not in {Phase.G, Phase.L, Phase.CR}:
@@ -2812,11 +2847,26 @@ def _openimcc_formation_from_species_thermo(
                         "phase": getattr(term_phase, "value", None),
                     },
                 )
+            term_token = polymorph_token(term.species)
             outcome = _openimcc_bridge_species_thermo(
-                term.species.formula, term_phase.value, temperature_K
+                term.species.formula,
+                term_phase.value,
+                temperature_K,
+                polymorph=None if term_token is None else term_token.value,
             )
             if isinstance(outcome, _OpenIMCCBridgeRefusal):
                 return refuse(outcome.reason, outcome.code, outcome.extra)
+            term_notice = _openimcc_extrapolation_notice(
+                outcome,
+                formula=term.species.formula,
+                phase_label=term_phase.value,
+                temperature_K=temperature_K,
+                quantity=quantity,
+                origin=origin,
+            )
+            if term_notice is not None:
+                extrapolated = True
+                term_notices.append(term_notice)
             is_product = term.coefficient > 0 and provenance is None
             if is_product:
                 row_id = outcome.get("source_row_id")
@@ -2856,20 +2906,6 @@ def _openimcc_formation_from_species_thermo(
                     f"interval=[{outcome.get('T_min')},{outcome.get('T_max')}]:"
                     f"derivatives_fit_implied={derivatives_fit}"
                 )
-                if phase is Phase.CR and _poly_name(identity) is not None:
-                    return refuse(
-                        RefusalReason.UNSUPPORTED,
-                        "pure-phase-polymorph-unresolved",
-                        {
-                            "engine": Engine.OPENIMCC.value,
-                            "formula": formula,
-                            "polymorph": _poly_name(identity),
-                            "source_row_id": row_id,
-                            "source_table_id": table_id,
-                        },
-                        evidence=evidence,
-                        provenance=provenance,
-                    )
             h_value = _finite_number(outcome.get("H_app_kJ_mol"))
             g_value = _finite_number(outcome.get("G_J_mol"))
             if h_value is None or g_value is None:
@@ -2932,13 +2968,17 @@ def _openimcc_formation_from_species_thermo(
             {"detail": str(exc)},
         )
     table_id = provenance[0] or ""
+    notices = list(
+        reference_phase_convention_notices(basis.convention_tables, quantity)
+    )
+    notices.extend(term_notices)
+    if pressure_assumed:
+        notices.append(_assumed_standard_pressure_notice(quantity, origin))
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
-        authority=Authority.BRIDGE,
-        notices=reference_phase_convention_notices(
-            basis.convention_tables, quantity
-        ),
+        authority=Authority.EXTRAPOLATED if extrapolated else Authority.BRIDGE,
+        notices=tuple(notices),
         refusal_reason=None,
         refusal_detail={},
         call_evidence=(
@@ -2993,7 +3033,28 @@ def openimcc_thermo_source_relation(
         ):
             exposed = _family_names(family, "nasa-glenn", "nasa_glenn")
         else:
-            exposed = False
+            folded_table = table.casefold()
+            folded_row = row.casefold()
+            # TSIV and the MnO liquid construction (IVTAN is in the row
+            # id) are exposed only on a tsiv/ivtan family. P672 is
+            # exposed only on a bulletin-672 family. Other Pankratz
+            # bulletins are not this source.
+            if (
+                "tsiv" in folded_table
+                or "ivtan" in folded_table
+                or "mno-liquid-construction" in folded_table
+                or "ivtan" in folded_row
+            ):
+                exposed = _family_names(family, "tsiv", "ivtan")
+            elif any(
+                needle in folded_table
+                for needle in ("p672", "b672", "bulletin-672", "usbm-b672")
+            ):
+                exposed = _family_names(
+                    family, "p672", "b672", "bulletin-672", "usbm-b672"
+                )
+            else:
+                exposed = False
         return (
             SourceRelation.EXPOSED if exposed else SourceRelation.HELD_OUT,
             None,
@@ -3034,13 +3095,18 @@ def openimcc_thermo_relation_for_prediction(
     """Per-row relation. Not a column of the engine×quantity table.
 
     Diagnostic rows keep the lineage relation: that ledger never called
-    the engine. Every other OpenIMCC thermochemistry row is exposed or
-    held out.
+    the engine. A NASA-9 row on a JANAF compilation is exposed: those
+    polynomials are fits that include JANAF. Every other OpenIMCC
+    thermochemistry row is exposed or held out from its own table.
     """
 
-    if engine is not Engine.OPENIMCC or quantity not in _engine_thermo_quantities(engine):
-        return lineage_relation, None
     if refusal_reason == "diagnostic_population":
+        return lineage_relation, None
+    if engine is Engine.NASA_CEA_9 and _family_names(
+        compilation_family(source_id, origin), "janaf"
+    ):
+        return SourceRelation.EXPOSED, None
+    if engine is not Engine.OPENIMCC or quantity not in _engine_thermo_quantities(engine):
         return lineage_relation, None
     return openimcc_thermo_source_relation(
         source_id=source_id,
@@ -3127,20 +3193,23 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
     if not temperature_K.is_finite() or temperature_K <= 0:
         return refuse(RefusalReason.INVALID_IDENTITY, "temperature-not-positive")
     t_ref_K = None
-    declared_anchor = ""
     if quantity is Quantity.H_MINUS_H298:
         accepted = _accepted_enthalpy_anchor(
             identity, engine=Engine.OPENIMCC, quantity=quantity, origin=origin
         )
         if isinstance(accepted, ThermoAttempt):
             return accepted
-        t_ref_K, declared_anchor = accepted
+        t_ref_K = accepted[0]
 
     phase_label = phase.value
+    crystal_polymorph = _poly_name(identity) if phase is Phase.CR else None
 
     def native_call(call_temperature_K: Decimal) -> Mapping[str, object] | ThermoAttempt:
         outcome = _openimcc_bridge_species_thermo(
-            formula, phase_label, call_temperature_K
+            formula,
+            phase_label,
+            call_temperature_K,
+            polymorph=crystal_polymorph,
         )
         if isinstance(outcome, _OpenIMCCBridgeRefusal):
             return refuse(outcome.reason, outcome.code, outcome.extra)
@@ -3181,23 +3250,17 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         f"derivatives_fit_implied={derivatives_fit}"
     )
     provenance = (table_id, row_id, None)
-
-    identity_poly = _poly_name(identity)
-    if phase is Phase.CR and identity_poly is not None:
-        # This pinned SpeciesThermo source reports only a generic crystal
-        # phase, not a named polymorph. Keep named crystals off that row until
-        # the selected OpenIMCC source identity explicitly names its form.
-        source_polymorph = None
-        if not _same_mineral(source_polymorph, identity_poly):
-            return refuse(
-                RefusalReason.UNSUPPORTED,
-                "pure-phase-polymorph-unresolved",
-                {"engine": Engine.OPENIMCC.value, "formula": formula,
-                 "polymorph": identity_poly, "source_row_id": row_id,
-                 "source_table_id": table_id},
-                evidence=evidence,
-                provenance=provenance,
-            )
+    notices: list[Notice] = []
+    target_notice = _openimcc_extrapolation_notice(
+        props,
+        formula=formula,
+        phase_label=phase_label,
+        temperature_K=temperature_K,
+        quantity=quantity,
+        origin=origin,
+    )
+    if target_notice is not None:
+        notices.append(target_notice)
 
     field = {Quantity.CP: "Cp_J_molK", Quantity.S: "S_J_molK"}.get(quantity)
     if field is not None:
@@ -3222,7 +3285,10 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                 return replace(refusal, openimcc_provenance=provenance)
         return ThermoAttempt(
             value=value, unit=QUANTITY_UNITS[quantity],
-            authority=Authority.BRIDGE, notices=(), refusal_reason=None,
+            authority=(
+                Authority.EXTRAPOLATED if notices else Authority.BRIDGE
+            ),
+            notices=tuple(notices), refusal_reason=None,
             refusal_detail={}, call_evidence=evidence,
             openimcc_provenance=provenance,
         )
@@ -3237,20 +3303,6 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
     reference_call_required = (
         phase is not Phase.G or t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K
     )
-    if reference_call_required and (
-        float(t_ref_K) < low or float(t_ref_K) > high
-    ):
-        return refuse(
-            RefusalReason.UNSUPPORTED,
-            "openimcc_reference_temperature_not_covered",
-            {"engine": Engine.OPENIMCC.value, "species": formula,
-             "phase": phase_label, "T_ref_K": str(t_ref_K),
-             "declared_interval_K": [props.get("T_min"), props.get("T_max")],
-             "source_row_id": row_id, "source_table_id": table_id,
-             "actual_anchor": declared_anchor},
-            evidence=evidence,
-            provenance=provenance,
-        )
 
     dfh298 = (
         _finite_number(props.get("dfH298_J_mol")) if phase is Phase.G else None
@@ -3294,17 +3346,30 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                 provenance=provenance,
             )
         h_reference_increment = as_decimal(str(h_reference)) - anchor_kJ
+        reference_notice = _openimcc_extrapolation_notice(
+            reference,
+            formula=formula,
+            phase_label=phase_label,
+            temperature_K=t_ref_K,
+            quantity=quantity,
+            origin=origin,
+        )
+        if reference_notice is not None:
+            notices.append(reference_notice)
 
     # Premise: gas H_app contains source dfH298; condensate rows need a
-    # same-phase H_app(T_ref) call within that row's interval. Algebra for
-    # gas: H(T)-H(T_ref) = [H_app(T)-dfH298] - [H_app(T_ref)-dfH298]. For
+    # same-phase H_app(T_ref) call. Algebra for gas:
+    # H(T)-H(T_ref) = [H_app(T)-dfH298] - [H_app(T_ref)-dfH298]. For
     # condensates, subtract the same-source H_app(T_ref), so its stable-phase
-    # anchor cancels. Units: H_app is kJ/mol and dfH298 is J/mol; divide the
-    # gas anchor by 1000. Sanity: 3.0 kJ/mol - 1000 J/mol / 1000 = 2.0 kJ/mol.
+    # anchor cancels. A reference temperature outside the declared interval
+    # is still called and flagged, the same extrapolation policy as T.
+    # Units: H_app is kJ/mol and dfH298 is J/mol; divide the gas anchor by
+    # 1000. Sanity: 3.0 kJ/mol - 1000 J/mol / 1000 = 2.0 kJ/mol.
     value = as_decimal(str(h_target)) - anchor_kJ - h_reference_increment
     return ThermoAttempt(
-        value=value, unit=QUANTITY_UNITS[quantity], authority=Authority.BRIDGE,
-        notices=(), refusal_reason=None, refusal_detail={},
+        value=value, unit=QUANTITY_UNITS[quantity],
+        authority=Authority.EXTRAPOLATED if notices else Authority.BRIDGE,
+        notices=tuple(notices), refusal_reason=None, refusal_detail={},
         call_evidence=f"{evidence}:H(T)-H(T_ref)",
         openimcc_provenance=provenance,
     )
@@ -4652,6 +4717,7 @@ class _TierCell:
     band_kind: str = "no_band"
     band_derived_n: int | None = None
     derive_eligible: bool = True
+    lineage_complete: bool = True
 
 
 @dataclass
@@ -4687,7 +4753,7 @@ class _TierAggregate:
             self.same_source_count += 1
             if cell.status is ResidualStatus.MATCH:
                 self.matched_same_source += 1
-        elif source_relation_is_unseen(cell.relation):
+        elif source_relation_is_unseen(cell.relation) and cell.lineage_complete:
             self.independent_count += 1
             if cell.status is ResidualStatus.MATCH:
                 self.matched_independent += 1
@@ -4856,6 +4922,31 @@ def _tier_markdown(
     return lines
 
 
+_INCOMPLETE_LINEAGE_EXCLUSION = "source_relation_independent_complete_ancestry"
+
+
+def _lineage_complete_for_relation(
+    relation: SourceRelation, exclusions: object
+) -> bool:
+    """Unseen rows with incomplete ancestry are not an independent count.
+
+    The exclusion token is the false conjunct ``unseen AND lineage_complete``.
+    On an exposed row the token is present because the row is not unseen,
+    so it does not judge same-source lineage. Missing exclusions stay complete
+    so a cell built without the token still counts as before.
+    """
+
+    if not source_relation_is_unseen(relation):
+        return True
+    if isinstance(exclusions, str):
+        tokens = {exclusions}
+    elif isinstance(exclusions, Sequence) and not isinstance(exclusions, (bytes, bytearray)):
+        tokens = {str(item) for item in exclusions}
+    else:
+        return True
+    return _INCOMPLETE_LINEAGE_EXCLUSION not in tokens
+
+
 def _cell_from_observation(
     *,
     engine: str,
@@ -4868,6 +4959,7 @@ def _cell_from_observation(
     origin: str | None,
     decision_band=None,
     derive_eligible: bool = True,
+    lineage_complete: bool = True,
 ) -> _TierCell:
     from simulator.battery.score import NO_HEADLINE_RAIL_TOKEN, _decision_band_kind
 
@@ -4908,6 +5000,7 @@ def _cell_from_observation(
             else None
         ),
         derive_eligible=derive_eligible,
+        lineage_complete=lineage_complete,
     )
 
 
@@ -4988,14 +5081,15 @@ def _tier_cell_from_payload_fields(
     band = band_data if isinstance(band_data, Mapping) else None
     band_rule = "" if band is None else str(band.get("rule") or "")
     band_value = None if band is None else str(band["value"])
+    relation = SourceRelation(
+        str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
+    )
     return _TierCell(
         observation_id=str(row.get("reference") or ""),
         rail=rail,
         engine=engine or "unknown",
         status=ResidualStatus(str(row.get("status"))),
-        relation=SourceRelation(
-            str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
-        ),
+        relation=relation,
         numeric=numeric,
         operation=operation,
         unit=unit,
@@ -5010,6 +5104,9 @@ def _tier_cell_from_payload_fields(
             else None
         ),
         derive_eligible=derive_eligible,
+        lineage_complete=_lineage_complete_for_relation(
+            relation, row.get("exclusions")
+        ),
     )
 
 
@@ -5052,6 +5149,9 @@ def compilation_tier_lines(
                     _is_flagged_stratum_notice(notice)
                     or _is_fusion_conversion_notice(notice)
                     for notice in residual.notices
+                ),
+                lineage_complete=_lineage_complete_for_relation(
+                    residual.source_relation, residual.exclusions
                 ),
             )
 
@@ -6144,18 +6244,24 @@ def compilation_tier_census(
         ):
             row["residuals"].append(residual.numeric.value)
         # An unbanded decision is the more specific bucket and owns same-source rows.
+        lineage_complete = _lineage_complete_for_relation(
+            residual.source_relation, residual.exclusions
+        )
         if residual.status is ResidualStatus.NO_BAND:
             row["no_band"] += 1
         elif source_relation_is_same_source(residual.source_relation):
             row["same_source"] += 1
-        elif source_relation_is_unseen(residual.source_relation):
+        elif source_relation_is_unseen(residual.source_relation) and lineage_complete:
             row["independent"] += 1
         else:
             row["unknown"] += 1
         if residual.status is ResidualStatus.MATCH:
             if source_relation_is_same_source(residual.source_relation):
                 row["match_same_source"] += 1
-            elif source_relation_is_unseen(residual.source_relation):
+            elif (
+                source_relation_is_unseen(residual.source_relation)
+                and lineage_complete
+            ):
                 row["match_independent"] += 1
 
     if audit_compile_residual:
