@@ -242,6 +242,9 @@ def test_minute42_reducing_step_stops_at_ferric_inventory(
     assert reservoir.melt_intrinsic_fO2_log > -10.0
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skip_reason == ""
+    assert reservoir.ferric_divergence["ferric_tangent_reasons"] == [
+        "ferric_inventory_handover",
+    ]
     assert reservoir.melt_redox_capacity_mol_per_ln_fO2 == pytest.approx(
         OXYGEN_RESERVOIR_NOOP_MOL
     )
@@ -278,6 +281,16 @@ def test_zero_ferric_inventory_skips_the_reducing_step(
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(_BASE_LOG)
     assert reservoir.redox_source_terms_applied is False
     assert reservoir.redox_source_skip_reason == "ferric_couple_exhausted"
+    assert reservoir.ferric_divergence["ferric_tangent_reasons"] == [
+        "ferric_couple_exhausted",
+        "ferric_inventory_handover",
+    ]
+    assert sim._redox_source_breakdown_diagnostic()["ferric_divergence"][
+        "ferric_tangent_reasons"
+    ] == [
+        "ferric_couple_exhausted",
+        "ferric_inventory_handover",
+    ]
     assert reservoir.melt_redox_capacity_mol_per_ln_fO2 == pytest.approx(
         OXYGEN_RESERVOIR_NOOP_MOL
     )
@@ -452,5 +465,149 @@ def test_load_batch_clears_ferric_tangent_exhaustion(
     sim: PyrolysisSimulator,
 ) -> None:
     sim._ferric_tangent_exhausted = True
+    sim._ferric_exhausted_bookable_o2_mol = 0.0
+    sim._ferric_tangent_reasons_this_hr = ["ferric_couple_exhausted"]
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
     assert sim._ferric_tangent_exhausted is False
+    assert sim._ferric_exhausted_bookable_o2_mol is None
+    assert sim._ferric_tangent_reasons_this_hr == []
+
+
+def test_ferric_reappearance_reopens_the_tangent(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Exhaust, prove the lock, then put Fe2O3 back on the in-step ledger.
+    # The next capacity read must clear the flag and a reducing step
+    # inside that inventory must move fO2 again.
+    _pin_tangent(sim, monkeypatch, fe2o3_mol=0.0)
+    skipped = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_reducing": -_STEP_MOL},
+        temperature_K=_TEMPERATURE_K,
+    )
+    assert skipped.redox_source_skip_reason == "ferric_couple_exhausted"
+    assert sim._ferric_tangent_exhausted is True
+    sim._reset_redox_source_diagnostics_for_hour()
+    locked = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_reducing": -_STEP_MOL},
+        temperature_K=_TEMPERATURE_K,
+    )
+    assert locked.redox_source_skip_reason == "no_melt_redox_capacity"
+    assert sim._ferric_tangent_exhausted is True
+
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": 1.0},
+        source="test ferric iron reappearing after exhaustion",
+        material_origin="feedstock",
+    )
+    reopened = sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=sim._current_melt_redox_fO2_log(),
+        T_K=_TEMPERATURE_K,
+    )
+    assert sim._ferric_tangent_exhausted is False
+    assert reopened == pytest.approx(_CAPACITY_MOL_PER_LN)
+
+    before = sim._current_melt_redox_fO2_log()
+    sim._reset_redox_source_diagnostics_for_hour()
+    resumed = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_reducing": -_STEP_MOL},
+        temperature_K=_TEMPERATURE_K,
+    )
+    expected = before + (-_STEP_MOL / _CAPACITY_MOL_PER_LN) / math.log(10.0)
+    assert resumed.redox_source_terms_applied is True
+    assert resumed.redox_source_skip_reason == ""
+    assert resumed.melt_intrinsic_fO2_log == pytest.approx(expected)
+    assert sim._ferric_tangent_exhausted is False
+
+    # A fresh lock, then an oxidizing step with no new Fe2O3.
+    # Capacity is 1 mol per ln so booking the 0.5 mol inventory is
+    # 0.5/ln(10) dex. The 1e-3 mol/ln pin would publish ~217 dex.
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_kwargs: 1.0,
+    )
+    bookable = ferric_couple_o2_mol(1.0)
+    before_lock = sim._current_melt_redox_fO2_log()
+    sim._reset_redox_source_diagnostics_for_hour()
+    locked_again = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_reducing": -(bookable + 1.0)},
+        temperature_K=_TEMPERATURE_K,
+    )
+    stopped = before_lock - (bookable / 1.0) / math.log(10.0)
+    assert locked_again.redox_source_terms_applied is True
+    assert locked_again.redox_source_skip_reason == ""
+    assert locked_again.melt_intrinsic_fO2_log == pytest.approx(stopped)
+    assert locked_again.ferric_divergence["ferric_tangent_reasons"] == [
+        "ferric_inventory_handover",
+    ]
+    assert sim._ferric_tangent_exhausted is True
+
+    oxidized = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_oxidizing": _STEP_MOL},
+        temperature_K=_TEMPERATURE_K,
+    )
+    assert oxidized.redox_source_terms_applied is True
+    assert oxidized.redox_source_skip_reason == ""
+    assert sim._ferric_tangent_exhausted is False
+    assert oxidized.melt_intrinsic_fO2_log == pytest.approx(
+        stopped + (_STEP_MOL / 1.0) / math.log(10.0)
+    )
+
+    resumed_after = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_reducing": -_STEP_MOL},
+        temperature_K=_TEMPERATURE_K,
+    )
+    assert resumed_after.redox_source_terms_applied is True
+    assert sim._ferric_tangent_exhausted is False
+    assert resumed_after.melt_intrinsic_fO2_log == pytest.approx(
+        oxidized.melt_intrinsic_fO2_log
+        + (-_STEP_MOL / 1.0) / math.log(10.0)
+    )
+
+
+def test_exchange_credit_reopens_the_tangent(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _pin_tangent(sim, monkeypatch, fe2o3_mol=0.0, capacity_mol_per_ln=1.0)
+    skipped = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_reducing": -_STEP_MOL},
+        temperature_K=_TEMPERATURE_K,
+    )
+    assert skipped.redox_source_skip_reason == "ferric_couple_exhausted"
+    assert sim._ferric_tangent_exhausted is True
+
+    head_o2_mol = 1.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": head_o2_mol},
+        source="test headspace O2 for an exchange credit after exhaustion",
+        material_origin="feedstock",
+    )
+    ledger_pO2 = sim._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+    transport_pO2 = sim._headspace_transport_pO2_bar_from_ledger(
+        ledger_pO2,
+        head_o2_mol=head_o2_mol,
+    )
+    effective_pO2 = min(
+        max(transport_pO2, sim._oxygen_numerical_floor_bar()),
+        10.0 ** sim._melt_redox_fO2_upper_bound_log(),
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = (
+        math.log10(effective_pO2) - 1.0
+    )
+    sim.melt.oxygen_reservoir.reference_T_K = _TEMPERATURE_K
+    sim._sync_oxygen_reservoir_mirror()
+    before = sim._current_melt_redox_fO2_log()
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_direction == "headspace_to_melt"
+    assert reservoir.exchange_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.melt_intrinsic_fO2_log > before
+    assert sim._ferric_tangent_exhausted is False
+    assert "ferric_couple_exhausted" in reservoir.ferric_divergence[
+        "ferric_tangent_reasons"
+    ]
