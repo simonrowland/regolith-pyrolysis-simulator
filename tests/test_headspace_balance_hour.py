@@ -272,6 +272,38 @@ def test_stiff_reduced_synthetic_hour_finishes_below_flux_cap(monkeypatch):
     assert warm_samples[len(warm_samples) // 2] > 4
 
 
+def test_reduced_extent_quadrature_preserves_synthetic_hour_closure():
+    law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=True,
+        track_extent=True,
+    )
+    result = capacity_coupling._reduced_manifold(
+        law, fractions, start, root, 3600.0, track_extent=True,
+    )
+
+    assert result is not None
+    n_end, added, bled, _vapour, _redox_added, _time, _dy = result
+    pa_per_mol = GAS_CONSTANT * _IFT_T_K / _IFT_V_M3
+    closure_error_pa = max(
+        abs((n_end[name] - start[name] - added[name] + bled[name]) * pa_per_mol)
+        for name in start
+    )
+    assert closure_error_pa <= DEFAULT_ABS_TOL_PA
+
+
+def test_passive_extent_kink_does_not_cause_reduced_newton_failures():
+    law, _holder, fractions, start, root = _reduced_manifold_case(
+        stiff=True,
+        track_extent=True,
+    )
+    result = capacity_coupling._reduced_manifold(
+        law, fractions, start, root, 3600.0, track_extent=True,
+    )
+
+    assert result is not None
+    assert law.reduced_newton_nonconvergence_failures == 0
+
+
 def test_reduced_endpoint_pressure_miss_declines_stall_handoff(monkeypatch):
     """A forced P* mismatch leaves the live full-system Radau path in control."""
 
