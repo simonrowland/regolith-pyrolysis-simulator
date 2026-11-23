@@ -2299,7 +2299,10 @@ def predict_mass_loss_fraction(
             "area_shape_not_self_similar",
         }:
             raise
-        from simulator.equipment import EquipmentDesigner
+        from simulator.equipment import (
+            DP_007_AREA_DEFAULT_SOURCE,
+            EquipmentDesigner,
+        )
 
         # Use the same face area the simulator's equipment designer assigns to
         # an unconfigured crucible. A = pi(d/2)^2, with d derived from the
@@ -2321,7 +2324,7 @@ def predict_mass_loss_fraction(
         flags.add(
             f"knob_defaulted:area={area_m2:.17g} m2; "
             f"original_reason={area_default_reason}; "
-            "default_source=EquipmentDesigner.size_crucible(sample_mass_kg).melt_surface_area_m2"
+            f"default_source={DP_007_AREA_DEFAULT_SOURCE}"
         )
     flags.add(
         "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
@@ -2546,6 +2549,7 @@ def predict_mass_loss_fraction(
             "inventory_capped_channels": sorted(inventory_capped_channels),
             "inventory_bound_kg_by_parent": inventory_bounds_by_parent,
         }
+        preheat_diagnostics = None
         try:
             diagnostics = _mass_loss_bound_gate(
                 unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
@@ -2553,10 +2557,19 @@ def predict_mass_loss_fraction(
                 preheat_bound_kg=preheat_bound_kg,
             )
         except ResidueInventoryRefusal as exc:
-            if exc.reason == "alpha_not_sourced":
-                # Missing coefficients now use the explicitly flagged alpha=1
-                # point model. Keep its envelope as diagnostics, but only the
-                # independent preheat envelope can still refuse this point.
+            if exc.reason not in {
+                "alpha_not_sourced",
+                "preheat_bound_not_negligible",
+            }:
+                raise
+            diagnostics = json.loads(exc.detail)
+            if exc.reason == "preheat_bound_not_negligible":
+                preheat_diagnostics = diagnostics
+                preheat_diagnostics["original_reason"] = exc.reason
+            else:
+                # Alpha=1 is already the flagged point default. Test preheat
+                # independently so its bound can flag the point without being
+                # conflated with the unsourced-alpha envelope.
                 try:
                     _mass_loss_bound_gate(
                         preheat_bound_kg, point_loss_kg, uncertainty_kg,
@@ -2565,19 +2578,19 @@ def predict_mass_loss_fraction(
                 except ResidueInventoryRefusal as preheat_exc:
                     if preheat_exc.reason != "preheat_bound_not_negligible":
                         raise
-                    preheat_detail = json.loads(preheat_exc.detail)
-                    preheat_detail.update(evidence)
-                    raise ResidueInventoryRefusal(
-                        preheat_exc.reason,
-                        json.dumps(preheat_detail, sort_keys=True),
-                    ) from preheat_exc
-            elif exc.reason != "preheat_bound_not_negligible":
-                raise
-            diagnostics = json.loads(exc.detail)
-            diagnostics.update(evidence)
-            raise ResidueInventoryRefusal(exc.reason, json.dumps(diagnostics, sort_keys=True)) from exc
+                    preheat_diagnostics = json.loads(preheat_exc.detail)
+                    preheat_diagnostics.update(evidence)
+                    preheat_diagnostics["original_reason"] = preheat_exc.reason
         diagnostics.update(evidence)
         flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
+        if preheat_diagnostics is not None:
+            # The point model omits preheat. If a real run includes it, the
+            # measured loss includes extra material, so this prediction is
+            # biased low relative to the measurement.
+            flags.add(
+                "preheat_not_negligible:"
+                + json.dumps(preheat_diagnostics, sort_keys=True)
+            )
         metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
         metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
         metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])

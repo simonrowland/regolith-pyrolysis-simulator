@@ -337,6 +337,7 @@ class NoticeKind(StrEnum):
     KNOB_DEFAULTED = "knob_defaulted"
     KEMS_CALIBRATION_BY_SOURCE = "kems_calibration_by_source"
     METHOD_ASSUMED = "method_assumed"
+    PREHEAT_NOT_NEGLIGIBLE = "preheat_not_negligible"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     # t-1593: a named material's cited bulk analysis varies by lot

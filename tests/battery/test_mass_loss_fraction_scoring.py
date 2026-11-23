@@ -541,6 +541,12 @@ def test_richter_rep5_row_scores_with_defaulted_evaporation_coefficients(
     assert "original_reason=evaporation_coefficients_not_sourced" in (
         alpha_default_notice.reason
     )
+    assert alpha_default_notice.policy is not None
+    assert alpha_default_notice.policy.id == "DP-005"
+    assert alpha_default_notice.policy.version == "v1"
+    assert alpha_default_notice.policy.status == "canonical"
+    assert alpha_default_notice.policy.value == Decimal("1")
+    assert alpha_default_notice.policy.units == "dimensionless"
     assert scored.score_eligible is False
     assert NoticeKind.ALPHA_ASSUMED.value in flagged_strata(scored.notices)
 

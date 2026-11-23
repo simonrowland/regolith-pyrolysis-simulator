@@ -331,6 +331,7 @@ from simulator.battery.validity import (
     GateOutcome,
     KEMS_GEOMETRY_FACTS,
     _calibration_grounded,
+    _DP_011_METHOD_INFERENCE,
     _partial_pressure_observations_by_experiment,
     apparatus_geometry_interval_notice,
     comparison_method_cell_constant_cancels,
@@ -603,6 +604,10 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_PREHEAT_NOT_NEGLIGIBLE = NoticeKind.PREHEAT_NOT_NEGLIGIBLE.value
+_DP_012_CALIBRATION_VALUE = (
+    "no calibration needed; use the printed reduced value"
+)
 _POLICY_FLAG_STRATA = (
     NoticeKind.EFFUSION_REGIME_ASSUMED,
     NoticeKind.ALPHA_ASSUMED,
@@ -2218,6 +2223,40 @@ def _unverified_apparatus_notices(
                         "factor"
                     ),
                     origin=reference.observation_id,
+                    policy=NoticePolicy(
+                        id="DP-012",
+                        version="v1",
+                        status="canonical",
+                        value=_DP_012_CALIBRATION_VALUE,
+                        units="source_reduced_quantity",
+                    ),
+                )
+            )
+        elif flag == "knob_defaulted":
+            knob = str(detail["knob"])
+            value = detail.get("value")
+            units = str(detail["units"])
+            policy_id = str(detail["policy_id"])
+            default_source = str(detail["default_source"])
+            original_reason = str(detail["original_reason"])
+            default_value = as_decimal(str(value))
+            default_display = f"{value} {units}"
+            defaulted_notices.append(
+                Notice(
+                    kind=NoticeKind.KNOB_DEFAULTED,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        f"knob_defaulted:{knob}={default_display}; "
+                        f"original_reason={original_reason}; default_source={default_source}"
+                    ),
+                    origin=reference.observation_id,
+                    policy=NoticePolicy(
+                        id=policy_id,
+                        version="v1",
+                        status="canonical",
+                        value=default_value,
+                        units=units,
+                    ),
                 )
             )
         elif flag in {"effusion_regime_assumed", "method_assumed"}:
@@ -2236,6 +2275,21 @@ def _unverified_apparatus_notices(
                         f"{flag}: {condition}; original_reason={original_reason}"
                     ),
                     origin=reference.observation_id,
+                    policy=NoticePolicy(
+                        id=(
+                            "DP-004"
+                            if flag == "effusion_regime_assumed"
+                            else "DP-011"
+                        ),
+                        version="v1",
+                        status="canonical",
+                        value=(
+                            condition
+                            if flag == "effusion_regime_assumed"
+                            else _DP_011_METHOD_INFERENCE
+                        ),
+                        units="method_condition",
+                    ),
                 )
             )
     author_reported_pressure = (
@@ -2432,6 +2486,17 @@ def _unverified_apparatus_notices(
                 affected_quantities=(quantity,),
                 reason=reason,
                 origin=reference.observation_id,
+                policy=(
+                    NoticePolicy(
+                        id="DP-011",
+                        version="v1",
+                        status="canonical",
+                        value=_DP_011_METHOD_INFERENCE,
+                        units="method_inference",
+                    )
+                    if fact == "method_unknown"
+                    else None
+                ),
             )
         )
     return tuple(notices)
@@ -2548,6 +2613,8 @@ def _classify_flagged_notice_facts(
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     strata.extend(flag.value for flag in _POLICY_FLAG_STRATA if flag.value in kinds)
+    if NoticeKind.PREHEAT_NOT_NEGLIGIBLE.value in kinds:
+        strata.append(FLAGGED_STRATUM_PREHEAT_NOT_NEGLIGIBLE)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
@@ -12635,9 +12702,6 @@ def _predict_mass_loss_with_residue(
         elif reason == "initial_composition_invalid":
             refusal = RefusalReason.METRIC_DOMAIN
             execution = ExecutionState.NOT_PROBED
-        elif reason == "preheat_bound_not_negligible":
-            refusal = RefusalReason.UNDERDETERMINED_APPARATUS
-            execution = ExecutionState.NOT_PROBED
         else:
             refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
             execution = ExecutionState.ATTEMPTED_UNAVAILABLE
@@ -12686,9 +12750,32 @@ def _predict_mass_loss_with_residue(
         if flag.startswith("alpha_assumed:"):
             kind = NoticeKind.ALPHA_ASSUMED
             origin = observation.observation_id
+            applied_value = as_decimal(
+                flag.partition("=")[2].split(";", 1)[0]
+            )
+            policy = NoticePolicy(
+                id="DP-005",
+                version="v1",
+                status="canonical",
+                value=applied_value,
+                units="dimensionless",
+            )
         elif flag.startswith("knob_defaulted:"):
             kind = NoticeKind.KNOB_DEFAULTED
             origin = observation.observation_id
+            raw_value = flag.partition("=")[2].split(None, 1)[0].rstrip(";")
+            applied_value = as_decimal(raw_value)
+            policy = NoticePolicy(
+                id="DP-007",
+                version="v1",
+                status="canonical",
+                value=applied_value,
+                units="m2",
+            )
+        elif flag.startswith("preheat_not_negligible:"):
+            kind = NoticeKind.PREHEAT_NOT_NEGLIGIBLE
+            origin = f"engine:{engine.value}"
+            policy = None
         elif (
             "paper-demonstrated-window" in flag
             or flag == "openimcc_extrapolated"
@@ -12696,9 +12783,11 @@ def _predict_mass_loss_with_residue(
         ):
             kind = NoticeKind.OUT_OF_CERTIFIED_BAND
             origin = f"engine:{engine.value}"
+            policy = None
         elif flag.startswith(("mass_loss_",)):
             kind = NoticeKind.FALLBACK
             origin = f"engine:{engine.value}"
+            policy = None
         else:
             continue
         notices_list.append(
@@ -12707,6 +12796,7 @@ def _predict_mass_loss_with_residue(
                 affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
                 reason=flag,
                 origin=origin,
+                policy=policy,
             )
         )
     notices = tuple(notices_list) + omission_notices(
@@ -17926,7 +18016,7 @@ def _compile_residual_with_lineage(
         return _refused(
             RefusalReason.UNDERDETERMINED_APPARATUS,
             {
-                "reason": "ion_intensity_without_calibration",
+                "reason": "ion intensity without calibration cannot become pressure",
                 "detail": (
                     "raw ion intensity or intensity ratio without a printed "
                     "reduction cannot be converted to pressure/activity without calibration"

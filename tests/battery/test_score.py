@@ -5383,6 +5383,13 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
         if item.kind is NoticeKind.METHOD_ASSUMED
     )
     assert notice.reason.startswith("method_assumed:method_unknown; original_reason=")
+    assert notice.policy is not None
+    assert notice.policy.id == "DP-011"
+    assert notice.policy.version == "v1"
+    assert notice.policy.value == (
+        "infer from printed quantity: equilibrium pressure -> equilibrium comparison; "
+        "flux or mass-loss rate -> HKL with DP-005"
+    )
     assert flagged_strata(residual.notices) == (NoticeKind.METHOD_ASSUMED.value,)
 
     pressure_identities = (
@@ -5431,31 +5438,97 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
     assert untyped_refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
 
 
-def test_richter_langmuir_alpha_still_fails_exposed_area() -> None:
-    geometry = ApparatusGeometry()
+def test_langmuir_alpha_does_not_require_exposed_area() -> None:
     exp = replace(
         F.tabulation_experiment(),
         method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
-        apparatus=Apparatus(geometry=geometry),
+        apparatus=Apparatus(geometry=ApparatusGeometry()),
     )
     gate = underdetermined_apparatus(exp, Quantity.EVAPORATION_COEFFICIENT_ALPHA)
-    assert gate.passed is False
-    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert gate.primary_check == "geometry_determinants"
-    missing = next(
-        c.detail["missing"] for c in gate.checks if c.name == "geometry_determinants"
-    )
-    assert "exposed_area_m2" in missing
+    assert gate.passed
 
-    with_area = replace(
-        exp,
-        apparatus=Apparatus(
-            geometry=ApparatusGeometry(exposed_area_m2=Located(State.of(Decimal("1e-4"))))
-        ),
+
+@pytest.mark.parametrize("quantity", (Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE))
+def test_langmuir_absolute_rate_defaults_area_from_runtime_crucible(quantity) -> None:
+    from simulator.equipment import EquipmentDesigner
+
+    experiment = F.tabulation_experiment()
+    mass = Located(
+        State.of(Value.point_of("0.001")),
+        locator=F.loc(page=123, section="Experimental"),
     )
-    assert underdetermined_apparatus(
-        with_area, Quantity.EVAPORATION_COEFFICIENT_ALPHA
-    ).passed
+    experiment = replace(
+        experiment,
+        method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        sample=replace(experiment.sample, mass_kg=mass),
+        apparatus=Apparatus(geometry=ApparatusGeometry()),
+    )
+    gate = underdetermined_apparatus(experiment, quantity)
+    assert gate.passed, gate
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    expected_area = EquipmentDesigner().size_crucible(0.001).melt_surface_area_m2
+    assert geometry.detail["flag"] == "knob_defaulted"
+    assert geometry.detail["policy_id"] == "DP-007"
+    assert geometry.detail["knob"] == "exposed_area_m2"
+    assert geometry.detail["value"] == pytest.approx(expected_area)
+    assert geometry.detail["units"] == "m2"
+    identity = replace(F.psat_identity("Mg"), quantity=quantity)
+    reference = F.observation(
+        f"langmuir-area-default-{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-8"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    notices = score_mod._unverified_apparatus_notices(reference, experiment, gate)
+    area_notice = next(
+        notice for notice in notices if notice.kind is NoticeKind.KNOB_DEFAULTED
+    )
+    assert area_notice.reason.startswith("knob_defaulted:exposed_area_m2=")
+    assert "original_reason=exposed_area_not_stated" in area_notice.reason
+    assert area_notice.policy is not None
+    assert area_notice.policy.id == "DP-007"
+    assert area_notice.policy.value == Decimal(str(expected_area))
+    assert area_notice.policy.units == "m2"
+    assert score_mod.flagged_strata(notices) == (NoticeKind.KNOB_DEFAULTED.value,)
+
+
+def test_langmuir_absolute_rate_without_area_or_sample_mass_keeps_exact_refusal() -> None:
+    experiment = F.tabulation_experiment()
+    experiment = replace(
+        experiment,
+        method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        sample=replace(experiment.sample, mass_kg=None),
+        apparatus=Apparatus(geometry=ApparatusGeometry()),
+    )
+    gate = underdetermined_apparatus(experiment, Quantity.MASS_LOSS_RATE)
+    assert gate.passed is False
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert geometry.detail["reason"] == (
+        "absolute rate needs an area: no area and no sample mass printed"
+    )
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    (
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+        Quantity.MASS_LOSS_AREAL_DENSITY,
+        Quantity.WALL_DEPOSIT_AREAL_RATE,
+    ),
+)
+def test_langmuir_pressure_and_areal_rates_do_not_require_exposed_area(quantity) -> None:
+    experiment = replace(
+        F.tabulation_experiment(),
+        method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        apparatus=Apparatus(geometry=ApparatusGeometry()),
+    )
+    assert underdetermined_apparatus(experiment, quantity).passed
 
 
 @pytest.mark.parametrize("quantity", (Quantity.P_PARTIAL, Quantity.P_SAT))
@@ -5521,7 +5594,23 @@ def test_uncalibrated_raw_ion_signal_cannot_become_pressure(quantity: Quantity) 
     assert residual.numeric is None
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert residual.refusal.detail["reason"] == "ion_intensity_without_calibration"
+    gate = underdetermined_apparatus(experiment, quantity, observation=reference)
+    assert gate.passed is False
+    calibration = next(
+        check for check in gate.checks if check.name == "kems_calibration"
+    )
+    assert calibration.detail["reason"] == (
+        "ion intensity without calibration cannot become pressure"
+    )
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert geometry.detail["reason"] == (
+        "ion intensity without calibration cannot become pressure"
+    )
+    assert residual.refusal.detail["reason"] == (
+        "ion intensity without calibration cannot become pressure"
+    )
     assert "without a printed reduction cannot be converted to pressure/activity" in (
         residual.refusal.detail["detail"]
     )
@@ -5814,10 +5903,18 @@ def test_kems_activity_with_assumed_effusion_regime_scores_in_flagged_stratum(
         for item in apparatus_notices
         if item.reason.startswith("effusion_regime_assumed:")
     )
-    assert "molecular_effusion_inside_cell" in method_notice.reason
-    assert "vacuum_outside" in method_notice.reason
-    assert "total_pressure=sum_of_partial_pressures" in method_notice.reason
+    assert "molecular effusion inside the cell" in method_notice.reason
+    assert "vacuum outside" in method_notice.reason
+    assert "P_total(cell) = Σ measured partials" in method_notice.reason
+    assert "never 1 atm" in method_notice.reason
     assert "original_reason=" in method_notice.reason
+    assert method_notice.policy is not None
+    assert method_notice.policy.id == "DP-004"
+    assert method_notice.policy.version == "v1"
+    assert method_notice.policy.value == (
+        "molecular effusion inside the cell; vacuum outside; "
+        "P_total(cell) = Σ measured partials; never 1 atm"
+    )
     assert NoticeKind.EFFUSION_REGIME_ASSUMED.value in flagged_strata(
         residual.notices
     )
@@ -6222,6 +6319,13 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
         if notice.kind is NoticeKind.KEMS_CALIBRATION_BY_SOURCE
     )
     assert notice.reason.startswith("kems_calibration_by_source:")
+    assert notice.policy is not None
+    assert notice.policy.id == "DP-012"
+    assert notice.policy.version == "v1"
+    assert notice.policy.status == "canonical"
+    assert notice.policy.value == (
+        "no calibration needed; use the printed reduced value"
+    )
     assert flagged_strata(residual.notices) == (
         NoticeKind.KEMS_CALIBRATION_BY_SOURCE.value,
     )
@@ -8458,6 +8562,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_PREHEAT_NOT_NEGLIGIBLE,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
@@ -8550,6 +8655,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             NoticeKind.METHOD_ASSUMED,
             "equilibrium_comparison_from_printed_quantity",
         ),
+        (
+            NoticeKind.PREHEAT_NOT_NEGLIGIBLE.value,
+            NoticeKind.PREHEAT_NOT_NEGLIGIBLE,
+            "preheat_not_negligible:bound_fraction=0.02",
+        ),
     )
     for stratum, kind, reason in cases:
         notice = Notice(
@@ -8576,6 +8686,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_PREHEAT_NOT_NEGLIGIBLE,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
@@ -8594,6 +8705,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (NoticeKind.KNOB_DEFAULTED, "DP-007 runtime crucible area"),
         (NoticeKind.KEMS_CALIBRATION_BY_SOURCE, "DP-012 author-reduced value"),
         (NoticeKind.METHOD_ASSUMED, "DP-011 inferred from quantity"),
+        (NoticeKind.PREHEAT_NOT_NEGLIGIBLE, "preheat_not_negligible:bound_fraction=0.02"),
         (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
         (NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG, "catalogue_composition:probe"),
         (
@@ -8643,6 +8755,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         "knob_defaulted",
         "kems_calibration_by_source",
         "method_assumed",
+        FLAGGED_STRATUM_PREHEAT_NOT_NEGLIGIBLE,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
@@ -8713,6 +8826,7 @@ def test_notice_policy_schema_pin_is_optional_and_structured() -> None:
         == "kems_calibration_by_source"
     )
     assert NoticeKind.METHOD_ASSUMED.value == "method_assumed"
+    assert NoticeKind.PREHEAT_NOT_NEGLIGIBLE.value == "preheat_not_negligible"
     assert to_plain(notice)["policy"] == {
         "id": "DP-005",
         "version": "v1",
@@ -21518,6 +21632,10 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
     assert ideal.pressure_Pa == result.pressure_Pa
     assert ideal.notice is not None
     assert ideal.notice.kind is NoticeKind.KNOB_DEFAULTED
+    assert ideal.notice.policy is not None
+    assert ideal.notice.policy.id == "DP-006"
+    assert ideal.notice.policy.version == "v1"
+    assert ideal.notice.policy.value == Decimal("1")
     assert ideal.notice.reason.startswith("knob_defaulted:clausing_factor=1")
     assert "real C < 1" in ideal.notice.reason
     assert flagged_strata((ideal.notice,)) == (NoticeKind.KNOB_DEFAULTED.value,)

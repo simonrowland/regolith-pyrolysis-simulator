@@ -572,6 +572,44 @@ def test_missing_or_non_self_similar_area_uses_equipment_default(
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
+def test_defaulted_mass_loss_area_carries_dp007_policy(
+    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
+):
+    from simulator.battery.enums import NoticeKind
+    from simulator.equipment import EquipmentDesigner
+
+    row, experiment = r11_inputs
+    source = deepcopy(fig3_source)
+    source["species"]["Mg"]["observations"] = []
+    original = score_module.load_yaml
+    monkeypatch.setattr(
+        score_module,
+        "load_yaml",
+        lambda path: source if path.name == "kems-010-richter-2007.yaml" else original(path),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+
+    assert prediction.value is not None, prediction.refusal_detail
+    notice = next(
+        item for item in prediction.notices if item.kind is NoticeKind.KNOB_DEFAULTED
+    )
+    default_area = EquipmentDesigner().size_crucible(
+        float(experiment.sample.mass_kg.state.value.point)
+    ).melt_surface_area_m2
+    assert "original_reason=sample_area_endpoints_not_stated" in notice.reason
+    assert notice.policy is not None
+    assert notice.policy.id == "DP-007"
+    assert notice.policy.version == "v1"
+    assert notice.policy.value == Decimal(str(default_area))
+    assert notice.policy.units == "m2"
+    assert NoticeKind.KNOB_DEFAULTED.value in score_module.flagged_strata(
+        prediction.notices
+    )
+
+
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_full_prediction_uses_defaulted_unsourced_channel(
     r11_inputs, prescribed_pressure_engine,
 ):
@@ -636,13 +674,22 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
         return result
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate)
-    with pytest.raises(ResidueInventoryRefusal) as failure:
-        residue.predict_mass_loss_fraction(
-            "openimcc", experiment, temperature_K=2073.15,
-            source_document=fig3_source, observation=row,
-        )
-    assert failure.value.reason == "preheat_bound_not_negligible"
-    bound = json.loads(failure.value.detail)
+    prediction = residue.predict_mass_loss_fraction(
+        "openimcc", experiment, temperature_K=2073.15,
+        source_document=fig3_source, observation=row,
+    )
+    assert prediction.mass_loss_fraction == 0.0
+    bound = json.loads(next(
+        flag.removeprefix("mass_loss_bound:")
+        for flag in prediction.engine_flags
+        if flag.startswith("mass_loss_bound:")
+    ))
+    preheat_flag = next(
+        flag for flag in prediction.engine_flags
+        if flag.startswith("preheat_not_negligible:")
+    )
+    assert "preheat_bound_kg" in preheat_flag
+    assert '"original_reason": "preheat_bound_not_negligible"' in preheat_flag
     assert integrations == [("sphere_constant", 2, 120.0),
                             ("sphere_shrinking", 2, 120.0), ("sphere_shrinking", 2, 120.0)]
     assert bound["bound_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
@@ -667,8 +714,22 @@ def test_real_r11_preheat_bound_is_independent_of_defaulted_alpha(
         deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original(path)
     ))
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert prediction.refusal_detail["reason"] == "preheat_bound_not_negligible"
+    from simulator.battery.enums import NoticeKind
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+    assert any(
+        notice.kind is NoticeKind.PREHEAT_NOT_NEGLIGIBLE
+        and notice.reason.startswith("preheat_not_negligible:")
+        for notice in prediction.notices
+    )
+    assert NoticeKind.PREHEAT_NOT_NEGLIGIBLE.value in (
+        score_module.flagged_strata(prediction.notices)
+    )
+    assert any(
+        notice.kind is NoticeKind.ALPHA_ASSUMED
+        for notice in prediction.notices
+    )
 
 
 def test_pressure_ceiling_uses_net_flux_and_preserves_equilibrium_guard(fig3_source):
@@ -709,7 +770,7 @@ def test_non_negligible_preheat_is_not_mislabelled_missing_alpha():
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
-def test_stated_bulk_uncertainty_refuses_even_below_one_percent(
+def test_stated_bulk_uncertainty_flags_preheat_without_refusing_prediction(
     r11_inputs, prescribed_pressure_engine,
 ):
     from simulator.battery.enums import UncertaintyKind
@@ -722,9 +783,19 @@ def test_stated_bulk_uncertainty_refuses_even_below_one_percent(
         value=Decimal("1e-9"), basis="absolute_fraction_of_initial_mass",
     ))
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    assert prediction.value is None
-    assert prediction.refusal_detail["reason"] == "preheat_bound_not_negligible"
-    detail = json.loads(prediction.refusal_detail["detail"])
+    from simulator.battery.enums import NoticeKind
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+    assert any(
+        notice.kind is NoticeKind.PREHEAT_NOT_NEGLIGIBLE
+        for notice in prediction.notices
+    )
+    detail = json.loads(next(
+        notice.reason.removeprefix("mass_loss_bound:")
+        for notice in prediction.notices
+        if notice.reason.startswith("mass_loss_bound:")
+    ))
     assert detail["fraction_clause_passed"] is True
     assert detail["uncertainty_clause_passed"] is False
 
