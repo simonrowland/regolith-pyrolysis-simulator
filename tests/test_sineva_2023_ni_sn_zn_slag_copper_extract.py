@@ -43,6 +43,18 @@ def _observations(document: dict) -> dict[str, dict]:
     }
 
 
+def _table_ii_oxygen_metal_rows(document: dict) -> list[dict]:
+    """Table II Metal rows printed under the shared O/SiO2 column's O heading (one source selector)."""
+    return [
+        row
+        for group in document["species"].values()
+        for row in group["observations"]
+        if row["locator"].get("table") == "II"
+        and row.get("phase_as_published") == "Metal"
+        and row["locator"].get("column") == "O"
+    ]
+
+
 def _assert_render_pins(document: dict) -> None:
     observations = _observations(document)
     for observation_id, (formula, number, page, oxygen) in RENDER_PINS.items():
@@ -63,15 +75,9 @@ def _assert_render_pins(document: dict) -> None:
     exp31 = observations["sineva23_tii_exp31_metal_sio2"]
     assert exp31["uncertainty"]["reported_status"] == "printed"
     assert exp31["uncertainty"]["as_published"] == "± 0.00"
-    table_ii_metals = [
-        (species, row)
-        for species, group in document["species"].items()
-        for row in group["observations"]
-        if row["locator"].get("table") == "II"
-        and row.get("phase_as_published") == "Metal"
-        and row["locator"].get("column") == "O"
-    ]
+    table_ii_metals = _table_ii_oxygen_metal_rows(document)
     assert len(table_ii_metals) == 36
+    assert all(row in document["species"]["O"]["observations"] for row in table_ii_metals)
     assert not any(
         row["locator"].get("table") == "II"
         and row.get("phase_as_published") == "Metal"
@@ -79,8 +85,7 @@ def _assert_render_pins(document: dict) -> None:
         for group in document["species"].values()
         for row in group["observations"]
     )
-    for species, row in table_ii_metals:
-        assert species == "O"
+    for row in table_ii_metals:
         assert row["locator"]["column"] == "O"
         assert row["values"]["component_as_published"] == "O"
         assert row["values"]["basis_as_published"] == "O mass percent in Metal phase"
@@ -194,15 +199,7 @@ def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> No
             assert condition.state.value == expected
             assert condition.locator is not None
 
-    table_ii_oxygen_metals = [
-        row
-        for row in observations.values()
-        if row["locator"].get("table") == "II"
-        and row.get("phase_as_published") == "Metal"
-        and row["locator"].get("column") == "O"
-    ]
-    assert len(table_ii_oxygen_metals) == 36
-    for source_row in table_ii_oxygen_metals:
+    for source_row in _table_ii_oxygen_metal_rows(document):
         migrated_row = by_id[source_row["observation_id"]]
         assert migrated_row.identity.species.formula == "O"
         assert migrated_row.value.point == Decimal(str(source_row["values"]["value"]))
