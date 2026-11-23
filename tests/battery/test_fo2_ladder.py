@@ -1036,6 +1036,10 @@ def test_graphite_container_uses_closed_cco_at_printed_or_resolved_pressure() ->
         replace(identity, total_pressure_Pa=pressure[1]),
         Decimal("1"),
     )
+    observation = replace(observation, point_conditions={
+        field: control for field, control in observation.point_conditions.items()
+        if field != "total_pressure_Pa"
+    })
     oxygen = oxygen_condition(unknown_pressure, bench, observation)
     assert oxygen.selected is not None
     assert oxygen.selected.route == "container_graphite_c_co_buffer"
@@ -1082,6 +1086,7 @@ def test_non_multivalent_row_without_printed_fo2_omits_oxygen() -> None:
 
 def test_previously_refused_engines_now_predict(monkeypatch) -> None:
     seen: dict[str, float] = {}
+    physical_pressures: dict[str, float] = {}
 
     def _open(name):
         return type("Handle", (), {
@@ -1090,8 +1095,9 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
             "unavailable_reason": None,
         })()
 
-    def _cell(handle, _pot, *, po2, **_kwargs):
+    def _cell(handle, _pot, *, po2, physical_pressure_bar, **_kwargs):
         seen[str(handle.name)] = po2.po2_bar
+        physical_pressures[str(handle.name)] = physical_pressure_bar
         return type("Cell", (), {
             "status": "ok",
             "refusal_reason": None,
@@ -1114,23 +1120,18 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _cell,
     )
-    experiment, bench, observation = _feo_case()
-    experiment = replace(
-        experiment, method=State.of(MethodToken.TABULATION),
-        pressure_environment=replace(
-            experiment.pressure_environment,
-            total_pressure_Pa=replace(
-                experiment.pressure_environment.total_pressure_Pa,
-                state=State.unknown("total pressure not printed"),
-            ),
-        ),
+    low, high = Decimal("1"), Decimal("10")
+    experiment, bench, observation = _feo_case(
+        pressure=Value(ValueKind.INTERVAL, interval_low=low, interval_high=high),
     )
+    experiment = replace(experiment, method=State.of(MethodToken.TABULATION))
     predictions = []
     for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
         predictions.append(predict_with_engine(
             engine, observation, experiment=experiment, bench=bench, isolated=False,
         ))
     assert set(seen) == {"alphamelts", "thermoengine", "openimcc"}
+    assert physical_pressures == dict.fromkeys(seen, 3.1622776601683795e-5)
     assert len(set(seen.values())) == 1
     assert next(iter(seen.values())) is not None
     assert all(item.value is not None for item in predictions)
@@ -1154,6 +1155,14 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
     )
     assert internal.value is not None
     assert internal.refusal_reason is None
+    for prediction in (*predictions, internal):
+        assert "total_pressure_interval_nominal" in flagged_strata(prediction.notices)
+        notice = next(n for n in prediction.notices if n.kind is NoticeKind.TOTAL_PRESSURE_INTERVAL_NOMINAL)
+        assert notice.policy.id == "DP-114"
+        assert notice.policy.status == "proposed"
+        assert "[1, 10] Pa" in notice.reason
+    pressure = predictions[0].identity.total_pressure_Pa.value
+    assert pressure == ApproxPressure(Decimal("3.162277660168379331998893544"), low, high, BandBasis.PRINTED)
     assert any(
         notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
         and notice.policy is not None
@@ -1161,6 +1170,33 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
         and "log10(fO2/bar)=-0.672064092852" in notice.reason
         for notice in internal.notices
     )
+
+
+@pytest.mark.parametrize(("low", "high"), (
+    ("0", "10"), ("-1", "10"), ("10", "1"), ("1", "Infinity"),
+), ids=("zero", "negative", "inverted", "nonfinite"))
+def test_invalid_total_pressure_interval_refuses_before_adapter(monkeypatch, low, high):
+    recorded = Value(ValueKind.INTERVAL, interval_low=Decimal("1"), interval_high=Decimal("10"))
+    # Test the scorer's defense independently of Value's finite-edge validation.
+    object.__setattr__(recorded, "interval_low", Decimal(low))
+    object.__setattr__(recorded, "interval_high", Decimal(high))
+    experiment, bench, observation = _feo_case()
+    experiment = replace(
+        experiment, method=State.of(MethodToken.TABULATION),
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=F.located(recorded),
+        ),
+    )
+
+    def unexpected(*_args, **_kwargs):
+        pytest.fail("invalid recorded pressure reached the adapter")
+
+    monkeypatch.setattr("simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine", unexpected)
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, bench=bench, isolated=False,
+    )
+    assert prediction.refusal_detail["reason"] == "total_pressure_invalid"
+    assert "total_pressure_interval_nominal" not in flagged_strata(prediction.notices)
 
 
 def test_tier_notice_reaches_the_residual() -> None:

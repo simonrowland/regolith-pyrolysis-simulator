@@ -316,6 +316,7 @@ class NoticeKind(StrEnum):
     )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
+    TOTAL_PRESSURE_INTERVAL_NOMINAL = "total_pressure_interval_nominal"
     TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     METHOD_IMPLIED = "method_implied"
     ASSUMED_FO2 = "assumed_fo2"
@@ -427,6 +428,7 @@ class NoticeKind(StrEnum):
 DEFAULT_POLICY_NOTICE_KINDS = frozenset(
     {
         NoticeKind.ASSUMED_PRESSURE,
+        NoticeKind.TOTAL_PRESSURE_INTERVAL_NOMINAL,
         NoticeKind.METHOD_IMPLIED,
         NoticeKind.EFFUSION_REGIME_ASSUMED,
         NoticeKind.ALPHA_ASSUMED,

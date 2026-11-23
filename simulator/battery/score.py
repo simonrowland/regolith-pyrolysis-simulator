@@ -235,6 +235,7 @@ from simulator.battery.records import (
     Work,
     _is_source_internally_inconsistent,
     ApproxPressure,
+    BandBasis,
     approximate_pressure_band_reason,
     as_decimal,
     identity_pressure_state,
@@ -9365,6 +9366,11 @@ def _score_pressure_state(
     pressure = identity.total_pressure_Pa
     missing = pressure is None or pressure.is_unknown or pressure.is_not_applicable
     if missing and observation is not None:
+        located = (observation.point_conditions or {}).get("total_pressure_Pa")
+        if isinstance(located, Located) and located.inference is None and located.state.is_value:
+            raw = located.state.value
+            if isinstance(raw, Value) and raw.kind is ValueKind.INTERVAL:
+                return located.state
         point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
         if point_pressure is not None:
             return State.of(point_pressure)
@@ -9538,8 +9544,23 @@ def _resolve_score_total_pressure(
         return None, None, None, None
 
     pressure_pa = _score_pressure_state(identity, observation, experiment)
+    pressure_notice = None
+    recorded = pressure_pa.value if pressure_pa is not None and pressure_pa.is_value else None
+    if isinstance(recorded, Value) and recorded.kind is ValueKind.INTERVAL:
+        lo, hi = recorded.interval_low, recorded.interval_high
+        try:
+            nominal = resolve("DP-114", low=lo, high=hi)
+            pressure_pa = State.of(ApproxPressure(nominal.value, lo, hi, BandBasis.PRINTED))
+        except (ValueError, ArithmeticError):
+            return 0.0, pressure_pa, None, "total_pressure_invalid"
+        pressure_notice = _default_policy_notice(
+            nominal,
+            quantity,
+            f"DP-114 total_pressure_Pa={{value}}; printed band [{lo}, {hi}] Pa",
+            origin="score:total_pressure",
+        )
     pressure_bar, pressure_invalid = _score_pressure_bar(pressure_pa)
-    if pressure_invalid:
+    if pressure_invalid or (pressure_notice is not None and pressure_bar == 0):
         return 0.0, pressure_pa, None, "total_pressure_invalid"
 
     original_reason = _original_pressure_reason(identity, observation, experiment)
@@ -9550,13 +9571,13 @@ def _resolve_score_total_pressure(
     )
     if _closed_system_experiment(experiment):
         if pressure_bar is not None:
-            return pressure_bar, pressure_pa, None, None
+            return pressure_bar, pressure_pa, pressure_notice, None
         if engine is not None and (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS:
             return None, None, None, None
         return None, None, None, "closed_system_engine_capability_gap"
 
     if pressure_bar is not None:
-        return pressure_bar, pressure_pa, None, None
+        return pressure_bar, pressure_pa, pressure_notice, None
 
     from simulator.battery.waypoints import _is_vacuum_pressure_method
 
@@ -10000,7 +10021,7 @@ def _predict_distin_closed_feo_activity(
 def _redox_input_view(
     observation: Observation, quantity: Quantity,
     experiment: Experiment | None,
-) -> tuple[Observation, tuple[Notice, ...]]:
+) -> tuple[Observation, Experiment | None, tuple[Notice, ...]]:
     return independent_redox_conditions(
         observation,
         quantity=quantity,
@@ -10096,7 +10117,7 @@ def _predict_redox(
         return refused(circular[0], circular[1])
 
     quantity = quantity_token(identity) or Quantity.FE3_FE2_RATIO
-    observation, exclusion_notices = _redox_input_view(observation, quantity, experiment)
+    observation, experiment, exclusion_notices = _redox_input_view(observation, quantity, experiment)
     material_notices.extend(exclusion_notices)
     identity = observation.identity
     material = _fe_redox_material(observation, identity, experiment)
@@ -14792,8 +14813,8 @@ def _predict_with_engine(
     ):
         from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
 
-        input_view, exclusion_notices = _redox_input_view(observation, quantity, experiment)
-        value = imposed_oxygen_pressure_pa(experiment, bench, input_view)
+        input_view, run_view, exclusion_notices = _redox_input_view(observation, quantity, experiment)
+        value = imposed_oxygen_pressure_pa(run_view, bench, input_view)
         if value is not None:
             return EnginePrediction(
                 engine=engine,

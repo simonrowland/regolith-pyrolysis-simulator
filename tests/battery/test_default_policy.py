@@ -36,6 +36,7 @@ from tests.battery import factories as F
 
 EXPECTED_POLICY_FLAGS = {
     "assumed_pressure",
+    "total_pressure_interval_nominal",
     "method_implied",
     "effusion_regime_assumed",
     "alpha_assumed",
@@ -59,6 +60,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         *(f"DP-{number:03d}" for number in range(1, 20)),
         "DP-101",
         "DP-108",
+        "DP-114",
     }
 
     required = {
@@ -101,6 +103,9 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         elif policy_id == "DP-108":
             assert entry["status"] == "proposed"
             assert entry["flag"] == "assumed_pressure"
+        elif policy_id == "DP-114":
+            assert entry["status"] == "proposed"
+            assert entry["flag"] == "total_pressure_interval_nominal"
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}

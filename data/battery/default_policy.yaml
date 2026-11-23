@@ -372,3 +372,20 @@ policies:
         units: bar
         condition: "unprinted total pressure"
         evidence: "1f9d41322; scorer's existing silent 1e-6 bar fallback"
+  - id: DP-114
+    condition: "total pressure recorded as a positive interval [lo, hi]"
+    formula: "nominal = sqrt(lo * hi); band = [lo, hi]"
+    formula_owner: "simulator.battery.default_policy.resolve"
+    units: Pa
+    physical_basis: "log-scale midpoint of the reported pressure interval"
+    bias: "the reported band does not identify the exact experimental pressure"
+    flag: total_pressure_interval_nominal
+    ruling: "t-1923 round 10"
+    version: 1
+    status: proposed
+    proposed_by: controller
+    proposed_at: "2026-11-23"
+    evidence: "ror-cvpress9x1123 positive 1–10 Pa interval probe"
+    canonized_by: null
+    canonized_at: null
+    history: []
