@@ -478,6 +478,12 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     assert composition.amount_basis is AmountBasis.MASS_PERCENT
     assert sum(dict(composition.components).values()).quantize(Decimal("0.000001")) == 100
     assert composition.input_provenance is None
+    a3_metal = by_id["henao_2001_t1_A-3_alloy_Fe"]
+    assert a3_metal.identity.composition.is_value
+    assert (
+        sum(dict(a3_metal.identity.composition.value.components).values())
+        == Decimal("101.9")
+    ), "A-3's accepted 101.9 wt% map must still reach the alloy capability gate"
     renormalization = next(
         notice
         for notice in a1_metal.notices
@@ -552,11 +558,23 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
         prediction.refusal_reason
         is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
         for prediction in metal_engine_outcomes
-    )
+    ), "all original metal-alloy rows must receive the adapter capability refusal"
     assert all(
         prediction.execution.state.value == "unsupported"
         for prediction in metal_engine_outcomes
     )
+    missing_alloy_composition = replace(
+        a1_metal,
+        identity=replace(
+            a1_metal.identity,
+            composition=State.unknown("composition removed for input diagnostic pin"),
+        ),
+    )
+    assert _predict_with_engine(
+        Engine.THERMOENGINE,
+        missing_alloy_composition,
+        experiment=result.experiments[missing_alloy_composition.experiment_id],
+    ).refusal_detail == {"reason": "missing_input", "input": "composition"}
     engine_ready_metal = replace(
         a1_metal,
         identity=replace(

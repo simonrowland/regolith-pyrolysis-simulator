@@ -132,7 +132,9 @@ def test_isolated_migration_preserves_phase_conditions_and_printed_values(tmp_pa
         identity = observation.identity
         assert identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         assert observation.value.point == point
-        assert identity.species.phase.value is phase
+        assert identity.species.phase.value is phase, (
+            f"{observation_id}: explicit source phase must outrank phase role"
+        )
         assert identity.phase_role.value is role
         assert identity.temperature_K.value == celsius_to_kelvin(Decimal(temperature))
         assert identity.composition.value is None

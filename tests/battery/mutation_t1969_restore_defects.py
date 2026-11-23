@@ -1,4 +1,4 @@
-"""Restore one t-1969 regression at a time and require its full regression test to fail.
+"""Restore one t-1969 regression and require its expected regression to fail.
 
 Run this only in a disposable Studio test tree, with the required native-library,
 matplotlib, and MPI temp-directory environment set before starting Python.
@@ -19,6 +19,30 @@ MIGRATE = ROOT / "simulator/battery/migrate.py"
 PROVENANCE = ROOT / "simulator/battery/input_provenance.py"
 SCORE = ROOT / "simulator/battery/score.py"
 HENAO_TEST = ROOT / "tests/test_henao_2001_ni_cr_mn_co_cu_slag_distribution_extract.py"
+ABDEYAZDAN_TEST = (
+    ROOT / "tests/test_abdeyazdan_2026_na_sn_si_phase_thermodynamics_extract.py"
+)
+
+TEST_BY_MUTATION = {
+    "phase-label": ABDEYAZDAN_TEST,
+    "alloy-capability": HENAO_TEST,
+    "test-local": HENAO_TEST,
+    "locator-row": HENAO_TEST,
+}
+EXPECTED_FAILURE = {
+    "phase-label": "explicit source phase must outrank phase role",
+    "alloy-capability": (
+        "all original metal-alloy rows must receive the adapter capability refusal"
+    ),
+    "test-local": "UnboundLocalError",
+    "locator-row": "AttributeError: 'Locator' object has no attribute 'row'",
+}
+EXPECTED_NODE = {
+    "phase-label": "test_isolated_migration_preserves_phase_conditions_and_printed_values",
+    "alloy-capability": "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+    "test-local": "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+    "locator-row": "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+}
 
 
 def replace_once(path: Path, old: str, new: str) -> None:
@@ -32,7 +56,7 @@ def restore(mutation: str) -> None:
     if mutation == "phase-label":
         replace_once(
             MIGRATE,
-            "            if phase_role_token is not None:\n"
+            "            if phase_role_token is not None and phase.is_unknown:\n"
             "                phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])\n",
             "            if phase_raw is None or phase_raw == \"\":\n"
             "                assert phase_role_token is not None\n"
@@ -41,8 +65,14 @@ def restore(mutation: str) -> None:
     elif mutation == "alloy-capability":
         replace_once(
             SCORE,
-            "    if role is PhaseRole.METAL and not preserve_input_diagnostic:\n",
-            "    if False and role is PhaseRole.METAL and not preserve_input_diagnostic:\n",
+            "    if role is PhaseRole.METAL:\n        from simulator.melt_backend.base import battery_adapter_class\n",
+            "    if role is PhaseRole.METAL and not (\n"
+            "        composition.amount_basis is AmountBasis.MASS_PERCENT\n"
+            "        and sum(\n"
+            "            (amount for _name, amount in composition.components), Decimal(0)\n"
+            "        ) != Decimal(\"100\")\n"
+            "    ):\n"
+            "        from simulator.melt_backend.base import battery_adapter_class\n",
         )
     elif mutation == "test-local":
         census = (
@@ -90,25 +120,65 @@ def main() -> int:
         backups = {path: Path(scratch, path.name) for path in touched}
         for path, backup in backups.items():
             backup.write_bytes(path.read_bytes())
-        try:
-            restore(args.mutation)
-            result = subprocess.run(
-                [
-                    sys.executable,
-                    "-m",
-                    "pytest",
-                    "-q",
-                    "-n",
-                    "4",
-                    "-p",
-                    "no:cacheprovider",
-                    str(HENAO_TEST),
-                ],
+
+        test_path = TEST_BY_MUTATION[args.mutation]
+        command = [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-n",
+            "4",
+            "-p",
+            "no:cacheprovider",
+            str(test_path),
+        ]
+
+        def run_test() -> subprocess.CompletedProcess[str]:
+            return subprocess.run(
+                command,
                 cwd=ROOT,
                 check=False,
+                capture_output=True,
+                text=True,
             )
+
+        try:
+            baseline = run_test()
+            if baseline.returncode != 0:
+                print(
+                    f"unmodified regression test failed for {args.mutation}:\n"
+                    f"{baseline.stdout}{baseline.stderr}",
+                    file=sys.stderr,
+                )
+                return 1
+            print(f"unmodified regression test passed: {test_path.name}")
+
+            restore(args.mutation)
+            result = run_test()
+            output = result.stdout + result.stderr
             if result.returncode == 0:
                 print(f"mutation survived: {args.mutation}", file=sys.stderr)
+                return 1
+            expected = EXPECTED_FAILURE[args.mutation]
+            failures = [
+                line for line in output.splitlines() if line.startswith("FAILED ")
+            ]
+            errors = [
+                line for line in output.splitlines() if line.startswith("ERROR ")
+            ]
+            if (
+                len(failures) != 1
+                or errors
+                or EXPECTED_NODE[args.mutation] not in failures[0]
+                or expected not in failures[0]
+            ):
+                print(
+                    f"mutation failed for an unexpected reason: {args.mutation}; "
+                    f"expected only {EXPECTED_NODE[args.mutation]} to fail with "
+                    f"{expected!r}\n{output}",
+                    file=sys.stderr,
+                )
                 return 1
             print(f"mutation detected: {args.mutation}")
             return 0

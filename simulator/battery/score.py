@@ -12288,6 +12288,17 @@ def _predict_phase_row(
             identity=identity,
         )
 
+    def mass_percent_basis_refusal() -> EnginePrediction:
+        return refused(
+            RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+            {
+                "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                "identity_amount_basis": AmountBasis.MASS_PERCENT.value,
+                "engine_basis": "mole_fraction or mol_inventory",
+                "detail": "printed mass-percent phase identity cannot be read as moles",
+            },
+        )
+
     solute = _capacity_solute(quantity)
     if solute is not None and not _adapter_models_dissolved_solute(engine, solute):
         return refused(
@@ -12320,36 +12331,6 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "phase_role"},
             execution=ExecutionState.NOT_PROBED,
         )
-    composition_state = identity.composition
-    composition = (
-        composition_state.value
-        if composition_state is not None
-        and composition_state.is_value
-        and isinstance(composition_state.value, Composition)
-        else None
-    )
-    preserve_input_diagnostic = composition is not None and (
-        composition.basis == SLAG_METAL_CHARGE_BASIS
-        or (
-            composition.amount_basis is AmountBasis.MASS_PERCENT
-            and sum((amount for _name, amount in composition.components), Decimal(0))
-            != Decimal("100")
-        )
-    )
-    if role is PhaseRole.METAL and not preserve_input_diagnostic:
-        from simulator.melt_backend.base import battery_adapter_class
-
-        adapter = battery_adapter_class(engine.value)
-        if adapter is None or not adapter().capabilities().get("metal_alloy", False):
-            return refused(
-                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
-                {
-                    "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
-                    "engine": engine.value,
-                    "phase_role": role.value,
-                    "detail": "adapter does not declare metal-alloy phase support",
-                },
-            )
     counter = _phase_role_value(identity, "counter_phase_role")
     if quantity is Quantity.DISTRIBUTION_RATIO and counter is None:
         return refused(
@@ -12440,23 +12421,17 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    composition = composition_state.value
+    if not composition.components:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+        )
     metal_charge = _unaccepted_metal_charge(engine, composition_state.value)
     if metal_charge is not None:
         reason, detail = metal_charge
         return refused(reason, detail)
-    if (
-        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
-    ):
-        return refused(
-            RefusalReason.COEFFICIENT_BASIS_MISMATCH,
-            {
-                "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
-                "identity_amount_basis": AmountBasis.MASS_PERCENT.value,
-                "engine_basis": "mole_fraction or mol_inventory",
-                "detail": "printed mass-percent phase identity cannot be read as moles",
-            },
-        )
     wt = composition_wt_pct(composition_state.value)
     if not wt:
         return refused(
@@ -12464,6 +12439,34 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    if (
+        role is PhaseRole.METAL
+        and composition.amount_basis is AmountBasis.MASS_PERCENT
+        and len(composition.components) == 1
+        and composition.components[0][1] < Decimal("1")
+    ):
+        # A sub-one singleton cannot be a complete mass-percent alloy map;
+        # keep the input-basis diagnosis ahead of the alloy capability refusal.
+        return mass_percent_basis_refusal()
+    if role is PhaseRole.METAL:
+        from simulator.melt_backend.base import battery_adapter_class
+
+        adapter = battery_adapter_class(engine.value)
+        if adapter is None or not adapter().capabilities().get("metal_alloy", False):
+            return refused(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+                {
+                    "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                    "engine": engine.value,
+                    "phase_role": role.value,
+                    "detail": "adapter does not declare metal-alloy phase support",
+                },
+            )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        return mass_percent_basis_refusal()
     if rewrite is not None and quantity is not None:
         scored_formula = (
             identity.species.formula if identity.species is not None else ""
