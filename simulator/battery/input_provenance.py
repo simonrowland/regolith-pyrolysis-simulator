@@ -8,7 +8,9 @@ Copies left elsewhere, on purpose:
 - feedstock_composition.FEOT_FROM_FE2O3 is 2*71.844/159.687. The d-323 input
   construction uses the ruling's rounded masses, 2*M_FeO/M_Fe2O3 = 143.69/159.69.
 - catalogue proxies stay provenance-None. The echo guard does not invent a token.
-- element_wt_percent rows are a different bulk and are not stamped here.
+- Raw element_wt_percent rows stay separate and are not stamped here. An
+  existing stoichiometric-oxide projection attached to an analyzed liquid row
+  can be used only as the flagged liquid input for a different phase.
 """
 
 from __future__ import annotations
@@ -18,14 +20,27 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal
 
+from simulator.battery.decimal_tokens import _decimal_rounding_half_width
 from simulator.battery.enums import (
+    AmountBasis,
     NoticeKind,
+    Phase,
     PhaseRole,
     Quantity,
     RefusalReason,
+    ValueKind,
+    effective_phase_basis,
 )
 from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.records import Composition, Experiment, Locator, Notice, Observation
+from simulator.battery.records import (
+    Composition,
+    Experiment,
+    Located,
+    Locator,
+    Notice,
+    Observation,
+    phase_token,
+)
 from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
 
 SCORED_PHASE_ANALYSIS = "scored_phase_analysis"
@@ -33,6 +48,12 @@ PRINTED_STARTING_BULK = "printed_starting_bulk"
 NAMED_MATERIAL_MIXTURE = "named_material_mixture_of_printed_starts"
 ANALYSED_MELT_MINUS_SCORED = "analysed_melt_minus_scored"
 SAME_RUN_INITIAL_ANALYSED_MELT = "same_run_initial_analysed_melt"
+SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE = (
+    "same_run_analysed_liquid_for_other_phase"
+)
+_PHASE_COMPOSITION_MISSING_ORIGINAL_REASON = (
+    "identity_incomplete:missing_input:composition"
+)
 
 INPUT_PROVENANCE_TOKENS = frozenset(
     {
@@ -41,6 +62,7 @@ INPUT_PROVENANCE_TOKENS = frozenset(
         NAMED_MATERIAL_MIXTURE,
         ANALYSED_MELT_MINUS_SCORED,
         SAME_RUN_INITIAL_ANALYSED_MELT,
+        SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
     }
 )
 
@@ -264,6 +286,338 @@ def _component_names(composition: Composition) -> set[str]:
     return {name for name, _amount in composition.components}
 
 
+@dataclass(frozen=True)
+class _PhaseCompositionInput:
+    composition: Composition | None = None
+    notice: Notice | None = None
+    refusal_reason: RefusalReason | None = None
+    refusal_detail: dict[str, object] | None = None
+
+
+def _phase_row_composition_input(
+    observation: Observation,
+    experiment: Experiment | None,
+    siblings: Sequence[Observation],
+) -> _PhaseCompositionInput:
+    """Choose a printed run input, or identify a liquid self-echo.
+
+    A typed starting bulk wins. Without one, a complete analysed liquid can
+    supply another phase in the same experiment. Scalar wt% rows need their
+    printed sum to match at the precision shown before they can form a vector.
+    """
+
+    identity = observation.identity
+    if (
+        not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        or (identity.composition is not None and identity.composition.is_value)
+    ):
+        return _PhaseCompositionInput()
+
+    rows = {row.observation_id: row for row in siblings}
+    rows[observation.observation_id] = observation
+
+    def temperature(row_identity: Identity) -> Decimal | None:
+        state = row_identity.temperature_K
+        value = state.value if state is not None and state.is_value else None
+        return value if isinstance(value, Decimal) and value.is_finite() else None
+
+    def phase(row_identity: Identity) -> Phase | None:
+        return phase_token(row_identity.species) if row_identity.species is not None else None
+
+    def liquid(row_identity: Identity) -> bool:
+        role = _phase_role_of(row_identity)
+        return role in _MELT_ROLES or (
+            role is None and phase(row_identity) in {Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
+        )
+
+    def other_phase(row_identity: Identity) -> bool:
+        role = _phase_role_of(row_identity)
+        return role in {PhaseRole.METAL, PhaseRole.MATTE} or (
+            role is None and phase(row_identity) in {Phase.CR, Phase.G}
+        )
+
+    def composition_sources(row: Observation) -> tuple[tuple[Composition, str], ...]:
+        found: list[tuple[Composition, str]] = []
+        row_identity = row.identity
+        if isinstance(row_identity, Identity):
+            state = row_identity.composition
+            if (
+                state is not None
+                and state.is_value
+                and isinstance(state.value, Composition)
+            ):
+                found.append((state.value, f"{row.observation_id}:identity.composition"))
+        point = (row.point_conditions or {}).get("composition")
+        if (
+            isinstance(point, Located)
+            and point.state.is_value
+            and isinstance(point.state.value, Composition)
+            and (
+                point.inference is None
+                or point.inference.relation
+                in {
+                    "wt_pct_to_mole_fraction",
+                    "element_wt_percent_stoichiometric_oxide_projection",
+                }
+            )
+        ):
+            found.append((point.state.value, f"{row.observation_id}:point_conditions.composition"))
+        return tuple(found)
+
+    def signature(composition: Composition) -> tuple[object, ...]:
+        return (
+            composition.basis,
+            tuple(sorted(composition.components)),
+            composition.amount_basis,
+            composition.proxy_flag,
+            composition.proxy_source,
+            composition.analysis_selection_rule,
+        )
+
+    def refusal(reason: str, sources: Sequence[str]) -> _PhaseCompositionInput:
+        return _PhaseCompositionInput(
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={"reason": reason, "sources": sorted(sources)},
+        )
+
+    start_candidates: dict[tuple[object, ...], tuple[Composition, str]] = {}
+    if experiment is not None:
+        initial = experiment.sample.initial_composition
+        if (
+            initial is not None
+            and initial.state.is_value
+            and isinstance(initial.state.value, Composition)
+            and initial.state.value.proxy_flag
+            != NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value
+            and initial.state.value.input_provenance
+            in {None, PRINTED_STARTING_BULK, NAMED_MATERIAL_MIXTURE}
+        ):
+            composition = initial.state.value
+            if composition.input_provenance is None:
+                composition = composition_with_provenance(
+                    composition, PRINTED_STARTING_BULK
+                )
+            start_candidates[signature(composition)] = (
+                composition,
+                "experiment.sample.initial_composition",
+            )
+    for row in rows.values():
+        if row.experiment_id != observation.experiment_id:
+            continue
+        for composition, source in composition_sources(row):
+            if composition.input_provenance not in _PRINTED_BULK_TOKENS:
+                continue
+            start_candidates[signature(composition)] = (composition, source)
+    if len(start_candidates) > 1:
+        return refusal("run_start_composition_ambiguous", [source for _, source in start_candidates.values()])
+    if start_candidates:
+        composition, source = next(iter(start_candidates.values()))
+        return _PhaseCompositionInput(
+            composition=composition,
+            notice=Notice(
+                kind=NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
+                affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+                reason=(
+                    f"{NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS.value}:"
+                    f"original_reason={_PHASE_COMPOSITION_MISSING_ORIGINAL_REASON};"
+                    f"source={source}"
+                ),
+                origin=observation.observation_id,
+            ),
+        )
+
+    target_temperature = temperature(identity)
+    target_role = _phase_role_of(identity)
+    target_phase = phase(identity)
+    target_is_liquid = liquid(identity)
+    target_is_other_phase = other_phase(identity)
+    liquid_rows = tuple(
+        row
+        for row in rows.values()
+        if row.observation_id != observation.observation_id
+        and row.experiment_id == observation.experiment_id
+        and isinstance(row.identity, Identity)
+        and quantity_token(row.identity) is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and liquid(row.identity)
+        and target_temperature is not None
+        and temperature(row.identity) == target_temperature
+    )
+
+    # The liquid analysis is an explicitly flagged proxy, not a run bulk
+    # mass-balance claim. It is only offered to predict a different phase in
+    # this run; the liquid's own rows remain the SC-458 self-echo. A full
+    # vector is the least lossy representation, while a d-323 residual vector
+    # is not the whole liquid and is ineligible.
+    full_analyses: dict[tuple[object, ...], tuple[Composition, str]] = {}
+    for row in liquid_rows:
+        for composition, source in composition_sources(row):
+            if (
+                composition.proxy_flag
+                == NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value
+                or composition.input_provenance
+                not in {
+                    None,
+                    SCORED_PHASE_ANALYSIS,
+                    SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
+                }
+            ):
+                continue
+            analysed = composition_with_provenance(
+                composition, SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE
+            )
+            full_analyses[signature(analysed)] = (analysed, source)
+
+    analysis_groups: dict[
+        tuple[PhaseRole | None, Phase | None, str], list[Observation]
+    ] = {}
+    for row in rows.values():
+        row_identity = row.identity
+        if (
+            row.experiment_id != observation.experiment_id
+            or not isinstance(row_identity, Identity)
+            or quantity_token(row_identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            or not liquid(row_identity)
+            or target_temperature is None
+            or temperature(row_identity) != target_temperature
+            or effective_phase_basis(
+                row_identity.subtype.value
+                if row_identity.subtype is not None and row_identity.subtype.is_value
+                else None
+            )
+            != "wt_percent"
+        ):
+            continue
+        role = _phase_role_of(row_identity)
+        row_phase = phase(row_identity)
+        subtype = (
+            str(row_identity.subtype.value)
+            if row_identity.subtype is not None and row_identity.subtype.is_value
+            else ""
+        )
+        analysis_groups.setdefault((role, row_phase, subtype), []).append(row)
+
+    assembled: dict[tuple[object, ...], tuple[Composition, str]] = {}
+    for (_role, _phase, _subtype), group in analysis_groups.items():
+        weights: dict[str, Decimal] = {}
+        printed_sums: set[Decimal] = set()
+        complete = True
+        for row in group:
+            row_identity = row.identity
+            assert isinstance(row_identity, Identity)
+            formula = row_identity.species.formula if row_identity.species is not None else ""
+            value = row.value
+            amount = value.point if value.kind is ValueKind.POINT else None
+            printed_sum_value = (row.point_conditions or {}).get("printed_sum")
+            printed_sum_state = (
+                printed_sum_value.state
+                if isinstance(printed_sum_value, Located)
+                else None
+            )
+            raw_printed_sum = (
+                printed_sum_state.value
+                if printed_sum_state is not None and printed_sum_state.is_value
+                else None
+            )
+            try:
+                printed_sum = Decimal(str(raw_printed_sum))
+            except (ArithmeticError, TypeError, ValueError):
+                complete = False
+                break
+            if (
+                not formula
+                or amount is None
+                or not amount.is_finite()
+                or amount < 0
+                or not printed_sum.is_finite()
+                or formula in weights
+            ):
+                complete = False
+                break
+            weights[formula] = amount
+            printed_sums.add(printed_sum)
+        if (
+            not complete
+            or len(printed_sums) != 1
+            or not weights
+            or sum(weights.values(), Decimal(0)) <= 0
+        ):
+            continue
+        printed_sum = next(iter(printed_sums))
+        measured_sum = sum(weights.values(), Decimal(0))
+        # Printed cells and their printed total are rounded independently.
+        rounding_bound = _decimal_rounding_half_width(printed_sum)
+        rounding_bound += sum(
+            (_decimal_rounding_half_width(amount) for amount in weights.values()),
+            Decimal(0),
+        )
+        if abs(measured_sum - printed_sum) > rounding_bound:
+            continue
+        composition = Composition(
+            basis="printed_phase_analysis",
+            components=tuple(weights.items()),
+            amount_basis=AmountBasis.MASS_PERCENT,
+            input_provenance=SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
+        )
+        source = ";".join(sorted(row.observation_id for row in group))
+        assembled[signature(composition)] = (composition, source)
+
+    if target_is_liquid:
+        same_phase_sibling = any(
+            isinstance(row.identity, Identity)
+            and quantity_token(row.identity) is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and liquid(row.identity)
+            and _phase_role_of(row.identity) == target_role
+            and phase(row.identity) == target_phase
+            and temperature(row.identity) == target_temperature
+            and row.observation_id != observation.observation_id
+            and bool(composition_sources(row))
+            for row in rows.values()
+        )
+        own_analysis = any(
+            composition.input_provenance not in _PRINTED_BULK_TOKENS
+            for composition, _source in composition_sources(observation)
+        ) or same_phase_sibling or any(
+            observation.observation_id in source.split(";")
+            for _composition, source in assembled.values()
+        )
+        if own_analysis:
+            return _PhaseCompositionInput(
+                refusal_reason=RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS,
+                refusal_detail={
+                    "reason": RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS.value,
+                    "detail": "input_is_same_run_analysed_melt",
+                    "observation_id": observation.observation_id,
+                },
+            )
+        return _PhaseCompositionInput()
+
+    if not target_is_other_phase:
+        return _PhaseCompositionInput()
+    candidates = full_analyses or assembled
+    if len(candidates) > 1:
+        return refusal(
+            "analysed_phase_composition_ambiguous",
+            [source for _, source in candidates.values()],
+        )
+    if not candidates:
+        return _PhaseCompositionInput()
+    composition, source = next(iter(candidates.values()))
+    return _PhaseCompositionInput(
+        composition=composition,
+        notice=Notice(
+            kind=NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
+            affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+            reason=(
+                f"{NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value}:"
+                f"original_reason={_PHASE_COMPOSITION_MISSING_ORIGINAL_REASON};"
+                f"source={source}"
+            ),
+            origin=observation.observation_id,
+        ),
+    )
+
+
 def input_composition_echo_detail(identity: Identity) -> dict[str, object] | None:
     """Refuse when the bulk provenance is the phase analysis being scored.
 
@@ -294,6 +648,22 @@ def input_composition_echo_detail(identity: Identity) -> dict[str, object] | Non
             "formula": formula,
         }
 
+    if provenance == SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE:
+        role = _phase_role_of(identity)
+        phase_state = identity.species.phase if identity.species is not None else None
+        phase = (
+            phase_state.value
+            if phase_state is not None
+            and getattr(phase_state, "is_value", False)
+            else phase_state
+        )
+        other_phase = (
+            role in {PhaseRole.METAL, PhaseRole.MATTE}
+            or (role is None and phase in {Phase.CR, Phase.G})
+        )
+        if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION and other_phase:
+            return None
+        return refused("analysed_liquid_input_is_not_a_different_phase")
     if provenance == SAME_RUN_INITIAL_ANALYSED_MELT:
         return refused("input_is_same_run_analysed_melt")
     if provenance == ANALYSED_MELT_MINUS_SCORED:

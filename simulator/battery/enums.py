@@ -332,6 +332,8 @@ class NoticeKind(StrEnum):
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
+    COMPOSITION_FROM_RUN_SIBLINGS = "composition_from_run_siblings"
+    COMPOSITION_FROM_ANALYSED_PHASE = "composition_from_analysed_phase"
     # t-1593: a named material's cited bulk analysis varies by lot
     # (JSC-1 vs JSC-1A). Advisory. Not a flagged stratum.
     LOT_VARIABILITY = "lot_variability"

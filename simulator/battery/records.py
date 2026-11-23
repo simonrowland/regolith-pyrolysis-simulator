@@ -769,6 +769,9 @@ class Composition:
     #     printed analysis; the scorer removes the scored components.
     #   same_run_initial_analysed_melt
     #     KC91 Table 3 initial analysis bound onto the final row.
+    #   same_run_analysed_liquid_for_other_phase
+    #     analysed liquid supplied only to a different phase-composition row
+    #     from the same run; the liquid's own composition remains an echo.
     input_provenance: str | None = None
 
     def __post_init__(self) -> None:

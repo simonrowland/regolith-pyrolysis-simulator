@@ -3151,6 +3151,14 @@ def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
         NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT.value
         == "composition_oxide_from_element_mass_percent"
     )
+    assert (
+        NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS.value
+        == "composition_from_run_siblings"
+    )
+    assert (
+        NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value
+        == "composition_from_analysed_phase"
+    )
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:

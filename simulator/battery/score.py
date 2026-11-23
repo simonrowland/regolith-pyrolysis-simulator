@@ -142,8 +142,10 @@ from simulator.battery.source_oxygen import (
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.input_provenance import (
     ANALYSED_MELT_MINUS_SCORED,
+    PRINTED_STARTING_BULK,
     SINGLE_LIQUID_MASS_FRACTION,
     InputDecision,
+    _phase_row_composition_input,
     analysed_melt_decision,
     analysed_melt_weight_map,
     collect_run_texts,
@@ -195,6 +197,7 @@ from simulator.battery.migrate import (
     to_plain,
     effective_run_composition,
     invalid_run_composition,
+    wt_pct_to_mole_fraction,
     ALPHA_GAS_SYSTEM_H2,
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
@@ -605,6 +608,7 @@ FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
+FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION = "phase-input-composition"
 FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION = "binary-complement-composition"
 FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION = (
     "oxide-from-element-mass-percent-composition"
@@ -2498,6 +2502,13 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if kinds.intersection(
+        {
+            NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS.value,
+            NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE.value,
+        }
+    ):
+        strata.append(FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION)
     if NoticeKind.COMPOSITION_BINARY_COMPLEMENT.value in kinds:
         strata.append(FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION)
     if NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT.value in kinds:
@@ -8655,6 +8666,14 @@ def _comparison_identity(
             for notice in prediction.notices
         )
     )
+    phase_input_used = any(
+        notice.kind
+        in {
+            NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
+            NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
+        }
+        for notice in prediction.notices
+    )
     comparison_activity = (
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
@@ -8671,6 +8690,7 @@ def _comparison_identity(
         and knudsen_total_pressure is None
         and melt_identity is identity
         and not fusion_polymorph_flag
+        and not phase_input_used
     ):
         return identity
     updates: dict[str, State] = {}
@@ -8703,9 +8723,20 @@ def _comparison_identity(
                 identity.species, polymorph=State.of(solid_polymorph)
             )
     if identity.composition is None or not identity.composition.is_value:
-        point, _notice = _printed_point_composition(reference)
-        if point is not None:
-            updates["composition"] = point
+        predicted_composition = (
+            prediction.identity.composition
+            if phase_input_used and isinstance(prediction.identity, Identity)
+            else None
+        )
+        if (
+            predicted_composition is not None
+            and predicted_composition.is_value
+        ):
+            updates["composition"] = predicted_composition
+        else:
+            point, _notice = _printed_point_composition(reference)
+            if point is not None:
+                updates["composition"] = point
     if (
         selected_oxygen is not None
         and selected_oxygen[0] is not None
@@ -18335,11 +18366,83 @@ def _compile_residual_with_lineage(
         ):
             predictor_kwargs["phase_siblings"] = phase_siblings
             predictor_kwargs["phase_sibling_refusal"] = phase_sibling_refusal
+        prediction_reference = implied_alpha_reference or reference
+        phase_input_notice: Notice | None = None
+        if (
+            builtin_predictor
+            and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        ):
+            phase_input = _phase_row_composition_input(
+                reference,
+                experiment,
+                context._observations_by_experiment.get(
+                    reference.experiment_id, ()
+                ),
+            )
+            if phase_input.refusal_reason is not None:
+                return _refused(
+                    phase_input.refusal_reason,
+                    phase_input.refusal_detail
+                    or {"reason": phase_input.refusal_reason.value},
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                )
+            phase_input_notice = phase_input.notice
+            phase_composition = phase_input.composition
+            if phase_composition is not None and isinstance(
+                prediction_reference.identity, Identity
+            ):
+                if phase_composition.amount_basis is AmountBasis.MASS_PERCENT:
+                    try:
+                        phase_composition = composition_with_provenance(
+                            wt_pct_to_mole_fraction(
+                                phase_composition.as_map()
+                            ),
+                            phase_composition.input_provenance
+                            or PRINTED_STARTING_BULK,
+                        )
+                    except (ArithmeticError, TypeError, ValueError) as exc:
+                        return _refused(
+                            RefusalReason.INVALID_IDENTITY,
+                            {
+                                "reason": "invalid_phase_input_composition",
+                                "detail": str(exc),
+                            },
+                            execution=Execution(
+                                state=ExecutionState.NOT_PROBED
+                            ),
+                        )
+                elif phase_composition.amount_basis not in {
+                    AmountBasis.MOLE_FRACTION,
+                    AmountBasis.MOL_INVENTORY,
+                }:
+                    return _refused(
+                        RefusalReason.IDENTITY_INCOMPLETE,
+                        {
+                            "reason": "missing_input",
+                            "input": "composition",
+                            "detail": "unsupported resolved composition amount basis",
+                        },
+                        execution=Execution(state=ExecutionState.NOT_PROBED),
+                    )
+                prediction_reference = replace(
+                    prediction_reference,
+                    identity=replace(
+                        prediction_reference.identity,
+                        composition=State.of(phase_composition),
+                    ),
+                )
+                if phase_input_notice is not None:
+                    notices = union_notices(notices, (phase_input_notice,))
         prediction = predictor(
             engine,
-            _melt_prediction_reference(implied_alpha_reference or reference),
+            _melt_prediction_reference(prediction_reference),
             **predictor_kwargs,
         )
+        if phase_input_notice is not None:
+            prediction = replace(
+                prediction,
+                notices=union_notices(prediction.notices, (phase_input_notice,)),
+            )
 
     notices = union_notices(notices, prediction.notices)
     identity_composition = (

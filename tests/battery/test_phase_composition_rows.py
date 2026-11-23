@@ -47,11 +47,17 @@ from simulator.battery.enums import (
     ppm_mass_to_wt_percent,
 )
 from simulator.battery.identity import Identity, ValenceBasis, celsius_to_kelvin, profile_for
+from simulator.battery.input_provenance import (
+    PRINTED_STARTING_BULK,
+    SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
+    _phase_row_composition_input,
+)
 from simulator.battery.migrate import REPO_ROOT, is_engine_map_oxide_key, migrate
 from simulator.battery.records import (
     Composition,
     Derivation,
     Execution,
+    Located,
     Residual,
     ResidualRefusal,
     Species,
@@ -59,12 +65,14 @@ from simulator.battery.records import (
 )
 from simulator.battery.score import (
     DECISION_BAND_RATCHET_RELATIVE_PATH,
+    FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
     EnginePrediction,
     ScoreContext,
     _ScorePayloadAccumulator,
     _alignment_axes,
     _phase_component_reference_wt_percent,
     _phase_mole_sibling_amounts,
+    composition_wt_pct,
     _residual_engine_observable,
     compile_residual,
     compute_metric,
@@ -75,6 +83,9 @@ from simulator.battery.score import (
     rail_for_quantity,
     refusal_census,
     residual_to_plain,
+    flagged_strata,
+    _input_composition_echo_detail,
+    wt_pct_to_mole_fraction,
     score_store,
 )
 from simulator.melt_backend.base import EquilibriumResult
@@ -769,6 +780,391 @@ def _phase_identity(
     if total_pressure_Pa is not None:
         kwargs["total_pressure_Pa"] = State.of(total_pressure_Pa)
     return Identity(**kwargs)
+
+
+def test_phase_row_prefers_printed_sample_start_over_liquid_analysis() -> None:
+    experiment = F.tabulation_experiment("phase-input-start")
+    start = Composition(
+        basis="printed_oxides",
+        components=(("SiO2", Decimal("0.75")), ("MgO", Decimal("0.25"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, initial_composition=F.located(start)),
+    )
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase", experiment.experiment_id, target_identity, Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    liquid = F.observation(
+        "liquid-phase", experiment.experiment_id,
+        _phase_identity("SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.GLASS),
+        Decimal("50"), evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    resolved = _phase_row_composition_input(
+        target, experiment, (target, liquid)
+    )
+
+    assert resolved.refusal_reason is None
+    assert resolved.composition == replace(
+        start, input_provenance=PRINTED_STARTING_BULK
+    )
+    assert resolved.notice is not None
+    assert resolved.notice.kind is NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS
+    assert "original_reason=identity_incomplete:missing_input:composition" in (
+        resolved.notice.reason
+    )
+    assert flagged_strata((resolved.notice,)) == (
+        FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
+    )
+
+
+def test_phase_row_uses_assembled_liquid_siblings_only_for_other_phase() -> None:
+    experiment = F.tabulation_experiment("phase-input-liquid-siblings")
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase", experiment.experiment_id, target_identity, Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    liquid_rows = []
+    for formula, amount in (("SiO2", "60.0"), ("MgO", "40.0")):
+        identity = replace(
+            _phase_identity(formula, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.GLASS),
+            composition=None,
+        )
+        row = F.observation(
+            f"liquid-{formula}", experiment.experiment_id, identity, Decimal(amount),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        liquid_rows.append(
+            replace(
+                row,
+                point_conditions={
+                    **(row.point_conditions or {}),
+                    "printed_sum": F.located(Decimal("100.0")),
+                },
+            )
+        )
+
+    resolved = _phase_row_composition_input(
+        target, experiment, (target, *liquid_rows)
+    )
+
+    assert resolved.refusal_reason is None
+    composition = resolved.composition
+    assert composition is not None
+    assert composition.input_provenance == SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE
+    assert composition.amount_basis is AmountBasis.MASS_PERCENT
+    assert dict(composition.components) == {
+        "SiO2": Decimal("60.0"),
+        "MgO": Decimal("40.0"),
+    }
+    assert wt_pct_to_mole_fraction(composition.as_map()).amount_basis is (
+        AmountBasis.MOLE_FRACTION
+    )
+    assert resolved.notice is not None
+    assert resolved.notice.kind is NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE
+    assert "original_reason=identity_incomplete:missing_input:composition" in (
+        resolved.notice.reason
+    )
+    assert flagged_strata((resolved.notice,)) == (
+        FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
+    )
+    candidate_identity = replace(target_identity, composition=State.of(composition))
+    assert _input_composition_echo_detail(candidate_identity) is None
+
+    same_liquid = _phase_row_composition_input(
+        liquid_rows[0], experiment, (target, *liquid_rows)
+    )
+    assert same_liquid.composition is None
+    assert same_liquid.refusal_reason is (
+        RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
+    )
+
+
+def test_phase_row_rejects_liquid_siblings_that_miss_the_printed_total() -> None:
+    experiment = F.tabulation_experiment("phase-input-liquid-total-mismatch")
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase", experiment.experiment_id, target_identity, Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    liquid_rows = []
+    for formula, amount in (("SiO2", "60.0"), ("MgO", "40.0")):
+        identity = replace(
+            _phase_identity(
+                formula,
+                Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+                role=PhaseRole.GLASS,
+            ),
+            composition=None,
+        )
+        row = F.observation(
+            f"liquid-{formula}", experiment.experiment_id, identity,
+            Decimal(amount), evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        liquid_rows.append(
+            replace(
+                row,
+                point_conditions={
+                    **(row.point_conditions or {}),
+                    "printed_sum": F.located(Decimal("99.0")),
+                },
+            )
+        )
+
+    resolved = _phase_row_composition_input(
+        target, experiment, (target, *liquid_rows)
+    )
+
+    assert resolved.composition is None
+    assert resolved.notice is None
+    assert resolved.refusal_reason is None
+
+
+def test_existing_elemental_analysis_projection_is_analyzed_liquid_input() -> None:
+    experiment = F.tabulation_experiment("phase-input-elemental-projection")
+    composition = Composition(
+        basis="stoichiometric_oxide_projection",
+        components=(
+            ("SiO2", Decimal("0.7")),
+            ("MgO", Decimal("0.3")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    derivation = Derivation(
+        relation="element_wt_percent_stoichiometric_oxide_projection",
+        inputs=("liquid-silicon",),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+    liquid_identity = replace(
+        _phase_identity(
+            "Si",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.GLASS,
+        ),
+        composition=None,
+    )
+    liquid = F.observation(
+        "liquid-silicon", experiment.experiment_id, liquid_identity, Decimal("30"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    liquid = replace(
+        liquid,
+        point_conditions={
+            **(liquid.point_conditions or {}),
+            "composition": Located(
+                State.of(composition),
+                locator=F.loc(table="1", record="LVP-13"),
+                inference=derivation,
+            ),
+        },
+    )
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase", experiment.experiment_id, target_identity, Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    resolved = _phase_row_composition_input(target, experiment, (target, liquid))
+
+    assert resolved.refusal_reason is None
+    assert resolved.composition is not None
+    assert resolved.composition.components == composition.components
+    assert resolved.composition.amount_basis is AmountBasis.MOLE_FRACTION
+    assert (
+        resolved.composition.input_provenance
+        == SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE
+    )
+    assert resolved.notice is not None
+    assert resolved.notice.kind is NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE
+    assert "original_reason=identity_incomplete:missing_input:composition" in (
+        resolved.notice.reason
+    )
+
+
+def test_catalog_proxy_is_not_promoted_to_analyzed_liquid_input() -> None:
+    experiment = F.tabulation_experiment("phase-input-catalog-proxy")
+    catalog = Composition(
+        basis="catalogue_proxy",
+        components=(
+            ("SiO2", Decimal("0.7")),
+            ("MgO", Decimal("0.3")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value,
+    )
+    liquid_identity = replace(
+        _phase_identity(
+            "SiO2",
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            role=PhaseRole.GLASS,
+        ),
+        composition=None,
+    )
+    liquid = F.observation(
+        "catalog-liquid", experiment.experiment_id, liquid_identity, Decimal("30"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    liquid = replace(
+        liquid,
+        point_conditions={
+            **(liquid.point_conditions or {}),
+            "composition": Located(
+                State.of(catalog),
+                locator=F.loc(table="1", record="sample-1"),
+            ),
+        },
+    )
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase", experiment.experiment_id, target_identity, Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    resolved = _phase_row_composition_input(target, experiment, (target, liquid))
+
+    assert resolved.composition is None
+    assert resolved.notice is None
+    assert resolved.refusal_reason is None
+
+
+def test_liquid_phase_row_keeps_same_analysis_as_a_typed_echo_refusal() -> None:
+    experiment = F.tabulation_experiment("phase-input-liquid-echo")
+    target_identity = replace(
+        _phase_identity("SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.GLASS),
+        composition=None,
+    )
+    target = F.observation(
+        "glass-phase", experiment.experiment_id, target_identity, Decimal("60"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    target = replace(
+        target,
+        point_conditions={
+            **(target.point_conditions or {}),
+            "composition": F.located(_bulk()),
+        },
+    )
+
+    resolved = _phase_row_composition_input(
+        target, experiment, (target,)
+    )
+
+    assert resolved.composition is None and resolved.notice is None
+    assert (
+        resolved.refusal_reason
+        is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
+    )
+    assert resolved.refusal_detail is not None
+    assert resolved.refusal_detail["detail"] == "input_is_same_run_analysed_melt"
+
+
+def test_compile_residual_passes_resolved_phase_composition_to_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    work = F.work()
+    experiment = F.tabulation_experiment(experiment_id="phase-input-compile")
+    target_identity = replace(
+        _phase_identity("MgO", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL),
+        composition=None,
+    )
+    target = F.observation(
+        "metal-phase-target", experiment.experiment_id, target_identity, Decimal("40"),
+        evidence=EvidenceClass.MEASURED_DIRECT, source_id="phase-input-source",
+    )
+    liquid = F.observation(
+        "glass-phase-input", experiment.experiment_id,
+        _phase_identity("SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.GLASS),
+        Decimal("60"), evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="phase-input-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={target.observation_id: target, liquid.observation_id: liquid},
+        extract_review={"phase-input-source": "reviewed"},
+        hostname="test",
+    )
+    observed_compositions: list[dict[str, float]] = []
+
+    def hook(_engine, *, composition_kg, **_kwargs):
+        observed_compositions.append(dict(composition_kg))
+        return EquilibriumResult(
+            status="ok",
+            liquid_fraction=0.5,
+            phases_present=["metal"],
+            phase_compositions={"metal": {"MgO": 60.0}},
+        )
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    residual, _candidate = compile_residual(
+        target,
+        Engine.ALPHAMELTS,
+        context=context,
+        comparison_ids={target.observation_id},
+    )
+
+    expected_wt_percent = composition_wt_pct(_bulk())
+    assert expected_wt_percent is not None
+    assert observed_compositions == [
+        {
+            oxide: amount / 1000.0
+            for oxide, amount in expected_wt_percent.items()
+        }
+    ]
+    assert residual.numeric is not None
+    assert FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION in flagged_strata(residual.notices)
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_PHASE_INPUT_COMPOSITION,
+    )
+
+    from simulator.battery.score import headline_rows
+
+    def melt_activity_row(residuals):
+        return next(
+            row
+            for row in headline_rows(
+                residuals,
+                context=context,
+                engines=(Engine.ALPHAMELTS,),
+            )
+            if row["rail"] == Rail.MELT_ACTIVITY.value
+        )
+
+    assert melt_activity_row((residual,))["n_candidates"] == 0
+    without_phase_input_flag = replace(
+        residual,
+        notices=tuple(
+            notice
+            for notice in residual.notices
+            if notice.kind
+            not in {
+                NoticeKind.COMPOSITION_FROM_RUN_SIBLINGS,
+                NoticeKind.COMPOSITION_FROM_ANALYSED_PHASE,
+            }
+        ),
+    )
+    assert melt_activity_row((without_phase_input_flag,))["n_candidates"] == 1
 
 
 def _dex(candidate: Decimal, reference: Decimal) -> Decimal:

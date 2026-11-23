@@ -23,8 +23,10 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.identity import Identity
+from simulator.battery import score as score_module
 from simulator.battery.input_provenance import (
     PRINTED_STARTING_BULK,
+    SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
     phase_map_provenance,
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
@@ -32,6 +34,7 @@ from simulator.battery.input_provenance import (
 from simulator.battery.records import Composition, Derivation, Locator, Species
 from simulator.battery.score import (
     _fe_redox_material,
+    _gate_input_composition,
     _input_composition_echo_detail,
     _predict_redox,
     _predict_phase_row,
@@ -210,6 +213,43 @@ def test_printed_starting_bulk_is_not_refused() -> None:
         MgO="0.02",
     )
     assert _input_composition_echo_detail(_identity("SiO2", composition)) is None
+
+
+def test_same_run_liquid_analysis_is_allowed_only_for_a_different_phase() -> None:
+    composition = _glass(
+        SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
+        SiO2="0.60",
+        MgO="0.40",
+    )
+    metal = _identity("MgO", composition, role=PhaseRole.METAL)
+    liquid = _identity("SiO2", composition, role=PhaseRole.GLASS)
+
+    assert _input_composition_echo_detail(metal) is None
+    refusal = _input_composition_echo_detail(liquid)
+    assert refusal is not None
+    assert refusal["reason"] == RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS.value
+    assert refusal["detail"] == "analysed_liquid_input_is_not_a_different_phase"
+
+
+def test_removing_echo_guard_admits_same_liquid_analysis(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    composition = _glass(
+        SAME_RUN_ANALYSED_LIQUID_FOR_OTHER_PHASE,
+        SiO2="0.60",
+        MgO="0.40",
+    )
+    identity = _identity("SiO2", composition, role=PhaseRole.GLASS)
+    observation = F.observation(
+        "same-liquid-input", "same-liquid-input", identity, Decimal("60")
+    )
+
+    guarded = _gate_input_composition(observation, identity, None)
+    assert guarded[1] is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
+
+    monkeypatch.setattr(score_module, "input_composition_echo_detail", lambda _identity: None)
+    mutated = _gate_input_composition(observation, identity, None)
+    assert mutated[1] is None
 
 
 def test_named_material_mixture_of_printed_starts_is_not_refused() -> None:
