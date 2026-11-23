@@ -485,7 +485,7 @@ def test_every_censused_fe_1_minus_x_source_row_parses(
 
     assert {source: len(rows) for source, rows in rows_by_source.items()} == {
         _DARKEN_GURRY: 89,
-        _SAITO: 84,
+        _SAITO: 42,
     }
     for rows in rows_by_source.values():
         for observation in rows:
@@ -1375,7 +1375,8 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
         assert converted.identity.reference_state.value.endmember.formula == "FeO"
         assert any(
             notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
-            and "original_reason=printed species formula Fe_tO" in notice.reason
+            and "original_reason=Ban-ya activity is printed as a_FetO "
+            "on a total-iron basis" in notice.reason
             for notice in converted.notices
         )
         assert FLAGGED_STRATUM_IRON_OXIDE_CONVENTION in flagged_strata(
@@ -1447,15 +1448,31 @@ def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
 
 
 def test_banya_total_iron_flag_excludes_measured_headline(banya_migration) -> None:
-    reference = next(
+    printed_reference = next(
         observation
         for observation in banya_migration.observations.values()
         if observation.observation_id.endswith("bch80_t2_c_a_1_activity")
     )
+    # This printed row has no identity composition, so supply a fixture
+    # composition to exercise the flagged residual path independently of that
+    # separate missing-input refusal.
+    composition = F.activity_identity(formula="FeO").composition
+    reference = replace(
+        printed_reference,
+        identity=replace(printed_reference.identity, composition=composition),
+    )
+    context = _context(banya_migration)
+    context = replace(
+        context,
+        observations={
+            **context.observations,
+            reference.observation_id: reference,
+        },
+    )
     residual, _candidate = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
-        context=_context(banya_migration),
+        context=context,
         comparison_ids={reference.observation_id},
         predict=_predict,
     )
@@ -1468,6 +1485,10 @@ def test_banya_total_iron_flag_excludes_measured_headline(banya_migration) -> No
     )
     assert any(
         notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+        for notice in residual.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.WUSTITE_REFERENCE_CONVERSION
         for notice in residual.notices
     )
 

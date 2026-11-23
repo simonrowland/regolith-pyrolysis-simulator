@@ -1182,14 +1182,24 @@ def _normalize_ascii_adduct_dots(text: str) -> str:
         if text[index] == ".":
             prefix = text[segment_start:index]
             suffix = text[index + 1 :]
-            starts_with_multiplier = re.match(
+            multiplier = re.match(
                 r"(?:\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", suffix
             )
+            multiplier_tail = (
+                suffix[multiplier.end() :]
+                if multiplier is not None
+                else ""
+            )
+            decimal_subscript = (
+                multiplier is not None
+                and re.search(r"[A-Z][a-z]?\d+$", prefix) is not None
+                and re.match(r"[A-Z][a-z]?\d*(?=\.|$)", multiplier_tail)
+                is not None
+            )
             starts_with_water = suffix.startswith(("H2O", "H₂O"))
-            decimal_multiplier = prefix.isdigit() and suffix[:1].isdigit()
             if (
-                (starts_with_multiplier is not None or starts_with_water)
-                and not decimal_multiplier
+                (multiplier is not None or starts_with_water)
+                and not decimal_subscript
             ):
                 normalized.append("·")
                 segment_start = index + 1
@@ -4385,17 +4395,25 @@ def _banya_feto_activity_comparison(
 
 def _total_iron_formula_notice(reference: Observation) -> Notice | None:
     identity = reference.identity
-    if not isinstance(identity, Identity) or identity.species.formula != "Fe_tO":
+    if not isinstance(identity, Identity):
         return None
     quantity = quantity_token(identity)
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
+    banya_total_iron_activity = reference.source_id in _BANYA_FETO_ACTIVITY_RELATIONS
+    if identity.species.formula != "Fe_tO" and not banya_total_iron_activity:
+        return None
+    original_reason = (
+        "Ban-ya activity is printed as a_FetO on a total-iron basis"
+        if banya_total_iron_activity
+        else "printed species formula Fe_tO"
+    )
     return Notice(
         kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
         affected_quantities=(quantity,),
         reason=(
             "total_iron_basis: default=Fe_tO interpreted as total Fe on an "
-            "FeO basis; original_reason=printed species formula Fe_tO; "
+            f"FeO basis; original_reason={original_reason}; "
             "d-420 basis convention"
         ),
         origin=reference.observation_id,
