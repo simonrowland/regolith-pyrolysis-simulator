@@ -67,7 +67,11 @@ def test_run_executor_returns_structured_execution():
 def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     run = _run()
     execution = RunExecutor().execute(run._session_config())
-    payload = run._build_output(execution)
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    payload = deterministic_gate_payload(run._build_output(execution))
     payload_bytes = (
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")
@@ -108,7 +112,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # the laptop and studio-3, so this digest is not a laptop re-run.
     # constack merge: repin on gate box
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
+        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

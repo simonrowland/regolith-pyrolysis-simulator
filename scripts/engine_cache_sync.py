@@ -51,10 +51,12 @@ def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
     folds to the same oxide. That dict is the provider copy of the adapter
     map, not a third table. Feedstock total-iron keys that the oxide map
     does not contain (``FeO_T``, ``FeO*``) come from
-    ``_TOTAL_IRON_AS_FEO_KEYS``. Those keys are already FeO-equivalent, so
-    a query the helper calls ``FeO`` includes them. Copying either list
-    would let the two drift, and ``expire --species FeO`` would keep
-    serving the missed spelling. A name neither source knows stays its
+    ``_TOTAL_IRON_AS_FEO_KEYS``. Those keys are already FeO-equivalent.
+    A query whose casefold is one of them is looked up as ``FeO`` before
+    expansion, and the original casefold stays in the match set. Without
+    that, the helper returns None for ``FeO_T`` and ``FeO*``, and the
+    expire would keep serving ``feo`` and ``feo_total``. Copying either
+    list would let the two drift. A name neither source knows stays its
     own casefold. The cache casefolds again, which does not change these
     strings.
     """
@@ -65,13 +67,19 @@ def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
     )
     from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
 
+    total_iron = {
+        str(key).strip().casefold()
+        for key in _TOTAL_IRON_AS_FEO_KEYS
+        if str(key).strip()
+    }
     spellings: list[str] = []
     for name in names:
         folded = name.strip().casefold()
         if not folded:
             continue
         found = {folded}
-        canonical = canonical_melt_oxide_activity_name(name)
+        lookup = "FeO" if folded in total_iron else name
+        canonical = canonical_melt_oxide_activity_name(lookup)
         if canonical is not None:
             canonical_folded = canonical.strip().casefold()
             if canonical_folded:
@@ -125,8 +133,9 @@ def main(argv: list[str] | None = None) -> int:
     choice.add_argument(
         "--species",
         help=(
-            "comma-separated species names; each name includes the oxide "
-            "spellings canonical_melt_oxide_activity_name treats as the same"
+            "comma-separated species names; FeO_T and FeO* are FeO, and "
+            "each name includes the oxide spellings "
+            "canonical_melt_oxide_activity_name treats as the same"
         ),
     )
     choice.add_argument(
@@ -144,13 +153,21 @@ def main(argv: list[str] | None = None) -> int:
     _add_apply_flags(prune)
     migrate = commands.add_parser(
         "migrate",
-        help="convert a schema-3 HOT/COLD pair in place without deleting values",
+        help="publish a schema-4 copy of a schema-3 HOT/COLD pair without deleting values",
     )
     migrate.add_argument("file", type=Path)
     migrate.add_argument(
         "--no-vacuum",
         action="store_true",
         help="keep the freed pages. The default reclaims them",
+    )
+    migrate.add_argument(
+        "--recover",
+        action="store_true",
+        help=(
+            "finish a complete schema-4 copy, or restore the schema-3 pair "
+            "from hard-linked backups, then remove leftover migration files"
+        ),
     )
     clear_mask = commands.add_parser(
         "clear-mask",
@@ -182,7 +199,10 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "prune":
             result = cache.prune_cache_file(args.file, apply=_apply(parser, args))
         elif args.command == "migrate":
-            result = cache.migrate_cache_file(args.file, vacuum=not args.no_vacuum)
+            if args.recover:
+                result = cache.recover_cache_file(args.file)
+            else:
+                result = cache.migrate_cache_file(args.file, vacuum=not args.no_vacuum)
         elif args.command == "clear-mask":
             result = cache.clear_refusal_mask(
                 args.file,
@@ -207,6 +227,13 @@ def main(argv: list[str] | None = None) -> int:
         unclassifiable = result.get("unclassifiable_rows")
         if unclassifiable is not None:
             print(f"unclassifiable rows: {unclassifiable}", file=sys.stderr)
+    if isinstance(result, dict) and args.command == "migrate" and args.recover:
+        print(
+            f"recover: {result.get('action')}; "
+            f"schema {result.get('schema_version')}; "
+            f"hot rows {result.get('hot_rows')}",
+            file=sys.stderr,
+        )
     if isinstance(result, dict) and args.command == "migrate" and result.get("migrated"):
         unknown_by_engine = result.get("species_unknown_by_engine") or {}
         listed = (

@@ -2,9 +2,10 @@
 
 A masked cell returns the typed refusal without a second engine call.
 Exact outputs stay on the engine + version + request key. The mask is a
-separate table. A sampled key is solved live; a different outcome deletes
-the cell. ``clear_refusal_mask`` drops one engine's cells and audit rows
-for one class.
+separate table. A stored exact row wins over a mask cell. A sampled key
+is solved live; a different outcome deletes the cell.
+``clear_refusal_mask`` drops one engine's cells and audit rows for one
+class.
 """
 
 import json
@@ -379,6 +380,10 @@ def test_readonly_serves_a_mask_and_does_not_learn_or_unmask(tmp_path, monkeypat
 
     _call("internal-analytical", unselected, solve)
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    # A test-owned file is readonly only when its mode differs from the
+    # runner snapshot. Pin that snapshot so this does not follow the mode
+    # the suite inherited, and so the file stays off the runner path.
+    engine_cache._RUNNER_CACHE_SNAPSHOT = (str(tmp_path / "runner-not-used"), "")
     engine_cache._MEMORY_CACHE.clear()
     served = _call("internal-analytical", unselected, solve)
     assert served["mask_hit"] == "refusal:unavailable"
@@ -637,6 +642,10 @@ def test_clear_drops_an_in_process_deny(tmp_path, monkeypatch):
     selected, unselected = _same_cell_sample("internal-analytical", 2700.0)
     _call("internal-analytical", unselected, lambda: _refusal("unavailable"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    # Same snapshot pin as the readonly serve test. The contradiction must
+    # not delete the row, including when the suite's snapshot mode is already
+    # readonly.
+    engine_cache._RUNNER_CACHE_SNAPSHOT = (str(tmp_path / "runner-not-used"), "")
     engine_cache._MEMORY_CACHE.clear()
     assert _call(
         "internal-analytical", selected, lambda: {"answer": 1},
@@ -687,6 +696,93 @@ def test_clear_of_a_cache_with_no_mask_does_not_create_tables(tmp_path, monkeypa
         }
         assert "engine_refusal_mask" not in names
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
+
+
+def test_stored_exact_refusal_wins_over_a_mask_cell(tmp_path, monkeypatch):
+    """A cacheable refusal row is served even when its coarse cell is masked.
+
+    Masking is for a key that has no exact row. The neighbor in the same
+    cell, which was never stored, still takes the mask.
+    """
+
+    _enable(tmp_path, monkeypatch)
+    engine = "alphamelts"
+    _selected, stored_request = _same_cell_sample(engine, 1800.0)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+    cell = engine_cache.refusal_mask_cell(stored_request)
+    assert cell is not None
+    stored_calls = []
+
+    def store():
+        stored_calls.append(1)
+        return {"status": "refusal", "refusal_reason": "out_of_basis"}
+
+    stored = _call(engine, stored_request, store)
+    assert stored == {"status": "refusal", "refusal_reason": "out_of_basis"}
+    assert stored_calls == [1]
+
+    teacher = None
+    skip = [stored_request]
+    for index in range(400):
+        request = {"temperature_K": 1800.0 + index * 0.001}
+        if request in skip:
+            continue
+        if engine_cache.refusal_mask_cell(request) != cell:
+            continue
+        key = engine_cache.engine_cache_key(engine, version, request)
+        if engine_cache.mask_verify_selected(key):
+            continue
+        teacher = request
+        break
+    assert teacher is not None
+    taught_calls = []
+
+    def teach():
+        taught_calls.append(1)
+        return _refusal("engine_crash")
+
+    taught = _call(engine, teacher, teach)
+    assert taught_calls == [1]
+    assert "mask_hit" not in taught
+
+    engine_cache._MEMORY_CACHE.clear()
+    replay_calls = []
+
+    def replay_solve():
+        replay_calls.append(1)
+        return {"status": "refusal", "refusal_reason": "out_of_basis"}
+
+    replay = _call(engine, stored_request, replay_solve)
+    assert replay_calls == []
+    assert replay["refusal_reason"] == "out_of_basis"
+    assert "mask_hit" not in replay
+    counts = engine_cache.engine_cache_counters()[engine]
+    assert counts["hits"] == 1
+
+    other = None
+    skip.append(teacher)
+    for index in range(400):
+        request = {"temperature_K": 1800.0 + index * 0.001}
+        if request in skip:
+            continue
+        if engine_cache.refusal_mask_cell(request) != cell:
+            continue
+        key = engine_cache.engine_cache_key(engine, version, request)
+        if engine_cache.mask_verify_selected(key):
+            continue
+        other = request
+        break
+    assert other is not None
+    masked_calls = []
+
+    def masked_solve():
+        masked_calls.append(1)
+        return {"answer": 1}
+
+    served = _call(engine, other, masked_solve)
+    assert masked_calls == []
+    assert served["refusal_reason"] == "engine_crash"
+    assert served["mask_hit"] == "refusal:engine_crash"
 
 
 def test_clear_mask_command_defaults_to_dry_run(tmp_path, monkeypatch, capsys):

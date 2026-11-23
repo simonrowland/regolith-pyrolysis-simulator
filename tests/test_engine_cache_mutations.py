@@ -4,6 +4,8 @@ import pytest
 
 from simulator import engine_cache
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def test_dropped_temperature_is_detected(monkeypatch):
     from tests.test_engine_cache_format import test_natural_key_is_exact_canonical_and_local

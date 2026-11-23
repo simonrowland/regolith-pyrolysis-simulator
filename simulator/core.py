@@ -5357,6 +5357,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from simulator.reduced_real_determinism import (
             GATE_CURVE_NOTICE_KEYS,
+            _identity_gate_curve,
+            _gate_curve_live_publication,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
@@ -5558,7 +5560,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             isinstance(validated_cache, dict)
             and validated_cache.get('key') == key
             and isinstance(validated_curve, Mapping)
-            and dict(validated_curve) == normalized_curve
+            and _identity_gate_curve(validated_curve) == _identity_gate_curve(
+                normalized_curve
+            )
             and gate_curve_memo_origin_matches(
                 self,
                 normalized_curve,
@@ -5611,7 +5615,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 gate_diagnostic[notice_key] = dict(notice)
         self._stamp_kress_floor_diagnostic(gate_diagnostic)
         self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
-        return normalized_record
+        return _gate_curve_live_publication(normalized_record, normalized_curve)
 
     def _melt_redox_liquid_fraction_factor(
         self,

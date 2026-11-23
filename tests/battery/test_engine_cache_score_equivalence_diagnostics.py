@@ -5,6 +5,8 @@ import pytest
 from tests.battery.test_engine_cache_equivalence import _canonical_residual_rows
 from tests.battery.engine_cache_score_equivalence import _assert_runs_match_off
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def test_equivalence_failure_names_run_and_shows_first_row_diff() -> None:
     off = b'row-0\nrow-1\nrow-2\nrow-3\n'

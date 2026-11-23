@@ -732,6 +732,8 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
     from engines.builtin import vapor_pressure as builtin_vapor_pressure
 

@@ -26,6 +26,8 @@ from simulator.melt_backend.base import (
 )
 from tests.battery.cache_test_support import open_available_engine
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 _ENGINE_NAMES = tuple(name for name in BATTERY_ENGINE_NAMES if name != "cached-real")
 _POTS, _ = load_binary_pots()
@@ -91,6 +93,8 @@ def _equilibrium_consumer_view(result) -> dict:
 def test_hot_round_trip_preserves_real_engine_consumer_view(
     engine_name, tmp_path, monkeypatch, request
 ) -> None:
+    # Cold cell is a live engine solve. The round-trip below uses this test's
+    # own cache, not the runner file.
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     handle = open_available_engine(Engine(engine_name), nodeid=request.node.nodeid)
     results = []

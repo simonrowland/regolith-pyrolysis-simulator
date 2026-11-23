@@ -17,6 +17,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery.cache_test_support import CACHE_TEST_ENGINES
 
+pytestmark = pytest.mark.engine_cache_off
+
 @dataclass(frozen=True)
 class _SettingCase:
     label: str

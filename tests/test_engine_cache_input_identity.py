@@ -9,6 +9,8 @@ import pytest
 from simulator import engine_cache
 from simulator.engine_cache import EngineCacheValue
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 @pytest.fixture(autouse=True)
 def _isolated_cache():

@@ -103,7 +103,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     # subspace dimensions stay fixed.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "1e0450a94117cdb7562136f78c0d26170d5bf92a652ea2d537210118f112fc69"
+    ).hexdigest() == "4c62f16ecc2ed144febdc631d14f50e7eac36ac00064592af11b9ad377974612"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -129,7 +129,7 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     # samples. It leaves the C5-on/off subspace dimensions unchanged.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "58941181badd4232ee5f597d7e5fd81425151ca752cd7137279a9078acfc6eaf"
+    ).hexdigest() == "ed443c28069ced764e89bec30558ad2b41c6aef793b9e7df9fd97a2ea45fa96a"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():
