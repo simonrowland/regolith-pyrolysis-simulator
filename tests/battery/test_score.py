@@ -11172,6 +11172,39 @@ def test_recorded_liquid_row_state_overrides_solid_characterization() -> None:
 
 
 @pytest.mark.parametrize(
+    ("recorded_state", "expected_refusal"),
+    (
+        (None, True),
+        ("solid", True),
+        ("liquid_melt", False),
+        ("mostly solid at room temperature", False),
+    ),
+)
+def test_recorded_vapour_sample_phase_precedes_experiment_form_for_refusal(
+    recorded_state: str | None, expected_refusal: bool
+) -> None:
+    from simulator.battery.score import (
+        vapour_crystalline_sample_liquid_engine_refusal,
+    )
+
+    experiment, reference = _vapour_over_sample_form("solid")
+    measured_condensed_form = (
+        None
+        if recorded_state is None
+        else {"state": recorded_state, "basis": "explicit_author"}
+    )
+
+    detail = vapour_crystalline_sample_liquid_engine_refusal(
+        reference.identity,
+        engine=Engine.INTERNAL_ANALYTICAL,
+        experiment=experiment,
+        measured_condensed_form=measured_condensed_form,
+    )
+
+    assert (detail is not None) is expected_refusal
+
+
+@pytest.mark.parametrize(
     "recorded_state",
     (
         "not solid",
