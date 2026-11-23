@@ -650,7 +650,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-18",
     },
     "simulator": {
-        "identity": "source-sha256:077449d3f059f6aa591738558b7d6da6ac2b54b6a6fb19ed99bfa35749300054",
+        "identity": "source-sha256:d03f245b03244827018202d9dda79b2de36a5d17e4a1feb9f2af95f50828a638",
         "date": "2026-11-23",
     },
 }
