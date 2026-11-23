@@ -193,7 +193,7 @@ def _assert_composition_bindings(document: dict) -> None:
     bounded_ids = {observation["observation_id"] for observation in bounded_rows}
     for observation in bounded_rows:
         values = observation["values"]
-        assert values["composition_missing_components"] == [
+        assert values.get("composition_missing_components") == [
             {
                 "component": "Ni",
                 "reason": "below_detection_limit",
