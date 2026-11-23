@@ -25,7 +25,8 @@ fidelity_samples:
     pdf_page_index: 1
     table: '1'
     record: '1'
-    column: Fe2O3
+    row: Fe2O3
+    column: '1'
 - path: species.Fe.observations[kilinc_1983_table1_measured_redox_series].values.rows[0].oxide_wt_percent.FeO
   value: '0.64'
   locator:
@@ -33,7 +34,8 @@ fidelity_samples:
     pdf_page_index: 1
     table: '1'
     record: '1'
-    column: FeO
+    row: FeO
+    column: '1'
 - path: species.Fe.observations[kilinc_1983_table2_duplicate_redox_series].values.rows[0].oxide_wt_percent.Fe2O3
   value: '2.09'
   locator:
@@ -41,7 +43,8 @@ fidelity_samples:
     pdf_page_index: 3
     table: '2'
     record: '37'
-    column: Fe2O3
+    row: Fe2O3
+    column: '37'
 - path: species.Fe.observations[kilinc_1983_table3_equilibrium_time_series].values.rows[0].oxide_wt_percent.FeO
   value: '2.23'
   locator:
@@ -49,7 +52,8 @@ fidelity_samples:
     pdf_page_index: 3
     table: '3'
     record: 5 h
-    column: FeO
+    row: FeO
+    column: '5'
 - path: species.Fe.observations[kilinc_1983_table1_measured_redox_series].values.rows[0].Fe2O3_wt_pct
   value: '1.13'
   locator:
@@ -57,7 +61,8 @@ fidelity_samples:
     pdf_page_index: 1
     table: '1'
     record: '1'
-    column: Fe2O3
+    row: Fe2O3
+    column: '1'
 - path: species.Fe.observations[kilinc_1983_table1_measured_redox_series].values.rows[0].FeO_wt_pct
   value: '0.64'
   locator:
@@ -65,7 +70,8 @@ fidelity_samples:
     pdf_page_index: 1
     table: '1'
     record: '1'
-    column: FeO
+    row: FeO
+    column: '1'
 species:
   Fe:
     observations:
@@ -120,6 +126,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '1'
+            column: '1'
           point_conditions:
             T_C:
               state:
@@ -130,7 +137,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '1'
-                column: T °C
+                row: T° C
+                column: '1'
             atmosphere:
               state:
                 tag: value
@@ -158,12 +166,12 @@ species:
           run_id_as_printed: '1'
           T_C_as_printed: 1,342
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '1'}
+            T_C: {row: T° C, column: '1'}
+            duration_h_as_printed: {row: Time (h), column: '1'}
+            FeO_wt_pct: {row: FeO, column: '1'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '1'}
+            sample_identifier_as_printed: {row: Identifier, column: '1'}
         - experiment_id: '2'
           sample_identifier_as_printed: '121'
           composition_role_as_printed: analysed glass
@@ -189,6 +197,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '2'
+            column: '2'
           point_conditions:
             T_C:
               state:
@@ -199,7 +208,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '2'
-                column: T °C
+                row: T° C
+                column: '2'
             atmosphere:
               state:
                 tag: value
@@ -227,12 +237,12 @@ species:
           run_id_as_printed: '2'
           T_C_as_printed: 1,344
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '2'}
+            T_C: {row: T° C, column: '2'}
+            duration_h_as_printed: {row: Time (h), column: '2'}
+            FeO_wt_pct: {row: FeO, column: '2'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '2'}
+            sample_identifier_as_printed: {row: Identifier, column: '2'}
         - experiment_id: '3'
           sample_identifier_as_printed: '3114'
           composition_role_as_printed: analysed glass
@@ -258,6 +268,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '3'
+            column: '3'
           point_conditions:
             T_C:
               state:
@@ -268,7 +279,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '3'
-                column: T °C
+                row: T° C
+                column: '3'
             atmosphere:
               state:
                 tag: value
@@ -296,12 +308,12 @@ species:
           run_id_as_printed: '3'
           T_C_as_printed: 1,340
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '3'}
+            T_C: {row: T° C, column: '3'}
+            duration_h_as_printed: {row: Time (h), column: '3'}
+            FeO_wt_pct: {row: FeO, column: '3'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '3'}
+            sample_identifier_as_printed: {row: Identifier, column: '3'}
         - experiment_id: '4'
           sample_identifier_as_printed: NIC-8
           composition_role_as_printed: analysed glass
@@ -327,6 +339,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '4'
+            column: '4'
           point_conditions:
             T_C:
               state:
@@ -337,7 +350,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '4'
-                column: T °C
+                row: T° C
+                column: '4'
             atmosphere:
               state:
                 tag: value
@@ -365,12 +379,12 @@ species:
           run_id_as_printed: '4'
           T_C_as_printed: 1,344
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '4'}
+            T_C: {row: T° C, column: '4'}
+            duration_h_as_printed: {row: Time (h), column: '4'}
+            FeO_wt_pct: {row: FeO, column: '4'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '4'}
+            sample_identifier_as_printed: {row: Identifier, column: '4'}
         - experiment_id: '5'
           sample_identifier_as_printed: 867-114
           composition_role_as_printed: analysed glass
@@ -396,6 +410,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '5'
+            column: '5'
           point_conditions:
             T_C:
               state:
@@ -406,7 +421,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '5'
-                column: T °C
+                row: T° C
+                column: '5'
             atmosphere:
               state:
                 tag: value
@@ -434,12 +450,12 @@ species:
           run_id_as_printed: '5'
           T_C_as_printed: 1,349
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '5'}
+            T_C: {row: T° C, column: '5'}
+            duration_h_as_printed: {row: Time (h), column: '5'}
+            FeO_wt_pct: {row: FeO, column: '5'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '5'}
+            sample_identifier_as_printed: {row: Identifier, column: '5'}
         - experiment_id: '6'
           sample_identifier_as_printed: 780-U-111
           composition_role_as_printed: analysed glass
@@ -465,6 +481,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '6'
+            column: '6'
           point_conditions:
             T_C:
               state:
@@ -475,7 +492,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '6'
-                column: T °C
+                row: T° C
+                column: '6'
             atmosphere:
               state:
                 tag: value
@@ -503,12 +521,12 @@ species:
           run_id_as_printed: '6'
           T_C_as_printed: 1,344
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '6'}
+            T_C: {row: T° C, column: '6'}
+            duration_h_as_printed: {row: Time (h), column: '6'}
+            FeO_wt_pct: {row: FeO, column: '6'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '6'}
+            sample_identifier_as_printed: {row: Identifier, column: '6'}
         - experiment_id: '7'
           sample_identifier_as_printed: 780-U-105
           composition_role_as_printed: analysed glass
@@ -534,6 +552,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '7'
+            column: '7'
           point_conditions:
             T_C:
               state:
@@ -544,7 +563,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '7'
-                column: T °C
+                row: T° C
+                column: '7'
             atmosphere:
               state:
                 tag: value
@@ -572,12 +592,12 @@ species:
           run_id_as_printed: '7'
           T_C_as_printed: 1,350
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '7'}
+            T_C: {row: T° C, column: '7'}
+            duration_h_as_printed: {row: Time (h), column: '7'}
+            FeO_wt_pct: {row: FeO, column: '7'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '7'}
+            sample_identifier_as_printed: {row: Identifier, column: '7'}
         - experiment_id: '8'
           sample_identifier_as_printed: '20424'
           composition_role_as_printed: analysed glass
@@ -603,6 +623,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '8'
+            column: '8'
           point_conditions:
             T_C:
               state:
@@ -613,7 +634,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '8'
-                column: T °C
+                row: T° C
+                column: '8'
             atmosphere:
               state:
                 tag: value
@@ -641,12 +663,12 @@ species:
           run_id_as_printed: '8'
           T_C_as_printed: 1,342
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '8'}
+            T_C: {row: T° C, column: '8'}
+            duration_h_as_printed: {row: Time (h), column: '8'}
+            FeO_wt_pct: {row: FeO, column: '8'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '8'}
+            sample_identifier_as_printed: {row: Identifier, column: '8'}
         - experiment_id: '21'
           sample_identifier_as_printed: COL-11
           composition_role_as_printed: analysed glass
@@ -672,6 +694,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '21'
+            column: '21'
           point_conditions:
             T_C:
               state:
@@ -682,7 +705,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '21'
-                column: T °C
+                row: T° C
+                column: '21'
             atmosphere:
               state:
                 tag: value
@@ -710,12 +734,12 @@ species:
           run_id_as_printed: '21'
           T_C_as_printed: 1,446
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '21'}
+            T_C: {row: T° C, column: '21'}
+            duration_h_as_printed: {row: Time (h), column: '21'}
+            FeO_wt_pct: {row: FeO, column: '21'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '21'}
+            sample_identifier_as_printed: {row: Identifier, column: '21'}
         - experiment_id: '22'
           sample_identifier_as_printed: 1910-199
           composition_role_as_printed: analysed glass
@@ -741,6 +765,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '22'
+            column: '22'
           point_conditions:
             T_C:
               state:
@@ -751,7 +776,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '22'
-                column: T °C
+                row: T° C
+                column: '22'
             atmosphere:
               state:
                 tag: value
@@ -779,12 +805,12 @@ species:
           run_id_as_printed: '22'
           T_C_as_printed: 1,428
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '22'}
+            T_C: {row: T° C, column: '22'}
+            duration_h_as_printed: {row: Time (h), column: '22'}
+            FeO_wt_pct: {row: FeO, column: '22'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '22'}
+            sample_identifier_as_printed: {row: Identifier, column: '22'}
         - experiment_id: '23'
           sample_identifier_as_printed: H-96A
           composition_role_as_printed: analysed glass
@@ -810,6 +836,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '23'
+            column: '23'
           point_conditions:
             T_C:
               state:
@@ -820,7 +847,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '23'
-                column: T °C
+                row: T° C
+                column: '23'
             atmosphere:
               state:
                 tag: value
@@ -848,12 +876,12 @@ species:
           run_id_as_printed: '23'
           T_C_as_printed: 1,434
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '23'}
+            T_C: {row: T° C, column: '23'}
+            duration_h_as_printed: {row: Time (h), column: '23'}
+            FeO_wt_pct: {row: FeO, column: '23'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '23'}
+            sample_identifier_as_printed: {row: Identifier, column: '23'}
         - experiment_id: '24'
           sample_identifier_as_printed: 90-05
           composition_role_as_printed: analysed glass
@@ -879,6 +907,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '24'
+            column: '24'
           point_conditions:
             T_C:
               state:
@@ -889,7 +918,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '24'
-                column: T °C
+                row: T° C
+                column: '24'
             atmosphere:
               state:
                 tag: value
@@ -917,12 +947,12 @@ species:
           run_id_as_printed: '24'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '24'}
+            T_C: {row: T° C, column: '24'}
+            duration_h_as_printed: {row: Time (h), column: '24'}
+            FeO_wt_pct: {row: FeO, column: '24'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '24'}
+            sample_identifier_as_printed: {row: Identifier, column: '24'}
         - experiment_id: '25'
           sample_identifier_as_printed: '20424'
           composition_role_as_printed: analysed glass
@@ -948,6 +978,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '25'
+            column: '25'
           point_conditions:
             T_C:
               state:
@@ -958,7 +989,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '25'
-                column: T °C
+                row: T° C
+                column: '25'
             atmosphere:
               state:
                 tag: value
@@ -986,12 +1018,12 @@ species:
           run_id_as_printed: '25'
           T_C_as_printed: 1,447
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '25'}
+            T_C: {row: T° C, column: '25'}
+            duration_h_as_printed: {row: Time (h), column: '25'}
+            FeO_wt_pct: {row: FeO, column: '25'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '25'}
+            sample_identifier_as_printed: {row: Identifier, column: '25'}
         - experiment_id: '26'
           sample_identifier_as_printed: G-84
           composition_role_as_printed: analysed glass
@@ -1017,6 +1049,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '26'
+            column: '26'
           point_conditions:
             T_C:
               state:
@@ -1027,7 +1060,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '26'
-                column: T °C
+                row: T° C
+                column: '26'
             atmosphere:
               state:
                 tag: value
@@ -1055,12 +1089,12 @@ species:
           run_id_as_printed: '26'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '26'}
+            T_C: {row: T° C, column: '26'}
+            duration_h_as_printed: {row: Time (h), column: '26'}
+            FeO_wt_pct: {row: FeO, column: '26'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '26'}
+            sample_identifier_as_printed: {row: Identifier, column: '26'}
         - experiment_id: '27'
           sample_identifier_as_printed: KIL-2
           composition_role_as_printed: analysed glass
@@ -1086,6 +1120,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '27'
+            column: '27'
           point_conditions:
             T_C:
               state:
@@ -1096,7 +1131,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '27'
-                column: T °C
+                row: T° C
+                column: '27'
             atmosphere:
               state:
                 tag: value
@@ -1124,12 +1160,12 @@ species:
           run_id_as_printed: '27'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '27'}
+            T_C: {row: T° C, column: '27'}
+            duration_h_as_printed: {row: Time (h), column: '27'}
+            FeO_wt_pct: {row: FeO, column: '27'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '27'}
+            sample_identifier_as_printed: {row: Identifier, column: '27'}
         - experiment_id: '28'
           sample_identifier_as_printed: 944-F
           composition_role_as_printed: analysed glass
@@ -1155,6 +1191,7 @@ species:
             pdf_page_index: 1
             table: '1'
             record: '28'
+            column: '28'
           point_conditions:
             T_C:
               state:
@@ -1165,7 +1202,8 @@ species:
                 pdf_page_index: 1
                 table: '1'
                 record: '28'
-                column: T °C
+                row: T° C
+                column: '28'
             atmosphere:
               state:
                 tag: value
@@ -1193,12 +1231,12 @@ species:
           run_id_as_printed: '28'
           T_C_as_printed: 1,434
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '28'}
+            T_C: {row: T° C, column: '28'}
+            duration_h_as_printed: {row: Time (h), column: '28'}
+            FeO_wt_pct: {row: FeO, column: '28'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '28'}
+            sample_identifier_as_printed: {row: Identifier, column: '28'}
         - experiment_id: '9'
           sample_identifier_as_printed: '121'
           composition_role_as_printed: analysed glass
@@ -1224,6 +1262,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '9'
+            column: '9'
           point_conditions:
             T_C:
               state:
@@ -1234,7 +1273,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '9'
-                column: T °C
+                row: T° C
+                column: '9'
             atmosphere:
               state:
                 tag: value
@@ -1262,12 +1302,12 @@ species:
           run_id_as_printed: '9'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '9'}
+            T_C: {row: T° C, column: '9'}
+            duration_h_as_printed: {row: Time (h), column: '9'}
+            FeO_wt_pct: {row: FeO, column: '9'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '9'}
+            sample_identifier_as_printed: {row: Identifier, column: '9'}
         - experiment_id: '10'
           sample_identifier_as_printed: NZC-4
           composition_role_as_printed: analysed glass
@@ -1293,6 +1333,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '10'
+            column: '10'
           point_conditions:
             T_C:
               state:
@@ -1303,7 +1344,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '10'
-                column: T °C
+                row: T° C
+                column: '10'
             atmosphere:
               state:
                 tag: value
@@ -1331,12 +1373,12 @@ species:
           run_id_as_printed: '10'
           T_C_as_printed: 1,454
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '10'}
+            T_C: {row: T° C, column: '10'}
+            duration_h_as_printed: {row: Time (h), column: '10'}
+            FeO_wt_pct: {row: FeO, column: '10'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '10'}
+            sample_identifier_as_printed: {row: Identifier, column: '10'}
         - experiment_id: '11'
           sample_identifier_as_printed: CAM-49
           composition_role_as_printed: analysed glass
@@ -1362,6 +1404,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '11'
+            column: '11'
           point_conditions:
             T_C:
               state:
@@ -1372,7 +1415,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '11'
-                column: T °C
+                row: T° C
+                column: '11'
             atmosphere:
               state:
                 tag: value
@@ -1400,12 +1444,12 @@ species:
           run_id_as_printed: '11'
           T_C_as_printed: 1,434
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '11'}
+            T_C: {row: T° C, column: '11'}
+            duration_h_as_printed: {row: Time (h), column: '11'}
+            FeO_wt_pct: {row: FeO, column: '11'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '11'}
+            sample_identifier_as_printed: {row: Identifier, column: '11'}
         - experiment_id: '12'
           sample_identifier_as_printed: '3114'
           composition_role_as_printed: analysed glass
@@ -1431,6 +1475,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '12'
+            column: '12'
           point_conditions:
             T_C:
               state:
@@ -1441,7 +1486,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '12'
-                column: T °C
+                row: T° C
+                column: '12'
             atmosphere:
               state:
                 tag: value
@@ -1469,12 +1515,12 @@ species:
           run_id_as_printed: '12'
           T_C_as_printed: 1,454
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '12'}
+            T_C: {row: T° C, column: '12'}
+            duration_h_as_printed: {row: Time (h), column: '12'}
+            FeO_wt_pct: {row: FeO, column: '12'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '12'}
+            sample_identifier_as_printed: {row: Identifier, column: '12'}
         - experiment_id: '13'
           sample_identifier_as_printed: '1004'
           composition_role_as_printed: analysed glass
@@ -1500,6 +1546,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '13'
+            column: '13'
           point_conditions:
             T_C:
               state:
@@ -1510,7 +1557,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '13'
-                column: T °C
+                row: T° C
+                column: '13'
             atmosphere:
               state:
                 tag: value
@@ -1538,12 +1586,12 @@ species:
           run_id_as_printed: '13'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '13'}
+            T_C: {row: T° C, column: '13'}
+            duration_h_as_printed: {row: Time (h), column: '13'}
+            FeO_wt_pct: {row: FeO, column: '13'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '13'}
+            sample_identifier_as_printed: {row: Identifier, column: '13'}
         - experiment_id: '14'
           sample_identifier_as_printed: NIC-8
           composition_role_as_printed: analysed glass
@@ -1569,6 +1617,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '14'
+            column: '14'
           point_conditions:
             T_C:
               state:
@@ -1579,7 +1628,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '14'
-                column: T °C
+                row: T° C
+                column: '14'
             atmosphere:
               state:
                 tag: value
@@ -1607,12 +1657,12 @@ species:
           run_id_as_printed: '14'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '14'}
+            T_C: {row: T° C, column: '14'}
+            duration_h_as_printed: {row: Time (h), column: '14'}
+            FeO_wt_pct: {row: FeO, column: '14'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '14'}
+            sample_identifier_as_printed: {row: Identifier, column: '14'}
         - experiment_id: '15'
           sample_identifier_as_printed: G-24
           composition_role_as_printed: analysed glass
@@ -1638,6 +1688,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '15'
+            column: '15'
           point_conditions:
             T_C:
               state:
@@ -1648,7 +1699,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '15'
-                column: T °C
+                row: T° C
+                column: '15'
             atmosphere:
               state:
                 tag: value
@@ -1676,12 +1728,12 @@ species:
           run_id_as_printed: '15'
           T_C_as_printed: 1,447
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '15'}
+            T_C: {row: T° C, column: '15'}
+            duration_h_as_printed: {row: Time (h), column: '15'}
+            FeO_wt_pct: {row: FeO, column: '15'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '15'}
+            sample_identifier_as_printed: {row: Identifier, column: '15'}
         - experiment_id: '16'
           sample_identifier_as_printed: TC-19
           composition_role_as_printed: analysed glass
@@ -1707,6 +1759,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '16'
+            column: '16'
           point_conditions:
             T_C:
               state:
@@ -1717,7 +1770,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '16'
-                column: T °C
+                row: T° C
+                column: '16'
             atmosphere:
               state:
                 tag: value
@@ -1745,12 +1799,12 @@ species:
           run_id_as_printed: '16'
           T_C_as_printed: 1,447
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '16'}
+            T_C: {row: T° C, column: '16'}
+            duration_h_as_printed: {row: Time (h), column: '16'}
+            FeO_wt_pct: {row: FeO, column: '16'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '16'}
+            sample_identifier_as_printed: {row: Identifier, column: '16'}
         - experiment_id: '17'
           sample_identifier_as_printed: COL-17
           composition_role_as_printed: analysed glass
@@ -1776,6 +1830,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '17'
+            column: '17'
           point_conditions:
             T_C:
               state:
@@ -1786,7 +1841,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '17'
-                column: T °C
+                row: T° C
+                column: '17'
             atmosphere:
               state:
                 tag: value
@@ -1814,12 +1870,12 @@ species:
           run_id_as_printed: '17'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '17'}
+            T_C: {row: T° C, column: '17'}
+            duration_h_as_printed: {row: Time (h), column: '17'}
+            FeO_wt_pct: {row: FeO, column: '17'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '17'}
+            sample_identifier_as_printed: {row: Identifier, column: '17'}
         - experiment_id: '18'
           sample_identifier_as_printed: A-1770
           composition_role_as_printed: analysed glass
@@ -1845,6 +1901,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '18'
+            column: '18'
           point_conditions:
             T_C:
               state:
@@ -1855,7 +1912,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '18'
-                column: T °C
+                row: T° C
+                column: '18'
             atmosphere:
               state:
                 tag: value
@@ -1883,12 +1941,12 @@ species:
           run_id_as_printed: '18'
           T_C_as_printed: 1,429
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '18'}
+            T_C: {row: T° C, column: '18'}
+            duration_h_as_printed: {row: Time (h), column: '18'}
+            FeO_wt_pct: {row: FeO, column: '18'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '18'}
+            sample_identifier_as_printed: {row: Identifier, column: '18'}
         - experiment_id: '19'
           sample_identifier_as_printed: G-24
           composition_role_as_printed: analysed glass
@@ -1914,6 +1972,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '19'
+            column: '19'
           point_conditions:
             T_C:
               state:
@@ -1924,7 +1983,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '19'
-                column: T °C
+                row: T° C
+                column: '19'
             atmosphere:
               state:
                 tag: value
@@ -1952,12 +2012,12 @@ species:
           run_id_as_printed: '19'
           T_C_as_printed: 1,429
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '19'}
+            T_C: {row: T° C, column: '19'}
+            duration_h_as_printed: {row: Time (h), column: '19'}
+            FeO_wt_pct: {row: FeO, column: '19'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '19'}
+            sample_identifier_as_printed: {row: Identifier, column: '19'}
         - experiment_id: '20'
           sample_identifier_as_printed: '442'
           composition_role_as_printed: analysed glass
@@ -1983,6 +2043,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '20'
+            column: '20'
           point_conditions:
             T_C:
               state:
@@ -1993,7 +2054,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '20'
-                column: T °C
+                row: T° C
+                column: '20'
             atmosphere:
               state:
                 tag: value
@@ -2021,12 +2083,12 @@ species:
           run_id_as_printed: '20'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '20'}
+            T_C: {row: T° C, column: '20'}
+            duration_h_as_printed: {row: Time (h), column: '20'}
+            FeO_wt_pct: {row: FeO, column: '20'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '20'}
+            sample_identifier_as_printed: {row: Identifier, column: '20'}
         - experiment_id: '29'
           sample_identifier_as_printed: 94-8
           composition_role_as_printed: analysed glass
@@ -2052,6 +2114,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '29'
+            column: '29'
           point_conditions:
             T_C:
               state:
@@ -2062,7 +2125,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '29'
-                column: T °C
+                row: T° C
+                column: '29'
             atmosphere:
               state:
                 tag: value
@@ -2090,12 +2154,12 @@ species:
           run_id_as_printed: '29'
           T_C_as_printed: 1,447
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '29'}
+            T_C: {row: T° C, column: '29'}
+            duration_h_as_printed: {row: Time (h), column: '29'}
+            FeO_wt_pct: {row: FeO, column: '29'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '29'}
+            sample_identifier_as_printed: {row: Identifier, column: '29'}
         - experiment_id: '30'
           sample_identifier_as_printed: A-1805
           composition_role_as_printed: analysed glass
@@ -2121,6 +2185,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '30'
+            column: '30'
           point_conditions:
             T_C:
               state:
@@ -2131,7 +2196,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '30'
-                column: T °C
+                row: T° C
+                column: '30'
             atmosphere:
               state:
                 tag: value
@@ -2159,12 +2225,12 @@ species:
           run_id_as_printed: '30'
           T_C_as_printed: 1,434
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '30'}
+            T_C: {row: T° C, column: '30'}
+            duration_h_as_printed: {row: Time (h), column: '30'}
+            FeO_wt_pct: {row: FeO, column: '30'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '30'}
+            sample_identifier_as_printed: {row: Identifier, column: '30'}
         - experiment_id: '31'
           sample_identifier_as_printed: 766-263
           composition_role_as_printed: analysed glass
@@ -2190,6 +2256,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '31'
+            column: '31'
           point_conditions:
             T_C:
               state:
@@ -2200,7 +2267,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '31'
-                column: T °C
+                row: T° C
+                column: '31'
             atmosphere:
               state:
                 tag: value
@@ -2228,12 +2296,12 @@ species:
           run_id_as_printed: '31'
           T_C_as_printed: 1,436
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '31'}
+            T_C: {row: T° C, column: '31'}
+            duration_h_as_printed: {row: Time (h), column: '31'}
+            FeO_wt_pct: {row: FeO, column: '31'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '31'}
+            sample_identifier_as_printed: {row: Identifier, column: '31'}
         - experiment_id: '32'
           sample_identifier_as_printed: 780-U-111
           composition_role_as_printed: analysed glass
@@ -2259,6 +2327,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '32'
+            column: '32'
           point_conditions:
             T_C:
               state:
@@ -2269,7 +2338,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '32'
-                column: T °C
+                row: T° C
+                column: '32'
             atmosphere:
               state:
                 tag: value
@@ -2297,12 +2367,12 @@ species:
           run_id_as_printed: '32'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '32'}
+            T_C: {row: T° C, column: '32'}
+            duration_h_as_printed: {row: Time (h), column: '32'}
+            FeO_wt_pct: {row: FeO, column: '32'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '32'}
+            sample_identifier_as_printed: {row: Identifier, column: '32'}
         - experiment_id: '33'
           sample_identifier_as_printed: X-973
           composition_role_as_printed: analysed glass
@@ -2328,6 +2398,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '33'
+            column: '33'
           point_conditions:
             T_C:
               state:
@@ -2338,7 +2409,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '33'
-                column: T °C
+                row: T° C
+                column: '33'
             atmosphere:
               state:
                 tag: value
@@ -2366,12 +2438,12 @@ species:
           run_id_as_printed: '33'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '33'}
+            T_C: {row: T° C, column: '33'}
+            duration_h_as_printed: {row: Time (h), column: '33'}
+            FeO_wt_pct: {row: FeO, column: '33'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '33'}
+            sample_identifier_as_printed: {row: Identifier, column: '33'}
         - experiment_id: '34'
           sample_identifier_as_printed: 780-U-105
           composition_role_as_printed: analysed glass
@@ -2397,6 +2469,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '34'
+            column: '34'
           point_conditions:
             T_C:
               state:
@@ -2407,7 +2480,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '34'
-                column: T °C
+                row: T° C
+                column: '34'
             atmosphere:
               state:
                 tag: value
@@ -2435,12 +2509,12 @@ species:
           run_id_as_printed: '34'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '34'}
+            T_C: {row: T° C, column: '34'}
+            duration_h_as_printed: {row: Time (h), column: '34'}
+            FeO_wt_pct: {row: FeO, column: '34'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '34'}
+            sample_identifier_as_printed: {row: Identifier, column: '34'}
         - experiment_id: '35'
           sample_identifier_as_printed: 944-E
           composition_role_as_printed: analysed glass
@@ -2466,6 +2540,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '35'
+            column: '35'
           point_conditions:
             T_C:
               state:
@@ -2476,7 +2551,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '35'
-                column: T °C
+                row: T° C
+                column: '35'
             atmosphere:
               state:
                 tag: value
@@ -2504,12 +2580,12 @@ species:
           run_id_as_printed: '35'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '35'}
+            T_C: {row: T° C, column: '35'}
+            duration_h_as_printed: {row: Time (h), column: '35'}
+            FeO_wt_pct: {row: FeO, column: '35'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '35'}
+            sample_identifier_as_printed: {row: Identifier, column: '35'}
         - experiment_id: '36'
           sample_identifier_as_printed: 780-K-15
           composition_role_as_printed: analysed glass
@@ -2535,6 +2611,7 @@ species:
             pdf_page_index: 2
             table: '1'
             record: '36'
+            column: '36'
           point_conditions:
             T_C:
               state:
@@ -2545,7 +2622,8 @@ species:
                 pdf_page_index: 2
                 table: '1'
                 record: '36'
-                column: T °C
+                row: T° C
+                column: '36'
             atmosphere:
               state:
                 tag: value
@@ -2573,12 +2651,12 @@ species:
           run_id_as_printed: '36'
           T_C_as_printed: 1,445
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '36'}
+            T_C: {row: T° C, column: '36'}
+            duration_h_as_printed: {row: Time (h), column: '36'}
+            FeO_wt_pct: {row: FeO, column: '36'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '36'}
+            sample_identifier_as_printed: {row: Identifier, column: '36'}
       derived_from:
       - pdf:kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
     - observation_id: kilinc_1983_table2_duplicate_redox_series
@@ -2632,6 +2710,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '37'
+            column: '37'
           point_conditions:
             T_C:
               state:
@@ -2642,7 +2721,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '37'
-                column: T °C
+                row: T° C
+                column: '37'
             atmosphere:
               state:
                 tag: value
@@ -2670,12 +2750,12 @@ species:
           run_id_as_printed: '37'
           T_C_as_printed: 1,344
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '37'}
+            T_C: {row: T° C, column: '37'}
+            duration_h_as_printed: {row: Time (h), column: '37'}
+            FeO_wt_pct: {row: FeO, column: '37'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '37'}
+            sample_identifier_as_printed: {row: Identifier, column: '37'}
         - experiment_id: '38'
           sample_identifier_as_printed: IC-2
           composition_role_as_printed: analysed glass
@@ -2701,6 +2781,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '38'
+            column: '38'
           point_conditions:
             T_C:
               state:
@@ -2711,7 +2792,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '38'
-                column: T °C
+                row: T° C
+                column: '38'
             atmosphere:
               state:
                 tag: value
@@ -2739,12 +2821,12 @@ species:
           run_id_as_printed: '38'
           T_C_as_printed: 1,342
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '38'}
+            T_C: {row: T° C, column: '38'}
+            duration_h_as_printed: {row: Time (h), column: '38'}
+            FeO_wt_pct: {row: FeO, column: '38'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '38'}
+            sample_identifier_as_printed: {row: Identifier, column: '38'}
         - experiment_id: '49'
           sample_identifier_as_printed: 94-8
           composition_role_as_printed: analysed glass
@@ -2770,6 +2852,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '49'
+            column: '49'
           point_conditions:
             T_C:
               state:
@@ -2780,7 +2863,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '49'
-                column: T °C
+                row: T° C
+                column: '49'
             atmosphere:
               state:
                 tag: value
@@ -2808,12 +2892,12 @@ species:
           run_id_as_printed: '49'
           T_C_as_printed: 1,344
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '49'}
+            T_C: {row: T° C, column: '49'}
+            duration_h_as_printed: {row: Time (h), column: '49'}
+            FeO_wt_pct: {row: FeO, column: '49'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '49'}
+            sample_identifier_as_printed: {row: Identifier, column: '49'}
         - experiment_id: '40'
           sample_identifier_as_printed: 94-8
           composition_role_as_printed: analysed glass
@@ -2839,6 +2923,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '40'
+            column: '40'
           point_conditions:
             T_C:
               state:
@@ -2849,7 +2934,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '40'
-                column: T °C
+                row: T° C
+                column: '40'
             atmosphere:
               state:
                 tag: value
@@ -2877,12 +2963,12 @@ species:
           run_id_as_printed: '40'
           T_C_as_printed: 1,340
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '40'}
+            T_C: {row: T° C, column: '40'}
+            duration_h_as_printed: {row: Time (h), column: '40'}
+            FeO_wt_pct: {row: FeO, column: '40'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '40'}
+            sample_identifier_as_printed: {row: Identifier, column: '40'}
         - experiment_id: '41'
           sample_identifier_as_printed: G-247
           composition_role_as_printed: analysed glass
@@ -2908,6 +2994,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '41'
+            column: '41'
           point_conditions:
             T_C:
               state:
@@ -2918,7 +3005,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '41'
-                column: T °C
+                row: T° C
+                column: '41'
             atmosphere:
               state:
                 tag: value
@@ -2946,12 +3034,12 @@ species:
           run_id_as_printed: '41'
           T_C_as_printed: 1,443
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '41'}
+            T_C: {row: T° C, column: '41'}
+            duration_h_as_printed: {row: Time (h), column: '41'}
+            FeO_wt_pct: {row: FeO, column: '41'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '41'}
+            sample_identifier_as_printed: {row: Identifier, column: '41'}
         - experiment_id: '42'
           sample_identifier_as_printed: G-247
           composition_role_as_printed: analysed glass
@@ -2977,6 +3065,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '42'
+            column: '42'
           point_conditions:
             T_C:
               state:
@@ -2987,7 +3076,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '42'
-                column: T °C
+                row: T° C
+                column: '42'
             atmosphere:
               state:
                 tag: value
@@ -3015,12 +3105,12 @@ species:
           run_id_as_printed: '42'
           T_C_as_printed: 1,436
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '42'}
+            T_C: {row: T° C, column: '42'}
+            duration_h_as_printed: {row: Time (h), column: '42'}
+            FeO_wt_pct: {row: FeO, column: '42'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '42'}
+            sample_identifier_as_printed: {row: Identifier, column: '42'}
         - experiment_id: '43'
           sample_identifier_as_printed: CSQ-3
           composition_role_as_printed: analysed glass
@@ -3046,6 +3136,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '43'
+            column: '43'
           point_conditions:
             T_C:
               state:
@@ -3056,7 +3147,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '43'
-                column: T °C
+                row: T° C
+                column: '43'
             atmosphere:
               state:
                 tag: value
@@ -3084,12 +3176,12 @@ species:
           run_id_as_printed: '43'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '43'}
+            T_C: {row: T° C, column: '43'}
+            duration_h_as_printed: {row: Time (h), column: '43'}
+            FeO_wt_pct: {row: FeO, column: '43'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '43'}
+            sample_identifier_as_printed: {row: Identifier, column: '43'}
         - experiment_id: '44'
           sample_identifier_as_printed: CSQ-3
           composition_role_as_printed: analysed glass
@@ -3115,6 +3207,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '44'
+            column: '44'
           point_conditions:
             T_C:
               state:
@@ -3125,7 +3218,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '44'
-                column: T °C
+                row: T° C
+                column: '44'
             atmosphere:
               state:
                 tag: value
@@ -3153,12 +3247,12 @@ species:
           run_id_as_printed: '44'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '44'}
+            T_C: {row: T° C, column: '44'}
+            duration_h_as_printed: {row: Time (h), column: '44'}
+            FeO_wt_pct: {row: FeO, column: '44'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '44'}
+            sample_identifier_as_printed: {row: Identifier, column: '44'}
         - experiment_id: '45'
           sample_identifier_as_printed: IC-2
           composition_role_as_printed: analysed glass
@@ -3184,6 +3278,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '45'
+            column: '45'
           point_conditions:
             T_C:
               state:
@@ -3194,7 +3289,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '45'
-                column: T °C
+                row: T° C
+                column: '45'
             atmosphere:
               state:
                 tag: value
@@ -3222,12 +3318,12 @@ species:
           run_id_as_printed: '45'
           T_C_as_printed: 1,443
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '45'}
+            T_C: {row: T° C, column: '45'}
+            duration_h_as_printed: {row: Time (h), column: '45'}
+            FeO_wt_pct: {row: FeO, column: '45'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '45'}
+            sample_identifier_as_printed: {row: Identifier, column: '45'}
         - experiment_id: '46'
           sample_identifier_as_printed: IC-2
           composition_role_as_printed: analysed glass
@@ -3253,6 +3349,7 @@ species:
             pdf_page_index: 3
             table: '2'
             record: '46'
+            column: '46'
           point_conditions:
             T_C:
               state:
@@ -3263,7 +3360,8 @@ species:
                 pdf_page_index: 3
                 table: '2'
                 record: '46'
-                column: T °C
+                row: T° C
+                column: '46'
             atmosphere:
               state:
                 tag: value
@@ -3291,12 +3389,12 @@ species:
           run_id_as_printed: '46'
           T_C_as_printed: 1,430
           cell_locators:
-            run_id_as_printed: 'Sample #'
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            sample_identifier_as_printed: Identifier
+            run_id_as_printed: {row: 'Sample #', column: '46'}
+            T_C: {row: T° C, column: '46'}
+            duration_h_as_printed: {row: Time (h), column: '46'}
+            FeO_wt_pct: {row: FeO, column: '46'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '46'}
+            sample_identifier_as_printed: {row: Identifier, column: '46'}
       derived_from:
       - pdf:kilinc-carmichael-rivers-sack-1983-ferric-ferrous-air
     - observation_id: kilinc_1983_table3_equilibrium_time_series
@@ -3346,7 +3444,8 @@ species:
           FeO_method_locator:
             published_page: 137
             pdf_page_index: 1
-            section: Results and Discussion
+            section: Experimental Procedures
+            column: left
             note: Ferrous iron contents (FeO) of glasses were determined using the volumetric and colorimetric procedure of Wilson (1960).
           printed_total_wt_percent: '98.68'
           duration_h_as_printed: '5'
@@ -3355,6 +3454,7 @@ species:
             pdf_page_index: 3
             table: '3'
             record: 5 h
+            column: '5'
           point_conditions:
             T_C:
               state:
@@ -3365,15 +3465,17 @@ species:
                 pdf_page_index: 3
                 table: '3'
                 record: 5 h
-                column: T °C
+                row: T° C
+                column: '5'
             atmosphere:
               state:
                 tag: value
                 value: air
               locator:
-                published_page: 136
-                pdf_page_index: 0
-                section: Abstract
+                published_page: 137
+                pdf_page_index: 1
+                section: Results and Discussion
+                column: right
             fO2_log:
               state:
                 tag: unknown
@@ -3391,12 +3493,12 @@ species:
           FeO_wt_pct: '2.23'
           T_C_as_printed: 1,349
           cell_locators:
-            run_id_as_printed: Time (h)
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            printed_total_wt_percent: Total
+            run_id_as_printed: {row: Time (h), column: '5'}
+            T_C: {row: T° C, column: '5'}
+            duration_h_as_printed: {row: Time (h), column: '5'}
+            FeO_wt_pct: {row: FeO, column: '5'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '5'}
+            printed_total_wt_percent: {row: Total, column: '5'}
           sample_description_as_printed: glassy andesite
           sample_description_locator:
             published_page: 137
@@ -3425,7 +3527,8 @@ species:
           FeO_method_locator:
             published_page: 137
             pdf_page_index: 1
-            section: Results and Discussion
+            section: Experimental Procedures
+            column: left
             note: Ferrous iron contents (FeO) of glasses were determined using the volumetric and colorimetric procedure of Wilson (1960).
           printed_total_wt_percent: '98.54'
           duration_h_as_printed: '12'
@@ -3434,6 +3537,7 @@ species:
             pdf_page_index: 3
             table: '3'
             record: 12 h
+            column: '12'
           point_conditions:
             T_C:
               state:
@@ -3444,15 +3548,17 @@ species:
                 pdf_page_index: 3
                 table: '3'
                 record: 12 h
-                column: T °C
+                row: T° C
+                column: '12'
             atmosphere:
               state:
                 tag: value
                 value: air
               locator:
-                published_page: 136
-                pdf_page_index: 0
-                section: Abstract
+                published_page: 137
+                pdf_page_index: 1
+                section: Results and Discussion
+                column: right
             fO2_log:
               state:
                 tag: unknown
@@ -3470,12 +3576,12 @@ species:
           FeO_wt_pct: '2.21'
           T_C_as_printed: 1,349
           cell_locators:
-            run_id_as_printed: Time (h)
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            printed_total_wt_percent: Total
+            run_id_as_printed: {row: Time (h), column: '12'}
+            T_C: {row: T° C, column: '12'}
+            duration_h_as_printed: {row: Time (h), column: '12'}
+            FeO_wt_pct: {row: FeO, column: '12'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '12'}
+            printed_total_wt_percent: {row: Total, column: '12'}
           sample_description_as_printed: glassy andesite
           sample_description_locator:
             published_page: 137
@@ -3504,7 +3610,8 @@ species:
           FeO_method_locator:
             published_page: 137
             pdf_page_index: 1
-            section: Results and Discussion
+            section: Experimental Procedures
+            column: left
             note: Ferrous iron contents (FeO) of glasses were determined using the volumetric and colorimetric procedure of Wilson (1960).
           printed_total_wt_percent: '99.00'
           duration_h_as_printed: '25'
@@ -3513,6 +3620,7 @@ species:
             pdf_page_index: 3
             table: '3'
             record: 25 h
+            column: '25'
           point_conditions:
             T_C:
               state:
@@ -3523,15 +3631,17 @@ species:
                 pdf_page_index: 3
                 table: '3'
                 record: 25 h
-                column: T °C
+                row: T° C
+                column: '25'
             atmosphere:
               state:
                 tag: value
                 value: air
               locator:
-                published_page: 136
-                pdf_page_index: 0
-                section: Abstract
+                published_page: 137
+                pdf_page_index: 1
+                section: Results and Discussion
+                column: right
             fO2_log:
               state:
                 tag: unknown
@@ -3549,12 +3659,12 @@ species:
           FeO_wt_pct: '2.25'
           T_C_as_printed: 1,349
           cell_locators:
-            run_id_as_printed: Time (h)
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            printed_total_wt_percent: Total
+            run_id_as_printed: {row: Time (h), column: '25'}
+            T_C: {row: T° C, column: '25'}
+            duration_h_as_printed: {row: Time (h), column: '25'}
+            FeO_wt_pct: {row: FeO, column: '25'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '25'}
+            printed_total_wt_percent: {row: Total, column: '25'}
           sample_description_as_printed: glassy andesite
           sample_description_locator:
             published_page: 137
@@ -3583,7 +3693,8 @@ species:
           FeO_method_locator:
             published_page: 137
             pdf_page_index: 1
-            section: Results and Discussion
+            section: Experimental Procedures
+            column: left
             note: Ferrous iron contents (FeO) of glasses were determined using the volumetric and colorimetric procedure of Wilson (1960).
           printed_total_wt_percent: '98.66'
           duration_h_as_printed: '48'
@@ -3592,6 +3703,7 @@ species:
             pdf_page_index: 3
             table: '3'
             record: 48 h
+            column: '48'
           point_conditions:
             T_C:
               state:
@@ -3602,15 +3714,17 @@ species:
                 pdf_page_index: 3
                 table: '3'
                 record: 48 h
-                column: T °C
+                row: T° C
+                column: '48'
             atmosphere:
               state:
                 tag: value
                 value: air
               locator:
-                published_page: 136
-                pdf_page_index: 0
-                section: Abstract
+                published_page: 137
+                pdf_page_index: 1
+                section: Results and Discussion
+                column: right
             fO2_log:
               state:
                 tag: unknown
@@ -3628,12 +3742,12 @@ species:
           FeO_wt_pct: '2.34'
           T_C_as_printed: 1,349
           cell_locators:
-            run_id_as_printed: Time (h)
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            printed_total_wt_percent: Total
+            run_id_as_printed: {row: Time (h), column: '48'}
+            T_C: {row: T° C, column: '48'}
+            duration_h_as_printed: {row: Time (h), column: '48'}
+            FeO_wt_pct: {row: FeO, column: '48'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '48'}
+            printed_total_wt_percent: {row: Total, column: '48'}
           sample_description_as_printed: glassy andesite
           sample_description_locator:
             published_page: 137
@@ -3662,7 +3776,8 @@ species:
           FeO_method_locator:
             published_page: 137
             pdf_page_index: 1
-            section: Results and Discussion
+            section: Experimental Procedures
+            column: left
             note: Ferrous iron contents (FeO) of glasses were determined using the volumetric and colorimetric procedure of Wilson (1960).
           printed_total_wt_percent: '98.17'
           duration_h_as_printed: '70'
@@ -3671,6 +3786,7 @@ species:
             pdf_page_index: 3
             table: '3'
             record: 70 h
+            column: '70'
           point_conditions:
             T_C:
               state:
@@ -3681,15 +3797,17 @@ species:
                 pdf_page_index: 3
                 table: '3'
                 record: 70 h
-                column: T °C
+                row: T° C
+                column: '70'
             atmosphere:
               state:
                 tag: value
                 value: air
               locator:
-                published_page: 136
-                pdf_page_index: 0
-                section: Abstract
+                published_page: 137
+                pdf_page_index: 1
+                section: Results and Discussion
+                column: right
             fO2_log:
               state:
                 tag: unknown
@@ -3707,12 +3825,12 @@ species:
           FeO_wt_pct: '2.58'
           T_C_as_printed: 1,359
           cell_locators:
-            run_id_as_printed: Time (h)
-            T_C: T °C
-            duration_h_as_printed: Time (h)
-            FeO_wt_pct: FeO
-            Fe2O3_wt_pct: Fe2O3
-            printed_total_wt_percent: Total
+            run_id_as_printed: {row: Time (h), column: '70'}
+            T_C: {row: T° C, column: '70'}
+            duration_h_as_printed: {row: Time (h), column: '70'}
+            FeO_wt_pct: {row: FeO, column: '70'}
+            Fe2O3_wt_pct: {row: Fe2O3, column: '70'}
+            printed_total_wt_percent: {row: Total, column: '70'}
           sample_description_as_printed: glassy andesite
           sample_description_locator:
             published_page: 137

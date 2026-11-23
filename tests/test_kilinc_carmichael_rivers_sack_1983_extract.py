@@ -32,14 +32,9 @@ def test_kilinc_extract_fidelity_and_source_mapping() -> None:
             assert all(isinstance(value, str) for value in row["oxide_wt_percent"].values())
             assert isinstance(row["Fe2O3_wt_pct"], str)
             assert isinstance(row["FeO_wt_pct"], str)
-            assert row["cell_locators"]["Fe2O3_wt_pct"] == "Fe2O3"
-            assert row["cell_locators"]["FeO_wt_pct"] == "FeO"
             assert row["Fe2O3_wt_pct"] == row["oxide_wt_percent"]["Fe2O3"]
             assert row["FeO_wt_pct"] == row["oxide_wt_percent"]["FeO"]
-            assert row["cell_locators"]["sample_identifier_as_printed"] == "Identifier"
-            assert row["cell_locators"]["run_id_as_printed"] == "Sample #"
             assert row["point_conditions"]["T_C"]["state"]["value"] == row["T_C"]
-            assert row["point_conditions"]["T_C"]["locator"] == row["locator"] | {"column": "T °C"}
             assert row["point_conditions"]["composition"]["state"]["value"]["components"] == row["oxide_wt_percent"]
             assert row["point_conditions"]["fO2_log"]["state"]["tag"] == "unknown"
             assert "locator" not in row["point_conditions"]["fO2_log"]
@@ -61,7 +56,50 @@ def test_kilinc_extract_fidelity_and_source_mapping() -> None:
         assert row["FeO_method_as_printed"] == "volumetric and colorimetric procedure of Wilson (1960)"
         assert row["FeO_method_locator"]["published_page"] == 137
         assert row["FeO_method_locator"]["pdf_page_index"] == 1
-        assert "column" not in row["FeO_method_locator"]
+        assert row["FeO_method_locator"]["section"] == "Experimental Procedures"
+        assert row["FeO_method_locator"]["column"] == "left"
+        assert row["point_conditions"]["atmosphere"]["locator"] == {
+            "published_page": 137,
+            "pdf_page_index": 1,
+            "section": "Results and Discussion",
+            "column": "right",
+        }
+
+
+def test_kilinc_cell_locators_follow_printed_table_orientation() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    table1, table2, table3 = (
+        item["values"]["rows"] for item in document["species"]["Fe"]["observations"]
+    )
+    for rows, columns in (
+        (table1, [str(n) for n in (*range(1, 9), *range(21, 29), *range(9, 21), *range(29, 37))]),
+        (table2, "37 38 49 40 41 42 43 44 45 46".split()),
+        (table3, "5 12 25 48 70".split()),
+    ):
+        assert [row["run_id_as_printed"] for row in rows] == columns
+        for row, column in zip(rows, columns, strict=True):
+            assert row["locator"]["column"] == column
+            printed_rows = {
+                "run_id_as_printed": "Time (h)" if rows is table3 else "Sample #",
+                "T_C": "T° C",
+                "duration_h_as_printed": "Time (h)",
+                "FeO_wt_pct": "FeO",
+                "Fe2O3_wt_pct": "Fe2O3",
+            }
+            if rows is table3:
+                printed_rows["printed_total_wt_percent"] = "Total"
+            else:
+                printed_rows["sample_identifier_as_printed"] = "Identifier"
+            assert row["cell_locators"] == {
+                field: {"row": label, "column": column}
+                for field, label in printed_rows.items()
+            }
+            assert row["point_conditions"]["T_C"]["locator"] == row["locator"] | {"row": "T° C"}
+
+    assert [
+        (sample["locator"]["row"], sample["locator"]["column"])
+        for sample in document["fidelity_samples"]
+    ] == [("Fe2O3", "1"), ("FeO", "1"), ("Fe2O3", "37"), ("FeO", "5"), ("Fe2O3", "1"), ("FeO", "1")]
 
 
 def test_kilinc_row_coordinates_reach_every_migrated_observation() -> None:
