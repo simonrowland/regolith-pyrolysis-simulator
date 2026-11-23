@@ -4105,26 +4105,27 @@ def test_lab_schedule_pressure_mutations_reject_invalid_values(
     assert str(error.value) == expected_reason
 
 
-def test_normalize_lab_schedule_uses_pressure_floor_owner(monkeypatch) -> None:
+def test_normalize_lab_schedule_marks_subfloor_pressure_as_extrapolated() -> None:
+    pressure_mbar = lab_schedule.LAB_SCHEDULE_PRESSURE_FLOOR_MBAR / 2.0
     schedule = _lab_schedule(
         duration_h=1.0,
         temperature_points=((0.0, 25.0), (1.0, 1200.0)),
-        pressure_points=((0.0, 1.0), (1.0, 1.0)),
+        pressure_points=((0.0, pressure_mbar), (1.0, pressure_mbar)),
         furnace_ceiling_C=1300.0,
     )
-    observed: list[float] = []
+    normalized = normalize_lab_schedule(schedule)
 
-    def floor_notice(value: float) -> tuple[str, str]:
-        observed.append(value)
-        return "test_pressure_floor", "forced notice"
-
-    monkeypatch.setattr(lab_schedule, "_pressure_floor_notice_mbar", floor_notice)
-    with pytest.raises(
-        LabScheduleValidationError,
-        match="test_pressure_floor: forced notice",
-    ):
-        normalize_lab_schedule(schedule)
-    assert observed == [1.0]
+    notices = normalized["pressure_domain_notices"]
+    assert len(notices) == 2
+    assert [notice["pressure_mbar"] for notice in notices] == [
+        pressure_mbar,
+        pressure_mbar,
+    ]
+    assert all(
+        notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+        and notice["authority"] == "extrapolated"
+        for notice in notices
+    )
 
 
 def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:
