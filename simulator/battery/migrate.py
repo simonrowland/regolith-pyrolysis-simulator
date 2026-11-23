@@ -9423,16 +9423,23 @@ def _apply_equilibrium_starting_bulk(
         return point_conditions, []
     if _row_printed_composition_unknown(point_conditions):
         return point_conditions, []
-    if (
-        quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        and _keeps_existing_composition(ident_kwargs.get("composition"))
-    ):
-        return point_conditions, []
     composition_for_row = composition
-    if composition.proxy_flag != "composition_from_sample_catalog":
+    if (
+        composition.input_provenance is None
+        and composition.proxy_flag != "composition_from_sample_catalog"
+    ):
         composition_for_row = composition_with_provenance(
             composition, PRINTED_STARTING_BULK
         )
+    if (
+        (
+            quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            or composition_for_row.input_provenance != PRINTED_STARTING_BULK
+            or composition_for_row.proxy_flag == "composition_from_sample_catalog"
+        )
+        and _keeps_existing_composition(ident_kwargs.get("composition"))
+    ):
+        return point_conditions, []
     located = Located(
         State.of(composition_for_row),
         locator=initial.locator,
