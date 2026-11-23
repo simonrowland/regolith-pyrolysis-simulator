@@ -354,7 +354,7 @@ species:
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: Mn(g)
-        quantity: partial_pressure_initial_points
+        quantity: partial_pressure
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
@@ -427,7 +427,7 @@ species:
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: Cr(g)
-        quantity: partial_pressure_initial_points
+        quantity: partial_pressure
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
@@ -491,7 +491,7 @@ species:
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: Mg(g)
-        quantity: partial_pressure_initial_points
+        quantity: partial_pressure
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         activity_note: low activity; same order as pure-oxide decomposition pressures (Altman 1963)
@@ -2132,14 +2132,17 @@ species:
         sample: '12022'
         composition_role: *demaria_1971_12022_initial_charge_role
         initial_charge_context: *demaria_1971_12022_initial_charge_context
-        point_conditions:
-          composition: *smales_12022_initial_charge_composition
         <<: &composition_12022
-          sample_Na2O_wt_pct: 0.36
-          sample_K2O_wt_pct: 0.068
           sample_alkali_content_wt_pct:
             Na2O: 0.36
             K2O: 0.068
+          sample_alkali_content_locator:
+            source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+            page: 3
+            published_page: 1369
+            pdf_page_index: 2
+            paragraph: Alkaline components
+            note: Separate printed alkali values retained as context, not merged into the Smales bulk analysis.
           composition_method_class: quoted_literature
           composition_attribution: "Smales 1971, as cited by DeMaria et al. 1971 ('reported elsewhere (SMALES, 1971)')"
           composition_source_note: >-
@@ -2154,7 +2157,7 @@ species:
             quote: Apollo 12 rock 12022 analytical composition
             cited_by_source_id: kems-022-demaria-1971
             citing_published_page: 1368
-            citing_pdf_page_index: 2
+            citing_pdf_page_index: 1
             citing_paragraph: sample 12022 composition
             citing_quote: “The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971).”
         prior_figure_digitization_present: true
@@ -2241,6 +2244,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018427, repeatability: 0.010374, total: 0.028932}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.018717, total: 0.061774}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1421.06
           invT_times_1e4_K_inv: 7.037
           log10_p_atm: -6.145
@@ -2257,6 +2262,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000641, total: 0.019123}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000135, total: 0.043192}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1377.03
           invT_times_1e4_K_inv: 7.262
           log10_p_atm: -6.716
@@ -2273,6 +2280,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000438, total: 0.018920}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001314, total: 0.044371}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1358.33
           invT_times_1e4_K_inv: 7.362
           log10_p_atm: -7.148
@@ -2289,6 +2298,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000665, total: 0.019147}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001943, total: 0.045000}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1334.94
           invT_times_1e4_K_inv: 7.491
           log10_p_atm: -7.460
@@ -2305,6 +2316,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000620, total: 0.019102}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001950, total: 0.045007}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1297.35
           invT_times_1e4_K_inv: 7.708
           log10_p_atm: -8.037
@@ -2321,6 +2334,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000899, total: 0.019381}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000780, total: 0.043837}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -3121,14 +3136,15 @@ fidelity_samples:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '8'
     line_range: 328-330
-- species: Na
-  observable: psat_series
-  observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
-  field: sample_Na2O_wt_pct
+- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12022_digitized].values.sample_alkali_content_wt_pct.Na2O
   value: 0.36
   locator:
-    figure: '1'
-    paragraph: 0.36 wt% Na2O in sample 12022 text
+    source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+    page: 3
+    published_page: 1369
+    pdf_page_index: 2
+    paragraph: Alkaline components
+    note: Printed Na2O 0.36 wt% retained as context, not as the starting-charge analysis.
 - species: Fe
   observable: activity_coefficient
   observation_id: demaria_1971_multi_rotating_geometry_absence_b1

@@ -318,7 +318,7 @@ def test_demaria_in_band_rows_have_thirty_points_and_twelve_context_rows(
         assert len(matching) == expected_counts[fragment], fragment
 
 
-def test_demaria_atomic_oxygen_points_use_smales_catalogue_composition(
+def test_demaria_atomic_oxygen_points_keep_sample_composition_roles(
     migrated_targets,
 ) -> None:
     oxygen = [
@@ -338,10 +338,10 @@ def test_demaria_atomic_oxygen_points_use_smales_catalogue_composition(
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert observation.admission.status is AdmissionStatus.ADMITTED
-    _assert_smales_catalogue_composition(oxygen, expected_sources)
+    _assert_demaria_sample_composition(oxygen, expected_sources)
 
 
-def test_demaria_table4_points_use_sample_smales_catalogue_composition(
+def test_demaria_table4_points_keep_sample_composition_roles(
     migrated_targets,
 ) -> None:
     table4 = [
@@ -364,25 +364,28 @@ def test_demaria_table4_points_use_sample_smales_catalogue_composition(
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert observation.admission.status is AdmissionStatus.ADMITTED
-    _assert_smales_catalogue_composition(table4, expected_sources)
+    _assert_demaria_sample_composition(table4, expected_sources)
 
 
-def _assert_smales_catalogue_composition(observations, expected_sources) -> None:
+def _assert_demaria_sample_composition(observations, expected_sources) -> None:
     for observation in observations:
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
-        assert composition.value.proxy_flag == "composition_from_sample_catalog"
-        assert "depleted residue" in composition.value.analysis_selection_rule
         sample = next(
             sample
             for sample in expected_sources
             if f":row={sample}" in observation.observation_id
         )
-        assert expected_sources[sample] in composition.value.proxy_source
-        assert any(
-            notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
-            for notice in observation.notices
-        )
+        if sample == "12022":
+            assert composition.value.proxy_flag == "initial_charge_only"
+        else:
+            assert composition.value.proxy_flag == "composition_from_sample_catalog"
+            assert "depleted residue" in composition.value.analysis_selection_rule
+            assert expected_sources[sample] in composition.value.proxy_source
+            assert any(
+                notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
+                for notice in observation.notices
+            )
 
 
 def test_demaria_context_rows_keep_unmapped_thermochemistry_reasons() -> None:

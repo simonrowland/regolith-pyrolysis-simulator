@@ -38,9 +38,9 @@ linked_rows:
     - species: Al
       count: 1
   table: '1'
-  page: 3
+  page: 2
   published_page: 176
-  pdf_page_index: 2
+  pdf_page_index: 1
   page_proof: rendered Table I; the scan's pdftotext layer does not return the table cells
 initial_charge_context:
   measurement_state_composition: not_published per point in the cited 1971 study
@@ -52,11 +52,11 @@ openimcc_basis:
   coverage: all selected oxide components are covered; MnO uses the relaxed Cr/Mn oxide basis
 engine_readiness:
   composition_ready_rows: 16
-  expected_refused_to_callable: 16
-  prediction_tier: callable with composition_from_initial_charge flag; evidence remains quoted_attributed
+  typed_quantity_rows: 16
+  prediction_tier: composition proxy and partial-pressure quantity are typed; engine/species callability is not claimed; evidence remains quoted_attributed
   unlinked: 32 of the 48 census refusals remain composition-unknown
-  other_sample: sample 12065 rows remain unlinked
+  other_sample: 12065 Table I points retain their separately cited 12065 composition; no 12022 charge is copied onto them
 numeric_values_changed: false
 verification:
   focused_test: tests/battery/test_migrate.py::test_demaria_1973_table1_temperature_and_conditions_reach_every_row
-  isolated_migration_and_store_regen: not run under owner hold
+  isolated_migration: measured in memory after the extract fixes; store regeneration not run under owner hold

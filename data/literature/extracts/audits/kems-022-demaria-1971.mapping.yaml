@@ -62,11 +62,11 @@ openimcc_basis:
   coverage: all selected oxide components are covered; MnO uses the relaxed Cr/Mn oxide basis
 engine_readiness:
   composition_ready_rows: 34
-  expected_refused_to_callable: 34
-  prediction_tier: callable with composition_from_initial_charge flag; other absent inputs use the scorer's typed defaults
+  typed_quantity_rows: 34
+  prediction_tier: composition proxy and partial-pressure quantity are typed; engine/species callability is not claimed
   unlinked: 3 of the 37 census refusals remain composition-unknown
-  other_sample: no Smales 12065 composition copied to this paper's sample 12065 rows
+  other_sample: no 12022 charge linked to the separate 12065 Figure 1 series; pre-existing 12065 catalogue proxies elsewhere are unchanged
 numeric_values_changed: false
 verification:
   focused_test: tests/battery/test_migrate.py::test_demaria_1971_smales_composition_links_only_12022_vapour_rows
-  isolated_migration_and_store_regen: not run under owner hold
+  isolated_migration: measured in memory after the extract fixes; store regeneration not run under owner hold

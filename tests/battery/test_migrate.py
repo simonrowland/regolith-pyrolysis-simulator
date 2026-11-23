@@ -13690,7 +13690,7 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
         assert condition.locator is not None
         assert condition.locator.table == "1"
         assert condition.locator.published_page == 176
-        assert condition.locator.pdf_page_index == 2
+        assert condition.locator.pdf_page_index == 1
         assert obs.locator is not None and obs.locator.table == "1"
 
     initial_charge_rows = [
@@ -13723,6 +13723,13 @@ def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
         na_extract["values"]["series"][0]["composition_role"]["quote"]
         == "The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971)."
     )
+    run_order_locator = na_extract["values"]["series"][0]["initial_charge_context"][
+        "run_order_index"
+    ]["locator"]
+    assert run_order_locator["page"] == 2
+    assert run_order_locator["published_page"] == 176
+    assert run_order_locator["pdf_page_index"] == 1
+    assert run_order_locator["table"] == "1"
     linked_source_rows = []
     for row in _extract_observations("kems-023-demaria-1973.yaml"):
         source_values = row.get("values", {})
@@ -13814,6 +13821,29 @@ def test_demaria_1971_smales_composition_links_only_12022_vapour_rows(
                 break
     assert actual_counts == expected_counts
     assert len(linked) == 34
+    table_pressure_fragments = (
+        "demaria_1971_mn_psat_table2_sample_12022",
+        "demaria_1971_cr_psat_table2_sample_12022",
+        "demaria_1971_mg_psat_table3_lunar_basalt",
+    )
+    typed_table_pressure_rows = [
+        obs
+        for obs in rows
+        if any(fragment in obs.observation_id for fragment in table_pressure_fragments)
+    ]
+    assert len(typed_table_pressure_rows) == 13
+    assert all(
+        obs.identity.quantity is not None
+        and obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.P_PARTIAL
+        for obs in typed_table_pressure_rows
+    )
+    typed_initial_points = [
+        obs
+        for obs in linked
+        if any(fragment in obs.observation_id for fragment in table_pressure_fragments)
+    ]
+    assert len(typed_initial_points) == 8
     for obs in linked:
         temperature = obs.identity.temperature_K
         assert temperature is not None and temperature.is_value
@@ -13838,6 +13868,15 @@ def test_demaria_1971_smales_composition_links_only_12022_vapour_rows(
     )
 
     extract_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    table_pressure_source_rows = [
+        row
+        for row in extract_rows
+        if row.get("observation_id") in table_pressure_fragments
+    ]
+    assert len(table_pressure_source_rows) == 3
+    for row in table_pressure_source_rows:
+        assert row["values"]["quantity"] == "partial_pressure"
+        assert "initial points" in row["locator"]["paragraph"].lower()
     linked_source_rows = [
         row
         for row in extract_rows
@@ -13866,7 +13905,13 @@ def test_demaria_1971_smales_composition_links_only_12022_vapour_rows(
         "Na2O": 0.36,
         "K2O": 0.068,
     }
-    assert "reported elsewhere (Smales, 1971)" in values["composition_source_note"]
+    assert values["composition_source_note"] == (
+        "DeMaria et al. (1971, p. 1368) refer the 12022 bulk composition to "
+        "Smales (1971), Table 2. Their p. 1369 alkaline-components paragraph "
+        "separately prints Na2O 0.36 wt % and K2O 0.068 wt %; those partial "
+        "values are retained as printed context and are not merged into or "
+        "averaged with the Smales bulk analysis."
+    )
     assert "composition_from_sample_catalog" not in values
     assert "sample_oxide_composition_wt_pct" not in values
     assert "printed_composition" not in values
@@ -13879,6 +13924,7 @@ def test_demaria_1971_smales_composition_links_only_12022_vapour_rows(
     assert source_components["SiO2"] == "42.3"
     assert source_components["Al2O3"] == "8.2"
     assert source_components["FeO"] == "21.6"
+    assert "Cr2O3" not in source_components
     expected_initial_composition = wt_pct_to_mole_fraction(
         DEMARIA_12022_MASS_PERCENT
     )
@@ -13890,6 +13936,26 @@ def test_demaria_1971_smales_composition_links_only_12022_vapour_rows(
     assert source_composition["locator"]["page"] == 2
     assert source_composition["locator"]["pdf_page_index"] == 1
     assert source_composition["locator"]["published_page"] == 1254
+    na_1973 = next(
+        row
+        for row in _extract_observations("kems-023-demaria-1973.yaml")
+        if row.get("observation_id")
+        == "demaria_1973_na_psat_table1_quoted_demaria_1971"
+    )
+    alkali_context = na_1973["values"]["sample_alkali_content_wt_pct"]
+    assert alkali_context == {"Na2O": 0.36, "K2O": 0.068}
+    alkali_locator = na_1973["values"]["sample_alkali_content_locator"]
+    assert alkali_locator["published_page"] == 1369
+    assert alkali_locator["pdf_page_index"] == 2
+    na_12022 = [
+        point
+        for point in na_1973["values"]["series"]
+        if point.get("sample") == "12022"
+    ]
+    assert len(na_12022) == 2
+    for point in na_12022:
+        assert "printed_composition" not in point
+        assert point["point_conditions"]["composition"]["locator"]["table"] == "2"
     sample_12065 = next(
         row
         for row in extract_rows

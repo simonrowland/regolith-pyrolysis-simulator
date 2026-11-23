@@ -77,7 +77,6 @@ from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
-FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
 # The generated rollup lives on its own page, linked from docs/model-limitations.md.
 MODEL_LIMITATIONS_PATH = REPO_ROOT / "docs" / "validation-battery-rollup.md"
 MOTZFELDT_TOOL_PATH = REPO_ROOT / "tools" / "motzfeldt.py"
@@ -985,6 +984,9 @@ def _literature_pressure_points(
                         "sample_K2O_wt_pct",
                         "composition_source_observation_id",
                         "composition_source_gap",
+                        "composition_role",
+                        "point_conditions",
+                        "sample",
                     )
                     if key in pt
                 }
@@ -3629,7 +3631,12 @@ def _melt_recipe_mol(
             "melt_composition_wt_pct",
             "sample_oxide_composition_wt_pct",
         )
-        if any(
+        point_conditions = point.get("point_conditions")
+        point_has_located_composition = (
+            isinstance(point_conditions, Mapping)
+            and isinstance(point_conditions.get("composition"), Mapping)
+        )
+        if point_has_located_composition or any(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
             for key in point_recipe_keys
         ):
@@ -3640,6 +3647,7 @@ def _melt_recipe_mol(
                 "sample_K2O_wt_pct",
                 "composition_source_observation_id",
                 "composition_source_gap",
+                "point_conditions",
             ):
                 values.pop(key, None)
         values.update(
@@ -3655,6 +3663,10 @@ def _melt_recipe_mol(
                 if key in point
             }
         )
+        if point_has_located_composition:
+            values["point_conditions"] = point_conditions
+        if "composition_role" in point:
+            values["composition_role"] = point["composition_role"]
     for key in ("composition_mol", "melt_composition_mol"):
         raw = values.get(key)
         if isinstance(raw, Mapping) and raw:
@@ -3674,20 +3686,42 @@ def _melt_recipe_mol(
         "sample_oxide_composition_wt_pct"
     ):
         provenance = "extract sample_oxide_composition_wt_pct"
-    material = str(values.get("material") or obs.phase or "").lower()
-    if not isinstance(raw_wt, Mapping) and (
-        "apollo_12" in material or "lunar_basalt_120" in material
-    ):
-        if values.get("composition_source_gap"):
-            return (
-                None,
-                "extract composition_source_gap",
-                "missing_condition:melt_composition",
-            )
-        feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
-        feedstock = feedstocks.get("lunar_mare_low_ti") or {}
-        raw_wt = feedstock.get("composition_wt_pct")
-        provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
+    if not isinstance(raw_wt, Mapping):
+        point_conditions = values.get("point_conditions")
+        located = (
+            point_conditions.get("composition")
+            if isinstance(point_conditions, Mapping)
+            else None
+        )
+        state = located.get("state") if isinstance(located, Mapping) else None
+        composition = (
+            state.get("value")
+            if isinstance(state, Mapping) and state.get("tag") == "value"
+            else None
+        )
+        if (
+            isinstance(composition, Mapping)
+            and composition.get("basis") == "oxide_weight_percent_as_published"
+            and composition.get("amount_basis") == "mass_percent"
+            and isinstance(composition.get("components"), list)
+        ):
+            raw_wt = {
+                str(component[0]): component[1]
+                for component in composition["components"]
+                if isinstance(component, (list, tuple)) and len(component) == 2
+            }
+            provenance = "extract point_conditions.composition"
+    if not isinstance(raw_wt, Mapping) and values.get("composition_source_gap"):
+        return (
+            None,
+            "extract composition_source_gap",
+            "missing_condition:melt_composition",
+        )
+    composition_role = values.get("composition_role")
+    if isinstance(composition_role, Mapping):
+        composition_role = composition_role.get("value")
+    if composition_role == "initial_charge_only" and isinstance(raw_wt, Mapping):
+        provenance = f"{provenance} (initial_charge_only)"
     # Prefer the printed alkali overlay when an extract gives it alongside a
     # complete melt recipe.
     if isinstance(raw_wt, Mapping) and values.get("sample_Na2O_wt_pct") is not None:

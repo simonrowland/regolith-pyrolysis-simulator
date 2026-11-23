@@ -56,25 +56,37 @@ def _observation(species: str, observation_id: str) -> AdoptedObservation:
     )
 
 
-def test_na_sample_composition_gaps_refuse_the_mare_proxy() -> None:
-    for sample in ("12022", "12065"):
-        obs = _observation(
-            "Na", f"demaria_1971_na_psat_figure1_sample_{sample}_digitized"
-        )
+def test_na_12022_uses_located_charge_and_12065_stays_missing() -> None:
+    sample_12022 = _observation(
+        "Na", "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
+    points, skip, drops = _literature_pressure_points(sample_12022)
+    assert skip is None
+    assert not drops
+    assert points is not None and len(points) == 6
+    recipe, source, error = _melt_recipe_mol(sample_12022, point=points[0])
+    assert error is None
+    assert recipe is not None
+    assert "point_conditions.composition" in source
+    assert "initial_charge_only" in source
+    assert recipe["SiO2"] == pytest.approx(42.3 / MOLAR_MASS["SiO2"])
+    assert recipe["Na2O"] == pytest.approx(0.23 / MOLAR_MASS["Na2O"])
 
-        recipe, source, error = _melt_recipe_mol(obs)
+    sample_12065 = _observation(
+        "Na", "demaria_1971_na_psat_figure1_sample_12065_digitized"
+    )
+    recipe, source, error = _melt_recipe_mol(sample_12065)
+    assert recipe is None
+    assert source == "extract composition_source_gap"
+    assert error == "missing_condition:melt_composition"
 
-        assert recipe is None
-        assert source == "extract composition_source_gap"
-        assert error == "missing_condition:melt_composition"
-
-        evaluation = evaluate_observation(
-            obs, vapor_pressure_data=load_vapor_pressure_data()
-        )
-        assert evaluation.skip_reason is not None
-        assert evaluation.skip_reason.startswith("typed-refusal:")
-        assert evaluation.records
-        assert all(record.actual_value is None for record in evaluation.records)
+    evaluation = evaluate_observation(
+        sample_12065, vapor_pressure_data=load_vapor_pressure_data()
+    )
+    assert evaluation.skip_reason is not None
+    assert evaluation.skip_reason.startswith("typed-refusal:")
+    assert evaluation.records
+    assert all(record.actual_value is None for record in evaluation.records)
 
 
 def test_admitted_psat_reports_missing_sample_composition() -> None:
@@ -98,7 +110,6 @@ def test_admitted_psat_reports_missing_sample_composition() -> None:
             "method_class": "measured_direct",
             "sample_Na2O_wt_pct": 0.36,
             "sample_K2O_wt_pct": 0.068,
-            "composition_source_gap": "full suite reported elsewhere (Smales 1971)",
             "points": [{"T_K": 1400.0, "p_Pa": 1.0e-2}],
         },
         equipment={},
@@ -118,7 +129,7 @@ def test_admitted_psat_reports_missing_sample_composition() -> None:
     assert all(record.actual_value is None for record in evaluation.records)
 
 
-def test_pressure_points_use_their_cited_smales_oxide_suites() -> None:
+def test_pressure_points_use_located_or_same_sample_oxide_suites() -> None:
     obs = _observation("Al2O", "demaria_1971_al2o_psat_table4")
     obs = replace(
         obs,
@@ -134,55 +145,25 @@ def test_pressure_points_use_their_cited_smales_oxide_suites() -> None:
     assert skip is None
     assert not drops
     assert points is not None
-    recipes = {}
-    for (
-        source_observation_id,
-        al2o3_wt_pct,
-        tio2_wt_pct,
-        na2o_wt_pct,
-        k2o_wt_pct,
-    ) in (
-        (
-            "smales_1971_apollo_12022_bulk_composition_tables1_2_3",
-            8.2,
-            4.9,
-            0.23,
-            0.061,
-        ),
-        (
-            "smales_1971_apollo_12065_bulk_composition_tables1_2_3",
-            9.8,
-            3.1,
-            0.24,
-            0.063,
-        ),
-    ):
-        point = next(
-            point
-            for point in points
-            if point.get("composition_source_observation_id")
-            == source_observation_id
-        )
-        recipe, source, error = _melt_recipe_mol(obs, point=point)
+    point_12022 = next(point for point in points if point["T_K"] == 2060.0)
+    recipe_12022, source_12022, error = _melt_recipe_mol(obs, point=point_12022)
+    assert error is None
+    assert recipe_12022 is not None
+    assert "point_conditions.composition" in source_12022
+    assert "initial_charge_only" in source_12022
+    assert recipe_12022["Al2O3"] == pytest.approx(8.2 / MOLAR_MASS["Al2O3"])
+    assert recipe_12022["Na2O"] == pytest.approx(0.23 / MOLAR_MASS["Na2O"])
 
-        assert error is None
-        assert source.startswith("extract sample_oxide_composition_wt_pct")
-        assert source_observation_id in source
-        # Convert the cited wt% values to oxide moles using each molar mass.
-        assert recipe is not None
-        assert recipe["Al2O3"] == pytest.approx(
-            al2o3_wt_pct / MOLAR_MASS["Al2O3"]
-        )
-        assert recipe["TiO2"] == pytest.approx(
-            tio2_wt_pct / MOLAR_MASS["TiO2"]
-        )
-        assert recipe["Na2O"] == pytest.approx(
-            na2o_wt_pct / MOLAR_MASS["Na2O"]
-        )
-        assert recipe["K2O"] == pytest.approx(k2o_wt_pct / MOLAR_MASS["K2O"])
-        recipes[source_observation_id] = recipe
-
-    sample_12022 = recipes["smales_1971_apollo_12022_bulk_composition_tables1_2_3"]
-    sample_12065 = recipes["smales_1971_apollo_12065_bulk_composition_tables1_2_3"]
-    assert sample_12022["Al2O3"] < sample_12065["Al2O3"]
-    assert sample_12022["TiO2"] > sample_12065["TiO2"]
+    point_12065 = next(
+        point
+        for point in points
+        if point.get("composition_source_observation_id")
+        == "smales_1971_apollo_12065_bulk_composition_tables1_2_3"
+    )
+    recipe_12065, source_12065, error = _melt_recipe_mol(obs, point=point_12065)
+    assert error is None
+    assert recipe_12065 is not None
+    assert source_12065.startswith("extract sample_oxide_composition_wt_pct")
+    assert "smales_1971_apollo_12065_bulk_composition_tables1_2_3" in source_12065
+    assert recipe_12065["Al2O3"] == pytest.approx(9.8 / MOLAR_MASS["Al2O3"])
+    assert recipe_12065["Na2O"] == pytest.approx(0.24 / MOLAR_MASS["Na2O"])
