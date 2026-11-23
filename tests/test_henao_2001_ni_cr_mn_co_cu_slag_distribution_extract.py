@@ -184,40 +184,30 @@ def _assert_composition_bindings(document: dict) -> None:
     # The assay map preserves the printed `< 0.03` detection bound. Use that
     # independently of the metadata being guarded so metadata cannot define
     # its own expected rows.
-    bounded_rows = [
-        observation
-        for observation in observations
-        if observation["values"]["composition_wt_pct"].get("Ni") == "< 0.03"
-    ]
-    assert len(bounded_rows) == 18
-    bounded_ids = {observation["observation_id"] for observation in bounded_rows}
-    for observation in bounded_rows:
-        values = observation["values"]
-        assert values.get("composition_missing_components") == [
-            {
-                "component": "Ni",
-                "reason": "below_detection_limit",
-                "value_as_published": "<0.03",
-            }
-        ]
-        assert "Ni was printed as <0.03 wt% and excluded." in values["note"]
+    bounded_count = 0
     for observation in observations:
         values = observation["values"]
-        if observation["observation_id"] in bounded_ids:
-            assert "composition_missing_components" in values
-            assert "Ni was printed as <0.03 wt% and excluded." in values["note"]
+        if values["composition_wt_pct"].get("Ni") == "< 0.03":
+            bounded_count += 1
+            assert values.get("composition_missing_components") == [
+                {
+                    "component": "Ni",
+                    "reason": "below_detection_limit",
+                    "value_as_published": "<0.03",
+                }
+            ]
+            assert values.get("note") == (
+                "Ni was printed as <0.03 wt% and excluded. "
+                "Tables 2-3, folio 1961."
+            )
         else:
             assert "composition_missing_components" not in values
             assert "note" not in values
+    assert bounded_count == 18
     assert all(
         "composition_status" not in observation["values"]
         for observation in observations
         if observation["values"].get("phase_label") == "metal"
-    )
-    assert all(
-        "note" not in observation["values"]
-        for observation in observations
-        if "composition_missing_components" not in observation["values"]
     )
 
 

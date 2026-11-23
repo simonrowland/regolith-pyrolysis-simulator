@@ -60,6 +60,9 @@ def _assert_render_pins(document: dict) -> None:
     assert oxygen["locator"]["phase"] == "Metal"
     assert oxygen["locator"]["column"] == "O"
     assert oxygen["values"]["basis_as_published"] == "O mass percent in Metal phase"
+    exp31 = observations["sineva23_tii_exp31_metal_sio2"]
+    assert exp31["uncertainty"]["reported_status"] == "printed"
+    assert exp31["uncertainty"]["as_published"] == "± 0.00"
     table_ii_metals = [
         (species, row)
         for species, group in document["species"].items()
