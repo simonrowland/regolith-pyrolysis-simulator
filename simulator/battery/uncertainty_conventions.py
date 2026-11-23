@@ -1,7 +1,10 @@
-"""Shared interpretation of printed uncertainty coverage declarations."""
+"""Shared parsing and interpretation of printed uncertainty declarations."""
 
-from collections.abc import Mapping
+import re
+from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
+
+from simulator.battery.records import as_decimal
 
 
 # Two-sided normal coverage factor for a 95% interval.
@@ -33,6 +36,195 @@ _NO_DECLARATION = frozenset(
 
 class UncertaintyConventionConflict(ValueError):
     """Raised when declared uncertainty conventions imply different factors."""
+
+
+UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+UNCERTAINTY_RANGE_RE = re.compile(
+    rf"[\[(]\s*({UNCERTAINTY_NUMBER})\s*[,;–—]\s*({UNCERTAINTY_NUMBER})\s*[\])]"
+)
+UNCERTAINTY_PAIR_RE = re.compile(
+    rf"({UNCERTAINTY_NUMBER})\s+(?:–|—|to)\s+({UNCERTAINTY_NUMBER})",
+    re.IGNORECASE,
+)
+UNCERTAINTY_SCALAR_RE = re.compile(UNCERTAINTY_NUMBER)
+
+
+def uncertainty_scalar_from_text(raw: str) -> str | None:
+    if re.search(r"(?:<=|≤|<)\s*\d", raw):
+        return None
+    match = re.search(rf"(?:±|\+/-)\s*({UNCERTAINTY_NUMBER})", raw)
+    if match is not None:
+        return match.group(1)
+    match = re.search(
+        rf"(?:standard\s+error|standard\s+deviation|\bsigma\b|\berror\b|\buncertainty\b)\s*[:=]?\s*({UNCERTAINTY_NUMBER})",
+        raw,
+        re.IGNORECASE,
+    )
+    if match is not None:
+        return match.group(1)
+    without_kind = re.sub(
+        r"\b95\s*%\s*(?:ci|confidence interval)\b", " ", raw,
+        flags=re.IGNORECASE,
+    )
+    without_kind = re.sub(
+        r"\b95\s*(?:ci|confidence interval)\b|\b[12]\s*-?\s*(?:sigma|σ)\b",
+        " ", without_kind, flags=re.IGNORECASE,
+    )
+    match = UNCERTAINTY_SCALAR_RE.search(without_kind)
+    return None if match is None else match.group(0)
+
+
+def mapping_uncertainty_value(
+    mapping: Mapping[str, object], *, exact_fields: Sequence[str] = ()
+) -> tuple[object | None, str | None]:
+    """Select a width from the observation's exact field, then generic fields.
+
+    Deliberately does not recurse: locator and provenance mappings are not width
+    declarations, even when one of their keys happens to contain a unit token.
+    """
+    for name in exact_fields:
+        if name not in mapping:
+            continue
+        value = mapping[name]
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            if isinstance(value, str):
+                scalar = uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    unit = _unit_from_width_text(value)
+                    return scalar, unit
+            return None, None
+        return value, None
+    for name in ("value", "amount", "error_value", "uncertainty_value"):
+        if name not in mapping:
+            continue
+        value = mapping[name]
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            if isinstance(value, str):
+                scalar = uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    unit = _unit_from_width_text(value)
+                    return scalar, unit
+            continue
+        return value, None
+    for key, value in mapping.items():
+        name = str(key).casefold()
+        if name in {
+            "sigma", "std", "standard_deviation", "standard_error",
+            "uncertainty", "error", "width", "range", "bounds", "interval",
+        }:
+            if isinstance(value, (tuple, list)) and len(value) == 2:
+                return value, "range"
+            try:
+                as_decimal(value)
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                if isinstance(value, str):
+                    scalar = uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = _unit_from_width_text(value)
+                        return scalar, unit
+                continue
+            return value, None
+    return None, None
+
+
+def _unit_from_width_text(raw: str) -> str | None:
+    if re.search(r"%|percent", raw, re.IGNORECASE):
+        return "%"
+    match = re.search(r"\b(dex|dimensionless|fraction)\b", raw, re.IGNORECASE)
+    return None if match is None else match.group(1)
+
+
+def mapping_uncertainty_unit(mapping: Mapping[str, object]) -> str | None:
+    for key, value in mapping.items():
+        if str(key).casefold() in {"unit", "units", "basis_unit"} and isinstance(value, str):
+            return value
+    return None
+
+
+def paired_width_unit(printed_value: str | None) -> str | None:
+    """Read the shared unit only from a value's printed parenthetical width."""
+    if printed_value is not None and re.search(
+        r"\d\s*\(\s*(?:±|\+/-)?\s*\d+(?:\.\d+)?\s*\)\s*%",
+        printed_value,
+    ):
+        return "%"
+    return None
+
+
+def uncertainty_exact_fields(
+    quantity: object,
+    *,
+    derivation_parameters: Sequence[tuple[str, object]] = (),
+    subtype: object = None,
+) -> tuple[str, ...]:
+    """Return scorer and migrator width fields in the shared precedence order."""
+    fields = [
+        name.removeprefix("original_")
+        for name, _ in derivation_parameters
+        if name.startswith("original_")
+    ]
+    subtype_token = subtype
+    if hasattr(subtype, "is_value"):
+        subtype_token = subtype.value if subtype.is_value else None
+    subtype_token = getattr(subtype_token, "value", subtype_token)
+    if isinstance(subtype_token, str) and subtype_token:
+        fields.append(subtype_token)
+    token = getattr(quantity, "value", quantity)
+    if isinstance(token, str):
+        fields.append(token)
+    return tuple(fields)
+
+
+def resolve_width_unit_basis(
+    unit: str | None,
+    *,
+    expected_unit: str | None = None,
+    declared_basis: str | None = None,
+    printed_value: str | None = None,
+    paired_value: str | None = None,
+    basis_evidence: str = "",
+) -> tuple[str | None, str | None]:
+    """Classify a width from its own unit and stated basis; return basis/conflict."""
+    normalized = (unit or "").strip().casefold()
+    declared = (declared_basis or "").strip().casefold()
+    if declared.startswith("uncertainty_convention_conflict:"):
+        return None, declared.partition(":")[2]
+    evidence = f"{basis_evidence} {printed_value or ''}".casefold()
+    relative = declared == "relative" or bool(re.search(r"\brelative\b", evidence))
+    absolute = declared in {"absolute", "dimensionless"} or bool(
+        re.search(r"percentage\s*points?", evidence)
+    ) or "atom%" in evidence or "atom %" in evidence
+    if normalized in {"%", "percent", "percentage", "atom%", "atom %"}:
+        if relative:
+            return "relative", None
+        if absolute or (
+            paired_value is not None
+            and re.search(
+                r"\d\s*\(\s*(?:±|\+/-)?\s*\d+(?:\.\d+)?\s*\)\s*%",
+                paired_value,
+            )
+        ):
+            return "dimensionless", None
+        return None, None
+    if normalized in {"dimensionless", "fraction", "1"}:
+        return ("relative" if relative else "dimensionless"), None
+    if normalized == "dex":
+        if expected_unit and expected_unit.casefold() in {
+            "dimensionless", "fraction", "1"
+        }:
+            return None, f"dex width is incompatible with {expected_unit} value"
+        if relative:
+            return None, "relative basis conflicts with dex width unit"
+        return "dex", None
+    return None, None
 
 
 def printed_uncertainty_convention(

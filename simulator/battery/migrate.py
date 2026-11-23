@@ -87,7 +87,12 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.uncertainty_conventions import (
     UncertaintyConventionConflict,
+    mapping_uncertainty_unit,
+    mapping_uncertainty_value,
+    paired_width_unit,
     printed_uncertainty_convention,
+    resolve_width_unit_basis,
+    uncertainty_exact_fields,
 )
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
@@ -282,10 +287,6 @@ from simulator.battery.records import (
     identity_pressure_state,
     nominal_pressure_pa,
     phase_token,
-)
-from simulator.battery.uncertainty import (
-    mapping_uncertainty_unit,
-    mapping_uncertainty_value,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
 from simulator.battery.validate import (
@@ -15906,6 +15907,9 @@ def _uncertainty_for_value_selection(
     selection: SourceSelection | None,
     quantity: Quantity | None,
     printed_value: str | None = None,
+    *,
+    derivation: Derivation | None = None,
+    subtype: object = None,
 ) -> Uncertainty:
     """Normalize a printed width only when its own unit and basis are known."""
 
@@ -15920,71 +15924,63 @@ def _uncertainty_for_value_selection(
     if not isinstance(raw, Mapping):
         return uncertainty
     verbatim = dict(raw)
+    exact_fields = uncertainty_exact_fields(
+        quantity,
+        derivation_parameters=derivation.parameters if derivation is not None else (),
+        subtype=subtype,
+    )
     width, unit_hint = mapping_uncertainty_value(
         verbatim,
-        exact_fields=(quantity.value,) if quantity is not None else (),
+        exact_fields=exact_fields,
     )
-    width = uncertainty.value if uncertainty.value is not None else _as_dec_or_none(width)
-    source_unit = mapping_uncertainty_unit(verbatim) or unit_hint
+    source_unit = (
+        mapping_uncertainty_unit(verbatim)
+        or unit_hint
+        or paired_width_unit(printed_value)
+    )
     if width is None:
         return uncertainty
-    if uncertainty.basis is not None and uncertainty.basis not in {
-        "dimensionless",
-        "fraction",
-        "relative",
-    }:
-        verbatim.setdefault("printed_basis", uncertainty.basis)
-    evidence = " ".join(
-        str(value)
-        for key, value in verbatim.items()
-        if key in {"as_printed", "note", "source", "description"}
-    )
-    locator = verbatim.get("locator")
-    if isinstance(locator, Mapping):
-        evidence += " " + str(locator.get("note", ""))
-    evidence = evidence.casefold()
-    declared_basis = str(verbatim.get("basis") or "").casefold()
-    if declared_basis == "relative" or re.search(r"\brelative\b", evidence):
-        basis = "relative"
-    elif source_unit and source_unit.casefold() in {
-        "%", "percent", "percentage", "atom%", "atom %"
-    }:
-        absolute_width = bool(
-            declared_basis in {"absolute", "dimensionless"}
-            or re.search(r"percentage\s*points?", evidence)
-            or (
-                printed_value is not None
-                and re.search(r"\d\s*\(\s*(?:±|\+/-)?\s*\d+(?:\.\d+)?\s*\)\s*%", printed_value)
-            )
-            or ("atom%" in evidence or "atom %" in evidence)
-            or (
-                printed_value is not None
-                and re.search(r"\d\s*\(\s*±\s*\d", printed_value)
-            )
-        )
-        if not absolute_width:
-            return uncertainty
-        basis = "dimensionless"
-    elif source_unit and source_unit.casefold() in {"dimensionless", "fraction", "1"}:
-        if declared_basis in {"relative", "absolute"}:
-            basis = "relative" if declared_basis == "relative" else "dimensionless"
+    parsed_width = _as_dec_or_none(width)
+    if parsed_width is None:
+        if isinstance(width, (tuple, list)) and len(width) == 2:
+            parsed_width = tuple(_as_dec_or_none(item) for item in width)
+            if any(item is None for item in parsed_width):
+                return uncertainty
         else:
-            basis = "dimensionless"
-    else:
+            return uncertainty
+    locator = verbatim.get("locator")
+    basis_evidence = ""
+    if isinstance(locator, Mapping):
+        basis_evidence = str(locator.get("note") or "")
+    basis, conflict = resolve_width_unit_basis(
+        source_unit,
+        expected_unit="dimensionless",
+        declared_basis=str(verbatim.get("basis") or uncertainty.basis or ""),
+        printed_value=str(verbatim.get("as_printed") or ""),
+        paired_value=printed_value,
+        basis_evidence=basis_evidence,
+    )
+    if conflict is not None:
+        return replace(
+            uncertainty,
+            value=None,
+            basis=f"uncertainty_convention_conflict:{conflict}",
+        )
+    if basis is None:
         return uncertainty
     if source_unit and source_unit.casefold() in {
         "%", "percent", "percentage", "atom%", "atom %"
     }:
-        if isinstance(width, tuple):
+        if isinstance(parsed_width, tuple):
             scaled: Decimal | tuple[Decimal, Decimal] = tuple(
-                _percent_to_fraction(value) for value in width
+                _percent_to_fraction(value) for value in parsed_width
             )
         else:
-            scaled = _percent_to_fraction(width)
-    elif isinstance(width, tuple):
-        scaled = tuple(as_decimal(value) for value in width)
+            scaled = _percent_to_fraction(parsed_width)
+    elif isinstance(parsed_width, tuple):
+        scaled = tuple(as_decimal(value) for value in parsed_width)
     else:
-        scaled = as_decimal(width)
+        scaled = as_decimal(parsed_width)
     if basis == "dimensionless":
         verbatim.setdefault("printed_units", source_unit)
         verbatim["units"] = "dimensionless"
@@ -29962,6 +29958,8 @@ class Migrator:
                 or values.get("value_as_published")
                 or ""
             ),
+            derivation=value_derivation,
+            subtype=identity.subtype,
         )
         uncertainty = _uncertainty_as_log10_dex(
             uncertainty, value_sel.printed_form
@@ -31421,8 +31419,6 @@ class Migrator:
         unc = uncertainty
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
-            if isinstance(raw_item, Mapping) and raw_item.get("unit"):
-                verbatim["units"] = str(raw_item["unit"])
             if isinstance(uncertainty.verbatim, Mapping):
                 for convention_key in ("confidence_level", "k", "kind"):
                     convention_value = uncertainty.verbatim.get(convention_key)
@@ -31475,6 +31471,8 @@ class Migrator:
                 value_sel,
                 q_token_point,
                 point_value_as_printed,
+                derivation=derivation,
+                subtype=identity.subtype,
             )
             unc = _uncertainty_as_log10_dex(unc, value_sel.printed_form)
         point_conditions = None

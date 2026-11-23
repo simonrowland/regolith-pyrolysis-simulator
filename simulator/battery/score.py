@@ -201,20 +201,20 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.uncertainty_conventions import (
     NORMAL_95_TICKET_MULTIPLIER,
-    UncertaintyConventionConflict,
-    printed_uncertainty_convention,
-)
-from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
-from simulator.battery.method_class_bands import select_method_class_band
-from simulator.battery.uncertainty import (
     UNCERTAINTY_NUMBER as _UNCERTAINTY_NUMBER,
     UNCERTAINTY_PAIR_RE as _UNCERTAINTY_PAIR_RE,
     UNCERTAINTY_RANGE_RE as _UNCERTAINTY_RANGE_RE,
     UNCERTAINTY_SCALAR_RE as _UNCERTAINTY_SCALAR_RE,
+    UncertaintyConventionConflict,
     mapping_uncertainty_unit as _mapping_uncertainty_unit,
     mapping_uncertainty_value as _mapping_uncertainty_value,
+    printed_uncertainty_convention,
+    resolve_width_unit_basis,
+    uncertainty_exact_fields,
     uncertainty_scalar_from_text as _uncertainty_scalar_from_text,
 )
+from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     INITIAL_CHARGE_ONLY_PROXY_NOTICE,
@@ -6218,10 +6218,11 @@ def _printed_uncertainty_source(
 ) -> tuple[Decimal | tuple[Decimal, Decimal] | None, str, str | None]:
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
+    printed_unit = _mapping_uncertainty_unit(raw) if isinstance(raw, Mapping) else None
     unit = (
         "dex" if "dex" in basis.casefold()
         else "fraction" if basis.casefold() in {"relative", "fraction"}
-        else None
+        else printed_unit
     )
     value: object | None = uncertainty.value
     shape = "scalar"
@@ -6235,7 +6236,6 @@ def _printed_uncertainty_source(
             shape = "range"
         elif mapped_unit is not None:
             unit = unit or mapped_unit
-        unit = unit or _mapping_uncertainty_unit(raw)
     elif value is None and isinstance(raw, str):
         match = _UNCERTAINTY_RANGE_RE.search(raw) or _UNCERTAINTY_PAIR_RE.search(raw)
         if match is not None:
@@ -6243,8 +6243,6 @@ def _printed_uncertainty_source(
             shape = "range"
         else:
             value = _uncertainty_scalar_from_text(raw)
-    if isinstance(raw, Mapping):
-        unit = unit or _mapping_uncertainty_unit(raw)
     if unit is None and isinstance(raw, str):
         raw_values = value if isinstance(value, (tuple, list)) else (value,)
         reported: set[Decimal] = set()
@@ -6266,6 +6264,31 @@ def _printed_uncertainty_source(
             if percent_value in reported:
                 unit = "%"
                 break
+    declared_basis = (
+        basis
+        if basis.startswith("uncertainty_convention_conflict:")
+        else str(raw.get("basis") or basis)
+        if isinstance(raw, Mapping)
+        else basis
+    )
+    basis_evidence = ""
+    printed_width = raw
+    if isinstance(raw, Mapping):
+        printed_width = raw.get("as_printed")
+        basis_evidence = " ".join(
+            str(raw.get(key) or "") for key in ("as_printed", "basis")
+        )
+        locator = raw.get("locator")
+        if isinstance(locator, Mapping):
+            basis_evidence += " " + str(locator.get("note") or "")
+    _resolved_basis, conflict = resolve_width_unit_basis(
+        printed_unit or unit,
+        declared_basis=declared_basis,
+        printed_value=None if printed_width is None else str(printed_width),
+        basis_evidence=basis_evidence,
+    )
+    if conflict is not None:
+        raise UncertaintyConventionConflict(conflict)
     if value is None:
         return None, shape, unit
     try:
@@ -7010,27 +7033,35 @@ def _printed_uncertainty_band(
     )
     if log10_activity_sigma:
         confidence_level = "one_sigma"
-    exact_fields: list[str] = []
+    exact_fields: tuple[str, ...] = ()
     if source_observation is not None:
         derivation = source_observation.derivation
-        if derivation is not None:
-            # Parameter names are optional. A derivation that only names
-            # output_unit contributes no original_ fields.
-            parameters = getattr(derivation, "parameters", ())
-            exact_fields.extend(
-                name.removeprefix("original_")
-                for name, _ in parameters
-                if name.startswith("original_")
-            )
         identity = getattr(source_observation, "identity", None)
+        subtype_value = None
         if isinstance(identity, Identity):
             subtype = identity.subtype
             if isinstance(subtype, State) and subtype.is_value and subtype.value:
-                exact_fields.append(str(subtype.value))
-    exact_fields.append(quantity.value)
-    source_value, shape, mapped_unit = _printed_uncertainty_source(
-        uncertainty, exact_fields=exact_fields
-    )
+                subtype_value = str(subtype.value)
+        exact_fields = uncertainty_exact_fields(
+            quantity,
+            derivation_parameters=(
+                getattr(derivation, "parameters", ()) if derivation is not None else ()
+            ),
+            subtype=subtype_value,
+        )
+    else:
+        exact_fields = uncertainty_exact_fields(quantity)
+    try:
+        source_value, shape, mapped_unit = _printed_uncertainty_source(
+            uncertainty, exact_fields=exact_fields
+        )
+    except UncertaintyConventionConflict as exc:
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "uncertainty_convention_conflict",
+                "detail": str(exc),
+            }
+        )
     envelope_value, envelope_refusal, is_temperature_envelope = (
         _temperature_envelope_value(uncertainty, source_observation)
     )

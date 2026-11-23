@@ -21586,7 +21586,10 @@ def test_series_null_point_is_queued_and_scalar_sibling_migrates(
 
 
 def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> None:
-    from simulator.battery.score import _mapping_uncertainty_value
+    from simulator.battery.score import (
+        _mapping_uncertainty_value,
+        _printed_uncertainty_band,
+    )
 
     selection = select_declared_source(
         Quantity.VALENCE_RATIO, "%", {"value": "70"}
@@ -21624,9 +21627,13 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
     dex_width = uncertainty_for(
         {"value": "3", "units": "dex", "as_printed": "±3 dex"}
     )
-    assert _uncertainty_for_value_selection(
+    preserved_dex = _uncertainty_for_value_selection(
         dex_width, selection, Quantity.VALENCE_RATIO, "70%"
-    ) == dex_width
+    )
+    assert preserved_dex.value is None
+    assert preserved_dex.basis.startswith(
+        "uncertainty_convention_conflict:"
+    )
 
     ambiguous = uncertainty_for(
         {"value": "3", "units": "%", "as_printed": "±3%"}
@@ -21640,8 +21647,8 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
             {
                 "value": "10",
                 "units": "%",
+                "basis": "relative",
                 "as_printed": "±10%",
-                "note": "The relative error is ±10%.",
             }
         ),
         selection,
@@ -21651,6 +21658,29 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
     assert relative.value == Decimal("0.1")
     assert relative.basis == "relative"
     assert relative.verbatim["units"] == "%"
+
+    conflicting = _uncertainty_for_value_selection(
+        uncertainty_for(
+            {
+                "value": "3",
+                "units": "dex",
+                "basis": "relative",
+                "as_printed": "relative error ±3 dex",
+            }
+        ),
+        selection,
+        Quantity.VALENCE_RATIO,
+        "70(3)%",
+    )
+    assert conflicting.value is None
+    assert conflicting.verbatim["units"] == "dex"
+    conflict_score = _printed_uncertainty_band(
+        Quantity.VALENCE_RATIO,
+        conflicting,
+        Decimal("0.7"),
+    )
+    assert conflict_score.band is None
+    assert conflict_score.refusal["reason"] == "uncertainty_convention_conflict"
 
     relative_fraction = _uncertainty_for_value_selection(
         uncertainty_for(
@@ -21666,6 +21696,103 @@ def test_percent_uncertainty_uses_width_units_and_shared_field_precedence() -> N
     )
     assert relative_fraction.value == Decimal("0.03")
     assert relative_fraction.basis == "relative"
+
+
+def test_exploded_width_and_score_share_exact_derivation_field(tmp_path: Path) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["observation_id"] = "na_valence_width_exact_field"
+    row["type"] = "concentration_series"
+    row["units"] = "%"
+    row["uncertainty"] = {
+        "Fe3_over_FeT": "3",
+        "value": "15",
+        "units": "%",
+        "basis": "absolute",
+        "as_printed": "3 percentage points",
+    }
+    row["derivation"] = {
+        "relation": "source field Fe3_over_FeT",
+        "inputs": ["fixture-source::source-row"],
+        "parameters": [["original_Fe3_over_FeT", "0.72"]],
+        "output_unit": "dimensionless",
+    }
+    row["values"] = {
+        "quantity": "valence_ratio",
+        "valence_basis": {
+            "numerator_oxidation_states": [3],
+            "denominator_kind": "total_element",
+            "value_form": "fraction",
+        },
+        "method_class": "measured_reduced",
+        "admission_status": "admitted",
+        "points": [
+            {"value": "70", "value_as_published": "70(3)%", "unit": "%"}
+        ],
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.uncertainty.value == Decimal("0.03")
+    assert observation.uncertainty.basis == "dimensionless"
+    score = _printed_uncertainty_band(
+        Quantity.VALENCE_RATIO,
+        observation.uncertainty,
+        observation.value.point,
+        source_observation=observation,
+    )
+    assert score.refusal is None
+    assert score.band is not None
+    assert score.band.value == Decimal(
+        "0.01902323731343039656308462938"
+    )
+
+
+def test_exploded_sigma_unit_conflicts_with_percent_value_unit(tmp_path: Path) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["observation_id"] = "na_valence_width_unit_conflict"
+    row["type"] = "concentration_series"
+    row["units"] = "%"
+    row["values"] = {
+        "quantity": "valence_ratio",
+        "valence_basis": {
+            "numerator_oxidation_states": [3],
+            "denominator_kind": "total_element",
+            "value_form": "fraction",
+        },
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "points": [
+            {
+                "value": "70",
+                "unit": "%",
+                "value_as_published": "70(3)%",
+                "sigma": "3 dex",
+            }
+        ],
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.value.point == Decimal("0.7")
+    assert observation.uncertainty.value is None
+    assert observation.uncertainty.basis.startswith(
+        "uncertainty_convention_conflict:"
+    )
+    assert "units" not in observation.uncertainty.verbatim
+    score = _printed_uncertainty_band(
+        Quantity.VALENCE_RATIO,
+        observation.uncertainty,
+        observation.value.point,
+        source_observation=observation,
+    )
+    assert score.band is None
+    assert score.refusal["reason"] == "uncertainty_convention_conflict"
 
 
 def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path) -> None:
