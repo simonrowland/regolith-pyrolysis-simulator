@@ -1050,29 +1050,6 @@ def _load_gas_pack(selection: str) -> Any:
     return loader()
 
 
-def _assert_gas_pack_selection(gas_pack: Any, selection: str) -> None:
-    """Require the supplied pack to match the selected pack without reading tables."""
-
-    selected = _load_gas_pack(selection)
-    if gas_pack is selected:
-        return
-    gas_pins = (
-        getattr(gas_pack, "gas_table_digest", None),
-        getattr(gas_pack, "condensate_table_digest", None),
-    )
-    selected_pins = (
-        getattr(selected, "gas_table_digest", None),
-        getattr(selected, "condensate_table_digest", None),
-    )
-    if (
-        not all(isinstance(pin, str) and pin for pin in gas_pins)
-        or gas_pins != selected_pins
-    ):
-        raise ValueError(
-            f"gas pack does not match selected OpenIMCC pack {selection!r}"
-        )
-
-
 def _temperature_domain_K() -> tuple[float, float]:
     try:
         _require_openimcc()
@@ -1408,15 +1385,15 @@ def _evaluate_with_timeout(
                 raise
             return payload
 
-    payload = cached_engine_call(
-        "openimcc",
-        request,
-        (
-            solve
-            if solve_timeout_s is None
-            else lambda: _call_with_hard_timeout(solve, solve_timeout_s)
-        ),
+    solve_call = (
+        solve
+        if solve_timeout_s is None
+        else lambda: _call_with_hard_timeout(solve, solve_timeout_s)
     )
+    if pack not in (None, DEFAULT_BACKEND_PACK_NAME):
+        payload = solve_call()
+    else:
+        payload = cached_engine_call("openimcc", request, solve_call)
     _reraise_cached_openimcc_refusal(payload)
     return OpenImccBridgeResult.from_hot(payload)
 
@@ -1454,7 +1431,6 @@ def evaluate_gas(
     from openimcc import evaluate_gas as openimcc_evaluate_gas
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
-    _assert_gas_pack_selection(gas_pack, gas_pack_selection)
     record_engine_open("openimcc")
 
     request = {
@@ -1482,7 +1458,13 @@ def evaluate_gas(
                 raise
             return payload
 
-    payload = cached_engine_call("openimcc", request, solve)
+    if (
+        gas_pack_selection == DEFAULT_GAS_PACK_SELECTION
+        and gas_pack is _load_gas_pack(DEFAULT_GAS_PACK_SELECTION)
+    ):
+        payload = cached_engine_call("openimcc", request, solve)
+    else:
+        payload = solve()
     _reraise_cached_openimcc_refusal(payload)
     return payload
 

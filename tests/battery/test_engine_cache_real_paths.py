@@ -2553,7 +2553,7 @@ def test_openimcc_cache_settings_use_selected_opener_pack() -> None:
     )
 
 
-def test_openimcc_gas_pack_selection_guard_uses_pack_pins_without_table_reads(
+def test_openimcc_gas_nondefault_pack_bypasses_cache_but_default_hits(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2574,59 +2574,72 @@ def test_openimcc_gas_pack_selection_guard_uses_pack_pins_without_table_reads(
     ) -> dict[str, float]:
         nonlocal calls
         calls += 1
-        return {"CO(g)": {"gas-a.csv": 1.0, "gas-b.csv": 2.0}[gas_pack.gas_path.name]}
+        return {"CO(g)": float(gas_pack.value)}
 
     monkeypatch.setitem(
         sys.modules,
         "openimcc",
         SimpleNamespace(evaluate_gas=fake_evaluate_gas),
     )
-    selected_core = SimpleNamespace(
-        gas_table_digest="gas-core",
-        condensate_table_digest="condensate-core",
-    )
-    duplicate_core = SimpleNamespace(
-        gas_table_digest="gas-core",
-        condensate_table_digest="condensate-core",
-    )
-    selected_ext = SimpleNamespace(
-        gas_table_digest="gas-ext",
-        condensate_table_digest="condensate-ext",
-    )
-    wrong_core = SimpleNamespace(
-        gas_table_digest="gas-edited",
-        condensate_table_digest="condensate-core",
-    )
+    default_pack = SimpleNamespace(value=1.0)
+    nondefault_pack = SimpleNamespace(value=2.0)
     monkeypatch.setattr(
         openimcc_bridge,
         "_load_gas_pack",
-        lambda selection: {
-            "published-core": selected_core,
-            "published-ext": selected_ext,
-        }[selection],
+        lambda selection: default_pack,
     )
     common = ({"SiO2": 0.5}, 1700.0, 1.0e-6)
-    first = evaluate_gas(*common, selected_core, gas_pack_selection="published-core")
-    same_pin = evaluate_gas(
-        *common, duplicate_core, gas_pack_selection="published-core"
+    first = evaluate_gas(*common, default_pack)
+    default_hit = evaluate_gas(*common, default_pack)
+    uncached_first = evaluate_gas(
+        *common, nondefault_pack, gas_pack_selection="published-core"
     )
-    with pytest.raises(ValueError, match="does not match selected"):
-        evaluate_gas(*common, wrong_core, gas_pack_selection="published-core")
-    other_selection = evaluate_gas(
-        *common, selected_ext, gas_pack_selection="published-ext"
+    uncached_second = evaluate_gas(
+        *common, nondefault_pack, gas_pack_selection="published-core"
     )
 
-    assert first == same_pin
-    assert first == other_selection
-    assert calls == 2
+    assert first == default_hit
+    assert uncached_first == uncached_second
+    assert uncached_first["CO(g)"] == 2.0
+    assert calls == 3
     assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
         "hits": 1,
-        "misses": 2,
-        "stores": 2,
+        "misses": 1,
+        "stores": 1,
         "store_error": 0,
         "read_error": 0,
         "conflicts": 0,
     }
+
+
+def test_openimcc_explicit_nondefault_melt_pack_bypasses_cache(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    cache_calls = []
+
+    def cached_engine_call(engine, request, solve):
+        cache_calls.append((engine, request))
+        return solve()
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cached_engine_call)
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_evaluate_uncached",
+        lambda **_kwargs: SimpleNamespace(to_hot=lambda: {"result": "solved"}),
+    )
+    monkeypatch.setattr(openimcc_bridge.OpenImccBridgeResult, "from_hot", lambda value: value)
+
+    nondefault = openimcc_bridge._evaluate_with_timeout(
+        {"SiO2": 1.0}, 1800.0, pack="published-ext"
+    )
+    default = openimcc_bridge._evaluate_with_timeout({"SiO2": 1.0}, 1800.0)
+
+    assert nondefault == {"result": "solved"}
+    assert default == {"result": "solved"}
+    assert [request["pack"] for _, request in cache_calls] == ["default"]
 
 
 def test_runtime_identity_is_captured_once_when_each_engine_opens(
