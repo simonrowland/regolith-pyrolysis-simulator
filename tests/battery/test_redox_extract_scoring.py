@@ -761,7 +761,9 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
         and FERRIC_FRACTION_RELATION in (observation.derivation.relation or "")
         and observation.value.kind.value == "point"
     ]
-    assert len(fraction_rows) == 168
+    # The Xu extract no longer carries Fe3_over_FeT: green had two hits; this
+    # tip has none, so its derived ferric-fraction row is absent as well.
+    assert len(fraction_rows) == 167
 
     invalid_rows = []
     band_counts = {}
