@@ -271,9 +271,7 @@ def _imported_object(
         try:
             value = importlib.import_module(".".join(parts[:split]))
             for attribute in parts[split:]:
-                if _is_class_object(value) and not _is_allowed_type(
-                    type(value), _SAFE_METACLASSES
-                ):
+                if not _has_safe_inspection_metaclass(value):
                     return None
                 value = inspect.getattr_static(value, attribute)
             return value
@@ -305,6 +303,13 @@ def _is_class_object(value) -> bool:
 
 def _is_allowed_type(value_type: type, allowed: tuple[type, ...]) -> bool:
     return isinstance(value_type, type) and any(value_type is candidate for candidate in allowed)
+
+
+def _has_safe_inspection_metaclass(value) -> bool:
+    if type(value) is types.ModuleType:
+        return True
+    owner_class = value if _is_class_object(value) else type(value)
+    return _is_allowed_type(type(owner_class), _SAFE_METACLASSES)
 
 
 def _receiver(
@@ -361,7 +366,14 @@ def _safe_signature_type(value) -> bool:
             return False
         if type(kwdefaults) is not dict and type(kwdefaults) is not type(None):
             return False
+        if type(kwdefaults) is dict and any(type(key) is not str for key in kwdefaults):
+            return False
         if type(annotations) is not dict:
+            return False
+        function_dict = object.__getattribute__(value, "__dict__")
+        if type(function_dict) is not dict or any(
+            type(key) is not str for key in function_dict
+        ) or "__text_signature__" in function_dict:
             return False
         if _has_static_attribute(value, "__wrapped__"):
             return False
@@ -464,7 +476,7 @@ def _receiver_attribute_signature(
     if type(receiver.value) is ast.ClassDef:
         return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)
     if _is_class_object(receiver.value):
-        if not _is_allowed_type(type(receiver.value), _SAFE_METACLASSES):
+        if not _has_safe_inspection_metaclass(receiver.value):
             return _SignatureResolution(None, "custom-metaclass", "class metaclass is outside the inspection allowlist")
         return _class_attribute_signature(receiver.value, name, receiver.is_instance)
     if type(receiver.value) is types.ModuleType:
@@ -473,12 +485,12 @@ def _receiver_attribute_signature(
         except AttributeError:
             return _SignatureResolution(None, "unresolvable", "static module attribute was not found")
         return _signature_of(attribute)
+    if not _has_safe_inspection_metaclass(receiver.value):
+        return _SignatureResolution(None, "custom-metaclass", "receiver class metaclass is outside the inspection allowlist")
     try:
         instance_attribute = inspect.getattr_static(receiver.value, name)
     except AttributeError:
         return _SignatureResolution(None, "unresolvable", "static instance attribute was not found")
-    if not _is_allowed_type(type(type(receiver.value)), _SAFE_METACLASSES):
-        return _SignatureResolution(None, "custom-metaclass", "receiver class metaclass is outside the inspection allowlist")
     try:
         class_attribute = inspect.getattr_static(type(receiver.value), name)
     except AttributeError:
@@ -502,9 +514,7 @@ def _receiver_and_attribute_for_path(
             continue
         try:
             for attribute in parts[split:-1]:
-                if _is_class_object(owner) and not _is_allowed_type(
-                    type(owner), _SAFE_METACLASSES
-                ):
+                if not _has_safe_inspection_metaclass(owner):
                     return _Receiver(owner, False), parts[-1]
                 owner = inspect.getattr_static(owner, attribute)
         except AttributeError:

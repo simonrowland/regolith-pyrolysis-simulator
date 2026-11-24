@@ -448,15 +448,90 @@ def test_scan_skips_function_with_custom_kwdefaults_without_running_hook(
     assert not reads
 
 
-def test_scan_skips_custom_metaclass_without_reading_class_dict(
+def test_scan_skips_function_with_custom_kwdefaults_key_without_running_hooks(
     tmp_path: Path, monkeypatch
 ) -> None:
     reads: list[str] = []
 
+    class Key:
+        def __hash__(self):
+            reads.append("hash")
+            return hash("value")
+
+        def __eq__(self, other):
+            reads.append("eq")
+            return other == "value"
+
+    def emit(*, value=1):
+        return value
+
+    emit.__kwdefaults__ = {Key(): 1}
+    reads.clear()
+    module = ModuleType("test_double_signature_custom_kwdefault_key")
+    module.emit = emit
+    monkeypatch.setitem(sys.modules, module.__name__, module)
+    (tmp_path / "test_custom_kwdefault_key.py").write_text(
+        "import test_double_signature_custom_kwdefault_key as api\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(api, 'emit', lambda *, value=1: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("nonstandard-metadata", 1),)
+    assert not reads
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_safe_signature_type", lambda value: True)
+        scan_tests(tmp_path)
+        assert reads
+
+
+def test_scan_skips_function_with_text_signature_without_running_hook(
+    tmp_path: Path, monkeypatch
+) -> None:
+    reads: list[str] = []
+
+    class TextSignature:
+        def __bool__(self):
+            reads.append("bool")
+            return False
+
+    def emit(value):
+        return value
+
+    emit.__text_signature__ = TextSignature()
+    module = ModuleType("test_double_signature_text_signature")
+    module.emit = emit
+    monkeypatch.setitem(sys.modules, module.__name__, module)
+    (tmp_path / "test_text_signature.py").write_text(
+        "import test_double_signature_text_signature as api\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(api, 'emit', lambda value: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("nonstandard-metadata", 1),)
+    assert not reads
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_safe_signature_type", lambda value: True)
+        scan_tests(tmp_path)
+        assert reads
+
+
+def test_scan_gates_custom_metaclass_before_instance_lookups(
+    tmp_path: Path, monkeypatch
+) -> None:
+    marker = {"read": False}
+
     class Meta(type):
         def __getattribute__(cls, name):
             if name == "__dict__":
-                reads.append(name)
+                marker["read"] = True
             return super().__getattribute__(name)
 
     class Receiver(metaclass=Meta):
@@ -465,19 +540,30 @@ def test_scan_skips_custom_metaclass_without_reading_class_dict(
 
     module = ModuleType("test_double_signature_custom_metaclass")
     module.Receiver = Receiver
+    module.receiver = Receiver()
     monkeypatch.setitem(sys.modules, module.__name__, module)
     (tmp_path / "test_custom_metaclass.py").write_text(
         "from test_double_signature_custom_metaclass import Receiver\n"
+        "from test_double_signature_custom_metaclass import receiver\n"
+        "from unittest.mock import patch\n"
         "def test_patch(monkeypatch):\n"
-        "    monkeypatch.setattr(Receiver(), 'emit', lambda value: None)\n",
+        "    monkeypatch.setattr(Receiver(), 'emit', lambda value: None)\n"
+        "def test_object_target():\n"
+        "    patch.object(receiver, 'emit', lambda value: None)\n"
+        "def test_string_target():\n"
+        "    patch('test_double_signature_custom_metaclass.receiver.emit', lambda value: None)\n",
         encoding="utf-8",
     )
 
     census = scan_tests(tmp_path)
 
-    assert census.scanned == 1 and census.resolved == 0
-    assert census.skipped_by_reason == (("custom-metaclass", 1),)
-    assert not reads
+    assert census.scanned == 3 and census.resolved == 0
+    assert census.skipped_by_reason == (("custom-metaclass", 3),)
+    assert marker["read"] is False
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_has_safe_inspection_metaclass", lambda value: True)
+        scan_tests(tmp_path)
+        assert marker["read"] is True
 
 
 def test_string_and_object_targets_resolve_exported_instance_identically(
