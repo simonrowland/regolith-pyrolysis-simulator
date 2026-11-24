@@ -19,18 +19,18 @@ lands with the t-110 chunk.
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
 from simulator.curve_utils import (
+    Curve,
     _finite_nonnegative,
     _finite_number,
     _interpolate,
     _normalise_curve,
 )
 
-Curve = Sequence[tuple[float, float]]
 SeriesBySpecies = Mapping[str, Curve]
 ScalarBySpecies = Mapping[str, float]
 
