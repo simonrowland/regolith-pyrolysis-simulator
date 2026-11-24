@@ -4480,26 +4480,33 @@ def run_isolated_cell_worker(
             )
             if isinstance(warning_seen, set):
                 warning_seen.clear()
-        cell = _equilibrate_cell_uncached(
-            handle,
-            pot,
-            temperature_K=float(payload["temperature_K"]),
-            po2=po2,
-            timeout_s=finite_float(payload.get("timeout_s")),
-            physical_pressure_bar=(
-                None
-                if payload.get("physical_pressure_bar") is None
-                else float(payload["physical_pressure_bar"])
-            ),
-            qualification=bool(payload.get("qualification")),
-            isolated=False,
-            arm=str(payload.get("arm") or ARM_HEADLINE),
-            _defer_qualification_decoration=bool(
-                payload.get("_defer_qualification_decoration")
-            ),
-            _cache_engine_call=False,
-        )
-        return cell.as_payload()
+        from simulator.vapour_rail import run_disclosure
+
+        with run_disclosure.disclosure_scope(inherit=False) as disclosures:
+            cell = _equilibrate_cell_uncached(
+                handle,
+                pot,
+                temperature_K=float(payload["temperature_K"]),
+                po2=po2,
+                timeout_s=finite_float(payload.get("timeout_s")),
+                physical_pressure_bar=(
+                    None
+                    if payload.get("physical_pressure_bar") is None
+                    else float(payload["physical_pressure_bar"])
+                ),
+                qualification=bool(payload.get("qualification")),
+                isolated=False,
+                arm=str(payload.get("arm") or ARM_HEADLINE),
+                _defer_qualification_decoration=bool(
+                    payload.get("_defer_qualification_decoration")
+                ),
+                _cache_engine_call=False,
+            )
+            response = cell.as_payload()
+            response["law_disclosures"] = [
+                dict(item) for item in disclosures.snapshot()
+            ]
+            return response
     finally:
         if owns_handle:
             close_battery_engine_handle(handle)
@@ -4728,10 +4735,12 @@ class _IsolatedCellWorker:
         )
 
         def solve() -> Any:
-            from simulator.vapour_rail.run_disclosure import active_registry
+            from simulator.vapour_rail.run_disclosure import (
+                accept_stored_memo,
+                active_registry,
+            )
 
             scoped_run = active_registry() is not None
-            cacheable_input_refusal = False
             with self._lock:
                 try:
                     result = self._worker.call(payload, timeout_s=timeout_s)
@@ -4764,22 +4773,27 @@ class _IsolatedCellWorker:
                     raise _IsolatedCellWorkerFailure(
                         detail="isolated worker response was not an object"
                     )
-                if result.get("status") == "refusal":
-                    from simulator.engine_cache import cacheable_refusal
+            accepted_disclosures = accept_stored_memo(result)
+            if accepted_disclosures is None:
+                result = dict(result)
+                result["status"] = "refusal"
+                result["refusal_reason"] = "law_disclosures_unknown"
+                result["engine_status"] = "law_disclosures_unknown"
+                result["engine_reason"] = (
+                    "isolated_worker_response_missing_or_unreadable"
+                )
+            if result.get("status") == "refusal":
+                from simulator.engine_cache import cacheable_refusal
 
-                    if not cacheable_refusal(result):
-                        return result
-                    cacheable_input_refusal = (
-                        result.get("engine_status") == "input_refusal"
-                    )
+                if not cacheable_refusal(result):
+                    return result
             hot = EquilibrateCell.from_payload(result).to_hot()
             if (
                 _engine_carries_disclosures(self.engine)
                 and scoped_run
-                and not cacheable_input_refusal
+                and accepted_disclosures is None
             ):
-                # The child process has no run-disclosure registry to attach to
-                # this value, so it cannot safely populate a scoped cache row.
+                # Unknown child metadata cannot become a measured empty cache row.
                 if isinstance(hot, EngineCacheValue):
                     return EngineCacheValue(
                         hot.hot, hot.cold, cacheable=False

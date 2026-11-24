@@ -344,7 +344,10 @@ def test_run_isolated_cell_worker_closes_acquired_handle(
         with pytest.raises(RuntimeError, match="fake cell failure"):
             battery.run_isolated_cell_worker(payload)
     else:
-        assert battery.run_isolated_cell_worker(payload) == {"status": "ok"}
+        assert battery.run_isolated_cell_worker(payload) == {
+            "status": "ok",
+            "law_disclosures": [],
+        }
     assert backend.close_calls == 1
 
 
@@ -386,7 +389,8 @@ def test_run_isolated_cell_worker_leaves_supplied_handle_to_owner(
     }
 
     assert battery.run_isolated_cell_worker(payload, handle=handle) == {
-        "status": "ok"
+        "status": "ok",
+        "law_disclosures": [],
     }
     assert backend.close_calls == 0
 
@@ -1696,6 +1700,18 @@ def _ok_cell(
     )
 
 
+_ISOLATED_CHILD_DISCLOSURE = {
+    "law_id": "Fe:test-law",
+    "provenance": "isolated child measurement",
+    "authority": "extrapolated",
+    "certified_band_K": None,
+    "anchor_gaps_dex": {},
+    "closer": "",
+    "certification_route": [],
+    "evaluation_count": 1,
+}
+
+
 def test_floor_value_is_typed_refusal_not_residual() -> None:
     floor_fill = MELT_DISSOCIATION_PO2_MIN_BAR
     floor_exploded = 4.527934710618984e20
@@ -2707,7 +2723,9 @@ def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
         hostname="worker-test",
         arm=request["arm"],
     )
-    return cell.as_payload()
+    response = cell.as_payload()
+    response["law_disclosures"] = []
+    return response
 
 
 class _InternalAnalyticalBudgetBackend:
@@ -2878,10 +2896,150 @@ def test_carrying_engine_isolated_worker_keeps_disclosures_unknown(
     finally:
         worker.close()
 
-    assert first["status"] == second["status"] == third["status"] == "ok"
+    assert first["status"] == second["status"] == third["status"] == "refusal"
+    assert first["refusal_reason"] == second["refusal_reason"] == (
+        "law_disclosures_unknown"
+    )
     assert calls["n"] == 3
     assert counts["hits"] == 0
-    assert counts["stores"] == 1
+    assert counts["stores"] == 0
+
+
+def test_run_isolated_cell_worker_returns_its_measured_disclosures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.vapour_rail import run_disclosure
+
+    disclosure = dict(_ISOLATED_CHILD_DISCLOSURE)
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+
+    def equilibrate(*_args, **_kwargs):
+        registry = run_disclosure.active_registry()
+        assert registry is not None
+        registry.reregister_public([disclosure])
+        return _ok_cell(engine="alphamelts", gas={})
+
+    monkeypatch.setattr(battery, "_equilibrate_cell_uncached", equilibrate)
+    payload = {
+        "pot_id": "isolated-worker-disclosure",
+        "composition_wt_pct": {"SiO2": 100.0},
+        "why": "disclosure transport test",
+        "po2": {"mode": "engine_default"},
+        "engine": "alphamelts",
+        "temperature_K": 1500.0,
+    }
+
+    response = battery.run_isolated_cell_worker(payload, handle=handle)
+
+    assert response["law_disclosures"] == [disclosure]
+
+
+@pytest.mark.parametrize("engine_id", sorted(ENGINE_CACHE_DISCLOSURE_ENGINES))
+def test_isolated_worker_replays_child_disclosures_into_scoped_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    engine_id: str,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator import engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    worker = battery._IsolatedCellWorker(engine_id)
+    disclosure = dict(_ISOLATED_CHILD_DISCLOSURE)
+    response = _ok_cell(engine=engine_id, gas={}).as_payload()
+    response["law_disclosures"] = [disclosure]
+    calls = {"n": 0}
+
+    def fake_call(_payload, *, timeout_s: float):
+        calls["n"] += 1
+        return dict(response)
+
+    monkeypatch.setattr(worker._worker, "call", fake_call)
+    request = {
+        "pot_id": "isolated-cell-disclosure-replay",
+        "temperature_K": 1700.0,
+        "po2": Po2Request(mode="engine_default", po2_bar=None).as_payload(),
+    }
+    try:
+        with _engine_cache_path_scope(
+            tmp_path / "isolated-cell-disclosure-replay.sqlite"
+        ):
+            with disclosure_scope(inherit=False) as disclosures:
+                first = worker.request(request, timeout_s=1.0)
+                first_snapshot = disclosures.snapshot()
+                second = worker.request(request, timeout_s=1.0)
+                final_snapshot = disclosures.snapshot()
+                counts = engine_cache.engine_cache_counters(reset=True)[engine_id]
+    finally:
+        worker.close()
+
+    assert first["status"] == second["status"] == "ok"
+    assert (
+        first_snapshot[0]["law_id"]
+        == final_snapshot[0]["law_id"]
+        == "Fe:test-law"
+    )
+    assert first_snapshot[0]["evaluation_count"] == 1
+    assert final_snapshot[0]["evaluation_count"] == 2
+    assert calls["n"] == 1
+    assert counts["hits"] == 1
+
+
+@pytest.mark.parametrize("engine_id", sorted(ENGINE_CACHE_DISCLOSURE_ENGINES))
+def test_isolated_worker_missing_disclosures_sets_typed_status(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    engine_id: str,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator import engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    worker = battery._IsolatedCellWorker(engine_id)
+    response = _ok_cell(engine=engine_id, gas={}).as_payload()
+    monkeypatch.setattr(
+        worker._worker,
+        "call",
+        lambda _payload, *, timeout_s: dict(response),
+    )
+    request = {
+        "pot_id": "isolated-cell-missing-disclosures",
+        "temperature_K": 1700.0,
+        "po2": Po2Request(mode="engine_default", po2_bar=None).as_payload(),
+    }
+    try:
+        with _engine_cache_path_scope(
+            tmp_path / "isolated-cell-missing-disclosures.sqlite"
+        ):
+            with disclosure_scope(inherit=False) as disclosures:
+                result = worker.request(request, timeout_s=1.0)
+                assert disclosures.snapshot() == ()
+    finally:
+        worker.close()
+
+    assert result["status"] == "refusal"
+    assert result["refusal_reason"] == "law_disclosures_unknown"
+    assert result["engine_status"] == "law_disclosures_unknown"
+    assert result["engine_reason"] == (
+        "isolated_worker_response_missing_or_unreadable"
+    )
 
 
 @pytest.mark.parametrize("engine_id", sorted(ENGINE_CACHE_DISCLOSURE_ENGINES))
@@ -2905,6 +3063,7 @@ def test_isolated_cacheable_input_refusal_is_cached_inside_disclosure_scope(
         status="refusal",
         refusal_reason=engine_cache.REFUSAL_INVALID_INPUT,
         engine_status="input_refusal",
+        law_disclosures=[],
     )
     calls = {"n": 0}
 
