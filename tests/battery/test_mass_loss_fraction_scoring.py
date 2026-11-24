@@ -406,17 +406,34 @@ def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
 
     if panel == "V":
         _residual, silica = by_coordinate[Decimal("1749.15"), "SiO2"]
-        assert float(silica.value.point) == pytest.approx(52.3835622735, abs=1e-5)
+        # Re-pin b274 -> merged candidate points: V SiO2 52.3835622735 ->
+        # 52.420421484088045; VI SiO2 41.9173329526 -> 41.65963190224761;
+        # VI Al2O3 86.3460797573 -> 86.33945396738928. VI SiO2 at 2480.15 K
+        # remains 0. The car-only values were 52.42073151451131,
+        # 41.6446496063453, and 86.60356896309993, respectively. The bulk
+        # shift is car-side: OpenIMCC pin 7cf98e62 includes the D066 v1 -> v4
+        # default switch (OpenIMCC ce673d05), and the car adds a mixed-parent
+        # residue channel set. The b274 probe predates that car-only helper,
+        # so these runs cannot separate those causes. Car and merged
+        # per-channel OpenIMCC activity snapshots match; the largest car ->
+        # merge residual is VI Al2O3 at 2480.15 K, from the residue endpoint
+        # corner path enabled by the nonlocal corner-counter fix
+        # (0e6bd5486c, brought in by merge a0a71dea3e).
+        assert float(silica.value.point) == pytest.approx(
+            52.420421484088045, abs=1e-5
+        )
     else:
         residual, silica = by_coordinate[Decimal("2156.15"), "SiO2"]
         assert references[residual.reference].value.point == Decimal("13.6")
-        assert float(silica.value.point) == pytest.approx(41.9173329526, abs=1e-5)
+        assert float(silica.value.point) == pytest.approx(41.65963190224761, abs=1e-5)
         assert [
             (notice.kind, notice.origin) for notice in residual.notices
             if notice.reason == "residue_fe_speciation_kress91_fallback"
         ] == [(NoticeKind.FALLBACK, "simulator.fe_redox:kress91_split")]
         _residual, alumina = by_coordinate[Decimal("2480.15"), "Al2O3"]
-        assert float(alumina.value.point) == pytest.approx(86.3460797573, abs=1e-4)
+        assert float(alumina.value.point) == pytest.approx(
+            86.33945396738928, abs=1e-4
+        )
         _residual, silica = by_coordinate[Decimal("2480.15"), "SiO2"]
         assert silica.value.point == Decimal(0)
         assert (
