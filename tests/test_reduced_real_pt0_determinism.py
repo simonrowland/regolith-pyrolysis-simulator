@@ -2830,6 +2830,27 @@ def test_pt0_exact_route_refuses_dependency_vector_mismatch(
     assert capture.hits == 0
 
 
+def test_pt0_equilibrium_replay_misses_after_activity_setpoint_change() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    source_key = capture.capture_sequence[-1]["key"]
+
+    sim.setpoints["high_t_melt_activity"] = "constant_gamma"
+    sim._high_t_melt_activity = "constant_gamma"
+    query_key = capture._equilibrium_key(sim)
+
+    assert source_key["solver_inputs"]["high_t_melt_activity"] == "openimcc"
+    assert query_key["solver_inputs"]["high_t_melt_activity"] == "constant_gamma"
+    assert canonical_physics_bucket_key_from_replay_key(
+        source_key
+    ) != canonical_physics_bucket_key_from_replay_key(query_key)
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", query_key)
+
+    assert capture.hits == 0
+
+
 def test_pt0_approximate_route_refuses_dependency_vector_mismatch() -> None:
     capture = PT0DeterminismStore("capture")
     sim, result = _pt0_equilibrium_capture_context(capture)
