@@ -587,7 +587,7 @@ def test_kennedy_scored_leaf_classification_keeps_facts_and_drops_metadata():
 
     assert non_finite == []
     assert ("values", "method") not in measured
-    assert ("values", "quantity") in measured
+    assert ("values", "quantity") not in measured
     assert not any("cell_locators" in leaf for leaf in measured)
     assert not any("composition_column_locators" in leaf for leaf in measured)
     assert any(

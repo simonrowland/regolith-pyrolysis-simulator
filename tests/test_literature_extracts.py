@@ -6196,6 +6196,7 @@ def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates(
     observation = {
         "values": {
             "quantity": "fe3_fe2_ratio",
+            "composition_basis_as_published": "Mol-%",
             "method": "wet_chemical_analysis",
             "temperature_uncertainty_as_printed": "± 3",
             "uncertainty_as_published": "± 1.3",
@@ -6235,7 +6236,6 @@ def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates(
 
     assert non_finite == []
     assert measured == [
-        ("values", "quantity"),
         ("values", "temperature_uncertainty_as_printed"),
         ("values", "uncertainty_as_published"),
         ("values", "point_conditions", "fO2_control", "state", "value"),
@@ -6261,6 +6261,8 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
             "quotes_path",
             "source_sha256",
             "line_range",
+            "quantity",
+            "composition_basis_as_published",
         }
     )
     seen = Counter()

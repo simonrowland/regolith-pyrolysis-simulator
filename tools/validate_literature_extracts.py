@@ -2474,8 +2474,9 @@ _SCORED_NUMERIC_CONDITIONS = (
 )
 # A locator cites a condition. Its page numbers are not measured leaves.
 _CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
-# Locator fields embedded in ``values`` are still provenance. The quote note
-# can be measured evidence; its location coordinates and table address are not.
+# Locator fields and extractor labels embedded in ``values`` are provenance,
+# not measured leaves. The quote note can be measured evidence; its location
+# coordinates and table address are not.
 _VALUE_PROVENANCE_KEYS = frozenset(
     {
         "cell_locators",
@@ -2492,6 +2493,8 @@ _VALUE_PROVENANCE_KEYS = frozenset(
         "quotes_path",
         "source_sha256",
         "line_range",
+        "quantity",
+        "composition_basis_as_published",
     }
 )
 # Closed keys whose string values are extractor-authored annotation, not
