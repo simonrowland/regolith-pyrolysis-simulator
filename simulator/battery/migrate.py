@@ -9790,7 +9790,10 @@ def _initial_charge_only_composition_proxy(
     ):
         return identity, point_conditions, list(notices)
     if selected is None:
-        reason = selected_refusal or composition_unknown_reason()
+        # Invalid input never enters the cascade, so selected_refusal stays
+        # empty. The collected refusal is the composition; the missing-field
+        # string would hide a malformed amount or a partial analysis.
+        reason = selected_refusal or composition_unknown_reason(refusal_reasons)
         unknown = Located(State.unknown(reason), locator=locator)
         conditions["composition"] = unknown
         return (
