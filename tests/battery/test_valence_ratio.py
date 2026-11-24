@@ -23,6 +23,7 @@ from simulator.battery.enums import (
     QuenchState,
     Quantity,
     Rail,
+    ResidualStatus,
     RefusalReason,
     ValenceDenominatorKind,
     ValenceValueForm,
@@ -2200,7 +2201,7 @@ def test_oxidising_cr_glass_carries_lower_bound_notice_outside_certified_tier():
 
     residual = next(row for row in residuals if row.reference == glass.observation_id)
     assert residual.numeric is not None
-    assert residual.score_eligible
+    assert residual.status is not ResidualStatus.REFUSED
     notice = next(
         notice
         for notice in residual.notices
