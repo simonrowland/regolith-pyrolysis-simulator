@@ -6,6 +6,7 @@ import copy
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
+from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
@@ -230,6 +231,24 @@ _REDUCED_REAL_MISS_POLICIES = frozenset({"fail-loud", "live-fill"})
 
 class ProfileValidationError(ValueError):
     """Raised when an optimizer profile file is malformed or unsafe."""
+
+
+class ProfileValidationDecision(Enum):
+    VALIDATION_ERROR = "validation_error"
+    STALE_PROFILE = "stale_profile"
+
+
+def classify_profile_validation(
+    reason: str | None, message: str | None
+) -> ProfileValidationDecision:
+    if (
+        reason == ProfileValidationError.__name__
+        and message is not None
+        and "out-of-policy gate" in message
+        and "FORCE_PROFILES=1" in message
+    ):
+        return ProfileValidationDecision.STALE_PROFILE
+    return ProfileValidationDecision.VALIDATION_ERROR
 
 
 class ValidatedProfile(Mapping[str, Any]):

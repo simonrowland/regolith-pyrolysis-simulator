@@ -75,6 +75,7 @@ from simulator.lab_schedule import (
     normalize_lab_schedule,
 )
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.optimize import profiles as profile_rules
 from simulator.optimize.evalspec import (
     DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
@@ -6309,8 +6310,10 @@ def _invalid_patch_result(
 
 
 def _is_stale_profile_refusal(exc: ProfileValidationError) -> bool:
-    message = str(exc)
-    return "out-of-policy gate" in message and "FORCE_PROFILES=1" in message
+    return (
+        profile_rules.classify_profile_validation(type(exc).__name__, str(exc))
+        is profile_rules.ProfileValidationDecision.STALE_PROFILE
+    )
 
 
 def _non_finite_payload_margin() -> GateMargin:

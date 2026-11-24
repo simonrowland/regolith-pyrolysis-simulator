@@ -60,6 +60,7 @@ except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
     yaml = None  # type: ignore[assignment]
 
 from scripts.seed_reduced_real_cache import payload_count, seed_cache
+import simulator.optimize.profiles as profile_rules
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
 from simulator.optimize.recipe import RecipeSchema
@@ -2458,13 +2459,10 @@ def _stale_profile_status(out_dir: Path) -> Mapping[str, str] | None:
         return None
     reason = str(job_status.get("reason", ""))
     message = str(job_status.get("message", ""))
-    if reason != "ProfileValidationError" or not _message_reports_stale_profile(message):
+    decision = profile_rules.classify_profile_validation(reason, message)
+    if decision is not profile_rules.ProfileValidationDecision.STALE_PROFILE:
         return None
     return {"reason": reason, "message": message}
-
-
-def _message_reports_stale_profile(message: str) -> bool:
-    return "out-of-policy gate" in message and "FORCE_PROFILES=1" in message
 
 
 def _message_reports_no_feasible(message: str) -> bool:
