@@ -78,6 +78,7 @@ from simulator.battery.score import (
     score_store,
 )
 from simulator.melt_backend.base import EquilibriumResult
+from simulator.state_types import State
 from tests.battery import factories as F
 from tests.battery.test_migrate import _write_min_tree
 
@@ -1491,8 +1492,16 @@ def test_distribution_ratio_dex_uses_both_phase_amounts(
 def test_non_phase_engines_refuse_and_the_refusal_is_counted(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    calls: list[dict[str, object]] = []
+
     def hook(*args, **kwargs):
-        raise AssertionError("phase assemblage must not be called")
+        calls.append(kwargs)
+        return EquilibriumResult(
+            status="ok",
+            phases_present=["liquid"],
+            liquid_fraction=1.0,
+            phase_compositions={"melt": {"SiO2": 50.0}},
+        )
 
     monkeypatch.setattr(
         "simulator.battery.score._equilibrate_phase_assemblage", hook
@@ -1569,9 +1578,13 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
     )
 
     pressure_prediction = predict_with_engine(Engine.ALPHAMELTS, missing_pressure_observation)
-    assert pressure_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert pressure_prediction.refusal_detail["input"] == "total_pressure_Pa"
-    assert pressure_prediction.execution.state is ExecutionState.NOT_PROBED
+    assert pressure_prediction.refusal_reason is None
+    assert calls[-1]["pressure_bar"] == pytest.approx(1.01325)
+    assert pressure_prediction.identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in pressure_prediction.notices
+    )
 
     phase_prediction = predict_with_engine(Engine.VAPOROCK, composition_observation)
     phase_residual = Residual(
@@ -1712,12 +1725,18 @@ def test_printed_experiment_pressure_reaches_the_scorer(
     missing = _with_bulk(_row(migrate(bare, write=False), "sample1-sio2-melt"))
     assert missing.identity.total_pressure_Pa.is_unknown
     assert missing.identity.total_pressure_Pa.is_not_applicable is False
-    refused = predict_with_engine(Engine.ALPHAMELTS, missing)
-    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert refused.refusal_detail["input"] == "total_pressure_Pa"
-    assert refused.execution.state is ExecutionState.NOT_PROBED
-    assert refused.value is None
-    assert calls == []
+    fallback = predict_with_engine(Engine.ALPHAMELTS, missing)
+    assert fallback.refusal_reason is None
+    assert fallback.execution.state is ExecutionState.PRODUCED
+    assert fallback.value == Decimal("10")
+    assert len(calls) == 1
+    assert calls[0]["pressure_bar"] == float(Decimal("101325") / Decimal("1e5"))
+    assert fallback.identity is not None
+    assert fallback.identity.total_pressure_Pa.value == Decimal("101325")
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in fallback.notices
+    )
 
 
 def test_legacy_alignment_axes_match_the_stored_ratchet() -> None:

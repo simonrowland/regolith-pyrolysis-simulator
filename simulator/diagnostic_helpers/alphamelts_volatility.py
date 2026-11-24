@@ -29,6 +29,7 @@ from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
 )
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from engines.builtin.vapor_pressure import (
     COEFF_BLOCK_ANTOINE,
     FIT_TARGET_STANDARD_REACTION,
@@ -301,7 +302,7 @@ def _analytical_vapor_pressures_from_activities(
     vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> dict[str, Any]:
     T_K = float(temperature_C) + 273.15
-    if T_K < 400.0:
+    if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
         return {
             "species": {},
             "extrapolated_beyond_valid_range_K": {},

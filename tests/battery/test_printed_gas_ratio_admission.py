@@ -109,6 +109,46 @@ def test_sossi_and_doyle_real_rows_respect_total_pressure_availability() -> None
     assert Decimal(str(doyle_band)).quantize(Decimal("0.0001")) == Decimal("0.0004")
 
 
+def test_located_pure_oxygen_label_reaches_the_bare_log_frame() -> None:
+    """A categorical O2 label is atmosphere evidence at the printed total pressure.
+
+    Sossi Per-fO2(1) prints O2 and 1 bar. CO2 is not air or pure oxygen, so
+    the quote owner still does not forward it.
+    """
+
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
+    experiments = {
+        experiment["experiment_id"]: experiment for experiment in sossi["experiments"]
+    }
+    pure = experiments["sossi-per-f-o2-1"]
+    labels = _quoted_atmosphere_values(pure["conditions"], pure["locator"])
+    assert labels == ("O2",)
+    decision = _bare_log_frame_decision(
+        Decimal("0.00"),
+        Decimal("2173.15"),
+        printed_atmospheres=labels,
+        total_pressure_pa=Decimal("100000"),
+    )
+    assert decision.state.is_value
+    assert decision.state.value == Decimal("100000")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+
+    carbon_dioxide = experiments["sossi-per-f-o2-2"]
+    assert _quoted_atmosphere_values(
+        carbon_dioxide["conditions"], carbon_dioxide["locator"]
+    ) == ()
+    refused = _bare_log_frame_decision(
+        Decimal("0.00"),
+        Decimal("2173.15"),
+        printed_atmospheres=(),
+        total_pressure_pa=Decimal("100000"),
+    )
+    assert refused.state.is_unknown
+    assert refused.state.reason == _BARE_LOG_SCALE_UNKNOWN
+
+
 def test_inherited_sossi_log_uses_gas_evaluation_temperature() -> None:
     from simulator.battery.migrate import (
         PrintedOxygenFacts,

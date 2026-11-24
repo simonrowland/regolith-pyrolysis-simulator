@@ -86,6 +86,11 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery.uncertainty_conventions import (
+    UncertaintyConventionConflict,
+    printed_uncertainty_convention,
+    standard_uncertainty_width,
+)
 from simulator.battery import schema_gap as sg
 from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.source_declarations import (
@@ -17521,9 +17526,12 @@ def fe3_fe2_ratio_from_ferric_fraction(r: Decimal) -> Decimal | None:
 
 
 def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
-    r: Decimal, sigma_r: Decimal
+    r: Decimal,
+    sigma_r: Decimal,
+    *,
+    printed_half_width: Decimal | None = None,
 ) -> tuple[Decimal | None, str | None]:
-    """Propagate a ferric-fraction standard uncertainty into log10(R)."""
+    """Propagate ferric uncertainty; validate the printed interval when given."""
 
     if (
         not r.is_finite()
@@ -17534,8 +17542,17 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     ):
         return None, "ferric_fraction_uncertainty_input_invalid"
     gap = Decimal(1) - r
-    two_sigma = Decimal(2) * sigma_r
-    if two_sigma >= r or two_sigma >= gap:
+    if printed_half_width is not None:
+        if (
+            not printed_half_width.is_finite()
+            or printed_half_width < 0
+            or printed_half_width >= r
+            or printed_half_width >= gap
+        ):
+            return None, "printed_uncertainty_outside_metric_domain"
+    elif Decimal(2) * sigma_r >= r or Decimal(2) * sigma_r >= gap:
+        # Non-printed callers have no original interval to check. Preserve
+        # their existing two-standard-uncertainty admissibility rule.
         return None, "ferric_fraction_uncertainty_linearization_invalid"
 
     # Premise: the print gives r = Fe3+/sumFe, while the stored value is
@@ -17546,8 +17563,8 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     # Unit check: r, R, sigma_r and sigma_R are dimensionless ratios, so both
     # sides are dimensionless (the final uncertainty is in dex). Sanity:
     # r=0.5 gives R=1 and sigma_R=4*sigma_r; as r->0, sigma_R->sigma_r.
-    # Refuse when a two-sigma span reaches either endpoint: log10(R) diverges
-    # at r=0 and r=1, so linearisation cannot represent that printed interval.
+    # The scorer has already kept a printed interval strictly inside (0, 1);
+    # the non-printed caller fallback above retains its prior sigma check.
     sigma_log10_r = sigma_r / (Decimal(10).ln() * r * gap)
     if not sigma_log10_r.is_finite():
         return None, "ferric_fraction_uncertainty_input_invalid"
@@ -24332,6 +24349,23 @@ def _quoted_atmosphere_values(
                         for formula, value in mole_percent.items()
                     )
                 )
+    # Located air or pure O2 has no ratio colon. Forward that printed
+    # label; the bare-log owner applies the printed total pressure.
+    # Unrecognised labels stay out, so they are not an unsupported gas.
+    if isinstance(mixture, Mapping):
+        state = mixture.get("state")
+        mixture_locator = mixture.get("locator")
+        raw_label = state.get("value") if isinstance(state, Mapping) else None
+        if (
+            isinstance(state, Mapping)
+            and str(state.get("tag") or "value") == "value"
+            and isinstance(mixture_locator, Mapping)
+            and mixture_locator
+            and isinstance(raw_label, str)
+            and raw_label.strip()
+            and _atmosphere_kind(raw_label.strip()) is not None
+        ):
+            candidates.append(raw_label.strip())
     return tuple(dict.fromkeys(candidates))
 
 
@@ -31596,6 +31630,48 @@ class Migrator:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
+            if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                parent_uncertainty = uncertainty.verbatim
+                try:
+                    uncertainty_declares_convention = (
+                        printed_uncertainty_convention(parent_uncertainty) is not None
+                    )
+                except UncertaintyConventionConflict:
+                    uncertainty_declares_convention = False
+                    extra_unc = None
+                    extra_unc_k = None
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["uncertainty"],
+                        "uncertainty_convention_conflict",
+                        source=source_key,
+                        observation_id=point_id,
+                    )
+                if extra_unc is None and uncertainty_declares_convention:
+                    standard_errors = raw_item.get("standard_errors")
+                    field_name = value_sel.field_name if value_sel is not None else None
+                    component = (
+                        _mass_percent_component_key(field_name)[0]
+                        if isinstance(field_name, str)
+                        else None
+                    )
+                    if isinstance(standard_errors, Mapping) and component is not None:
+                        extra_unc = standard_errors.get(component)
+                    if extra_unc is None and isinstance(uncertainty.verbatim, Mapping):
+                        zero_width_cells = uncertainty.verbatim.get("zero_width_cells")
+                        sample = raw_item.get("sample")
+                        if isinstance(zero_width_cells, list):
+                            extra_unc = next(
+                                (
+                                    cell.get("sigma")
+                                    for cell in zero_width_cells
+                                    if isinstance(cell, Mapping)
+                                    and cell.get("sample") == sample
+                                    and cell.get("formula") == component
+                                ),
+                                None,
+                            )
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
@@ -32020,9 +32096,10 @@ class Migrator:
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
             if isinstance(uncertainty.verbatim, Mapping):
-                confidence_level = uncertainty.verbatim.get("confidence_level")
-                if confidence_level is not None:
-                    verbatim["confidence_level"] = confidence_level
+                for convention_key in ("confidence_level", "k", "kind"):
+                    convention_value = uncertainty.verbatim.get(convention_key)
+                    if convention_value is not None:
+                        verbatim[convention_key] = convention_value
             if extra_unc_k is not None:
                 verbatim["k"] = extra_unc_k
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
@@ -32047,7 +32124,9 @@ class Migrator:
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
                 if numeric_extra_unc is not None:
                     if extra_unc_k is not None:
-                        numeric_extra_unc /= Decimal(extra_unc_k)
+                        numeric_extra_unc = standard_uncertainty_width(
+                            numeric_extra_unc, Decimal(extra_unc_k)
+                        )
                     unc = replace(
                         unc,
                         value=_log_width_in_dex(

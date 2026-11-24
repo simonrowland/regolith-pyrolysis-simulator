@@ -49,6 +49,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.policy.default_policy import DP_019_VACUUM_BOUNDARY_BAR
 from simulator.melt_backend.base import (
     ANTOINE_FALLBACK_SOURCE_PREFIX,
     REDOX_MODE_NOT_AN_INPUT,
@@ -203,15 +204,9 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
     }
 )
 
-# DP-019 uses this finite high-vacuum boundary when a vacuum method omits
-# total pressure. The transitional general missing-pressure path still uses
-# the same numeric value under rejected DP-101 until t-1924c retargets it.
-# Unit check: 1e-6 bar × 1e5 Pa/bar = 0.1 Pa. This is a model boundary, not
-# inferred source pressure.
-# Limiting check: pressure-independent comparisons should be unchanged by this
-# input; lowering pressure moves a pressure-sensitive gas equilibrium toward
-# its vacuum limit. Actual higher pressure may therefore bias the prediction.
-DP_019_VACUUM_BOUNDARY_BAR = 1.0e-6
+# Gram-scale reference charge when an analytical Knudsen source omits mass.
+# It sets the physical scale of the loader cutoff and its trace-tail bounds.
+DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG = 1e-3
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
@@ -4015,6 +4010,7 @@ def internal_analytical_residue_vapor_pressure(
     from types import SimpleNamespace
 
     from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
+    from simulator.fe_redox import _engine_fe_speciation
     from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
@@ -4029,6 +4025,13 @@ def internal_analytical_residue_vapor_pressure(
                 fO2_log=fO2_log, po2_request=po2_request,
                 include_diagnostic_shadows=include_diagnostic_shadows,
             )
+        q, activity = _engine_fe_speciation(result)
+        speciation = _finite_component_map({
+            "fe3_over_sum_fe": q,
+            "activity_used_for_pressure": activity,
+        })
+        if speciation:
+            result.fe_redox_split = speciation
         return result
 
     def solve():

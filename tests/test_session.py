@@ -974,9 +974,26 @@ def test_c0_gas_bearing_noop_adjustments_keep_the_startup_exit_deadline():
         assert sim.campaign_mgr.c0_remaining_budget_exit is None
 
 
+@pytest.mark.live_engine
+@pytest.mark.serial
+@pytest.mark.xdist_group("serial")
 def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
     monkeypatch,
 ):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    liquidus_searches = []
+    find_liquidus_solidus = MAGEMinBackend.find_liquidus_solidus
+
+    def count_liquidus_search(backend, *args, **kwargs):
+        liquidus_searches.append((args, kwargs))
+        return find_liquidus_solidus(backend, *args, **kwargs)
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "find_liquidus_solidus",
+        count_liquidus_search,
+    )
     session = SimSession().start(
         _config(
             feedstock_id="mars_phyllosilicate_clay",
@@ -985,9 +1002,24 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
     )
     sim = session.simulator
     startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    assert len(liquidus_searches) == 1
+    startup_curve_memo = deepcopy(
+        sim._freeze_gate_liquid_fraction_curve_memo
+    )
+    assert len(startup_curve_memo) == 1
+    startup_key, startup_record = next(iter(startup_curve_memo.items()))
+
     sim.step()
     assert sim.melt.campaign == CampaignPhase.C0
     assert sim.melt.campaign_hour == 1
+    assert len(liquidus_searches) == 1
+    assert sim._freeze_gate_liquid_fraction_curve_memo[startup_key]["curve"] == (
+        startup_record["curve"]
+    )
+    sim._freeze_gate_liquid_fraction_cache = None
+    live_curve_record = sim._melt_redox_liquidus_gate_record()
+    assert live_curve_record["curve"] == startup_record["curve"]
+    assert len(liquidus_searches) == 1
 
     feed_alkali_kg = startup_prediction["Na_plus_K_feed_mass_kg"]
     budget_fraction = startup_prediction["alkali_retention_budget_fraction"]
@@ -1015,6 +1047,7 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
         remaining_hold_budget_hr=remaining_hold_hr,
         preferred_exit_temperature_C=startup_prediction["T_exit_C"],
     )
+    assert len(liquidus_searches) == 1
     assert future_prediction["prediction_status"] == "ok"
 
     current_train_alkali_kg = sim._c0_nak_mass_kg_from_atom_moles(
@@ -1071,6 +1104,7 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
         campaign="C0",
         field="ramp_rate",
     )
+    assert len(liquidus_searches) == 2
     failed_prediction = sim.campaign_mgr.c0_exit_prediction
     assert failed_prediction["prediction_status"] == (
         "no_candidate_fits_remaining_budget"

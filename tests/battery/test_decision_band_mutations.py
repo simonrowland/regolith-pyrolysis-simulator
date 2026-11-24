@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -173,7 +174,7 @@ def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> 
 
     two_sigma = resolve("Table 1 2-sigma", confidence_level="two_sigma")
     assert two_sigma.band is not None
-    assert two_sigma.band.value == Decimal("0.1")
+    assert two_sigma.band.value == Decimal("0.1") / Decimal(2) * _Z95
     assert _decision_band_kind(two_sigma.band) == "printed_2sigma"
 
     confidence_interval = resolve("Table 2 95% confidence interval", confidence_level="ci95")
@@ -233,7 +234,35 @@ def test_unstated_plus_minus_defaults_to_one_sigma_with_two_sigma_alternative() 
     assert resolved.notice is not None
     assert resolved.notice.reason == "uncertainty_confidence_level_assumed_1sigma"
     assert resolved.two_sigma_band is not None
-    assert resolved.two_sigma_band.value == Decimal("0.1")
+    # Printed half-width / k = 0.1 / 2 = 0.05 kJ/mol; the alternative
+    # band tickets that standard width with the normal-95 transform.
+    assert resolved.two_sigma_band.value == (
+        Decimal("0.05") * NORMAL_95_TICKET_MULTIPLIER
+    )
+
+
+def test_coverage_normalization_callers_use_the_shared_owner() -> None:
+    root = Path(__file__).resolve().parents[2]
+    for relative_path, target in (
+        ("simulator/battery/score.py", "metric_standard_width"),
+        ("simulator/battery/score.py", "two_sigma_measurement_dex"),
+        ("simulator/battery/migrate.py", "numeric_extra_unc"),
+    ):
+        tree = ast.parse((root / relative_path).read_text(encoding="utf-8"))
+        normalized_assignments = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(name, ast.Name) and name.id == target
+                for target_node in node.targets
+                for name in ast.walk(target_node)
+            )
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
+            and node.value.func.id == "standard_uncertainty_width"
+        ]
+        assert len(normalized_assignments) == 1, relative_path
 
 
 def test_printed_confidence_text_precedes_default_and_method_override() -> None:
@@ -248,7 +277,7 @@ def test_printed_confidence_text_precedes_default_and_method_override() -> None:
     )
 
     assert resolved.band is not None
-    assert resolved.band.value == Decimal("0.1")
+    assert resolved.band.value == Decimal("0.1") / Decimal(2) * _Z95
     assert _decision_band_kind(resolved.band) == "printed_2sigma"
     assert resolved.notice is None
     assert resolved.two_sigma_band is None
@@ -322,7 +351,7 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
     )
     assert heat.band is not None
     assert heat.band.unit == "J_per_declared_mol_basis_per_K"
-    assert heat.band.value == Decimal("1.00416")
+    assert heat.band.value == Decimal("1.00416") / Decimal(2) * NORMAL_95_TICKET_MULTIPLIER
 
     pressure = _printed_uncertainty_band(
         Quantity.P_PARTIAL,
@@ -337,13 +366,21 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
         Decimal("100000"),
         source_observation=source("Pa", Quantity.P_PARTIAL),
     )
-    expected_dex = max(
-        abs(Decimal("1.01").ln() / Decimal(10).ln()),
-        abs(Decimal("0.99").ln() / Decimal(10).ln()),
+    # A printed 1 kPa two-sigma width means endpoints at 100,500 and 99,500 Pa.
+    expected_standard_dex = max(
+        abs(Decimal("100500").ln() - Decimal("100000").ln()) / Decimal(10).ln(),
+        abs(Decimal("99500").ln() - Decimal("100000").ln()) / Decimal(10).ln(),
     )
+    # The standard dex width gets the normal-95 ticket multiplier once.
+    expected_dex = expected_standard_dex * NORMAL_95_TICKET_MULTIPLIER
     assert pressure.band is not None
     assert pressure.band.unit == "dimensionless"
-    assert pressure.band.value == expected_dex
+    assert pressure.standard_uncertainty_dex is not None
+    assert abs(pressure.band.value - expected_dex) < Decimal("1e-27")
+    assert (
+        abs(pressure.standard_uncertainty_dex - expected_standard_dex)
+        < Decimal("1e-27")
+    )
     assert _decision_band_kind(pressure.band) == "printed_2sigma"
 
 

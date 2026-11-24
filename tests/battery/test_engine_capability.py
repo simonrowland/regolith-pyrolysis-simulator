@@ -79,6 +79,193 @@ def test_capability_table_names_the_score_engines() -> None:
     assert set(ENGINE_QUANTITIES) == set(SCORE_ENGINE_SET)
 
 
+def test_capability_census_uses_the_dispatched_phase_route() -> None:
+    from simulator.battery.engine_capability import (
+        any_declared_engine_covers,
+        engine_covers_scoring_route,
+    )
+
+    assert engine_covers_scoring_route(
+        Engine.ALPHAMELTS, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert engine_covers_scoring_route(
+        Engine.MAGEMIN, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert not engine_covers_scoring_route(
+        Engine.VAPOROCK, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert not engine_covers_scoring_route(
+        Engine.INTERNAL_ANALYTICAL, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert not engine_covers_scoring_route(
+        Engine.ALPHAMELTS, Quantity.SULFIDE_CAPACITY
+    )
+    assert not any_declared_engine_covers(Quantity.SULFIDE_CAPACITY)
+
+
+def test_phase_route_census_matches_production_dispatch(monkeypatch) -> None:
+    """Callable membership uses the same phase-route decision as predict."""
+
+    from decimal import Decimal
+
+    from simulator.battery.engine_capability import (
+        capability_summary,
+        observation_route_covered,
+    )
+    from simulator.battery.enums import (
+        AmountBasis,
+        ExecutionState,
+        Phase,
+        PhaseRole,
+        RefusalReason,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import Composition, Species
+    from simulator.battery.score import ScoreContext, predict_with_engine, score_store
+    from simulator.melt_backend import base as melt_base
+    from simulator.state_types import State
+    from tests.battery import factories as F
+
+    assert observation_route_covered(
+        Engine.ALPHAMELTS,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "wt_percent",
+    )
+    assert not observation_route_covered(
+        Engine.VAPOROCK,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "wt_percent",
+    )
+    assert not observation_route_covered(
+        Engine.MAGEMIN, Quantity.SULFIDE_CAPACITY, None
+    )
+
+    bulk = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("1")), ("MgO", Decimal("1"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+    def phase_identity(subtype: str | None, quantity: Quantity) -> Identity:
+        return Identity(
+            quantity=quantity,
+            species=Species("SiO2" if quantity is not Quantity.SULFIDE_CAPACITY else "S", Phase.L),
+            subtype=None if subtype is None else State.of(subtype),
+            temperature_K=State.of(Decimal("1673.15")),
+            phase_role=State.of(PhaseRole.MELT),
+            composition=State.of(bulk),
+            fO2_Pa=State.of(Decimal("1e-5")),
+            total_pressure_Pa=State.of(Decimal("100000")),
+        )
+
+    experiment = F.tabulation_experiment(experiment_id="phase-exp")
+    supported = F.observation(
+        "phase-wt",
+        experiment.experiment_id,
+        phase_identity("wt_percent", Quantity.EQUILIBRIUM_PHASE_COMPOSITION),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    unsupported = F.observation(
+        "phase-prose",
+        experiment.experiment_id,
+        phase_identity("free text basis", Quantity.EQUILIBRIUM_PHASE_COMPOSITION),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    context = ScoreContext(
+        {"work-1": F.work()},
+        {experiment.experiment_id: experiment},
+        {
+            supported.observation_id: supported,
+            unsupported.observation_id: unsupported,
+        },
+    )
+    summary = capability_summary(
+        observations=context.observations,
+        origins={},
+        experiments=context.experiments,
+        engines=(Engine.ALPHAMELTS,),
+        scored_observation_ids=(),
+        n_records=2,
+        n_scored_records=0,
+        n_refused_records=0,
+    )
+    assert summary["coverage"]["callable_observations"] == 1
+    assert summary["capability_matrix"]["uncovered_pair_total"] == 1
+    assert not observation_route_covered(
+        Engine.ALPHAMELTS,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "free text basis",
+    )
+    phase_rows = [
+        row
+        for row in summary["capability_matrix"]["rows"]
+        if row["quantity"] == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+    ]
+    assert phase_rows
+    assert all(row["covered"] for row in phase_rows)
+
+    calls: list[str] = []
+
+    def hook(*_args, **_kwargs):
+        calls.append("equilibrate")
+        return melt_base.EquilibriumResult(
+            status="ok",
+            phases_present=["liquid"],
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 10.0, "MgO": 40.0}},
+            liquid_composition_wt_pct={"SiO2": 10.0, "MgO": 40.0},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    supported_prediction = predict_with_engine(Engine.ALPHAMELTS, supported)
+    assert calls == ["equilibrate"]
+    assert supported_prediction.refusal_reason is None
+    assert supported_prediction.value is not None
+
+    calls.clear()
+    prose_prediction = predict_with_engine(Engine.ALPHAMELTS, unsupported)
+    assert calls == []
+    assert prose_prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prose_prediction.refusal_detail["reason"] == "quantity_not_predicted"
+
+    produced, _candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        include_diagnostics=False,
+    )
+    assert [item.reference for item in produced] == [supported.observation_id]
+
+    calls.clear()
+    vaporock_prediction = predict_with_engine(Engine.VAPOROCK, supported)
+    assert calls == []
+    assert (
+        vaporock_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+    )
+
+    calls.clear()
+    capacity = F.observation(
+        "sulfide",
+        experiment.experiment_id,
+        phase_identity(None, Quantity.SULFIDE_CAPACITY),
+        Decimal("-2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    capacity_prediction = predict_with_engine(Engine.MAGEMIN, capacity)
+    assert calls == []
+    assert (
+        capacity_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR
+    )
+
+
 def test_predict_time_capability_ladder_matches_the_pin() -> None:
     """Phase basis changes only equilibrium phase composition.
 
@@ -123,7 +310,6 @@ def test_declared_capability_is_the_adapter_set() -> None:
         (Engine.VAPOROCK, Quantity.P_SAT),
         (Engine.VAPOROCK, Quantity.ACTIVITY),
         (Engine.VAPOROCK, Quantity.FE3_FE2_RATIO),
-        (Engine.VAPOROCK, Quantity.EQUILIBRIUM_PHASE_COMPOSITION),
         (Engine.VAPOROCK, Quantity.TRANSITION_TEMPERATURE),
         (Engine.THERMOENGINE, Quantity.S),
         (Engine.THERMOENGINE, Quantity.H_MINUS_H298),
@@ -163,6 +349,7 @@ def test_declared_capability_is_the_adapter_set() -> None:
         (Engine.CATALOG_EVALUATOR, Quantity.CP),
         (Engine.CATALOG_EVALUATOR, Quantity.FE3_FE2_RATIO),
         (Engine.VAPOROCK, Quantity.DELTA_FG),
+        (Engine.VAPOROCK, Quantity.EQUILIBRIUM_PHASE_COMPOSITION),
     )
     for engine, quantity in covered:
         assert engine_covers_quantity(engine, quantity), (engine, quantity)

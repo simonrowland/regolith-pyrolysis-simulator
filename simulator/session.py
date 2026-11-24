@@ -24,6 +24,10 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
+from simulator.process_timestep import (
+    ProcessTimestepRefusal,
+    resolve_process_timestep,
+)
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
 from simulator.scalar_boundary import is_declared_real_scalar, require_finite_float as _finite_float
@@ -209,6 +213,7 @@ class SimSessionConfig:
     # is_complete() instead of stopping at ``hours``. ``hours`` stays the
     # authored budget for the cache key and for runs that leave this false.
     until_campaign_complete: bool = False
+    process_dt_s: float = 3600.0
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical
@@ -256,6 +261,13 @@ class SimSessionConfig:
         object.__setattr__(self, "c5_enabled", c5_enabled)
         object.__setattr__(self, "mre_target_species", mre_target_species)
         object.__setattr__(self, "mre_max_voltage_V", mre_max_voltage_V)
+        try:
+            resolved_dt = resolve_process_timestep(self.process_dt_s)
+        except ProcessTimestepRefusal as exc:
+            raise ValueError(
+                f"{exc.reason}: process_dt_s={self.process_dt_s!r}"
+            ) from exc
+        object.__setattr__(self, "process_dt_s", resolved_dt.dt_s)
 
 
 @dataclass(frozen=True)
@@ -405,6 +417,8 @@ class SimSession:
                 ),
             )
         )
+        sim.process_timestep = resolve_process_timestep(config.process_dt_s)
+        sim.campaign_mgr._process_dt_h = sim.process_dt_hr()
         if forecast_backend_resolvable:
             forecast_backend_name = str(config.backend_name)
             forecast_backend_policy = config.backend_policy

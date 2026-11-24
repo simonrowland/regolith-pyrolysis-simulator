@@ -1,4 +1,10 @@
-"""b-491: pO2 floor inversion is a typed notice, not a silent metal pressure."""
+"""b-491: pO2 floor inversion is a typed notice, not a silent metal pressure.
+
+On an FeO+SiO2 melt the d-469 metal-saturation floor binds above 1e-30,
+so the five provider tests withhold that floor. The clamp-inversion
+notice is what they protect. The floor itself is
+``tests/test_metal_saturation_floor.py``.
+"""
 
 from __future__ import annotations
 
@@ -36,6 +42,29 @@ _T_K = 1700.0
 
 def _yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
+
+
+def _withhold_metal_saturation_floor(monkeypatch) -> None:
+    """Publish the caller's log. This account's Fe floor would hide the clamp.
+
+    b-491 (90f2a27a82) flags the 1e-30 dissociation floor when a negative
+    mass-action exponent inverts it. It does not change the clamp. FeO
+    0.30 plus SiO2 0.50 at 1700 K binds on Fe near -10.12, so the
+    production path never reaches 1e-30. Withholding the floor keeps
+    that clamp, the Si ceiling, and the 1e21 / 10^10.5 / 10^5.25 ratios
+    on the same account. A Fe-free Si-free melt does reach the clamp,
+    and its Mg and Na pressures stay under the catalog ceiling, so it
+    cannot carry the Si assertion.
+    """
+
+    def _publish_unfloored(unfloored_log10_fO2_bar, temperature_K, activities):
+        del temperature_K, activities
+        return float(unfloored_log10_fO2_bar), None
+
+    monkeypatch.setattr(
+        "engines.builtin.vapor_pressure.apply_melt_metal_saturation_floor",
+        _publish_unfloored,
+    )
 
 
 def _request(*, pO2_bar: float, intrinsic_fO2_log: float) -> IntentRequest:
@@ -164,7 +193,8 @@ def test_exact_log10_min_is_a_floor_even_when_not_clamped() -> None:
     assert notice["was_clamped"] is False
 
 
-def test_provider_flags_floor_inversion_and_completes() -> None:
+def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
+    _withhold_metal_saturation_floor(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
     diagnostic = result.diagnostic
@@ -204,7 +234,8 @@ def test_provider_flags_floor_inversion_and_completes() -> None:
     )
 
 
-def test_provider_flags_exact_minus_30_without_clamp_warning() -> None:
+def test_provider_flags_exact_minus_30_without_clamp_warning(monkeypatch) -> None:
+    _withhold_metal_saturation_floor(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-30.0))
     diagnostic = result.diagnostic
@@ -221,9 +252,10 @@ def test_provider_flags_exact_minus_30_without_clamp_warning() -> None:
     assert clamp_warnings == []
 
 
-def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9() -> None:
+def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
     """Hand mass-action: n_Si=-1 → 21 dex; n_Mg_eff=-0.5 → 10.5 dex; n_Na=-0.25 → 5.25 dex."""
 
+    _withhold_metal_saturation_floor(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     at_ref = provider.dispatch(
         _request(pO2_bar=1e-9, intrinsic_fO2_log=-9.0)
@@ -239,7 +271,8 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9() -> None:
     assert at_floor["Na"] / at_ref["Na"] == pytest.approx(10 ** 5.25, rel=1e-6)
 
 
-def _si_floor_notice_from_provider():
+def _si_floor_notice_from_provider(monkeypatch):
+    _withhold_metal_saturation_floor(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-30.0))
     diagnostic = result.diagnostic
@@ -247,7 +280,7 @@ def _si_floor_notice_from_provider():
     return provider, result, diagnostic, notice
 
 
-def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
+def test_floor_notice_reaches_carrier_extra_and_pareto(monkeypatch) -> None:
     """M04: provider floor reason/band must ride extra.extrapolation_notice."""
 
     from simulator.diagnostics import _attach_pareto_source_notices
@@ -258,7 +291,9 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
     )
     from simulator.vapour_rail.request import VapourResolveState
 
-    provider, result, diagnostic, notice = _si_floor_notice_from_provider()
+    provider, result, diagnostic, notice = _si_floor_notice_from_provider(
+        monkeypatch
+    )
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Si"]
     assert result.status == "ok"
     assert diagnostic["vapor_pressures_Pa"]["Si"] > 0.0
@@ -386,7 +421,7 @@ def test_clean_in_band_timestep_publishes_without_floor_notice() -> None:
     assert not (answer.extra or {}).get("extrapolation_notice")
 
 
-def test_early_floor_notice_survives_clean_timestep_wall_merge() -> None:
+def test_early_floor_notice_survives_clean_timestep_wall_merge(monkeypatch) -> None:
     """M04: worst-severity wall merge keeps the floor reason after a clean hour."""
 
     from types import SimpleNamespace
@@ -397,7 +432,7 @@ def test_early_floor_notice_survives_clean_timestep_wall_merge() -> None:
     )
     from simulator.diagnostics import _attach_pareto_source_notices
 
-    _, _, _, notice = _si_floor_notice_from_provider()
+    _, _, _, notice = _si_floor_notice_from_provider(monkeypatch)
 
     def _carrier(extra=None, *, authoritative: bool):
         record = {

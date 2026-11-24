@@ -646,13 +646,15 @@ def test_headless_full_run_ledgers_and_product_story_web(
     )
     # The source-reaction wall refusal leaves proxy CrO on terminal.offgas
     # instead of booking it on the train. The rump loses the same chromium:
-    # Cr2O3 3.328323685668657 → 0.7042714559225458. Offgas CrO
+    # Cr2O3 3.328323685668657 → 0.7042601172589825 after the retained-caller
+    # change (2fb2f595e3) and Stage-2 chromia cartridge change (c65e410cf0);
+    # L and both b274 tips obtain this value. Offgas CrO
     # 0 → 2.4563577999771256, and the Cr-equivalent offgas total
     # 0.18005189890349527 → 1.896070159628202. Elemental Cr on the train
     # rounds to the 0.02 kg product. Cartridge residue and the terminal
     # chromia account hold the rest. Rump + train + offgas + residue +
     # stored chromia still total 2.459768802 kg Cr against the 2.46 kg feed.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(0.7042714559225458, rel=1e-9)
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(0.7042601172589825, rel=1e-9)
     assert cr_ingot_kg == 0.02
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)

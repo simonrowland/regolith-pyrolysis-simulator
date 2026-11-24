@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 from dataclasses import replace
 from decimal import Decimal
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -17,6 +19,12 @@ from simulator.battery.enums import (
     Quantity,
     ResidualStatus,
 )
+from simulator.policy.enums import (
+    DEFAULT_POLICY_NOTICE_KINDS as OWNER_DEFAULT_POLICY_NOTICE_KINDS,
+    MethodToken as OwnerMethodToken,
+    NoticeKind as OwnerNoticeKind,
+    Phase as OwnerPhase,
+)
 from simulator.battery.migrate import to_plain
 from simulator.battery.records import Notice, NoticePolicy, union_notices
 from simulator.battery.score import (
@@ -28,7 +36,6 @@ from simulator.battery.score import (
     headline_payloads,
 )
 from simulator.equipment import EquipmentDesigner
-from simulator.state import MeltState
 from tests.battery import factories as F
 
 
@@ -48,7 +55,21 @@ EXPECTED_POLICY_FLAGS = {
     "composition_from_analysed_phase",
     "method_unstated",
     "method_inferred",
+    "buffer_calibration_not_printed_canonical_used",
 }
+
+
+def test_battery_policy_tokens_reexport_single_owner_definitions() -> None:
+    assert NoticeKind is OwnerNoticeKind
+    assert Phase is OwnerPhase
+    assert MethodToken is OwnerMethodToken
+    assert DEFAULT_POLICY_NOTICE_KINDS is OWNER_DEFAULT_POLICY_NOTICE_KINDS
+
+
+def _policy_json_bytes(policy: object) -> bytes:
+    return json.dumps(policy, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
 
 
 def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
@@ -59,6 +80,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         "DP-101",
         "DP-106",
         "DP-107",
+        "DP-112",
     }
 
     required = {
@@ -106,6 +128,11 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "simulator.battery.migrate._method_inference_from_evidence"
             )
             assert entry["flag"] == "method_inferred"
+        elif policy_id == "DP-112":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1123canon"
+            assert entry["canonized_by"] is None
+            assert entry["canonized_at"] is None
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -193,8 +220,8 @@ def test_method_implied_notice_requires_policy_metadata() -> None:
         )
 
 
-def test_runtime_owned_apparatus_defaults_are_read_from_the_runtime() -> None:
-    runtime_area = MeltState().melt_surface_area_m2
+def test_other_apparatus_default_resolves_runtime_value() -> None:
+    runtime_area = Decimal("0.000123")
 
     assert resolve("DP-008", runtime_default=runtime_area).value == runtime_area
 
@@ -205,7 +232,19 @@ def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
         sample_mass_kg
     ).melt_surface_area_m2
     resolved = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+    policy_bytes = _policy_json_bytes(resolved.payload["policy"])
+    runner_sample_policy = resolve(
+        "DP-007", sample_mass_kg=0.01
+    ).payload["policy"]
 
+    assert (
+        hashlib.sha256(policy_bytes).hexdigest()
+        == "b538cb732135d3441ff6fe826811ef25c398f61e9dbbc2755e9849be4ab4ea96"
+    )
+    assert (
+        hashlib.sha256(_policy_json_bytes(runner_sample_policy)).hexdigest()
+        == "053e7537cc22fe756da0429942b746f28e2de91a0905b14b83e61b89992b2a12"
+    )
     assert resolved.value == Decimal(str(expected_area_m2))
     assert resolved.units == "m²"
     assert resolved.value < Decimal("0.2") / Decimal("1000")
@@ -220,6 +259,12 @@ def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
         ),
     ):
         resolve("DP-007")
+    for invalid_mass_kg in (0.0, -sample_mass_kg):
+        with pytest.raises(
+            ValueError,
+            match="DP-007 sample_mass_kg must be positive",
+        ):
+            resolve("DP-007", sample_mass_kg=invalid_mass_kg)
 
 
 def test_vacuum_pressure_uses_the_runtime_owner_constant() -> None:
@@ -255,6 +300,28 @@ def test_contextual_formula_does_not_return_its_text_as_a_value() -> None:
         resolve("DP-010")
 
 
+def test_dp112_resolves_the_buffer_owner_formula_result() -> None:
+    assert load_policy_table()["DP-112"]["formula_owner"] == (
+        "simulator.chemistry.fo2_buffers.evaluate_buffer"
+    )
+    result = Decimal("27.5")
+    resolved = resolve("DP-112", formula_result=result)
+    assert resolved.value == result
+    assert resolved.flag is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    assert resolved.payload["policy_status"] == "proposed"
+    assert resolved.payload["policy"]["value"] == format(result.normalize(), "f")
+    with pytest.raises(ValueError, match="DP-112 requires the owning formula result"):
+        resolve("DP-112")
+
+
+def test_dp010_resolves_the_intrinsic_fo2_ladder_result() -> None:
+    result = Decimal("-8.25")
+    resolved = resolve("DP-010", formula_result=result)
+    assert resolved.value == result
+    assert resolved.flag is NoticeKind.ASSUMED_FO2
+    assert resolved.payload["policy"]["value"] == "-8.25"
+
+
 def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
     assert load_policy_table()["DP-004"]["formula_owner"] == (
         "simulator.battery.score._sum_gas_partial_pressures_pa"
@@ -274,6 +341,7 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
             "DP-017",
             {"value": "fixture composition", "flag": "composition_from_run_siblings"},
         ),
+        ("DP-112", {"value": Decimal("1")}),
     )
     for policy_id, context in cases:
         with pytest.raises(ValueError, match="owning formula result"):
@@ -331,7 +399,7 @@ def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
 
 
 def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monkeypatch) -> None:
-    import simulator.battery.default_policy as policy_module
+    import simulator.policy.default_policy as policy_module
 
     policy_path = tmp_path / "default_policy.yaml"
     policy_path.write_text("schema_version: 1\npolicies: []\n", encoding="utf-8")
@@ -503,7 +571,7 @@ def test_method_inferred_payload_without_policy_is_rejected_by_headline_census()
 def test_proposals_require_allocated_ids_and_refuse_duplicate_ids(
     tmp_path, monkeypatch
 ) -> None:
-    import simulator.battery.default_policy as policy_module
+    import simulator.policy.default_policy as policy_module
 
     policy_path = tmp_path / "default_policy.yaml"
     policy_path.write_text(

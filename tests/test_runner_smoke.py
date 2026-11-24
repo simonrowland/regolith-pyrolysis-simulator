@@ -2264,10 +2264,13 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
             allow_nan=False,
         ).encode("utf-8")
         assert canonical_hours == expected_hours
-        # The committed mars golden's per-hour summary. The condenser stack
-        # regenerated that fixture; this is its sha256, not a second run.
+        # b-1303 removes the skipped continuation notice and AlphaMELTS
+        # reference-pressure metadata from usable projected MAGEMin bounds.
+        # 7f840b5792 stores the native-Fe onset at the melt's a_FeO in
+        # fe_redox_split. Flux and ledger digests did not move. This hour
+        # digest is the studio value after that diagnostic change.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "dc698b1407dd501052c9ca37b314cd670dcb49474fc084b5cdc3a3b4c612f8ba"
+            "67874a17e2c2c6edc52928dd36d96142ef4f4f78115eb7a9e044bbf649b808b0"
         )
 
 
@@ -2971,7 +2974,12 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
         hours=1,
         c5_enabled=True,
         mre_target_species="CaO",
-        mre_max_voltage_V=2.5,
+        # The production CaO Nernst requirement at 1600 C and 0.05 bar is
+        # 2.6185 V (studio margin -0.118538 V at a 2.5 V cap). That cap
+        # books no transition, so the equilibrium abort leaves the runner
+        # reason blank. 2.7 V is inside the certified (0, 5) V domain and
+        # commits CaO before the abort.
+        mre_max_voltage_V=2.7,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "poisoned-hour-smoke",

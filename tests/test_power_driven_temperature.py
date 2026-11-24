@@ -1,0 +1,922 @@
+"""Power-driven melt temperature for a measured furnace watt trace.
+
+Robinot 2026 carries the watt series. Sesko 2024 stays a reported
+range and has no power driver. With the driver absent, the lab
+schedule's melt temperature series is still the target.
+"""
+
+from __future__ import annotations
+
+import copy
+import math
+from pathlib import Path
+
+import pytest
+
+from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+from simulator.campaigns import CampaignManager
+from simulator.equipment import EquipmentDesigner
+from simulator.lab_schedule import lab_schedule_digests
+from simulator.runner import _load_preset_run_spec
+from simulator.state import (
+    BatchRecord,
+    CampaignPhase,
+    CondensationTrain,
+    MeltState,
+)
+from simulator.thermal_budget import (
+    FURNACE_POWER_DRIVER_KEY,
+    SOLAR_ABSORPTANCE_DEFAULT,
+    WINDOW_TRANSMITTANCE_UPPER_BOUND,
+    PowerTemperatureRefusal,
+    absorbed_focal_power_W,
+    furnace_power_driver_payload,
+    measured_furnace_power_trace,
+    melt_temperature_from_furnace_power,
+    pellet_face_areas_m2,
+    reported_temperature_observations,
+    sample_furnace_power_W,
+    solve_power_driven_melt_temperature_C,
+)
+
+
+_REPO = Path(__file__).resolve().parents[1]
+_ROBINOT = _REPO / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
+_SESKO = _REPO / "data" / "presets" / "vacuum_pyrolysis" / "sesko_2024.yaml"
+_DT_S = 60.0
+_DT_H = _DT_S / 3600.0
+
+
+def _robinot_schedule() -> dict:
+    spec = _load_preset_run_spec(_ROBINOT, "faithful")
+    schedule = copy.deepcopy(spec.lab_schedule)
+    assert FURNACE_POWER_DRIVER_KEY in schedule
+    return schedule
+
+
+def _manager(schedule, *, furnace_max_T_C: float = 1800.0, dt_h: float = _DT_H):
+    manager = CampaignManager({"furnace_max_T_C": furnace_max_T_C})
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    manager._process_dt_h = dt_h
+    return manager
+
+
+def _melt(temperature_C: float = 25.0) -> MeltState:
+    return MeltState(campaign=CampaignPhase.C2A, temperature_C=temperature_C)
+
+
+def _step(manager, melt, step_index: int):
+    # _update_temperature clears the coupled record before the step's
+    # first read. This helper calls get_temp_target directly, so it
+    # clears here. A same-step reuse test must not.
+    manager.__dict__.pop("_power_temperature_for_step", None)
+    elapsed_h = step_index * manager._process_dt_h
+    previous = float(melt.temperature_C)
+    target, ramp = manager.get_temp_target(
+        CampaignPhase.C2A,
+        elapsed_h,
+        melt,
+    )
+    record = manager._power_temperature_for_step
+    melt.temperature_C = float(target)
+    return float(target), float(ramp), record, previous
+
+
+def _series(schedule, *, furnace_max_T_C: float = 1800.0):
+    manager = _manager(schedule, furnace_max_T_C=furnace_max_T_C)
+    melt = _melt()
+    return [_step(manager, melt, index) for index in range(59)]
+
+
+def _double_power(schedule) -> dict:
+    doubled = copy.deepcopy(schedule)
+    trace = doubled[FURNACE_POWER_DRIVER_KEY]["trace"]
+    value_index = list(trace["point_fields"]).index("expected_value")
+    points = []
+    for point in trace["points"]:
+        row = list(point)
+        row[value_index] = float(row[value_index]) * 2.0
+        points.append(row)
+    trace["points"] = points
+    return doubled
+
+
+def _trace_watts_by_minute(trace) -> dict[float, float]:
+    fields = list(trace["point_fields"])
+    time_index = fields.index("time_min")
+    value_index = fields.index("expected_value")
+    return {
+        float(point[time_index]): float(point[value_index])
+        for point in trace["points"]
+    }
+
+
+def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
+    schedule = _robinot_schedule()
+    driver = schedule[FURNACE_POWER_DRIVER_KEY]
+    assert driver["mass_kg"] == pytest.approx(0.00338)
+    assert driver["exposed_area_m2"] is None
+    assert driver["emissivity"] is None
+    assert driver["pellet_diameter_m"] == pytest.approx(0.013)
+    assert driver["pellet_height_m"] == pytest.approx(0.010)
+    assert driver["focal_spot_diameter_m"] == pytest.approx(0.020)
+    assert driver["radiating_face_set"] == "hot_upper"
+    assert driver["solar_absorptance"] is None
+    assert driver["window_transmittance"] is None
+    assert driver["conductivity_W_m_K"] is None
+    watts = _trace_watts_by_minute(driver["trace"])
+
+    rows = _series(schedule)
+    temperatures = [row[0] for row in rows]
+    assert all(math.isfinite(temperature) for temperature in temperatures)
+    assert all(25.0 < temperature < 10000.0 for temperature in temperatures)
+    # Minute 1 is the end of the first 60 s step. It is not the
+    # schedule line (about 55 C). Sensible heat still dominates that
+    # step, so the top is a few hundred degrees, not the peak.
+    assert 350.0 < temperatures[0] < 2000.0
+    assert temperatures[29] > temperatures[4] > temperatures[0]
+    assert temperatures[-1] > temperatures[0]
+    # The tonne-sizer root was 4864 °C. Node 1 radiates the lumped
+    # hot-upper area. A full wall on node 2 sits near the top-face-only
+    # root; the booked root stays closer to the lumped area.
+    areas = pellet_face_areas_m2(0.013, 0.010)
+    late_target, _late_ramp, late, late_previous = rows[29]
+    shared = dict(
+        power_W=late["focal_power_W"],
+        previous_temperature_C=late_previous,
+        dt_s=_DT_S,
+        mass_kg=late["mass_kg"],
+        emissivity=late["emissivity"],
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=late["solar_absorptance"],
+        window_transmittance=late["window_transmittance"],
+        conductivity_W_m_K=late["conductivity_W_m_K"],
+    )
+    lumped_late = solve_power_driven_melt_temperature_C(
+        area_m2=areas["hot_upper"],
+        **shared,
+    )
+    top_only_late = solve_power_driven_melt_temperature_C(
+        area_m2=areas["top"],
+        **shared,
+    )
+    assert late_target == pytest.approx(late["temperature_C"])
+    assert lumped_late["nodes"] == "one_node"
+    assert top_only_late["nodes"] == "one_node"
+    assert math.isfinite(late["temperature_C"])
+    assert late["node_1_area_m2"] == pytest.approx(areas["hot_upper"])
+    assert late["node_2_area_m2"] == pytest.approx(
+        areas["hot_upper"] - areas["top"]
+    )
+    assert abs(late["temperature_C"] - lumped_late["temperature_C"]) < abs(
+        late["temperature_C"] - top_only_late["temperature_C"]
+    )
+
+    target, ramp, record, previous = rows[0]
+    # Eq. (6) watts are the focal spot. The pellet takes the uniform-disk
+    # intercept 0.4225, the Gaier midpoint, and the unprinted window at 1.
+    assert record["focal_power_W"] == pytest.approx(watts[1.0])
+    assert record["intercept"] == pytest.approx(0.4225)
+    assert record["solar_absorptance"] == pytest.approx(SOLAR_ABSORPTANCE_DEFAULT)
+    assert record["solar_absorptance"] == pytest.approx(0.7875)
+    assert record["window_transmittance"] == pytest.approx(
+        WINDOW_TRANSMITTANCE_UPPER_BOUND
+    )
+    assert record["power_W"] == pytest.approx(
+        watts[1.0] * 0.4225 * SOLAR_ABSORPTANCE_DEFAULT
+    )
+    assert record["time_s"] == pytest.approx(60.0)
+    assert record["role"] == "prediction"
+    assert record["source_class"] == "engine_prediction"
+    assert record["scored_as_observed_temperature"] is False
+    assert record["mass_kg"] == pytest.approx(0.00338)
+    # Investigation areas for the 13 mm by 10 mm cylinder: top
+    # 1.327e-4 m², lumped hot upper 3.369e-4 m², full side 5.411e-4 m².
+    # area_m2 and node_1_area_m2 are the hot upper surface used for both
+    # radiation and evaporation. side_area_m2 stays the full cylinder wall.
+    assert areas["hot_upper"] == pytest.approx(3.369e-4, abs=5.0e-8)
+    assert areas["full_side"] == pytest.approx(5.411e-4, abs=5.0e-8)
+    assert record["face_set"] == "hot_upper"
+    assert record["nodes"] == "two_node"
+    assert record["area_m2"] == pytest.approx(areas["hot_upper"])
+    assert record["top_area_m2"] == pytest.approx(areas["top"])
+    assert record["side_area_m2"] == pytest.approx(areas["side"])
+    assert record["sensitivity"]["face_set"] == "full_side"
+    assert record["sensitivity"]["nodes"] == "one_node"
+    assert record["sensitivity"]["area_m2"] == pytest.approx(areas["full_side"])
+    assert record["sensitivity"]["role"] == "sensitivity"
+    assert record["sensitivity"]["temperature_C"] < record["temperature_C"]
+    assert record["emissivity"] == pytest.approx(EquipmentDesigner.MELT_EMISSIVITY)
+    # The schedule holder ends at 1500 C. The balance does not read it.
+    holder = schedule["surface_temperature_C"]["holder"]
+    assert holder[-1]["value"] == 1500
+    assert record["cold_boundary_K"] == pytest.approx(300.0)
+    assert record["surroundings_K"] == pytest.approx(300.0)
+    assert record["conductivity_W_m_K"] == pytest.approx(1.0)
+    assert ramp == pytest.approx(abs(target - previous))
+    knobs = {notice["knob"]: notice for notice in record["notices"]}
+    assert set(knobs) == {
+        "melt_emissivity",
+        "solar_absorptance",
+        "window_transmittance",
+        "pellet_conductivity_W_m_K",
+        "cold_boundary_K",
+        "two_node_geometry",
+    }
+    assert knobs["melt_emissivity"]["kind"] == "knob_defaulted"
+    assert knobs["solar_absorptance"]["kind"] == "knob_defaulted"
+    assert knobs["window_transmittance"]["kind"] == "typed_unknown"
+    assert knobs["window_transmittance"]["bound"] == "upper"
+    assert knobs["pellet_conductivity_W_m_K"]["kind"] == "knob_defaulted"
+    assert knobs["pellet_conductivity_W_m_K"]["value"] == pytest.approx(1.0)
+    assert knobs["pellet_conductivity_W_m_K"]["band_low"] == pytest.approx(0.6)
+    assert knobs["pellet_conductivity_W_m_K"]["band_high"] == pytest.approx(1.4)
+    assert knobs["cold_boundary_K"]["kind"] == "typed_unknown"
+    assert knobs["cold_boundary_K"]["value"] == pytest.approx(300.0)
+    assert "1500" in knobs["cold_boundary_K"]["source"]
+    assert knobs["melt_emissivity"]["unit"] == "1"
+    assert knobs["melt_emissivity"]["value"] == pytest.approx(
+        EquipmentDesigner.MELT_EMISSIVITY
+    )
+    assert knobs["solar_absorptance"]["value"] == pytest.approx(
+        SOLAR_ABSORPTANCE_DEFAULT
+    )
+    assert knobs["solar_absorptance"]["band_low"] == pytest.approx(0.669)
+    assert knobs["solar_absorptance"]["band_high"] == pytest.approx(0.906)
+    for _target, _ramp, step_record, _previous in rows:
+        assert {(notice["kind"], notice["knob"]) for notice in step_record["notices"]} == {
+            ("knob_defaulted", "melt_emissivity"),
+            ("knob_defaulted", "solar_absorptance"),
+            ("typed_unknown", "window_transmittance"),
+            ("knob_defaulted", "pellet_conductivity_W_m_K"),
+            ("typed_unknown", "cold_boundary_K"),
+            ("typed_unknown", "two_node_geometry"),
+        }
+        assert step_record["face_set"] == "hot_upper"
+        assert step_record["scored_as_observed_temperature"] is False
+
+    late = rows[29][2]
+    assert late["exceeds_furnace_ceiling"] is True
+    assert late["exceeds_furnace_max"] is True
+    assert temperatures[29] > 1800.0
+
+    midpoint = sample_furnace_power_W(driver["trace"], 0.25 * 60.0)
+    assert midpoint == pytest.approx((watts[0.0] + watts[0.5]) / 2.0)
+
+    manager = _manager(schedule)
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        manager.get_temp_target(CampaignPhase.C2A, 59 * _DT_H, _melt())
+    assert refused.value.reason == "power_trace_does_not_bracket"
+
+    observed = reported_temperature_observations(schedule["melt_temperature_C"])
+    assert len(observed) == 1
+    assert observed[0]["value"] == 1800
+    assert observed[0]["source_class"] == "literature_sidecar"
+    assert observed[0]["qualifier"] == "approximate_peak"
+    assert reported_temperature_observations((record,)) == ()
+
+
+def test_doubled_robinot_power_raises_the_predicted_temperature():
+    schedule = _robinot_schedule()
+    base = _series(schedule)
+    doubled = _series(_double_power(schedule))
+    for minute in (1, 5, 30, 59):
+        assert doubled[minute - 1][0] > base[minute - 1][0]
+
+
+def test_sesko_has_no_power_driver_and_its_range_is_not_a_temperature_series():
+    spec = _load_preset_run_spec(_SESKO, "faithful")
+    assert FURNACE_POWER_DRIVER_KEY not in spec.lab_schedule
+    assert (
+        reported_temperature_observations(
+            spec.lab_schedule["melt_temperature_C"]
+        )
+        == ()
+    )
+
+
+def test_schedule_without_a_power_trace_keeps_interpolation_and_the_furnace_clamp():
+    schedule = _robinot_schedule()
+    del schedule[FURNACE_POWER_DRIVER_KEY]
+    bare = copy.deepcopy(schedule)
+    loaded = _robinot_schedule()
+    assert lab_schedule_digests(bare) == lab_schedule_digests(loaded)
+
+    manager = _manager(bare, furnace_max_T_C=1800.0, dt_h=1.0)
+    target, ramp = manager.get_temp_target(CampaignPhase.C2A, 0, _melt())
+    assert target == pytest.approx(1800.0)
+    assert ramp == pytest.approx(1775.0)
+    assert "_power_temperature_for_step" not in manager.__dict__
+
+    clamped = _manager(bare, furnace_max_T_C=1500.0, dt_h=1.0)
+    clamped_target, _ramp = clamped.get_temp_target(
+        CampaignPhase.C2A,
+        0,
+        _melt(),
+    )
+    assert clamped_target == pytest.approx(1500.0)
+    assert "_power_temperature_for_step" not in clamped.__dict__
+
+
+def test_power_driven_target_skips_the_furnace_clamp_and_the_c0_forecast_cap():
+    schedule = _robinot_schedule()
+    manager = CampaignManager({"furnace_max_T_C": 1200.0})
+    manager.overrides["C0"] = {"lab_schedule": schedule}
+    manager._process_dt_h = _DT_H
+    manager.c0_exit_prediction = {"T_exit_C": 100.0}
+    manager.c0_remaining_budget_exit = object()
+    melt = MeltState(campaign=CampaignPhase.C0, temperature_C=25.0)
+
+    # Minute 1 of the corrected pellet balance sits below this 1200 C
+    # ceiling. The clamp-skip is the minute-30 sample, where the same
+    # balance is above the ceiling and above the 100 C forecast cap.
+    target, _ramp = manager.get_temp_target(CampaignPhase.C0, 29.0 * _DT_H, melt)
+
+    assert target > 1200.0
+    assert target != pytest.approx(25.0)
+    assert target != pytest.approx(100.0)
+    record = manager._power_temperature_for_step
+    assert record["exceeds_furnace_max"] is True
+    assert target == pytest.approx(record["temperature_C"])
+
+
+def test_a_later_call_in_the_same_step_reuses_the_coupled_record():
+    schedule = _robinot_schedule()
+    manager = _manager(schedule)
+    melt = _melt()
+    calls = {"n": 0}
+
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        calls["n"] += 1
+        if float(temperature_K) < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            return {}
+        return {"SiO": 0.01}
+
+    manager._species_rate_kg_hr_at_K = rates
+    hour = 0.0
+    target, ramp = manager.get_temp_target(CampaignPhase.C2A, hour, melt)
+    record = manager._power_temperature_for_step
+    sink = record["evaporative_sink_W"]
+    solved_calls = calls["n"]
+    assert sink > 0.0
+    assert solved_calls > 0
+    assert record["campaign_phase"] is CampaignPhase.C2A
+    assert record["campaign_hour"] == hour
+    assert record["ramp_C_per_hr"] == pytest.approx(ramp)
+
+    again, again_ramp = manager.get_temp_target(CampaignPhase.C2A, hour, melt)
+    assert calls["n"] == solved_calls
+    assert again == pytest.approx(target)
+    assert again_ramp == pytest.approx(ramp)
+    assert manager._power_temperature_for_step["evaporative_sink_W"] == sink
+
+    # The step has applied the temperature. A re-solve would book a new
+    # ramp from here, and with the callback gone it would book no sink.
+    melt.temperature_C = float(target)
+    manager.__dict__.pop("_species_rate_kg_hr_at_K", None)
+    booked, booked_ramp = manager.get_temp_target(CampaignPhase.C2A, hour, melt)
+    assert calls["n"] == solved_calls
+    assert booked == pytest.approx(target)
+    assert booked_ramp == pytest.approx(ramp)
+    assert booked_ramp > 0.0
+    assert manager._power_temperature_for_step["evaporative_sink_W"] == sink
+
+    # Hour matches. Campaign does not. These reads must not adopt the
+    # coupled temperature or replace the record.
+    sodium, _sodium_ramp = manager.get_temp_target(
+        CampaignPhase.C3_NA,
+        0,
+        melt,
+    )
+    mre, _mre_ramp = manager.get_temp_target(
+        CampaignPhase.MRE_BASELINE,
+        0,
+        melt,
+    )
+    assert sodium == pytest.approx(1150.0)
+    assert mre == pytest.approx(1575.0)
+    assert manager._power_temperature_for_step["temperature_C"] == pytest.approx(
+        target
+    )
+    assert manager._power_temperature_for_step["evaporative_sink_W"] == sink
+    assert manager._power_temperature_for_step["campaign_phase"] is CampaignPhase.C2A
+
+    fresh, _fresh_ramp, fresh_record, _previous = _step(manager, melt, 1)
+    assert calls["n"] == solved_calls
+    assert fresh_record["evaporative_sink_W"] == pytest.approx(0.0)
+    assert fresh_record["campaign_hour"] == pytest.approx(_DT_H)
+    assert fresh != pytest.approx(target)
+
+
+def test_c0_exit_reuses_the_coupled_record_at_minute_thirty():
+    schedule = _robinot_schedule()
+    manager = CampaignManager({"furnace_max_T_C": 1800.0})
+    manager.overrides["C0"] = {"lab_schedule": schedule}
+    manager._process_dt_h = _DT_H
+    manager.c0_first_melt_backstop = True
+    melt = MeltState(campaign=CampaignPhase.C0, temperature_C=25.0)
+    melt.campaign_hour = 30.0 * _DT_H
+
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            return {}
+        return {"SiO": 0.01}
+
+    manager._species_rate_kg_hr_at_K = rates
+
+    target, _ramp = manager.get_temp_target(
+        CampaignPhase.C0,
+        melt.campaign_hour,
+        melt,
+    )
+    coupled_record = manager._power_temperature_for_step
+    assert coupled_record["campaign_hour"] == pytest.approx(0.5)
+    assert coupled_record["evaporative_sink_W"] > 0.0
+    manager.__dict__.pop("_species_rate_kg_hr_at_K", None)
+    coupled_record["ramp_C_per_hr"] = 1234.5
+    melt.temperature_C = float(target)
+
+    assert manager.check_endpoint(
+        melt,
+        None,
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["ramp_C_per_hr"] == pytest.approx(1234.5)
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+
+
+def test_a_printed_area_and_emissivity_emit_no_knob_defaulted_notice():
+    schedule = _robinot_schedule()
+    schedule[FURNACE_POWER_DRIVER_KEY] = furnace_power_driver_payload(
+        {
+            "role": "measured_driver",
+            "units": "W",
+            "point_fields": ["time_min", "expected_value"],
+            "points": [[0.0, 100.0], [1.0, 100.0]],
+        },
+        mass_kg=0.00338,
+        exposed_area_m2=1.0e-3,
+    )
+    schedule[FURNACE_POWER_DRIVER_KEY]["emissivity"] = 0.9
+    manager = _manager(schedule)
+    _target, _ramp, record, _previous = _step(manager, _melt(), 0)
+
+    assert record["notices"] == ()
+    assert record["area_m2"] == pytest.approx(1.0e-3)
+    assert record["emissivity"] == pytest.approx(0.9)
+    assert record["intercept"] is None
+    assert record["focal_power_W"] is None
+    assert record["face_set"] is None
+    assert record["sensitivity"] is None
+    assert record["power_W"] == pytest.approx(100.0)
+    assert record["cold_boundary_K"] is None
+    assert record["surroundings_K"] == pytest.approx(0.0)
+    assert record["conductivity_W_m_K"] is None
+
+
+def test_ambiguous_or_negative_power_and_a_missing_charge_refuse():
+    with pytest.raises(PowerTemperatureRefusal) as ambiguous:
+        measured_furnace_power_trace({
+            "trajectory_comparison": {
+                "recorded_input_traces": [
+                    {"role": "measured_driver", "units": "W"},
+                    {"role": "measured_driver", "units": "W"},
+                ],
+            },
+        })
+    assert ambiguous.value.reason == "ambiguous_furnace_power_trace"
+
+    with pytest.raises(PowerTemperatureRefusal) as negative:
+        sample_furnace_power_W(
+            {
+                "role": "measured_driver",
+                "units": "W",
+                "point_fields": ["time_min", "expected_value"],
+                "points": [[0.0, -1.0], [1.0, 10.0]],
+            },
+            30.0,
+        )
+    assert negative.value.reason == "furnace_power_not_nonnegative"
+
+    payload = furnace_power_driver_payload(
+        {
+            "role": "measured_driver",
+            "units": "W",
+            "point_fields": ["time_min", "expected_value"],
+            "points": [[0.0, 10.0], [1.0, 10.0]],
+        },
+        mass_kg=None,
+        exposed_area_m2=None,
+    )
+    with pytest.raises(PowerTemperatureRefusal) as missing:
+        melt_temperature_from_furnace_power(
+            payload,
+            time_s=60.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            live_mass_kg=0.0,
+        )
+    assert missing.value.reason == "charge_mass_missing"
+
+
+def test_uniform_disk_intercept_books_the_printed_13_mm_pellet():
+    # Investigation anchor: (13 mm / 20 mm)^2 = 0.4225, and 1468.82 W of
+    # focal power puts 620.6 W on the pellet when alpha and tau are 1.
+    record = solve_power_driven_melt_temperature_C(
+        power_W=1468.819694,
+        previous_temperature_C=1800.0,
+        dt_s=60.0,
+        mass_kg=1.0,
+        area_m2=1.0e-3,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=1.0,
+        window_transmittance=1.0,
+    )
+
+    assert record["intercept"] == pytest.approx(0.4225)
+    assert record["focal_power_W"] == pytest.approx(1468.819694)
+    # Investigation: 0.4225 of 1468.82 W is 620.6 W on the pellet.
+    assert record["power_W"] == pytest.approx(620.6, abs=0.05)
+    assert record["notices"] == ()
+    # No printed height, so the sky balance is unchanged.
+    assert record["cold_boundary_K"] is None
+    assert record["surroundings_K"] == pytest.approx(0.0)
+
+
+def test_pellet_larger_than_focal_spot_intercepts_the_focal_power_once():
+    absorbed, intercept = absorbed_focal_power_W(
+        1000.0,
+        pellet_diameter_m=0.030,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=1.0,
+        window_transmittance=1.0,
+    )
+
+    assert intercept == pytest.approx(1.0)
+    assert absorbed == pytest.approx(1000.0)
+
+
+def test_one_focal_diameter_without_the_other_refuses():
+    with pytest.raises(PowerTemperatureRefusal) as missing_spot:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=1.0,
+            area_m2=1.0e-3,
+            emissivity=0.85,
+            pellet_diameter_m=0.013,
+        )
+    assert missing_spot.value.reason == "focal_diameter_missing"
+
+    with pytest.raises(PowerTemperatureRefusal) as missing_pellet:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=1.0,
+            area_m2=1.0e-3,
+            emissivity=0.85,
+            focal_spot_diameter_m=0.020,
+            solar_absorptance=0.8,
+        )
+    assert missing_pellet.value.reason == "focal_diameter_missing"
+
+
+def test_one_kilogram_without_a_focal_spot_keeps_the_sizer_balance():
+    # Docstring sanity from before the focal booking: 1 kg, emissivity
+    # 0.85, sizer area, 1740.1373551492054 W holds 1800 °C. No pellet
+    # diameters, so the watts are not scaled.
+    record = solve_power_driven_melt_temperature_C(
+        power_W=1740.1373551492054,
+        previous_temperature_C=1800.0,
+        dt_s=60.0,
+        mass_kg=1.0,
+        area_m2=None,
+        emissivity=None,
+    )
+
+    assert record["temperature_C"] == pytest.approx(1800.0, abs=1.0e-4)
+    assert record["area_m2"] == pytest.approx(
+        EquipmentDesigner.radiative_loss_area_m2(1.0)
+    )
+    assert record["intercept"] is None
+    assert record["face_set"] is None
+    assert record["sensitivity"] is None
+    assert record["power_W"] == pytest.approx(1740.1373551492054)
+    assert record["cold_boundary_K"] is None
+    assert record["surroundings_K"] == pytest.approx(0.0)
+    assert record["conductivity_W_m_K"] is None
+    assert {notice["knob"] for notice in record["notices"]} == {
+        "melt_radiative_area_m2",
+        "melt_emissivity",
+    }
+
+
+def test_sub_kilogram_charge_without_a_cylinder_refuses_the_tonne_sizer():
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=0.00338,
+            area_m2=None,
+            emissivity=0.85,
+        )
+    assert refused.value.reason == "radiative_area_out_of_domain"
+
+
+def test_unset_face_set_on_a_gram_pellet_defaults_to_hot_upper():
+    record = solve_power_driven_melt_temperature_C(
+        power_W=100.0,
+        previous_temperature_C=25.0,
+        dt_s=60.0,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+    declared = solve_power_driven_melt_temperature_C(
+        power_W=100.0,
+        previous_temperature_C=25.0,
+        dt_s=60.0,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        radiating_face_set="hot_upper",
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+
+    assert record["face_set"] == "hot_upper"
+    assert record["area_m2"] == pytest.approx(declared["area_m2"])
+    assert record["temperature_C"] == pytest.approx(declared["temperature_C"])
+    knobs = {notice["knob"]: notice for notice in record["notices"]}
+    assert knobs["radiating_face_set"]["kind"] == "knob_defaulted"
+    assert knobs["radiating_face_set"]["value"] == "hot_upper"
+    assert "radiating_face_set" not in {
+        notice["knob"] for notice in declared["notices"]
+    }
+
+
+def test_an_unknown_face_set_refuses():
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=0.00338,
+            area_m2=None,
+            emissivity=0.85,
+            pellet_diameter_m=0.013,
+            pellet_height_m=0.010,
+            focal_spot_diameter_m=0.020,
+            radiating_face_set="top_only",
+            solar_absorptance=0.85,
+            window_transmittance=1.0,
+        )
+    assert refused.value.reason == "radiating_face_set_unknown"
+
+
+def _peak_pellet(**overrides):
+    payload = dict(
+        power_W=1468.819694,
+        previous_temperature_C=25.0,
+        dt_s=1.0e12,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        radiating_face_set="hot_upper",
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+        conductivity_W_m_K=1.0,
+    )
+    payload.update(overrides)
+    return solve_power_driven_melt_temperature_C(**payload)
+
+
+def _lumped_hot_upper(**overrides):
+    """One-node root on the lumped hot-upper area.
+
+    Passing that area explicitly, with no face set, keeps radiation,
+    the holder slab, and argon at one temperature. The booked hot-upper
+    face is the two-node split and is not this path.
+    """
+
+    areas = pellet_face_areas_m2(0.013, 0.010)
+    return _peak_pellet(
+        area_m2=areas["hot_upper"],
+        radiating_face_set=None,
+        **overrides,
+    )
+
+
+def test_printed_face_areas_match_the_investigation_with_holder_and_argon():
+    # Investigation table at the peak focal power, k = 1, Nu = 2,
+    # losses at the solved temperature. The hot-upper number is the
+    # one-node lumped area. The full-side number is the one-node
+    # isothermal bound. Node 1 radiates that lumped area, so the
+    # booked root stays closer to it than to the top face alone.
+    anchors = (
+        (0.906, 2112.0, 1851.0),
+        (0.85, 2072.0, 1816.0),
+        (0.669, 1929.0, 1689.0),
+    )
+    areas = pellet_face_areas_m2(0.013, 0.010)
+    solved = {}
+    for alpha, hot_C, full_C in anchors:
+        lumped = _lumped_hot_upper(solar_absorptance=alpha)
+        booked = _peak_pellet(solar_absorptance=alpha)
+        full = _peak_pellet(solar_absorptance=alpha, radiating_face_set="full_side")
+        top_only = _peak_pellet(
+            solar_absorptance=alpha,
+            area_m2=areas["top"],
+            radiating_face_set=None,
+        )
+        solved[alpha] = booked
+        assert lumped["nodes"] == "one_node"
+        assert lumped["area_m2"] == pytest.approx(areas["hot_upper"])
+        assert lumped["temperature_C"] == pytest.approx(hot_C, abs=2.0)
+        assert booked["nodes"] == "two_node"
+        assert booked["area_m2"] == pytest.approx(areas["hot_upper"])
+        assert booked["node_1_area_m2"] == pytest.approx(booked["area_m2"])
+        assert booked["node_2_area_m2"] == pytest.approx(
+            areas["hot_upper"] - areas["top"]
+        )
+        assert abs(booked["temperature_C"] - lumped["temperature_C"]) < abs(
+            booked["temperature_C"] - top_only["temperature_C"]
+        )
+        assert booked["sensitivity"]["area_m2"] == pytest.approx(areas["full_side"])
+        assert booked["sensitivity"]["face_set"] == "full_side"
+        assert booked["sensitivity"]["nodes"] == "one_node"
+        assert booked["sensitivity"]["temperature_C"] == pytest.approx(full_C, abs=2.0)
+        assert full["nodes"] == "one_node"
+        assert full["area_m2"] == pytest.approx(areas["full_side"])
+        assert full["temperature_C"] == pytest.approx(full_C, abs=2.0)
+        assert full["temperature_side_C"] == pytest.approx(full["temperature_C"])
+        assert booked["cold_boundary_K"] == pytest.approx(300.0)
+        assert booked["surroundings_K"] == pytest.approx(300.0)
+        assert booked["conductivity_W_m_K"] == pytest.approx(1.0)
+        assert "pellet_conductivity_W_m_K" not in {
+            notice["knob"] for notice in booked["notices"]
+        }
+
+    # The noticed default is the investigation's k = 1, not a retune.
+    default_k = _peak_pellet(conductivity_W_m_K=None)
+    assert default_k["temperature_C"] == pytest.approx(
+        solved[0.85]["temperature_C"]
+    )
+    assert default_k["sensitivity"]["temperature_C"] == pytest.approx(
+        solved[0.85]["sensitivity"]["temperature_C"]
+    )
+    # The Gaier midpoint is 0.7875. Its one-node lumped hot-upper root
+    # is 2025.77 °C, rounded to the 2026 °C pin. The booked two-node
+    # top stays closer to that lumped root than to the top face alone.
+    midpoint = _lumped_hot_upper(solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT)
+    booked_midpoint = _peak_pellet(solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT)
+    top_only_midpoint = _peak_pellet(
+        solar_absorptance=SOLAR_ABSORPTANCE_DEFAULT,
+        area_m2=areas["top"],
+        radiating_face_set=None,
+    )
+    assert SOLAR_ABSORPTANCE_DEFAULT == pytest.approx(0.7875)
+    assert midpoint["temperature_C"] == pytest.approx(2026.0, abs=0.5)
+    assert abs(
+        booked_midpoint["temperature_C"] - midpoint["temperature_C"]
+    ) < abs(
+        booked_midpoint["temperature_C"] - top_only_midpoint["temperature_C"]
+    )
+
+
+def test_holder_series_is_not_the_cold_boundary():
+    trace = {
+        "role": "measured_driver",
+        "units": "W",
+        "point_fields": ["time_min", "expected_value"],
+        "points": [[0.0, 100.0], [1.0, 100.0]],
+    }
+    driver = furnace_power_driver_payload(
+        trace,
+        mass_kg=0.00338,
+        exposed_area_m2=None,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        radiating_face_set="hot_upper",
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+    driver["holder_temperature_C"] = 1500.0
+    decoy = melt_temperature_from_furnace_power(
+        driver,
+        time_s=60.0,
+        previous_temperature_C=25.0,
+        dt_s=60.0,
+    )
+    bare = solve_power_driven_melt_temperature_C(
+        power_W=100.0,
+        previous_temperature_C=25.0,
+        dt_s=60.0,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=None,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        radiating_face_set="hot_upper",
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+
+    assert decoy["temperature_C"] == pytest.approx(bare["temperature_C"])
+    assert decoy["cold_boundary_K"] == pytest.approx(300.0)
+    assert decoy["surroundings_K"] == pytest.approx(300.0)
+    source = next(
+        notice["source"]
+        for notice in decoy["notices"]
+        if notice["knob"] == "cold_boundary_K"
+    )
+    assert "1500" in source
+
+
+def test_campaign_thread_puts_the_evaporative_sink_in_the_root():
+    # The manager does not own a flux law. A callback installed on it
+    # is the evaporation booking at the trial temperature. Quasi-steady
+    # here is one step whose sample lands on the peak watt and whose
+    # duration is that same peak time, so the sensible term is a few
+    # watts against about 123 W of SiO enthalpy.
+    #
+    # 401 mg/min of SiO is the audit's one-minute dump. kg/h = mg/min
+    # * 1e-6 kg/mg * 60 min/h. The enthalpy is not pasted: the closure
+    # file checks the JANAF reaction against the budget. This test only
+    # checks that the thread makes the root colder by a bounded amount.
+    schedule = _robinot_schedule()
+    watts = _trace_watts_by_minute(
+        schedule[FURNACE_POWER_DRIVER_KEY]["trace"]
+    )
+    peak_min = max(watts, key=watts.get)
+    assert peak_min > 0.0
+    dt_h = peak_min / 60.0
+    kg_hr = 401.0 * 1.0e-6 * 60.0
+
+    def rates(
+        temperature_K: float,
+        _melt_surface_area_m2: float | None,
+    ) -> dict[str, float]:
+        if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            return {}
+        return {"SiO": kg_hr}
+
+    bare = _manager(schedule, dt_h=dt_h)
+    coupled = _manager(schedule, dt_h=dt_h)
+    coupled._species_rate_kg_hr_at_K = rates
+    hot, _ramp, bare_record, _previous = _step(bare, _melt(), 0)
+    cold, _coupled_ramp, coupled_record, _coupled_previous = _step(
+        coupled, _melt(), 0
+    )
+
+    assert bare_record["evaporative_sink_W"] == pytest.approx(0.0)
+    assert coupled_record["evaporative_sink_W"] > 0.0
+    assert 0.0 < hot - cold < 1500.0
+    assert cold == pytest.approx(coupled_record["temperature_C"])
+
+
+def test_a_non_positive_conductivity_on_a_pellet_refuses():
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        _peak_pellet(conductivity_W_m_K=0.0)
+    assert refused.value.reason == "pellet_conductivity_not_positive"
+
+
+def test_conductivity_without_a_printed_cylinder_refuses():
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        solve_power_driven_melt_temperature_C(
+            power_W=1740.1373551492054,
+            previous_temperature_C=1800.0,
+            dt_s=60.0,
+            mass_kg=1.0,
+            area_m2=None,
+            emissivity=0.85,
+            conductivity_W_m_K=1.0,
+        )
+    assert refused.value.reason == "pellet_geometry_incomplete"

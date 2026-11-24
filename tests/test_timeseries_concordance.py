@@ -2,10 +2,20 @@ from __future__ import annotations
 
 import pytest
 
+from simulator import curve_utils
+from simulator.diagnostic_helpers import timeseries_concordance
 from simulator.diagnostic_helpers.timeseries_concordance import (
     dual_concordance,
     trapezoid_integral,
 )
+
+
+def test_concordance_curve_alias_uses_shared_owner(monkeypatch) -> None:
+    assert timeseries_concordance.Curve is curve_utils.Curve
+
+    monkeypatch.setattr(timeseries_concordance, "Curve", tuple[tuple[float, float], ...])
+    with pytest.raises(AssertionError):
+        assert timeseries_concordance.Curve is curve_utils.Curve
 
 
 def test_integral_concordance_uses_exact_trapezoid_totals_per_species() -> None:

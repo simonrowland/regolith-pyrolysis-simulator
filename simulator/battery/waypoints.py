@@ -200,6 +200,8 @@ _AUTHORITY_RANK = {
 }
 _PI = Decimal("3.141592653589793238462643383279502884197")
 _R = GAS_CONSTANT_DECIMAL
+# This is a battery-readiness classification for the evidence band. Runtime
+# lab schedules below it are still executed and carry an extrapolation notice.
 RPS_PRESSURE_FLOOR_PA = as_decimal(LAB_SCHEDULE_PRESSURE_FLOOR_MBAR) * Decimal("100")
 ENGINE_POINT_CONSUMERS = (
     "internal-analytical",
@@ -1472,7 +1474,7 @@ def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
 
 
 def pressure_boundary(
-    experiment: Experiment, bench: Bench, observation: Observation | None = None
+    experiment: Experiment, bench: Bench | None, observation: Observation | None = None
 ) -> WaypointResult:
     routes: list[Waypoint] = []
     point = _point_condition(experiment, observation, "total_pressure_Pa", "pressure_boundary")
@@ -1484,8 +1486,15 @@ def pressure_boundary(
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
             WaypointAuthority.DERIVED if run_pressure.inference else WaypointAuthority.PRINTED,
             ("experiment.pressure_environment.total_pressure_Pa",)))
-    speed = _value(bench.pumping_speed_m3_s)
-    gas_load = next((fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"), None)
+    speed = None if bench is None else _value(bench.pumping_speed_m3_s)
+    gas_load = (
+        None
+        if bench is None
+        else next(
+            (fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"),
+            None,
+        )
+    )
     if speed is not None and gas_load is not None:
         load_value = _value(gas_load.value)
         if load_value is not None:
@@ -1828,15 +1837,239 @@ def _c_co_pressure_Pa(
     return None
 
 
-def _is_pressure_unit_conversion(inference: object) -> bool:
-    return (
-        inference is not None
-        and str(getattr(inference, "relation", "")).endswith("_to_Pa")
-        and any(
-            str(item).startswith("original_unit=")
-            for item in getattr(inference, "inputs", ())
-        )
+# Names owned here. fo2_ladder and the scorer import these sets; they do not
+# restate the literals.
+ROUTE_OXYGEN_PARTIAL_PRESSURE = "oxygen_partial_pressure_to_log_fO2"
+ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE = "oxygen_sweep_partial_pressure"
+ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE = (
+    "oxygen_sweep_component_partial_pressure"
+)
+ROUTE_EXPERIMENT_FO2_PA = "experiment_fO2_Pa_to_log_fO2"
+ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA = (
+    "experiment_oxygen_partial_pressure_Pa_to_log_fO2"
+)
+TYPED_RUN_OXYGEN_ROUTES = frozenset({
+    ROUTE_OXYGEN_PARTIAL_PRESSURE,
+    ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE,
+    ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE,
+})
+EXPERIMENT_RUN_OXYGEN_ROUTES = frozenset({
+    ROUTE_EXPERIMENT_FO2_PA,
+    ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA,
+})
+
+
+def _positive_stored_pa(value: Value | None) -> Decimal | None:
+    """A finite positive point pressure, or None."""
+
+    if value is None or value.kind is not ValueKind.POINT or value.point is None:
+        return None
+    point = value.point
+    if not isinstance(point, Decimal) or not point.is_finite() or point <= 0:
+        return None
+    return point
+
+
+def _decimal_state_pa(raw: object) -> Decimal | None:
+    if isinstance(raw, Decimal) and raw.is_finite() and raw > 0:
+        return raw
+    if isinstance(raw, Value):
+        return _positive_stored_pa(raw)
+    return None
+
+
+def vacuum_bound_pressure_pa(
+    experiment: Experiment,
+    bench: Bench | None,
+    observation: Observation | None,
+) -> Decimal | None:
+    """Printed vacuum upper bound in pascals, when the run note says so.
+
+    The same predicate decides the vacuum waypoint and the score admission.
+    A unit conversion counts only when ``pressure_has_only_unit_conversion``
+    accepts it. Apparatus ultimate vacuum is not this bound.
+    """
+
+    boundary = _prediction_pressure_waypoint(
+        pressure_boundary(experiment, bench, observation), experiment.method
     )
+    if boundary is None or boundary.route not in {
+        "printed_run_pressure",
+        "observation_total_pressure_Pa",
+    }:
+        return None
+    located_pressure = experiment.pressure_environment.total_pressure_Pa
+    if boundary.route == "observation_total_pressure_Pa" and observation is not None:
+        located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
+    locator_note = (
+        str(located_pressure.locator.note or "").lower()
+        if located_pressure is not None and located_pressure.locator is not None
+        else ""
+    )
+    from simulator.battery.source_oxygen import pressure_has_only_unit_conversion
+
+    if located_pressure is None or not pressure_has_only_unit_conversion(located_pressure):
+        return None
+    if not any(
+        token in locator_note
+        for token in ("vacuum", "residual", "chamber pressure", "during evaporation")
+    ):
+        return None
+    pressure = boundary.value
+    upper_pa: Decimal | None = None
+    if pressure.kind is ValueKind.POINT:
+        upper_pa = nominal_pressure_pa(pressure)
+    elif pressure.kind is ValueKind.BOUND and pressure.bound_operator in {"<", "<=", "≤"}:
+        upper_pa = pressure.bound_value
+    if upper_pa is None or upper_pa < 0 or upper_pa > Decimal("1"):
+        return None
+    return upper_pa
+
+
+def observation_gas_oxygen_partial(
+    experiment: Experiment,
+    bench: Bench | None,
+    observation: Observation | None,
+) -> tuple[Value, Waypoint] | None:
+    """Ideal-mixture pO2 = x_O2 * P, with the pressure waypoint that supplied P.
+
+    Units: dimensionless mole fraction times pascals is pascals.
+    At x_O2 = 0.2 and P = 1e5 Pa, log10(fO2/bar) = log10(0.2).
+    """
+
+    if observation is None:
+        return None
+    gas = (observation.point_conditions or {}).get("gas_composition")
+    if gas is None or not gas.state.is_value:
+        return None
+    comp = gas.state.value
+    if not isinstance(comp, Composition) or comp.amount_basis is not AmountBasis.MOLE_FRACTION:
+        return None
+    fraction = dict(comp.components).get("O2")
+    if fraction is None:
+        return None
+    pressure = _prediction_pressure_waypoint(
+        pressure_boundary(experiment, bench, observation), experiment.method
+    )
+    if pressure is None:
+        return None
+    partial = _multiply(pressure.value, Value.point_of(fraction))
+    if partial is None:
+        return None
+    return partial, pressure
+
+
+def observation_gas_oxygen_pa(
+    experiment: Experiment,
+    bench: Bench | None,
+    observation: Observation | None,
+) -> Decimal | None:
+    """Point pascals of :func:`observation_gas_oxygen_partial`, or None."""
+
+    partial = observation_gas_oxygen_partial(experiment, bench, observation)
+    if partial is None:
+        return None
+    return nominal_pressure_pa(partial[0])
+
+
+def route_source_pressure_pa(
+    experiment: Experiment,
+    bench: Bench | None,
+    observation: Observation | None,
+    route: str,
+) -> Decimal | None:
+    """Located pascals for a score route that started as a pressure.
+
+    Log-defined buffer and gas-couple evaluations are not located pressures
+    and return None. Callers must not invert those routes' logs to recover
+    a pressure this function did not find.
+    """
+
+    if route == "observation_fO2_Pa_to_log_fO2":
+        if observation is None:
+            return None
+        from simulator.battery.source_oxygen import (
+            oxygen_pressure_point,
+            pressure_has_only_unit_conversion,
+        )
+
+        point = oxygen_pressure_point(observation)
+        if point is None or not pressure_has_only_unit_conversion(point):
+            return None
+        located = (observation.point_conditions or {}).get("fO2_Pa")
+        if located is None or not located.state.is_value:
+            return None
+        raw = located.state.value
+        try:
+            value = raw if isinstance(raw, Value) else Value.point_of(raw)
+        except (TypeError, ValueError, ArithmeticError):
+            return None
+        return _positive_stored_pa(value)
+    if route == ROUTE_OXYGEN_PARTIAL_PRESSURE:
+        control = experiment.fO2_control
+        if control is None:
+            return None
+        return _positive_stored_pa(_value(control.oxygen_partial_pressure_Pa))
+    if route == ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE:
+        sweep = experiment.pressure_environment.sweep_gas
+        if (
+            not sweep.state.is_value
+            or sweep.state.value.alternatives is not None
+            or sweep.state.value.species != "O2"
+            or not sweep.state.value.partial_pressure_Pa.is_value
+        ):
+            return None
+        return _decimal_state_pa(sweep.state.value.partial_pressure_Pa.value)
+    if route == ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE:
+        sweep = experiment.pressure_environment.sweep_gas
+        if (
+            not sweep.state.is_value
+            or sweep.state.value.alternatives is not None
+            or sweep.state.value.components is None
+        ):
+            return None
+        printed_o2 = [
+            component
+            for component in sweep.state.value.components
+            if component.species == "O2" and component.partial_pressure_Pa.is_value
+        ]
+        if len(printed_o2) != 1:
+            return None
+        return _decimal_state_pa(printed_o2[0].partial_pressure_Pa.value)
+    if route == ROUTE_EXPERIMENT_FO2_PA:
+        return _positive_stored_pa(_printed_run_oxygen_pa(experiment, "fO2_Pa"))
+    if route == ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA:
+        return _positive_stored_pa(
+            _printed_run_oxygen_pa(experiment, "oxygen_partial_pressure_Pa")
+        )
+    if route == "vacuum_total_pressure_upper_bound":
+        return vacuum_bound_pressure_pa(experiment, bench, observation)
+    if route == "observation_gas_composition":
+        return observation_gas_oxygen_pa(experiment, bench, observation)
+    return None
+
+
+def _printed_run_oxygen_pa(experiment: Experiment, name: str) -> Value | None:
+    """Located experiment oxygen in Pa, when the print is not an inference.
+
+    A pure unit conversion stays. A note that the condition was derived does not.
+    """
+
+    located = experiment.conditions.get(name)
+    if located is None or not located.state.is_value:
+        return None
+    from simulator.battery.source_oxygen import pressure_has_only_unit_conversion
+
+    if not pressure_has_only_unit_conversion(located):
+        return None
+    note = located.locator.note if located.locator is not None else None
+    if isinstance(note, str) and "derived condition" in note.casefold():
+        return None
+    raw = located.state.value
+    try:
+        return raw if isinstance(raw, Value) else Value.point_of(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
 
 
 
@@ -1866,14 +2099,14 @@ def oxygen_condition(
         if pressure is not None:
             value = _log_pressure(pressure)
             if value is not None:
-                routes.append(Waypoint("oxygen_condition", value, "oxygen_partial_pressure_to_log_fO2",
+                routes.append(Waypoint("oxygen_condition", value, ROUTE_OXYGEN_PARTIAL_PRESSURE,
                     WaypointAuthority.DERIVED, ("experiment.fO2_control.oxygen_partial_pressure_Pa",)))
     sweep = experiment.pressure_environment.sweep_gas
     if (sweep.state.is_value and sweep.state.value.alternatives is None
             and sweep.state.value.species == "O2" and sweep.state.value.partial_pressure_Pa.is_value):
         value = _log_pressure(Value.point_of(sweep.state.value.partial_pressure_Pa.value))
         if value is not None:
-            routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_partial_pressure",
+            routes.append(Waypoint("oxygen_condition", value, ROUTE_OXYGEN_SWEEP_PARTIAL_PRESSURE,
                 WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
     if (sweep.state.is_value and sweep.state.value.alternatives is None
             and sweep.state.value.components is not None):
@@ -1886,8 +2119,28 @@ def oxygen_condition(
         if len(printed_o2) == 1:
             value = _log_pressure(Value.point_of(printed_o2[0].partial_pressure_Pa.value))
             if value is not None:
-                routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_component_partial_pressure",
+                routes.append(Waypoint("oxygen_condition", value, ROUTE_OXYGEN_SWEEP_COMPONENT_PARTIAL_PRESSURE,
                     WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
+    for name, route_name in (
+        ("fO2_Pa", ROUTE_EXPERIMENT_FO2_PA),
+        (
+            "oxygen_partial_pressure_Pa",
+            ROUTE_EXPERIMENT_OXYGEN_PARTIAL_PRESSURE_PA,
+        ),
+    ):
+        printed_pa = _printed_run_oxygen_pa(experiment, name)
+        if printed_pa is None:
+            continue
+        value = _log_pressure(printed_pa)
+        if value is None:
+            continue
+        routes.append(Waypoint(
+            "oxygen_condition",
+            value,
+            route_name,
+            WaypointAuthority.DERIVED,
+            (f"experiment.conditions.{name}",),
+        ))
     gas = (observation.point_conditions or {}).get("gas_composition") if observation else None
     if gas is not None and gas.state.is_value:
         from simulator.battery.records import Composition
@@ -1895,14 +2148,10 @@ def oxygen_condition(
         comp = gas.state.value
         if isinstance(comp, Composition) and comp.amount_basis is AmountBasis.MOLE_FRACTION:
             fractions = dict(comp.components)
-            pressure = _prediction_pressure_waypoint(
-                pressure_boundary(experiment, bench, observation), experiment.method
-            )
-            if "O2" in fractions and pressure is not None:
-                # Ideal mixture: pO2=xO2*P. Units: dimensionless*Pa=Pa.
-                # At xO2=.2 and P=1e5 Pa, log10(fO2/bar)=log10(.2)=-.69897.
-                partial = _multiply(pressure.value, Value.point_of(fractions["O2"]))
-                value = _log_pressure(partial) if partial is not None else None
+            gas_oxygen = observation_gas_oxygen_partial(experiment, bench, observation)
+            if gas_oxygen is not None:
+                partial, pressure = gas_oxygen
+                value = _log_pressure(partial)
                 if value is not None:
                     routes.append(Waypoint("oxygen_condition", value, "observation_gas_composition",
                         WaypointAuthority.DERIVED,
@@ -2002,56 +2251,38 @@ def oxygen_condition(
     # Sanity: P_total=1e-4 Pa=1e-9 bar gives log10(fO2/bar) <= -9.
     # Only the run pressure waypoint is inspected. Apparatus ultimate vacuum is
     # deliberately absent from pressure_boundary and cannot create this route.
-    boundary = _prediction_pressure_waypoint(
-        pressure_boundary(experiment, bench, observation), experiment.method
-    )
-    if boundary is not None and boundary.route in {"printed_run_pressure", "observation_total_pressure_Pa"}:
-        pressure = boundary.value
-        located_pressure = experiment.pressure_environment.total_pressure_Pa
-        if boundary.route == "observation_total_pressure_Pa" and observation is not None:
-            located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
-        locator_note = str(located_pressure.locator.note or "").lower() if located_pressure is not None and located_pressure.locator is not None else ""
-        vacuum_evidence = (
-            located_pressure is not None
-            and (
-                located_pressure.inference is None
-                or _is_pressure_unit_conversion(located_pressure.inference)
-            )
-            and any(
-                token in locator_note
-                for token in (
-                    "vacuum",
-                    "residual",
-                    "chamber pressure",
-                    "during evaporation",
-                )
-            )
+    upper_pa = vacuum_bound_pressure_pa(experiment, bench, observation)
+    if upper_pa is not None:
+        boundary = _prediction_pressure_waypoint(
+            pressure_boundary(experiment, bench, observation), experiment.method
         )
-        upper_pa: Decimal | None = None
-        if pressure.kind is ValueKind.POINT:
-            upper_pa = nominal_pressure_pa(pressure)
-        elif (pressure.kind is ValueKind.BOUND
-              and pressure.bound_operator in {"<", "<=", "≤"}):
-            upper_pa = pressure.bound_value
-        if vacuum_evidence and upper_pa is not None and upper_pa >= 0 and upper_pa <= Decimal("1"):
-            locator = experiment.pressure_environment.total_pressure_Pa.locator
-            locator_text = repr(locator) if locator is not None else boundary.inputs[0]
-            if boundary.route == "observation_total_pressure_Pa" and observation is not None:
-                located = (observation.point_conditions or {}).get("total_pressure_Pa")
-                locator_text = repr(located.locator) if located is not None and located.locator is not None else boundary.inputs[0]
-            value = _log_pressure(
-                Value(ValueKind.POINT, point=upper_pa, approximate=pressure.approximate)
+        assert boundary is not None
+        pressure = boundary.value
+        locator = experiment.pressure_environment.total_pressure_Pa.locator
+        locator_text = repr(locator) if locator is not None else boundary.inputs[0]
+        if boundary.route == "observation_total_pressure_Pa" and observation is not None:
+            located = (observation.point_conditions or {}).get("total_pressure_Pa")
+            locator_text = (
+                repr(located.locator)
+                if located is not None and located.locator is not None
+                else boundary.inputs[0]
             )
-            if value is not None:
-                qualification = "approximate " if pressure.approximate else ""
-                routes.append(Waypoint(
-                    "oxygen_condition",
-                    value,
-                    "vacuum_total_pressure_upper_bound",
-                    WaypointAuthority.EXTRAPOLATED,
-                    (*boundary.inputs, "Dalton: pO2 <= P_total"),
-                    notice=f"{qualification}upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
-                ))
+        value = _log_pressure(
+            Value(ValueKind.POINT, point=upper_pa, approximate=pressure.approximate)
+        )
+        if value is not None:
+            qualification = "approximate " if pressure.approximate else ""
+            routes.append(Waypoint(
+                "oxygen_condition",
+                value,
+                "vacuum_total_pressure_upper_bound",
+                WaypointAuthority.EXTRAPOLATED,
+                (*boundary.inputs, "Dalton: pO2 <= P_total"),
+                notice=(
+                    f"{qualification}upper bound from printed vacuum {upper_pa} Pa, "
+                    f"{locator_text}; bound, not a measurement"
+                ),
+            ))
     if routes:
         # A fired route is the decision. The OR-set is consulted only for the gap text.
         return _result(

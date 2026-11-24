@@ -61,6 +61,7 @@ from engines.builtin._common import (
     reject_wrong_intent,
     unpack_controls,
 )
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -1107,7 +1108,7 @@ def _solid_host_bakeout_result(
             diagnostic=diagnostic,
         )
 
-    if temperature_K < 400.0:
+    if temperature_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
         return _done("unavailable", "below_400_K")
     if "vapour_batch_flux_pressures_Pa" not in controls:
         return _done("unavailable", "missing_vapour_batch_flux_pressures_Pa")
@@ -1447,9 +1448,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 control_audit=control_audit,
                 temperature_K=T_K,
             )
-        if T_K < 400:
-            # Mirrors _calculate_evaporation: below 400 K, no significant
-            # evaporation -- return an empty flux dict with ok status.
+        if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            # Mirrors _calculate_evaporation: below the vapor owner's
+            # thermal physical zero, no evaporation. Empty flux, ok.
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 status="ok",

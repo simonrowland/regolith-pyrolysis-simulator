@@ -54,6 +54,7 @@ from simulator.optimize.evaluate import (
     _is_stale_profile_refusal,
     _stale_profile_result,
     evaluate,
+    neighbour_use_from_carrier,
 )
 from simulator.optimize.evalspec import (
     EvalSpec,
@@ -120,10 +121,16 @@ from simulator.optimize.recipe import (
     c5_sampler_context,
 )
 from simulator.optimize.result_scope import result_scope_json, result_scope_payload
-from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VERSION
+from simulator.optimize.save_bundle import (
+    MEMBER_SCHEMA_VERSION,
+    OPTIMIZER_CACHE_NAME,
+    PARETO_NAME,
+    SAVE_SCHEMA_VERSION,
+)
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
+    study_results_write_lock_path,
     _deserialize_eval_spec,
     _deserialize_margins,
     _deserialize_objectives,
@@ -494,17 +501,6 @@ class StudyReplayResult:
         object.__setattr__(self, "strategy_state", MappingProxyType(dict(self.strategy_state)))
 
 
-def _study_write_lock_path(out: Path) -> Path:
-    """Shared commit lock for cache.sqlite plus materialized study artifacts.
-
-    Evaluations run outside this lock. Final artifact files are latest snapshots
-    for the run directory, so concurrent finishers serialize and the later
-    completed artifact commit wins.
-    """
-
-    return out / ".study-results.write.lock"
-
-
 class _LockedLineWriter:
     def __init__(self, path: Path, mode: str, store: ResultStore) -> None:
         if mode not in {"a", "w", "r"}:
@@ -653,8 +649,8 @@ def run(
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = result_store or ResultStore(
-        out / "cache.sqlite",
-        write_lock_path=_study_write_lock_path(out),
+        out / OPTIMIZER_CACHE_NAME,
+        write_lock_path=study_results_write_lock_path(out),
     )
     warm_start_source = _resolve_warm_start_source(
         resolved_profile,
@@ -1038,7 +1034,9 @@ def run(
             "all candidates failed with non_finite_payload; "
             f"failure_counts={dict(failure_counts)}"
         )
-    if explore_selection.winner is None:
+    # An empty front is the old no-winner path. A front whose rows all used a
+    # neighbour still ranks, and two-phase still runs. The recipe stays exact.
+    if not explore_selection.ranked:
         if _no_feasible_config_failure(failure_counts, len(records)):
             _write_empty_artifacts(
                 out,
@@ -1143,6 +1141,9 @@ def run(
         leaderboard = explore_leaderboard
         pareto = explore_selection.published
         winner = explore_selection.winner
+        if winner is None:
+            result_status = COMPLETED_NO_FEASIBLE_WINNER_STATUS
+            result_reason = COMPLETED_NO_FEASIBLE_WINNER_STATUS
 
     artifacts = _write_artifacts(
         out,
@@ -1260,8 +1261,8 @@ def run_certify(
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = ResultStore(
-        out / "cache.sqlite",
-        write_lock_path=_study_write_lock_path(out),
+        out / OPTIMIZER_CACHE_NAME,
+        write_lock_path=study_results_write_lock_path(out),
     )
     source = ResultStore(Path(source_store))
     stored = source.fetch(certify_cache_key)
@@ -2247,6 +2248,8 @@ def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
         "run_reference": _serialize_run_reference(scored.run_reference),
         "result_blob": _result_blob(scored),
         "notes": list(scored.notes),
+        "neighbour_hits": scored.neighbour_hits,
+        "neighbour_preset": scored.neighbour_preset,
     }
 
 
@@ -2268,6 +2271,9 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
     objectives = _deserialize_objectives(
         _sequence_of_mappings(payload.get("objectives", ()))
     )
+    hits, preset = neighbour_use_from_carrier(payload)
+    if hits == 0:
+        hits, preset = neighbour_use_from_carrier(payload.get("result_blob"))
     return ScoredResult(
         candidate_id=(
             str(payload["candidate_id"]) if payload.get("candidate_id") is not None else None
@@ -2292,6 +2298,8 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
             payload.get("result_blob"),
         ),
         notes=tuple(str(item) for item in payload.get("notes", ())),
+        neighbour_hits=hits,
+        neighbour_preset=preset,
     )
 
 
@@ -2820,7 +2828,7 @@ def _run_exact_certification(
     if selection.winner is None:
         return _CertificationPassResult(
             leaderboard=leaderboard,
-            pareto=(),
+            pareto=selection.published,
             winner=None,
             artifact=artifact,
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
@@ -3132,7 +3140,7 @@ def _warm_start_paths(
     path_raw = raw.get("path", raw.get("run_dir"))
     if store_raw is None and pareto_raw is None and path_raw is None:
         raise StudyError(
-            "warm_start_from must name a prior run dir, cache.sqlite, or pareto.json"
+            f"warm_start_from must name a prior run dir, {OPTIMIZER_CACHE_NAME}, or {PARETO_NAME}"
         )
     if path_raw is not None:
         inferred_store, inferred_pareto = _infer_warm_start_paths(
@@ -3152,7 +3160,7 @@ def _warm_start_paths(
     )
     if store_path is None or pareto_path is None:
         raise StudyError(
-            "warm_start_from mapping must resolve both cache.sqlite and pareto.json"
+            f"warm_start_from mapping must resolve both {OPTIMIZER_CACHE_NAME} and {PARETO_NAME}"
         )
     return store_path, pareto_path
 
@@ -3165,11 +3173,11 @@ def _resolve_warm_start_path(path: Path, base_dir: Path) -> Path:
 
 
 def _infer_warm_start_paths(path: Path) -> tuple[Path, Path]:
-    if path.name == "cache.sqlite":
-        return path, path.parent / "pareto.json"
-    if path.name == "pareto.json":
-        return path.parent / "cache.sqlite", path
-    return path / "cache.sqlite", path / "pareto.json"
+    if path.name == OPTIMIZER_CACHE_NAME:
+        return path, path.parent / PARETO_NAME
+    if path.name == PARETO_NAME:
+        return path.parent / OPTIMIZER_CACHE_NAME, path
+    return path / OPTIMIZER_CACHE_NAME, path / PARETO_NAME
 
 
 def _resolve_warm_start_seeds(
@@ -3940,6 +3948,53 @@ def _cached_extraction_completion_feasible(
     )
 
 
+def neighbour_scored_result_reusable(
+    scored: ScoredResult,
+    *,
+    requested: str | None = None,
+) -> bool:
+    """A neighbour score may replay only for the coarse preset that made it.
+
+    ``requested`` is the quantization token of the lookup, not of the stored
+    spec. Hits are unknown until the run returns, so they are not part of
+    the pre-run cache key. A fine request must not reuse the row even when
+    a key collision hands it back.
+    """
+
+    if scored.neighbour_hits <= 0:
+        return True
+    if requested is None and scored.eval_spec is not None:
+        requested = scored.eval_spec.control_quantization
+    from simulator.reduced_real_determinism import optimizer_neighbour_preset
+
+    preset = optimizer_neighbour_preset({"control_quantization": requested or ""})
+    return preset is not None and preset == scored.neighbour_preset
+
+
+def _record_neighbour_hits(record: StudyRecord) -> int:
+    hits, _preset = neighbour_use_from_carrier(record.trace_summary)
+    if hits:
+        return hits
+    hits, _preset = neighbour_use_from_carrier(record.result_blob)
+    return hits
+
+
+def _exact_recipe_winner(
+    ranked: Sequence[StudyRecord],
+) -> StudyRecord | None:
+    """The published recipe is the best ranked row that did not use a neighbour.
+
+    Coarse neighbour rows stay on the front and may be ranked against each
+    other. They are not the final recipe. A run with no neighbour hits is
+    unchanged: the first ranked row still wins.
+    """
+
+    for record in ranked:
+        if _record_neighbour_hits(record) == 0:
+            return record
+    return None
+
+
 def _lookup_cached(
     candidate: Candidate,
     profile: Mapping[str, Any],
@@ -3970,6 +4025,11 @@ def _lookup_cached(
         return None
     cached = store.lookup(spec)
     if cached is None:
+        return None
+    if not neighbour_scored_result_reusable(
+        cached,
+        requested=spec.control_quantization,
+    ):
         return None
     if not _cached_extraction_completion_feasible(
         cached,
@@ -4481,6 +4541,8 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "evidence_rank",
             "proof_rank",
             "proof_grade",
+            "neighbour_hits",
+            "neighbour_preset",
             "neighbor_disagreement",
             "reduced_real_cache",
             "per_hour_summary",
@@ -4797,6 +4859,8 @@ def _light_backend_status_trace_for_reference(
             "kernel_fallback_used",
             "knob_saturation",
             "interpolation_feasibility_verdict",
+            "neighbour_hits",
+            "neighbour_preset",
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
@@ -5156,8 +5220,8 @@ def _publish_pareto(members: Sequence[StudyRecord]) -> tuple[StudyRecord, ...]:
     (``_sampling_order_key``). That covers ``StudyResult.pareto``,
     ``StudyReplayResult.pareto``, and ``pareto.json`` rows from the study
     loop, replay, certify, two-phase certification, and the aborted-cache
-    writer. The winner is the ``_rank_key`` minimum of the same set, chosen
-    separately. Objective rank, completion order, ``trial_number``,
+    writer. The winner is the best ranked row of that set that did not use a
+    neighbour, chosen separately. Objective rank, completion order, ``trial_number``,
     ``candidate_id``, and ``cache_key`` do not reorder a sequence whose
     records carry ``ask_ordinal``.
     """
@@ -5169,8 +5233,9 @@ def _publish_pareto(members: Sequence[StudyRecord]) -> tuple[StudyRecord, ...]:
 class _ParetoSelection:
     """One front shared by every study path.
 
-    ``published`` is sampling order. ``ranked`` and ``winner`` use
-    ``_rank_key``. Certification-pool truncation is selection, so it
+    ``published`` is sampling order. ``ranked`` uses ``_rank_key``. The
+    winner is the first ranked row with no neighbour hits. Certification-pool
+    truncation is selection, so it
     consumes ``ranked``. Publication consumes ``published``.
     """
 
@@ -5200,7 +5265,7 @@ def _select_pareto(
     return _ParetoSelection(
         published=_publish_pareto(front),
         ranked=ranked,
-        winner=ranked[0] if ranked else None,
+        winner=_exact_recipe_winner(ranked),
     )
 
 
@@ -5394,7 +5459,7 @@ def _write_artifacts(
     manifest_path = out / "study.manifest.json"
     summary_path = out / "study.summary.json"
     profile_path = out / "study.profile.yaml"
-    pareto_path = out / "pareto.json"
+    pareto_path = out / PARETO_NAME
     search_provenance_path = out / "search_provenance.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
@@ -5874,7 +5939,11 @@ def _summary_products_source(
 ) -> tuple[StudyRecord | None, str]:
     if winner is not None:
         return winner, "winner"
-    if leaderboard and leaderboard[0].feasible:
+    if (
+        leaderboard
+        and leaderboard[0].feasible
+        and _record_neighbour_hits(leaderboard[0]) == 0
+    ):
         return leaderboard[0], "rank_1_leaderboard"
     return None, "none"
 
@@ -6450,7 +6519,7 @@ def _records_from_cache_sqlite(
     constraints: Any = None,
     write_store: ResultStore | None = None,
 ) -> tuple[StudyRecord, ...]:
-    store_path = out / "cache.sqlite"
+    store_path = out / OPTIMIZER_CACHE_NAME
     if not store_path.is_file():
         return ()
     store = ResultStore(
@@ -6541,7 +6610,7 @@ def _candidate_from_cached_scored(
         id=str(candidate_id),
         patch=RecipePatch({}).validated(schema),
         metadata={
-            "strategy": "cache.sqlite",
+            "strategy": OPTIMIZER_CACHE_NAME,
             "sequence": index,
             "proposal_source": "cache_sqlite",
             "seed_lineage": False,
@@ -6664,7 +6733,7 @@ def _write_empty_artifacts(
             + "\n",
             encoding="utf-8",
         )
-        (out / "pareto.json").write_text(
+        (out / PARETO_NAME).write_text(
             json.dumps(
                 {
                     "member_schema_version": MEMBER_SCHEMA_VERSION,

@@ -12,6 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.battery.score as score_module
+from simulator.battery.engine_capability import engine_covers_quantity
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -29,6 +30,7 @@ from simulator.battery.engine_capability import engine_covers_quantity
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
+    _BARE_LOG_BAR_NOTICE,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     load_yaml,
@@ -110,7 +112,7 @@ def _sossi_aithala_redox_context():
     return context, observations
 
 
-def _printed_fraction_sigma_r(observation):
+def _printed_fraction_width(observation):
     uncertainty = observation.uncertainty
     if uncertainty is None:
         return None
@@ -145,8 +147,16 @@ def _printed_fraction_sigma_r(observation):
         score_module.QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
     }:
         return None
+    return converted
+
+
+def _printed_fraction_sigma_r(observation):
+    width = _printed_fraction_width(observation)
+    if width is None:
+        return None
     confidence_level = (
-        score_module._stated_printed_confidence_level(uncertainty) or "not_stated"
+        score_module._stated_printed_confidence_level(observation.uncertainty)
+        or "not_stated"
     )
     confidence_scale = (
         Decimal(2)
@@ -155,7 +165,7 @@ def _printed_fraction_sigma_r(observation):
         if confidence_level == "ci95"
         else Decimal(1)
     )
-    return converted / confidence_scale
+    return width / confidence_scale
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
@@ -204,9 +214,13 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert args[0]["Mg"] > 0.0
     assert args[2] == "imposed"
     assert args[1] == float(observation.identity.temperature_K.value)
-    assert kwargs["lambda_imposed"] == pytest.approx(
-        float(observation.point_conditions["fO2_log"].state.value) * math.log(10.0),
-        rel=1e-15,
+    assert float(observation.point_conditions["fO2_log"].state.value) == 0.0
+    assert observation.identity.fO2_Pa.value == Decimal("100000")
+    assert kwargs["lambda_imposed"] == pytest.approx(0.0, abs=1e-12)
+    assert prediction.identity.fO2_Pa.value == Decimal("100000")
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in prediction.notices
     )
     direct = original_evaluate_redox(*args, **kwargs)
     direct_ratio = direct.ferric_fe_mol / direct.ferrous_fe_mol
@@ -228,6 +242,43 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert not any(
         notice.reason == "uncertainty_confidence_level_assumed_1sigma"
         for notice in residuals[0].notices
+    )
+
+
+def test_internal_analytical_sossi_pure_oxygen_commands_one_bar(monkeypatch):
+    """The Kress route commands the same 1 bar pure-O2 end member."""
+
+    context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    experiment = context.experiments[observation.experiment_id]
+    assert observation.identity.fO2_Pa.value == Decimal("100000")
+    captured: list[float] = []
+    import simulator.fe_redox as fe_redox
+
+    original = fe_redox.kress91_split
+
+    def capture_split(**kwargs):
+        captured.append(kwargs["fO2_log"])
+        return original(**kwargs)
+
+    monkeypatch.setattr(fe_redox, "kress91_split", capture_split)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert captured
+    assert captured == [0.0] * len(captured)
+    assert prediction.identity is not None
+    assert prediction.identity.fO2_Pa is not None
+    assert prediction.identity.fO2_Pa.value == Decimal("100000")
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in prediction.notices
     )
 
 
@@ -295,16 +346,53 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     residuals, _ = score_store(
         context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
     )
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
     values = [
-        float(residual.numeric.value).hex()
+        residual
         for residual in residuals
         if residual.numeric is not None
     ]
     assert len(values) == 18
-    encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
-    # Pinned with the declared OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 (pyproject.toml); under e975edd the digest is 12100581….
-    assert hashlib.sha256(encoded).hexdigest() == (
-        "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
+    # The pure-O2 end member is a printed 1 bar frame. No row in this set
+    # is scale-unknown, so none carries DP-010. Eligibility stays false.
+    unknown_rows = []
+    grounded_rows = []
+    for residual in values:
+        observation = context.observations[residual.reference]
+        if _scale_unknown_oxygen(observation):
+            unknown_rows.append(residual)
+            assert any(
+                notice.policy is not None
+                and notice.policy.id == "DP-010"
+                and _BARE_LOG_SCALE_UNKNOWN in notice.reason
+                and "printed_fO2_log=" in notice.reason
+                for notice in residual.notices
+            )
+            assert not residual.score_eligible
+            assert "not_flagged_stratum" in residual.exclusions
+        else:
+            grounded_rows.append(residual)
+            assert not any(
+                notice.policy is not None and notice.policy.id == "DP-010"
+                for notice in residual.notices
+            )
+    assert unknown_rows == []
+    assert len(grounded_rows) == 18
+    # d-460 flags the unknown-frame row, and the other rows stay ineligible
+    # on the same conjuncts as the internal-analytical table. An empty
+    # eligible list is the pin. Requiring a score_eligible row was the
+    # contradiction with that table.
+    eligible = [residual for residual in values if residual.score_eligible]
+    assert eligible == []
+    backlog = score_module.notice_backlog(values)
+    assert backlog.get(NoticeKind.ASSUMED_FO2.value, 0) == sum(
+        1
+        for residual in unknown_rows
+        for notice in residual.notices
+        if notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.policy is not None
+        and notice.policy.id == "DP-010"
     )
     for backlog in (
         score_module.notice_backlog(residuals),
@@ -323,8 +411,8 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
             if observations[residual.reference].source_id
             == "aithala-2026-magmatic-iron-redox-to-2100c"
             else (
-                "iron-oxide-convention",
                 "method_unstated",
+                "iron-oxide-convention",
                 "proposed-policy",
             )
         )
@@ -344,7 +432,15 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     assert not any(residual.score_eligible for residual in residuals)
 
 
-def test_openimcc_redox_without_printed_fo2_still_refuses():
+def test_openimcc_redox_without_printed_fo2_uses_the_registered_default():
+    """Absent printed oxygen with composition and temperature is DP-010.
+
+    d-460 refuses only when the engine cannot be called. This row still has
+    iron, composition, and temperature. The notice names the absence, not
+    the unknown-scale sentence, so a removed log stays distinct from a
+    printed zero whose frame was not stated.
+    """
+
     pytest.importorskip("openimcc")
     _context, observations = _sossi_aithala_redox_context()
     observation = observations[
@@ -361,12 +457,91 @@ def test_openimcc_redox_without_printed_fo2_still_refuses():
 
     prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
+    assert prediction.refusal_reason is None
+    assert prediction.value is not None
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and "no printed fO2, applicable buffer, or air-composition evidence"
+        in notice.reason
+        and "reference scale not printed" not in notice.reason
+        for notice in prediction.notices
+    )
+
+
+def test_unknown_scale_without_frame_or_atmosphere_keeps_dp010():
+    """DP-010 stays when the log has no frame and no governing atmosphere.
+
+    The pure-O2 end member is printed evidence. This control removes that
+    frame and the experiment atmosphere, and keeps the printed zero so the
+    notice stays the unknown-scale sentence rather than the absence sentence.
+    """
+
+    pytest.importorskip("openimcc")
+    from simulator.battery.migrate import (
+        _BARE_LOG_BAR_NOTICE,
+        _BARE_LOG_SCALE_UNKNOWN,
+        _bare_log_frame_decision,
+        located_unknown,
+    )
+
+    context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    refused = _bare_log_frame_decision(
+        Decimal("0.00"),
+        Decimal("2173.15"),
+        printed_atmospheres=(),
+        total_pressure_pa=Decimal("100000"),
+    )
+    assert refused.state.is_unknown
+    assert refused.state.reason == _BARE_LOG_SCALE_UNKNOWN
+    experiment = context.experiments[observation.experiment_id]
+    conditions = {
+        key: value
+        for key, value in experiment.conditions.items()
+        if "gas" not in key.casefold() and "atmosphere" not in key.casefold()
     }
+    assert conditions
+    stripped = replace(
+        experiment,
+        conditions=conditions,
+        fO2_control=None,
+        ambient_pressure_evidence=None,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            sweep_gas=located_unknown("control has no governing atmosphere"),
+        ),
+    )
+    point_conditions = {
+        key: value
+        for key, value in (observation.point_conditions or {}).items()
+        if "gas" not in key.casefold() and "atmosphere" not in key.casefold()
+    }
+    assert "fO2_log" in point_conditions
+    control = replace(
+        observation,
+        point_conditions=point_conditions,
+        notices=tuple(
+            notice
+            for notice in observation.notices
+            if notice.kind is not NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            and notice.reason != _BARE_LOG_BAR_NOTICE
+        ),
+        identity=replace(observation.identity, fO2_Pa=refused.state),
+    )
+
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, control, experiment=stripped)
+        assert prediction.value is not None, (engine, prediction.refusal_detail)
+        assert any(
+            notice.policy is not None
+            and notice.policy.id == "DP-010"
+            and _BARE_LOG_SCALE_UNKNOWN in notice.reason
+            and "printed_fO2_log=0" in notice.reason
+            for notice in prediction.notices
+        ), engine
 
 
 def _openimcc_row_with_mass_composition(components):
@@ -441,14 +616,21 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     args, kwargs = calls[0]
     assert args[0].get("Fe", 0.0) > 0.0
     assert args[2] == "imposed"
-    assert kwargs["lambda_imposed"] == pytest.approx(
-        float(row.point_conditions["fO2_log"].state.value) * math.log(10.0),
-        rel=1e-15,
+    assert float(row.point_conditions["fO2_log"].state.value) == 0.0
+    assert kwargs["lambda_imposed"] == pytest.approx(0.0, abs=1e-12)
+    assert prediction.identity.fO2_Pa.value == Decimal("100000")
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in prediction.notices
     )
 
 
 def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
-    """Silica with no fO2 is a printed-oxygen refusal, not a Kress FeOt refusal."""
+    """Silica with no iron cannot call OpenIMCC. Absent fO2 is not that refusal.
+
+    d-460 supplies DP-010 when composition and temperature exist. The engine
+    still cannot be called with no iron, so the refusal is total_iron.
+    """
 
     row = _openimcc_row_with_mass_composition((("SiO2", Decimal("100")),))
     conditions = dict(row.point_conditions or {})
@@ -466,7 +648,7 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {
         "reason": "missing_input",
-        "input": "printed_fO2",
+        "input": "total_iron",
     }
     assert prediction.coefficient_sources == ()
 
@@ -593,6 +775,30 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
         residual for residual in residuals if residual.reference in sossi_sd_ids
     ]
     assert len(sossi_sd_residuals) == 11
+    expected_statuses = {
+        "aithala_2026_1800_30_xanes": ResidualStatus.MATCH,
+        "aithala_2026_1900_30_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_10_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_120_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_30_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2100_30_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_1_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_2_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_3_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_6_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_7_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_8_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_9_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_10_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_f_o2_11_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_f_o2_12_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_ts1_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_ts2_xanes": ResidualStatus.MISMATCH,
+    }
+    assert {
+        residual.reference.rsplit("::", 1)[-1]: residual.status
+        for residual in residuals
+    } == expected_statuses
     boundary_refusals = []
     for residual in sossi_sd_residuals:
         assert residual.numeric is not None
@@ -600,17 +806,15 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
         fraction = dict(observation.derivation.parameters)[
             "original_Fe3_over_FeT"
         ].state.value
-        sigma_r = _printed_fraction_sigma_r(observation)
-        assert sigma_r is not None
-        if Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+        printed_width = _printed_fraction_width(observation)
+        assert printed_width is not None
+        if printed_width >= fraction or printed_width >= (
             Decimal(1) - fraction
         ):
             assert residual.numeric.decision_band is None
             assert residual.status is ResidualStatus.NO_BAND
             assert residual.refusal is not None
-            assert residual.refusal.detail["reason"] == (
-                "ferric_fraction_uncertainty_linearization_invalid"
-            )
+            assert residual.refusal.detail["reason"] == "printed_uncertainty_outside_metric_domain"
             boundary_refusals.append(residual.reference)
         else:
             assert residual.refusal is None
@@ -621,9 +825,32 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
             or "two_sigma_reading_verdict=" in (notice.band or "")
             for notice in residual.notices
         )
-    assert len(boundary_refusals) == 2
-    assert any(reference.endswith("sossi_2020_per_f_o2_11_xanes") for reference in boundary_refusals)
-    assert any(reference.endswith("sossi_2020_per_f_o2_12_xanes") for reference in boundary_refusals)
+    assert boundary_refusals == []
+    unknown = []
+    grounded = []
+    for residual in residuals:
+        observation = observations[residual.reference]
+        has_default = any(
+            notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in residual.notices
+        )
+        if _scale_unknown_oxygen(observation):
+            unknown.append(residual)
+            assert residual.numeric is not None
+            assert residual.numeric.value.is_finite()
+            assert has_default
+            assert not residual.score_eligible
+            assert "not_flagged_stratum" in residual.exclusions
+        else:
+            grounded.append(residual)
+            assert residual.numeric is not None
+            assert residual.numeric.value.is_finite()
+            assert not has_default
+            assert "not_flagged_stratum" in residual.exclusions
+    assert unknown == []
+    assert len(grounded) == 18
+    backlog = score_module.notice_backlog(residuals)
+    assert backlog.get(NoticeKind.ASSUMED_FO2.value, 0) == 0
     encoded = json.dumps(
         [residual_to_plain(residual) for residual in residuals],
         sort_keys=True,
@@ -651,17 +878,26 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # d-341 (t-1646) assumes 1 sigma only where neither metadata nor printed
     # text states the level; the Sossi rows' printed SD caption keeps their
     # primary 1-sigma verdicts without the assumption/alternative notices.
-    # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
-    # r=0; the remaining source widths use the transformed log-ratio metric.
+    # t-1646 round 5 refused Sossi (11)/(12) because the normalized standard
+    # width crossed r=0. Their original one-sigma intervals are in-domain, so
+    # each now has a printed band and no refusal. Relative to round 10's
+    # 0140d9de... payload, serialization changes each row's status from NO_BAND
+    # to MATCH, numeric.decision_band from None to its printed-width-derived
+    # ticket, and refusal from the typed ferric linearization refusal to None.
+    # Those fields follow directly from the original printed interval passing
+    # the domain gate; the remaining sixteen rows' statuses remain unchanged.
     # fam13 binds the six Aithala Table S-1 Fe rows to the physical SI PDF
     # (page 13, SI-7; SHA-256 ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa).
     # Their printed redox values and decisions are unchanged; the serialized
     # locator changes from source_path=None to that PDF path. The row-level
-    # method split also changes serialized experiment IDs; the combined output
-    # hash below pins both metadata changes while the 18 numeric residuals stay
-    # bit-identical.
+    # method split also changes serialized experiment IDs. b274's DP-112
+    # registry flag admits canonical-buffer notices. The combined output hash
+    # below pins both metadata updates while the numeric residuals stay
+    # governed by the separate scorer assertions above.
+    # b274 refreshes its prior 3fc087... payload pin, and the row-specific
+    # experiment IDs produce this merged metadata digest.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "d521761fdf1a3c8121f5dea5e13ced19bde0b63204bf3781c5fd851f56a30436"
+        "3032738c8adb3635df9699111f9f7387277ceaff27a1105ee1244e029454b5db"
     )
 
 
@@ -687,17 +923,16 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
 
         # Independent first-order propagation into the scorer's log10 ratio
         # metric, using only each row's recorded printed r and sigma_r.
+        printed_width = _printed_fraction_width(observation)
+        assert printed_width is not None
         crosses_log_domain = (
-            Decimal(2) * printed_sigma >= fraction
-            or Decimal(2) * printed_sigma >= Decimal(1) - fraction
+            printed_width >= fraction or printed_width >= Decimal(1) - fraction
         )
         if crosses_log_domain:
             assert residual.numeric.decision_band is None
             assert residual.status is ResidualStatus.NO_BAND
             assert residual.refusal is not None
-            assert residual.refusal.detail["reason"] == (
-                "ferric_fraction_uncertainty_linearization_invalid"
-            )
+            assert residual.refusal.detail["reason"] == "printed_uncertainty_outside_metric_domain"
             boundary_refusals.append(reference)
         else:
             assert residual.refusal is None
@@ -709,14 +944,14 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
             )
             assert abs(residual.numeric.decision_band.value - expected_band) < Decimal("1e-20")
 
-    assert len(boundary_refusals) == 2
-    assert {reference.rsplit("::", 1)[-1] for reference in boundary_refusals} == {
-        "sossi_2020_per_f_o2_11_xanes",
-        "sossi_2020_per_f_o2_12_xanes",
-    }
-    assert sum(row.status is ResidualStatus.MATCH for row in residuals) == 2
-    assert sum(row.status is ResidualStatus.MISMATCH for row in residuals) == 14
-    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 2
+    assert boundary_refusals == []
+    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 0
+    # The owner hold defers the exact MATCH/MISMATCH split for the two rows
+    # whose bands were restored; Studio must refresh the serialized payload pin.
+    assert sum(
+        row.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
+        for row in residuals
+    ) == 18
     aithala_1800_30 = next(
         observation_id
         for observation_id, observation in observations.items()
@@ -767,21 +1002,21 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
             observation.value.point,
             source_observation=observation,
         )
-        sigma_r = _printed_fraction_sigma_r(observation)
+        printed_width = _printed_fraction_width(observation)
         if resolution.band is not None:
-            assert sigma_r is not None
-            assert Decimal(2) * sigma_r < fraction
-            assert Decimal(2) * sigma_r < Decimal(1) - fraction
+            assert printed_width is not None
+            assert printed_width < fraction
+            assert printed_width < Decimal(1) - fraction
             band_counts[observation.source_id] = (
                 band_counts.get(observation.source_id, 0) + 1
             )
         elif (
             resolution.refusal is not None
             and resolution.refusal.get("reason")
-            == "ferric_fraction_uncertainty_linearization_invalid"
+            == "printed_uncertainty_outside_metric_domain"
         ):
-            assert sigma_r is not None
-            assert Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+            assert printed_width is not None
+            assert printed_width >= fraction or printed_width >= (
                 Decimal(1) - fraction
             )
             invalid_rows.append(observation.observation_id)
@@ -789,13 +1024,9 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
     assert band_counts == {
         "aithala-2026-magmatic-iron-redox-to-2100c": 16,
         "cottrell-2009-iron-xanes": 18,
-        "sossi-2020-magma-ocean-redox": 10,
+        "sossi-2020-magma-ocean-redox": 12,
     }
-    assert len(invalid_rows) == 2
-    assert {row.rsplit("::", 1)[-1] for row in invalid_rows} == {
-        "sossi_2020_per_f_o2_11_xanes",
-        "sossi_2020_per_f_o2_12_xanes",
-    }
+    assert invalid_rows == []
 
 
 def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
@@ -888,7 +1119,7 @@ def _assert_unknown_redox_headline(records) -> None:
     assert row["n_score_eligible"] == 0
 
 
-def test_borisov_2018_rows_reach_redox_scoring_population():
+def test_borisov_2018_rows_reach_redox_scoring_population(monkeypatch):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     source = load_yaml(extract)
@@ -1067,11 +1298,23 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         identity=replace(row4.identity, fO2_Pa=None),
     )
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing_fo2)
-    assert missing_prediction.value is None
-    assert missing_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
+    # d-460: composition and temperature are enough to call the engine.
+    # The command is the registered default, not the removed printed log.
+    printed_log = row4.point_conditions["fO2_log"].state.value
+    assert missing_prediction.refusal_reason is None
+    assert missing_prediction.value is not None
+    assert missing_prediction.value.is_finite()
+    default_notices = [
+        notice
+        for notice in missing_prediction.notices
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    ]
+    assert len(default_notices) == 1
+    assert "commanded_default_log10_bar=" in default_notices[0].reason
+    assert "printed_fO2_log=" not in default_notices[0].reason
+    assert default_notices[0].policy.value not in {
+        format(printed_log, "f"),
+        str(printed_log),
     }
 
     unsupported = predict_with_engine(Engine.MAGEMIN, row4)
@@ -1102,6 +1345,8 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         435,
         404,
     )
+    # METHOD_UNSTATED/PHASE_INFERRED (ea358c0945) flag all rows; 10 also carry
+    # out_of_certified_band.
     assert (
         measured_unknown["certified_numeric"],
         measured_unknown["flagged_numeric"],
@@ -1122,6 +1367,40 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     mismatch_context = replace(
         context,
         observations={conflicting_fo2.observation_id: conflicting_fo2},
+    )
+    # The oxygen owner commands a positive identity fO2. The disagreement
+    # has to be on the prediction identity; planting it on the row is the command.
+    # Later cases reuse this observation id, so only the planted 1000 Pa is rewritten.
+    original_predict = score_module.predict_with_engine
+
+    def prediction_with_other_oxygen(engine, observation, **kwargs):
+        prediction = original_predict(engine, observation, **kwargs)
+        planted = (
+            observation.identity.fO2_Pa
+            if observation.identity is not None
+            else None
+        )
+        if (
+            planted is None
+            or not planted.is_value
+            or planted.value != Decimal("1000")
+            or prediction.identity is None
+        ):
+            return prediction
+        return replace(
+            prediction,
+            identity=replace(
+                prediction.identity, fO2_Pa=State.of(Decimal("1"))
+            ),
+            notices=tuple(
+                notice
+                for notice in prediction.notices
+                if notice.origin != "fo2_ladder"
+            ),
+        )
+
+    monkeypatch.setattr(
+        score_module, "predict_with_engine", prediction_with_other_oxygen
     )
     mismatch_residuals, _ = score_store(
         mismatch_context,
@@ -1566,6 +1845,8 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
         if observation.observation_id != reference.observation_id:
             return prediction
         identity = prediction.identity
+        if identity is None:
+            return prediction
         if axis == "temperature_K":
             conflict = replace(
                 identity,
@@ -1588,8 +1869,20 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
                 identity, total_pressure_Pa=State.of(Decimal("200000"))
             )
         else:
-            conflict = identity
-        return replace(prediction, identity=conflict)
+            # A positive identity fO2 is the command, so the row's planted
+            # 1000 Pa is not a conflict. The prediction has to disagree.
+            conflict = replace(identity, fO2_Pa=State.of(Decimal("1")))
+        updated = replace(prediction, identity=conflict)
+        if axis == "fO2_Pa":
+            updated = replace(
+                updated,
+                notices=tuple(
+                    notice
+                    for notice in updated.notices
+                    if notice.origin != "fo2_ladder"
+                ),
+            )
+        return updated
 
     monkeypatch.setattr(score_module, "predict_with_engine", prediction_with_conflicting_axis)
     residuals, _ = score_store(
@@ -1641,6 +1934,18 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
         for residual in residuals
     }
     assert observed_pairs == expected_pairs
+    covered = tuple(
+        engine
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, Quantity.FE3_FE2_RATIO)
+    )
+    assert Engine.CATALOG_EVALUATOR not in covered
+    assert Engine.NASA_CEA_9 in covered
+    assert len(residuals) == len(redox_rows) * len(covered)
+    assert not any(
+        residual.key.rsplit("::", 1)[-1] == Engine.CATALOG_EVALUATOR.value
+        for residual in residuals
+    )
     for residual in residuals:
         observation_id = residual.key.split(":T=", 1)[0]
         engine = residual.key.rsplit("::", 1)[-1]
@@ -1752,6 +2057,17 @@ def _borisov_row4():
     )
 
 
+def _scale_unknown_oxygen(observation) -> bool:
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    state = observation.identity.fO2_Pa
+    return (
+        state is not None
+        and state.is_unknown
+        and state.reason == _BARE_LOG_SCALE_UNKNOWN
+    )
+
+
 def _without_printed_fo2(observation):
     conditions = dict(observation.point_conditions or {})
     conditions.pop("fO2_log", None)
@@ -1838,8 +2154,23 @@ def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
         )
 
     calls = _patch_melts_cell(monkeypatch, cell_for)
-    printed = score_module._printed_fe_redox_fo2_log(row4, row4.identity)
+    _resolved_identity, printed, oxygen_notices = score_module._resolve_row_fo2(
+        row4.identity,
+        row4,
+        None,
+        {},
+        Decimal(0),
+        Quantity.FE3_FE2_RATIO,
+    )
     assert printed is not None
+    assert not any(
+        item.policy is not None and item.policy.id == "DP-010" for item in oxygen_notices
+    )
+    assert all(
+        item.reason == _BARE_LOG_BAR_NOTICE
+        or item.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        for item in oxygen_notices
+    )
     for engine in (Engine.THERMOENGINE, Engine.ALPHAMELTS):
         prediction = predict_with_engine(engine, row4, isolated=False)
         assert prediction.value == expected
@@ -2005,6 +2336,14 @@ def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
 
 
 def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(monkeypatch):
+    """Absent printed oxygen is the registered default on both MELTS engines.
+
+    The cell is commanded with the admitted pascal pressure over 1 bar.
+    The log is the production resolver's command, not a pasted intrinsic.
+    """
+
+    from simulator.physical_constants import BAR_PA_DECIMAL
+
     row4 = _without_printed_fo2(_borisov_row4())
     calls = _patch_melts_cell(
         monkeypatch,
@@ -2012,25 +2351,33 @@ def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(mon
             liquid_composition_wt_pct={"FeO": 9.0, "Fe2O3": 1.0},
         ),
     )
-    alphamelts = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
-    assert alphamelts.value is None
-    assert alphamelts.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert alphamelts.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
-    assert calls == []
-
-    thermoengine = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
-    assert thermoengine.value == fe3_fe2_ratio_from_oxide_wt_pct(
-        Decimal("1.0"), Decimal("9.0")
-    )
-    assert thermoengine.identity is not None
-    assert thermoengine.identity.fO2_Pa is None
-    assert len(calls) == 1
-    assert calls[0]["po2"].mode == "engine_default"
-    assert calls[0]["po2"].po2_bar is None
-    assert calls[0]["physical_pressure_bar"] == pytest.approx(1.01325)
+    expected = fe3_fe2_ratio_from_oxide_wt_pct(Decimal("1.0"), Decimal("9.0"))
+    admitted_pa = None
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        prediction = predict_with_engine(engine, row4, isolated=False)
+        assert prediction.refusal_reason is None
+        assert prediction.value == expected
+        assert prediction.identity is not None
+        assert prediction.identity.fO2_Pa is not None
+        assert prediction.identity.fO2_Pa.is_value
+        pressure = prediction.identity.fO2_Pa.value
+        assert isinstance(pressure, Decimal) and pressure > 0
+        if admitted_pa is None:
+            admitted_pa = pressure
+        else:
+            assert pressure == admitted_pa
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in prediction.notices
+        )
+    assert admitted_pa is not None
+    assert len(calls) == 2
+    for call in calls:
+        assert call["po2"].mode == "commanded"
+        assert call["po2"].po2_bar == pytest.approx(
+            float(admitted_pa / BAR_PA_DECIMAL)
+        )
+        assert call["physical_pressure_bar"] == pytest.approx(1.01325)
 
 
 def test_melts_fe_redox_commissioning_notice_is_the_only_extrapolated_flag(monkeypatch):

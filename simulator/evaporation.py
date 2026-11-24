@@ -1410,6 +1410,79 @@ def gate_dispatch_curve_notices(
                 )
     return notices
 
+
+def _scale_mol_map(species_mol: dict, dt_h: float) -> dict[str, float]:
+    return {
+        str(species): float(mol) * dt_h
+        for species, mol in species_mol.items()
+    }
+
+
+def _rescale_wall_reaction_booking(booking: dict, dt_h: float) -> None:
+    """Scale one hour of booked capture mols down to this step.
+
+    The route integrates the kg/h flux. ``condensed_kg`` is already the
+    step mass. The proposal debits that mass and credits these mols, so
+    the mols have to be the same step. Callers skip this on the hour.
+    """
+
+    products = booking.get("baffle_products_mol")
+    if isinstance(products, dict):
+        booking["baffle_products_mol"] = _scale_mol_map(products, dt_h)
+    by_stage = booking.get("baffle_products_mol_by_stage")
+    if isinstance(by_stage, dict):
+        booking["baffle_products_mol_by_stage"] = {
+            stage: _scale_mol_map(species_mol, dt_h)
+            for stage, species_mol in by_stage.items()
+            if isinstance(species_mol, dict)
+        }
+    for key in (
+        "baffle_oxygen_debit_mol",
+        "baffle_oxygen_credit_mol",
+        "wall_oxygen_debit_mol",
+        "wall_oxygen_credit_mol",
+    ):
+        if key in booking:
+            booking[key] = float(booking[key]) * dt_h
+    walls = booking.get("wall_products_mol_by_account")
+    if isinstance(walls, dict):
+        booking["wall_products_mol_by_account"] = {
+            account: _scale_mol_map(species_mol, dt_h)
+            for account, species_mol in walls.items()
+            if isinstance(species_mol, dict)
+        }
+    legs = booking.get("reaction_legs")
+    if not isinstance(legs, list):
+        return
+    scaled_legs = []
+    for leg in legs:
+        if not isinstance(leg, dict):
+            scaled_legs.append(leg)
+            continue
+        scaled = dict(leg)
+        leg_products = scaled.get("products_mol")
+        if isinstance(leg_products, dict):
+            scaled["products_mol"] = _scale_mol_map(leg_products, dt_h)
+        for key in ("oxygen_debit_mol", "oxygen_credit_mol", "vapour_mol"):
+            if key in scaled:
+                scaled[key] = float(scaled[key]) * dt_h
+        scaled_legs.append(scaled)
+    booking["reaction_legs"] = scaled_legs
+
+
+def _rescale_stage3_reactive_alkali(reaction: dict, dt_h: float) -> None:
+    """Scale one hour of reactive-alkali mols down to this step."""
+
+    for key in (
+        "uptake_mol",
+        "oxygen_debit_mol",
+        "oxide_product_mol",
+        "transport_uptake_mol",
+    ):
+        if key in reaction:
+            reaction[key] = float(reaction[key]) * dt_h
+
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -1627,6 +1700,27 @@ class EvaporationMixin:
             campaign_name=campaign,
         )
 
+    def _furnace_ledger_fe3_over_sum_fe(self) -> float | None:
+        """Ledger Fe3+/ΣFe for the furnace Langmuir closure.
+
+        d-463: this q is the atom ledger on ``process.cleaned_melt``.
+        It is not the gram-lab engine speciation and not the Kress91
+        fallback. A missing ledger keeps the fixed-activity FeO demand.
+        An invalid amount raises from ``iron_oxide_values`` rather than
+        being read as q = 0.
+        """
+
+        ledger = getattr(self, "atom_ledger", None)
+        project = getattr(ledger, "project_account_mol", None)
+        if not callable(project):
+            return None
+        melt = project("process.cleaned_melt")
+        if not isinstance(melt, Mapping):
+            return None
+        from simulator.feedstock_composition import ledger_fe3_over_sum_fe
+
+        return ledger_fe3_over_sum_fe(melt)
+
     def _closed_langmuir_pressures_for_partials(
         self,
         publication_Pa: Mapping[str, float],
@@ -1680,6 +1774,9 @@ class EvaporationMixin:
             ),
             allow_unmeasured_alpha_fallback=allow_fallback,
             unmeasured_alpha_fallback_species_allowlist=fallback_species,
+            fe3_over_sum_fe=EvaporationMixin._furnace_ledger_fe3_over_sum_fe(
+                self
+            ),
         )
 
     def _reclose_langmuir_pressures(
@@ -2033,6 +2130,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        melt_surface_area_m2: float | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -2053,6 +2151,9 @@ class EvaporationMixin:
             M_i         = molar mass (kg/mol)
             R           = gas constant (J/mol·K)
             T           = temperature (K)
+
+        The coupled hot-upper balance supplies its node-1 area here so
+        the trial rate and radiation term use the same surface.
 
         The SiO suppression under pO₂ control is handled automatically:
         when pO₂ is elevated, the equilibrium vapor pressure of SiO
@@ -2076,6 +2177,8 @@ class EvaporationMixin:
         Returns:
             EvaporationFlux with species_kg_hr dict
         """
+        from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+
         T_K = self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
         flux = EvaporationFlux()
         # A previous hour's computed rates must not leak into a tick that
@@ -2263,7 +2366,7 @@ class EvaporationMixin:
 
         if not vapor_pressures:
             if (
-                0.0 < T_K < 400.0
+                0.0 < T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K
                 and getattr(equilibrium, 'status', None) == 'ok'
                 and (getattr(equilibrium, 'diagnostics', {}) or {}).get(
                     'vapor_pressure_zero_reason'
@@ -2446,7 +2549,8 @@ class EvaporationMixin:
                 reason,
                 diagnostic,
             )
-        if T_K < 400:  # Catalog pressure exists; thermal physical zero.
+        if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+            # Catalog pressure exists; thermal physical zero.
             note_wall_supply_interval_physical_zero(
                 flux,
                 reason="below_400K",
@@ -2559,6 +2663,7 @@ class EvaporationMixin:
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
                 vapour_batch_flux_overlay=flux_overlay_report,
+                melt_surface_area_m2=melt_surface_area_m2,
             )
         )
         kernel_result = self._dispatch_only(
@@ -4261,9 +4366,9 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         """One visible record for the dispatch the retry abandoned.
 
-        Includes every row and notice from that dispatch, physics rows
-        included. A timeout that leaves ``_dispatch_only`` has no planner
-        step-down; the row is synthesized here so the retry does not drop it.
+        A planner step-down is included only when an alternate provider ran.
+        Otherwise the abandoned primary attempt stays under this environment
+        record, without being mislabeled as a step-down.
         """
 
         from simulator.reduced_real_determinism import (
@@ -4276,26 +4381,23 @@ class EvaporationMixin:
         failed = list(step_down.get('failed_providers', ())) if isinstance(
             step_down, Mapping,
         ) else []
+        provider_attempt = None
         if not failed:
             reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
-            attempt = {
+            provider_attempt = {
                 'provider': (
                     diagnostic.get('kernel_fallback_used')
                     or self._liquid_fraction_provider
                 ),
                 'status': status,
                 'reason': '; '.join(reasons) or str(
-                    diagnostic.get('reason') or status
+                    diagnostic.get('reason') or timeout_reason or status
                 ),
                 'diagnostic': dict(diagnostic),
             }
-            if failed_provider_attempt_is_environment(attempt):
-                attempt['disposition'] = 'environment'
-            step_down = {
-                'failed_providers': [attempt],
-                'realized_provider': None,
-            }
-            owned['gate_provider_step_down'] = step_down
+            if failed_provider_attempt_is_environment(provider_attempt):
+                provider_attempt['disposition'] = 'environment'
+            owned.pop('gate_provider_step_down', None)
         record = {
             'disposition': 'environment',
             'reason': timeout_reason,
@@ -4303,6 +4405,8 @@ class EvaporationMixin:
             'hour': int(self.melt.hour),
         }
         record.update(gate_dispatch_curve_notices(owned))
+        if provider_attempt is not None:
+            record['provider_attempt'] = provider_attempt
         return record
 
     def _freeze_gate_curve_from_gate_dispatch(
@@ -4318,6 +4422,7 @@ class EvaporationMixin:
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_outcome_token,
+            gate_curve_bounds_are_usable,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
@@ -4346,11 +4451,9 @@ class EvaporationMixin:
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
         timeout_reason = None
-        # The final dispatch is published as that dispatch produced it.
-        # The abandoned dispatch, including its non-timeout rows and
-        # notices, is one environment record. A second timeout still
-        # publishes the final dispatch, so hold-last-good still sees
-        # alphamelts. d-298/d-299's hold decision is unchanged.
+        # The final dispatch is published as produced. Any abandoned primary
+        # attempt is kept in its environment record; it does not imply that
+        # AlphaMELTS ran. d-298/d-299's hold decision is unchanged.
         abandoned_environment = None
         for attempt_index in range(2):
             try:
@@ -4401,6 +4504,17 @@ class EvaporationMixin:
             status,
             diagnostic,
         )
+        step_down = diagnostic.get('gate_provider_step_down')
+        if (
+            isinstance(step_down, Mapping)
+            and step_down.get('realized_provider')
+            and gate_curve_bounds_are_usable(
+                diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+            )
+        ):
+            # The planner's step-down provider owns these bounds even when
+            # its status is flagged; publish the curve with its step-down notice.
+            status_outcome = GateCurveProviderOutcome.PRODUCED
         record_gate_curve_provider_outcome(self, status_outcome)
         if (
             status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
@@ -4713,11 +4827,9 @@ class EvaporationMixin:
         source: str,
         reasons: list[str],
     ) -> dict[str, Any] | None:
-        if (
-            solidus_T_C is None
-            or liquidus_T_C is None
-            or not solidus_T_C < liquidus_T_C
-        ):
+        from simulator.reduced_real_determinism import gate_curve_bounds_are_usable
+
+        if not gate_curve_bounds_are_usable(solidus_T_C, liquidus_T_C):
             reasons.append(f'{source} invalid bounds')
             return None
         return {
@@ -4740,7 +4852,10 @@ class EvaporationMixin:
         repair_notices: list[dict[str, Any]] | None = None,
         reasons: list[str] | None = None,
     ) -> dict[str, Any] | None:
-        from simulator.reduced_real_determinism import record_repair_notice
+        from simulator.reduced_real_determinism import (
+            gate_curve_bounds_are_usable,
+            record_repair_notice,
+        )
 
         points: list[tuple[float, float]] = []
         for point in path:
@@ -4784,11 +4899,7 @@ class EvaporationMixin:
             solidus_T_C = min(T for T, _ in points)
         if liquidus_T_C is None and points:
             liquidus_T_C = max(T for T, _ in points)
-        if (
-            solidus_T_C is None
-            or liquidus_T_C is None
-            or not solidus_T_C < liquidus_T_C
-        ):
+        if not gate_curve_bounds_are_usable(solidus_T_C, liquidus_T_C):
             return None
         dedup: dict[float, float] = {}
         for temperature_C, liquid_fraction in sorted(points):
@@ -5275,6 +5386,7 @@ class EvaporationMixin:
         vapour_batch_flux_pressures_Pa: Mapping[str, float] | None = None,
         vapour_batch_report: Mapping[str, Any] | None = None,
         vapour_batch_flux_overlay: Mapping[str, Any] | None = None,
+        melt_surface_area_m2: float | None = None,
     ) -> tuple[dict[str, Any], dict[str, float]]:
         # VR-11: this already-gated map comes from the typed effective-pressure
         # seam. The kernel never reads equilibrium.vapor_pressures_Pa for flux.
@@ -5348,7 +5460,11 @@ class EvaporationMixin:
             'molar_mass_kg_mol': molar_masses_kg_mol,
             'stoich_by_species': stoich_by_species,
             'available_oxide_kg': available_oxide_kg,
-            'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
+            'melt_surface_area_m2': float(
+                self.melt.melt_surface_area_m2
+                if melt_surface_area_m2 is None
+                else melt_surface_area_m2
+            ),
             'stir_factor': {
                 'axial': clamp_stir_factor(self.melt.stir_state.axial),
                 'radial': clamp_stir_factor(self.melt.stir_state.radial),
@@ -5660,8 +5776,10 @@ class EvaporationMixin:
                 / total_o2_draw_kg_hr
             )
             current_rate = float(effective_rates.get(species, 0.0))
+            # allowed_draw_kg is this step. The draw beside it is kg/h.
+            # Dividing by dt_hr makes the scale -expm1(-k dt) / (k dt).
             allowed_rate = current_rate * (
-                allowed_draw_kg / by_species_draw[species])
+                allowed_draw_kg / (by_species_draw[species] * dt_hr))
             if allowed_rate <= 1e-12:
                 effective_rates.pop(species, None)
                 _note(species, allowed_rate if allowed_rate > 0.0 else 0.0)
@@ -5759,7 +5877,8 @@ class EvaporationMixin:
                 campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
             )
         route_result = self.condensation_model.route(
-            evap_flux, self.melt)
+            evap_flux, self.melt, dt_h=self.process_dt_hr(),
+        )
 
         antoine_extrapolations = dict(
             getattr(route_result, 'antoine_extrapolations', {}) or {}
@@ -5880,12 +5999,13 @@ class EvaporationMixin:
 
             # Premise: the ledger delta spans this tick's full vapor credit and
             # every committed removal (baffle, wall, or retained holdup).
-            # Algebra: free-vapor delta = (before + evolved - removals) - before
-            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
-            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
-            # complete committed removal leaves zero, independent of diagnostics.
+            # Algebra: free vapor = evolved - removals. That delta is step
+            # mass. species_kg_hr is kg/h, so divide by the step. At one
+            # hour the divisor is 1.0. Zero removal leaves the evolved rate;
+            # complete removal leaves zero.
             residual_species_kg_hr[species] = max(
-                0.0, overhead_after_kg - overhead_before_kg,
+                0.0,
+                (overhead_after_kg - overhead_before_kg) / self.process_dt_hr(),
             )
 
         # Premise: the finite-capacity redox clamp is sequential and nonlinear;
@@ -6035,8 +6155,11 @@ class EvaporationMixin:
         if evaporation_transition is None:
             return {}
 
+        # rate and remaining are kg/h. The overhead credit is that rate
+        # times dt. The debit has to be the same step mass. The provider
+        # debits the kilograms it is given and does not read dt_hr.
         condensed_kg = max(
-            0.0, rate_kg_hr - remaining_kg_hr,
+            0.0, (rate_kg_hr - remaining_kg_hr) * self.process_dt_hr(),
         )
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
@@ -6063,13 +6186,29 @@ class EvaporationMixin:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
-        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+        if source_account == 'process.cleaned_melt':
+            # The caller passes step moles. The evaporation transition
+            # multiplies a kg/h rate by dt, so this rate is step mass / dt.
+            rate_kg_hr = (
+                native_fe_vapor_mol * fe_molar_mass / self.process_dt_hr()
+            )
+            route_dt_h = self.process_dt_hr()
+        else:
+            # The metal-phase tap credits these step moles. The debit below
+            # is that step mass, not an hourly rate times dt. The flux is
+            # step kilograms labeled kg/h, so the oxygen clip stays at one
+            # hour. A real dt would over-allow the clip, and this debit
+            # would then under-book.
+            rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+            route_dt_h = 1.0
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
         if sample_time_h is not None:
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
-        route_result = self.condensation_model.route(evap_flux, self.melt)
+        route_result = self.condensation_model.route(
+            evap_flux, self.melt, dt_h=route_dt_h,
+        )
         if source_account == 'process.metal_phase':
             remaining_kg = float(
                 route_result.remaining_by_species.get('Fe', 0.0) or 0.0
@@ -6165,7 +6304,11 @@ class EvaporationMixin:
                 species='Fe',
             )
             routed_fe_mol = overhead_fe_mol
+        # remaining_kg is the route's kg/h remainder. The debit leaves
+        # remaining_kg * dt in overhead, so the moles are that step mass
+        # over M_Fe. At one hour dt is 1.0 and the moles stay remaining / M.
         remaining_kg = float(route_diag.get('remaining_kg', 0.0) or 0.0)
+        uncondensed_mol = remaining_kg * self.process_dt_hr() / fe_molar_mass
         return {
             'native_fe_vapor_route_status': route_status,
             'native_fe_vapor_mol': float(routed_fe_mol),
@@ -6177,7 +6320,7 @@ class EvaporationMixin:
                 route_diag.get('credited_condensed_kg', 0.0) or 0.0
             ),
             'native_fe_uncondensed_kg': remaining_kg,
-            'native_fe_uncondensed_mol': float(remaining_kg / fe_molar_mass),
+            'native_fe_uncondensed_mol': float(uncondensed_mol),
         }
 
     def _dispatch_condensation_route(
@@ -6214,6 +6357,20 @@ class EvaporationMixin:
             wall_deposit_fraction = 0.0
             wall_deposit_account_fractions = {}
 
+        # The route's booking and reactive-alkali mols are one hour of the
+        # kg/h flux. condensed_kg is this step. Each side gets its own
+        # copy. On the hour those copies are unscaled.
+        has_booking = species in route_result.wall_reaction_booking_by_species
+        raw_booking = (
+            route_result.wall_reaction_booking_by_species[species]
+            if has_booking else None
+        )
+        has_alkali = species in route_result.stage3_reactive_alkali_by_species
+        raw_alkali = (
+            route_result.stage3_reactive_alkali_by_species[species]
+            if has_alkali else None
+        )
+
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
             transition_meta={
@@ -6221,23 +6378,23 @@ class EvaporationMixin:
                     getattr(route_result, 'condensation_authority_by_species', {})
                     .get(species, {})
                 ),
-                **({'wall_reaction_booking': copy.deepcopy(
-                    route_result.wall_reaction_booking_by_species[species])}
-                   if species in route_result.wall_reaction_booking_by_species else {}),
-                **({'stage3_reactive_alkali': dict(
-                    route_result.stage3_reactive_alkali_by_species[species])}
-                   if species in route_result.stage3_reactive_alkali_by_species else {}),
+                **({'wall_reaction_booking':
+                    self._condensation_booking_for_this_step(raw_booking)}
+                   if has_booking else {}),
+                **({'stage3_reactive_alkali':
+                    self._reactive_alkali_for_this_step(raw_alkali)}
+                   if has_alkali else {}),
             },
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
-                **({'stage3_reactive_alkali': dict(
-                    route_result.stage3_reactive_alkali_by_species[species])}
-                   if species in route_result.stage3_reactive_alkali_by_species else {}),
-                **({'wall_reaction_booking': copy.deepcopy(
-                    route_result.wall_reaction_booking_by_species[species])}
-                   if species in route_result.wall_reaction_booking_by_species else {}),
+                **({'stage3_reactive_alkali':
+                    self._reactive_alkali_for_this_step(raw_alkali)}
+                   if has_alkali else {}),
+                **({'wall_reaction_booking':
+                    self._condensation_booking_for_this_step(raw_booking)}
+                   if has_booking else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
@@ -6258,7 +6415,7 @@ class EvaporationMixin:
                         {},
                     )
                 ),
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         if kernel_result.transition is None:
@@ -6274,6 +6431,28 @@ class EvaporationMixin:
             self._stage_baffle_product_kg_from_credits(kernel_result.transition)
         )
         return float(diagnostic.get('credited_condensed_kg', 0.0))
+
+    def _condensation_booking_for_this_step(self, booking: dict) -> dict:
+        """Return this step's wall-reaction mols.
+
+        One hour returns a copy of the booked hour. A shorter step scales
+        every booked mol by ``dt_h`` and does not multiply the hour by 1.
+        """
+
+        scaled = copy.deepcopy(booking)
+        if self.process_timestep.is_one_hour:
+            return scaled
+        _rescale_wall_reaction_booking(scaled, self.process_dt_hr())
+        return scaled
+
+    def _reactive_alkali_for_this_step(self, reaction: dict) -> dict:
+        """Return this step's reactive-alkali mols. The hour is unscaled."""
+
+        scaled = dict(reaction)
+        if self.process_timestep.is_one_hour:
+            return scaled
+        _rescale_stage3_reactive_alkali(scaled, self.process_dt_hr())
+        return scaled
 
     def _apply_organic_tar_wall_deposit(self) -> None:
         """Move cold-wall tar from overhead_gas onto process.wall_deposit.
@@ -6453,7 +6632,8 @@ class EvaporationMixin:
             return (0.0, None) if return_transition else 0.0
 
         parent_oxide = stoich['parent_oxide']
-        rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+        dt_hr = self.process_dt_hr()
+        rate_kg_per_tick = rate_kg_hr * dt_hr
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
@@ -6474,7 +6654,7 @@ class EvaporationMixin:
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+        remaining_kg = max(0.0, remaining_kg_hr) * dt_hr
         if remaining_kg > product_kg + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} exceeds credited vapor"
@@ -6490,7 +6670,7 @@ class EvaporationMixin:
                 'sp_data': dict(sp_data or {}),
                 'rate_kg_hr': float(rate_kg_hr),
                 'remaining_kg_hr': float(remaining_kg_hr),
-                'dt_hr': 1.0,
+                'dt_hr': dt_hr,
                 'available_kg': float(available_kg),
             },
         )
@@ -6506,7 +6686,7 @@ class EvaporationMixin:
             'sp_data': dict(sp_data or {}),
             'rate_kg_hr': float(rate_kg_hr),
             'remaining_kg_hr': float(remaining_kg_hr),
-            'dt_hr': 1.0,
+            'dt_hr': dt_hr,
             'available_kg': float(available_kg),
         }
         transition = self._commit_proposal(
