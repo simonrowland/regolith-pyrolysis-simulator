@@ -130,10 +130,22 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
-    for oxygen, pressure in answers.items():
-        assert pressure / answers[1e-9] == pytest.approx(
-            (oxygen / 1e-9) ** exponent
+    # Elemental Si's reaction pressure also cannot exceed pure-component
+    # saturation: the source reaction's implied metal activity is at most one.
+    saturation_Pa = (
+        ellingham_graph.metal_saturation_pressure_Pa(
+            species, 1873.15, vapor_pressure_data=vapor_pressure_data,
         )
+        if species in vapor_pressure_data["metals"]
+        else math.inf
+    )
+    assert answers[1000.0] < saturation_Pa
+    for oxygen, pressure in answers.items():
+        expected = min(
+            answers[1000.0] * (oxygen / 1000.0) ** exponent,
+            saturation_Pa,
+        )
+        assert pressure == pytest.approx(expected)
     if route == "fallback":
         for oxygen in (1e-31, 1000.0):
             notice = receipts[oxygen]

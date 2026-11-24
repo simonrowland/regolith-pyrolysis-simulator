@@ -1615,10 +1615,10 @@ def test_worker_timeout_exception_is_counted_and_not_stored(tmp_path, monkeypatc
             "ImccFerricInputUnsupportedError",
         ),
         (
-            # Keep the unmodelled P2O5 below OpenIMCC's trace cutoff so this
-            # receipt exercises the SP extension refusal, not the earlier
-            # trace-limit guard.
-            {"SiO2": 1.0, "P2O5": 0.005},
+            # Use 0.01 mol P2O5: Studio showed 0.005 mol did not raise the
+            # extension refusal, while 0.1 mol exceeded the 1 mol% trace limit.
+            # 0.01 mol remains below that limit (0.01 / 1.01 mol total).
+            {"SiO2": 1.0, "P2O5": 0.01},
             "imcc_sp_extension_required",
             "ImccSPComponentRequiresExtensionError",
         ),
