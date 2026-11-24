@@ -13,6 +13,7 @@ import yaml
 
 from simulator.battery.enums import (
     EvidenceClass,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
@@ -1243,6 +1244,54 @@ def _store_kind(path: Path) -> str | None:
     return None
 
 
+def _is_typed_method_notice(obs, reason_path: str, reason: object) -> bool:
+    """Validate method-default notices without treating their history as absence."""
+
+    match = re.fullmatch(r"notices\[(\d+)\]\.reason", reason_path)
+    if match is None:
+        return False
+    notices = obs.get("notices")
+    index = int(match[1])
+    if not isinstance(notices, list) or index >= len(notices):
+        return False
+    notice = notices[index]
+    if not isinstance(notice, Mapping):
+        return False
+    policy = notice.get("policy")
+    if not isinstance(policy, Mapping):
+        return False
+    kind = notice.get("kind")
+    if kind == NoticeKind.METHOD_UNSTATED.value:
+        prefix = "method_unstated: default=unspecified; original_reason="
+        assert isinstance(reason, str) and reason.startswith(prefix)
+        assert reason[len(prefix) :]
+        policy_id = "DP-106"
+        value = MethodToken.UNSPECIFIED.value
+    elif kind == NoticeKind.METHOD_INFERRED.value:
+        inferred = re.fullmatch(
+            r"method_inferred: value=([a-z_]+); evidence=.+; original_reason=.+",
+            str(reason),
+        )
+        assert inferred is not None
+        policy_id = "DP-107"
+        value = inferred[1]
+    else:
+        return False
+
+    assert policy == {
+        "id": policy_id,
+        "version": 1,
+        "status": "proposed",
+        "value": value,
+        "units": "method token",
+    }
+    method = MethodToken(policy["value"])
+    assert (method is MethodToken.UNSPECIFIED) == (
+        kind == NoticeKind.METHOD_UNSTATED.value
+    )
+    return True
+
+
 STORE_PATHS = sorted(
     path
     for directory in ("observations-v2", "extracts-v2")
@@ -1301,6 +1350,11 @@ def absence_audit(paths=STORE_PATHS):
                     numeric = _numeric_evidence_paths(leaves)
                 for reason_path, reason in _leaves(obs):
                     if not reason_path.endswith(("reason", "unavailable_reason")) or not isinstance(reason, str):
+                        continue
+                    # DP-106/107 retain the pre-inference reason as notice
+                    # provenance. They are explicit typed defaults, not current
+                    # absence claims; validate their exact notice and policy above.
+                    if _is_typed_method_notice(obs, reason_path, reason):
                         continue
                     contradiction = None
                     if "no numeric coordinate/value pairs" in reason and len(numeric) >= 2:

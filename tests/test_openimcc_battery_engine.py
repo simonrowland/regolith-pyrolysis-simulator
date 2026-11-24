@@ -33,6 +33,7 @@ from simulator.battery.migrate import load_yaml
 from simulator.battery.score import (
     ENGINE_CHANNELS,
     SCORE_ENGINE_SET,
+    _rms,
     candidate_observation,
     compile_residual,
     composition_wt_pct,
@@ -2101,6 +2102,73 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     assert "remedy:" in payload["reason"]
 
 
+def _assert_plante_d460_flagged_summary(residuals, context, engine_rows, engines):
+    summary = next(
+        row for row in headline_rows(residuals, context=context, engines=engines)
+        if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
+    )
+    assert summary["n"] == 0
+    assert summary["n_score_eligible"] == 0
+    assert summary["n_inside_band"] == 0
+    assert summary["n_no_band"] == 0
+    assert summary["band_width_dex"] is None
+    assert summary["median_dex"] is None
+    assert summary["rms_dex"] is None
+    for residual, candidate in engine_rows:
+        assert candidate.observation_id.startswith("engine:openimcc:")
+        assert any(
+            notice.reason == "confidence_level_not_stated"
+            for notice in residual.notices
+        )
+        phase_notices = [
+            notice
+            for notice in residual.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        ]
+        assert len(phase_notices) == 1
+        phase_notice = phase_notices[0]
+        assert phase_notice.reason.startswith("phase_inferred: value=g;")
+        assert phase_notice.policy is not None
+        assert (
+            phase_notice.policy.id,
+            phase_notice.policy.version,
+            phase_notice.policy.status,
+            phase_notice.policy.value,
+            phase_notice.policy.units,
+        ) == ("DP-016", 1, "canonical", "g", "phase token")
+
+    phase_strata = [
+        row
+        for row in flagged_stratum_rows(residuals, engines=engines)
+        if row["stratum"] == NoticeKind.PHASE_INFERRED.value
+        and row["rail"] == Rail.VAPOUR.value
+        and row["engine"] == Engine.OPENIMCC.value
+    ]
+    assert len(phase_strata) == 1
+    assert (
+        phase_strata[0]["n"],
+        phase_strata[0]["policy_id"],
+        phase_strata[0]["policy_status"],
+    ) == (len(engine_rows), "DP-016", "canonical")
+    dex_values = [
+        residual.numeric.value
+        for residual, _candidate in engine_rows
+        if residual.numeric is not None
+        and residual.numeric.operation is MetricOperation.DEX
+    ]
+    assert len(dex_values) == len(engine_rows) == 162
+    assert float(phase_strata[0]["median_dex"]) == pytest.approx(
+        -0.193144973432544415, abs=1e-8
+    )
+    assert float(phase_strata[0]["rms_dex"]) == pytest.approx(
+        0.2180912476850483, abs=1e-8
+    )
+    assert float(phase_strata[0]["rms_dex"]) == pytest.approx(
+        float(_rms(dex_values)), abs=1e-12
+    )
+    return summary
+
+
 def test_openimcc_scores_plante_with_independent_lineage() -> None:
     _require_oxygen_balance()
     code = r'''
@@ -2113,7 +2181,7 @@ import simulator.battery.score
 import engines.engine_commissioning
 
 from simulator.battery.enums import Engine
-from simulator.battery.score import headline_rows, score_store
+from simulator.battery.score import score_store
 
 test_helpers = runpy.run_path("tests/test_openimcc_battery_engine.py")
 context = test_helpers["_plante_score_context"]()
@@ -2131,7 +2199,6 @@ engine_rows = [
     for residual, candidate in rows
     if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
 ]
-assert len(engine_rows) == 162
 binary_pot_residual, binary_pot_candidate = next(
     (residual, candidate)
     for residual, candidate in engine_rows
@@ -2154,20 +2221,9 @@ assert any(
     for _, candidate in engine_rows
     if candidate.engine is not None
 )
-summary = next(
-    row for row in headline_rows(residuals, context=context, engines=engines)
-    if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
+summary = test_helpers["_assert_plante_d460_flagged_summary"](
+    residuals, context, engine_rows, engines
 )
-# d-128 keeps the printed band score-eligible and adds an informational notice.
-assert summary["n_score_eligible"] == 160
-assert all(
-    any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
-    for residual, candidate in engine_rows
-    if candidate.observation_id.startswith("engine:openimcc:")
-)
-assert summary["n_inside_band"] == 56
-assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
-assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
@@ -2187,15 +2243,6 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
-    # d-128 keeps the printed band score-eligible and adds an informational notice.
-    assert result["headline"]["n_score_eligible"] == 160
-    assert result["headline"]["n_inside_band"] == 56
-    assert float(result["headline"]["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
-    )
-    assert float(result["headline"]["rms_dex"]) == pytest.approx(
-        0.2097386994979764836, abs=1e-8
-    )
     assert result["lineage"] == "independent"
 
 
@@ -2717,7 +2764,6 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
             for residual, candidate in rows
             if candidate.engine is not None and candidate.engine.name is engine
         ]
-        assert len(engine_rows) == 162
         assert {
             (candidate.engine.lineage_complete, residual.source_relation.value)
             for residual, candidate in engine_rows
@@ -2740,32 +2786,8 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     )
     assert eligibility_issues == ()
 
-    summary = {
-        row["engine"]: row
-        for row in headline_rows(residuals, context=context, engines=engines)
-        if row["rail"] == "vapour"
-    }
-    openimcc = summary[Engine.OPENIMCC.value]
-    # d-128 flags each printed band whose source does not state a confidence level.
-    openimcc_rows = [
-        residual for residual, candidate in rows
-        if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
-    ]
-    assert openimcc["n_score_eligible"] == 160
-    assert len(openimcc_rows) == 162
-    assert all(
-        any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
-        for residual in openimcc_rows
-    )
-    assert openimcc["n_inside_band"] == 56
-    assert float(openimcc["band_width_dex"]) == pytest.approx(
-        0.14612803567823803, abs=1e-12
-    )
-    assert float(openimcc["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
-    )
-    assert float(openimcc["rms_dex"]) == pytest.approx(
-        0.209738699497976484, abs=1e-8
+    openimcc = _assert_plante_d460_flagged_summary(
+        residuals, context, engine_rows, engines
     )
 
     solved_openimcc_notice = next(
