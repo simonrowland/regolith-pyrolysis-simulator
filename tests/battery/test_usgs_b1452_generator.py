@@ -481,6 +481,17 @@ def test_old_interior_mining_breaks_fluorphlogopite_refusal(monkeypatch) -> None
         _clear_formula_indexes()
 
 
+def _assert_rejected_span_boundary_refuses() -> None:
+    resolution = generator._resolve_formula({}, name="TEST Fe$Kg_{3}$O")
+    assert resolution.formula is None
+    assert resolution.source is None
+    assert str(resolution.reason).startswith(generator.FORMULA_UNRESOLVED_REASON_PREFIX)
+
+
+def test_rejected_span_does_not_join_neighboring_text() -> None:
+    _assert_rejected_span_boundary_refuses()
+
+
 def _row_name_and_weight(record: dict, index: int) -> tuple[str, str | None]:
     row = record["rows"][index]
     cells = row.get("cells") or {}
