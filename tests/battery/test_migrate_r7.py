@@ -1780,6 +1780,213 @@ def test_method_specific_experiment_id_probe_rejects_shared_conflict(
         assert mass_loss.experiment_id != microprobe.experiment_id
 
 
+@pytest.mark.parametrize(
+    (
+        "filename",
+        "source_id",
+        "row_method_id",
+        "shared_method_id",
+        "row_method",
+        "shared_method",
+    ),
+    [
+        (
+            "mysen-1985-cmas-redox.yaml",
+            "mysen-1985-cmas-redox",
+            "mysen_1985_table1_wet_chemistry_fe3_sumfe",
+            "mysen_1985_table1_mossbauer_fe3_sumfe",
+            MethodToken.UNSPECIFIED,
+            MethodToken.MOSSBAUER_SPECTROSCOPY,
+        ),
+        (
+            "kems-184-behrens-1979.yaml",
+            "kems-184-behrens-1979",
+            "behrens_1979_table1_si_second_law_this_work",
+            "behrens_1979_knudsen_detected_species",
+            MethodToken.UNSPECIFIED,
+            MethodToken.KNUDSEN_EFFUSION,
+        ),
+    ],
+    ids=("mysen-wet-chemistry-and-mossbauer", "behrens-model-and-knudsen"),
+)
+def test_declared_experiment_method_conflicts_split_and_reject_legacy_sharing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    filename: str,
+    source_id: str,
+    row_method_id: str,
+    shared_method_id: str,
+    row_method: MethodToken,
+    shared_method: MethodToken,
+) -> None:
+    def rows_for(result, local_id):
+        prefix = f"{source_id}::{local_id}"
+        return [
+            row
+            for observation_id, row in result.observations.items()
+            if observation_id == prefix or observation_id.startswith(prefix + "::")
+        ]
+
+    result = _migrate_real_extract(tmp_path / "current", filename)
+    row_method_rows = rows_for(result, row_method_id)
+    shared_method_rows = rows_for(result, shared_method_id)
+    assert row_method_rows
+    assert shared_method_rows
+    assert all(
+        result.experiments[row.experiment_id].method == State.of(row_method)
+        for row in row_method_rows
+    )
+    assert all(
+        result.experiments[row.experiment_id].method == State.of(shared_method)
+        for row in shared_method_rows
+    )
+    assert {row.experiment_id for row in row_method_rows}.isdisjoint(
+        row.experiment_id for row in shared_method_rows
+    )
+
+    shared_experiment_id = next(
+        experiment_id
+        for experiment_id in {
+            row.experiment_id for row in (*row_method_rows, *shared_method_rows)
+        }
+        if "::declared:" not in experiment_id
+    )
+    original = Migrator._experiment_id
+
+    def legacy_shared_experiment(
+        self, work_id, locator, fallback, distinguisher=None
+    ):
+        if distinguisher is not None and (
+            distinguisher.startswith("method:") or "::method:" in distinguisher
+        ):
+            return shared_experiment_id
+        return original(self, work_id, locator, fallback, distinguisher)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(Migrator, "_experiment_id", legacy_shared_experiment)
+        legacy = _migrate_real_extract(tmp_path / "legacy", filename)
+    legacy_row_method_rows = rows_for(legacy, row_method_id)
+    legacy_shared_method_rows = rows_for(legacy, shared_method_id)
+    with pytest.raises(AssertionError):
+        assert {row.experiment_id for row in legacy_row_method_rows}.isdisjoint(
+            row.experiment_id for row in legacy_shared_method_rows
+        )
+
+
+def test_missing_row_method_defaults_and_flags_inside_declared_experiment(
+    tmp_path: Path,
+) -> None:
+    filename = "mysen-1985-cmas-redox.yaml"
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / filename).read_text(
+            encoding="utf-8"
+        )
+    )
+    wet_chemistry = next(
+        observation
+        for observation in extract["species"]["Fe"]["observations"]
+        if observation["observation_id"]
+        == "mysen_1985_table1_wet_chemistry_fe3_sumfe"
+    )
+    wet_chemistry["values"].pop("method")
+
+    result = _migrate_real_extract(tmp_path, filename, extract_doc=extract)
+    wet_rows = [
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id
+        == "mysen-1985-cmas-redox::mysen_1985_table1_wet_chemistry_fe3_sumfe"
+        or observation_id.startswith(
+            "mysen-1985-cmas-redox::mysen_1985_table1_wet_chemistry_fe3_sumfe::"
+        )
+    ]
+    mossbauer_rows = [
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id
+        == "mysen-1985-cmas-redox::mysen_1985_table1_mossbauer_fe3_sumfe"
+        or observation_id.startswith(
+            "mysen-1985-cmas-redox::mysen_1985_table1_mossbauer_fe3_sumfe::"
+        )
+    ]
+    assert wet_rows
+    assert mossbauer_rows
+    assert all(
+        result.experiments[row.experiment_id].method
+        == State.of(MethodToken.UNSPECIFIED)
+        for row in wet_rows
+    )
+    assert all(
+        any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            and "original_reason=source does not state method" in notice.reason
+            for notice in row.notices
+        )
+        for row in wet_rows
+    )
+    assert {row.experiment_id for row in wet_rows}.isdisjoint(
+        row.experiment_id for row in mossbauer_rows
+    )
+
+
+def test_chatain_dta_printed_method_resolves_and_rejects_legacy_omission(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source_text = "differential thermal analysis (DTA)"
+    local_id = "chatain_2021_dta_transition_temperature"
+
+    def rows_for(result):
+        prefix = f"chatain-2021-nacro2-thermodynamics::{local_id}"
+        return [
+            row
+            for observation_id, row in result.observations.items()
+            if observation_id == prefix or observation_id.startswith(prefix + "::")
+        ]
+
+    result = _migrate_real_extract(
+        tmp_path / "current", "chatain-2021-nacro2-thermodynamics.yaml"
+    )
+    rows = rows_for(result)
+    assert rows
+    assert all(
+        result.experiments[row.experiment_id].method
+        == State.of(MethodToken.DTA_DSC)
+        for row in rows
+    )
+    assert not any(
+        notice.kind is NoticeKind.METHOD_UNSTATED
+        for row in rows
+        for notice in row.notices
+    )
+
+    original = Migrator._resolve_method_for_observation
+
+    def legacy_omits_measured_by(self, *args, **kwargs):
+        kwargs["method_raw_candidates"] = tuple(
+            candidate
+            for candidate in kwargs["method_raw_candidates"]
+            if candidate != source_text
+        )
+        return original(self, *args, **kwargs)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            Migrator,
+            "_resolve_method_for_observation",
+            legacy_omits_measured_by,
+        )
+        legacy = _migrate_real_extract(
+            tmp_path / "legacy", "chatain-2021-nacro2-thermodynamics.yaml"
+        )
+    legacy_rows = rows_for(legacy)
+    with pytest.raises(AssertionError):
+        assert all(
+            legacy.experiments[row.experiment_id].method
+            == State.of(MethodToken.DTA_DSC)
+            for row in legacy_rows
+        )
+
+
 def test_observation_method_notice_regression_probe_rejects_dropped_notice(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

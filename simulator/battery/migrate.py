@@ -25863,10 +25863,6 @@ class Migrator:
                     *method_raw_candidates,
                     *method_evidence_candidates,
                     *evidence_candidates,
-                    experiment_method.reason
-                    if experiment_method is not None
-                    and experiment_method.is_unknown
-                    else None,
                 )
                 if (text := _method_text_value(candidate)) is not None
             ),
@@ -25904,10 +25900,6 @@ class Migrator:
                     else (
                         *method_evidence_candidates,
                         *evidence_candidates,
-                        experiment_method.reason
-                        if experiment_method is not None
-                        and experiment_method.is_unknown
-                        else None,
                     )
                 )
                 method_evidence = _method_inference_from_evidence(
@@ -28754,11 +28746,13 @@ class Migrator:
             obs.get("regime"),
             obs.get("method"),
             obs.get("method_as_printed"),
+            obs.get("measured_by_as_printed"),
             obs.get("method_text"),
             obs.get("analytical_method"),
             obs.get("method_detail_as_printed"),
             values.get("method"),
             values.get("method_as_printed"),
+            values.get("measured_by_as_printed"),
             values.get("method_text"),
             values.get("analytical_method"),
             values.get("method_detail_as_printed"),
@@ -28786,18 +28780,21 @@ class Migrator:
             quantity=quantity_for_notice,
         )
         if (
-            declared_experiment_id is None
-            and experiment_before_method_resolution is not None
+            experiment_before_method_resolution is not None
             and experiment_before_method_resolution.method.is_value
             and method.is_value
             and experiment_before_method_resolution.method.value is not method.value
         ):
-            # Synthetic IDs can group measurements from one work; keep a
-            # conflicting row's typed method from standing in for both rows.
+            # A shared experiment can group rows only while their typed method
+            # decisions agree. Keep each conflicting row on its own method ID.
             self.result.experiments[experiment_id] = (
                 experiment_before_method_resolution
             )
-            method_distinguisher = f"method:{method.value.value}"
+            method_distinguisher = (
+                f"declared:{declared_experiment_id}::method:{method.value.value}"
+                if declared_experiment_id is not None
+                else f"method:{method.value.value}"
+            )
             distinguisher = (
                 f"{distinguisher}::{method_distinguisher}"
                 if distinguisher
@@ -28808,6 +28805,13 @@ class Migrator:
                 locator,
                 source_id,
                 distinguisher=distinguisher,
+            )
+            # The method-specific row keeps the declared run context; only
+            # its typed technique differs from the shared experiment.
+            self.result.experiments[experiment_id] = replace(
+                experiment_before_method_resolution,
+                experiment_id=experiment_id,
+                method=method,
             )
         experiment = self.result.experiments.get(experiment_id)
         migration_axis_notices = tuple(
@@ -29223,11 +29227,15 @@ class Migrator:
                     "composition": derived,
                     **point_conditions,
                 }
-        if declared_experiment_id is None or (
-            declared_experiment_id in self.result.experiments
-            and (
-                bool(obs.get("equipment"))
-                or row_sample.initial_composition is not None
+        if (
+            declared_experiment_id is None
+            or experiment_id != declared_experiment_id
+            or (
+                declared_experiment_id in self.result.experiments
+                and (
+                    bool(obs.get("equipment"))
+                    or row_sample.initial_composition is not None
+                )
             )
         ):
             self._ensure_experiment(

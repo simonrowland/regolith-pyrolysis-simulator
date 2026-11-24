@@ -84,8 +84,10 @@ def _sossi_aithala_redox_context():
             or (
                 observation.source_id
                 == "aithala-2026-magmatic-iron-redox-to-2100c"
-                and observation.experiment_id.rsplit("::", 1)[-1]
-                in _AITHALA_REDOX_EXPERIMENTS
+                and any(
+                    part in _AITHALA_REDOX_EXPERIMENTS
+                    for part in observation.experiment_id.split("::")
+                )
             )
         )
     }
@@ -289,7 +291,7 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     """Golden pin for extracting the shared inventory and evidence helpers."""
     pytest.importorskip("openimcc")
-    context, _observations = _sossi_aithala_redox_context()
+    context, observations = _sossi_aithala_redox_context()
     residuals, _ = score_store(
         context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
     )
@@ -316,9 +318,29 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
         score_module.flagged_strata(residual.notices)
-        == ("method_unstated", "proposed-policy")
+        == (
+            ("iron-oxide-convention",)
+            if observations[residual.reference].source_id
+            == "aithala-2026-magmatic-iron-redox-to-2100c"
+            else (
+                "iron-oxide-convention",
+                "method_unstated",
+                "proposed-policy",
+            )
+        )
         for residual in residuals
-    )
+    ), {
+        source_id: sorted(
+            {
+                score_module.flagged_strata(residual.notices)
+                for residual in residuals
+                if observations[residual.reference].source_id == source_id
+            }
+        )
+        for source_id in sorted(
+            {observation.source_id for observation in observations.values()}
+        )
+    }
     assert not any(residual.score_eligible for residual in residuals)
 
 
@@ -634,11 +656,12 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # fam13 binds the six Aithala Table S-1 Fe rows to the physical SI PDF
     # (page 13, SI-7; SHA-256 ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa).
     # Their printed redox values and decisions are unchanged; the serialized
-    # locator changes from source_path=None to that PDF path. The combined
-    # payload hash therefore moves from 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862
-    # to 0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50.
+    # locator changes from source_path=None to that PDF path. The row-level
+    # method split also changes serialized experiment IDs; the combined output
+    # hash below pins both metadata changes while the 18 numeric residuals stay
+    # bit-identical.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50"
+        "d521761fdf1a3c8121f5dea5e13ced19bde0b63204bf3781c5fd851f56a30436"
     )
 
 
@@ -698,7 +721,7 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
         observation_id
         for observation_id, observation in observations.items()
         if observation.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
-        and observation.experiment_id.rsplit("::", 1)[-1] == "aithala-2026-1800-30"
+        and "aithala-2026-1800-30" in observation.experiment_id.split("::")
     )
     assert residual_by_reference[aithala_1800_30].status is ResidualStatus.MATCH
 
