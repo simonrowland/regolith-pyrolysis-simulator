@@ -106,8 +106,56 @@ def test_demaria_figure2_callable_points_keep_a_positive_prediction(monkeypatch)
     assert "melt-only oxygen balance" in (result.skip_reason or "")
 
 
+def test_demaria_figure2_scored_request_carries_projection(monkeypatch) -> None:
+    from simulator.battery import score as battery_score
+    from simulator.battery.enums import NoticeKind
+    from simulator.diagnostic_helpers import binary_pot_battery as pots
+
+    calls: list[dict[str, float]] = []
+    predictions = []
+    real_equilibrate = pots.equilibrate_cell
+    real_predict = battery_score.predict_with_engine
+
+    def capture_equilibrate(handle, pot, **kwargs):
+        request = kwargs.get("po2")
+        if (
+            getattr(handle, "name", None) == "internal-analytical"
+            and getattr(request, "mode", None)
+            == pots.PO2_OXYGEN_BALANCE_EFFUSION
+        ):
+            calls.append(dict(pot.composition_wt_pct))
+        return real_equilibrate(handle, pot, **kwargs)
+
+    def predict_in_process(*args, **kwargs):
+        kwargs["isolated"] = False
+        prediction = real_predict(*args, **kwargs)
+        predictions.append(prediction)
+        return prediction
+
+    monkeypatch.setattr(pots, "equilibrate_cell", capture_equilibrate)
+    monkeypatch.setattr(
+        battery_score, "predict_with_engine", predict_in_process
+    )
+    test_demaria_figure2_callable_points_keep_a_positive_prediction(monkeypatch)
+
+    assert calls
+    assert all("MnO" not in composition for composition in calls)
+    projected = [
+        notice
+        for prediction in predictions
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+    assert projected
+    assert all("MnO" in notice.dropped for notice in projected)
+    assert all(
+        "MnO" in notice.reason and "wt_pct" in notice.reason
+        for notice in projected
+    )
+
+
 def test_passing_mno_through_to_openimcc_breaks_the_pin(monkeypatch) -> None:
-    """MnO is outside IMCC-SF04. Skipping the cleaned-melt projection refuses both points.
+    """Removing the score-boundary projection refuses both Figure 2 points.
 
     The closure's internal-analytical call runs in a child, which would not
     see a parent monkeypatch. Force the same process, then keep every oxide.
@@ -132,6 +180,4 @@ def test_passing_mno_through_to_openimcc_breaks_the_pin(monkeypatch) -> None:
         battery_score, "predict_with_engine", predict_in_process
     )
     with pytest.raises(AssertionError):
-        test_demaria_figure2_callable_points_keep_a_positive_prediction(
-            monkeypatch
-        )
+        test_demaria_figure2_scored_request_carries_projection(monkeypatch)
