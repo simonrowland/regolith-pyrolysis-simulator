@@ -4631,6 +4631,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             ),
             # Exact pre-clamp redox input for the t-568 typed Fe shadow. The
             # existing bar-valued field above stays the live evaluator channel.
+            # Keep it unfloored because the vapour batch fingerprints shadow identity.
             "source_reaction_fO2_log10": (
                 float(intrinsic_fO2_log)
                 if intrinsic_fO2_log_supplied
