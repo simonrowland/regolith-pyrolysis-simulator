@@ -25,6 +25,7 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.core import PoisonedHourError
+from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT,
@@ -52,7 +53,6 @@ from simulator.reduced_real_determinism import (
     canonical_json_bytes,
     gate_curve_memo_record,
     gate_curve_memo_producer_configuration,
-    uncacheable_replay_disposition,
 )
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
@@ -1265,7 +1265,7 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
         assert kwargs['fe_redox_policy'] == 'intrinsic'
 
 
-def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
+def test_freeze_gate_enabled_falls_to_floor_instead_of_backend_liquidus(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -1302,13 +1302,14 @@ def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     sim.backend.find_liquidus_solidus = fake_liquidus_finder
 
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim._calculate_evaporation(_equilibrium())
-    assert error.value.diagnostic['provider'] == 'magemin'
+    sim._calculate_evaporation(_equilibrium())
+    refusal = sim._last_freeze_gate_diagnostic['gate_provider_refusal']
+    assert refusal['provider'] == 'magemin'
+    assert refusal['fallback_authority'] == EvidenceClass.INTERNAL_ANALYTICAL.value
     assert sim._freeze_gate_liquid_fraction_cache is None
 
 
-def test_freeze_gate_enabled_no_engine_freeze_stops(
+def test_freeze_gate_enabled_absent_provider_falls_to_floor(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -1340,10 +1341,12 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim._calculate_evaporation(_equilibrium())
-    assert error.value.reason == 'liquid_fraction_provider_failed'
-    assert 'gate_liquid_fraction provider absent' in error.value.diagnostic['detail']
+    sim._calculate_evaporation(_equilibrium())
+    refusal = sim._last_freeze_gate_diagnostic['gate_provider_refusal']
+    assert refusal['fallback_authority'] == EvidenceClass.INTERNAL_ANALYTICAL.value
+    assert 'gate_liquid_fraction provider absent' in (
+        refusal['provider_diagnostic']['exception_message']
+    )
 
 
 def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
@@ -1804,10 +1807,13 @@ def test_uncacheable_gate_failure_survives_in_progress_redox_bootstrap(
         raise ProviderUnavailableError('outer gate provider unavailable')
 
     monkeypatch.setattr(sim, '_dispatch_only', unavailable_dispatch)
-    with pytest.raises(EvaporationFluxRefusal):
-        sim._freeze_gate_curve()
+    # Old rule: the outer provider failure aborted. The floor is not a memo.
+    curve = sim._freeze_gate_curve()
+    assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert curve['gate_provider_refusal']['fallback_authority'] == (
+        EvidenceClass.INTERNAL_ANALYTICAL.value
+    )
     assert bootstrap_curves == [None]
-    assert uncacheable_replay_disposition(sim)
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
     assert store.entries == {}
@@ -1890,11 +1896,19 @@ def test_redox_gate_distinguishes_numerical_failure_from_missing_provider_defaul
     T_K = sim.melt.temperature_C + 273.15
     before = sim.atom_ledger.mol_by_account()
     if provider_status == 'unavailable':
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._melt_redox_temperature_shift_is_liquid(T_K)
-        assert error.value.diagnostic['outcome'] == 'failed'
-        with pytest.raises(EvaporationFluxRefusal):
-            sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K)
+        # Old rule: an uncallable provider aborted. It now continues on
+        # the analytical floor. Numerical failure stays a different outcome.
+        assert sim._melt_redox_temperature_shift_is_liquid(T_K)
+        assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
+            fO2_log=-9.0, T_K=T_K,
+        ) > 0.0
+        curve = sim._melt_redox_liquidus_gate_curve()
+        assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        refusal = curve['gate_provider_refusal']
+        assert refusal['outcome'] == 'failed'
+        assert refusal['fallback_authority'] == (
+            EvidenceClass.INTERNAL_ANALYTICAL.value
+        )
         assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
     else:
         assert sim._melt_redox_temperature_shift_is_liquid(T_K)
@@ -6789,12 +6803,30 @@ def test_core_gate_curve_memo_does_not_reuse_fallback_after_provider_unavailable
         provider_calls.append(intent)
         raise ProviderUnavailableError('declared gate unavailable')
     monkeypatch.setattr(sim, '_dispatch_only', unavailable)
-    for _ in range(2):
-        with pytest.raises(EvaporationFluxRefusal):
-            sim._melt_redox_liquidus_gate_curve()
-    assert len(provider_calls) == 2
+    # Old rule: each call aborted. The floor is tick-local, not a solved memo,
+    # and the next hour asks the provider again.
+    first = sim._melt_redox_liquidus_gate_curve()
+    assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert first['gate_provider_refusal']['fallback_authority'] == (
+        EvidenceClass.INTERNAL_ANALYTICAL.value
+    )
+    assert len(provider_calls) == 1
+    held = sim._melt_redox_liquidus_gate_curve()
+    assert held['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert len(provider_calls) == 1
     assert sim._freeze_gate_liquid_fraction_cache is None
-    assert _freeze_gate_key_for_current_state(sim) not in sim._freeze_gate_liquid_fraction_curve_memo
+    assert _freeze_gate_key_for_current_state(sim) not in (
+        sim._freeze_gate_liquid_fraction_curve_memo
+    )
+    sim.melt.hour += 1
+    again = sim._melt_redox_liquidus_gate_curve()
+    assert again['gate_provider_refusal']['fallback_authority'] == (
+        EvidenceClass.INTERNAL_ANALYTICAL.value
+    )
+    assert len(provider_calls) == 2
+    assert _freeze_gate_key_for_current_state(sim) not in (
+        sim._freeze_gate_liquid_fraction_curve_memo
+    )
 
 
 @pytest.mark.parametrize(
@@ -7302,8 +7334,12 @@ def test_uncacheable_gate_curve_refusal_skips_every_memo(
         raise ProviderUnavailableError('gate provider runtime failure')
 
     monkeypatch.setattr(sim, '_dispatch_only', unavailable_dispatch)
-    with pytest.raises(EvaporationFluxRefusal):
-        sim._freeze_gate_curve()
+    # Old rule: this refusal aborted. The floor still skips every memo.
+    curve = sim._freeze_gate_curve()
+    assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert curve['gate_provider_refusal']['fallback_authority'] == (
+        EvidenceClass.INTERNAL_ANALYTICAL.value
+    )
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
     assert store.capture_sequence == []
@@ -7769,6 +7805,17 @@ def test_failed_gate_provider_refusal_does_not_enter_any_memo(
         first = sim._melt_redox_liquidus_gate_curve()
         assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
         assert first['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
+        sim.melt.hour += 1
+    elif (
+        initial_status == 'unavailable'
+        or initial_diagnostic.get('backend_status_reason') == 'subprocess_died'
+    ):
+        # Old rule: initialization failure and subprocess death aborted.
+        first = sim._melt_redox_liquidus_gate_curve()
+        assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        assert first['gate_provider_refusal']['fallback_authority'] == (
+            EvidenceClass.INTERNAL_ANALYTICAL.value
+        )
         sim.melt.hour += 1
     else:
         with pytest.raises(EvaporationFluxRefusal):

@@ -737,20 +737,56 @@ def test_non_prefix_gate_liquidus_runtime_error_still_aborts(tmp_path, monkeypat
     assert emitted == []
 
 
-def test_gate_liquidus_message_prefix_pinned_to_upstream_source():
-    # b-1043 replaced the RuntimeError prefix with a typed refusal. Pin the
-    # executable producer and keep environment failures out of physics gaps.
-    sim = SimpleNamespace(
-        _liquid_fraction_provider="magemin",
-        _dispatch_only=lambda *_args, **_kwargs: SimpleNamespace(
+def test_gate_liquidus_environment_failure_falls_to_floor_not_a_physics_gap():
+    # Old rule: an environment failure raised liquid_fraction_provider_failed.
+    # The all-rungs-fail control still raises, and that refusal is not a
+    # physics case-gap.
+    floor = {
+        "source": "kress91_liquid_calibration_floor",
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1200.000001,
+    }
+
+    def dispatch(*_args, **_kwargs):
+        return SimpleNamespace(
             status="unavailable",
             diagnostic={"reason": "environment", "exception_class": "OSError"},
             warnings=(),
-        ),
+        )
+
+    sim = SimpleNamespace(
+        _liquid_fraction_provider="magemin",
+        _dispatch_only=dispatch,
+        _freeze_gate_kress_floor_curve=lambda *_args, **_kwargs: dict(floor),
+        melt=SimpleNamespace(hour=1, temperature_C=1150.0),
+    )
+    # The owner stamps and returns through these methods. A namespace
+    # that omits them is not the production consumer.
+    sim._lower_rung_gate_provider_refusal = (
+        EvaporationMixin._lower_rung_gate_provider_refusal.__get__(sim)
+    )
+    sim._return_lower_rung_gate_curve = (
+        EvaporationMixin._return_lower_rung_gate_curve.__get__(sim)
+    )
+    curve = EvaporationMixin._freeze_gate_curve_from_gate_dispatch(
+        sim, [], fO2_log=-9.0,
+    )
+    refusal = curve["gate_provider_refusal"]
+    assert curve["source"] == "kress91_liquid_calibration_floor"
+    assert refusal["provider"] == "magemin"
+    assert refusal["fallback_authority"] == "internal-analytical"
+    assert refusal["provider_diagnostic"]["reason"] == "environment"
+    assert refusal["outcome"] == "failed"
+
+    bare = SimpleNamespace(
+        _liquid_fraction_provider="magemin",
+        _dispatch_only=dispatch,
+        _freeze_gate_kress_floor_curve=lambda *_args, **_kwargs: None,
+        melt=SimpleNamespace(hour=1, temperature_C=1150.0),
     )
     with pytest.raises(EvaporationFluxRefusal) as error:
         EvaporationMixin._freeze_gate_curve_from_gate_dispatch(
-            sim, [], fO2_log=-9.0,
+            bare, [], fO2_log=-9.0,
         )
 
     assert str(error.value) == "liquid_fraction_provider_failed"

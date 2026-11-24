@@ -2749,6 +2749,16 @@ _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "oserror",
 })
 
+# Category 1/2: the engine cannot be called. An execution failure is not
+# one of these, and must not be treated as one.
+_GATE_CURVE_TERMINAL_INPUT_REASONS = frozenset({
+    "missing_input",
+    "invalid_input",
+    "invalid_fo2_log",
+    "invalid_pressure_bar",
+    "non_finite_composition",
+})
+
 
 def gate_curve_provider_diagnostic_reasons(
     diagnostic: Mapping[str, Any] | None,
@@ -2792,6 +2802,20 @@ def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
     return gate_curve_provider_timeout_reason(diagnostic) is not None
 
 
+def gate_curve_provider_failure_is_terminal_input(
+    diagnostic: Mapping[str, Any] | None,
+) -> bool:
+    """True when no engine call is possible: missing or invalid input.
+
+    Execution failures (worker death, missing binary, OSError) are not
+    terminal. The gate falls to the next callable liquid-fraction rung.
+    """
+    return any(
+        reason in _GATE_CURVE_TERMINAL_INPUT_REASONS
+        for reason in gate_curve_provider_diagnostic_reasons(diagnostic)
+    )
+
+
 def gate_curve_provider_outcome_for_status(
     status: str,
     diagnostic: Mapping[str, Any] | None = None,
@@ -2812,10 +2836,7 @@ def gate_curve_provider_outcome_for_status(
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
-    if any(reason in {
-        "missing_input", "invalid_input", "invalid_fo2_log",
-        "invalid_pressure_bar", "non_finite_composition",
-    } for reason in reasons):
+    if gate_curve_provider_failure_is_terminal_input(diagnostic):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
