@@ -1450,6 +1450,45 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert requests[0][1]["pack"] == "published-ext"
 
 
+def test_evaluate_bridge_notices_are_json_serializable(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    notice = SimpleNamespace(code="melt_notice", detail="coded by openimcc")
+    package_labels = SimpleNamespace(
+        identity={"model_id": "test-model", "datapack_version": "test-version"},
+        coverage={},
+        envelope_status="inside",
+        flags=(),
+        notices=(notice,),
+        acid_sink_ratio=None,
+    )
+    package_result = SimpleNamespace(
+        parent_oxides=(), parent_activity=(), labels=package_labels,
+        extrapolated=False,
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            evaluate=lambda *_args, **_kwargs: package_result,
+            __version__="test-version",
+        ),
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_load_pack",
+        lambda _name: SimpleNamespace(binding_digest="test-digest"),
+    )
+
+    result = openimcc_bridge._evaluate_uncached(
+        composition_mol={"SiO2": 1.0}, temperature_K=1700.0
+    )
+
+    assert result.notices == (str(notice),)
+    assert result.labels.notices == result.notices
+    assert json.loads(json.dumps(result.notices)) == [str(notice)]
+
+
 def test_evaluate_preserves_boolean_temperature_for_openimcc_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

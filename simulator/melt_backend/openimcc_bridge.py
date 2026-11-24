@@ -1210,13 +1210,17 @@ def _evaluate_uncached(
             },
         }
     package_labels = result.labels
+    # OpenIMCC 7cf98e62 returns coded melt notices rather than the strings
+    # exposed by the prior package contract. Keep the bridge's existing
+    # simulator-owned notice shape JSON-safe at this boundary.
+    notices = tuple(str(notice) for notice in package_labels.notices)
     labels = ImccAdapterLabels(
         identity=package_labels.identity,
         coverage=package_labels.coverage,
         trust="internal-analytical",
         envelope_status=package_labels.envelope_status,
         flags=tuple(package_labels.flags),
-        notices=tuple(package_labels.notices),
+        notices=notices,
         acid_sink_ratio=(
             None
             if package_labels.acid_sink_ratio is None
@@ -1228,7 +1232,7 @@ def _evaluate_uncached(
         parent_oxide_activities=activities,
         parent_oxides=parent_oxides,
         flags=tuple(labels.flags),
-        notices=tuple(labels.notices),
+        notices=notices,
         acid_sink_ratio=(
             None if labels.acid_sink_ratio is None else float(labels.acid_sink_ratio)
         ),
