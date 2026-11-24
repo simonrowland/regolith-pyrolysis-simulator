@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from simulator.corpus_paths import regolith_corpus_root
+from simulator.battery.migrate import work_from_plain
 
 SCHEMA = "literature_index.v1"
 STATUS_SCHEMA = "literature_source_status.v1"
@@ -455,12 +456,16 @@ def load_work_metadata(root: Path) -> dict[str, dict]:
         doc = load_yaml(path)
         if not isinstance(doc, dict) or doc.get("schema_version") != "battery_work.v2.1":
             continue
-        work = doc.get("work") or {}
-        if not isinstance(work, dict) or doc.get("experiments") or doc.get("context"):
+        work_payload = doc.get("work") or {}
+        if not isinstance(work_payload, dict) or doc.get("experiments") or doc.get("context"):
             continue
-        source_files = work.get("source_files")
+        try:
+            work = work_from_plain(work_payload)
+        except (AssertionError, AttributeError, KeyError, TypeError, ValueError):
+            continue
+        source_files = work_payload.get("source_files")
         assets = source_files.get("files") if isinstance(source_files, dict) else None
-        source_ids = work.get("source_ids") or []
+        source_ids = work_payload.get("source_ids") or []
         citation_only = (
             isinstance(assets, list)
             and bool(assets)
@@ -478,8 +483,8 @@ def load_work_metadata(root: Path) -> dict[str, dict]:
             if not isinstance(source_id, str) or not source_id:
                 continue
             metadata = works.setdefault(source_id, {"citation": None, "doi": None})
-            metadata["citation"] = metadata["citation"] or work.get("citation")
-            metadata["doi"] = metadata["doi"] or work.get("doi")
+            metadata["citation"] = metadata["citation"] or work.citation
+            metadata["doi"] = metadata["doi"] or work.doi
     return works
 
 

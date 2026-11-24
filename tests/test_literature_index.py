@@ -304,16 +304,28 @@ def test_work_metadata_rejects_empty_assets_and_accepts_typed_placeholder(tmp_pa
     }
     placeholder = {
         "schema_version": "battery_work.v2.1",
-        "work": {"source_ids": ["placeholder"], "citation": "Placeholder", "source_files": {
-            "files": [{"asset_id": "unknown:placeholder", "role": "pdftotext", "path": "unknown"}]
+        "work": {"work_id": "placeholder", "source_ids": ["placeholder"], "citation": "Placeholder", "source_files": {
+            "files": [{
+                "asset_id": "unknown:placeholder", "role": "pdftotext", "path": "unknown",
+                "sha256": {"tag": "unknown", "reason": "INDEX does not give an unmatched-layer asset"},
+            }]
+        }},
+        "experiments": [], "context": [],
+    }
+    missing_sha256 = {
+        "schema_version": "battery_work.v2.1",
+        "work": {"work_id": "missing-sha256", "source_ids": ["missing-sha256"], "citation": "Missing sha256", "source_files": {
+            "files": [{"asset_id": "unknown:missing-sha256", "role": "pdftotext", "path": "unknown"}]
         }},
         "experiments": [], "context": [],
     }
     (works / "empty.yaml").write_text(yaml.safe_dump(empty))
     (works / "placeholder.yaml").write_text(yaml.safe_dump(placeholder))
+    (works / "missing-sha256.yaml").write_text(yaml.safe_dump(missing_sha256))
 
     metadata = builder.load_work_metadata(tmp_path)
     assert "empty" not in metadata
+    assert "missing-sha256" not in metadata
     assert metadata["placeholder"]["citation"] == "Placeholder"
 
 
