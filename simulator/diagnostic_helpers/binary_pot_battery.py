@@ -3144,39 +3144,12 @@ class _OpenImccBatteryBackend:
         # OpenIMCC refuses raw Fe2O3. d-180: fold ferric onto FeOt and
         # carry the owner's notices. Do not copy the fold.
         fold_notices: tuple[Mapping[str, Any], ...] = ()
-        projection_policy: Mapping[str, Any] | None = None
-
-        def project_nonparent(moles: Mapping[str, Any]) -> Mapping[str, Any]:
-            """Drop oxides the cleaned-melt policy already projects.
-
-            Raw ``evaluate`` refuses MnO and Cr2O3 as outside IMCC-SF04.
-            Parent-only input is returned unchanged, so a fixed parent
-            composition still reaches the model as it arrived.
-            """
-
-            nonlocal projection_policy
-            parents = set(self._bridge.OPENIMCC_PARENT_OXIDES)
-            outside = False
-            for name, amount in moles.items():
-                if str(name) in parents or str(name) in {"FeO", "Fe2O3"}:
-                    continue
-                try:
-                    number = float(amount)
-                except (TypeError, ValueError):
-                    continue
-                if math.isfinite(number) and number > 0.0:
-                    outside = True
-                    break
-            if not outside:
-                return moles
-            cleaned, projection_policy = self._bridge._cleaned_melt_policy(moles)
-            return cleaned
 
         if composition_mol:
             folded_mol, fold_notices = self._bridge.fold_ferric_to_feot(
                 composition_mol
             )
-            bridge_kwargs["composition_mol"] = project_nonparent(folded_mol)
+            bridge_kwargs["composition_mol"] = folded_mol
         elif composition_kg is not None:
             if self._bridge.positive_fe2o3(composition_kg):
                 # kg is a 1 kg batch (wt%/100). The fold is a mole identity.
@@ -3189,29 +3162,9 @@ class _OpenImccBatteryBackend:
                 folded_mol, fold_notices = self._bridge.fold_ferric_to_feot(
                     batch_mol
                 )
-                bridge_kwargs["composition_mol"] = project_nonparent(folded_mol)
+                bridge_kwargs["composition_mol"] = folded_mol
             else:
-                parents = set(self._bridge.OPENIMCC_PARENT_OXIDES)
-                has_nonparent = False
-                for name, amount in composition_kg.items():
-                    if str(name) in parents or str(name) in {"FeO", "Fe2O3"}:
-                        continue
-                    try:
-                        number = float(amount)
-                    except (TypeError, ValueError):
-                        continue
-                    if math.isfinite(number) and number > 0.0:
-                        has_nonparent = True
-                        break
-                if not has_nonparent:
-                    bridge_kwargs["composition_kg"] = composition_kg
-                else:
-                    wt_pct = {
-                        str(name): float(amount) * 100.0
-                        for name, amount in composition_kg.items()
-                    }
-                    batch_mol = composition_kg_and_mol(wt_pct)[1]
-                    bridge_kwargs["composition_mol"] = project_nonparent(batch_mol)
+                bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol
         with self._bridge._with_solve_timeout(call_timeout_s):
@@ -3225,32 +3178,6 @@ class _OpenImccBatteryBackend:
         notices: list[dict[str, Any]] = [
             _carried_ferric_fold_notice(row) for row in fold_notices
         ]
-        if projection_policy is not None:
-            relaxed = projection_policy.get("openimcc_projection_crmn_relaxed")
-            if isinstance(relaxed, Mapping):
-                notices.append(
-                    {
-                        "kind": "openimcc_projection_crmn_relaxed",
-                        "authority": None,
-                        "reason": str(
-                            relaxed.get("message")
-                            or "openimcc_projection_crmn_relaxed"
-                        ),
-                        "wt_pct": dict(relaxed.get("wt_pct") or {}),
-                    }
-                )
-            projected_notice = projection_policy.get("notice")
-            if isinstance(projected_notice, Mapping):
-                notices.append(
-                    {
-                        "kind": "openimcc_projected_bulk",
-                        "authority": None,
-                        "reason": str(
-                            projected_notice.get("message")
-                            or "openimcc_projected_bulk"
-                        ),
-                    }
-                )
         authority: str | None = None
         outside_domain = bool(
             result.extrapolated or result.envelope_status != "inside"

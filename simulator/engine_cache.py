@@ -351,8 +351,8 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
-    "internal-analytical": 3,
+    "openimcc": 2,
+    "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 4,
     "alphamelts": 4,
@@ -375,6 +375,8 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
+# openimcc v2: 2026-11-24 scored oxygen-balance requests use the cleaned-melt bulk at the scoring boundary
+# internal-analytical v4: 2026-11-24 oxygen-balance vapour predictions use the same cleaned-melt bulk as their solved oxygen condition
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice

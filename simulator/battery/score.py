@@ -14615,7 +14615,6 @@ def _predict_with_engine(
     if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
-        from simulator.battery.enums import AmountBasis
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
@@ -15189,6 +15188,142 @@ def _predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+
+    if (
+        po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+        and wt is not None
+    ):
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            composition_kg_and_mol,
+        )
+        from simulator.melt_backend.openimcc_bridge import (
+            PROJECTED_BULK_CLASSIFICATION_KEY,
+            OpenImccCompositionPolicyRefusal,
+            _cleaned_melt_policy,
+        )
+
+        _bulk_kg, bulk_mol = composition_kg_and_mol(wt)
+        try:
+            projected_mol, policy = _cleaned_melt_policy(bulk_mol)
+        except OpenImccCompositionPolicyRefusal as exc:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=f"equilibrate_cell:{name}:exception",
+                ),
+                authority=Authority.REFUSED,
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                refusal_detail={
+                    "reason": exc.reason_code,
+                    "projection_code": exc.code,
+                    "engine_reason": str(exc),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        projected_composition = Composition(
+            "oxides",
+            tuple(
+                (str(oxide), Decimal(str(amount)))
+                for oxide, amount in projected_mol.items()
+            ),
+            AmountBasis.MOL_INVENTORY,
+        )
+        projected_wt = composition_wt_pct(projected_composition)
+        if projected_wt is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+                refusal_detail={"reason": "openimcc_projection_unusable"},
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        wt = projected_wt
+        classification = policy.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if isinstance(classification, Mapping):
+            projected_notice = policy.get("notice")
+            if isinstance(projected_notice, Mapping):
+                dropped = tuple(
+                    str(name)
+                    for name in classification.get("dropped_components", ())
+                )
+                dropped_wt_pct = classification.get(
+                    "dropped_component_wt_pct", {}
+                )
+                total_wt_pct = classification.get("dropped_total_wt_pct")
+                dropped_fraction = (
+                    None
+                    if total_wt_pct is None
+                    else as_decimal(str(total_wt_pct)) / Decimal("100")
+                )
+                input_notices.append(
+                    Notice(
+                        kind=NoticeKind.COMPOSITION_PROJECTED,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            str(
+                                projected_notice.get("message")
+                                or "openimcc projected the scored bulk"
+                            )
+                            + "; dropped_wt_pct="
+                            + json.dumps(
+                                dict(dropped_wt_pct)
+                                if isinstance(dropped_wt_pct, Mapping)
+                                else {},
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            )
+                        ),
+                        origin="engine:openimcc",
+                        dropped=dropped,
+                        dropped_mass_fraction=dropped_fraction,
+                    )
+                )
+        relaxed = policy.get("openimcc_projection_crmn_relaxed")
+        if isinstance(relaxed, Mapping):
+            input_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=str(
+                        relaxed.get("message")
+                        or "Cr2O3 and MnO projection use the stated relaxed gate"
+                    ),
+                    origin="engine:openimcc",
+                )
+            )
+        for key in ("fe2o3_fold", "fe_redox_notice"):
+            fold_notice = policy.get(key)
+            if isinstance(fold_notice, Mapping):
+                input_notices.append(
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "ferric folded to FeOt"
+                            if key == "fe2o3_fold"
+                            else str(
+                                fold_notice.get("message")
+                                or fold_notice.get("code")
+                                or "ferric redox projection"
+                            )
+                        ),
+                        origin="engine:openimcc",
+                    )
+                )
 
     qualification = False
     extra_notices: list[Notice] = list(input_notices)
