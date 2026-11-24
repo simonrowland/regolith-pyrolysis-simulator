@@ -745,14 +745,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
     },
-    'lru:simulator/vapour_rail/melt_activity_resolver.py:load': {
-        "path": 'simulator/vapour_rail/melt_activity_resolver.py',
-        "line": 686,
-        "kind": 'lru',
-        "name": 'load',
-        "carries_disclosure": False,
-        "how": 'Loaded catalogue or activity registry. It does not evaluate a law, so it has no disclosure to replay.',
-    },
     'lru:simulator/vapour_rail/trace_acquisition.py:load_trace_acquisition': {
         "path": 'simulator/vapour_rail/trace_acquisition.py',
         "line": 52,
