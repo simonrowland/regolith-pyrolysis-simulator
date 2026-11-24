@@ -13,12 +13,17 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_stoichiometry,
 )
 from simulator.state import GAS_CONSTANT
-from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+from simulator.vapour_rail.catalog import (
+    compiled_catalog_for,
+    vapor_pressure_legacy_view,
+)
 
 
 @pytest.fixture(scope="module")
 def vapor_pressure_data():
-    return ellingham_graph._load_default_vapor_pressure_data()
+    return vapor_pressure_legacy_view(
+        ellingham_graph._load_default_vapor_pressure_data()
+    )
 
 
 @pytest.mark.parametrize(
@@ -87,6 +92,14 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
 
     monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     backend = AlphaMELTSBackend()
+    saturation_pressure_data = (
+        ellingham_graph._load_default_vapor_pressure_data()
+        if species == "Si"
+        else vapor_pressure_data
+    )
+    helper_pressure_data = (
+        saturation_pressure_data if route == "helper" else vapor_pressure_data
+    )
     answers = {}
     receipts = {}
     warning_messages = []
@@ -94,8 +107,13 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             if route == "helper":
+                # The legacy projection carries Si's reference pressure model
+                # but not the complete source inputs needed by this evaluator.
                 pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
-                    species, 1873.15, oxygen, vapor_pressure_data=vapor_pressure_data,
+                    species,
+                    1873.15,
+                    oxygen,
+                    vapor_pressure_data=helper_pressure_data,
                 )
             else:
                 pressure = backend._activities_times_antoine(
@@ -115,8 +133,27 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
+    # The Si elemental rail cannot exceed its pure-component saturation
+    # pressure: its source reaction implies metal activity at most unity. Use
+    # the owner lookup, which resolves the catalog shape used by production.
+    saturation_Pa = (
+        ellingham_graph.metal_saturation_pressure_Pa(
+            species, 1873.15, vapor_pressure_data=saturation_pressure_data,
+        )
+        if species == "Si"
+        else math.inf
+    )
+    # At 1000 bar, the Si power-law pressure is still below saturation; at
+    # 1e-31 bar its uncapped value (~8.84e14 Pa) greatly exceeds P_sat ~0.894 Pa.
+    assert answers[1000.0] < saturation_Pa
+    if species == "Si":
+        assert answers[1e-31] == pytest.approx(saturation_Pa)
     for oxygen, pressure in answers.items():
-        assert pressure / answers[1e-9] == pytest.approx((oxygen / 1e-9) ** exponent)
+        expected = min(
+            answers[1000.0] * (oxygen / 1000.0) ** exponent,
+            saturation_Pa,
+        )
+        assert pressure == pytest.approx(expected)
     if route == "fallback":
         for oxygen in (1e-31, 1000.0):
             notice = receipts[oxygen]
@@ -124,6 +161,189 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
             assert notice["pO2_bar_used"] == oxygen
             assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
             assert notice["was_clamped"] is False
+
+
+def test_every_catalog_metal_saturation_pressure_resolves(
+    vapor_pressure_data,
+) -> None:
+    """Each metals-catalog row must provide an elemental saturation rail."""
+
+    from engines.builtin.sodium_saturation import (
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+
+    temperature_K = 1423.15
+    metals = vapor_pressure_data["metals"]
+    assert "Na" in metals
+    for species, row in metals.items():
+        pressure = ellingham_graph.metal_saturation_pressure_Pa(
+            species,
+            temperature_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        assert math.isfinite(pressure) and pressure >= 0.0, species
+        block = sodium_saturation_block(row)
+        if block is not None:
+            assert pressure == sodium_saturation_pressure(
+                block, temperature_K
+            ).pressure_pa
+
+
+@pytest.mark.parametrize("species", ("Mg", "Na", "K"))
+def test_elemental_metal_pressure_is_capped_at_pure_saturation(
+    vapor_pressure_data,
+    species,
+) -> None:
+    from engines.builtin.vapor_pressure import (
+        COEFF_BLOCK_PURE_COMPONENT,
+        vapor_pressure_antoine_coefficients,
+        wall_condensation_antoine_coefficients,
+    )
+
+    temperature_K = 1423.15
+    cap_notices = []
+    pressure = ellingham_graph._effective_equilibrium_pressure_Pa_with_notices(
+        species,
+        temperature_K,
+        1e-28,
+        vapor_pressure_data=vapor_pressure_data,
+        cap_notices=cap_notices,
+    )
+    pure_metal_saturation = ellingham_graph.metal_saturation_pressure_Pa(
+        species,
+        temperature_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    pure_antoine, coefficient_block = wall_condensation_antoine_coefficients(
+        vapor_pressure_data["metals"][species], temperature_K,
+    )
+    if species in {"Na", "K"}:
+        runtime_antoine, runtime_block = vapor_pressure_antoine_coefficients(
+            vapor_pressure_data["metals"][species], temperature_K,
+        )
+        assert runtime_block != coefficient_block
+        assert runtime_antoine != pure_antoine
+
+    assert coefficient_block == COEFF_BLOCK_PURE_COMPONENT
+    if species == "Na":
+        from engines.builtin.sodium_saturation import (
+            sodium_saturation_block,
+            sodium_saturation_pressure,
+        )
+
+        sodium_block = sodium_saturation_block(
+            vapor_pressure_data["metals"][species]
+        )
+        assert sodium_block is not None
+        assert pure_metal_saturation == sodium_saturation_pressure(
+            sodium_block, temperature_K
+        ).pressure_pa
+    else:
+        assert pure_metal_saturation == ellingham_graph._antoine_reference_pressure_Pa(
+            pure_antoine,
+            temperature_K,
+        )
+    if species == "Mg":
+        # The JANAF Mg(g)/MgO fit gives ΔG≈−877 kJ/mol O2 at 1423.15 K,
+        # hence K≈6.4e−33 bar. At pO2=1e-28 bar, a_M≈0.008 and p_Mg is
+        # below the pure-metal sidecar cap, so no cap notice is emitted.
+        assert pressure == pytest.approx(
+            799.6039375676731,
+            rel=1e-12,
+            abs=1e-12,
+        )
+        assert pressure < pure_metal_saturation
+        assert cap_notices == []
+    else:
+        assert pressure == pytest.approx(pure_metal_saturation)
+        assert type(pressure) is float
+        assert len(cap_notices) == 1
+        notice = cap_notices[0]
+        assert notice["code"] == "elemental_metal_saturation_cap"
+        assert notice["species"] == species
+        assert notice["uncapped_pressure_Pa"] > notice["capped_pressure_Pa"]
+        assert notice["capped_pressure_Pa"] == pressure
+
+
+@pytest.mark.parametrize(
+    ("species", "expected_pressure_pa"),
+    (("Cr", 48.022), ("Al", 3.495e-4), ("Ti", 1.685e-6), ("Mn", None)),
+    ids=("Cr", "Al", "Ti", "Mn"),
+)
+def test_liquid_oxide_source_rows_use_catalog_evaluator_or_refuse(
+    species,
+    expected_pressure_pa,
+):
+    catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
+    evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(species)
+    expected = evaluator.evaluate(
+        1873.15,
+        source_activity=1.0,
+        pO2_bar=1e-12,
+    ).pressure_pa
+    if expected_pressure_pa is not None:
+        assert expected == pytest.approx(expected_pressure_pa, rel=1e-3)
+    assert ellingham_graph.effective_equilibrium_pressure_Pa(
+        species,
+        1873.15,
+        1e-12,
+        vapor_pressure_data=catalog_payload,
+        a_oxide=1.0,
+    ) == pytest.approx(expected)
+
+    legacy_view = vapor_pressure_legacy_view(catalog_payload)
+    with pytest.raises(
+        ellingham_graph.EllinghamPressureRefusal,
+        match="requires a catalog melt-source evaluator",
+    ):
+        ellingham_graph.effective_equilibrium_pressure_Pa(
+            species,
+            1873.15,
+            1e-12,
+            vapor_pressure_data=legacy_view,
+            a_oxide=1.0,
+        )
+
+
+def test_cr_catalog_source_uses_callers_low_fo2_and_caps_pure_metal():
+    catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
+    temperature_K = 1423.15
+    caller_pO2_bar = 1e-28
+    source_activity = 1.0
+    evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(
+        "Cr"
+    )
+    uncapped_pressure = evaluator.evaluate(
+        temperature_K,
+        source_activity=source_activity,
+        pO2_bar=caller_pO2_bar,
+    ).pressure_pa
+    pure_metal_cap = ellingham_graph.metal_saturation_pressure_Pa(
+        "Cr",
+        temperature_K,
+        vapor_pressure_data=catalog_payload,
+    )
+
+    # The Cr2O3(s) Ellingham segment gives ΔG≈−508.0 kJ/mol O2 at 1423.15 K,
+    # so K≈2.3e−19 bar and the caller's 1e−28 bar input drives the liquid-Cr
+    # source reaction above its independent pure-metal saturation rail.
+    assert uncapped_pressure > pure_metal_cap
+    cap_notices = []
+    pressure = ellingham_graph._effective_equilibrium_pressure_Pa_with_notices(
+        "Cr",
+        temperature_K,
+        caller_pO2_bar,
+        vapor_pressure_data=catalog_payload,
+        a_oxide=source_activity,
+        cap_notices=cap_notices,
+    )
+    assert pure_metal_cap == pytest.approx(0.10679639619291863)
+    assert pressure == pytest.approx(pure_metal_cap)
+    assert type(pressure) is float
+    assert len(cap_notices) == 1
+    assert cap_notices[0]["uncapped_pressure_Pa"] == uncapped_pressure
+    assert cap_notices[0]["capped_pressure_Pa"] == pure_metal_cap
 
 
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
@@ -142,12 +362,13 @@ def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
         pO2_bar,
         vapor_pressure_data=vapor_pressure_data,
     )
-    assert not ellingham_graph.evolves(
-        "Ti",
-        T_K,
-        pO2_bar,
-        vapor_pressure_data=vapor_pressure_data,
-    )
+    with pytest.raises(ellingham_graph.EllinghamPressureRefusal):
+        ellingham_graph.evolves(
+            "Ti",
+            T_K,
+            pO2_bar,
+            vapor_pressure_data=vapor_pressure_data,
+        )
 
 
 def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
@@ -172,16 +393,17 @@ def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
     ) == pytest.approx(expected)
 
 
-def test_evolution_order_qualitative_pyrolysis_sequence(vapor_pressure_data) -> None:
+def test_evolution_order_qualitative_pyrolysis_sequence() -> None:
     # Representative mbar-sweep operating point in the Fe/SiO band.
     T_K = 1650.0
     pO2_bar = 1e-6
+    catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
     species = ("Na", "K", "Fe", "SiO", "Mg", "Ca", "Al", "Ti")
     ranked = ellingham_graph.evolution_order(
         T_K,
         pO2_bar,
         species,
-        vapor_pressure_data=vapor_pressure_data,
+        vapor_pressure_data=catalog_payload,
     )
     order = [entry.species for entry in ranked]
 
@@ -198,7 +420,7 @@ def test_evolution_order_qualitative_pyrolysis_sequence(vapor_pressure_data) -> 
         "Ti",
         T_K,
         pO2_bar,
-        vapor_pressure_data=vapor_pressure_data,
+        vapor_pressure_data=catalog_payload,
     )
 
 

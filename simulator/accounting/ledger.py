@@ -33,6 +33,7 @@ from simulator.account_ids import (
     ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
     SOLID_CHAR_CARBON_ACCOUNT,
 )
 
@@ -93,7 +94,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.stage0_salt_feed",
     "process.stage0_volatile_feed",
     "process.wall_deposit",
-    "reservoir.fo2_buffer",
+    OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     "reservoir.stage0_oxidant",
     "reservoir.stage0_process_gas",

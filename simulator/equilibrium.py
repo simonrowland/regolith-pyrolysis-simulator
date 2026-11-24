@@ -375,6 +375,10 @@ class EquilibriumMixin:
         (see the shared SiO pressure owner).  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
+        from simulator.chemistry.ellingham_graph import (
+            ElementalMetalSaturationCapNotice,
+            _cap_elemental_metal_pressure_at_saturation_Pa,
+        )
         from engines.builtin.vapor_pressure import (
             BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
             COEFF_BLOCK_ANTOINE,
@@ -440,6 +444,9 @@ class EquilibriumMixin:
             )
 
         vapor_pressures = {}
+        elemental_metal_saturation_caps: list[
+            ElementalMetalSaturationCapNotice
+        ] = []
         vapor_pressure_sources = {}
         activities = {}
         activity_provenance = {}
@@ -926,6 +933,13 @@ class EquilibriumMixin:
                         species=species,
                         field="P_effective_pO2",
                     )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                    notices=elemental_metal_saturation_caps,
+                )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
                     source_label = vapor_pressure_source_label(
@@ -1039,6 +1053,13 @@ class EquilibriumMixin:
                     P_eq_raw,
                     species=species,
                     field="P_effective_liquid_oxide_standard_reaction",
+                )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                    notices=elemental_metal_saturation_caps,
                 )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
@@ -1170,6 +1191,13 @@ class EquilibriumMixin:
                     P_eq_raw,
                     species=species,
                     field="P_effective_gas_rail_standard_reaction",
+                )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                    notices=elemental_metal_saturation_caps,
                 )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
@@ -1334,19 +1362,27 @@ class EquilibriumMixin:
             # --- Effective vapor pressure ---                     [ELLI-4]
             #
             # Condensed-basis rows produce a Raoultian activity against the
-            # pure-component vapor pressure and may saturate at a metal pool.
-            # Gas-basis rows already produce f_M/p°; multiplying by P_sat again
-            # would double-count the vaporization equilibrium.
+            # pure-component vapor pressure. Gas-basis rows already produce
+            # f_M/p° and convert directly to Pa.
             if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 P_effective_Pa = metal_activity_root * _ELLINGHAM_STANDARD_PRESSURE_PA
             else:
                 assert P_reference_Pa is not None
-                P_effective_Pa = min(metal_activity_root, 1.0) * P_reference_Pa
+                P_effective_Pa = (
+                    min(metal_activity_root, 1.0) * P_reference_Pa
+                )
 
             P_effective_Pa = _require_finite_vapor_value(
                 P_effective_Pa,
                 species=species,
                 field="P_effective_Pa",
+            )
+            P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                P_effective_Pa,
+                vapor_pressure_data=self.vapor_pressures,
+                notices=elemental_metal_saturation_caps,
             )
 
             if species in metal_extrapolations:
@@ -1579,6 +1615,10 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
+        if elemental_metal_saturation_caps:
+            _eq_diagnostics["elemental_metal_saturation_caps"] = [
+                dict(notice) for notice in elemental_metal_saturation_caps
+            ]
         # This completed path sets status='ok'; invalid T/P already returned
         # out_of_domain above. Merge every typed omission note into its result.
         if metal_saturation_floor_notice is not None:

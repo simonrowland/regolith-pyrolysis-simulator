@@ -26,6 +26,7 @@ DECLARED_ACCOUNTS = frozenset({
     "process.cleaned_melt",
     "terminal.drain_tap_material",
     "process.overhead_gas",
+    "reservoir.fo2_buffer",
 })
 METALLIC_TAP_DECLARED_ACCOUNTS = frozenset({
     "process.metal_phase",
@@ -52,7 +53,16 @@ PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
 }
 
 
-def _request(registry, accounts, native_fe_mol: float) -> IntentRequest:
+def _request(
+    registry,
+    accounts,
+    native_fe_mol: float | None = None,
+    *,
+    control_inputs: dict | None = None,
+) -> IntentRequest:
+    controls = dict(control_inputs or {})
+    if native_fe_mol is not None:
+        controls["native_fe_mol"] = native_fe_mol
     return IntentRequest(
         intent=ChemistryIntent.NATIVE_FE_SATURATION,
         account_view=ProviderAccountView(
@@ -61,7 +71,7 @@ def _request(registry, accounts, native_fe_mol: float) -> IntentRequest:
         ),
         temperature_C=1600.0,
         pressure_bar=1e-5,
-        control_inputs={"native_fe_mol": native_fe_mol},
+        control_inputs=controls,
     )
 
 
@@ -97,7 +107,7 @@ def test_provider_emits_only_declared_accounts(formula_registry):
 
     assert result.status == "ok"
     assert result.transition is not None
-    assert result.transition.accounts_touched() == DECLARED_ACCOUNTS
+    assert result.transition.accounts_touched() <= DECLARED_ACCOUNTS
     validate_proposal_accounts(
         result.transition,
         BuiltinNativeFeSaturationProvider().capability_profile().declared_accounts,
@@ -147,6 +157,7 @@ def test_native_fe_proposal_balances_atoms(formula_registry):
 
     assert result.status == "ok"
     assert result.transition is not None
+    assert result.transition.reason == "native_fe_saturation_split"
     assert dict(result.transition.debits) == {
         "process.cleaned_melt": {"FeO": 1.25},
     }
@@ -189,6 +200,136 @@ def test_native_fe_proposal_partitions_tap_and_vapor(formula_registry):
     assert result.diagnostic["tap_fe_credit_mol"] == pytest.approx(1.75)
     _atom_check(result.transition, formula_registry, tol=1e-12)
     validate_atom_balance(result.transition, formula_registry)
+
+
+def test_native_fe_alias_matches_per_oxide_extent_map(formula_registry):
+    accounts = {"process.cleaned_melt": {"FeO": 3.0}}
+    provider = BuiltinNativeFeSaturationProvider()
+    legacy = provider.dispatch(
+        _request(formula_registry, accounts, native_fe_mol=1.25)
+    )
+    mapped = provider.dispatch(
+        _request(
+            formula_registry,
+            accounts,
+            control_inputs={
+                "metal_extent_mol_by_oxide": {"FeO": 1.25},
+                "oxygen_account": "process.overhead_gas",
+            },
+        )
+    )
+
+    assert legacy.status == mapped.status == "ok"
+    assert legacy.transition is not None
+    assert mapped.transition is not None
+    assert legacy.transition.reason == "native_fe_saturation_split"
+    assert mapped.transition.reason == "melt_metal_saturation_buffer"
+    assert dict(legacy.transition.debits) == dict(mapped.transition.debits)
+    assert dict(legacy.transition.credits) == dict(mapped.transition.credits)
+    assert legacy.transition.credits["terminal.drain_tap_material"]["Fe"] == pytest.approx(
+        1.25
+    )
+    _atom_check(mapped.transition, formula_registry, tol=1e-12)
+
+
+def test_metal_extent_map_routes_ni_fe_and_oxygen_to_buffer(
+    formula_registry,
+):
+    result = BuiltinNativeFeSaturationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {
+                    "NiO": 2.0,
+                    "FeO": 2.0,
+                },
+            },
+            control_inputs={
+                "metal_extent_mol_by_oxide": {
+                    "NiO": 0.5,
+                    "FeO": 0.75,
+                },
+                "oxygen_account": "reservoir.fo2_buffer",
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.cleaned_melt": {
+            "NiO": 0.5,
+            "FeO": 0.75,
+        },
+    }
+    assert dict(result.transition.credits) == {
+        # CoO has no citable condensed formation segment, so only NiO and
+        # FeO contribute: each monoxide releases one half mol O2 per mol metal.
+        "reservoir.fo2_buffer": {"O2": 0.625},
+        "terminal.drain_tap_material": {
+            "Ni": 0.5,
+            "Fe": 0.75,
+        },
+    }
+    assert result.transition.accounts_touched() <= DECLARED_ACCOUNTS
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+    validate_atom_balance(result.transition, formula_registry)
+
+
+@pytest.mark.parametrize(
+    ("oxide", "extent", "available", "reason"),
+    [
+        ("NiO", -0.1, 1.0, "negative_metal_extent"),
+        ("NiO", 1.1, 1.0, "oxide_inventory_exceeded"),
+        ("CoO", 0.1, 1.0, "unsupported_oxide"),
+        ("Na2O", 0.1, 1.0, "unsupported_oxide"),
+    ],
+)
+def test_metal_extent_map_refuses_invalid_or_unsupported_oxide(
+    formula_registry,
+    oxide,
+    extent,
+    available,
+    reason,
+):
+    result = BuiltinNativeFeSaturationProvider().dispatch(
+        _request(
+            formula_registry,
+            {"process.cleaned_melt": {oxide: available}},
+            control_inputs={
+                "metal_extent_mol_by_oxide": {oxide: extent},
+                "oxygen_account": "reservoir.fo2_buffer",
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason"] == reason
+
+
+@pytest.mark.parametrize(
+    "oxygen_account",
+    ["process.cleaned_melt", "", None, 1],
+)
+def test_metal_extent_map_refuses_invalid_oxygen_account(
+    formula_registry,
+    oxygen_account,
+):
+    result = BuiltinNativeFeSaturationProvider().dispatch(
+        _request(
+            formula_registry,
+            {"process.cleaned_melt": {"NiO": 1.0}},
+            control_inputs={
+                "metal_extent_mol_by_oxide": {"NiO": 0.1},
+                "oxygen_account": oxygen_account,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason"] == "invalid_oxygen_account"
 
 
 def test_native_metal_proposal_partitions_without_creating_oxygen(formula_registry):

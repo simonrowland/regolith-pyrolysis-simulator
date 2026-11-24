@@ -84,6 +84,7 @@ def _equilibrium_consumer_view(result) -> dict:
         "activities_standard_state": vapor.get("activities_standard_state"),
         "pressure_omissions": vapor.get("below_reporting_threshold_omissions"),
         "floor_notices": vapor.get("pO2_floor_inversion_notices_by_species"),
+        "d207_notices": vapor.get("d207_notices"),
         "liquid_composition": getattr(result, "liquid_composition_wt_pct", {}),
         "fe_redox_split": getattr(result, "fe_redox_split", {}),
     }
@@ -135,11 +136,29 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
         assert _hot_consumer_view(EquilibrateCell.from_hot(payload)) == _hot_consumer_view(cold)
         assert engine_cache.engine_cache_counters()[engine_name]["hits"] == 1
         if engine_name == "internal-analytical":
-            assert json.loads(warm.vapor_pressure_backend_status_reason) == json.loads(
-                cold.vapor_pressure_backend_status_reason
-            )
+            cold_provenance = json.loads(cold.vapor_pressure_backend_status_reason)
+            warm_provenance = json.loads(warm.vapor_pressure_backend_status_reason)
+            d207_fields = {
+                "phase_basis_source",
+                "phase_basis_detail",
+                "phase_basis_notice",
+                "notices",
+            }
+            assert d207_fields.issubset(cold_provenance)
+            assert {name: warm_provenance[name] for name in d207_fields} == {
+                name: cold_provenance[name] for name in d207_fields
+            }
+            assert warm_provenance == cold_provenance
 
         result = results[-1]
+        if engine_name == "internal-analytical":
+            vapor_diagnostic = (
+                (getattr(result, "diagnostics", {}) or {}).get(
+                    "vapor_pressure_diagnostic"
+                )
+                or {}
+            )
+            assert isinstance(vapor_diagnostic.get("d207_notices"), list)
         engine_cache.cached_engine_call(
             engine_name, {"call": "equilibrium-consumer-view"},
             lambda: equilibrium_to_hot(vars(result), engine_id=engine_name),

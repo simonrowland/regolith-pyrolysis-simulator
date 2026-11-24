@@ -142,6 +142,11 @@ _NATIVE_OUTPUT_NUMBER_RE = re.compile(
 )
 
 
+def _inherit_process_group_for_worker_children() -> None:
+    """Keep nested engine workers in this worker's process group."""
+    os.environ[INHERIT_PROCESS_GROUP_ENV] = '1'
+
+
 def _next_engine_pool_seq() -> int:
     """Hand out the next per-process pool number (thread naming only)."""
     global _ENGINE_POOL_SEQ

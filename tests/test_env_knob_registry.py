@@ -22,15 +22,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-# t-1747 adds two reviewed sites to the 94-token count after removing two
-# local-alias tokens from scripts/grind_home.py. Removing the YAML cache's
-# per-process root assignment leaves 94 + 2 - 1 = 95.
-# The b265 cooling path adds one token: env = os.environ.copy() in
-# simulator/melt_backend/alphamelts.py gate_cooling_path. The ambient helper's
-# environment = os.environ token, and its .get("ALPHAMELTS_CALC_MODE"), were
-# already in the 95. The .get call is not itself an environ/getenv token.
-# 95 + 1 = 96.
-ENV_ACCESS_TOKEN_CEILING = 96
+# b271f's ceiling is 96 (t-1747, the YAML-cache removal, and the b265
+# cooling-path token). The pin car removes one token in
+# scripts/grid_pregrind.py and moves the process-group handoff token from
+# simulator/optimize/pool.py to simulator/engine_pool.py. 96 - 1 + 0 = 95.
+ENV_ACCESS_TOKEN_CEILING = 95
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep

@@ -107,7 +107,7 @@ ENGINE_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.ALPHAMELTS: _cell_quantities(vapour=True, thermo=frozenset()),
     Engine.THERMOENGINE: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
     Engine.MAGEMIN: _cell_quantities(vapour=False, thermo=PURE_PHASE_QUANTITIES),
-    Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=frozenset()),
+    Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
     Engine.INTERNAL_ANALYTICAL: _cell_quantities(
         vapour=True, thermo=ELLINGHAM_QUANTITIES | FUSION_QUANTITIES
     ),

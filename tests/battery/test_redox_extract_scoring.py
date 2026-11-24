@@ -290,7 +290,7 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
         total_flags += len(flags)
 
     assert len(results) == 18
-    assert total_flags == 130
+    assert total_flags == 166
 
 
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
@@ -307,9 +307,9 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     ]
     assert len(values) == 18
     encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
-    # Pinned with the declared OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 (pyproject.toml); under e975edd the digest is 12100581….
+    # Pinned with the declared OpenIMCC pin 9c327c2991fcc07b902019d26a8fe7cd25deb075 (pyproject.toml); under e975edd the digest is 12100581….
     assert hashlib.sha256(encoded).hexdigest() == (
-        "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
+        "cdbef7d7303e5c0dea58ff312dbdfa59dcaff988cb5417b1a11db2d825cea011"
     )
     for backlog in (
         score_module.notice_backlog(residuals),
@@ -318,7 +318,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         ),
     ):
         assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 142
+        assert backlog["engine_model_caveat"] == 178
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
@@ -459,11 +459,14 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
 def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
 
-    ``b1a7c34db`` ``predict_with_engine(OPENIMCC, row4)`` returns this
-    Decimal from ``openimcc.evaluate_redox`` on the printed mole-fraction
-    composition. The row is not a mass-percent stand-in. OpenIMCC must
-    not open or equilibrate a cell. The pack digest is the digest on the
-    result the scorer just stamped, not a host-specific literal.
+    ``8e1d1ef23d`` carries this receipt onto L after the OpenIMCC numeric
+    repin ``5c670398e0`` (``9c327c2``) and DG46 redox pack ``938c3e3717``;
+    that moved the Decimal from ``1.6414352204105178`` to
+    ``2.3552879363945403``. It comes from ``openimcc.evaluate_redox`` on
+    the printed mole-fraction composition. The row is not a mass-percent
+    stand-in. OpenIMCC must not open or equilibrate a cell. The pack digest
+    is the digest on the result the scorer just stamped, not a host-specific
+    literal.
     """
 
     pytest.importorskip("openimcc")
@@ -494,7 +497,7 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     prediction = predict_with_engine(Engine.OPENIMCC, row4)
 
     assert prediction.refusal_reason is None
-    assert prediction.value == Decimal("1.6414352204105178")
+    assert prediction.value == Decimal("2.3552879363945403")
     assert prediction.unit == "dimensionless"
     assert prediction.authority is Authority.BRIDGE
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"

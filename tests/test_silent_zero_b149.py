@@ -140,6 +140,7 @@ def test_kernel_ok_empty_note_on_diagnostic_surface() -> None:
         _vapor_pressure_dispatch_pO2_bar=lambda: 1e-12,
         _vapor_pressure_dispatch_intrinsic_fO2_log=lambda: None,
         _oxygen_numerical_floor_bar=lambda: 1e-12,
+        _melt_metal_saturation_fO2_floor_log=lambda _temperature_K: None,
     )
     if not hasattr(PyrolysisSimulator, "_refresh_vapor_pressures_from_kernel"):
         pytest.skip("kernel refresh helper unavailable")

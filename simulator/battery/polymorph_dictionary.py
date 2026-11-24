@@ -438,6 +438,22 @@ def lookup_janaf_crystal(formula: str, qualifier: str) -> Polymorph | None:
     return JANAF_CRYSTAL_DICTIONARY.get((formula_normalised(formula), qualifier))
 
 
+def polymorph_for_janaf_table_id(
+    formula: str, table_id: str | None
+) -> Polymorph | None:
+    """Resolve a JANAF table ID through the canonical crystal dictionary."""
+
+    if not isinstance(table_id, str) or not table_id.strip():
+        return None
+    from simulator.reference_data.janaf import formula_normalised
+
+    normalised_formula = formula_normalised(formula)
+    for row_formula, _qualifier, token, table_ids in _JANAF_CRYSTAL_ROWS:
+        if row_formula == normalised_formula and table_id in table_ids:
+            return token
+    return None
+
+
 def resolve_janaf_polymorph(
     *,
     formula: str,

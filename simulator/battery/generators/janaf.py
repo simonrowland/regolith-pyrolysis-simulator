@@ -3606,6 +3606,40 @@ def janaf_tabulated_gas_thermo(
     )
 
 
+def _janaf_gas_dfh298_kJ_per_mol(formula: str, table_id: str) -> Decimal | None:
+    """Return the exact 298.15 K formation-enthalpy cell for one gas source."""
+
+    if _janaf_gas_table_ids().get(formula) != (table_id,):
+        return None
+    rows, _digest = _checked_fusion_table_rows(table_id)
+    matches = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        enthalpy = row.get("formation_enthalpy")
+        temperature_value = (
+            temperature.get("value")
+            if isinstance(temperature, Mapping)
+            else None
+        )
+        enthalpy_value = (
+            enthalpy.get("value") if isinstance(enthalpy, Mapping) else None
+        )
+        if temperature_value is None or enthalpy_value is None:
+            continue
+        try:
+            temperature_K = Decimal(str(temperature_value))
+            enthalpy_kJ_mol = Decimal(str(enthalpy_value))
+        except (InvalidOperation, TypeError, ValueError):
+            return None
+        if temperature_K == Decimal("298.15"):
+            matches.append(enthalpy_kJ_mol)
+    if len(matches) != 1 or not matches[0].is_finite():
+        return None
+    return matches[0]
+
+
 def _janaf_gas_formation_gibbs_J_per_mol(
     formula: str, temperature_K: Decimal
 ) -> Decimal:

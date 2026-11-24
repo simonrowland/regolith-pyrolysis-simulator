@@ -47,6 +47,7 @@ import yaml
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from . import feo_standard as _feo_standard
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
@@ -324,6 +325,7 @@ from simulator.battery.validate import (
     ValidationIssue,
     _BOUND_WORK_INPUTS,
     _asset_ids,
+    _canonical_doi_source,
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
@@ -568,7 +570,8 @@ def _attempt_coefficient_sources(
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
-# IMCC consumes the SF04 magma companion workbook.
+# OpenIMCC row refs resolve through its packaged source declarations. Older
+# packs without those declarations retain their explicit version aliases.
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "nasa-glenn": ("nasa-glenn",),
@@ -586,10 +589,34 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": (SF04_WORKBOOK_SOURCE_ID,),
     "openimcc-v1.0.3-d066-ext-v1": (SF04_WORKBOOK_SOURCE_ID,),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-source-ref:DarkenGurry1946": ("doi:10.1021/ja01209a030",),
+    "openimcc-source-ref:FC87": ("doi:10.1016/j.icarus.2003.08.023",),
+    "openimcc-source-ref:Masson1965": ("doi:10.1098/rspa.1965.0176",),
+    "openimcc-source-ref:SF04": ("doi:10.1016/j.icarus.2003.08.023",),
+    "openimcc-source-ref:Shornikov2017": (
+        "doi:10.1134/s0036024417020303",
+    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
 )
+
+
+def _unmapped_coefficient_source_aliases(
+    sources: Sequence[str],
+) -> tuple[str, ...]:
+    """Name known source-alias shapes whose store mapping is missing."""
+
+    return tuple(
+        source
+        for source in coefficient_lineage_sources(sources)
+        if source not in COEFFICIENT_SOURCE_STORE_IDS
+        and (
+            source in _ENGINE_SOURCE_ALIASES
+            or source.startswith("openimcc-v")
+            or source.startswith("openimcc-source-ref:")
+        )
+    )
 
 # score_eligible conjuncts (v2.1 YAML score_eligible). Tests mutate each.
 SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
@@ -663,156 +690,7 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
-
-
-@dataclass(frozen=True)
-class _FeOActivityStandard:
-    name: str
-    offset_j_mol: Decimal
-
-
-_INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
-    name="JANAF-type",
-    offset_j_mol=Decimal(0),
-)
-_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.3-d066-v1"
-_OPENIMCC_DEFAULT_PACK_DIGEST = (
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
-)
-_OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
-)
-_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
-)
-_OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
-    name="JANAF-type",
-    offset_j_mol=Decimal(0),
-)
-
-
-def _source_value(sources: Sequence[str], prefix: str) -> str | None:
-    return next(
-        (source[len(prefix):] for source in sources if source.startswith(prefix)),
-        None,
-    )
-
-
-def _resolve_feo_activity_standard(
-    engine: Engine,
-    coefficient_sources: Sequence[str],
-) -> tuple[_FeOActivityStandard | None, ResidualRefusal | None]:
-    if engine is Engine.INTERNAL_ANALYTICAL:
-        return _INTERNAL_ANALYTICAL_FEO_STANDARD, None
-    if engine is not Engine.OPENIMCC:
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": "feo_activity_standard_not_declared",
-                "engine": engine.value,
-            },
-        )
-
-    condensate_digest = _source_value(
-        coefficient_sources,
-        "openimcc-condensate-table:sha256:",
-    )
-    if condensate_digest is not None and condensate_digest != (
-        _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
-    ):
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": "openimcc_feo_condensate_table_digest_mismatch",
-                "expected_condensate_table_digest": (
-                    _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
-                ),
-                "actual_condensate_table_digest": condensate_digest,
-            },
-        )
-
-    gas_load_failure = _source_value(
-        coefficient_sources,
-        "openimcc-gas-datapack-load-failure:",
-    )
-    if gas_load_failure is not None and condensate_digest is None:
-        return None, ResidualRefusal(
-            RefusalReason.METRIC_DOMAIN,
-            {
-                "reason": (
-                    "openimcc_feo_gas_datapack_load_failed_"
-                    "condensate_identity_missing"
-                ),
-                "gas_load_failure": gas_load_failure,
-                "missing_identity": "condensate_table_digest",
-            },
-        )
-
-    redox_pack_digest = _source_value(
-        coefficient_sources,
-        "openimcc-redox-pack:sha256:",
-    )
-    if redox_pack_digest is not None:
-        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {
-                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
-                    "expected_redox_pack_digest": (
-                        _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
-                    ),
-                    "actual_redox_pack_digest": redox_pack_digest,
-                },
-            )
-        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
-
-    pack_version = _source_value(
-        coefficient_sources,
-        "openimcc-pack-version:",
-    )
-    pack_digest = _source_value(
-        coefficient_sources,
-        "openimcc-pack-digest:",
-    )
-    if (
-        condensate_digest == _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
-        and pack_version == _OPENIMCC_DEFAULT_PACK_VERSION
-        and pack_digest == _OPENIMCC_DEFAULT_PACK_DIGEST
-    ):
-        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
-
-    return None, ResidualRefusal(
-        RefusalReason.METRIC_DOMAIN,
-        {
-            "reason": "feo_activity_standard_not_declared",
-            "engine": engine.value,
-            "profile": pack_version or "unknown",
-        },
-    )
-
-
-def _canonical_log10_feo_activity(
-    log10_engine_activity: Decimal,
-    temperature_K: Decimal,
-    offset_j_mol: Decimal,
-) -> Decimal:
-    """Convert one FeO activity from its engine standard to JANAF Fe-019."""
-
-    if offset_j_mol == 0:
-        return log10_engine_activity
-    # Premise: μ = μ° + RT ln a for the same FeO chemical potential. With
-    # offset = G°(FeO,l | engine) - G°(FeO,l | JANAF Fe-019), equating the two
-    # μ values gives ln(a_canon) = ln(a_engine) + offset/(RT), then dividing
-    # by ln(10) gives log10(a_canon) = log10(a_engine) + offset/(RT ln 10).
-    # Unit check: J/mol divided by (J/(mol K) × K × ln 10) is dimensionless;
-    # the ln-to-log10 conversion is the explicit ln(10) divisor. Sanity:
-    # +9701.7 J/mol at 1649.15 K gives +0.3073 dex.
-    denominator = (
-        Decimal(str(GAS_CONSTANT))
-        * temperature_K
-        * Decimal(10).ln()
-    )
-    return log10_engine_activity + offset_j_mol / denominator
+    provenance: Mapping[str, object] = field(default_factory=dict)
 
 
 def _canonicalize_feo_activity_prediction(
@@ -832,7 +710,19 @@ def _canonicalize_feo_activity_prediction(
     ):
         return prediction, None
 
-    standard, refusal = _resolve_feo_activity_standard(
+    temperature_K = temperature_of(comparison_identity)
+    if prediction.engine is Engine.OPENIMCC:
+        refusal = _feo_standard.openimcc_feo_activity_normalisation_refusal(
+            prediction.provenance.get("feo_standard_normalisation"),
+            prediction.provenance.get("melt_pack_identity"),
+            prediction.coefficient_sources,
+            temperature_K,
+        )
+        if refusal is not None:
+            return None, refusal
+        return prediction, None
+
+    standard, refusal = _feo_standard._resolve_feo_activity_standard(
         prediction.engine,
         prediction.coefficient_sources,
     )
@@ -841,8 +731,6 @@ def _canonicalize_feo_activity_prediction(
     assert standard is not None
     if standard.offset_j_mol == 0:
         return prediction, None
-
-    temperature_K = temperature_of(comparison_identity)
     if temperature_K is None or temperature_K <= 0:
         return None, ResidualRefusal(
             RefusalReason.METRIC_DOMAIN,
@@ -853,12 +741,73 @@ def _canonicalize_feo_activity_prediction(
         )
     if not prediction.value.is_finite() or prediction.value <= 0:
         return prediction, None
-    log10_canonical = _canonical_log10_feo_activity(
-        prediction.value.log10(),
-        temperature_K,
-        standard.offset_j_mol,
+    log10_canonical = _feo_standard._canonical_log10_feo_activity(
+        prediction.value.log10(), temperature_K, standard.offset_j_mol
     )
     return replace(prediction, value=Decimal(10) ** log10_canonical), None
+
+
+def _normalize_openimcc_feo_activity_prediction(
+    prediction: EnginePrediction,
+) -> EnginePrediction:
+    comparison_identity = prediction.identity
+    if (
+        prediction.engine is not Engine.OPENIMCC
+        or prediction.value is None
+        or not isinstance(comparison_identity, Identity)
+        or quantity_token(comparison_identity) is not Quantity.ACTIVITY
+        or comparison_identity.species is None
+        or comparison_identity.species.formula.strip().casefold() != "feo"
+    ):
+        return prediction
+    temperature_K = temperature_of(comparison_identity)
+    if temperature_K is None or temperature_K <= 0:
+        return replace(
+            prediction,
+            value=None,
+            authority=Authority.REFUSED,
+            refusal_reason=RefusalReason.METRIC_DOMAIN,
+            refusal_detail={"reason": "feo_activity_standard_temperature_missing"},
+        )
+    value, record, notice, refusal = _feo_standard.normalize_openimcc_feo_activity_value(
+        prediction.value,
+        prediction.coefficient_sources,
+        prediction.provenance.get("melt_pack_identity"),
+        temperature_K,
+    )
+    if refusal is not None:
+        return replace(
+            prediction,
+            value=None,
+            authority=Authority.REFUSED,
+            refusal_reason=refusal.reason,
+            refusal_detail=dict(refusal.detail),
+        )
+    assert value is not None and record is not None
+    authority = prediction.authority
+    certified_band = prediction.certified_band
+    if record.get("authority") == Authority.EXTRAPOLATED.value:
+        band = record["certified_band"]["temperature_K"]
+        assert isinstance(band, (list, tuple)) and len(band) == 2
+        authority = Authority.EXTRAPOLATED
+        certified_band = {
+            "temperature_K": (Decimal(str(band[0])), Decimal(str(band[1])))
+        }
+    return replace(
+        prediction,
+        value=value,
+        authority=authority,
+        certified_band=certified_band,
+        notices=union_notices(
+            prediction.notices,
+            (notice,) if notice is not None else (),
+        ),
+        provenance={
+            **prediction.provenance,
+            "melt_pack_identity": record["melt_pack_identity"],
+            "feo_standard_normalisation": record,
+        },
+    )
 
 
 def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
@@ -5856,12 +5805,11 @@ def _candidate_lineage_for_sources(
         if indexes is not None:
             indexes.candidate_lineages[source_key] = result
         return result
-    for src in lineage_sources:
-        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            result = (False, None)
-            if indexes is not None:
-                indexes.candidate_lineages[source_key] = result
-            return result
+    if _unmapped_coefficient_source_aliases(lineage_sources):
+        result = (False, None)
+        if indexes is not None:
+            indexes.candidate_lineages[source_key] = result
+        return result
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True, None
@@ -5921,6 +5869,33 @@ def resolve_source_relation(
     )
 
 
+def _reference_lineage_with_work_doi(
+    reference: Observation, indexes: _ValidationIndexes
+) -> Ancestry:
+    lineage = _observation_lineage(
+        reference.observation_id,
+        indexes.observations,
+        indexes.table_ids,
+        experiments=indexes.experiments,
+        asset_ids=indexes.asset_ids,
+        _cache=indexes.observation_lineages,
+    )
+    if not lineage.complete or lineage.ids is None:
+        return lineage
+    if indexes.works is None or indexes.experiments is None:
+        return lineage
+    experiment = indexes.experiments.get(reference.experiment_id)
+    work = None if experiment is None else indexes.works.get(experiment.work_id)
+    if work is None:
+        return lineage
+    ids = set(lineage.ids) | {work.work_id}
+    if work.doi:
+        doi_source = _canonical_doi_source(f"doi:{work.doi}".lower())
+        if doi_source is not None:
+            ids.add(doi_source)
+    return Ancestry.of(ids)
+
+
 def _resolve_source_relation_with_indexes(
     reference: Observation,
     coefficient_sources: Sequence[str],
@@ -5936,21 +5911,16 @@ def _resolve_source_relation_with_indexes(
     indexes = _indexes
     if indexes is None or not indexes.matches(works, observations, experiments):
         indexes = _build_validation_indexes(works, observations, experiments)
-    reference_lineage = _observation_lineage(
-        reference.observation_id,
-        observations,
-        indexes.table_ids,
+    reference_lineage = _reference_lineage_with_work_doi(reference, indexes)
+    candidate_complete, candidate_lineage = _candidate_lineage_for_sources(
+        coefficient_sources,
+        works=works,
+        observations=observations,
         experiments=experiments,
-        asset_ids=indexes.asset_ids,
-        _cache=indexes.observation_lineages,
-    )
-    candidate_lineage = _resolve_coefficient_sources(
-        coefficient_lineage_sources(coefficient_sources),
-        observations,
-        works,
-        experiments,
         _indexes=indexes,
     )
+    if not candidate_complete or candidate_lineage is None:
+        return SourceRelation.UNKNOWN
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
 
 
@@ -6011,18 +5981,9 @@ class _ScoringLineageResolver:
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
-        reference_lineage = self.indexes.observation_lineages.get(
-            reference.observation_id
+        reference_lineage = _reference_lineage_with_work_doi(
+            reference, self.indexes
         )
-        if reference_lineage is None:
-            reference_lineage = _observation_lineage(
-                reference.observation_id,
-                self.context.observations,
-                self.indexes.table_ids,
-                experiments=self.context.experiments,
-                asset_ids=self.indexes.asset_ids,
-                _cache=self.indexes.observation_lineages,
-            )
 
         if (
             not reference_lineage.complete
@@ -8361,9 +8322,7 @@ def cell_notices(
             )
     status_reason = getattr(cell, "vapor_pressure_backend_status_reason", None)
     backend_status = getattr(cell, "vapor_pressure_backend_status", None)
-    if backend_status == AUTHORITY_FALLBACK or status_reason == "fallback" or (
-        isinstance(status_reason, str) and "fallback" in status_reason
-    ):
+    if backend_status == AUTHORITY_FALLBACK:
         notices.append(
             Notice(
                 kind=NoticeKind.FALLBACK,
@@ -8725,6 +8684,42 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
         reason=reason,
         origin="score:predict_with_engine",
     )
+
+
+def _hashimoto_channel_omission_notices(
+    omissions: object, quantity: Quantity, *, origin: str
+) -> tuple[Notice, ...]:
+    """Keep each Hashimoto channel omission visible on its scored row."""
+
+    if not omissions:
+        return ()
+    if isinstance(omissions, Sequence) and not isinstance(omissions, (str, bytes)):
+        records = omissions
+    else:
+        records = ({"reason": "hashimoto_channel_omission_payload_invalid"},)
+    notices: list[Notice] = []
+    for record in records:
+        if isinstance(record, Mapping):
+            channel = record.get("channel")
+            reason = record.get("reason")
+            kind = record.get("kind")
+            if not isinstance(reason, str) or not reason:
+                reason = "hashimoto_channel_omission_reason_missing"
+            if kind not in {None, NoticeKind.INPUT_OMITTED.value}:
+                reason = f"untyped omission record ({kind!r}): {reason}"
+            if isinstance(channel, str) and channel:
+                reason = f"{channel}: {reason}"
+        else:
+            reason = f"hashimoto_channel_omission_record_invalid: {record!r}"
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(quantity,),
+                reason=reason,
+                origin=origin,
+            )
+        )
+    return tuple(notices)
 
 
 def _cell_oxygen_not_modelled_notice(
@@ -10018,12 +10013,16 @@ def _predict_distin_closed_feo_activity(
         identity,
         fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
     )
-    # The pinned openimcc/data/packs/openimcc-redox-v1.json:294-318 row names
-    # JANAF Fe-019 and embeds its FeO(l) coefficients; its redox-pack digest
-    # therefore guards the standard used by this closed-redox result.
+    # MELT owns the activity standard; the FeO standard owner validates that
+    # this redox pack's FeO(l) row is compatible with the returned MELT digest.
     coefficient_sources = [
         f"openimcc-redox-pack:sha256:{result.redox_pack_digest}"
     ]
+    if result.melt_pack_binding_digest:
+        coefficient_sources.append(
+            "openimcc-melt-binding:sha256:"
+            f"{result.melt_pack_binding_digest}"
+        )
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -10188,6 +10187,13 @@ def _predict_redox(
                 {"reason": "invalid_redox_composition", "detail": str(exc)},
             )
         candidate_fields = _openimcc_candidate_valence_fields(identity)
+        # The default d066-v4 melt pack uses DG46; the unversioned candidate
+        # redox pack uses Fe-019 and OpenIMCC now rejects that mixed basis.
+        candidate_redox_pack = (
+            "openimcc-redox-cr-ti-candidate-v4.json"
+            if candidate_fields is not None
+            else None
+        )
         redox_element = (
             identity.species.formula
             if candidate_fields is not None and identity.species is not None
@@ -10229,12 +10235,12 @@ def _predict_redox(
         redox_kwargs: dict[str, object] = {
             "lambda_imposed": float(fo2_log) * math.log(10.0)
         }
-        if candidate_fields is not None:
+        if candidate_redox_pack is not None:
             redox_kwargs["redox_pack_path"] = (
                 Path(openimcc.__file__).resolve().parent
                 / "data"
                 / "packs"
-                / "openimcc-redox-cr-ti-candidate.json"
+                / candidate_redox_pack
             )
         try:
             from simulator.melt_backend.openimcc_bridge import evaluate_redox
@@ -10305,8 +10311,8 @@ def _predict_redox(
             certified_band={"temperature_K": band},
             identity=prediction_identity,
             version=(
-                "openimcc-redox-cr-ti-candidate"
-                if candidate_fields is not None
+                candidate_redox_pack.removesuffix(".json")
+                if candidate_redox_pack is not None
                 else "openimcc-redox"
             ),
         )
@@ -10845,7 +10851,7 @@ def _oxygen_input_request(
     temperature_K: float | None = None,
     composition_wt: Mapping[str, float] | None = None,
     source_oxygen_bar: float | None = None,
-) -> "Po2Request | EnginePrediction":
+) -> Any:
     """The scorer's one oxygen-input decision.
 
     A printed identity fO2 is commanded as float(fO2_Pa)/1e5, the same
@@ -10998,7 +11004,7 @@ def _borrow_internal_analytical_effusion(
     handles: Mapping[str, object] | None,
     isolated: bool | None,
     notices: list[Notice],
-) -> "Po2Request | EnginePrediction":
+) -> Any:
     """Command the internal-analytical closure for an engine that cannot solve it.
 
     The solver stays in the internal-analytical adapter. This function reads
@@ -13421,7 +13427,7 @@ def predict_with_engine(
             handles and handles.get(Engine.INTERNAL_ANALYTICAL.value) is not None
         )
     if isinstance(handles, dict):
-        return _engine_prediction_or_unparseable_component(
+        prediction = _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -13432,11 +13438,12 @@ def predict_with_engine(
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
         )
+        return _normalize_openimcc_feo_activity_prediction(prediction)
 
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _engine_prediction_or_unparseable_component(
+        prediction = _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,
@@ -13447,6 +13454,7 @@ def predict_with_engine(
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
         )
+        return _normalize_openimcc_feo_activity_prediction(prediction)
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
             close_battery_engine_handles,
@@ -15651,10 +15659,21 @@ def _predict_with_engine(
     handle, _owns_handle = _open_cached_battery_handle(engine, handle_map)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
+    melt_pack_identity: dict[str, str] | None = None
     if engine is Engine.OPENIMCC:
         identity_block = getattr(handle, "identity", None) or {}
         if isinstance(identity_block, Mapping):
             engine_version = str(identity_block.get("version") or "") or None
+            if all(
+                isinstance(identity_block.get(key), str)
+                and identity_block.get(key)
+                for key in ("model_id", "pack_version", "pack_digest")
+            ):
+                melt_pack_identity = {
+                    "model_id": str(identity_block["model_id"]),
+                    "pack_version": str(identity_block["pack_version"]),
+                    "binding_digest": str(identity_block["pack_digest"]),
+                }
             provenance = (
                 ("openimcc-pack-version", identity_block.get("pack_version")),
                 ("openimcc-pack-digest", identity_block.get("pack_digest")),
@@ -15664,7 +15683,8 @@ def _predict_with_engine(
                     [
                         *sources,
                         *openimcc_pack_coefficient_sources(
-                            identity_block.get("pack_version")
+                            identity_block.get("pack_version"),
+                            identity_block.get("pack_digest"),
                         ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
@@ -16823,6 +16843,11 @@ def _predict_with_engine(
         ),
         requested_composition=requested,
         version=engine_version,
+        provenance=(
+            {}
+            if melt_pack_identity is None
+            else {"melt_pack_identity": melt_pack_identity}
+        ),
     )
 
 
@@ -16840,16 +16865,21 @@ def candidate_observation(
         )
     else:
         value = Value.point_of(prediction.value)
-    provenance = (
-        dict(prediction.refusal_detail)
-        if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and prediction.value is not None
-        else (
-            {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
-            if reference.provenance and "source_oxygen_condition" in reference.provenance
-            else None
-        )
+    provenance: dict[str, object] | None = (
+        dict(prediction.provenance) if prediction.provenance else None
     )
+    if (
+        quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and prediction.value is not None
+    ):
+        provenance = {**(provenance or {}), **prediction.refusal_detail}
+    elif reference.provenance and "source_oxygen_condition" in reference.provenance:
+        provenance = {
+            **(provenance or {}),
+            "source_oxygen_condition": reference.provenance[
+                "source_oxygen_condition"
+            ],
+        }
     selected_oxygen = _selected_shared_ladder_oxygen(prediction)
     if selected_oxygen is not None:
         if provenance is None:
@@ -17130,7 +17160,10 @@ def _hashimoto_residue_prediction(
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
-                primary_provenance.get("datapack_version")
+                primary_provenance.get("datapack_version"),
+                primary_provenance.get("pack_digest", {}).get("melt_datapack")
+                if isinstance(primary_provenance.get("pack_digest"), Mapping)
+                else None,
             ),
             *openimcc_engine_identity_sources(
                 primary_provenance.get("engine_binding_identity")
@@ -17262,6 +17295,20 @@ def _hashimoto_residue_prediction(
             _hashimoto_engine_floor_inversion_notices(
                 engine,
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
+            )
+        )
+        notices.extend(
+            _hashimoto_channel_omission_notices(
+                primary_provenance.get("gas_channel_omissions"),
+                reported_quantity,
+                origin="hashimoto-openimcc-gas-channel",
+            )
+        )
+        notices.extend(
+            _hashimoto_channel_omission_notices(
+                production.provenance.get("runtime_catalog_omissions"),
+                reported_quantity,
+                origin="hashimoto-runtime-catalog",
             )
         )
         surface_floor = primary_provenance.get("surface_pO2_balance_floor")
@@ -17877,10 +17924,14 @@ def _sossi_residue_prediction(
                 f"no positive Sossi {formula} prediction",
             )
         provenance = dict(prediction.provenance)
+        melt_pack_identity = provenance.get("melt_pack_identity")
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
-                provenance.get("datapack_version")
+                provenance.get("datapack_version"),
+                melt_pack_identity.get("pack_digest")
+                if isinstance(melt_pack_identity, Mapping)
+                else None,
             ),
             *openimcc_engine_identity_sources(
                 provenance.get("engine_binding_identity")
@@ -19029,6 +19080,17 @@ def _compile_residual_with_lineage(
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
     prediction_sources = tuple(prediction.coefficient_sources)
+    unmapped_aliases = _unmapped_coefficient_source_aliases(prediction_sources)
+    if engine is Engine.OPENIMCC and unmapped_aliases:
+        return _refused(
+            RefusalReason.LINEAGE_UNKNOWN,
+            {
+                "reason": "openimcc_pack_coefficient_source_alias_missing",
+                "coefficient_source_aliases": unmapped_aliases,
+            },
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+        )
     expanded_sources = expand_coefficient_sources(prediction_sources)
     lineage_complete = (
         _candidate_lineage_for_sources(

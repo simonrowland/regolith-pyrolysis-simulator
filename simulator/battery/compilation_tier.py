@@ -35,6 +35,7 @@ from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.source_declarations import B677_SOURCE_ID, SOURCE_DECLARATIONS
 from simulator.battery.engine_capability import (
     ELLINGHAM_QUANTITIES as _ENGINE_ELLINGHAM_QUANTITIES,
+    PURE_PHASE_QUANTITIES as _ENGINE_PURE_PHASE_QUANTITIES,
     THERMO_QUANTITIES as _THERMO_QUANTITIES,
     engine_thermo_quantities as _engine_thermo_quantities,
 )
@@ -74,6 +75,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.polymorph_dictionary import (
     canonical_element_allotrope,
+    polymorph_for_janaf_table_id,
     unrecognised_polymorph_spelling,
 )
 from simulator.battery.records import (
@@ -2573,6 +2575,397 @@ def _pure_phase_attempt(
     )
 
 
+def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
+    identity = observation.identity
+    origin = observation.observation_id
+    quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if not isinstance(identity, Identity) or quantity is None:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "quantity-unknown",
+            quantity=Quantity.DELTA_FG,
+            origin=origin,
+            extra={"engine": Engine.OPENIMCC.value},
+        )
+
+    def refuse(
+        reason: RefusalReason,
+        code: str,
+        extra: dict[str, object] | None = None,
+        *,
+        evidence: str = "openimcc.species_thermo",
+    ) -> ThermoAttempt:
+        return _refuse(
+            reason, code, quantity=quantity, origin=origin, extra=extra,
+            call_evidence=evidence,
+        )
+
+    if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "apparent-gibbs-is-not-delta-fG",
+            {"engine": Engine.OPENIMCC.value},
+        )
+    if quantity is Quantity.DELTA_FH:
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "apparent-enthalpy-is-not-delta-fH",
+            {"engine": Engine.OPENIMCC.value},
+        )
+    if quantity not in _ENGINE_PURE_PHASE_QUANTITIES:
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "engine-thermo-does-not-emit",
+            {"engine": Engine.OPENIMCC.value},
+        )
+    if identity.species is None:
+        return refuse(RefusalReason.IDENTITY_UNKNOWN, "species-unknown")
+    per = _state_value(identity.per)
+    if per is not PerBasis.MOL_SPECIES:
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-per-basis-mismatch",
+            {
+                "engine": Engine.OPENIMCC.value,
+                "expected_per": PerBasis.MOL_SPECIES.value,
+                "actual_per": getattr(per, "value", None),
+            },
+        )
+
+    _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
+    formula = identity.species.formula
+    if parse_species_formula(formula, species=identity.species) is None:
+        return refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "species-formula-unparsed",
+            {"formula": formula},
+        )
+    phase = phase_token(identity.species)
+    if phase not in {Phase.G, Phase.L, Phase.CR}:
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-phase-unsupported",
+            {"engine": Engine.OPENIMCC.value, "phase": getattr(phase, "value", None)},
+        )
+    if phase is Phase.CR and polymorph_token(identity.species) is None:
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-polymorph-unresolved",
+            {"engine": Engine.OPENIMCC.value, "formula": formula},
+        )
+
+    temperature = identity.temperature_K
+    if not isinstance(temperature, State) or not temperature.is_value or temperature.value is None:
+        return refuse(RefusalReason.IDENTITY_UNKNOWN, "temperature-unknown")
+    temperature_K = as_decimal(temperature.value)
+    if not temperature_K.is_finite() or temperature_K <= 0:
+        return refuse(RefusalReason.INVALID_IDENTITY, "temperature-not-positive")
+    t_ref_K = None
+    declared_anchor = ""
+    if quantity is Quantity.H_MINUS_H298:
+        accepted = _accepted_enthalpy_anchor(
+            identity, engine=Engine.OPENIMCC, quantity=quantity, origin=origin
+        )
+        if isinstance(accepted, ThermoAttempt):
+            return accepted
+        t_ref_K, declared_anchor = accepted
+
+    from simulator.melt_backend import openimcc_bridge
+
+    phase_label = phase.value
+
+    def native_call(call_temperature_K: Decimal) -> Mapping[str, object] | ThermoAttempt:
+        try:
+            result = openimcc_bridge.species_thermo(
+                formula,
+                phase_label,
+                float(call_temperature_K),
+                allow_extrapolation=True,
+            )
+        except Exception as exc:  # OpenIMCC engine boundary
+            if type(exc).__name__ in {
+                "ImccGasTemperatureOutsideDomainError",
+                "ImccTOutsideDatapackDomainError",
+            }:
+                interval = getattr(exc, "declared_interval_K", None)
+                if not isinstance(interval, (tuple, list)):
+                    interval = getattr(exc, "T_interval", None)
+                if not isinstance(interval, (tuple, list)):
+                    low = getattr(exc, "T_min", None)
+                    high = getattr(exc, "T_max", None)
+                    interval = None if low is None or high is None else (low, high)
+                interval_lookup_error = None
+                if phase is Phase.CR and not isinstance(interval, (tuple, list)):
+                    try:
+                        interval = (
+                            openimcc_bridge._species_thermo_crystal_declared_interval(
+                                formula, float(call_temperature_K)
+                            )
+                        )
+                    except Exception as lookup_exc:  # preserve typed refusal below
+                        interval_lookup_error = (
+                            f"{type(lookup_exc).__name__}: {lookup_exc}"
+                        )
+                if (
+                    phase is not Phase.CR
+                    and not isinstance(interval, (tuple, list))
+                ):
+                    bounds = re.search(r"\[([^,\]]+),\s*([^\]]+)\]", str(exc))
+                    if bounds is not None:
+                        low = _finite_number(bounds.group(1))
+                        high = _finite_number(bounds.group(2))
+                        interval = None if low is None or high is None else (low, high)
+                row_id = getattr(exc, "source_row_id", getattr(exc, "row_id", None))
+                detail = {
+                    "species": formula,
+                    "phase": phase_label,
+                    "requested_T_K": str(call_temperature_K),
+                    "declared_interval_K": None if interval is None else list(interval),
+                    "source_row_id": row_id,
+                    "upstream_error": f"{type(exc).__name__}: {exc}",
+                }
+                if interval_lookup_error is not None:
+                    detail["declared_interval_lookup_error"] = interval_lookup_error
+                return refuse(
+                    RefusalReason.UNSUPPORTED,
+                    "openimcc_species_thermo_outside_interval",
+                    detail,
+                )
+            if (
+                isinstance(exc, KeyError)
+                or type(exc).__name__ == "ImccGasSpeciesNotFoundError"
+            ):
+                return refuse(
+                    RefusalReason.UNSUPPORTED, "openimcc_species_missing",
+                    {"species": formula, "phase": phase_label},
+                )
+            from simulator.melt_backend.openimcc_bridge import OpenImccUnavailableError
+
+            return refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc_species_thermo_unavailable",
+                {"species": formula, "phase": phase_label, "detail": str(exc),
+                 "dependency_unavailable": isinstance(exc, OpenImccUnavailableError)},
+            )
+        if not isinstance(result, Mapping):
+            return refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc_species_thermo_result_invalid",
+                {"species": formula, "phase": phase_label},
+            )
+        return result
+
+    props = native_call(temperature_K)
+    if isinstance(props, ThermoAttempt):
+        return props
+    row_id = props.get("source_row_id")
+    table_id = props.get("source_table_id")
+    low, high = _finite_number(props.get("T_min")), _finite_number(props.get("T_max"))
+    derivatives_fit = props.get("derivatives_fit_implied")
+    extrapolated = props.get("extrapolated")
+    declared_interval = props.get("declared_interval_K")
+    continuation = props.get("continuation")
+    native_authority = props.get("authority")
+    if (
+        not isinstance(row_id, str)
+        or not row_id
+        or not isinstance(table_id, str)
+        or not table_id
+    ):
+        return refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "openimcc_species_thermo_provenance_missing",
+        )
+    source_dfh298_J_mol = None
+    if phase is Phase.G and row_id == table_id:
+        try:
+            from simulator.battery.generators.janaf import (
+                _janaf_gas_dfh298_kJ_per_mol,
+            )
+
+            source_dfh298_kJ_mol = _janaf_gas_dfh298_kJ_per_mol(
+                formula, table_id
+            )
+            if source_dfh298_kJ_mol is not None:
+                source_dfh298_J_mol = float(source_dfh298_kJ_mol * 1000)
+        except (ImportError, OSError, ValueError):
+            source_dfh298_J_mol = None
+    if (
+        low is None
+        or high is None
+        or low > high
+        or not isinstance(derivatives_fit, bool)
+    ):
+        return refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "openimcc_species_thermo_provenance_incomplete",
+            {"species": formula, "phase": phase_label, "source_row_id": row_id},
+        )
+    if not isinstance(extrapolated, bool):
+        return refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "openimcc_species_thermo_extrapolation_status_missing",
+            {"species": formula, "phase": phase_label, "source_row_id": row_id},
+        )
+    if extrapolated:
+        if (
+            not isinstance(declared_interval, (tuple, list))
+            or len(declared_interval) != 2
+            or _finite_number(declared_interval[0]) is None
+            or _finite_number(declared_interval[1]) is None
+            or not isinstance(continuation, str)
+            or not continuation.strip()
+            or not isinstance(native_authority, str)
+            or not native_authority.strip()
+        ):
+            return refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc_species_thermo_extrapolation_notice_incomplete",
+                {"species": formula, "phase": phase_label, "source_row_id": row_id},
+            )
+    evidence = (
+        f"openimcc.species_thermo:{formula}:source_row_id={row_id}:"
+        f"source_table_id={table_id}:phase={phase_label}:"
+        f"interval=[{props.get('T_min')},{props.get('T_max')}]:"
+        f"derivatives_fit_implied={derivatives_fit}"
+    )
+    extrapolation_notices: tuple[Notice, ...] = ()
+    result_authority = Authority.BRIDGE
+    if extrapolated:
+        declared_low, declared_high = declared_interval
+        extrapolation_notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=(
+                    "openimcc_species_thermo_extrapolated; "
+                    f"continuation={continuation}; authority={native_authority}"
+                ),
+                origin=origin,
+                band=f"declared_interval_K=[{declared_low}, {declared_high}]",
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+        result_authority = Authority.EXTRAPOLATED
+
+    identity_poly = _poly_name(identity)
+    if phase is Phase.CR and identity_poly is not None:
+        # OpenIMCC's crystal rows identify the JANAF table rather than a
+        # polymorph label. Resolve that table through the canonical dictionary
+        # before comparing it with the requested named crystal.
+        source_polymorph = polymorph_for_janaf_table_id(formula, row_id)
+        if not _same_mineral(source_polymorph, identity_poly):
+            return refuse(
+                RefusalReason.UNSUPPORTED,
+                "pure-phase-polymorph-unresolved",
+                {"engine": Engine.OPENIMCC.value, "formula": formula,
+                 "polymorph": identity_poly, "source_row_id": row_id,
+                 "source_table_id": table_id},
+                evidence=evidence,
+            )
+
+    field = {Quantity.CP: "Cp_J_molK", Quantity.S: "S_J_molK"}.get(quantity)
+    if field is not None:
+        value = _finite_number(props.get(field))
+        if value is None:
+            return refuse(
+                RefusalReason.UNSUPPORTED, "pure-phase-property-absent",
+                {"engine": Engine.OPENIMCC.value, "property": field}, evidence=evidence,
+            )
+        value = as_decimal(str(value))
+        if quantity is Quantity.S and phase is Phase.G:
+            value, refusal = _apply_printed_entropy_shift(
+                value,
+                identity,
+                quantity=quantity,
+                origin=origin,
+                call_evidence=evidence,
+                engine=Engine.OPENIMCC,
+            )
+            if refusal is not None:
+                return refusal
+        return ThermoAttempt(
+            value=value, unit=QUANTITY_UNITS[quantity],
+            authority=result_authority, notices=extrapolation_notices,
+            refusal_reason=None,
+            refusal_detail={}, call_evidence=evidence,
+        )
+
+    h_target = _finite_number(props.get("H_app_kJ_mol"))
+    if h_target is None or t_ref_K is None:
+        return refuse(
+            RefusalReason.UNSUPPORTED, "pure-phase-property-absent",
+            {"engine": Engine.OPENIMCC.value, "property": "H"}, evidence=evidence,
+        )
+    reference_call_required = (
+        phase is not Phase.G or t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K
+    )
+    if reference_call_required and (
+        float(t_ref_K) < low or float(t_ref_K) > high
+    ):
+        return refuse(
+            RefusalReason.UNSUPPORTED,
+            "openimcc_reference_temperature_not_covered",
+            {"engine": Engine.OPENIMCC.value, "species": formula,
+             "phase": phase_label, "T_ref_K": str(t_ref_K),
+             "declared_interval_K": [props.get("T_min"), props.get("T_max")],
+             "source_row_id": row_id, "source_table_id": table_id,
+             "actual_anchor": declared_anchor},
+            evidence=evidence,
+        )
+
+    dfh298 = _finite_number(source_dfh298_J_mol) if phase is Phase.G else None
+    if phase is Phase.G and dfh298 is None:
+        return refuse(
+            RefusalReason.UNSUPPORTED, "openimcc_source_enthalpy_anchor_missing",
+            {"species": formula, "phase": phase_label, "source_row_id": row_id},
+            evidence=evidence,
+        )
+    anchor_kJ = (
+        Decimal(0)
+        if dfh298 is None
+        else as_decimal(str(dfh298)) / Decimal(1000)
+    )
+    h_reference_increment = Decimal(0)
+    if reference_call_required:
+        reference = native_call(t_ref_K)
+        if isinstance(reference, ThermoAttempt):
+            return reference
+        if (
+            reference.get("source_row_id") != row_id
+            or reference.get("source_table_id") != table_id
+        ):
+            return refuse(
+                RefusalReason.UNSUPPORTED,
+                "openimcc_enthalpy_reference_source_mismatch",
+                {"species": formula, "phase": phase_label,
+                 "source_row_id": row_id,
+                 "reference_source_row_id": reference.get("source_row_id")},
+                evidence=evidence,
+            )
+        h_reference = _finite_number(reference.get("H_app_kJ_mol"))
+        if h_reference is None:
+            return refuse(
+                RefusalReason.UNSUPPORTED, "openimcc_reference_enthalpy_absent",
+                {"species": formula, "phase": phase_label, "source_row_id": row_id},
+                evidence=evidence,
+            )
+        h_reference_increment = as_decimal(str(h_reference)) - anchor_kJ
+
+    # Premise: gas H_app contains source dfH298; condensate rows need a
+    # same-phase H_app(T_ref) call within that row's interval. Algebra for
+    # gas: H(T)-H(T_ref) = [H_app(T)-dfH298] - [H_app(T_ref)-dfH298]. For
+    # condensates, subtract the same-source H_app(T_ref), so its stable-phase
+    # anchor cancels. Units: H_app is kJ/mol and dfH298 is J/mol; divide the
+    # gas anchor by 1000. Sanity: 3.0 kJ/mol - 1000 J/mol / 1000 = 2.0 kJ/mol.
+    value = as_decimal(str(h_target)) - anchor_kJ - h_reference_increment
+    return ThermoAttempt(
+        value=value, unit=QUANTITY_UNITS[quantity], authority=result_authority,
+        notices=extrapolation_notices, refusal_reason=None, refusal_detail={},
+        call_evidence=f"{evidence}:H(T)-H(T_ref)",
+    )
+
+
 def _janaf_catalog_standard_pressure_Pa() -> Decimal | None:
     """Published JANAF p° from the generator that writes the catalog identity.
 
@@ -2614,6 +3007,7 @@ def _apply_printed_entropy_shift(
     quantity: Quantity,
     origin: str,
     call_evidence: str,
+    engine: Engine = Engine.VAPOROCK,
 ) -> tuple[Decimal, ThermoAttempt | None]:
     """S on the printed pressure, or a refusal. Other quantities are unchanged.
 
@@ -2637,7 +3031,7 @@ def _apply_printed_entropy_shift(
             why or "standard-pressure-unknown",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value},
+            extra={"engine": engine.value},
             call_evidence=call_evidence,
         )
     if shift == 0:
@@ -2649,7 +3043,7 @@ def _apply_printed_entropy_shift(
             "nonfinite-engine-value",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value},
+            extra={"engine": engine.value},
             call_evidence=call_evidence,
         )
     return shifted, None
@@ -3534,6 +3928,8 @@ def predict_thermo_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
+    if engine is Engine.OPENIMCC:
+        return _openimcc_species_thermo_attempt(observation)
     if not isinstance(identity, Identity) or quantity is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,

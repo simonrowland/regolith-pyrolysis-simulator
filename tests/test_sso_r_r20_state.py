@@ -1481,6 +1481,9 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     sim.melt.campaign = CampaignPhase.C3_NA
     sim.melt.temperature_C = 1150.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -11.0
+    # This explicitly seeded fO2 is already at the current state temperature;
+    # do not tag it with a reference temperature below Kress91's 1200 C floor.
+    sim.melt.oxygen_reservoir.reference_T_K = None
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]

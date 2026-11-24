@@ -14,21 +14,21 @@ class BuiltinBackendEquilibriumProvider(ChemistryProvider):
     """Declares account authority for validated backend equilibrium commits."""
 
     name = "builtin-backend-equilibrium"
-    DECLARED_ACCOUNTS = frozenset({
-        "process.cleaned_melt",
-        "process.metal_phase",
-        "process.overhead_gas",
-        "reservoir.fo2_buffer",
-    })
-
     def capability_profile(self) -> CapabilityProfile:
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
+
         return CapabilityProfile(
             provider_id=self.name,
             intents=frozenset({ChemistryIntent.BACKEND_EQUILIBRIUM}),
             is_authoritative_for=frozenset({
                 ChemistryIntent.BACKEND_EQUILIBRIUM
             }),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=frozenset({
+                "process.cleaned_melt",
+                "process.metal_phase",
+                "process.overhead_gas",
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+            }),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

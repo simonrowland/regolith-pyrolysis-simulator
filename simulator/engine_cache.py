@@ -480,7 +480,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
+    "openimcc": 4,
     "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 4,
@@ -498,10 +498,15 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
-# openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# openimcc v1: 2026-11-08 initial cache version at OpenIMCC 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84.
+# Species-local pin moves stay on v1; the live commit comes from
+# ENGINE_CHEMISTRY_VERSION_IDENTITY_AT["openimcc"].
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# openimcc v2: 2026-11-17 OpenIMCC 9c327c2: binary-pot oxygen balance and residue, Knudsen, mass-loss and Hashimoto runtimes consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
+# openimcc v3: 2026-11-19 OpenIMCC 979adb2 and species_thermo scoring (d-446)
+# openimcc v4: 2026-11-22 OpenIMCC bae51f7: JANAF crystal fallback, S/Sr metastable caps and R&H As/Sb/Sn/Te/Ce
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
 # internal-analytical v4: 2026-11-23 Markova car 2 - preserve the Fe speciation consumed by residue oxygen balance. If b-1124's v4 also lands, the train re-bumps to max+1.
@@ -658,8 +663,8 @@ def species_from_natural_key(key: bytes) -> frozenset[str] | None:
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
-        "date": "2026-11-08",
+        "identity": "commit:7cf98e62812b6a338158f6c7568e6f373c473056",
+        "date": "2026-11-23",
     },
     "internal-analytical": {
         "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
@@ -683,7 +688,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
 }
 
-OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
+OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2bec587e444805a7bd6ec091308c00c88840357191d2e3d27dfee37fc99581af"
 
 _TABLE = "engine_outputs"
 _SPECIES_TABLE = "engine_output_species"
