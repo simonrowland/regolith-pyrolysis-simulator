@@ -5234,9 +5234,12 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version(
         assert db_path is not None
         _set_pt1_payload_codec_version(db_path, key_hash, row_version)
 
+    miss_store = (
+        PT0DeterminismStore("replay", db_path=db_path) if persistent else store
+    )
     with pytest.raises(PT0CacheMiss):
-        store._lookup("freeze_gate_curve", key)
-    assert store.hits == 0
+        miss_store._lookup("freeze_gate_curve", key)
+    assert miss_store.hits == 0
 
     store._store("freeze_gate_curve", key, current_payload, law_disclosures=[])
     entry = store._entries[key_hash]
@@ -5275,9 +5278,14 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
         assert db_path is not None
         _set_pt1_payload_codec_version(db_path, key_hash, row_version)
 
+    miss_store = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
     with pytest.raises(PT0CacheMiss):
-        capture._lookup("equilibrium_post_record", key, sim=sim)
-    assert capture.hits == 0
+        miss_store._lookup("equilibrium_post_record", key, sim=sim)
+    assert miss_store.hits == 0
 
     capture.capture_equilibrium(sim, result)
     entry = capture._entries[key_hash]

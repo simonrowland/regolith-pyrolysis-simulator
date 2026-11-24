@@ -177,17 +177,18 @@ def _decode_payload_for_admission(
     artifact: str,
     payload: Any,
     *,
+    payload_codec_version: int | None = None,
     keys: Sequence[Mapping[str, Any]] = (),
 ) -> Any | None:
     expected_version = _payload_codec_version(artifact)
     if expected_version is None:
         return payload
-    if not isinstance(payload, Mapping):
+    if (
+        type(payload_codec_version) is not int
+        or payload_codec_version != expected_version
+    ):
         return None
-    # Current payloads stay markerless to preserve their reviewed bytes. If a
-    # row carries a codec marker, admission compares that row value directly.
-    row_version = payload.get("payload_codec_version", expected_version)
-    if type(row_version) is not int or row_version != expected_version:
+    if not isinstance(payload, Mapping):
         return None
     if artifact == "freeze_gate_curve":
         curve_payload = payload.get("curve")
@@ -1251,6 +1252,7 @@ class PT0DeterminismStore:
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
+        payload_codec_version = _payload_codec_version(artifact)
         repair_notices_json = encode_repair_notices_json(repair_notices)
         key_hash = _sha256(key_bytes)
         payload_hash = _sha256(payload_bytes)
@@ -1271,6 +1273,7 @@ class PT0DeterminismStore:
             and _decode_payload_for_admission(
                 artifact,
                 existing.get("payload"),
+                payload_codec_version=existing.get("payload_codec_version"),
                 keys=(key,),
             ) is None
         )
@@ -1333,6 +1336,7 @@ class PT0DeterminismStore:
             "key_bytes": key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(payload)),
             "payload_hash": payload_hash,
+            "payload_codec_version": payload_codec_version,
             "repair_notices_json": effective_notices_json,
             "law_disclosures": incoming_disclosures,
             "physics_bucket_key": copy.deepcopy(dict(physics_bucket_key)),
@@ -1384,6 +1388,7 @@ class PT0DeterminismStore:
             decoded = _decode_payload_for_admission(
                 artifact,
                 entry.get("payload"),
+                payload_codec_version=entry.get("payload_codec_version"),
                 keys=(key,),
             )
             if decoded is None:
@@ -1461,6 +1466,7 @@ class PT0DeterminismStore:
                 _decode_payload_for_admission(
                     artifact,
                     entry.get("payload"),
+                    payload_codec_version=entry.get("payload_codec_version"),
                     keys=(candidate_key,),
                 )
                 if entry is not None
@@ -1638,6 +1644,7 @@ class PT0DeterminismStore:
             decoded = _decode_payload_for_admission(
                 artifact,
                 entry.get("payload"),
+                payload_codec_version=entry.get("payload_codec_version"),
                 keys=tuple(
                     key for key in (entry.get("key"), query_key)
                     if isinstance(key, Mapping)
@@ -1660,6 +1667,7 @@ class PT0DeterminismStore:
                 decoded = _decode_payload_for_admission(
                     artifact,
                     candidate.get("payload"),
+                    payload_codec_version=candidate.get("payload_codec_version"),
                     keys=tuple(
                         key for key in (candidate.get("key"), query_key)
                         if isinstance(key, Mapping)
@@ -1774,6 +1782,11 @@ class PT0DeterminismStore:
         decoded = _decode_payload_for_admission(
             artifact,
             attempt["payload"],
+            payload_codec_version=(
+                attempt["neighbors"][0].get("payload_codec_version")
+                if attempt.get("neighbors")
+                else None
+            ),
             keys=(key,),
         )
         if decoded is None:
@@ -1953,6 +1966,7 @@ class PT1PersistentEquilibriumStore:
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        payload_codec_version = _payload_codec_version(artifact)
         validate_repair_notices_json(repair_notices_json)
         if self.strict_vapor_gate:
             assert_strict_vapor_pt1_row(
@@ -1985,6 +1999,7 @@ class PT1PersistentEquilibriumStore:
                 stale_payload = _decode_payload_for_admission(
                     artifact,
                     entry.get("payload"),
+                    payload_codec_version=entry.get("payload_codec_version"),
                     keys=(entry.get("key", {}), key),
                 ) is None
                 if not stale_payload and (
@@ -2008,10 +2023,12 @@ class PT1PersistentEquilibriumStore:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
                             "SET payload_sha256 = ?, payload_bytes = ?, "
+                            "payload_codec_version = ?, "
                             "repair_notices_json = ? WHERE key_hash = ?",
                             (
                                 payload_hash,
                                 sqlite3.Binary(payload_bytes),
+                                payload_codec_version,
                                 effective_notices_json,
                                 key_hash,
                             ),
@@ -2116,6 +2133,7 @@ class PT1PersistentEquilibriumStore:
                     request_schema_version,
                     key_sha256,
                     payload_sha256,
+                    payload_codec_version,
                     key_bytes,
                     payload_bytes,
                     code_version,
@@ -2137,7 +2155,7 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -2146,6 +2164,7 @@ class PT1PersistentEquilibriumStore:
                     source_request_schema,
                     key_hash,
                     source_payload_hash,
+                    payload_codec_version,
                     sqlite3.Binary(source_key_bytes),
                     sqlite3.Binary(source_payload_bytes),
                     source_code_version,
@@ -2284,6 +2303,7 @@ class PT1PersistentEquilibriumStore:
                     decoded = _decode_payload_for_admission(
                         artifact,
                         entry.get("payload"),
+                        payload_codec_version=entry.get("payload_codec_version"),
                         keys=tuple(
                             key for key in (entry.get("key"), query_key)
                             if isinstance(key, Mapping)
@@ -2358,6 +2378,7 @@ class PT1PersistentEquilibriumStore:
                     if _decode_payload_for_admission(
                         artifact,
                         entry.get("payload"),
+                        payload_codec_version=entry.get("payload_codec_version"),
                         keys=tuple(
                             key for key in (entry.get("key"), query_key)
                             if isinstance(key, Mapping)
@@ -2370,6 +2391,9 @@ class PT1PersistentEquilibriumStore:
                             "key": copy.deepcopy(dict(entry["key"])),
                             "key_hash": row_hash,
                             "payload": copy.deepcopy(dict(entry["payload"])),
+                            "payload_codec_version": entry.get(
+                                "payload_codec_version"
+                            ),
                             "repair_notices_json": entry[
                                 "repair_notices_json"
                             ],
@@ -2446,6 +2470,7 @@ class PT1PersistentEquilibriumStore:
                     decoded = _decode_payload_for_admission(
                         artifact,
                         entry.get("payload"),
+                        payload_codec_version=entry.get("payload_codec_version"),
                         keys=tuple(
                             key for key in (entry.get("key"), query_key)
                             if isinstance(key, Mapping)
@@ -2544,6 +2569,7 @@ class PT1PersistentEquilibriumStore:
                 request_schema_version TEXT NOT NULL,
                 key_sha256 TEXT NOT NULL,
                 payload_sha256 TEXT NOT NULL,
+                payload_codec_version INTEGER,
                 key_bytes BLOB NOT NULL,
                 payload_bytes BLOB NOT NULL,
                 code_version TEXT NOT NULL,
@@ -2644,6 +2670,7 @@ class PT1PersistentEquilibriumStore:
         }
         columns = {
             "corpus_version": "TEXT",
+            "payload_codec_version": "INTEGER",
             "repair_notices_json": "TEXT",
             "physics_bucket_schema_version": "TEXT",
             "physics_bucket_sha256": "TEXT",
@@ -2751,6 +2778,11 @@ class PT1PersistentEquilibriumStore:
                 if self._table_has_column(conn, table, "law_disclosures_json")
                 else "NULL"
             )
+            codec_version_column = (
+                "payload_codec_version"
+                if self._table_has_column(conn, table, "payload_codec_version")
+                else "NULL"
+            )
             row = conn.execute(
                 f"""
                 SELECT
@@ -2760,6 +2792,7 @@ class PT1PersistentEquilibriumStore:
                     request_schema_version,
                     key_sha256,
                     payload_sha256,
+                    {codec_version_column} AS payload_codec_version,
                     key_bytes,
                     payload_bytes,
                     code_version,
@@ -2854,6 +2887,11 @@ class PT1PersistentEquilibriumStore:
             "key_bytes": row_key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(row_payload)),
             "payload_hash": row["payload_sha256"],
+            "payload_codec_version": (
+                row["payload_codec_version"]
+                if "payload_codec_version" in row.keys()
+                else None
+            ),
             "repair_notices_json": repair_notices_json,
             "law_disclosures": _law_disclosures_from_json(
                 row["law_disclosures_json"]
