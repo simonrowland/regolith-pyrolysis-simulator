@@ -8607,6 +8607,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        FLAGGED_STRATUM_RESIDUE_REDOX,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
@@ -8682,6 +8683,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_APPROXIMATE_VALUE,
             NoticeKind.APPROXIMATE_VALUE,
             "approximate_printed_value",
+        ),
+        (
+            FLAGGED_STRATUM_RESIDUE_REDOX,
+            NoticeKind.FALLBACK,
+            "residue_fe_speciation_kress91_fallback",
         ),
     )
     for stratum, kind, reason in cases:
@@ -11712,6 +11718,17 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
             provenance = {
                 "experiment_id": experiment_id,
                 "engine": engine,
+                "engine_flags": (
+                    "residue_fe_speciation_kress91_fallback",
+                    "residue_fe_speciation_unavailable_stoichiometric_feo",
+                ),
+                "pressure_law_diagnostics": ({
+                    "species": "Fe",
+                    "declared": -0.5,
+                    "observed": -0.6,
+                    "expected": -0.598,
+                    "reason": "residue_pressure_law_redox_active",
+                },),
                 "oxygen_model": f"own oxygen balance: {engine}",
                 "surface_pO2_balance_floor": (
                     {
@@ -11780,6 +11797,31 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert first_prediction.refusal_detail["experiment_id"] == first.experiment_id
         assert first_prediction.refusal_detail["consumed_row"]["observation_id"] == first.observation_id
         assert first_prediction.refusal_detail["production_alpha_arm"]["alpha_arm"] == "alpha_runtime_catalog"
+        assert any(
+            notice.kind is NoticeKind.FALLBACK
+            and notice.reason == "residue_fe_speciation_kress91_fallback"
+            for notice in first_prediction.notices
+        )
+        unavailable = next(
+            notice for notice in first_prediction.notices
+            if notice.reason == "residue_fe_speciation_unavailable_stoichiometric_feo"
+        )
+        assert unavailable.kind is NoticeKind.FALLBACK
+        assert "default=1 O/Fe" in unavailable.origin
+        assert score.flagged_strata((unavailable,)) == (
+            score.FLAGGED_STRATUM_RESIDUE_REDOX,
+        )
+        redox_diagnostic = next(
+            notice for notice in first_prediction.notices
+            if notice.reason == "residue_pressure_law_redox_active"
+            and "species=Fe" in notice.origin
+        )
+        assert "declared=-0.5" in redox_diagnostic.origin
+        assert "observed=-0.6" in redox_diagnostic.origin
+        assert "expected=-0.598" in redox_diagnostic.origin
+        assert score.FLAGGED_STRATUM_RESIDUE_REDOX in score.flagged_strata(
+            first_prediction.notices
+        )
         assert any("feo_melt_redox_stack2_pending" in notice.reason for notice in first_prediction.notices)
         assert any("residue_time_refinement_unconverged" in notice.reason for notice in first_prediction.notices)
         floor_notice = next(

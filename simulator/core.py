@@ -777,6 +777,8 @@ from simulator.high_t_melt_activity import (
 # ============================================================================
 
 _PRESERVE_REFERENCE_T_K = object()
+# Provider-input cutoff for species loaded through _ledger_species_kg.
+LEDGER_LOADER_SPECIES_CUTOFF_KG = 1e-12
 _VALID_DECISION_CHOICES = {
     DecisionType.ROOT_BRANCH: ('pyrolysis', 'mre_baseline'),
     DecisionType.PATH_AB: ('A', 'A_staged', 'B'),
@@ -2080,7 +2082,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return {
             str(species): float(kg)
             for species, kg in values.items()
-            if float(kg) > 1e-12
+            if float(kg) > LEDGER_LOADER_SPECIES_CUTOFF_KG
         }
 
     def _backend_account_policies(self) -> tuple[AccountPolicy, ...]:

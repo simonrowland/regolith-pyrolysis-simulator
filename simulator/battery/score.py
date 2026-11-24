@@ -633,6 +633,7 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_RESIDUE_REDOX = "residue-redox"
 FLAGGED_STRATUM_IRON_OXIDE_CONVENTION = "iron-oxide-convention"
 _DEFAULT_POLICY_FLAG_VALUES = frozenset(
     kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS
@@ -2593,6 +2594,13 @@ def _has_proposed_policy(
 def _classify_flagged_notice_facts(
     notices: Sequence[tuple[str, object]],
 ) -> tuple[str, ...]:
+    from simulator.battery.residue import TRACE_TAIL_BELOW_LOADER_CUTOFF
+    from simulator.vacuum_oxygen_balance import (
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
     strata: list[str] = []
     kinds = {kind for kind, _reason in notices}
     if (
@@ -2629,6 +2637,15 @@ def _classify_flagged_notice_facts(
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
+    if any(
+        reason == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK
+        or reason == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO
+        or reason == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_RESIDUE_REDOX)
+    if (NoticeKind.ENGINE_MODEL_CAVEAT.value, TRACE_TAIL_BELOW_LOADER_CUTOFF) in notices:
+        strata.append(TRACE_TAIL_BELOW_LOADER_CUTOFF)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(
@@ -2671,6 +2688,84 @@ def _classify_flagged_notice_facts(
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     return tuple(strata)
+
+
+def _residue_redox_flag_notices(
+    flags: Sequence[str],
+    *,
+    quantity: Quantity,
+    origin: str,
+    pressure_law_diagnostics: Sequence[Mapping[str, object]] = (),
+) -> tuple[Notice, ...]:
+    """Translate the residue engine's redox flags into scored evidence."""
+
+    from simulator.vacuum_oxygen_balance import (
+        PressureLawChannelDiagnostic,
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
+    notices = []
+    detailed_reasons: set[str] = set()
+    for diagnostic in pressure_law_diagnostics:
+        species = diagnostic.get("species")
+        declared = diagnostic.get("declared")
+        observed = diagnostic.get("observed")
+        expected = diagnostic.get("expected")
+        reason = diagnostic.get("reason")
+        if (
+            not isinstance(species, str)
+            or not all(isinstance(value, (int, float)) for value in (
+                declared, observed, expected
+            ))
+            or reason != RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        ):
+            continue
+        detailed_reasons.add(str(reason))
+        channel_diagnostic = PressureLawChannelDiagnostic(
+            species=species,
+            declared=float(declared),
+            observed=float(observed),
+            expected=float(expected),
+            reason=str(reason),
+        )
+        arm = diagnostic.get("arm")
+        arm_label = f"arm={arm}; " if isinstance(arm, str) else ""
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(quantity,),
+                reason=str(reason),
+                origin=(
+                    f"{origin}; {arm_label}{channel_diagnostic.evidence_text()}"
+                ),
+            )
+        )
+    for flag in flags:
+        if flag == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK:
+            kind = NoticeKind.FALLBACK
+        elif flag == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO:
+            kind = NoticeKind.FALLBACK
+        elif flag == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE:
+            if flag in detailed_reasons:
+                continue
+            kind = NoticeKind.ENGINE_MODEL_CAVEAT
+        else:
+            continue
+        notices.append(
+            Notice(
+                kind=kind,
+                affected_quantities=(quantity,),
+                reason=flag,
+                origin=(
+                    f"{origin}; default=1 O/Fe"
+                    if flag == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO
+                    else origin
+                ),
+            )
+        )
+    return tuple(notices)
 
 
 def _is_calibration_not_grounded_reason(reason: object) -> bool:
@@ -12881,6 +12976,15 @@ def _predict_mass_loss_with_residue(
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    notices += _residue_redox_flag_notices(
+        result.engine_flags,
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        origin=f"engine:{engine.value}",
+        pressure_law_diagnostics=tuple(
+            diagnostic.as_record()
+            for diagnostic in result.pressure_law_diagnostics
+        ),
+    )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
@@ -16978,6 +17082,20 @@ def _hashimoto_residue_prediction(
             )
         ]
         notices.extend(
+            _residue_redox_flag_notices(
+                tuple(primary_provenance.get("engine_flags") or ()),
+                quantity=reported_quantity,
+                origin=f"engine:{engine.value}",
+                pressure_law_diagnostics=tuple(
+                    diagnostic
+                    for diagnostic in primary_provenance.get(
+                        "pressure_law_diagnostics"
+                    ) or ()
+                    if isinstance(diagnostic, Mapping)
+                ),
+            )
+        )
+        notices.extend(
             _hashimoto_engine_floor_inversion_notices(
                 engine,
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
@@ -17126,7 +17244,9 @@ def _knudsen_residue_prediction(
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         _element_retention_ratio_from_inventories,
+        _knudsen_trace_tail_notices,
         _printed_fm_definition,
         predict_knudsen_residue_composition,
         _require_element_retention_transport_inputs,
@@ -17229,20 +17349,33 @@ def _knudsen_residue_prediction(
                 "element_unavailable" if is_retention else "channel_missing",
                 reference.identity.species.formula,
             )
+        notices = result["notices"]
+        if result.get("trace_tail"):
+            # The extent cache shares the solve across residue components.
+            # Classify against this row's resolution on a row-local copy.
+            trace_tail = dict(result["trace_tail"])
+            notices += _knudsen_trace_tail_notices(
+                trace_tail, reference, oxide_wt_pct=not is_retention,
+            )
+            provenance["trace_tail"] = trace_tail
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=result["notices"], identity=reference.identity,
+            notices=notices, identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        attempted = (
+            isinstance(exc, ResidueEngineNonconvergence)
+            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
+        )
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
-            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if attempted else ExecutionState.NOT_PROBED),
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if attempted else RefusalReason.UNSUPPORTED,
             refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
             notices=getattr(exc, "notices", ()), identity=reference.identity,
         )
