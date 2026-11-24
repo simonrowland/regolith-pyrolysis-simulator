@@ -81,6 +81,7 @@ KRESS91_NONLINEAR_COEFFICIENT = -3.36
 KRESS91_PRESSURE_INV_T_COEFFICIENT = -0.000000701
 KRESS91_PRESSURE_D_T_COEFFICIENT = -0.000000000154
 KRESS91_PRESSURE_SQUARED_COEFFICIENT = 0.0000000000000000385
+_KRESS91_PRESSURE_FLOOR_BAR = 1.0e-9
 # Kress91 liquid calibration floor. Kress91 coefficients above remain the
 # thermodynamic source; higher-temperature bands are flagged, not model-swapped.
 KRESS91_LIQUID_CALIBRATION_MIN_T_C = 1200.0
@@ -232,8 +233,7 @@ def _kress91_temperature_pressure_term(
             'Kress91 invalid control pressure_bar: expected finite positive '
             f'value or None, got {pressure_bar!r}'
         )
-    p_pa = max(p_bar, 1.0e-9) * PA_PER_BAR
-    pressure_terms = _kress91_pressure_terms(float(T_K), p_pa)
+    pressure_terms = _kress91_pressure_terms(float(T_K), p_bar)
     term += pressure_terms[0]
     term += pressure_terms[1]
     term += pressure_terms[2]
@@ -242,7 +242,7 @@ def _kress91_temperature_pressure_term(
 
 def _kress91_pressure_terms(
     T_K: float,
-    pressure_pa: float,
+    pressure_bar: float,
 ) -> tuple[float, float, float]:
     """Return Kress91's three pressure addends in their historical order.
 
@@ -264,16 +264,21 @@ def _kress91_pressure_terms(
     ``T0 = 1673 K`` and pressure in Pa, the fitted absolute-pressure
     addends in the dimensionless log ratio are ``f*P/T +
     g*(T-T0)*P/T + h*P²/T``. Each product is dimensionless: the coefficient
-    units cancel Pa and K exactly. A temperature rebasing
-    subtracts the reference endpoint's fitted terms, so the incremental
-    pressure contribution is zero when target and reference are both at the
-    1-bar reference. The absolute fitted addends below are retained for
-    parity with the established forward relation.
+    units cancel Pa and K exactly. At fixed temperature, the pressure
+    increment ``Q(T,P) - Q(T,1 bar)`` is zero at 1 bar. A temperature rebase
+    compares fitted sums at different temperatures, and the sum is
+    temperature dependent: rebasing from 1473.15 K to 1873.15 K at 1 bar
+    changes ln(fO2) by approximately -3.27895e-5 from these pressure terms
+    alone. The absolute fitted addends below are retained for parity with
+    the established forward relation. The pressure floor and bar-to-Pa
+    conversion are applied here so every caller uses the same effective
+    pressure.
 
     The tuple keeps each historical addend separate so both callers perform
     the same left-to-right floating-point additions as before consolidation.
     """
 
+    pressure_pa = max(float(pressure_bar), _KRESS91_PRESSURE_FLOOR_BAR) * PA_PER_BAR
     return (
         KRESS91_PRESSURE_INV_T_COEFFICIENT * (pressure_pa / float(T_K)),
         KRESS91_PRESSURE_D_T_COEFFICIENT
@@ -935,8 +940,7 @@ def _kress91_ln_ratio(
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
-    pressure_terms = _kress91_pressure_terms(T_K, p_pa)
+    pressure_terms = _kress91_pressure_terms(T_K, pressure_bar)
     return (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)

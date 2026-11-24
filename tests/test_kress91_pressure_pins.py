@@ -105,7 +105,44 @@ def test_kress91_temperature_rebase_pressure_path_stays_bit_identical() -> None:
             assert value.hex() == _REBASE_HEX[(target_T_K, target_pressure_bar)]
 
 
-def test_kress91_pressure_rebase_is_zero_at_the_one_bar_reference() -> None:
+def test_kress91_forward_floor_is_owned_by_shared_pressure_helper() -> None:
+    for composition in COMPOSITIONS:
+        mol_fractions = melt_mol_fractions_for_kress91(composition)
+        for temperature_K in TEMPERATURES_K:
+            below_floor = kress91_fe3_over_sigma_fe(
+                fO2_log=-7.25,
+                mol_fractions=mol_fractions,
+                T_K=temperature_K,
+                pressure_bar=1.0e-12,
+            )
+            at_floor = kress91_fe3_over_sigma_fe(
+                fO2_log=-7.25,
+                mol_fractions=mol_fractions,
+                T_K=temperature_K,
+                pressure_bar=1.0e-9,
+            )
+            assert below_floor.hex() == at_floor.hex()
+
+
+def test_kress91_rebase_floor_is_owned_by_shared_pressure_helper() -> None:
+    reference_T_K = TEMPERATURES_K[0]
+    for target_T_K in TEMPERATURES_K:
+        below_floor = kress91_ln_fO2_temperature_delta(
+            reference_T_K,
+            target_T_K,
+            reference_pressure_bar=1.0,
+            target_pressure_bar=1.0e-12,
+        )
+        at_floor = kress91_ln_fO2_temperature_delta(
+            reference_T_K,
+            target_T_K,
+            reference_pressure_bar=1.0,
+            target_pressure_bar=1.0e-9,
+        )
+        assert below_floor.hex() == at_floor.hex()
+
+
+def test_kress91_pressure_rebase_is_zero_for_identical_endpoints_at_one_bar() -> None:
     for temperature_K in TEMPERATURES_K:
         value = kress91_ln_fO2_temperature_delta(
             temperature_K,
@@ -130,3 +167,15 @@ def test_mutating_shared_pressure_owner_breaks_both_consumer_pins(
         test_kress91_forward_pressure_path_stays_bit_identical()
     with pytest.raises(AssertionError):
         test_kress91_temperature_rebase_pressure_path_stays_bit_identical()
+
+
+def test_mutating_shared_pressure_floor_breaks_both_consumer_pins(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    test_kress91_forward_floor_is_owned_by_shared_pressure_helper()
+    test_kress91_rebase_floor_is_owned_by_shared_pressure_helper()
+    monkeypatch.setattr(fe_redox_module, "_KRESS91_PRESSURE_FLOOR_BAR", 1.0e-10)
+    with pytest.raises(AssertionError):
+        test_kress91_forward_floor_is_owned_by_shared_pressure_helper()
+    with pytest.raises(AssertionError):
+        test_kress91_rebase_floor_is_owned_by_shared_pressure_helper()
