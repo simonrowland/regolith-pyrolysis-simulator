@@ -72,8 +72,11 @@ def test_hashimoto_exhaustion_closure_refactor_numeric_pin():
 
 
 @pytest.mark.parametrize("route", ("hashimoto", "knudsen"))
-def test_fe_pressure_notice_reaches_coupled_mgo_residue_output(route):
+def test_fe_pressure_notice_reaches_coupled_mgo_residue_output(
+    route, extent_point, monkeypatch
+):
     from simulator.battery import residue, score
+    from simulator.battery.score import ScoreContext
 
     inventory = {"FeO": 1.0, "MgO": 2.0}
     channels = (
@@ -129,12 +132,80 @@ def test_fe_pressure_notice_reaches_coupled_mgo_residue_output(route):
     )["MgO"]
 
     assert high_mgo_wt_pct > low_mgo_wt_pct
+
+    # Exercise the scoring entry point that attaches integration notices to
+    # its MgO prediction. The real integration above supplies the coupled
+    # result and its Fe pressure notice.
+    reference, experiment, rows = extent_point
+    reference = replace(
+        reference,
+        identity=replace(reference.identity, species=Species("MgO", Phase.L)),
+    )
+    context = ScoreContext(
+        {},
+        {experiment.experiment_id: experiment},
+        {row.observation_id: row for row in (*rows, reference)},
+    )
+    if route == "hashimoto":
+        source_id = "kems-015-hashimoto-1983"
+        reference = replace(
+            reference,
+            observation_id=(
+                source_id
+                + "::hashimoto_1983_table3_residue_composition_series::MgO"
+            ),
+            source_id=source_id,
+        )
+        selection = frozenset({experiment.experiment_id})
+        provenance = {"engine_pressure_notices": high_fe.pressure_notices}
+        rows_by_arm = {
+            experiment.experiment_id + "::alpha_common_unity_sensitivity": SimpleNamespace(
+                experiment_id=experiment.experiment_id,
+                alpha_arm="alpha_common_unity_sensitivity",
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct={"MgO": high_mgo_wt_pct},
+                sensitivity_band_wt_pct={"MgO": (high_mgo_wt_pct, high_mgo_wt_pct)},
+                provenance=provenance,
+            ),
+            experiment.experiment_id + "::alpha_runtime_catalog": SimpleNamespace(
+                experiment_id=experiment.experiment_id,
+                alpha_arm="alpha_runtime_catalog",
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct={"MgO": high_mgo_wt_pct},
+                geometry_oxide_wt_pct={},
+                sensitivity_band_wt_pct={"MgO": (high_mgo_wt_pct, high_mgo_wt_pct)},
+                provenance={},
+            ),
+        }
+        cache = {
+            (source_id, Engine.INTERNAL_ANALYTICAL, selection): rows_by_arm
+        }
+        prediction = score._hashimoto_residue_prediction(
+            context,
+            reference,
+            Engine.INTERNAL_ANALYTICAL,
+            cache,
+            selected_experiment_ids=selection,
+            test_experiment_ids=selection,
+        )
+    else:
+        monkeypatch.setattr(
+            residue,
+            "predict_knudsen_residue_composition",
+            lambda *_args, **_kwargs: {
+                "composition_wt_pct": {"MgO": high_mgo_wt_pct},
+                "notices": (),
+                "pressure_notices": high_fe.pressure_notices,
+            },
+        )
+        prediction = score._knudsen_residue_prediction(
+            context, reference, Engine.INTERNAL_ANALYTICAL
+        )
+    assert prediction.value is not None
     assert any(
         item.reason.startswith("Fe pressure extension")
-        for item in score._residue_engine_pressure_notices(
-            high_fe.pressure_notices,
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
-        )
+        and item.affected_quantities == (Quantity.RESIDUE_COMPONENT_COMPOSITION,)
+        for item in prediction.notices
     )
 
 

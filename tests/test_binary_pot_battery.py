@@ -537,7 +537,9 @@ def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> Non
         timeout_s=30.0,
         isolated=False,
     )
-    assert extrapolated.authority == AUTHORITY_EXTRAPOLATED, (
+    # The extrapolation is scoped to the affected pressure species, so a
+    # cell-wide authority would overstate the notice's scope.
+    assert extrapolated.authority is None, (
         extrapolated.status,
         extrapolated.refusal_reason,
         extrapolated.engine_status,

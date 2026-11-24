@@ -897,7 +897,10 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
         )
         matching_notices = [notice for notice in fe_notices if notice.reason == reason]
         assert len(matching_notices) == 1
-        assert matching_notices[0].authority is Authority.EXTRAPOLATED
+        # The builtin out-of-band record has no authority field, and the
+        # typed converter preserves that. The cell authority resolver still
+        # reports extrapolation for the scoped Fe pressure below.
+        assert matching_notices[0].authority is None
         assert not any(
             notice.reason == reason
             for notice in cell_notices(
