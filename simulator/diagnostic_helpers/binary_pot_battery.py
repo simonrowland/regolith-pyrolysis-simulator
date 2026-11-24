@@ -420,11 +420,21 @@ def _call_cached_backend_equilibrate(
                     raise
                 caught_thermoengine.append(exc)
                 return payload
+        preserve_provider_notices = handle.name in {
+            "internal-analytical",
+            "alphamelts",
+        }
         if isinstance(result, EquilibriumResult):
+            if preserve_provider_notices:
+                result = _preserve_provider_notices_for_engine_cache(result)
             return result.to_hot(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):
+            if preserve_provider_notices:
+                result = _preserve_provider_notices_for_engine_cache(result)
             return equilibrium_to_hot(vars(result), engine_id=handle.name, live_value=result)
         if isinstance(result, Mapping):
+            if preserve_provider_notices:
+                result = _preserve_provider_notices_for_engine_cache(result)
             return equilibrium_to_hot(result, engine_id=handle.name)
         if _is_refusal(result):
             return result
@@ -1716,17 +1726,66 @@ def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
     return notices
 
 
+def _provider_notice_flags_from_result(result: Any) -> list[dict[str, Any]]:
+    """Read scoped builtin-provider notices from every result publication site."""
+
+    diagnostics = (
+        result.get("diagnostics")
+        if isinstance(result, Mapping)
+        else getattr(result, "diagnostics", None)
+    )
+    if not isinstance(diagnostics, Mapping):
+        return []
+    notices: list[dict[str, Any]] = []
+    for field_name in ("vapor_pressure_diagnostic", "subprocess_vapor_projection"):
+        diagnostic = diagnostics.get(field_name)
+        if isinstance(diagnostic, Mapping):
+            notices.extend(_nested_notice_flags(diagnostic))
+    return notices
+
+
+def _preserve_provider_notices_for_engine_cache(result: Any) -> Any:
+    """Keep provider notices in the cache's existing typed notice payload."""
+
+    provider_notices = _provider_notice_flags_from_result(result)
+    if not provider_notices:
+        return result
+    if isinstance(result, Mapping):
+        result = dict(result)
+        diagnostics = dict(result.get("diagnostics") or {})
+        result["diagnostics"] = diagnostics
+    else:
+        diagnostics = dict(getattr(result, "diagnostics", None) or {})
+        result.diagnostics = diagnostics
+    existing = diagnostics.get("imcc_notices") or []
+    existing_notices = list(existing) if isinstance(existing, (list, tuple)) else []
+    diagnostics["imcc_notices"] = existing_notices + [
+        notice for notice in provider_notices if notice not in existing_notices
+    ]
+    if any(
+        notice.get("authority") == AUTHORITY_EXTRAPOLATED
+        for notice in provider_notices
+    ):
+        diagnostics["authority"] = AUTHORITY_EXTRAPOLATED
+    return result
+
+
 def engine_flags_from_result(
     result: Any,
 ) -> tuple[list[dict[str, Any]], str | None, dict[str, Any] | None]:
-    """Read the engine's own flag, authority, and notice once.
+    """Read the engine's own flag and all provider notices once.
 
     The IMCC battery backend stores one notice list on both
     ``diagnostics['imcc_notices']`` and ``result.imcc_notices``. Reading
-    both appended every notice twice.
+    both appended every notice twice. Builtin provider notices can also be
+    published under the core or alphaMELTS subprocess diagnostic branches.
     """
 
-    diagnostics = getattr(result, "diagnostics", None) or {}
+    diagnostics = (
+        result.get("diagnostics")
+        if isinstance(result, Mapping)
+        else getattr(result, "diagnostics", None)
+    ) or {}
     if not isinstance(diagnostics, Mapping):
         diagnostics = {}
     notices: list[dict[str, Any]] = []
@@ -1749,6 +1808,14 @@ def engine_flags_from_result(
     ):
         certified_band = _plain_data(diagnostics["certified_band"])
 
+    provider_notices = _provider_notice_flags_from_result(result)
+    notices.extend(provider_notices)
+    if any(
+        row.get("authority") == AUTHORITY_EXTRAPOLATED
+        for row in provider_notices
+    ):
+        authority = AUTHORITY_EXTRAPOLATED
+
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
@@ -1757,6 +1824,8 @@ def engine_flags_from_result(
         if not isinstance(row, Mapping):
             continue
         copied = _plain_data(row)
+        if copied in provider_notices:
+            continue
         notices.append(copied)
         if authority is None and copied.get("authority"):
             authority = str(copied["authority"])
@@ -3955,8 +4024,6 @@ def _internal_analytical_vapor_pressure_adapter(
                     "affected_quantities": ["p_partial"],
                 }
             )
-    core_flags.extend(_nested_notice_flags(core_diagnostic))
-
     imcc_notices = [*oxygen_notices]
     imcc_notices.extend(core_flags)
     vapor_authority = core_diagnostic.get("vapor_pressure_authority")
@@ -4106,6 +4173,7 @@ def internal_analytical_residue_vapor_pressure(
                 "category": int(exc.category),
             }
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
+            result = _preserve_provider_notices_for_engine_cache(result)
             return equilibrium_to_hot(vars(result), engine_id="internal-analytical", live_value=result)
         return result
 

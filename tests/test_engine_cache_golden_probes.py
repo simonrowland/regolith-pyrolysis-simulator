@@ -35,7 +35,8 @@ ENGINE_GOLDEN_PROBES = {
     "internal-analytical": (4, "a294dc7fa183d8c0c9a51b01b887ae3c4816768213fddaf977721d9440d2d467"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
-    "alphamelts": (4, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
+    # The train regenerates this digest against the new provider-pressure cache version.
+    "alphamelts": (5, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
     "thermoengine": (4, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
 }
 

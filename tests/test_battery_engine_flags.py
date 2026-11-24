@@ -7,6 +7,8 @@ and attaching the flag does not move the value.
 
 from __future__ import annotations
 
+import inspect
+import textwrap
 import types
 from dataclasses import replace
 from decimal import Decimal
@@ -15,6 +17,7 @@ from unittest.mock import patch
 import pytest
 
 import simulator.melt_backend.vaporock as vaporock_module
+from simulator.diagnostic_helpers import binary_pot_battery as battery_module
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -188,6 +191,11 @@ def test_vaporock_1773k_cell_keeps_extrapolated_flag(monkeypatch) -> None:
     assert hot.gas_partial_pressures_Pa["Na"] > 0.0
     assert hot.gas_partial_pressures_Pa["SiO"] > 0.0
     assert hot.gas_partial_pressures_Pa != warm.gas_partial_pressures_Pa
+    assert not any(
+        "Holzheid stoichiometric FeO gamma conversion extrapolated"
+        in str(row.get("reason", ""))
+        for row in hot.notices
+    )
 
     assert warm.status == "ok"
     assert warm.authority is None
@@ -581,6 +589,69 @@ def test_nested_provider_notice_stays_on_its_diagnostic_result() -> None:
     )
     assert dependent_prediction.authority is Authority.EXTRAPOLATED
     assert mutated_dependent_prediction.authority is Authority.EXTRAPOLATED
+
+
+def test_subprocess_provider_notice_reader_mutation_is_detected(monkeypatch) -> None:
+    result = types.SimpleNamespace(
+        diagnostics={
+            "subprocess_vapor_projection": {
+                "vapor_pressure_numerator_provenance": {
+                    "Fe": {
+                        "notice": {
+                            "kind": "out_of_certified_band",
+                            "authority_level": AUTHORITY_EXTRAPOLATED,
+                            "reason": "subprocess Fe notice missing",
+                            "affected_species": ["Fe"],
+                            "affected_quantities": ["p_partial"],
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+    def assert_scored_notice() -> None:
+        flags, authority, _band = engine_flags_from_result(result)
+        scored = types.SimpleNamespace(notices=flags, authority=authority)
+        fe_notices = cell_notices(
+            Quantity.P_PARTIAL, Engine.ALPHAMELTS, scored, species="Fe"
+        )
+        si_notices = cell_notices(
+            Quantity.P_PARTIAL, Engine.ALPHAMELTS, scored, species="SiO"
+        )
+        assert any(
+            notice.reason == "subprocess Fe notice missing"
+            for notice in fe_notices
+        ), "subprocess Fe notice missing"
+        assert not any(
+            notice.reason == "subprocess Fe notice missing"
+            for notice in si_notices
+        )
+
+    assert_scored_notice()
+
+    source = textwrap.dedent(
+        inspect.getsource(battery_module._provider_notice_flags_from_result)
+    )
+    branches = '("vapor_pressure_diagnostic", "subprocess_vapor_projection")'
+    assert source.count(branches) == 1
+    namespace = vars(battery_module).copy()
+    exec(
+        compile(
+            source.replace(branches, '("vapor_pressure_diagnostic",)'),
+            "<reader without subprocess branch>",
+            "exec",
+        ),
+        namespace,
+    )
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            battery_module,
+            "_provider_notice_flags_from_result",
+            namespace["_provider_notice_flags_from_result"],
+        )
+        with pytest.raises(AssertionError, match="subprocess Fe notice missing"):
+            assert_scored_notice()
 
 
 def test_scoped_pressure_notices_match_canonical_gas_species_keys() -> None:
