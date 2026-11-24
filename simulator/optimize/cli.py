@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import UTC, datetime
+import glob
 import json
 from pathlib import Path
 import sys
@@ -27,12 +28,17 @@ from simulator.optimize.study import (
     run,
     run_certify,
 )
+from simulator.corpus_version import current_corpus_version
+from simulator.optimize.results_store import ResultStore
 
 
 JOB_STATUS_NAME = "job_status.json"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "prune-stale-corpus":
+        return _prune_stale_corpus(argv[1:])
     parser = _parser()
     args = parser.parse_args(argv)
     _validate_constrained_max_args(args, parser)
@@ -109,6 +115,50 @@ def main(argv: Sequence[str] | None = None) -> int:
         winner_candidate_id=winner_candidate_id,
         study_status=study_status,
     )
+    return 0
+
+
+def _prune_stale_corpus(argv: Sequence[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="python -m simulator.optimize prune-stale-corpus"
+    )
+    parser.add_argument("--store", action="append", type=Path, default=[])
+    parser.add_argument("--keep-corpus-version", default=None)
+    parser.add_argument("--apply", action="store_true")
+    args = parser.parse_args(argv)
+    keep_version = args.keep_corpus_version or current_corpus_version()
+    stores = args.store or [
+        Path(path) for path in sorted(glob.glob("runs/*/cache.sqlite"))
+    ]
+    report = {
+        "keep_corpus_version": keep_version,
+        "mode": "apply" if args.apply else "dry-run",
+        "stores": [],
+    }
+    for path in stores:
+        if not path.is_file():
+            raise FileNotFoundError(f"optimizer result store not found: {path}")
+        result_store = ResultStore(path)
+        counts = result_store.prune_stale_corpus_version(
+            keep_version, apply=args.apply
+        )
+        report["stores"].append(
+            {
+                "store": str(path),
+                "artifact_kind": "result_rows",
+                **counts,
+                "deleted": counts["stale"] if args.apply else 0,
+            }
+        )
+    if not report["stores"]:
+        print("No optimizer result stores found.")
+    for entry in report["stores"]:
+        action = "deleted" if args.apply else "would delete"
+        print(
+            f"{entry['store']} result_rows: {action} {entry['stale']} stale; "
+            f"kept {entry['kept']}; unversioned {entry['unversioned']}"
+        )
+    print(json.dumps(report, sort_keys=True))
     return 0
 
 

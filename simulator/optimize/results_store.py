@@ -256,6 +256,36 @@ class ResultStore:
             timeout_ms=self.write_lock_timeout_ms,
         )
 
+    def prune_stale_corpus_version(
+        self, keep_corpus_version: str, *, apply: bool = False
+    ) -> dict[str, int]:
+        """Count and optionally delete rows outside the kept corpus version."""
+        if not isinstance(keep_corpus_version, str) or not keep_corpus_version:
+            raise ValueError("keep_corpus_version must be a non-empty string")
+
+        def prune(conn: sqlite3.Connection) -> dict[str, int]:
+            counts = {
+                "stale": int(conn.execute(
+                    "SELECT COUNT(*) FROM results WHERE corpus_version IS NOT NULL AND corpus_version != ?",
+                    (keep_corpus_version,),
+                ).fetchone()[0]),
+                "kept": int(conn.execute(
+                    "SELECT COUNT(*) FROM results WHERE corpus_version = ?",
+                    (keep_corpus_version,),
+                ).fetchone()[0]),
+                "unversioned": int(conn.execute(
+                    "SELECT COUNT(*) FROM results WHERE corpus_version IS NULL"
+                ).fetchone()[0]),
+            }
+            if apply and counts["stale"]:
+                conn.execute(
+                    "DELETE FROM results WHERE corpus_version IS NOT NULL AND corpus_version != ?",
+                    (keep_corpus_version,),
+                )
+            return counts
+
+        return self._execute_write(prune)
+
     @property
     def schema_version(self) -> int:
         with self._connect() as conn:
