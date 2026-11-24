@@ -306,6 +306,8 @@ class NoticeKind(StrEnum):
     FALLBACK = "fallback"
     OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
+    SOSSI_GAS_BOUNDARY_UNVERIFIED = "sossi_gas_boundary_unverified"
+    SCCM_REFERENCE_STATE_UNREPORTED = "sccm_reference_state_unreported"
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
     COMPOSITION_BINARY_COMPLEMENT = "composition_binary_complement"

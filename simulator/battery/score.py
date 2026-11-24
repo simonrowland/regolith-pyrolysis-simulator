@@ -2540,7 +2540,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
-    if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
+    if {
+        NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+        NoticeKind.SOSSI_GAS_BOUNDARY_UNVERIFIED.value,
+    } & kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
@@ -17423,7 +17426,7 @@ def _sossi_residue_prediction(
         if isinstance(gas_assessment, Mapping):
             notices.append(
                 Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    kind=NoticeKind.SOSSI_GAS_BOUNDARY_UNVERIFIED,
                     affected_quantities=(reported_quantity,),
                     reason="sossi_gas_boundary_unverified",
                     origin="sossi-gas-table2-diagnostic",

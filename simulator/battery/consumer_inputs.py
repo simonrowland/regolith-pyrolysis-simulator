@@ -11,7 +11,7 @@ from simulator.battery.records import (
     Value,
     nominal_pressure_pa,
 )
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import NoticeKind, ValueKind
 from simulator.source_ids import SOSSI_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
@@ -168,7 +168,7 @@ def _sossi_table2_gas_boundary(experiment, observation, *, expected_run_id=None)
         boundary["component_flows"] = component_flows
         boundary["flow_reference_state"] = {
             **not_reported,
-            "reason": "sccm_reference_state_unreported",
+            "reason": NoticeKind.SCCM_REFERENCE_STATE_UNREPORTED.value,
             "conversion_role": "diagnostic_only",
             "conversion_note": (
                 "Total pressure is imposed and fO2 uses the CO/CO2 ratio, "

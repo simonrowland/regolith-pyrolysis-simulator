@@ -598,11 +598,12 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
 ) -> None:
     import simulator.battery.score as score_module
     import simulator.battery.residue as residue
-    from simulator.battery.enums import Engine
+    from simulator.battery.enums import Engine, NoticeKind
     from simulator.battery.oxygen_identity import check_sossi_table2_gas_equilibrium
     from simulator.battery.score import (
         _residue_prediction_cache_entry,
         _sossi_residue_prediction,
+        flagged_strata,
         load_score_context,
         point_magnitude,
     )
@@ -731,9 +732,11 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
             )
         assert assessment["fallback"] == "independently_published_run_log_fO2"
         assert any(
-            notice.reason == "sossi_gas_boundary_unverified"
+            notice.kind is NoticeKind.SOSSI_GAS_BOUNDARY_UNVERIFIED
+            and notice.reason == "sossi_gas_boundary_unverified"
             for notice in fallback.notices
         )
+        assert "out_of_certified_band" in flagged_strata(fallback.notices)
 
     cached = _residue_prediction_cache_entry(
         cache, source_id, Engine.OPENIMCC, selection
