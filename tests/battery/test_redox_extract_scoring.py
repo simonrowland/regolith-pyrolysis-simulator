@@ -111,9 +111,11 @@ def _printed_fraction_width(observation):
     uncertainty = observation.uncertainty
     if uncertainty is None:
         return None
-    source_value, _shape, mapped_unit = score_module._printed_uncertainty_source(
-        uncertainty,
-        exact_fields=("Fe3_over_FeT", "Fe3_over_sum_Fe"),
+    source_value, _shape, mapped_unit, _basis, _basis_default_reason = (
+        score_module._printed_uncertainty_source(
+            uncertainty,
+            exact_fields=("Fe3_over_FeT", "Fe3_over_sum_Fe"),
+        )
     )
     if source_value is None:
         return None
@@ -122,14 +124,13 @@ def _printed_fraction_width(observation):
         if isinstance(source_value, tuple)
         else source_value
     )
-    raw_text = score_module._uncertainty_original(uncertainty)
+    # Width unit comes from the basis owner via mapped_unit. The deleted
+    # suffix scan no longer takes the printed value or the raw text.
     source_unit = score_module._uncertainty_unit(
         Quantity.FE3_FE2_RATIO,
         uncertainty,
         observation,
         mapped_unit,
-        source_value,
-        raw_text,
     )
     converted, converted_unit = score_module._convert_uncertainty_width(
         Quantity.FE3_FE2_RATIO,

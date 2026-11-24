@@ -126,7 +126,13 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
             )
         )
         assert migrated_row.uncertainty.verbatim["value"] == "10"
-        assert migrated_row.uncertainty.verbatim["units"] == "%"
+        assert migrated_row.uncertainty.value == Decimal("0.1")
+        assert migrated_row.uncertainty.basis == "relative"
+        # The locator note states a relative error, so the percent is scaled
+        # once to a fraction and the printed percent is kept beside it.
+        assert migrated_row.uncertainty.verbatim["units"] == "fraction"
+        assert migrated_row.uncertainty.verbatim["printed_units"] == "%"
+        assert "basis_default_reason" not in migrated_row.uncertainty.verbatim
         assert migrated_row.uncertainty.verbatim["as_printed"] == "±10%"
         assert migrated_row.uncertainty.verbatim["confidence_level"] == "not_stated"
         assert migrated_row.uncertainty.kind is UncertaintyKind.PRINTED
@@ -165,6 +171,28 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
             and "value" not in row.uncertainty.verbatim
             for row in migrated_rows
         )
+        assert all(row.uncertainty.value is None for row in migrated_rows)
+        assert all(row.uncertainty.basis is None for row in migrated_rows)
+        assert all(
+            (resolution := _printed_uncertainty_band(
+                Quantity.VALENCE_RATIO,
+                row.uncertainty,
+                row.value.point,
+                source_observation=row,
+            )).band is None
+            and resolution.refusal is not None
+            and resolution.refusal["reason"] == "unparseable_printed_uncertainty"
+            for row in migrated_rows
+        )
+    assert sum(
+        len([
+            row for row in rows
+            if row.observation_id.startswith(
+                f"{SOURCE_ID}::{observation['observation_id']}::"
+            )
+        ])
+        for observation in esr_observations
+    ) == 10
 
     compositions = {
         tuple(row.identity.composition.value.components)

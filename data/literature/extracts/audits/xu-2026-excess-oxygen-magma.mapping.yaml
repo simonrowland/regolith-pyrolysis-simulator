@@ -2,10 +2,9 @@ source_id: xu-2026-excess-oxygen-magma
 source: ../regolith-corpus/raw/xu-2026-excess-oxygen-magma/xu-2026-excess-oxygen-magma.pdf
 supplement: ../regolith-sources/_incoming/xu-2026-excess-oxygen-magma/supporting/publisher-supplement.zip
 extraction_mode: manual_600dpi_render_checked
-table_tool: copied from offer-21 commit 57eef5488 into scratch; not committed
+table_tool: seat tools/mineru_table_draft.py convert/compare and tools/mineru_table_qa.py
 table_tool_compare: >-
-  The born-digital PDF table draft merged mean and standard-deviation cells (for example 23.40 and 0.07 became 23.400.07),
-  so Table 1 was transcribed manually and checked cell by cell against the 600 dpi physical page 3 render. No tool emit was used.
+  MinerU QA reports 0.702 numeric agreement for the Table 1 block because mean and 1-sd values are fused in cells (for example 23.40 and 0.07 become 23.400.07); 326 run-together cells are flagged. The logical table layout and all stored numeric cells were checked against the 600 dpi physical page 3 render. The rendered table has one starting-material row and 21 LVP experiment rows; no tool emit was used. The post-extraction compare found 0 matched, 1 no-match, 0 mismatches and 5 unverifiable locators; the S1 value is verified on rendered supplement page 22, and the remaining table labels are not present in the single-page Table 1 draft.
 mappings:
   - table: '1'
     page: 3
@@ -22,8 +21,8 @@ mappings:
     typed_as:
       - one equilibrium_phase_composition observation per printed glass component per sample for EMPA values
       - one equilibrium_phase_composition observation per printed glass component per sample for SIMS CO2 and H2O values
+      - the Table 1 MORB starting-composition row as the initial bulk shared by all 21 listed LVP experiments
     context_only:
-      - starting-material analysis, because it is not an equilibrated run-product phase
       - Total and EO values, with printed standard deviations and the author equation
     identity:
       phase_role: glass
@@ -33,6 +32,83 @@ mappings:
       oxygen_source: "printed PtO2 or No PtO2 where present; blank LVP-1 cell remains unreported, and no actual run fO2 is inferred"
       sample_binding: every component binds to the Table 1 LVP sample and row
       quench: the single 1-atm LVP-1 sample was water-quenched as stated in supplement page 5
+    starting_bulk:
+      role: initial bulk
+      source_row: MORB starting comp.
+      elemental_basis: wt.% as printed; Fe is total Fe (FeT)
+      printed_analysis_counts:
+        EMPA: 10
+        SIMS: 6
+      printed_means:
+        EMPA_Si: '23.54'
+        EMPA_Ti: '0.59'
+        EMPA_Al: '7.94'
+        EMPA_FeT: '8.36'
+        EMPA_Mg: '4.58'
+        EMPA_Ca: '8.10'
+        EMPA_Na: '2.03'
+        EMPA_K: '0.17'
+        EMPA_O: '44.46'
+        EMPA_Pt: '0.00'
+        EMPA_Cl: '0.00'
+        total: '99.76'
+        SIMS_CO2: '0.00'
+        SIMS_H2O: '0.04'
+        EO: '-0.4'
+      printed_1sd:
+        Si: '0.26'
+        Ti: '0.03'
+        Al: '0.10'
+        FeT: '0.16'
+        Mg: '0.03'
+        Ca: '0.06'
+        Na: '0.07'
+        K: '0.01'
+        O: '0.30'
+        SIMS_CO2: '0.00'
+        SIMS_H2O: '0.00'
+      printed_1sd_confidence: 'one_sigma, stated in the Table 1 footnote as standard deviations (1 sd)'
+      iron_valence:
+        value_as_published: '70(3)%'
+        source: Supplementary Table S1, cell B11, relative Fe3+ doublet area
+        confidence_level: not_stated
+        value_used_as_fraction: '0.70'
+        uncertainty_used_as_fraction: '0.03'
+        data_locator: Supplementary Table S1, cell B11; rendered PDF physical page 22, PDF index 21
+      projection:
+        method: existing element-wt-percent stoichiometric oxide projection, then existing wt-percent-to-mole-fraction converter
+        Fe_split: measured Fe3+/ΣFe partitions FeT into FeO and Fe2O3; Table 1 all-Fe3 convention applies only to EO calculation
+        measured_oxygen: retained as closure check and not included as an oxide component
+        retained_components: H2O; zero CO2, Pt and Cl are preserved in the source context and omitted from the positive mole map
+        inputs:
+          - xu-2026-excess-oxygen-magma::xu_2026_table1_starting_composition_context
+          - xu-2026-excess-oxygen-magma::xu_2026_moessbauer_starting_glass_fe3_fet
+      linkage: Supplement states that the 21 Table 1 experiments use the synthetic MORB; the one shared MORB starting comp. row is the bulk for these runs.
+      linkage_locator_proof:
+        physical_page: 3
+        pdf_page_index: 2
+        published_page: not printed
+        proof_string: Twenty-one high pressure and temperature experiments (Table 1) were conducted under nominally dry conditions
+      audit:
+        row_column_assignment: Table 1 starting row checked against the 600 dpi render on physical page 3; order follows the table headers.
+        proof_string: '23.54 0.59 7.94 8.36 4.58 8.10 2.03 0.17 44.46 0.00 0.00 99.76'
+        physical_page: 3
+        pdf_page_index: 2
+        printed_page: 3
+        row_count: 1 starting-material row linked to 21 experiments
+        numeric_cells: 28
+        machine_read_and_render_resolution: >-
+          pdftotext separates each table row; MinerU QA reports 0.702 numeric agreement and run-together columns because the mean and 1-sd lines are concatenated in its HTML cells. All 28 stored numeric cells in this row were read against the 600 dpi render (verification b).
+        cell_columns:
+          EMPA_n: n under Glass EMPA (wt.%)
+          means: 'Si, Ti, Al, FeT, Mg, Ca, Na, K, O, Pt, Cl'
+          total: Total (wt.%)
+          SIMS_n: n under SIMS (wt.%)
+          SIMS_means: 'CO2, H2O'
+          EO: EO (wt.%)
+          EMPA_1sd: 'Si, Ti, Al, FeT, Mg, Ca, Na, K, O'
+          SIMS_1sd: 'CO2, H2O'
+        verification: every listed cell is on physical PDF page 3, PDF index 2, Table 1 row MORB starting comp.; verification b, page render
     audit:
       typed_scalar_observations: 273
       row_column_assignment: every Table 1 mean and 1-sd cell checked against the 600 dpi render of physical page 3
@@ -52,16 +128,48 @@ mappings:
       - excess oxygen
     reason: Molecular-dynamics results and calculated EO are model outputs, not measurements; all printed rows and 1-sd values are retained.
   - table: S1
-    locator: publisher workbook, sheet Table S1, cells A1:B12
+    locator: publisher workbook, sheet Table S1, cells A1:B12; rendered PDF counterpart is physical page 22, Table S1
     columns:
       - Mössbauer hyperfine parameter
       - Fe2+ and Fe3+ doublet values
     typed_as:
-      - Fe3+ relative area 70(3)% as measured_reduced fe3_fe2_ratio
+      - Fe3+ relative area 70(3)% as measured_reduced valence_ratio; numerator Fe3+, denominator total Fe, fraction form
     context_only:
       - Fe2+ and Fe3+ center shift, quadrupole splitting and FWHM
       - Fe2+ relative area 30(3)%
-    raw_inputs: not printed; spectrum fit described in the Mössbauer method section
+      - fitted spectrum in Figure S7; it is not digitized
+    reduction_inputs:
+      raw_spectrum: underlying spectral values are not tabulated; the measured spectrum and two-doublet fit are plotted in Figure S7
+      reported_fit_output: both fitted relative areas are retained in the Table S1 context row
+      evidence: measured_reduced because the authors fit their own spectrum to determine the relative areas
+    uncertainty:
+      Fe3_relative_area_sigma: '3%'
+      confidence_level: not_stated
+    table1_uncertainty:
+      printed_standard_deviations: 262 of 273 phase-composition values carry a printed sigma; all are 1 sd per the Table 1 footnote
+      absent_widths: 11 rows have no printed sigma and remain absent
+      S2_rows: individual analyses have no per-row sigma
+    locator_proof:
+      workbook_cell: B11
+      value_as_published: '70(3)%'
+      pdf_page_index: 21
+      physical_page: 22
+      published_page: not printed
+      proof_string: area (%) 70(3)
+      render_check: physical page 22 checked at 600 dpi; Table S1 row and columns confirmed
+    method_locator_proof:
+      pdf_page_index: 4
+      physical_page: 5
+      published_page: not printed
+      proof_string: Fe3+/ΣFe was determined from relative areas to be 0.70 ± 0.03
+      render_check: physical page 5 checked against the text layer
+    raw_input_locator_proof:
+      figure: S7
+      physical_page: 20
+      pdf_page_index: 19
+      published_page: not printed
+      proof_string: Fig. S7. Room temperature Mössbauer spectrum of MORB glass starting material
+      raw_values: not tabulated; the spectrum is plotted
   - table: S2
     locator: publisher workbook, sheet Table S2, displayed cells A1:O177
     columns:
@@ -108,3 +216,68 @@ mappings:
     typed_as: context figure records with no numeric points
     digitisation: deferred to a figure pass
     marker_counts: not enumerated where captions do not provide them; no plotted values estimated
+
+observable_audit:
+  target_quantity: equilibrium_phase_composition
+  phase_role: glass
+  basis: wt_percent
+  table1_rows: 273
+  supplement_table_s2_rows: 1188
+  total_rows: 1461
+  experiment_links: 21 unique LVP experiments, bound by the printed sample ID on each observation
+  starting_bulk: one shared MORB starting glass on the Table 1 starting-material row, linked to all 21 LVP runs by the supplement's stated scope
+  identity_axes_after_migration:
+    composition: initial bulk from experiment.sample.initial_composition
+    temperature_K: printed per row from Table 1
+    total_pressure_Pa: printed per row from Table 1, including the literal 1 atm LVP-1 value
+    fO2_Pa: actual absolute value not printed; Table 1 prints PtO2/No PtO2 controls on physical page 3, the supplement gives nominal buffer log fO2 ≈ 0 on physical page 3, and the main paper says no PtO2 remains after the runs and actual fO2 is more reduced than the buffer on physical page 7
+  engine_readiness:
+    composition: 1461/1461 have the linked starting bulk
+    temperature: 1461/1461 printed
+    total_pressure: 1461/1461 printed
+    actual_fO2: 0/1461 printed as an absolute run value; Table 1 and the page 7 statement leave the actual value unknown
+    actual_fO2_locator_proof:
+      physical_page: 7
+      pdf_page_index: 6
+      published_page: 7
+      proof_string: no PtO2 is present in the samples after the experiments, so the real fO2 in the experiments is more reduced than the fO2 of the Pt–PtO2 buffer
+    outcome: all 1461 phase rows are currently refused at the shared phase-row preflight with missing_input fO2_Pa because no absolute fO2 is printed; the d-460 fix is owned by the canonical-buffer car and will resolve the policy registry rungs DP-112, DP-003, and DP-010, in that precedence order
+  quench_audit:
+    target_rows: 1461 glass-component observations plus the starting-glass Fe3+/ΣFe observation
+    product_row_status: not_stated for preservation of the reported component composition; the source notes that some EO may have degassed during quenching but does not say that the listed component analyses preserve the run composition
+    product_locator:
+      physical_page: 2
+      pdf_page_index: 1
+      published_page: 2
+      proof_string: Some EO may have degassed during the temperature quenching process
+    starting_glass_status: not_stated for preservation of iron valence through quenching
+    starting_glass_locator:
+      physical_page: 3
+      pdf_page_index: 2
+      published_page: not printed
+      proof_string: The melts were quenched rapidly by immersing the bottom of Pt crucible in water
+  excluded_product_echoes: all prior point_conditions composition projections from the same run-product analyses removed; their measured glass-component observations remain unchanged
+  isolated_migration:
+    observations: 1462
+    hard_issues: 0
+    quantity_counts:
+      equilibrium_phase_composition: 1461
+      valence_ratio: 1
+    experiment_count_in_extract: 21
+    experiment_count_in_migrator: 22
+    extra_migrated_experiment: source-level experiment for the starting-glass Mössbauer observation; it has no Table 1 run conditions
+    initial_composition_mapped_to_target_experiments: 21
+    target_identity_axis_counts:
+      composition: 1461
+      temperature_K: 1461
+      total_pressure_Pa: 1461
+      fO2_Pa: 0
+    target_quantity_unknown: 0
+    target_phase_unknown: 0
+    uncertainty_kind_counts:
+      none: 1199
+      printed: 263
+    uncertainty_confidence_counts:
+      not_present: 1199
+      one_sigma: 262
+      not_stated: 1

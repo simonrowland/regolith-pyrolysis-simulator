@@ -69,6 +69,80 @@ transcription:
     Thomas and Wood 2023 workbook: B6:R6, B9:R21, B23:R26, B34:R39; these vectors are absent from the cited Thomas extract.
     Thomas and Wood 2021 workbook: B40:R55, B57:R70; the cited extract stores starting mixes, not these measured glass vectors.
     Rusiecka and Wood 2025 workbook: B75:R77; workbook Cl differs from the paper (1.7, 2.23, 2.7 vs 1.6, 2.0, 2.57).
+  starting_materials:
+    source_path: corpus/raw/rusiecka-wood-2026-chlorine-hcl/rusiecka-wood-2026-chlorine-hcl.pdf
+    printed_locator:
+      page: 2
+      published_page: 2
+      pdf_page_index: 1
+      table: '1'
+    printed_caption: Anhydrous compositions of the starting materials used in this study
+    source_statement: Table 1 shows the anhydrous compositions of the starting materials.
+    row_count: 4
+    composition_columns:
+      - SiO2
+      - TiO2
+      - Al2O3
+      - FeOtot
+      - MgO
+      - CaO
+      - Na2O
+      - K2O
+    stored_component_key_for_FeOtot: FeOT
+    basis: oxide mass percent as printed
+    total: No total column is printed; no sum was added.
+    cell_audit:
+      numeric_cell_count: 32
+      confirmation: >-
+        Method (b): the physical page 2 render resolves all 32 cells because MinerU did not detect this table. The exact
+        pdftotext page-2 values and row/column assignments agree with the 600 dpi render. The PDF prints Page 2 of 15
+        (article citation 181:46). Table QA reports companion Table 2 and Table 3 agreement of 1.000; those are not this
+        starting-material table.
+      values:
+        AND: ['62.49', '0.62', '18.20', '3.99', '3.47', '6.85', '3.35', '1.03']
+        HSR: ['77.30', '0.13', '12.77', '1.62', '0.12', '1.02', '3.52', '3.46']
+        DCB: ['66.76', '1.02', '14.62', '5.36', '1.42', '4.02', '4.64', '2.16']
+        DCB-Al: ['64.49', '1.01', '22.65', '1.24', '1.67', '4.14', '3.33', '1.47']
+      draft_compare:
+        status: unverifiable_by_mineru_draft
+        reason: The MinerU page chunk begins after physical page 2, so Table 1 has no draft cells or printed-caption evidence.
+        disposition: Manual pdftotext and render audit confirms the Table 1 caption, 4-row data and all 32 component cells.
+    experiment_linkage:
+      workbook_rows: 81:96
+      sample_codes:
+        AND: ['AND-1', 'AND-2', 'AND-3', 'AND-4', 'AND-5', 'AND-6']
+        HSR: ['HSR-1', 'HSR-2', 'HSR-3']
+        DCB: ['DCB-1', 'DCB-2', 'DCB-3', 'DCB-4', 'DCB-5', 'DCB-6']
+        DCB-Al: ['DCB-Al-1']
+      linkage: >-
+        Workbook sample IDs are attached to the per-row experiment foreign keys. Their printed prefixes match the Table 1
+        starting-material labels. Table 2 has AND-7 where worksheet row 96 has DCB-6; that discrepancy remains as already
+        recorded above, and neither source label was changed.
+    engine_readiness:
+      observable: equilibrium_phase_composition
+      phase: glass
+      expected_rows: 272
+      ready_after_initial_composition: 272
+      identity_axes: composition, temperature_K, total_pressure_Pa, and fO2_Pa migrate for all 272 rows.
+      conditions: >-
+        Workbook rows 81:96 print T_C, total pressure in GPa, and linear fO2 in bar. Total pressure is converted to Pa;
+        fO2 is converted once to canonical Pa using 100000 Pa/bar, with its exact printed bar value retained in the note
+        beside the source-cell locator.
+      other_inputs_not_reported: >-
+        The supporting article reports the end-loaded piston-cylinder apparatus, pressure media, capsule materials, and
+        EPMA calibrations. These details are documented but are not identity axes required by this phase-composition
+        observable. It does not report a per-run quench-preservation or direction statement; both remain not_stated for
+        all 272 2026 glass observations. Conditions come from workbook columns T, U, and Y.
+    quench_statement:
+      observation_count: 272
+      preservation: not_stated
+      quench_direction: not_stated
+      searched: Experimental procedure and Table 2; no quench or glass-preservation statement located.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+      page_proof: 'Page 3 of 15; The charges contained glass'
   omitted_duplicate_composition_rows:
     Thomas and Wood 2023: rows 3–5, 7–8, 22, and 30–33 match vectors in thomas-2022-chlorine-bonding-silicate-melts under the same IDs.
     Thomas and Wood 2023 renamed IDs: row 27 CMAS+Na-2 matches CMAS+Na+2; row 28 Fo5Di48An47 matches CNMAS-1; row 29 En17An43Di40 matches CNMAS-2.
@@ -78,8 +152,10 @@ transcription:
     S: Printed Total; no species formula/component token, not reconstructed or treated as another oxide.
     AD:CG: Calculated molar transforms and regression features; not independent measured compositions. Raw printed wt.% components
       are the typed composition basis.
-    Z: Formula output has no header; not treated as a printed log-fO2 column. The headed linear fO2 column Y is retained as
-      the condition.
+    Z: >-
+      Formula output has no header; not treated as a printed log-fO2 column. The headed linear fO2 column Y is the source
+      for row fO2 conditions: phase-composition rows use canonical Pa with the exact bar value in the note; capacity rows
+      retain fO2_bar.
   companion_table_disagreement: Article Table 2 (physical PDF p. 5) has AND-7 and no DCB-6; worksheet row 96 has DCB-6 and
     no AND-7. Both printed records are retained separately; the worksheet is not silently edited.
   source_pdf: 'No PDF is present in raw/rusiecka-2026-chlorine-data/. Companion paper: raw/rusiecka-wood-2026-chlorine-hcl/rusiecka-wood-2026-chlorine-hcl.pdf.'

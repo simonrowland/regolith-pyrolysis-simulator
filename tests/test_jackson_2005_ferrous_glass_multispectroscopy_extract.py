@@ -12,6 +12,7 @@ import yaml
 
 from simulator.battery.enums import AmountBasis, Quantity
 from simulator.battery.migrate import Migrator
+from simulator.battery.score import _printed_uncertainty_band
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -173,6 +174,22 @@ def test_isolated_migration_preserves_species_composition_conditions_and_quench(
                 _elemental_formula(observation.identity.composition.value.components)
                 == formula_by_sample[sample_name]
             )
+            if source_id == "jackson_2005_xanes_rb2_fe3_fraction":
+                assert observation.uncertainty.value == Decimal("0.05")
+                assert observation.uncertainty.basis == "dimensionless"
+                assert observation.uncertainty.verbatim["units"] == "dimensionless"
+                assert observation.uncertainty.verbatim["printed_units"] == "%"
+                band = _printed_uncertainty_band(
+                    Quantity.VALENCE_RATIO,
+                    observation.uncertainty,
+                    observation.value.point,
+                    source_observation=observation,
+                )
+                assert band.refusal is None
+                assert band.band is not None
+                assert band.band.value == Decimal(
+                    "0.3451325257414478738817685345"
+                )
             assert conditions["temperature_K"].state.is_value
             assert conditions["composition"].state.is_value
             assert (

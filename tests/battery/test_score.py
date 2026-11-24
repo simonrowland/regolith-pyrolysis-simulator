@@ -21,7 +21,6 @@ from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Mapping
 
 import pytest
 import yaml
@@ -2160,7 +2159,20 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
     width_count = 0
     band_count = 0
     conflicts: list[str] = []
+    source_field_counts: dict[tuple[str, str], int] = {}
     for observation in observations.values():
+        raw_uncertainty = observation.uncertainty.verbatim
+        if isinstance(raw_uncertainty, Mapping):
+            source = observation.observation_id.partition("::")[0]
+            for field in (
+                "T_m_uncertainty_K",
+                "gamma_uncertainty",
+                "two_sigma",
+                "limits",
+            ):
+                if field in raw_uncertainty:
+                    key = (source, field)
+                    source_field_counts[key] = source_field_counts.get(key, 0) + 1
         if observation.uncertainty.kind is UncertaintyKind.NONE:
             continue
         quantity = quantity_token(observation.identity)
@@ -2186,6 +2198,20 @@ def test_full_store_printed_width_band_census_matches_green() -> None:
     # Round 10 restores the two in-domain Sossi XANES intervals; no printed
     # widths or convention conflicts are added or removed.
     assert (width_count, band_count, conflicts) == (21202, 13527, [])
+    assert source_field_counts == {
+        ("shornikov-2000-aluminosilicate-vaporization", "T_m_uncertainty_K"): 31,
+        ("shornikov-2019-ca-feo-vapor", "T_m_uncertainty_K"): 2,
+        ("shornikov-2025-ca-al-inclusion-thermodynamics", "T_m_uncertainty_K"): 1,
+        ("bouhifd-2007-basalt-thermochemistry", "T_m_uncertainty_K"): 1,
+        ("lu-2026-mercury-sulfur-liquidus", "T_m_uncertainty_K"): 16,
+        ("shornikov-2020-cao-mgo-thermodynamics", "T_m_uncertainty_K"): 4,
+        ("shornikov-2024-wollastonite-evaporation", "T_m_uncertainty_K"): 5,
+        ("archakov-1999-titania-slag-evaporation", "T_m_uncertainty_K"): 1,
+        ("baborak-2023-alkali-silicate-levitation-evaporation", "T_m_uncertainty_K"): 6,
+        ("lamoreaux-hildenbrand-1984", "T_m_uncertainty_K"): 1,
+        ("kems-012-sossi-2019", "gamma_uncertainty"): 58,
+        ("florin-2025-cu-silicate-evaporation", "two_sigma"): 1,
+    }
 
 
 def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> None:
@@ -2739,6 +2765,12 @@ def test_source_method_activity_band_uses_explicit_basis_and_meaning(
     assert band.band_basis == "source_method"
     assert band.value == Decimal(expected_band)
     assert band.rule.startswith(f"{rule}:")
+    if basis == "relative_percent":
+        assert not any(
+            isinstance(notice.reason, str)
+            and notice.reason.startswith("uncertainty_basis_defaulted:")
+            for notice in residual.notices
+        )
 
 
 @pytest.mark.parametrize(

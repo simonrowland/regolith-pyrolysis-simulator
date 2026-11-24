@@ -88,8 +88,13 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.uncertainty_conventions import (
     UncertaintyConventionConflict,
+    mapping_uncertainty_unit,
+    mapping_uncertainty_value,
+    paired_width_unit,
     printed_uncertainty_convention,
+    resolve_observed_width_basis,
     standard_uncertainty_width,
+    uncertainty_exact_fields,
 )
 from simulator.battery import schema_gap as sg
 from simulator.battery.default_policy import resolve as resolve_default_policy
@@ -9412,10 +9417,10 @@ def _apply_equilibrium_starting_bulk(
     anhydrous normalization still carries the oxide bulk and says that
     identity.composition omits H2O. A missing or unusable start stays
     missing, except a b-704 mass-percent refusal, which remains an explicit
-    unknown on the observation. A row that already prints ``composition``
-    or ``initial_composition_as_published`` as unknown keeps that blank:
-    the experiment bulk is not this row's printed start. Residue quantities
-    do not call this.
+    unknown on the observation. For phase-composition rows, a usable sample
+    start takes precedence over a row-level analyzed-product composition.
+    A row that prints ``composition`` or ``initial_composition_as_published``
+    as unknown keeps that blank. Residue quantities do not call this.
     """
 
     if experiment is None:
@@ -9458,18 +9463,38 @@ def _apply_equilibrium_starting_bulk(
         return point_conditions, []
     if _row_printed_composition_unknown(point_conditions):
         return point_conditions, []
-    if _keeps_existing_composition(ident_kwargs.get("composition")):
-        return point_conditions, []
     composition_for_row = composition
-    if composition.proxy_flag != "composition_from_sample_catalog":
+    if (
+        composition.input_provenance is None
+        and composition.proxy_flag != "composition_from_sample_catalog"
+    ):
         composition_for_row = composition_with_provenance(
             composition, PRINTED_STARTING_BULK
         )
+    if (
+        (
+            quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            or composition_for_row.input_provenance != PRINTED_STARTING_BULK
+            or composition_for_row.proxy_flag == "composition_from_sample_catalog"
+        )
+        and _keeps_existing_composition(ident_kwargs.get("composition"))
+    ):
+        return point_conditions, []
     located = Located(
         State.of(composition_for_row),
         locator=initial.locator,
         inference=initial.inference,
     )
+    existing_identity_composition = ident_kwargs.get("composition")
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and _keeps_existing_composition(existing_identity_composition)
+        and isinstance(existing_identity_composition, State)
+        and isinstance(existing_identity_composition.value, Composition)
+        and existing_identity_composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ):
+        return point_conditions, []
     ident_kwargs["composition"] = located.state
     existing_point = (point_conditions or {}).get("composition")
     if not (
@@ -16194,6 +16219,109 @@ class SourceSelection:
     @property
     def available(self) -> bool:
         return self.value.kind is not ValueKind.UNAVAILABLE
+
+
+def _uncertainty_for_value_selection(
+    uncertainty: Uncertainty,
+    selection: SourceSelection | None,
+    quantity: Quantity | None,
+    printed_value: str | None = None,
+    *,
+    derivation: Derivation | None = None,
+    subtype: object = None,
+) -> Uncertainty:
+    """Normalize a printed width only when its own unit and basis are known."""
+
+    if (
+        selection is None
+        or not selection.available
+        or selection.unit_trail != "percent_to_fraction"
+        or selection.value.kind is not ValueKind.POINT
+    ):
+        return uncertainty
+    raw = uncertainty.verbatim
+    if not isinstance(raw, Mapping):
+        return uncertainty
+    verbatim = dict(raw)
+    exact_fields = uncertainty_exact_fields(
+        quantity,
+        derivation_parameters=derivation.parameters if derivation is not None else (),
+        subtype=subtype,
+    )
+    selected = mapping_uncertainty_value(
+        verbatim,
+        exact_fields=exact_fields,
+    )
+    width = selected.value
+    # Shape stays on the selection. The unit is only a closed-vocabulary unit.
+    width_unit = selected.unit
+    source_unit = (
+        width_unit
+        or mapping_uncertainty_unit(verbatim)
+        or paired_width_unit(printed_value)
+    )
+    if width is None:
+        return uncertainty
+    parsed_width = _as_dec_or_none(width)
+    if parsed_width is None:
+        if isinstance(width, (tuple, list)) and len(width) == 2:
+            parsed_width = tuple(_as_dec_or_none(item) for item in width)
+            if any(item is None for item in parsed_width):
+                return uncertainty
+        else:
+            return uncertainty
+    resolved = resolve_observed_width_basis(
+        verbatim,
+        inline_unit=width_unit,
+        uncertainty_basis=str(uncertainty.basis or ""),
+        paired_value=printed_value,
+        expected_unit="dimensionless",
+        selected_text=selected.text,
+        nested_unit=selected.declared_unit,
+    )
+    basis = resolved.basis
+    conflict = resolved.conflict
+    default_reason = resolved.basis_default_reason
+    if conflict is not None:
+        return replace(
+            uncertainty,
+            value=None,
+            basis=f"uncertainty_convention_conflict:{conflict}",
+        )
+    if basis is None:
+        return uncertainty
+    percent_width = bool(
+        source_unit
+        and source_unit.casefold() in {
+            "%", "percent", "percentage", "atom%", "atom %"
+        }
+    )
+    if percent_width:
+        if isinstance(parsed_width, tuple):
+            scaled: Decimal | tuple[Decimal, Decimal] = tuple(
+                _percent_to_fraction(value) for value in parsed_width
+            )
+        else:
+            scaled = _percent_to_fraction(parsed_width)
+    elif isinstance(parsed_width, tuple):
+        scaled = tuple(as_decimal(value) for value in parsed_width)
+    else:
+        scaled = as_decimal(parsed_width)
+    if basis == "dimensionless":
+        verbatim.setdefault("printed_units", source_unit)
+        verbatim["units"] = "dimensionless"
+    elif basis == "relative":
+        # Scale once. "%" is stored as the fraction the scorer must not divide
+        # by 100 again. printed_units keeps the percent the paper used.
+        # atom% is not in the scorer's percent set, so its unit stays put.
+        if source_unit and source_unit.casefold() in {"%", "percent", "percentage"}:
+            verbatim.setdefault("printed_units", source_unit)
+            verbatim["units"] = "fraction"
+        elif source_unit:
+            verbatim["units"] = source_unit
+        if default_reason:
+            verbatim["basis_default_reason"] = default_reason
+    return replace(uncertainty, verbatim=verbatim, value=scaled, basis=basis)
 
 
 def _quantity_token(declared: Quantity | State[Quantity] | str | None) -> Quantity | None:
@@ -30489,8 +30617,21 @@ class Migrator:
                 value_sel.reason or "source values have no printed scalar/series point"
             )
 
+        uncertainty = uncertainty_for(obs.get("uncertainty"))
+        uncertainty = _uncertainty_for_value_selection(
+            uncertainty,
+            value_sel,
+            q_token,
+            str(
+                obs.get("value_as_published")
+                or values.get("value_as_published")
+                or ""
+            ),
+            derivation=value_derivation,
+            subtype=identity.subtype,
+        )
         uncertainty = _uncertainty_as_log10_dex(
-            uncertainty_for(obs.get("uncertainty")), value_sel.printed_form
+            uncertainty, value_sel.printed_form
         )
         t_m_unc = values.get("T_m_uncertainty_K") if isinstance(values, Mapping) else None
         if q_token is Quantity.TRANSITION_TEMPERATURE and t_m_unc is not None:
@@ -31067,7 +31208,11 @@ class Migrator:
         ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
     ) -> bool:
-        raw_item = item.get("item")
+        source_item = item.get("item")
+        raw_item = source_item
+        non_mapping_point = not isinstance(raw_item, Mapping)
+        if non_mapping_point:
+            raw_item = {}
         point_composition_context = (
             source_point_composition_context
             if source_point_composition_context is not None
@@ -31410,7 +31555,7 @@ class Migrator:
                 point_id = ordinal_point_id
             elif content_stable_id:
                 point_id = _exploded_point_id(
-                    parent_id, item, coord, raw_item, row_extra
+                    parent_id, item, coord, source_item, row_extra
                 )
             elif coord is not None:
                 point_id = series_point_id(parent_id, temperature=coord, extra=row_extra)
@@ -31522,7 +31667,9 @@ class Migrator:
                             )
         else:
             if content_stable_id:
-                point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
+                point_id = _exploded_point_id(
+                    parent_id, item, coord, source_item, None
+                )
             else:
                 point_id = f"{parent_id}::point:{index}"
 
@@ -31983,6 +32130,23 @@ class Migrator:
                         basis="log10_dex",
                     )
         if value_sel is not None:
+            point_value_as_printed = (
+                str(
+                    raw_item.get("value_as_published")
+                    or raw_item.get("value_as_printed")
+                    or ""
+                )
+                if isinstance(raw_item, Mapping)
+                else None
+            )
+            unc = _uncertainty_for_value_selection(
+                unc,
+                value_sel,
+                q_token_point,
+                point_value_as_printed,
+                derivation=derivation,
+                subtype=identity.subtype,
+            )
             unc = _uncertainty_as_log10_dex(unc, value_sel.printed_form)
         point_conditions = None
         if coord is not None:
