@@ -58,6 +58,7 @@ ZIP64_EOCD_LOCATOR_SIGNATURE = 0x07064B50
 ZIP_CENTRAL_DIRECTORY_SIGNATURE = 0x02014B50
 ZIP_CENTRAL_DIRECTORY_FIXED_BYTES = 46
 IMPORTED_DIR_NAME = "imported"
+IMPORT_STAGING_PREFIX = ".import."
 IMPORT_OVERLAY_NAME = "import.overlay.json"
 VERDICT_CONFIRMED = "confirmed"
 VERDICT_DISPUTED = "disputed"
@@ -157,7 +158,7 @@ def import_study_bundle(
 
     imported_root = root / IMPORTED_DIR_NAME
     imported_root.mkdir(parents=True, exist_ok=True)
-    tmp = Path(mkdtemp(prefix=".import.", dir=imported_root))
+    tmp = Path(mkdtemp(prefix=IMPORT_STAGING_PREFIX, dir=imported_root))
     try:
         member_names = _extract_bundle_members(source, tmp)
         index_payload = _parse_json_object(
@@ -474,8 +475,12 @@ def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:
 def is_optimizer_archive_store(path: Path | str, runs_root: Path | str) -> bool:
     """Whether a result store has import provenance or is in import quarantine."""
     directory = Path(path).resolve().parent
-    return (directory / IMPORT_OVERLAY_NAME).is_file() or is_imported_path(
-        directory, runs_root
+    in_import_quarantine = is_imported_path(directory, runs_root)
+    is_import_staging = in_import_quarantine and directory.name.startswith(
+        IMPORT_STAGING_PREFIX
+    )
+    return not is_import_staging and (
+        (directory / IMPORT_OVERLAY_NAME).is_file() or in_import_quarantine
     )
 
 

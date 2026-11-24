@@ -132,14 +132,19 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
     args = parser.parse_args(argv)
     keep_versions = tuple(interoperable_corpus_versions())
     runs_root = Path(os.environ.get("OPTIMIZER_RUNS_DIR") or Path.cwd() / "runs").expanduser()
-    stores = args.store or list(dict.fromkeys([
-        *(path / OPTIMIZER_CACHE_NAME for path in optimizer_run_dirs(runs_root)),
-        *(
-            path
-            for path in runs_root.rglob(OPTIMIZER_CACHE_NAME)
-            if is_optimizer_archive_store(path, runs_root)
-        ),
-    ]))
+    auto_archive_stores: set[Path] = set()
+    if args.store:
+        stores = args.store
+    else:
+        archive_stores = []
+        for path in runs_root.rglob(OPTIMIZER_CACHE_NAME):
+            if is_optimizer_archive_store(path, runs_root):
+                archive_stores.append(path)
+                auto_archive_stores.add(path)
+        stores = list(dict.fromkeys([
+            *(path / OPTIMIZER_CACHE_NAME for path in optimizer_run_dirs(runs_root)),
+            *archive_stores,
+        ]))
     report = {
         "keep_corpus_version": current_corpus_version(),
         "keep_corpus_versions": list(keep_versions),
@@ -147,45 +152,68 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
         "stores": [],
         "retained_artifacts": [],
     }
-    for path in stores:
-        if not path.is_file():
-            raise FileNotFoundError(f"optimizer result store not found: {path}")
-        real_path = Path(os.path.realpath(path))
-        if is_optimizer_archive_store(real_path, runs_root):
+    try:
+        for path in stores:
+            if not path.is_file():
+                if not args.store and path in auto_archive_stores:
+                    report["stores"].append(
+                        {
+                            "store": str(path),
+                            "artifact_kind": "archive",
+                            "status": "disappeared",
+                        }
+                    )
+                    continue
+                raise FileNotFoundError(f"optimizer result store not found: {path}")
+            real_path = Path(os.path.realpath(path))
+            if is_optimizer_archive_store(real_path, runs_root):
+                report["stores"].append(
+                    {"store": str(real_path), "artifact_kind": "archive", "status": "skipped"}
+                )
+                continue
+            if args.apply:
+                result_store = ResultStore(
+                    real_path,
+                    write_lock_path=study_results_write_lock_path(real_path.parent),
+                )
+                counts = result_store.prune_stale_corpus_version(keep_versions, apply=True)
+            else:
+                counts = ResultStore.count_stale_corpus_versions(real_path, keep_versions)
             report["stores"].append(
-                {"store": str(real_path), "artifact_kind": "archive", "status": "skipped"}
+                {
+                    "store": str(real_path),
+                    "artifact_kind": "result_rows",
+                    **counts,
+                    "deleted": counts["stale"] if args.apply else 0,
+                }
             )
-            continue
-        if args.apply:
-            result_store = ResultStore(
-                real_path,
-                write_lock_path=study_results_write_lock_path(real_path.parent),
+        artifact_dirs = {Path(entry["store"]).parent for entry in report["stores"]}
+        if not args.store:
+            artifact_dirs.update(path.parent for path in runs_root.rglob(PARETO_NAME))
+        for directory in sorted(artifact_dirs):
+            pareto = directory / PARETO_NAME
+            if pareto.is_file():
+                report["retained_artifacts"].append(
+                    {"path": str(pareto), "artifact_kind": "warm_start", "status": "kept"}
+                )
+    except Exception as exc:
+        print(f"Prune aborted: {type(exc).__name__}: {exc}")
+        print(
+            json.dumps(
+                {**report, "abort_reason": f"{type(exc).__name__}: {exc}"},
+                sort_keys=True,
             )
-            counts = result_store.prune_stale_corpus_version(keep_versions, apply=True)
-        else:
-            counts = ResultStore.count_stale_corpus_versions(real_path, keep_versions)
-        report["stores"].append(
-            {
-                "store": str(real_path),
-                "artifact_kind": "result_rows",
-                **counts,
-                "deleted": counts["stale"] if args.apply else 0,
-            }
         )
-    artifact_dirs = {Path(entry["store"]).parent for entry in report["stores"]}
-    if not args.store:
-        artifact_dirs.update(path.parent for path in runs_root.rglob(PARETO_NAME))
-    for directory in sorted(artifact_dirs):
-        pareto = directory / PARETO_NAME
-        if pareto.is_file():
-            report["retained_artifacts"].append(
-                {"path": str(pareto), "artifact_kind": "warm_start", "status": "kept"}
-            )
+        raise
     if not report["stores"]:
         print("No optimizer result stores found.")
     for entry in report["stores"]:
         if entry["artifact_kind"] == "archive":
-            print(f"{entry['store']} archive: skipped (archive markers present)")
+            print(
+                f"{entry['store']} archive: {entry['status']}"
+                if entry["status"] == "disappeared"
+                else f"{entry['store']} archive: skipped (archive markers present)"
+            )
             continue
         action = "deleted" if args.apply else "would delete"
         print(

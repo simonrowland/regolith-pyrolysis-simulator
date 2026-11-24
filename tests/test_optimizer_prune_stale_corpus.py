@@ -17,7 +17,7 @@ from simulator.optimize.results_store import (
     study_results_write_lock_path,
 )
 from simulator.optimize import results_store as results_store_module
-from simulator.optimize.import_bundle import IMPORT_OVERLAY_NAME
+from simulator.optimize.import_bundle import IMPORT_OVERLAY_NAME, is_imported_path
 from simulator.optimize.save_bundle import (
     ARTIFACT_INDEX_NAME,
     REQUIRED_MEMBERS,
@@ -318,6 +318,69 @@ def test_default_report_keeps_pareto_and_lists_quarantined_store(tmp_path, monke
     assert report["retained_artifacts"] == [{
         "path": str(native / "pareto.json"), "artifact_kind": "warm_start", "status": "kept"
     }]
+
+
+def _assert_import_staging_is_not_discovered(tmp_path, monkeypatch, capsys):
+    root = tmp_path / "runs"
+    staging_store = root / "imported" / ".import.in-progress" / "cache.sqlite"
+    staging_store.parent.mkdir(parents=True)
+    staging_store.write_bytes(b"partially published import")
+    (staging_store.parent / IMPORT_OVERLAY_NAME).write_text("{}")
+    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
+
+    assert cli.main(["prune-stale-corpus"]) == 0
+
+    output = capsys.readouterr().out
+    report = json.loads(output.splitlines()[-1])
+    assert report["stores"] == []
+
+
+def test_import_staging_store_is_not_discovered(tmp_path, monkeypatch, capsys):
+    _assert_import_staging_is_not_discovered(tmp_path, monkeypatch, capsys)
+
+
+def test_import_staging_classifier_mutation_probe_rejects_old_rule(
+    tmp_path, monkeypatch, capsys
+):
+    def old_classifier(path, runs_root):
+        directory = Path(path).resolve().parent
+        return (directory / IMPORT_OVERLAY_NAME).is_file() or (
+            is_imported_path(directory, runs_root)
+        )
+
+    monkeypatch.setattr(cli, "is_optimizer_archive_store", old_classifier)
+    with pytest.raises(AssertionError):
+        _assert_import_staging_is_not_discovered(tmp_path, monkeypatch, capsys)
+
+
+def test_apply_reports_committed_stores_when_later_store_is_missing(
+    tmp_path, monkeypatch, capsys
+):
+    store = _store_with_versions(tmp_path / "native")
+    missing = tmp_path / "runs" / "native-lost-during-prune" / "cache.sqlite"
+    monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
+
+    with pytest.raises(FileNotFoundError, match="optimizer result store not found"):
+        cli.main([
+            "prune-stale-corpus",
+            "--store",
+            str(store.path),
+            "--store",
+            str(missing),
+            "--apply",
+        ])
+
+    assert _keys(store) == {"current", "older-compatible", "unversioned"}
+    report = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert report["stores"] == [{
+        "store": str(store.path.resolve()),
+        "artifact_kind": "result_rows",
+        "stale": 1,
+        "kept": 2,
+        "unversioned": 1,
+        "deleted": 1,
+    }]
+    assert report["abort_reason"].startswith("FileNotFoundError: optimizer result store not found:")
 
 
 def test_quarantine_path_mutation_probe_rejects_marker_only_classifier(
