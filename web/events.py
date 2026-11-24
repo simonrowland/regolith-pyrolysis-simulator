@@ -683,6 +683,28 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
         return True
 
 
+def _emit_pending_pause_ack(socketio, sid: str, run_id: str) -> bool:
+    """Acknowledge a pause once its current simulation step has settled."""
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        if (
+            state is None
+            or state.get('run_id') != run_id
+            or not state.get('running')
+            or not state.pop('pause_ack_pending', False)
+        ):
+            return False
+        socketio.emit(
+            'simulation_status',
+            _browser_socket_payload(
+                'simulation_status',
+                {'status': 'paused', 'run_id': run_id},
+            ),
+            room=sid,
+        )
+        return True
+
+
 _PER_HOUR_DETAIL_FIELDS = (
     'condensation_refusals_by_species',
     'vapour_batch_summary',
@@ -3005,6 +3027,7 @@ def _start_background_loop(
             ):
                 break
             if state['paused']:
+                _emit_pending_pause_ack(socketio, sid, run_id)
                 socketio.sleep(0.1)
                 continue
 
@@ -3236,6 +3259,8 @@ def _start_background_loop(
                 stop_for_failure(exc, session, sim)
                 break
 
+            _emit_pending_pause_ack(socketio, sid, run_id)
+
             campaign_summary = step_result.campaign_summary
             campaign_refusal = None
             campaign_refusal_key = None
@@ -3413,6 +3438,7 @@ def _start_background_loop(
                         restart = True
                     if not current.get('running'):
                         restart = False
+            _emit_pending_pause_ack(socketio, sid, run_id)
             if callable(resume):
                 resume()
             if restart:
@@ -4151,27 +4177,24 @@ def register_events(socketio):
     @socketio.on('pause_simulation')
     def handle_pause():
         sid = request.sid
-        state, lock = _current_simulation_state(sid)
-        if not state or not lock:
-            reject_control_without_active_run(sid, 'pause_simulation')
-            return
-        run_id = state['run_id']
-        with lock:
-            current, _ = _current_simulation_state(sid, run_id)
-            if current is not state:
+        with _simulations_guard:
+            state = _simulations.get(sid)
+            if state is None or sid not in _sim_locks:
+                reject_control_without_active_run(sid, 'pause_simulation')
                 return
             if not state['running']:
                 reject_control_without_active_run(sid, 'pause_simulation')
                 return
+            run_id = state['run_id']
             state['session'].pause()
             state['paused'] = True
-            _emit_if_current(
-                socketio,
-                sid,
-                run_id,
-                'simulation_status',
-                {'status': 'paused'},
-            )
+            state['pause_ack_pending'] = True
+            loop_exited = state.get('loop_exited', False)
+
+        # The active loop emits at its next safe boundary. An already-parked
+        # loop has no boundary left to reach, so acknowledge it here.
+        if loop_exited:
+            _emit_pending_pause_ack(socketio, sid, run_id)
 
     @socketio.on('resume_simulation')
     def handle_resume(data=None):
