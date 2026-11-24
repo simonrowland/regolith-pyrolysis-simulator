@@ -969,6 +969,42 @@ def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(ox
     assert mass(result.evaporated_mol) / mass(initial) == pytest.approx(0.2, abs=1e-10)
 
 
+def test_knudsen_extent_fires_secondary_parent_exhaustion_event(monkeypatch):
+    from scipy import integrate as scipy_integrate
+
+    real_solve_ivp = scipy_integrate.solve_ivp
+    event_hits_by_solve = []
+
+    def record_solve_ivp(*args, **kwargs):
+        solution = real_solve_ivp(*args, **kwargs)
+        event_hits_by_solve.append(
+            tuple(tuple(float(hit) for hit in hits) for hits in solution.t_events)
+        )
+        return solution
+
+    monkeypatch.setattr(scipy_integrate, "solve_ivp", record_solve_ivp)
+    result = integrate_knudsen_residue_inventory(
+        {"Al2O3": 1.0, "SiO2": 0.01},
+        (
+            ResidueChannel(
+                "AlSiO", "AlSiO", "Al2O3", 1.0, "mixed-parent event",
+                parent_oxide_stoich={"Al2O3": 0.5, "SiO2": 1.0},
+            ),
+            ResidueChannel("O2", "O2", None, 1.0, "oxygen extent"),
+        ),
+        lambda _inventory, _logp, _temperature: {"AlSiO": 1.0e6, "O2": 1.0},
+        temperature_path=((0.02, 2000.0),),
+        measured_mass_loss_fraction=0.02,
+        near_saturated=True,
+        source_fO2_log_by_interval=(-10.0,),
+    )
+
+    # Parents follow inventory order, so event index 1 is secondary SiO2.
+    assert any(len(events) > 1 and events[1] for events in event_hits_by_solve)
+    assert result.residue_mol["SiO2"] == 0.0
+    assert result.residue_mol["Al2O3"] > 0.0
+
+
 @pytest.mark.parametrize("pressures,reason", (
     ({"O2": 0.0}, "channel_missing"),
     ({"FeO": float("nan"), "O2": 0.0}, "residue_pressure_invalid"),

@@ -1711,8 +1711,7 @@ def integrate_knudsen_residue_inventory(
         while xi < stop:
             event_indices = [
                 i for i, k in enumerate(parents)
-                if k in active_parents
-                and state[i] > 0.0
+                if state[i] > 0.0
                 and any(k in term.parent_moles_per_product for term in terms)
             ]
             if state[oxygen_index] > 0.0:
@@ -1748,7 +1747,7 @@ def integrate_knudsen_residue_inventory(
                     parent = parents[index]
                     cutoff = parent_cutoffs.get(parent, 0.0)
                     if len(hits) or state[index] <= cutoff:
-                        active_parents.remove(parent)
+                        active_parents.discard(parent)
                         if cutoff > 0.0:
                             trace_tail_kg[parent] = state[index] * _formula_terms(parent)[1]
                         else:

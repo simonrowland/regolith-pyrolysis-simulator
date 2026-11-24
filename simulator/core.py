@@ -7154,13 +7154,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 target_fO2_log,
                 T_K=T_K,
             )
-            candidate_fO2_log = self._apply_melt_metal_saturation_buffer(
-                candidate_fO2_log=target_fO2_log,
-                redox_capacity_mol_per_ln=C_m,
-                temperature_K=T_K,
-                source_terms=terms,
-                gate_authority=gate_authority,
-            )
             published_fO2_log = self._ledger_consistent_melt_fO2_log(T_K)
             reservoir.melt_intrinsic_fO2_log = (
                 self._finite_oxygen_reservoir_fO2_log(
@@ -7169,7 +7162,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     source_terms_mol_o2_equiv=terms,
                     net_o2_equiv_mol=net_o2_equiv_mol,
                     melt_redox_capacity_mol_per_ln_fO2=C_m,
-                    candidate_fO2_log=candidate_fO2_log,
+                    candidate_fO2_log=published_fO2_log,
                 )
             )
             applied_delta_ln = (
