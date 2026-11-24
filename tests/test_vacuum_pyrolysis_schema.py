@@ -787,6 +787,7 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
     assert area_notice["value"] == pytest.approx(
         design.crucible.melt_surface_area_m2
     )
+    assert area_notice["original_reason"] == "exposed_melt_area_not_printed"
     assert area_notice["source_class"] == "assumption_with_sensitivity_marker"
     assert area_notice["out_of_domain"] is True
 

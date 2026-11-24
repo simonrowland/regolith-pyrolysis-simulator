@@ -678,6 +678,7 @@ from simulator.lab_geometry import (
     LabGeometryError,
     parse_lab_geometry,
     resolve_gram_lab_exposed_melt_area,
+    _resolve_lab_surface_profile,
 )
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
@@ -1427,6 +1428,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.setpoints.get("lab_geometry"),
             allow_temperature_profiles=allow_lab_geometry_temperature_profiles,
         )
+        self._dp008_surface_temperature_defaults: dict[str, dict[str, Any]] = {}
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = self._new_atom_ledger()
@@ -4267,19 +4269,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for surface in self.lab_geometry.surfaces:
             profile_key = str(getattr(surface, "temperature_profile", "") or "")
             if profile_key:
-                if profile_key not in surface_schedule:
+                profile_resolution = _resolve_lab_surface_profile(
+                    surface,
+                    surface_schedule,
+                    scale=self.lab_geometry.scale,
+                )
+                if profile_resolution.schedule_points is None:
+                    if profile_resolution.default_temperature_C is not None:
+                        assert profile_resolution.notice is not None
+                        self._dp008_surface_temperature_defaults[
+                            surface.surface_id
+                        ] = profile_resolution.notice
+                        temperatures_C[surface.surface_id] = (
+                            profile_resolution.default_temperature_C
+                        )
+                        continue
+                    assert profile_resolution.reason is not None
                     refusal = LabScheduleValidationError(
-                        "lab_schedule_missing_surface_temperature: "
-                        f"{profile_key}"
+                        profile_resolution.reason
                     )
                     if unavailable is None:
                         raise refusal
                     unavailable[surface.surface_id] = str(refusal)
                     continue
-                points = surface_schedule[profile_key]
                 try:
                     temperatures_C[surface.surface_id] = interpolate_schedule_points(
-                        points,
+                        profile_resolution.schedule_points,
                         sample_time_h,
                     )
                 except LabScheduleValidationError as exc:
@@ -18534,19 +18549,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if area_resolution.defaulted:
                 sample_mass_g = self.lab_geometry.sample_mass_g
-                if sample_mass_g is None:
-                    raise LabGeometryError(
-                        'lab_geometry_sample_mass_not_printed',
-                        'DP-007 requires lab_geometry.sample.mass_g',
-                    )
+                sample_mass_kg = (
+                    sample_mass_g / 1000.0
+                    if sample_mass_g is not None
+                    else self.record.batch_mass_kg
+                )
                 from simulator.battery.default_policy import resolve
 
-                resolved = resolve('DP-007', sample_mass_kg=sample_mass_g / 1000.0)
-                resolved_area_m2 = float(resolved.value)
+                resolved = resolve('DP-007', sample_mass_kg=sample_mass_kg)
+                resolved_area_m2 = float(area_resolution.area_m2)
                 self._dp007_area_default = {
                     'resolved': resolved,
-                    'reason': 'exposed_melt_area_not_printed',
-                    'detail': 'lab_geometry.sample.exposed_melt_area_m2 is unprinted',
+                    'value': area_resolution.area_m2,
+                    'unit': 'm2',
+                    'reason': area_resolution.default_reason,
+                    'detail': (
+                        'lab_geometry.sample.exposed_melt_area_m2: '
+                        f'{area_resolution.default_reason}'
+                    ),
                 }
             self.melt.melt_surface_area_m2 = (
                 crucible_area_m2

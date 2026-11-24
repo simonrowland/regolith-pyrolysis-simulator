@@ -330,7 +330,7 @@ def test_assumed_pellet_diameter_area_reports_basis_and_domain_flag() -> None:
     ]
 
 
-def test_declared_area_without_basis_is_printed_but_requires_locator() -> None:
+def test_missing_locator_uses_sized_face_and_preserves_reason() -> None:
     geometry = {
         "scale": "gram_lab",
         "sample": {
@@ -355,14 +355,26 @@ def test_declared_area_without_basis_is_printed_but_requires_locator() -> None:
     assert "notices" not in bridge
 
     geometry["sample"].pop("exposed_melt_area_source_ref")
-    with pytest.raises(LabGeometryError) as excinfo:
-        resolve_gram_lab_exposed_melt_area(geometry)
-    assert excinfo.value.code == (
+    resolution = resolve_gram_lab_exposed_melt_area(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    bridge = gram_lab_exposed_melt_area_bridge(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    assert resolution.area_m2 == pytest.approx(0.0002)
+    assert resolution.defaulted is True
+    assert resolution.default_reason == (
         "missing_lab_geometry_exposed_melt_area_locator"
     )
+    assert bridge["notices"][0]["original_reason"] == (
+        "missing_lab_geometry_exposed_melt_area_locator"
+    )
+    assert bridge["notices"][0]["value"] == pytest.approx(0.0002)
 
 
-def test_unknown_exposed_area_basis_is_typed_refusal() -> None:
+def test_unknown_exposed_area_basis_uses_sized_face_and_preserves_reason() -> None:
     geometry = {
         "scale": "gram_lab",
         "sample": {
@@ -372,11 +384,48 @@ def test_unknown_exposed_area_basis_is_typed_refusal() -> None:
         },
     }
 
-    with pytest.raises(LabGeometryError) as excinfo:
-        resolve_gram_lab_exposed_melt_area(geometry)
-    assert excinfo.value.code == (
+    resolution = resolve_gram_lab_exposed_melt_area(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    assert resolution.area_m2 == pytest.approx(0.0002)
+    assert resolution.defaulted is True
+    assert resolution.default_reason == (
         "invalid_lab_geometry_exposed_melt_area_basis"
     )
+
+
+def test_area_basis_without_value_uses_sized_face_and_preserves_reason() -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {"exposed_melt_area_basis": "printed"},
+    }
+    resolution = resolve_gram_lab_exposed_melt_area(
+        geometry,
+        crucible_face_area_m2=0.0002,
+    )
+    assert resolution.area_m2 == pytest.approx(0.0002)
+    assert resolution.defaulted is True
+    assert resolution.default_reason == (
+        "lab_geometry_exposed_melt_area_basis_without_value"
+    )
+
+
+@pytest.mark.parametrize("bad_area", [0.0, -1.0, math.inf, math.nan])
+def test_invalid_area_stays_refused_even_with_invalid_provenance(bad_area) -> None:
+    geometry = {
+        "scale": "gram_lab",
+        "sample": {
+            "exposed_melt_area_m2": bad_area,
+            "exposed_melt_area_basis": "unknown",
+        },
+    }
+    with pytest.raises(LabGeometryError) as caught:
+        resolve_gram_lab_exposed_melt_area(
+            geometry,
+            crucible_face_area_m2=0.0002,
+        )
+    assert caught.value.code == "invalid_lab_geometry_positive_value"
 
 
 def test_profile_only_geometry_stays_refused_without_surface_schedule() -> None:
@@ -514,7 +563,7 @@ def test_surface_temperature_schedule_requires_lab_geometry() -> None:
     assert excinfo.value.code == "lab_surface_temperature_schedule_without_geometry"
 
 
-def test_surface_temperature_profile_key_is_required() -> None:
+def test_missing_declared_surface_profile_uses_flagged_runtime_default() -> None:
     schedule = dynamic_lab_schedule()
     schedule["surface_temperature_C"]["holder"] = schedule[
         "surface_temperature_C"
@@ -531,11 +580,17 @@ def test_surface_temperature_profile_key_is_required() -> None:
         allow_fallback_vapor=True,
     )
 
-    with pytest.raises(
-        LabScheduleValidationError,
-        match="lab_schedule_missing_surface_temperature: holder_profile",
-    ):
-        run._start_session()
+    sim = run._start_session().simulator
+    temperatures = sim._resolve_lab_surface_temperatures(
+        schedule["surface_temperature_C"],
+        sample_time_h=0.0,
+    )
+    assert temperatures["holder"] == pytest.approx(0.0)
+    notice = sim._dp008_surface_temperature_defaults["holder"]
+    assert notice["policy"]["id"] == "DP-008"
+    assert notice["reason"] == (
+        "lab_schedule_missing_surface_temperature: holder_profile"
+    )
 
 
 def test_declared_surface_temperature_schedule_moves_runtime_deposits() -> None:

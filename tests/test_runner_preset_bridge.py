@@ -496,6 +496,38 @@ def test_null_exposed_melt_area_uses_sized_crucible_face_with_flag() -> None:
     assert pomeroy_area_notice["out_of_domain"] is True
 
 
+@pytest.mark.parametrize(
+    ("provenance_gap", "reason"),
+    [
+        ("unknown_basis", "invalid_lab_geometry_exposed_melt_area_basis"),
+        ("missing_locator", "missing_lab_geometry_exposed_melt_area_locator"),
+    ],
+)
+def test_untrusted_area_provenance_uses_sized_face_with_dp007(
+    provenance_gap: str,
+    reason: str,
+) -> None:
+    preset = _vacuum_preset("robinot_2026.yaml")
+    sample = preset["lab_geometry"]["sample"]
+    sample["exposed_melt_area_m2"] = 0.000123
+    if provenance_gap == "unknown_basis":
+        sample["exposed_melt_area_basis"] = "unrecognized_basis"
+        sample["exposed_melt_area_source_ref"] = "located_but_untrusted"
+    else:
+        sample["exposed_melt_area_basis"] = "printed"
+        sample.pop("exposed_melt_area_source_ref", None)
+
+    session = _gram_lab_run(preset, campaign="C2A")._start_session()
+    sim = session.simulator
+    sim._get_turbine_spec()
+    sized_face_m2 = sim._equipment.crucible.melt_surface_area_m2
+
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(sized_face_m2)
+    assert sim._dp007_area_default["reason"] == reason
+    assert sim._dp007_area_default["value"] == pytest.approx(sized_face_m2)
+    assert sim._dp007_area_default["resolved"].flag.value == "knob_defaulted"
+
+
 def test_missing_pressure_default_is_limited_to_gram_lab() -> None:
     setpoints = copy.deepcopy(runner_module.load_config_bundle().setpoints)
     setpoints["lab_geometry"] = {"scale": "pilot_scale"}
@@ -659,6 +691,8 @@ def test_dp007_area_notice_is_attached_to_run_metadata() -> None:
     notices = output["run_metadata"]["runtime_notices"]
     assert len(notices) == 1
     assert notices[0]["kind"] == "knob_defaulted"
+    assert notices[0]["value"] == pytest.approx(expected.value)
+    assert notices[0]["unit"] == "m2"
     assert notices[0]["reason"] == "exposed_melt_area_not_printed"
     assert notices[0]["policy"] == {
         "id": "DP-007",

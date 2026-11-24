@@ -571,15 +571,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
                 "missing_lab_geometry",
                 "preset lab_geometry is required",
             )
-        required_profiles = tuple(
-            surface.temperature_profile
-            for surface in lab_geometry.surfaces
-            if surface.temperature_profile
-        )
-        normalize_lab_schedule(
-            schedule,
-            required_surface_profiles=required_profiles,
-        )
+        normalize_lab_schedule(schedule)
     except (LabGeometryError, LabScheduleValidationError, TypeError, ValueError) as exc:
         raise PresetRunnerError(
             f"malformed_preset: {exc}",
@@ -1688,6 +1680,14 @@ class PyrolysisRun:
                         allow_temperature_profiles=True,
                     )
                 )
+        lab_geometry_notices.extend(
+            dict(notice)
+            for notice in getattr(
+                sim,
+                "_dp008_surface_temperature_defaults",
+                {},
+            ).values()
+        )
         # Anything left in metadata_overrides is propagated verbatim --
         # callers can stuff extra provenance (CI run id, etc.) without
         # the runner needing to know about it.
@@ -1719,6 +1719,8 @@ class PyrolysisRun:
             resolved = dp007_area_default["resolved"]
             dp007_area_notice = {
                 "kind": resolved.flag.value,
+                "value": dp007_area_default["value"],
+                "unit": dp007_area_default["unit"],
                 "reason": dp007_area_default["reason"],
                 "detail": dp007_area_default["detail"],
                 "policy": resolved.payload["policy"],

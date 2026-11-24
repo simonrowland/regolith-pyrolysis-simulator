@@ -56,6 +56,17 @@ class GramLabMeltAreaResolution:
     out_of_domain: bool = False
     basis: str | None = None
     locator: str | None = None
+    default_reason: str | None = None
+
+
+@dataclass(frozen=True)
+class _LabSurfaceProfileResolution:
+    """Resolved schedule points or the typed bench default for one profile."""
+
+    schedule_points: Any | None = None
+    default_temperature_C: float | None = None
+    notice: dict[str, Any] | None = None
+    reason: str | None = None
 
 
 @dataclass(frozen=True)
@@ -231,52 +242,65 @@ def resolve_gram_lab_exposed_melt_area(
         if isinstance(raw_locator, str) and raw_locator.strip()
         else None
     )
+    area = None
+    default_reason = None
     defaulted = raw_area in (None, "")
     if defaulted:
-        if basis is not None:
-            raise LabGeometryError(
-                "lab_geometry_exposed_melt_area_basis_without_value",
-                "lab_geometry.sample.exposed_melt_area_basis requires "
-                "exposed_melt_area_m2",
-            )
+        default_reason = (
+            "lab_geometry_exposed_melt_area_basis_without_value"
+            if basis is not None
+            else "exposed_melt_area_not_printed"
+        )
         if crucible_face_area_m2 is None:
             return GramLabMeltAreaResolution(None)
         raw_area = crucible_face_area_m2
     else:
+        # A supplied number remains subject to the positive finite contract
+        # even when its provenance cannot be trusted.
+        try:
+            area = (
+                float(raw_area)
+                if is_declared_real_scalar(raw_area, allow_numeric_str=True)
+                else None
+            )
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise LabGeometryError(
+                "invalid_lab_geometry_positive_value",
+                "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
+            ) from exc
+        if area is None or not math.isfinite(area) or area <= 0.0:
+            raise LabGeometryError(
+                "invalid_lab_geometry_positive_value",
+                "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
+            )
         basis = basis or "printed"
         if basis not in {
             "printed",
             LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER,
         }:
-            raise LabGeometryError(
-                "invalid_lab_geometry_exposed_melt_area_basis",
-                "lab_geometry.sample.exposed_melt_area_basis must be "
-                "'printed' or "
-                f"'{LAB_EXPOSED_MELT_AREA_ASSUMED_PELLET_DIAMETER}'",
-            )
-        if locator is None:
-            raise LabGeometryError(
-                "missing_lab_geometry_exposed_melt_area_locator",
-                "declared lab_geometry.sample.exposed_melt_area_m2 requires "
-                "exposed_melt_area_source_ref",
-            )
+            default_reason = "invalid_lab_geometry_exposed_melt_area_basis"
+        elif locator is None:
+            default_reason = "missing_lab_geometry_exposed_melt_area_locator"
+        if default_reason is not None:
+            if crucible_face_area_m2 is None:
+                return GramLabMeltAreaResolution(None)
+            raw_area = crucible_face_area_m2
+            defaulted = True
+            area = None
 
-    try:
-        area = (
-            float(raw_area)
-            if is_declared_real_scalar(raw_area, allow_numeric_str=True)
-            else None
-        )
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise LabGeometryError(
-            "invalid_lab_geometry_positive_value",
-            "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
-        ) from exc
-    if area is None or not math.isfinite(area) or area <= 0.0:
-        raise LabGeometryError(
-            "invalid_lab_geometry_positive_value",
-            "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
-        )
+    if area is None:
+        try:
+            area = float(raw_area)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise LabGeometryError(
+                "invalid_lab_geometry_positive_value",
+                "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
+            ) from exc
+        if not math.isfinite(area) or area <= 0.0:
+            raise LabGeometryError(
+                "invalid_lab_geometry_positive_value",
+                "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
+            )
     return GramLabMeltAreaResolution(
         area_m2=area,
         defaulted=defaulted,
@@ -286,6 +310,7 @@ def resolve_gram_lab_exposed_melt_area(
         ),
         basis=basis,
         locator=locator,
+        default_reason=default_reason,
     )
 
 
@@ -313,6 +338,8 @@ def gram_lab_exposed_melt_area_bridge(
             "default_source": "EquipmentDesigner.size_crucible",
             "source_class": "assumption_with_sensitivity_marker",
             "sensitivity_marker": "defaulted_crucible_face",
+            "reason": resolution.default_reason,
+            "original_reason": resolution.default_reason,
         }
         if resolution.out_of_domain:
             notice["out_of_domain"] = True
@@ -397,6 +424,49 @@ def _lab_surface_temperature_default_notices(
             notice["out_of_domain"] = True
         notices.append(notice)
     return notices
+
+
+def _resolve_lab_surface_profile(
+    surface: LabSurface,
+    surface_schedule: Mapping[str, Any],
+    *,
+    scale: str,
+) -> _LabSurfaceProfileResolution:
+    """Resolve the declared profile or return its typed bench fallback."""
+
+    profile_name = surface.temperature_profile
+    if profile_name in surface_schedule:
+        return _LabSurfaceProfileResolution(
+            schedule_points=surface_schedule[profile_name],
+        )
+    reason = f"lab_schedule_missing_surface_temperature: {profile_name}"
+    if scale != LAB_GEOMETRY_SCALE:
+        return _LabSurfaceProfileResolution(reason=reason)
+
+    from simulator.battery.default_policy import resolve
+
+    policy = resolve(
+        "DP-008",
+        runtime_default=_LAB_SURFACE_TEMPERATURE_DEFAULT_C,
+    )
+    notice = {
+        "code": policy.flag.value,
+        "path": f"lab_geometry.surfaces.{surface.surface_id}.temperature_C",
+        "value": policy.value,
+        "unit": "C",
+        "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
+        "source_class": "assumption_with_sensitivity_marker",
+        "sensitivity_marker": "defaulted_lab_surface_temperature",
+        "profile": profile_name,
+        "reason": reason,
+        "original_reason": reason,
+        "policy": dict(policy.payload["policy"]),
+    }
+    return _LabSurfaceProfileResolution(
+        default_temperature_C=float(policy.value),
+        notice=notice,
+        reason=reason,
+    )
 
 
 def _parse_lab_surface(
