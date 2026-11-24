@@ -1111,7 +1111,7 @@ def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
                 # JANAF TiO2 O-043/O-044 pair (2130 K crossing), so the
                 # printed 2173 K TiO2 solid now refuses as above-melting.
                 ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 3,
-                ("method_unknown", "method_unknown"): 1,
+                ("identity_incomplete", "printed_solid_reference_above_melting"): 1,
                 ("unsupported", "engine-thermo-does-not-emit"): 11,
                 ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
                 ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 3,
