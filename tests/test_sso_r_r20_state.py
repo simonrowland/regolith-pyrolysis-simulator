@@ -3242,11 +3242,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
-    # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
-    # finite-series-resistance escape fraction moved with D_AB.
+    # The Holzheid extrapolation reduces the native Fe pool from 1842.724 to
+    # 1816.228 mol, shifting this escape fraction at 1700 °C.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.0020039128629401287,
         rel=0.0,
         abs=1.0e-15,
     )
