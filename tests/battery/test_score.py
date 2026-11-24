@@ -807,7 +807,8 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     prediction = replace(
         _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
         identity=replace(
-            identity, total_pressure_Pa=State.of(Decimal("0.1"))
+            identity,
+            total_pressure_Pa=State.of(Decimal(str(policy.value))),
         ),
         notices=(assumption_notice,),
     )
@@ -879,7 +880,7 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
     )
     assert aggregate.flagged_records() == serialized_strata
     expected_flagged_rows = (
-        "| method_implied | vapour | internal-analytical | DP-101 | rejected | 1 |",
+        "| assumed_pressure | vapour | internal-analytical | DP-001 | canonical | 1 |",
     )
     legacy_report = score_mod._render_score_report_from_payloads_legacy(
         (payload,),
