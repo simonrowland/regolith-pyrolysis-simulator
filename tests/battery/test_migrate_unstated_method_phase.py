@@ -327,10 +327,14 @@ def test_phase_with_no_single_side_preserves_explicit_unknown(
         notice.kind is NoticeKind.PHASE_INFERRED
         for notice in observation.notices
     )
-    assert not any(
-        "phase" in entry.axes and entry.observation_id == observation.observation_id
+    phase_entries = [
+        entry
         for entry in result.queue
-    )
+        if "phase" in entry.axes
+        and entry.observation_id == observation.observation_id
+    ]
+    assert len(phase_entries) == 1
+    assert phase_entries[0].why == observation.identity.species.phase.reason
 
 
 def test_transition_phase_defaults_to_flagged_unspecified(
