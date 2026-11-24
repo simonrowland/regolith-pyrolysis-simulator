@@ -146,11 +146,21 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         fo2_mode=Fo2Mode.SHARED_LADDER,
     )
     if resolved.route == _VACUUM_ROUTE:
+        selected_pa_bar = (
+            resolved.po2_bar
+            if resolved.po2_bar is not None
+            else 10.0**resolved.log10_fO2_bar
+        )
+        selected_pa = selected_pa_bar * PA_PER_BAR
         notice = replace(
             notice,
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
             band="vacuum pO2 upper bound substituted at Ptotal",
             authority=Authority.EXTRAPOLATED,
+            reason=(
+                f"{reason}; selected_fO2_Pa={selected_pa:g}; "
+                "Dalton pO2 <= Ptotal; the upper bound was substituted as a point"
+            ),
         )
     return notice
 
@@ -380,7 +390,10 @@ def resolve_row_fo2(
         if route.route == _VACUUM_ROUTE:
             log = _log_point(route.value)
             if log is not None:
-                return ResolvedFo2(log, 3, route.route, False)
+                return ResolvedFo2(
+                    log, 3, route.route, False,
+                    po2_bar=10.0**log,
+                )
     if _knudsen_blocks_intrinsic(experiment, observation, quantity):
         return None
     return _tier4(weights, temperature)

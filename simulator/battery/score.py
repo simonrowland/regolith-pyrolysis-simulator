@@ -9259,7 +9259,7 @@ def _printed_fe_redox_fo2_log(
 
 
 def _fe_redox_pressure(
-    observation: Observation, identity: Identity
+    observation: Observation, identity: Identity, experiment: Experiment | None
 ) -> tuple[float, State[Any]] | _FeRedoxRefusal:
     pressure_pa = identity.total_pressure_Pa
     point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
@@ -9268,6 +9268,11 @@ def _fe_redox_pressure(
         and point_pressure is not None
     ):
         pressure_pa = State.of(point_pressure)
+    if (
+        (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
+        and experiment is not None
+    ):
+        pressure_pa = experiment.pressure_environment.total_pressure_Pa.state
     if (
         pressure_pa is not None
         and pressure_pa.is_value
@@ -9618,11 +9623,7 @@ def _unprinted_redox_oxygen(
     this point. None means no independent oxygen condition can be called.
     """
 
-    from simulator.battery.fo2_ladder import (
-        _VACUUM_ROUTE,
-        fo2_tier_notice,
-        resolve_row_fo2,
-    )
+    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 
     quantity = quantity_token(observation.identity)
     if quantity is None:
@@ -9647,13 +9648,7 @@ def _unprinted_redox_oxygen(
     qualified = replace(
         notice,
         reason=(
-            f"{notice.reason}; selected_fO2_Pa={commanded.value}; "
-            "original_reason=source does not print fO2 for this run"
-            + (
-                "; Dalton pO2 <= Ptotal; the upper bound was substituted as a point"
-                if resolved.route == _VACUUM_ROUTE
-                else ""
-            )
+            f"{notice.reason}; original_reason=source does not print fO2 for this run"
         ),
     )
     return fo2_log, commanded, qualified
@@ -9948,7 +9943,7 @@ def _predict_redox(
             ),
         )
 
-    pressure = _fe_redox_pressure(observation, identity)
+    pressure = _fe_redox_pressure(observation, identity, experiment)
     if isinstance(pressure, _FeRedoxRefusal):
         return refused(pressure.reason, pressure.detail)
     pressure_bar, pressure_pa = pressure

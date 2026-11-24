@@ -16,7 +16,6 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
-    FO2Channel,
     MetricOperation,
     MethodToken,
     NoticeKind,
@@ -49,7 +48,6 @@ from simulator.battery.records import (
     BenchIdentity,
     BenchIdentityBasis,
     Composition,
-    FO2Control,
     Located,
     Locator,
     Species,
@@ -1777,7 +1775,7 @@ def _without_printed_fo2(observation):
     )
 
 
-def _borisov_score_context(*, vacuum=False, named_valence=False, buffered=False):
+def _borisov_score_context(*, vacuum=False, named_valence=False):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     migrator = Migrator(root)
@@ -1825,11 +1823,6 @@ def _borisov_score_context(*, vacuum=False, named_valence=False, buffered=False)
         "bench_id": bench.id,
         "method": State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
     }
-    if buffered:
-        changes["fO2_control"] = FO2Control(
-            channel=State.of(FO2Channel.BUFFER),
-            buffer=F.located("IW"),
-        )
     if vacuum:
         changes["pressure_environment"] = replace(
             experiment.pressure_environment,
@@ -1850,17 +1843,18 @@ def _borisov_score_context(*, vacuum=False, named_valence=False, buffered=False)
     return context, row, experiment, bench
 
 
-def test_redox_dispatcher_forwards_recorded_buffer_and_preserves_control():
-    context, row, experiment, bench = _borisov_score_context(buffered=True)
+def test_redox_dispatcher_uses_reachable_control_and_preserves_bench():
+    context, row, experiment, bench = _borisov_score_context()
     residuals, _ = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
     residual = next(item for item in residuals if item.reference == row.observation_id)
+    assert residual.numeric is not None and residual.numeric.value.is_finite()
     oxygen = [notice for notice in residual.notices if notice.origin == "fo2_ladder"]
     assert len(oxygen) == 1
-    assert "route=buffer_relation" in oxygen[0].reason
+    assert "route=intrinsic_melt_fO2" in oxygen[0].reason
     assert "selected_fO2_Pa=" in oxygen[0].reason
-    assert oxygen[0].kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert oxygen[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     assert context.benches[experiment.bench_id] is bench
 
     without_bench = replace(context, benches={})
@@ -1877,16 +1871,17 @@ def test_redox_dispatcher_forwards_recorded_buffer_and_preserves_control():
 
 def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
     context, row, _experiment, _bench = _borisov_score_context(
-        named_valence=True, buffered=True
+        named_valence=True
     )
     residuals, _ = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
     residual = next(item for item in residuals if item.reference == row.observation_id)
+    assert residual.numeric is not None and residual.numeric.value.is_finite()
     notice = next(item for item in residual.notices if item.origin == "fo2_ladder")
     assert notice.affected_quantities == (Quantity.VALENCE_RATIO,)
-    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-    assert "route=buffer_relation" in notice.reason
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert "route=intrinsic_melt_fO2" in notice.reason
     assert "selected_fO2_Pa=" in notice.reason
 
     borrowed_context = replace(context, benches={})
@@ -1938,6 +1933,14 @@ def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
     assert vacuum_notice.authority is Authority.EXTRAPOLATED
     assert "Dalton pO2 <= Ptotal" in vacuum_notice.reason
     assert "selected_fO2_Pa=" in vacuum_notice.reason
+    assert "selected_fO2_Pa=0.0001" in vacuum_notice.reason
+    pressure_bar, selected_pressure = score_module._fe_redox_pressure(
+        vacuum_row,
+        vacuum_row.identity,
+        vacuum_context.experiments[vacuum_row.experiment_id],
+    )
+    assert pressure_bar == pytest.approx(1e-9)
+    assert selected_pressure.value == Decimal("0.0001")
     measured_headline = headline_payload_records(
         [residual_to_plain(vacuum_residual)],
         engines=(Engine.INTERNAL_ANALYTICAL,),
