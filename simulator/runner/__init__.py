@@ -4735,6 +4735,13 @@ def build_sio_yield_report(
     result = base_run._run_session(session)
     if result.get("status") in {"failed", "refused"}:
         raise RunnerError(str(result.get("error_message", "SiO run failed")))
+    from simulator.reduced_real_determinism import (
+        ENVIRONMENT_GATE_HOLD_MESSAGE,
+        find_environment_gate_refusal,
+    )
+
+    if find_environment_gate_refusal(result) is not None:
+        raise RunnerError(ENVIRONMENT_GATE_HOLD_MESSAGE)
 
     final_state = result.get("final_state", {})
     if (
