@@ -63,6 +63,7 @@ from scripts.seed_reduced_real_cache import payload_count, seed_cache
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
 from simulator.optimize.recipe import RecipeSchema
+from simulator.optimize.save_bundle import PARETO_NAME
 from simulator.grind_preflight import (
     GrindSourceGateError,
     assert_grind_feedstock_stage0_route_coverage,
@@ -2481,7 +2482,7 @@ def _stderr_reports_no_feasible(stderr_path: Path) -> bool:
 
 def _load_no_feasible_artifact_failure_counts(out_dir: Path) -> dict[str, int]:
     try:
-        payload = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+        payload = json.loads((out_dir / PARETO_NAME).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {}
     if not isinstance(payload, Mapping) or not isinstance(payload.get("failure_counts"), Mapping):
@@ -2502,7 +2503,7 @@ def _has_complete_no_feasible_artifacts(out_dir: Path, budget: int) -> bool:
         return False
     if (out_dir / "winner.recipe.yaml").exists():
         return False
-    pareto_path = out_dir / "pareto.json"
+    pareto_path = out_dir / PARETO_NAME
     try:
         pareto_payload = json.loads(pareto_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):

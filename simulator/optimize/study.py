@@ -121,10 +121,16 @@ from simulator.optimize.recipe import (
     c5_sampler_context,
 )
 from simulator.optimize.result_scope import result_scope_json, result_scope_payload
-from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VERSION
+from simulator.optimize.save_bundle import (
+    MEMBER_SCHEMA_VERSION,
+    OPTIMIZER_CACHE_NAME,
+    PARETO_NAME,
+    SAVE_SCHEMA_VERSION,
+)
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
+    study_results_write_lock_path,
     _deserialize_eval_spec,
     _deserialize_margins,
     _deserialize_objectives,
@@ -495,17 +501,6 @@ class StudyReplayResult:
         object.__setattr__(self, "strategy_state", MappingProxyType(dict(self.strategy_state)))
 
 
-def _study_write_lock_path(out: Path) -> Path:
-    """Shared commit lock for cache.sqlite plus materialized study artifacts.
-
-    Evaluations run outside this lock. Final artifact files are latest snapshots
-    for the run directory, so concurrent finishers serialize and the later
-    completed artifact commit wins.
-    """
-
-    return out / ".study-results.write.lock"
-
-
 class _LockedLineWriter:
     def __init__(self, path: Path, mode: str, store: ResultStore) -> None:
         if mode not in {"a", "w", "r"}:
@@ -654,8 +649,8 @@ def run(
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = result_store or ResultStore(
-        out / "cache.sqlite",
-        write_lock_path=_study_write_lock_path(out),
+        out / OPTIMIZER_CACHE_NAME,
+        write_lock_path=study_results_write_lock_path(out),
     )
     warm_start_source = _resolve_warm_start_source(
         resolved_profile,
@@ -1266,8 +1261,8 @@ def run_certify(
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = ResultStore(
-        out / "cache.sqlite",
-        write_lock_path=_study_write_lock_path(out),
+        out / OPTIMIZER_CACHE_NAME,
+        write_lock_path=study_results_write_lock_path(out),
     )
     source = ResultStore(Path(source_store))
     stored = source.fetch(certify_cache_key)
@@ -3145,7 +3140,7 @@ def _warm_start_paths(
     path_raw = raw.get("path", raw.get("run_dir"))
     if store_raw is None and pareto_raw is None and path_raw is None:
         raise StudyError(
-            "warm_start_from must name a prior run dir, cache.sqlite, or pareto.json"
+            f"warm_start_from must name a prior run dir, {OPTIMIZER_CACHE_NAME}, or {PARETO_NAME}"
         )
     if path_raw is not None:
         inferred_store, inferred_pareto = _infer_warm_start_paths(
@@ -3165,7 +3160,7 @@ def _warm_start_paths(
     )
     if store_path is None or pareto_path is None:
         raise StudyError(
-            "warm_start_from mapping must resolve both cache.sqlite and pareto.json"
+            f"warm_start_from mapping must resolve both {OPTIMIZER_CACHE_NAME} and {PARETO_NAME}"
         )
     return store_path, pareto_path
 
@@ -3178,11 +3173,11 @@ def _resolve_warm_start_path(path: Path, base_dir: Path) -> Path:
 
 
 def _infer_warm_start_paths(path: Path) -> tuple[Path, Path]:
-    if path.name == "cache.sqlite":
-        return path, path.parent / "pareto.json"
-    if path.name == "pareto.json":
-        return path.parent / "cache.sqlite", path
-    return path / "cache.sqlite", path / "pareto.json"
+    if path.name == OPTIMIZER_CACHE_NAME:
+        return path, path.parent / PARETO_NAME
+    if path.name == PARETO_NAME:
+        return path.parent / OPTIMIZER_CACHE_NAME, path
+    return path / OPTIMIZER_CACHE_NAME, path / PARETO_NAME
 
 
 def _resolve_warm_start_seeds(
@@ -5464,7 +5459,7 @@ def _write_artifacts(
     manifest_path = out / "study.manifest.json"
     summary_path = out / "study.summary.json"
     profile_path = out / "study.profile.yaml"
-    pareto_path = out / "pareto.json"
+    pareto_path = out / PARETO_NAME
     search_provenance_path = out / "search_provenance.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
@@ -6524,7 +6519,7 @@ def _records_from_cache_sqlite(
     constraints: Any = None,
     write_store: ResultStore | None = None,
 ) -> tuple[StudyRecord, ...]:
-    store_path = out / "cache.sqlite"
+    store_path = out / OPTIMIZER_CACHE_NAME
     if not store_path.is_file():
         return ()
     store = ResultStore(
@@ -6615,7 +6610,7 @@ def _candidate_from_cached_scored(
         id=str(candidate_id),
         patch=RecipePatch({}).validated(schema),
         metadata={
-            "strategy": "cache.sqlite",
+            "strategy": OPTIMIZER_CACHE_NAME,
             "sequence": index,
             "proposal_source": "cache_sqlite",
             "seed_lineage": False,
@@ -6738,7 +6733,7 @@ def _write_empty_artifacts(
             + "\n",
             encoding="utf-8",
         )
-        (out / "pareto.json").write_text(
+        (out / PARETO_NAME).write_text(
             json.dumps(
                 {
                     "member_schema_version": MEMBER_SCHEMA_VERSION,

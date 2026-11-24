@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import Enum
 import hashlib
 import io
 import json
@@ -29,6 +30,8 @@ from simulator.optimize.save_bundle import (
     ALLOWED_MEMBERS,
     ARTIFACT_INDEX_NAME,
     MEMBER_SCHEMA_VERSION,
+    OPTIMIZER_CACHE_NAME,
+    PARETO_NAME,
     REQUIRED_MEMBERS,
     SAVE_SCHEMA_VERSION,
     TERMINAL_STUDY_STATUSES,
@@ -56,6 +59,7 @@ ZIP64_EOCD_LOCATOR_SIGNATURE = 0x07064B50
 ZIP_CENTRAL_DIRECTORY_SIGNATURE = 0x02014B50
 ZIP_CENTRAL_DIRECTORY_FIXED_BYTES = 46
 IMPORTED_DIR_NAME = "imported"
+IMPORT_STAGING_PREFIX = ".import."
 IMPORT_OVERLAY_NAME = "import.overlay.json"
 VERDICT_CONFIRMED = "confirmed"
 VERDICT_DISPUTED = "disputed"
@@ -126,6 +130,20 @@ class ImportSafetyCapError(ImportBundleError):
     """Raised when an import safety cap is exceeded."""
 
 
+class StagedImportStoreError(ImportBundleError):
+    """Raised when pruning targets an import that has not been published."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        super().__init__(f"refusing STAGED optimizer import store: {path}")
+
+
+class OptimizerStoreClassification(Enum):
+    NATIVE = "native"
+    STAGED = "staged"
+    PUBLISHED_ARCHIVE = "published_archive"
+
+
 @dataclass(frozen=True)
 class ImportedStudy:
     study_id: str
@@ -155,7 +173,7 @@ def import_study_bundle(
 
     imported_root = root / IMPORTED_DIR_NAME
     imported_root.mkdir(parents=True, exist_ok=True)
-    tmp = Path(mkdtemp(prefix=".import.", dir=imported_root))
+    tmp = Path(mkdtemp(prefix=IMPORT_STAGING_PREFIX, dir=imported_root))
     try:
         member_names = _extract_bundle_members(source, tmp)
         index_payload = _parse_json_object(
@@ -192,7 +210,7 @@ def import_study_bundle(
             rmtree(tmp, ignore_errors=True)
             return ImportedStudy(destination.name, destination, True, warning)
 
-        with open_untrusted_result_db(tmp / "cache.sqlite") as conn:
+        with open_untrusted_result_db(tmp / OPTIMIZER_CACHE_NAME) as conn:
             conn.execute("SELECT name FROM sqlite_master LIMIT 1").fetchall()
         verification = verify_imported_study(
             tmp,
@@ -227,7 +245,7 @@ def open_untrusted_result_db(path: Path | str) -> sqlite3.Connection:
     if not db_path.is_file():
         raise ImportBundleError(f"imported sqlite not found: {db_path}")
     if db_path.stat().st_size > SQLITE_CAP_BYTES:
-        raise ImportSafetyCapError("cache.sqlite exceeds 400MB cap")
+        raise ImportSafetyCapError(f"{OPTIMIZER_CACHE_NAME} exceeds 400MB cap")
     uri = "file:" + quote(str(db_path.resolve()), safe="/") + "?mode=ro&immutable=1"
     conn = sqlite3.connect(uri, uri=True)
     try:
@@ -251,7 +269,9 @@ def open_untrusted_result_db(path: Path | str) -> sqlite3.Connection:
         page_size = int(conn.execute("PRAGMA page_size").fetchone()[0])
         page_count = int(conn.execute("PRAGMA page_count").fetchone()[0])
         if page_size * page_count > SQLITE_CAP_BYTES:
-            raise ImportSafetyCapError("cache.sqlite page footprint exceeds 400MB cap")
+            raise ImportSafetyCapError(
+                f"{OPTIMIZER_CACHE_NAME} page footprint exceeds 400MB cap"
+            )
     except Exception:
         conn.close()
         raise
@@ -336,7 +356,7 @@ def verify_imported_study(
 def _enforce_import_safety_caps(root: Path) -> dict[str, Any]:
     return {
         "leaderboard": _read_leaderboard(root / "leaderboard.csv"),
-        "rows_by_cache_key": _imported_rows_by_cache_key(root / "cache.sqlite"),
+        "rows_by_cache_key": _imported_rows_by_cache_key(root / OPTIMIZER_CACHE_NAME),
     }
 
 
@@ -399,7 +419,7 @@ def imported_study_model(
     summary = _study_summary_for_model(raw_summary)
     overlay = _load_overlay(root)
     leaderboard = _read_leaderboard(root / "leaderboard.csv")
-    pareto = _load_json_object(root / "pareto.json")
+    pareto = _load_json_object(root / PARETO_NAME)
     runs = Path(runs_root) if runs_root is not None else root.parent.parent
     badges = _overlay_badges(overlay)
     verification = _overlay_verification(overlay)
@@ -465,6 +485,22 @@ def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:
     except ValueError:
         return False
     return True
+
+
+def classify_optimizer_store(
+    path: Path | str, runs_root: Path | str
+) -> OptimizerStoreClassification:
+    """Classify a cache store before callers decide whether it can be written."""
+    directory = Path(path).resolve().parent
+    in_import_quarantine = is_imported_path(directory, runs_root)
+    is_import_staging = in_import_quarantine and directory.name.startswith(
+        IMPORT_STAGING_PREFIX
+    )
+    if is_import_staging:
+        return OptimizerStoreClassification.STAGED
+    if (directory / IMPORT_OVERLAY_NAME).is_file() or in_import_quarantine:
+        return OptimizerStoreClassification.PUBLISHED_ARCHIVE
+    return OptimizerStoreClassification.NATIVE
 
 
 def _extract_bundle_members(
@@ -806,7 +842,7 @@ def _validate_zip_member(info: zipfile.ZipInfo) -> None:
 
 
 def _member_cap(name: str) -> int:
-    if name == "cache.sqlite":
+    if name == OPTIMIZER_CACHE_NAME:
         return SQLITE_CAP_BYTES
     if name == "leaderboard.csv":
         return CSV_CAP_BYTES
@@ -1538,16 +1574,18 @@ def _imported_rows_by_cache_key(cache_path: Path) -> dict[str, dict[str, Any]]:
                 for index, row in enumerate(cursor, start=1):
                     if index > row_cap:
                         raise ImportSafetyCapError(
-                            f"cache.sqlite results exceeds {row_cap} row cap"
+                            f"{OPTIMIZER_CACHE_NAME} results exceeds {row_cap} row cap"
                         )
                     if "cache_key" not in row.keys():
-                        raise ImportBundleError("cache.sqlite results missing cache_key")
+                        raise ImportBundleError(
+                            f"{OPTIMIZER_CACHE_NAME} results missing cache_key"
+                        )
                     rows[str(row["cache_key"])] = dict(row)
             finally:
                 conn.set_progress_handler(None, 0)
     except sqlite3.Error:
         raise ImportSafetyCapError(
-            "cache.sqlite results query exceeded resource bounds"
+            f"{OPTIMIZER_CACHE_NAME} results query exceeded resource bounds"
         )
     return rows
 
@@ -1558,9 +1596,9 @@ def _require_results_table(conn: sqlite3.Connection) -> None:
         ("results",),
     ).fetchone()
     if row is None:
-        raise ImportBundleError("cache.sqlite missing results table")
+        raise ImportBundleError(f"{OPTIMIZER_CACHE_NAME} missing results table")
     if row["type"] != "table":
-        raise ImportBundleError("cache.sqlite results must be a table")
+        raise ImportBundleError(f"{OPTIMIZER_CACHE_NAME} results must be a table")
 
 
 def _install_progress_limit(conn: sqlite3.Connection) -> None:
