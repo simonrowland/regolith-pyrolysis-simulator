@@ -859,7 +859,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 5516,
+        "line": 5520,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
