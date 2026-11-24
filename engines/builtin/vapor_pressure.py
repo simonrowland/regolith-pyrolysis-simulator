@@ -65,6 +65,7 @@ from engines.antoine import (
     _antoine_skip_reason_for_refusal,
     _read_antoine_coefficients,
 )
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
@@ -761,7 +762,6 @@ OPENIMCC_VAPOUR_PHASE_SIGNAL_INVALID_NOTICE = {
 # simulator.evaporation accepts an empty pressure map below this limit only
 # when the equilibrium diagnostic carries this exact token. The subprocess
 # projection reads the token; it does not grow a second temperature check.
-BUILTIN_VAPOR_BELOW_400K_LIMIT_K = 400.0
 BUILTIN_VAPOR_BELOW_400K_ZERO_REASON = "internal_analytical_below_400K"
 
 

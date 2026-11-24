@@ -272,7 +272,9 @@ def test_r11_supplier_free_corner_has_zero_oxygen_limit(monkeypatch):
      {"AlO2": 2.404363895932157e-12}),
     ("releaser", 2.018842360013919e-6, 2.418878686943272e-6,
      {"Ca": 1.0945417031259065e-8}),
-    ("both", 2.018842360013919e-6, 2.41883027431536e-6,
+    # pO2_low is the d49e77b9c6 cap candidate (Ca off, AlO2 on). Ca alpha 0
+    # drops out of the balance, so the root equals the consumer low corner.
+    ("both", 2.018796086752906e-6, 2.41883027431536e-6,
      {"Ca": 1.0945526566383604e-8, "AlO2": 2.5155238153992054e-12}),
     ("supplier-free", 0.0, 9.276577176338048e-7,
      {"Ca": 0.056077, "AlO2": 1.979584409968031e-12}),
@@ -302,10 +304,12 @@ def test_mass_loss_bounds_use_each_channels_worst_oxygen_corner(
     )
     # Independent closed form: with y=x**(3/4), the balance is quadratic,
     # 2 D/sqrt(M_O2)*y**2 + C*alpha_AlO2/(2*sqrt(M_AlO2))*y =
-    # A*alpha_Mg/sqrt(M_Mg) + B*alpha_Ca/sqrt(M_Ca). Each target uses its
-    # monotone-bound corner; HKL at that root gives parent-oxide kg, including
-    # its signed O coproduct once. Supplier-free Ca also uses its zero-root
-    # inventory cap.
+    # A*alpha_Mg/sqrt(M_Mg) + B*alpha_Ca/sqrt(M_Ca). Each target's mass-loss
+    # bound is its monotone maximizing corner (6bc44e35b7); HKL at that root
+    # gives parent-oxide kg, including its signed O coproduct once.
+    # d49e77b9c6 also solves the negative-exponent cap candidate, and that
+    # root is inside the reported pO2 window. Supplier-free Ca uses its
+    # zero-root inventory cap.
     assert corners["pO2_low_bar"] <= corners["pO2_high_bar"]
     assert corners["pO2_low_bar"] == pytest.approx(expected_low, rel=1e-10, abs=0.0)
     assert corners["pO2_high_bar"] == pytest.approx(expected_high, rel=1e-10, abs=0.0)
@@ -413,8 +417,15 @@ def test_single_channel_corner_recovers_congruent_oxygen_root(
         residue._channel_terms(channels), {"MgO": 1.0}
     )
     quarter_alpha_channels = (replace(oxygen_channels[0], alpha=0.25), oxygen_channels[1])
+
+    def quarter_pressure(logp):
+        # The solver's model is log10(pO2/bar) only. The residue (inventory, logp)
+        # callable is adapted at the corner owner, not inside the balance.
+        return pressure({"MgO": 1.0}, logp)
+
+    quarter_pressure.declares_fixed_activities = True
     quarter_root = _solve_vacuum_oxygen_balance(
-        pressure, quarter_alpha_channels, temperature_K=1800.0,
+        quarter_pressure, quarter_alpha_channels, temperature_K=1800.0,
     ).pO2_bar
     assert quarter_root == pytest.approx(
         congruent_root * 0.25 ** (2.0 / 3.0), rel=1e-10,
@@ -612,7 +623,7 @@ def test_unreported_cr_valence_flags_both_alpha_corners_and_unions_bounds(
     assert detail["reason"] == "Cr valence not reported by the producer"
     assert detail["candidate_o_bar_per_Cr"] == [1.0, 1.5, 3.0]
     assert "alkali-rich melts near air" in detail["context"]
-    assert "no sourced Cr6+ stability bound" in detail["context"]
+    assert "No sourced Cr6+ stability bound" in detail["context"]
     assert "t-1962" in detail["context"]
     assert corners["primary_corner_count"] == 12
     assert len(bound_alpha_vectors) == 12
@@ -801,7 +812,13 @@ def test_ferric_feo_mass_loss_envelope_includes_mixed_iron_alpha_arm(
     assert roots_by_corner[positive_corner] == pytest.approx(
         6.071549282154776e-7, rel=1e-9,
     )
-    assert corners["pO2_low_bar"] == pytest.approx(6.071549282154776e-7, rel=1e-9)
+    # d49e77b9c6's negative-exponent cap candidate is Fe=0, FeO=0. That root
+    # is the zero-oxygen boundary, so the reported low is 0. The mixed arm
+    # stays the minimum positive root and the mass-loss bound still covers it.
+    assert corners["pO2_low_bar"] == 0.0
+    assert min(root for root in roots_by_corner.values() if root > 0.0) == pytest.approx(
+        6.071549282154776e-7, rel=1e-9,
+    )
     assert pressures_by_corner[positive_corner]["Fe"] == pytest.approx(
         0.12833651381197933, rel=1e-9,
     )
@@ -1135,6 +1152,65 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
     detail = json.loads(prediction.refusal_detail["detail"])
     assert detail["bound_fraction"] > 0.01
     assert detail["unsourced_channels"] == ["Ca"]
+
+    # The schedule's 25 + 20 + 20 + 90 point steps have two corners each:
+    # only unsourced Ca is targeted, and its lone negative-exponent cap reuses
+    # the already-solved vector. The 47 point endpoints (25 + 20 + 1 + 1)
+    # have three each: those same two corners plus one Ca neighbour flip.
+    # The 60 preheat-rectangle steps have three each because the rectangle also
+    # targets sourced Mg. Its one endpoint has five: three primary corners,
+    # plus one neighbour flip for each of Ca and Mg.
+    point_steps = 25 + 20 + 20 + 90
+    point_endpoint_count = 25 + 20 + 1 + 1
+    preheat_steps = 60
+    preheat_endpoint_count = 1
+    expected_corners = (
+        point_steps * 2
+        + point_endpoint_count * 3
+        + preheat_steps * 3
+        + preheat_endpoint_count * 5
+    )
+    # Every step and endpoint call also performs one all-on solve.
+    number_of_calls = (
+        point_steps + point_endpoint_count + preheat_steps + preheat_endpoint_count
+    )
+    expected_roots = expected_corners + number_of_calls
+    expected_neighbours = point_endpoint_count * 1 + preheat_endpoint_count * 2
+    assert detail["corner_evaluations"] == expected_corners, detail
+    assert detail["corner_root_solves"] == expected_roots, detail
+    assert detail["corner_neighbour_evaluations"] == expected_neighbours, detail
+
+
+@pytest.mark.engine_cache_off
+def test_corner_counter_oracle_rejects_dropped_step_callback(
+    r11_inputs, prescribed_pressure_engine, monkeypatch,
+):
+    """Mutation probe: a lost integration callback must fail the fixture oracle."""
+    import simulator.battery.residue as residue
+
+    original_integrate = residue._hashimoto_integrate_geometry
+    dropped_callback = False
+
+    def drop_first_step_callback(*args, **kwargs):
+        nonlocal dropped_callback
+        callback = kwargs.get("on_step")
+        if callback is not None and not dropped_callback:
+            def mutant_callback(*callback_args, **callback_kwargs):
+                nonlocal dropped_callback
+                if not dropped_callback:
+                    dropped_callback = True
+                    return None
+                return callback(*callback_args, **callback_kwargs)
+
+            kwargs["on_step"] = mutant_callback
+        return original_integrate(*args, **kwargs)
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", drop_first_step_callback)
+    with pytest.raises(AssertionError):
+        test_full_prediction_refuses_non_negligible_unsourced_channel(
+            r11_inputs, prescribed_pressure_engine
+        )
+    assert dropped_callback
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.

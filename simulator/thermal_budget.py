@@ -35,11 +35,11 @@ from dataclasses import dataclass
 from typing import Any
 
 from engines.antoine import _read_antoine_coefficients
-from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.reference_data.janaf import (
     formation_enthalpy_kj_per_mol_admitted,
 )
-from simulator.diagnostic_helpers.timeseries_concordance import (
+from simulator.curve_utils import (
     _interpolate,
     _normalise_curve,
 )
@@ -1367,7 +1367,7 @@ PELLET_CONDUCTIVITY_DEFAULT_W_M_K = 1.0
 # Still-gas sphere. Continuum conduction at the printed diameter, not a
 # fitted Nusselt number and not a free-molecular flux.
 NU_STILL_SPHERE = 2.0
-# engines.builtin.vapor_pressure.BUILTIN_VAPOR_BELOW_400K_LIMIT_K is
+# engines.vapor_limits.BUILTIN_VAPOR_BELOW_400K_LIMIT_K is
 # the thermal physical zero. The kinetic flux, the analytical vapor
 # loop, and this balance all treat a temperature below it as no
 # evaporation. The bisection bracket starts at 0 K, and an empty

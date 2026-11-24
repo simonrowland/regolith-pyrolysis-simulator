@@ -8773,9 +8773,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # so those hours keep the shadow's existing molar-mass order. Above
         # those gates the batch map includes extrapolated species and the
         # capacity solve prices that map with the extrapolation flag attached.
-        from engines.builtin.vapor_pressure import (
-            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
-        )
+        from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
         from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
 
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
@@ -11771,9 +11769,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 warning = f"{notice['code']}: T_gas={notice['temperature_K']:g} K; {notice['reason']}"
                 if warning not in result.warnings:
                     result.warnings.append(warning)
-        from engines.builtin.vapor_pressure import (
-            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
-        )
+        from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 
         if T_C + 273.15 < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             restore_retained_backend_activity_sources()
@@ -18586,9 +18582,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # before the ramp reads the step-start melt.
         self._power_balance_root_booking = {}
         self._power_balance_applied_booking = None
-        from engines.builtin.vapor_pressure import (
-            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
-        )
+        from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
         from simulator.thermal_budget import (
             EVAPORATIVE_BRACKET_CEILING_K,
             FURNACE_POWER_DRIVER_KEY,
@@ -18810,7 +18804,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 sample_mass_g = self.lab_geometry.sample_mass_g
                 if sample_mass_g is None:
                     raise
-                from simulator.battery.default_policy import resolve
+                from simulator.policy.default_policy import resolve
 
                 # When b-1298 lands, DP-007 defers to its lab-geometry
                 # resolver for both evaporating area and film length.

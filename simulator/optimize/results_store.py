@@ -66,6 +66,7 @@ from simulator.optimize.result_trust import (
     real_engine_producer_stamp_rejections,
     result_trust_carriers as _admission_carriers,
 )
+from simulator.optimize.sqlite_readonly import connect_readonly
 
 SCHEMA_VERSION = 5
 OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
@@ -78,6 +79,21 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
 READ_COMPATIBILITY_REJECTION_NOTE_PREFIX = (
     "result_store_read_compatibility_rejections:"
 )
+
+
+def study_results_write_lock_path(out: str | Path) -> Path:
+    """Lock shared by result-cache and materialized study-artifact writers."""
+    return Path(out) / ".study-results.write.lock"
+
+
+def _stale_corpus_predicate(versions: Sequence[str]) -> tuple[str, tuple[str, ...]]:
+    if not versions:
+        return "corpus_version IS NOT NULL", ()
+    placeholders = ", ".join("?" for _ in versions)
+    return (
+        f"corpus_version IS NOT NULL AND corpus_version NOT IN ({placeholders})",
+        tuple(versions),
+    )
 
 __all__ = [
     "DEFAULT_BUSY_TIMEOUT_MS",
@@ -256,6 +272,66 @@ class ResultStore:
             self.write_lock_path,
             timeout_ms=self.write_lock_timeout_ms,
         )
+
+    def prune_stale_corpus_version(
+        self, keep_corpus_versions: str | Sequence[str], *, apply: bool = False
+    ) -> dict[str, int]:
+        """Count and optionally delete rows outside the served corpus versions."""
+        if isinstance(keep_corpus_versions, str):
+            keep_corpus_versions = (keep_corpus_versions,)
+        versions = tuple(dict.fromkeys(keep_corpus_versions))
+        stale_where, stale_params = _stale_corpus_predicate(versions)
+
+        def prune(conn: sqlite3.Connection) -> dict[str, int]:
+            counts = self._corpus_version_counts(conn, versions)
+            if apply and counts["stale"]:
+                conn.execute(
+                    f"DELETE FROM results WHERE {stale_where}",
+                    stale_params,
+                )
+            return counts
+
+        if apply:
+            return self._execute_write(prune)
+        with connect_readonly(self.path) as conn:
+            conn.execute("BEGIN")
+            return prune(conn)
+
+    @classmethod
+    def count_stale_corpus_versions(
+        cls, path: str | Path, versions: Sequence[str]
+    ) -> dict[str, int]:
+        """Read-only count for CLI dry runs; never initializes or migrates a store."""
+        with connect_readonly(path) as conn:
+            conn.execute("BEGIN")
+            if conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='results'"
+            ).fetchone() is None:
+                raise ResultStoreSchemaError("optimizer result store has no results table")
+            if not _column_exists(conn, "results", "corpus_version"):
+                total = int(conn.execute("SELECT COUNT(*) FROM results").fetchone()[0])
+                return {"stale": 0, "kept": 0, "unversioned": total}
+            return cls._corpus_version_counts(conn, versions)
+
+    @staticmethod
+    def _corpus_version_counts(
+        conn: sqlite3.Connection, versions: Sequence[str]
+    ) -> dict[str, int]:
+        stale_where, stale_params = _stale_corpus_predicate(versions)
+        kept_sql = (
+            "SELECT COUNT(*) FROM results WHERE corpus_version IN ("
+            + ", ".join("?" for _ in versions)
+            + ")" if versions else "SELECT 0"
+        )
+        return {
+            "stale": int(conn.execute(
+                f"SELECT COUNT(*) FROM results WHERE {stale_where}", stale_params
+            ).fetchone()[0]),
+            "kept": int(conn.execute(kept_sql, tuple(versions)).fetchone()[0]),
+            "unversioned": int(conn.execute(
+                "SELECT COUNT(*) FROM results WHERE corpus_version IS NULL"
+            ).fetchone()[0]),
+        }
 
     @property
     def schema_version(self) -> int:
