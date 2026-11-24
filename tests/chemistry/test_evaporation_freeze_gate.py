@@ -795,7 +795,28 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert rebuild_counts.get(name, 0) == 0
             assert equilibrium_count[0] > equilibrations_before
 
-    assert observed == expected, floor_refusals
+    for name, pinned in expected.items():
+        got = observed.get(name, [])
+        if got == pinned:
+            continue
+        def ends(row):
+            return row[:4]
+
+        mismatch = next(
+            (
+                (index, ends(row), ends(pinned_row))
+                for index, (row, pinned_row) in enumerate(zip(got, pinned))
+                if row != pinned_row
+            ),
+            None,
+        )
+        raise AssertionError(
+            f'{name}: got {len(got)} pinned {len(pinned)} '
+            f'mismatch={mismatch} '
+            f'extra={[ends(row) for row in got[len(pinned):]]!r} '
+            f'missing={[ends(row) for row in pinned[len(got):]]!r} '
+            f'floor={floor_refusals.get(name)!r}'
+        )
 
 
 def test_native_fe_no_commit_split_suppresses_vapor_route(
