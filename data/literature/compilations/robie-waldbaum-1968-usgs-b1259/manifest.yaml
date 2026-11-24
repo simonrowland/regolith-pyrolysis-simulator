@@ -3171,12 +3171,24 @@ corrections:
   layout_as_extracted: 3 5 £500
   printed_token: '35.500'
   evidence: PDF page 225 image visibly prints log_Kf=35.500 at T=1700.0 K
+- correction_id: b1259-p226-formula_as_published
+  pdf_page: 226
+  field: formula_as_published
+  layout_as_extracted: CaAl.SiCK
+  printed_token: CaAl2SiO6
+  evidence: PDF page 226 image visibly prints 'CaAl2SiO6'
 - correction_id: b1259-p226-temperature-12
   pdf_page: 226
   field: temperature
   layout_as_extracted: 13CO
   printed_token: '1300'
   evidence: PDF page 226 image visibly prints '1300 55.345 112.42 69.85 -790.766 -603.710 101.493'
+- correction_id: b1259-p226-delta_f_H-03
+  pdf_page: 226
+  field: delta_f_H
+  layout_as_extracted: '-766.941'
+  printed_token: '-786.941'
+  evidence: PDF page 226 image visibly prints delta_f_H=-786.941 at T=500.0 K
 - correction_id: b1259-p228-formula_as_published
   pdf_page: 228
   field: formula_as_published
@@ -12301,7 +12313,7 @@ entries:
   record_sha256: 5c183cccb7af407315e7a51e8b4cd3f0bbe94ee8f67037b62d9d955f52a368da
 - record_id: b1259-ht-0195-calcium-aluminum-pyroxene
   path: records/b1259-ht-0195-calcium-aluminum-pyroxene.json
-  formula: CaAl.SiCK
+  formula: CaAl2SiO6
   phase: Crystals 298.15° to 1700°K. i D
   name_as_published: CALCIUM-ALUMINUM PYROXENE
   source: *id001
@@ -12314,7 +12326,7 @@ entries:
   ambiguities: []
   untranscribed: false
   sha256: 013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83
-  record_sha256: 50f46c28e005e7db2ab89ad96303b52020f6db2b7cb9fa6e013254f0688c3506
+  record_sha256: adc8e396668f853cd03371c7a7b809b7a01f281ba6cd2c42162087ab4a091af1
 - record_id: b1259-ht-0196-oiopside
   path: records/b1259-ht-0196-oiopside.json
   formula: CaMg(SiO ) 2

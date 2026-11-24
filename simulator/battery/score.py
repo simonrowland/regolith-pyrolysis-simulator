@@ -44,7 +44,7 @@ from typing import (
 
 import yaml
 
-from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.chemistry.formula_text import _strip_formula_markup
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.policy.default_policy import resolve as resolve_default_policy
 from simulator.battery.oxygen_identity import (
@@ -351,7 +351,7 @@ from simulator.battery.validity import (
 )
 from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
-from simulator.reference_data.janaf import formula_composition
+from simulator.reference_data.janaf import PHASE_SUFFIX_RE, formula_composition
 
 # Explicit closed set. openimcc is the only IMCC producer. Do not build this from
 # resolve_backend, BATTERY_ENGINE_NAMES, or any probe of installed backends.
@@ -1152,91 +1152,27 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
     return species is not None and phase_token(species) is phase
 
 
-def _normalize_ascii_adduct_dots(text: str) -> str:
-    normalized: list[str] = []
-    segment_start = 0
-    index = 0
-    while index < len(text):
-        if text[index] == "·":
-            normalized.append(text[index])
-            segment_start = index + 1
-            index += 1
-            continue
-        if text[index] == ".":
-            prefix = text[segment_start:index]
-            suffix = text[index + 1 :]
-            multiplier = re.match(
-                r"(?:\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", suffix
-            )
-            multiplier_tail = (
-                suffix[multiplier.end() :]
-                if multiplier is not None
-                else ""
-            )
-            # Fe0.95O must keep its decimal when the tail is a single element;
-            # treating 95O as an adduct corrupts the existing composition.
-            decimal_subscript = (
-                multiplier is not None
-                and re.search(r"[A-Z][a-z]?\d+$", prefix) is not None
-                and re.match(r"[A-Z][a-z]?\d*(?=\.|$)", multiplier_tail)
-                is not None
-            )
-            # The dot in a leading hydrate multiplier such as 6.5H2O is decimal.
-            decimal_multiplier = prefix.isdigit() and suffix[:1].isdigit()
-            starts_with_water = suffix.startswith(("H2O", "H₂O"))
-            if (
-                (multiplier is not None or starts_with_water)
-                and not decimal_subscript
-                and not decimal_multiplier
-            ):
-                normalized.append("·")
-                segment_start = index + 1
-                index += 1
-                continue
-        normalized.append(text[index])
-        index += 1
-    return "".join(normalized)
-
-
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
-    """Parse explicit stoichiometry; None → unmatched, never string equality.
+    """Parse formula atoms only after validating printed phase and charge axes.
 
-    The fast-path ``formula_composition`` result is returned unchanged. Its
-    source-derived extension accepts element symbols with numeric counts,
-    nested ``()[]{}`` groups, hydrate/adduct segments (including fractional or
-    decimal multipliers), TeX math wrappers / ``\\text{}``, and TeX or Unicode
-    subscripts. Newly normalized terminal phase or polymorph labels require a
-    matching existing species axis, as in ``$AsCl_3(g)$`` and ``$Fe(α)$``. A
-    terminal bracket phase label that the accounting parser would strip, as in
-    ``Fe2O3[s]``, uses that same axis before the fallback. The d-420 iron-oxide
-    conventions are normalized without assigning a numerical vacancy value;
-    other names, variable compositions, and unverified charge or phase labels
-    remain unmatched.
+    Accounting owns formula notation, dot classification, and atom counts.
+    This scorer boundary validates annotations that JANAF may otherwise strip,
+    plus the explicitly typed iron-oxide reference conventions.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(_normalize_ascii_adduct_dots(formula))
-    if established is not None:
-        return established
-
     text = formula.strip()
     if text.startswith("$") and text.endswith("$"):
         text = text[1:-1].strip()
     if "$" in text:
         return None
-    text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
-    text = (
-        text.replace(r"\cdot", "·")
-        .replace(r"\bullet", "·")
-        .replace("•", "·")
-        .replace("⋅", "·")
-    )
-    text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
-    text = fold_subscript_digits(text)
-    phase_labels = {
+    # Strip command wrappers so terminal phase labels remain visible to the
+    # scorer's axis checks. Formula notation stays with the accounting owner.
+    text = _strip_formula_markup(text)
+    phase_labels: dict[str, Phase] = {
         "c": Phase.CR,
         "cr": Phase.CR,
         "s": Phase.CR,
@@ -1249,14 +1185,50 @@ def parse_species_formula(
         "vapor": Phase.G,
         "aq": Phase.AQ,
     }
-    annotation = re.search(r"\(([^()]*)\)$", text)
-    if annotation is not None:
-        label = annotation.group(1).strip().lower()
-        annotated_phase = phase_labels.get(label)
-        if annotated_phase is not None:
-            if not _species_axis_matches_phase(species, annotated_phase):
+
+    # Peel terminal charge, parenthetical phase, bracket phase, and melt tags
+    # before handing the remaining formula to its accounting owner.
+    annotated_charge: int | None = None
+    annotated_phases: list[Phase] = []
+    charge_pattern = r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$"
+    for _ in range(4):
+        charge_annotation = re.search(charge_pattern, text)
+        if charge_annotation is not None:
+            if annotated_charge is not None:
                 return None
-        else:
+            signs = next(
+                group for group in charge_annotation.groups() if group is not None
+            )
+            if any(sign != signs[0] for sign in signs):
+                return None
+            annotated_charge = len(signs) * (1 if signs[0] == "+" else -1)
+            text = text[: charge_annotation.start()]
+            continue
+
+        # NASA Glenn's E±n suffix carries ionic charge, not another element.
+        electron_charge = re.search(r"E([+-])(\d+)$", text)
+        if electron_charge is not None:
+            if annotated_charge is not None:
+                return None
+            annotated_charge = int(electron_charge.group(2))
+            if electron_charge.group(1) == "-":
+                annotated_charge = -annotated_charge
+            text = text[: electron_charge.start()]
+            continue
+
+        annotation = re.search(r"\(([^()]*)\)$", text)
+        if annotation is not None:
+            raw_label = annotation.group(1).strip()
+            label = raw_label.lower()
+            # An uppercase element symbol in a terminal group is formula syntax,
+            # not the lowercase ``(c)`` phase annotation.
+            if label in phase_labels and raw_label != "C":
+                annotated_phases.append(phase_labels[label])
+                text = text[: annotation.start()]
+                continue
+            # JANAF strips recognized tags that have no scorer Phase axis.
+            if PHASE_SUFFIX_RE.fullmatch(f"({label})"):
+                return None
             from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 
             try:
@@ -1267,113 +1239,50 @@ def parse_species_formula(
                 if species is None or polymorph_token(species) is not annotated_polymorph:
                     return None
                 text = text[: annotation.start()]
-        if annotated_phase is not None:
-            text = text[: annotation.start()]
+                continue
+            if not raw_label[:1].isupper():
+                return None
+            break
 
-    melt_suffix = re.search(r"_melt$", text, re.IGNORECASE)
-    if melt_suffix is not None:
-        if not _species_axis_matches_phase(species, Phase.L):
-            return None
-        text = text[: melt_suffix.start()]
+        melt_suffix = re.search(r"_melt$", text, re.IGNORECASE)
+        if melt_suffix is not None:
+            if not _species_axis_matches_phase(species, Phase.L):
+                return None
+            text = text[: melt_suffix.start()]
+            continue
 
-    # Accounting strips these terminal brackets with no species axis. Bare
-    # [c] is not in that suffix list and stays unmatched.
-    bracket = re.search(r"\[([^\[\]]*)\]$", text)
-    if bracket is not None:
-        label = bracket.group(1).strip().lower()
-        if label != "c":
-            annotated_phase = phase_labels.get(label)
-            if annotated_phase is not None:
-                if not _species_axis_matches_phase(species, annotated_phase):
-                    return None
+        # Bare [c] is not a phase suffix. Other recognized bracket phases use
+        # the same axis check as parenthetical annotations.
+        bracket = re.search(r"\[([^\[\]]*)\]$", text)
+        if bracket is not None:
+            label = bracket.group(1).strip().lower()
+            if label != "c" and label in phase_labels:
+                annotated_phases.append(phase_labels[label])
                 text = text[: bracket.start()]
+                continue
+        break
 
-    # NASA Glenn's E±n suffix carries ionic charge, not another element.
-    # Its charge must agree with the typed species before the suffix is dropped.
-    electron_charge = re.search(r"E([+-])(\d+)$", text)
-    if electron_charge is not None:
-        annotated_charge = int(electron_charge.group(2))
-        if electron_charge.group(1) == "-":
-            annotated_charge = -annotated_charge
-        if species is None or charge_value(species) != annotated_charge:
-            return None
-        text = text[: electron_charge.start()]
+    if len(set(annotated_phases)) > 1:
+        return None
+    annotated_phase = annotated_phases[0] if annotated_phases else None
 
-    charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
-    if charge_annotation is not None:
-        signs = next(group for group in charge_annotation.groups() if group is not None)
-        annotated_charge = len(signs) * (1 if signs[0] == "+" else -1)
-        if any(sign != signs[0] for sign in signs):
-            return None
-        if species is None or charge_value(species) != annotated_charge:
-            return None
-        text = text[: charge_annotation.start()]
+    if annotated_charge is not None and (
+        species is None or charge_value(species) != annotated_charge
+    ):
+        return None
+    if annotated_phase is not None and not _species_axis_matches_phase(
+        species, annotated_phase
+    ):
+        return None
 
-    # d-420 treats wüstite's symbolic vacancy fraction as a reference-state
-    # convention, not a measured x to invent. Fe_tO is total iron reported on
-    # an FeO basis; the downstream comparison and typed flags own those bases.
+    # d-420 treats these as reference-state conventions, not measured vacancy
+    # fractions. Downstream comparisons and typed flags own the basis handling.
     if text in {"Fe(1-x)O", "Fe_tO"}:
         return (("Fe", 1.0), ("O", 1.0))
 
-    # ASCII periods separate formula-unit adducts when another formula follows
-    # (for example 3Al2O3.2SiO2). A terminal period plus digits is instead a
-    # leading-zero decimal subscript, as in Fe.9470. Decimal hydrate multipliers
-    # remain one number for the segment parser.
-    text = _normalize_ascii_adduct_dots(text)
-    text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 
-    if "·" in text:
-        hydrated: defaultdict[str, float] = defaultdict(float)
-        try:
-            from simulator.accounting.formulas import parse_formula
-
-            # Parse each middle-dot segment separately so hydrate multipliers
-            # such as 1/2 and 6.5 do not collide with period splitting.
-            for segment in text.split("·"):
-                multiplier_match = re.match(
-                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
-                )
-                multiplier = 1.0
-                body = segment
-                if multiplier_match is not None:
-                    number = multiplier_match.group(1)
-                    if "/" in number:
-                        numerator, denominator = number.split("/", 1)
-                        if int(denominator) == 0:
-                            return None
-                        multiplier = int(numerator) / int(denominator)
-                    else:
-                        multiplier = float(number)
-                    body = segment[multiplier_match.end() :]
-                if not body:
-                    return None
-                composition = formula_composition(body)
-                if composition is None:
-                    parsed_body = parse_formula(body, species=body).elements
-                    composition = tuple(
-                        sorted(
-                            (str(symbol), float(count))
-                            for symbol, count in parsed_body.items()
-                        )
-                    )
-                for symbol, count in composition:
-                    hydrated[symbol] += multiplier * count
-        except ValueError:
-            return None
-        return tuple(sorted(hydrated.items()))
-
-    parsed = formula_composition(text)
-    if parsed is not None:
-        return parsed
-    if "." in text:
-        return None
-    try:
-        from simulator.accounting.formulas import parse_formula
-
-        elements = parse_formula(text, species=text).elements
-    except ValueError:
-        return None
-    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
+    return atoms_parse_formula_else_janaf(text)
 
 
 def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:

@@ -14,8 +14,8 @@
   "pdf_page": 226,
   "page": 220,
   "name_as_published": "CALCIUM-ALUMINUM PYROXENE",
-  "formula_as_published": "CaAl.SiCK",
-  "formula": "CaAl.SiCK",
+  "formula_as_published": "CaAl2SiO6",
+  "formula": "CaAl2SiO6",
   "phase": "Crystals 298.15° to 1700°K. i D",
   "gram_formula_weight": {
     "as_published": "218.125",
@@ -331,11 +331,13 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "-766.941",
-        "value": -766.941,
+        "as_published": "-786.941",
+        "value": -786.941,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "-766.941",
+        "correction_id": "b1259-p226-delta_f_H-03"
       },
       "delta_f_G": {
         "as_published": "-716.739",
@@ -1394,12 +1396,28 @@
   "ambiguities": [],
   "corrections": [
     {
+      "correction_id": "b1259-p226-formula_as_published",
+      "pdf_page": 226,
+      "field": "formula_as_published",
+      "layout_as_extracted": "CaAl.SiCK",
+      "printed_token": "CaAl2SiO6",
+      "evidence": "PDF page 226 image visibly prints 'CaAl2SiO6'"
+    },
+    {
       "correction_id": "b1259-p226-temperature-12",
       "pdf_page": 226,
       "field": "temperature",
       "layout_as_extracted": "13CO",
       "printed_token": "1300",
       "evidence": "PDF page 226 image visibly prints '1300 55.345 112.42 69.85 -790.766 -603.710 101.493'"
+    },
+    {
+      "correction_id": "b1259-p226-delta_f_H-03",
+      "pdf_page": 226,
+      "field": "delta_f_H",
+      "layout_as_extracted": "-766.941",
+      "printed_token": "-786.941",
+      "evidence": "PDF page 226 image visibly prints delta_f_H=-786.941 at T=500.0 K"
     }
   ],
   "record_id": "b1259-ht-0195-calcium-aluminum-pyroxene",

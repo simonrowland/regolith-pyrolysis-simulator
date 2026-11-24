@@ -234,7 +234,7 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     assert _atoms("Al2O3·2SiO2·2H2O") == kaolinite
     for parseable in (b1259_parseable, b1452_parseable):
         candidate = parseable("Al2O3·2SiO2·2H2O")
-        assert candidate == "Al2O3.2SiO2.2H2O"
+        assert candidate == "Al2O3·2SiO2·2H2O"
         assert _atoms(candidate) == kaolinite
     # Feldspar hand count. The fractional parts stay on one species.
     assert _atoms("Na1.08Fe1.17Si3.13O8") == {

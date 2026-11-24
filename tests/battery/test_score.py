@@ -4619,18 +4619,24 @@ def test_one_sided_bound_is_not_scored_as_point() -> None:
 def test_species_formula_unparsed_never_string_matched() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
-    ident = replace(ident, species=replace(ident.species, formula="unknown"))
-    ref = F.observation(
-        "bad-formula",
-        exp.experiment_id,
-        ident,
-        Decimal("1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    residual, _ = _compile(ref, exp, _predict(Decimal("1"), ident))
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal.detail.get("reason") == "species_formula_unparsed"
+    for index, formula in enumerate(("unknown", "CaSO4.2D2O", "CaSO4·2D2O")):
+        formula_identity = replace(
+            ident, species=replace(ident.species, formula=formula)
+        )
+        ref = F.observation(
+            f"bad-formula-{index}",
+            exp.experiment_id,
+            formula_identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        residual, _ = _compile(
+            ref, exp, _predict(Decimal("1"), formula_identity)
+        )
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.detail.get("reason") == "species_formula_unparsed"
     assert parse_species_formula("unknown") is None
     assert parse_species_formula("kems-007") is None
     assert parse_species_formula("O2") == (("O", 2.0),)
@@ -4646,11 +4652,41 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
     )
     rows = json.loads(fixture.read_text(encoding="utf-8"))
     assert len(rows) == 200
+    phase_suffixes = {"(g)": Phase.G, "(l)": Phase.L}
     for row in rows:
+        formula = str(row["formula"])
         expected = tuple(
             (str(symbol), float(count)) for symbol, count in row["elements"]
         )
-        assert parse_species_formula(row["formula"]) == expected
+        species = None
+        for suffix, phase in phase_suffixes.items():
+            if formula.endswith(suffix):
+                species = Species(formula[: -len(suffix)], phase)
+                break
+        assert parse_species_formula(formula, species=species) == expected
+
+
+def test_species_formula_parser_pins_bianchite_to_b1452_source() -> None:
+    compilation = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452"
+    )
+    record = json.loads(
+        (compilation / "records/robie-hemingway-fisher-1978-usgs-b1452-0003.json")
+        .read_text(encoding="utf-8")
+    )
+    row = next(row for row in record["rows"] if row["source_text_line"] == 661)
+    assert 26 in record["source_locator"]["printed_pages"]
+    assert 32 in record["source_locator"]["pdf_pages"]
+    assert row["cells"]["name_and_formula"]["as_published"] == (
+        r"BIANCHITE $ZnSO_{4} \cdot 6H_{2}O$"
+    )
+    assert parse_species_formula("ZnSO4·6H2O") == (
+        ("H", 12.0),
+        ("O", 10.0),
+        ("S", 1.0),
+        ("Zn", 1.0),
+    )
 
 
 def test_species_formula_parser_accepts_published_typography() -> None:
@@ -4689,6 +4725,50 @@ def test_species_formula_parser_accepts_ascii_dot_adducts_and_decimal_counts() -
     assert parse_species_formula("Fe.9470") == score_mod.formula_composition("Fe0.9470")
     assert parse_species_formula("NbC.98") == score_mod.formula_composition("NbC0.98")
     assert parse_species_formula("VC.88") == score_mod.formula_composition("VC0.88")
+
+
+def test_species_formula_parser_accepts_formula_owner_ascii_dot_adducts() -> None:
+    from simulator.accounting.formulas import parse_formula
+
+    for formula, owner_formula in (
+        ("3Al2O3.2SiO2", "3Al2O3.2SiO2"),
+        ("CaAl2Si2O7(OH)2.H2O", "CaAl2Si2O7(OH)2.H2O"),
+        ("CaCO3.H2O", "CaCO3.H2O"),
+        ("FeSO4.H2O", "FeSO4.H2O"),
+        ("Mg2(OH)2CO3.3H2O", "Mg2(OH)2CO3.3H2O"),
+        ("NaAlSi2O6.H2O", "NaAlSi2O6.H2O"),
+        ("5MgO.4CO2.5H2O", "5MgO.4CO2.5H2O"),
+        ("Al2O3.3H2O", "Al2O3.3H2O"),
+        ("Al₂O₃.3H₂O", "Al2O3.3H2O"),
+        ("$Al_2O_3.3H_2O$", "Al2O3.3H2O"),
+        ("CoSO₄.7H₂O", "CoSO4.7H2O"),
+    ):
+        expected = tuple(
+            sorted(
+                (str(element), float(count))
+                for element, count in parse_formula(owner_formula).elements.items()
+            )
+        )
+        assert parse_species_formula(formula) == expected
+
+
+def test_species_formula_parser_refuses_malformed_ascii_adducts() -> None:
+    for formula in (
+        "3Al2O3.0SiO2",
+        "3Al2O3.0",
+        "XxO.2SiO2",
+        "3Al2O3..2SiO2",
+        "3Al2O3.2SiO2.",
+    ):
+        assert parse_species_formula(formula) is None
+
+    for formula in ("Fe0.947O",):
+        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula("Al2O3.3H2O") == (
+        ("Al", 2.0),
+        ("H", 6.0),
+        ("O", 6.0),
+    )
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
@@ -4738,6 +4818,147 @@ def test_species_formula_parser_accepts_bullet_hydrates_and_unicode_phase() -> N
     assert parse_species_formula("H2SO4.6.5H2O") == (
         ("H", 15.0), ("O", 10.5), ("S", 1.0)
     )
+
+
+def test_species_formula_parser_preserves_normalized_decimal_stoichiometry() -> None:
+    expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula("MgAl1.5SiO3") == expected
+    assert parse_species_formula("MgAl₁.₅SiO₃") == expected
+    assert parse_species_formula("$MgAl_1.5SiO_3$") == expected
+
+
+def test_species_formula_parser_checks_decimal_formula_annotations() -> None:
+    formula = "MgAl₁.5SiO₃(g)"
+    expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(formula, species=Species("MgAl1.5SiO3", Phase.CR)) is None
+    assert parse_species_formula(formula, species=Species("MgAl1.5SiO3", Phase.G)) == expected
+    assert parse_species_formula("MgAl₁.5SiO₃+") is None
+    assert parse_species_formula(
+        "MgAl₁.5SiO₃+", species=Species("MgAl1.5SiO3", Phase.CR, charge=1)
+    ) == expected
+    ascii_formula = "MgAl1.5SiO3(g)"
+    assert parse_species_formula(ascii_formula) is None
+    assert parse_species_formula(
+        ascii_formula, species=Species("MgAl1.5SiO3", Phase.G)
+    ) == expected
+    combined_suffix = "MgAl1.5SiO3(g)+"
+    assert parse_species_formula(
+        combined_suffix, species=Species("MgAl1.5SiO3", Phase.G, charge=1)
+    ) == expected
+    assert parse_species_formula(
+        combined_suffix, species=Species("MgAl1.5SiO3", Phase.CR, charge=1)
+    ) is None
+    for janaf_phase in ("fl", "cr,l", "l,g", "ref"):
+        assert parse_species_formula(
+            f"MgAl1.5SiO3({janaf_phase})",
+            species=Species("MgAl1.5SiO3", Phase.G),
+        ) is None
+
+
+def test_phase_axis_bypass_mutation_recreates_production_parser_failure(
+    monkeypatch,
+) -> None:
+    ascii_formula = "MgAl1.5SiO3(g)"
+    unicode_formula = "MgAl₁.5SiO₃(g)"
+    expected = score_mod.formula_composition("MgAl1.5SiO3")
+    assert expected == (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula(ascii_formula) is None
+    assert parse_species_formula(unicode_formula) is None
+    monkeypatch.setattr(score_mod, "_species_axis_matches_phase", lambda *_args: True)
+    assert parse_species_formula(ascii_formula) == expected
+    assert parse_species_formula(unicode_formula) == expected
+
+
+def test_species_formula_parser_honors_braced_and_mixed_decimal_subscripts() -> None:
+    expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula("$MgAl_{1.5}SiO_3$") == expected
+    assert parse_species_formula("MgAl₁.5SiO₃") == expected
+    # The dot in _{1.5} is a coefficient. Classifying it as water yields five H2O.
+    assert parse_species_formula("$MgAl_{1.5}H_2O$") == (
+        ("Al", 1.5),
+        ("H", 2.0),
+        ("Mg", 1.0),
+        ("O", 1.0),
+    )
+    assert parse_species_formula("$MgAl_{1.5}H_2O.2H_2O$") == (
+        ("Al", 1.5), ("H", 6.0), ("Mg", 1.0), ("O", 3.0)
+    )
+    assert parse_species_formula(r"$MgAl_{1.5}H_2O\cdot CO_2$") == (
+        ("Al", 1.5), ("C", 1.0), ("H", 2.0), ("Mg", 1.0), ("O", 3.0)
+    )
+
+
+def test_species_formula_parser_classifies_each_dot() -> None:
+    from simulator.accounting.formulas import parse_formula
+
+    for formula in ("Fe0.947O.2H2O", "Fe0.947O2.2H2O"):
+        expected = tuple(
+            sorted(
+                (str(element), float(count))
+                for element, count in parse_formula(formula).elements.items()
+            )
+        )
+        assert parse_species_formula(formula) == expected
+    assert parse_species_formula("Fe0.947O2.2H2O·CO2") == (
+        ("C", 1.0), ("Fe", 0.947), ("H", 4.0), ("O", 6.0)
+    )
+
+
+def test_species_formula_parser_rejects_conflicting_phase_suffixes() -> None:
+    conflicting = "Fe2O3(g)[s]"
+    assert parse_species_formula(conflicting) is None
+    assert (
+        parse_species_formula(conflicting, species=Species("Fe2O3", Phase.CR))
+        is None
+    )
+    assert (
+        parse_species_formula(conflicting, species=Species("Fe2O3", Phase.G))
+        is None
+    )
+    matching = "Fe2O3(g)[g]"
+    assert parse_species_formula(matching) is None
+    assert parse_species_formula(
+        matching, species=Species("Fe2O3", Phase.G)
+    ) == score_mod.formula_composition("Fe2O3")
+    assert (
+        parse_species_formula(matching, species=Species("Fe2O3", Phase.CR))
+        is None
+    )
+
+
+def test_species_formula_parser_does_not_treat_d2o_as_an_adduct() -> None:
+    assert parse_species_formula("CaSO4.2D2O") is None
+    assert parse_species_formula("CaSO4·2D2O") is None
+    assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
+    assert parse_species_formula("D2O(l)", species=Species("D2O", Phase.L)) == (
+        ("D", 2.0), ("O", 1.0)
+    )
+
+
+def test_decimal_precedence_mutation_recreates_production_parser_failure(
+    monkeypatch,
+) -> None:
+    from simulator.accounting import formulas as formula_owner
+
+    split_adducts = formula_owner._ascii_adduct_parts
+
+    def adduct_first(formula: str) -> list[str] | None:
+        if formula == "MgAl1.5SiO3":
+            return ["MgAl1", "5SiO3"]
+        return split_adducts(formula)
+
+    monkeypatch.setattr(formula_owner, "_ascii_adduct_parts", adduct_first)
+    with pytest.raises(AssertionError):
+        test_species_formula_parser_preserves_normalized_decimal_stoichiometry()
+
+
+def test_species_formula_parser_keeps_adjacent_parenthesized_groups() -> None:
+    assert parse_species_formula("(CO)(C)") == (("C", 2.0), ("O", 1.0))
+
+
+def test_species_formula_parser_rejects_unmultiplied_dot_fragment() -> None:
+    assert parse_species_formula("CaAl.SiCK") is None
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:
