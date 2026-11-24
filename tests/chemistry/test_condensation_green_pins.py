@@ -142,8 +142,13 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
         assert active
         # Engine registration maps and engine_version strings are excluded
         # because host-specific registrations and builds are not run results.
-        digest_payload, engine_version_count = _runner_digest_payload(runner_output)
-        assert engine_version_count >= 1
+        # engine_version strings rode only on the alphaMELTS continuation
+        # records. Since b-1303 that continuation runs only when MAGEMin has
+        # no usable curve, so a clean run can strip zero of them. Engine
+        # identity is still asserted above through engines_used["active"].
+        digest_payload, _engine_version_count = _runner_digest_payload(
+            runner_output
+        )
         digest_serialized = json.dumps(digest_payload, sort_keys=True)
         actual["runner_sha256"] = hashlib.sha256(
             digest_serialized.encode()
