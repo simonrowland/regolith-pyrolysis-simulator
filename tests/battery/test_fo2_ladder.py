@@ -54,7 +54,7 @@ from simulator.battery.score import (
     compile_residual,
     flagged_strata,
     load_score_context,
-    _predict_with_engine,
+    _predict_engine_from_supplied_inputs,
     _resolve_score_total_pressure,
     predict_with_engine,
     residual_to_plain,
@@ -164,7 +164,7 @@ def _feo_case(**kwargs):
 def test_comparison_path_shares_the_effusion_closure_condition() -> None:
     """Tier-3 effusion shares the closure, not a private number per engine."""
 
-    source = inspect.getsource(_predict_with_engine)
+    source = inspect.getsource(_predict_engine_from_supplied_inputs)
     assert "PO2_OXYGEN_BALANCE_EFFUSION" in source
     assert "_borrow_internal_analytical_effusion" in source
 
@@ -848,10 +848,14 @@ def test_molybdenum_capsule_is_a_typed_gap_even_for_knudsen() -> None:
                 oxygen=oxygen,
                 quantity=Quantity.ACTIVITY,
             )
-            assert resolved is None, (container, method, resolved)
+            assert resolved is not None, (container, method)
+            assert resolved.route == "dp010_ambient_air_unprinted_atmosphere", (
+                container, method, resolved.route,
+            )
+            assert resolved.policy is not None and resolved.policy.id == "DP-010"
 
 
-def test_unknown_explicit_buffer_does_not_resolve_dp010_or_vacuum_proxy() -> None:
+def test_unknown_explicit_buffer_is_flagged_dp010_not_a_vacuum_proxy() -> None:
     _base_experiment, bench, observation = _feo_case()
     for method in (
         MethodToken.QUENCH_EQUILIBRATION,
@@ -881,7 +885,10 @@ def test_unknown_explicit_buffer_does_not_resolve_dp010_or_vacuum_proxy() -> Non
             oxygen=oxygen,
             quantity=Quantity.ACTIVITY,
         )
-        assert resolved is None, (method, resolved)
+        assert resolved is not None, method
+        assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+        assert resolved.route != "fo2_vacuum_cell_proxy"
+        assert resolved.policy is not None and resolved.policy.id == "DP-010"
 
 
 def test_vacuum_bound_does_not_hide_an_unsupported_container() -> None:
@@ -918,7 +925,11 @@ def test_vacuum_bound_does_not_hide_an_unsupported_container() -> None:
         oxygen=oxygen,
         quantity=Quantity.ACTIVITY,
     )
-    assert resolved is None
+    assert resolved is not None
+    assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+    assert resolved.route != "vacuum_total_pressure_upper_bound"
+    assert resolved.route != "fo2_vacuum_cell_proxy"
+    assert resolved.policy is not None and resolved.policy.id == "DP-010"
 
     printed = replace(
         row,

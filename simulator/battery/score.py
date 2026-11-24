@@ -208,8 +208,6 @@ from simulator.battery.migrate import (
 from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     independent_redox_conditions,
-    oxygen_request_inputs,
-    selected_oxygen_control,
 )
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -8717,9 +8715,6 @@ def _comparison_identity(
     Oxygen selection never supplies total pressure.
     """
 
-    if any(n.kind is NoticeKind.TARGET_IS_IMPOSED_CONTROL for n in prediction.notices):
-        return identity, None
-
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
@@ -10183,13 +10178,6 @@ def _predict_redox(
         if isinstance(kress_basis, _FeRedoxRefusal):
             return refused(kress_basis.reason, kress_basis.detail)
 
-    observation, experiment, oxygen_selected = _oxygen_admission(
-        observation, experiment, quantity,
-    )
-    identity = observation.identity
-    material_notices.extend(
-        notice for notice in oxygen_selected.notices if notice not in material_notices
-    )
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
     resolved_po2_bar = None
     if fo2_log is None:
@@ -10926,18 +10914,6 @@ def _prediction_identity_with_fo2(
     )
 
 
-def _oxygen_admission(observation, experiment, quantity):
-    """The one oxygen filter, applied where the engine request is built."""
-
-    return oxygen_request_inputs(
-        observation,
-        experiment,
-        quantity=quantity,
-        is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
-        identity_sources=redox_identity_sources(observation, experiment),
-    )
-
-
 def _oxygen_input_request(
     *,
     engine: Engine,
@@ -11017,44 +10993,6 @@ def _oxygen_input_request(
         fo2_tier_notice,
         resolve_row_fo2,
     )
-
-    observation, experiment, selected = _oxygen_admission(observation, experiment, quantity)
-    if isinstance(observation.identity, Identity):
-        identity = observation.identity
-    input_notices.extend(selected.notices)
-    if selected.imposed and selected.route is not None:
-        # The selected control is the only oxygen this request may carry.
-        # An unevaluated buffer or gas control is not replaced by a sibling
-        # scalar or by the ambient default.
-        from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
-
-        input_notices.append(Notice(
-            kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
-            affected_quantities=(quantity,),
-            reason=(
-                "scored oxygen is the run setpoint; "
-                f"route={selected.route.value}"
-            ),
-            origin=observation.observation_id,
-        ))
-        value = imposed_oxygen_pressure_pa(
-            experiment, bench, observation, route=selected.route,
-        )
-        if value is None:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.UNSUPPORTED,
-                detail=_quantity_not_predicted_detail(quantity),
-                notices=tuple(input_notices),
-            )
-        return Po2Request(
-            mode=PO2_COMMANDED,
-            po2_bar=float(value) / PA_PER_BAR,
-        )
 
     if _has_printed_fo2(observation, identity):
         fo2_state = identity.fO2_Pa
@@ -12521,6 +12459,13 @@ def _predict_element_mass_fraction_phase(
             execution=ExecutionState.NOT_PROBED,
             notices=notices,
         )
+    if quantity is not None:
+        observation, experiment, exclusion_notices = _redox_input_view(
+            observation, quantity, experiment,
+        )
+        notices = notices + exclusion_notices
+        if isinstance(observation.identity, Identity):
+            identity = observation.identity
     pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
         _resolve_score_total_pressure(
             identity,
@@ -13021,6 +12966,13 @@ def _predict_phase_row(
             name: float(Decimal(100) * amount / kept_total)
             for name, amount in kept
         }
+    if quantity is not None:
+        observation, experiment, redox_exclusion = _redox_input_view(
+            observation, quantity, experiment,
+        )
+        exclusion_notices = exclusion_notices + redox_exclusion
+        if isinstance(observation.identity, Identity):
+            identity = observation.identity
     pressure_bar, pressure_state, pressure_notice, pressure_invalid = (
         _resolve_score_total_pressure(
             identity,
@@ -14912,6 +14864,48 @@ def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
     )
 
 
+def _printed_oxygen_scalar(
+    observation: Observation, experiment: Experiment | None,
+) -> bool:
+    """True when a numeric oxygen pressure remains on this view."""
+
+    identity = observation.identity
+    if isinstance(identity, Identity):
+        fo2 = identity.fO2_Pa
+        if fo2 is not None and fo2.is_value and fo2.value is not None:
+            return True
+    for field, condition in (observation.point_conditions or {}).items():
+        if condition_identity_axis(field) == "fO2_Pa" and condition.state.is_value:
+            return True
+    control = None if experiment is None else experiment.fO2_control
+    if control is None:
+        return False
+    scalar = control.oxygen_partial_pressure_Pa
+    return scalar is not None and scalar.state.is_value
+
+
+def _buffer_or_gas_without_scalar(
+    observation: Observation, experiment: Experiment | None,
+) -> bool:
+    """True when the only remaining oxygen control is a buffer or a gas ratio.
+
+    A scalar pressure is an engine input on its own. A buffer or gas route
+    needs a bench; without one the caller uses the registered default.
+    """
+
+    if _printed_oxygen_scalar(observation, experiment):
+        return False
+    control = None if experiment is None else experiment.fO2_control
+    if control is None:
+        return False
+    gas = None if control.gas_ratio is None else control.gas_ratio.value
+    buffer = control.buffer
+    return any(
+        located is not None and located.state.is_value
+        for located in (buffer, gas)
+    )
+
+
 def _lost_exemption_oxygen_prediction(
     prediction: EnginePrediction,
     observation: Observation,
@@ -14919,11 +14913,12 @@ def _lost_exemption_oxygen_prediction(
     bench: Bench | None,
     quantity: Quantity | None,
 ) -> EnginePrediction:
-    """Predict a fugacity row whose oxygen command the request filter excluded.
+    """Predict a fugacity row whose oxygen command cannot be an engine input.
 
-    d-460: losing the setpoint exemption is a stated default with its notice,
-    not a refusal. The same filter the request builder uses decides that.
-    Partial pressure stays on the ordinary cell path.
+    d-460: a target-dependent oxygen value, and a buffer or gas route with no
+    bench, take the registered default and its notice. An independent
+    scalar command is left on the engine's own refusal. Partial pressure
+    stays on the ordinary cell path.
     """
 
     if quantity is not Quantity.FUGACITY:
@@ -14941,12 +14936,31 @@ def _lost_exemption_oxygen_prediction(
         return prediction
     from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 
-    fo2_observation, filtered, selected = _oxygen_admission(
-        observation, experiment, quantity,
+    fo2_observation, filtered, exclusion_notices = _redox_input_view(
+        observation, quantity, experiment,
     )
-    if selected.imposed or not selected.notices:
+    excluded = any(
+        notice.kind in {
+            NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL,
+            NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH,
+            NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY,
+        }
+        for notice in exclusion_notices
+    )
+    if excluded and _printed_oxygen_scalar(fo2_observation, filtered):
+        # The excluded control left an independent scalar. The engine's
+        # fugacity refusal stands; the default must not replace that command.
         return prediction
-    resolved = resolve_row_fo2(filtered, bench, fo2_observation, quantity=quantity)
+    if not excluded and (
+        bench is not None or not _buffer_or_gas_without_scalar(fo2_observation, filtered)
+    ):
+        return prediction
+    ladder_experiment = filtered
+    if not excluded and filtered is not None and filtered.fO2_control is not None:
+        ladder_experiment = replace(filtered, fO2_control=None)
+    resolved = resolve_row_fo2(
+        ladder_experiment, bench, fo2_observation, quantity=quantity,
+    )
     if resolved is None or resolved.closure:
         return prediction
     bar = resolved.po2_bar
@@ -14962,7 +14976,7 @@ def _lost_exemption_oxygen_prediction(
         execution=Execution(state=ExecutionState.PRODUCED, call_evidence=resolved.route),
         value=value,
         unit="Pa",
-        notices=(fo2_tier_notice(quantity, resolved), *selected.notices),
+        notices=(fo2_tier_notice(quantity, resolved), *exclusion_notices),
         coefficient_sources=prediction.coefficient_sources,
         identity=identity_out,
     )
@@ -14982,8 +14996,9 @@ def _predict_with_engine(
 ) -> EnginePrediction:
     """Predict one non-catalog row from the supplied inputs.
 
-    Oxygen commands are filtered in the request builder. Target-dependent
-    temperature, composition and ferric inputs stay in ``_predict_redox``.
+    Target-dependent inputs are removed where pressure and oxygen are read.
+    A fugacity row the engine cannot predict is recovered by
+    ``_lost_exemption_oxygen_prediction``.
     """
 
     _require_score_engine(engine)
@@ -15021,8 +15036,9 @@ def _predict_engine_from_supplied_inputs(
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells.
 
-    An imposed oxygen setpoint returns that control's own route. Every
-    other oxygen input is filtered where the engine request is built.
+    Target-dependent inputs are removed where pressure and oxygen are read.
+    A fugacity row the engine cannot predict is recovered by
+    ``_lost_exemption_oxygen_prediction``.
     """
 
     _require_score_engine(engine)
@@ -15030,55 +15046,6 @@ def _predict_engine_from_supplied_inputs(
         return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    if quantity is not None and experiment is not None:
-        selected = selected_oxygen_control(
-            observation,
-            experiment,
-            quantity=quantity,
-            is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
-            identity_sources=redox_identity_sources(observation, experiment),
-        )
-        if selected.imposed and selected.route is not None:
-            from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
-
-            value = imposed_oxygen_pressure_pa(
-                experiment, bench, observation, route=selected.route,
-            )
-            notice = Notice(
-                kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
-                affected_quantities=(quantity,),
-                reason=(
-                    "scored oxygen is the run setpoint; "
-                    f"route={selected.route.value}"
-                ),
-                origin=observation.observation_id,
-            )
-            if value is not None:
-                return EnginePrediction(
-                    engine=engine,
-                    channel=ENGINE_CHANNELS[engine],
-                    execution=Execution(
-                        state=ExecutionState.PRODUCED,
-                        call_evidence=selected.field,
-                    ),
-                    value=value,
-                    unit="Pa",
-                    authority=Authority.DERIVED_FROM_APPARATUS,
-                    notices=(notice, *selected.notices),
-                    identity=identity,
-                )
-            # The selected route did not evaluate. Another control's number
-            # is not a substitute.
-            return EnginePrediction(
-                engine=engine,
-                channel=ENGINE_CHANNELS[engine],
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                authority=Authority.DERIVED_FROM_APPARATUS,
-                notices=(notice, *selected.notices),
-                refusal_reason=RefusalReason.UNSUPPORTED,
-                refusal_detail=_quantity_not_predicted_detail(quantity),
-                identity=identity,
-            )
     if engine is Engine.NASA_CEA_9 and quantity is not None:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -15650,6 +15617,12 @@ def _predict_engine_from_supplied_inputs(
     wt: dict[str, float] | None = None
     requested: State[Composition] | None = None
     input_notices: list[Notice] = []
+    observation, experiment, exclusion_notices = _redox_input_view(
+        observation, quantity, experiment,
+    )
+    input_notices.extend(exclusion_notices)
+    if isinstance(observation.identity, Identity):
+        identity = observation.identity
     composition_value: Composition | None = None
     activity_payload: Mapping | None = None
     activity_fo2_bar: float | None = None
@@ -19916,6 +19889,14 @@ def _compile_residual_with_lineage(
             compared_reference,
             compared_candidate,
             allow_unknown_species_polymorph=True,
+        )
+    elif _pressure_independent_comparison(reference, prediction):
+        # The comparison notice already says this path does not require
+        # total pressure. An unknown chamber pressure is not an identity gap.
+        equal = _identity_equal(
+            compared_reference,
+            compared_candidate,
+            ignore_total_pressure=True,
         )
     else:
         equal = _score_identity_equal(compared_reference, compared_candidate)
@@ -24267,6 +24248,30 @@ def _policies_for_stratum(
     return tuple(sorted(policies)) or ((None, None),)
 
 
+def _flagged_census_bindings(
+    notices: Iterable[Notice | Mapping[str, object]],
+    strata: Sequence[str],
+) -> tuple[tuple[str, str | None, str | None], ...]:
+    """One policy binding per residual.
+
+    Headline strata still name proposed-policy. The census does not bind
+    that stratum again when the notice-kind stratum already bound the same
+    policy id and status.
+    """
+
+    bound: set[tuple[str | None, str | None]] = set()
+    found: list[tuple[str, str | None, str | None]] = []
+    for stratum in strata:
+        for policy_id, policy_status in _policies_for_stratum(notices, stratum):
+            key = (policy_id, policy_status)
+            if stratum == FLAGGED_STRATUM_PROPOSED_POLICY and key in bound:
+                continue
+            if policy_id is not None:
+                bound.add(key)
+            found.append((stratum, policy_id, policy_status))
+    return tuple(found)
+
+
 def flagged_stratum_rows(
     residuals: Sequence[Residual],
     *,
@@ -24281,13 +24286,12 @@ def flagged_stratum_rows(
         if residual.rail is None or residual.numeric is None:
             continue
         engine = _engine_of(residual)
-        for stratum in flagged_strata(residual.notices):
-            for policy_id, policy_status in _policies_for_stratum(
-                residual.notices, stratum
-            ):
-                groups.setdefault(
-                    (stratum, residual.rail.value, engine, policy_id, policy_status), []
-                ).append(residual)
+        for stratum, policy_id, policy_status in _flagged_census_bindings(
+            residual.notices, flagged_strata(residual.notices),
+        ):
+            groups.setdefault(
+                (stratum, residual.rail.value, engine, policy_id, policy_status), []
+            ).append(residual)
     rows: list[dict[str, object]] = []
     for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
         groups.items(),
@@ -26018,39 +26022,38 @@ def flagged_stratum_payloads(
             for notice in (row.get("notices") or ())
             if isinstance(notice, Mapping)
         )
-        for stratum in _flagged_payload_strata(row):
-            for policy_id, policy_status in _policies_for_stratum(
-                notices, stratum
-            ):
-                key = (stratum, rail, engine, policy_id, policy_status)
-                counts[key] = counts.get(key, 0) + 1
-                if hulls is not None:
-                    from simulator.battery.compilation_tier import reference_observation
+        for stratum, policy_id, policy_status in _flagged_census_bindings(
+            notices, _flagged_payload_strata(row),
+        ):
+            key = (stratum, rail, engine, policy_id, policy_status)
+            counts[key] = counts.get(key, 0) + 1
+            if hulls is not None:
+                from simulator.battery.compilation_tier import reference_observation
 
-                    reference = str(row.get("reference") or "")
-                    hull_key = (
-                        f"flagged:{stratum}"
-                        if policy_id is None
-                        else (
-                            f"flagged:{stratum}:policy={policy_id}"
-                            f":status={policy_status}"
-                        )
+                reference = str(row.get("reference") or "")
+                hull_key = (
+                    f"flagged:{stratum}"
+                    if policy_id is None
+                    else (
+                        f"flagged:{stratum}:policy={policy_id}"
+                        f":status={policy_status}"
                     )
-                    hulls.setdefault(
-                        (hull_key, rail, engine), _ConditionHull()
-                    ).add(reference, reference_observation(observations or {}, reference))
-                dex = (
-                    numeric.get("value")
-                    if numeric.get("operation") == MetricOperation.DEX.value
-                    else None
                 )
-                if dex is None:
-                    continue
-                try:
-                    value = as_decimal(dex)
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
-                groups.setdefault(key, []).append(value)
+                hulls.setdefault(
+                    (hull_key, rail, engine), _ConditionHull()
+                ).add(reference, reference_observation(observations or {}, reference))
+            dex = (
+                numeric.get("value")
+                if numeric.get("operation") == MetricOperation.DEX.value
+                else None
+            )
+            if dex is None:
+                continue
+            try:
+                value = as_decimal(dex)
+            except (TypeError, ValueError, ArithmeticError):
+                continue
+            groups.setdefault(key, []).append(value)
     return [
         {
             "stratum": stratum,

@@ -182,12 +182,13 @@ def test_formula_results_must_come_from_the_named_owner() -> None:
     for policy_id, context in (
         ("DP-010", {"value": Decimal("-0.672")}),
         ("DP-108", {"value": Decimal("250")}),
-        ("DP-108", {"predicted_total_pressure_pa": Decimal("0")}),
         ("DP-004", {"value": Decimal("250")}),
         ("DP-004", {"measured_partial_pressures": [Decimal("100"), Decimal("150")]}),
     ):
         with pytest.raises(ValueError, match="owning|requires"):
             resolve(policy_id, **context)
+    with pytest.raises(ValueError, match="must be positive"):
+        resolve("DP-108", predicted_total_pressure_pa=Decimal("0"))
 
 
 @pytest.mark.parametrize(
@@ -278,8 +279,12 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
         "simulator.battery.score._sum_gas_partial_pressures_pa"
     )
     cases = (
-        ("DP-004", {"measured_partial_pressures": [Decimal("1"), Decimal("2")]}),
-        ("DP-004", {"value": Decimal("3")}),
+        (
+            "DP-004",
+            {"measured_partial_pressures": [Decimal("1"), Decimal("2")]},
+            "owning partial-pressure sum",
+        ),
+        ("DP-004", {"value": Decimal("3")}, "owning formula result"),
         (
             "DP-013",
             {
@@ -287,14 +292,16 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
                 "flag": "basis_converted",
                 "transform_id": "mol_percent_to_fraction",
             },
+            "owning formula result",
         ),
         (
             "DP-017",
             {"value": "fixture composition", "flag": "composition_from_run_siblings"},
+            "owning formula result",
         ),
     )
-    for policy_id, context in cases:
-        with pytest.raises(ValueError, match="owning formula result"):
+    for policy_id, context, expected in cases:
+        with pytest.raises(ValueError, match=expected):
             resolve(policy_id, **context)
 
 
@@ -412,12 +419,9 @@ def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monke
     )
     assert not _headline_payload_admits(row, tier="measured")
     flagged = flagged_stratum_payloads([row], [Engine.INTERNAL_ANALYTICAL])
-    assert [item["stratum"] for item in flagged] == [
-        "knob_defaulted",
-        "proposed-policy",
-    ]
-    assert all(item["policy_id"] == policy_id for item in flagged)
-    assert all(item["policy_status"] == "proposed" for item in flagged)
+    assert [item["stratum"] for item in flagged] == ["knob_defaulted"]
+    assert flagged[0]["policy_id"] == policy_id
+    assert flagged[0]["policy_status"] == "proposed"
 
     canonical_policy = {**notice_policy, "status": "canonical"}
     canonical_row = {

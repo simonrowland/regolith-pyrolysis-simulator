@@ -6,7 +6,6 @@ from decimal import Decimal
 from enum import Enum
 
 from simulator.battery.enums import FO2Channel, NoticeKind, Quantity, ValueKind
-from simulator.battery.identity import quantity_token
 from simulator.battery.records import Experiment, Located, Notice, Observation, State, Value
 from simulator.battery.printed_cells import (
     PrintedCell as _PrintedCell,
@@ -42,33 +41,7 @@ class TargetRelation(str, Enum):
     DERIVED_FROM_TARGET = "derived_from_target"
     TARGET_ANALYTE_OPERAND = "target_analyte_operand"
     INDEPENDENT_RUN_CONTROL = "independent_run_control"
-    IMPOSED_CONTROL_TARGET = "imposed_control_target"
     INDEPENDENT = "independent"
-
-
-class OxygenControlRoute(str, Enum):
-    """The oxygen control a typed declaration names.
-
-    A scalar pressure, a named buffer and a gas ratio are different controls.
-    The evaluator may read only the selected one.
-    """
-
-    SCALAR_PRESSURE = "scalar_pressure"
-    NAMED_BUFFER = "named_buffer"
-    GAS_CONTROL = "gas_control"
-
-
-_OXYGEN_CONTROL_ROUTES = {
-    "oxygen_partial_pressure_Pa": OxygenControlRoute.SCALAR_PRESSURE,
-    "fO2_Pa": OxygenControlRoute.SCALAR_PRESSURE,
-    "buffer": OxygenControlRoute.NAMED_BUFFER,
-    "gas_ratio": OxygenControlRoute.GAS_CONTROL,
-}
-_ROUTE_PREFERENCE = (
-    OxygenControlRoute.NAMED_BUFFER,
-    OxygenControlRoute.GAS_CONTROL,
-    OxygenControlRoute.SCALAR_PRESSURE,
-)
 
 
 @dataclass(frozen=True)
@@ -76,7 +49,6 @@ class CandidateInput:
     field: str
     condition: Located
     axis: str | None = None
-    imposed_oxygen: bool = False
     experiment: Experiment | None = None
     resolve_identity_sources: Callable[[], Mapping[str, tuple[str, ...]]] | None = None
 
@@ -138,32 +110,6 @@ def _match_target_cell(targets: tuple[_PrintedCell, ...], candidate: _PrintedCel
     return "same" if "same" in matches else "ambiguous" if "ambiguous" in matches else None
 
 
-def _declared_imposed_oxygen_target(
-    observation: Observation, candidate: CandidateInput,
-) -> bool:
-    """True when the row records that its oxygen value is the imposed control.
-
-    An observation has no condition-role field. The typed record the extract
-    or migration already stores is a derivation whose only input is this
-    imposed-oxygen field and which has no correction parameters. A matching
-    cell, a restored printed target, or a correction's original operand is
-    not that declaration.
-    """
-
-    derivation = observation.derivation
-    if (
-        derivation is None
-        or derivation.parameters
-        or derivation.inputs != (candidate.field,)
-        or not candidate.imposed_oxygen
-    ):
-        return False
-    species = observation.identity.species
-    if species is None or species.formula != "O2":
-        return False
-    return quantity_token(observation.identity) in {Quantity.FUGACITY, Quantity.P_PARTIAL}
-
-
 def classify_target_provenance(
     observation: Observation, candidate: CandidateInput,
 ) -> TargetProvenance:
@@ -200,7 +146,7 @@ def classify_target_provenance(
                 if operand is not None:
                     operands.append(operand)
                     references_run_control |= _is_run_control(
-                        CandidateInput(field, operand, axis, field in imposed_inputs),
+                        CandidateInput(field, operand, axis),
                     )
         # A unit conversion restates this condition's own printed magnitude
         # without the unit. That collision is the same-cell check below,
@@ -229,8 +175,6 @@ def classify_target_provenance(
     dependency = derivation_match(condition)
     if dependency is not None:
         return TargetProvenance(TargetRelation.DERIVED_FROM_TARGET, dependency == "ambiguous")
-    if _declared_imposed_oxygen_target(observation, candidate):
-        return TargetProvenance(TargetRelation.IMPOSED_CONTROL_TARGET)
 
     cell = _printed_cell(condition, address_only=condition.inference is not None)
     match = _match_target_cell(targets, cell)
@@ -271,8 +215,7 @@ def _is_run_control(candidate: CandidateInput) -> bool:
     field = candidate.field.rsplit(".", 1)[-1]
     axis = candidate.axis or field
     return (
-        candidate.imposed_oxygen
-        or CONTROL_VARIABLE_FIELDS.get(axis) == frozenset()
+        CONTROL_VARIABLE_FIELDS.get(axis) == frozenset()
         or any(field in fields for fields in CONTROL_VARIABLE_FIELDS.values())
     )
 
@@ -339,7 +282,7 @@ def independent_redox_conditions(
     def classify(field: str, condition: Located) -> TargetProvenance:
         return classify_target_provenance(observation, CandidateInput(
             field, condition, condition_identity_axis(field.rsplit(".", 1)[-1]),
-            imposed_oxygen=field in imposed_inputs, experiment=experiment,
+            experiment=experiment,
             resolve_identity_sources=lambda: identity_sources,
         ))
 
@@ -529,251 +472,3 @@ def _target_exclusion_notice(
         destination=repr(observation.locator),
     )
 
-
-def _oxygen_route(field: str) -> OxygenControlRoute | None:
-    return _OXYGEN_CONTROL_ROUTES.get(field.rsplit(".", 1)[-1])
-
-
-@dataclass(frozen=True)
-class OxygenInput:
-    field: str
-    condition: Located
-    provenance: TargetProvenance
-
-
-@dataclass(frozen=True)
-class SelectedOxygenControl:
-    """The oxygen control admitted to an engine request.
-
-    ``route`` is None when no typed control is selected. ``notices`` name
-    every oxygen input the request must not use. ``imposed`` is the setpoint
-    exemption: the scored oxygen is that control, and no other control's
-    number may stand in for it.
-    """
-
-    route: OxygenControlRoute | None
-    field: str | None
-    value: Located | None
-    provenance: TargetProvenance | None
-    notices: tuple[Notice, ...]
-    excluded: tuple[tuple[str, str], ...] = ()
-
-    @property
-    def imposed(self) -> bool:
-        return (
-            self.route is not None
-            and self.provenance is not None
-            and self.provenance.relation is TargetRelation.IMPOSED_CONTROL_TARGET
-        )
-
-
-def _oxygen_candidates(
-    observation: Observation,
-    experiment: Experiment | None,
-    *,
-    is_oxygen_field: Callable[[str], bool],
-    identity_sources: Mapping[str, tuple[str, ...]],
-) -> tuple[OxygenInput, ...]:
-    """Every oxygen input the request builder can see, classified once."""
-
-    found: list[OxygenInput] = []
-    imposed = _imposed_oxygen_inputs(experiment)
-    conditions = observation.point_conditions or {}
-    fields: list[tuple[str, Located]] = [
-        (field, condition)
-        for field, condition in conditions.items()
-        if is_oxygen_field(field)
-    ]
-    for field, condition in imposed.items():
-        if _oxygen_route(field) is None:
-            continue
-        fields.append((field, condition))
-
-    def sources() -> Mapping[str, tuple[str, ...]]:
-        return identity_sources
-
-    for field, condition in fields:
-        found.append(OxygenInput(
-            field,
-            condition,
-            classify_target_provenance(observation, CandidateInput(
-                field, condition,
-                imposed_oxygen=field in imposed,
-                experiment=experiment,
-                resolve_identity_sources=sources,
-            )),
-        ))
-    return tuple(found)
-
-
-def _select_imposed(candidates: tuple[OxygenInput, ...]) -> OxygenInput | None:
-    imposed = [
-        candidate for candidate in candidates
-        if candidate.provenance.relation is TargetRelation.IMPOSED_CONTROL_TARGET
-        and _oxygen_route(candidate.field) is not None
-    ]
-    if not imposed:
-        return None
-    if len(imposed) == 1:
-        return imposed[0]
-    return min(
-        imposed,
-        key=lambda candidate: _ROUTE_PREFERENCE.index(_oxygen_route(candidate.field)),
-    )
-
-
-def _identity_echo_reason(
-    observation: Observation,
-    excluded: Mapping[str, str],
-    identity_sources: Mapping[str, tuple[str, ...]],
-) -> str | None:
-    """An unsourced copy of the scored oxygen, or a copy of an excluded source.
-
-    Value equality is used only for the unsourced echo of this row's own
-    cell. It is not evidence that the row is an imposed setpoint.
-    """
-
-    identity = observation.identity
-    fo2 = getattr(identity, "fO2_Pa", None)
-    if fo2 is None or not fo2.is_value or fo2.value is None:
-        return None
-    sources = identity_sources.get("fO2_Pa") or ()
-    for source in sources:
-        reason = excluded.get(source)
-        if reason is None:
-            reason = excluded.get(source.removeprefix("point_conditions."))
-        if reason is not None:
-            return reason
-    if sources:
-        return None
-    scored = getattr(observation.value, "point", None)
-    if scored is not None and fo2.value == scored:
-        return "same"
-    return None
-
-
-def selected_oxygen_control(
-    observation: Observation,
-    experiment: Experiment | None,
-    *,
-    quantity: Quantity,
-    is_oxygen_field: Callable[[str], bool],
-    identity_sources: Mapping[str, tuple[str, ...]],
-) -> SelectedOxygenControl:
-    """Return the selected oxygen control, not a Boolean.
-
-    The route is the typed declaration's own control. Notices record every
-    target-derived oxygen input, including a detached row's own cell.
-    """
-
-    candidates = _oxygen_candidates(
-        observation, experiment,
-        is_oxygen_field=is_oxygen_field,
-        identity_sources=identity_sources,
-    )
-    chosen = _select_imposed(candidates)
-    excluded = {
-        candidate.field: reason
-        for candidate in candidates
-        if (reason := candidate.provenance.exclusion_reason) is not None
-        and (chosen is None or candidate.field != chosen.field)
-    }
-    echo = _identity_echo_reason(observation, excluded, identity_sources)
-    if echo is not None:
-        excluded.setdefault("identity.fO2_Pa", echo)
-    located = {candidate.field: candidate.condition for candidate in candidates}
-    excluded_fields = tuple(sorted(excluded.items()))
-    notices = tuple(
-        _target_exclusion_notice(
-            observation, quantity, field, reason, located.get(field),
-        )
-        for field, reason in excluded_fields
-    )
-    if chosen is None:
-        return SelectedOxygenControl(None, None, None, None, notices, excluded_fields)
-    return SelectedOxygenControl(
-        _oxygen_route(chosen.field),
-        chosen.field,
-        chosen.condition,
-        chosen.provenance,
-        notices,
-        excluded_fields,
-    )
-
-
-def oxygen_request_inputs(
-    observation: Observation,
-    experiment: Experiment | None,
-    *,
-    quantity: Quantity,
-    is_oxygen_field: Callable[[str], bool],
-    identity_sources: Mapping[str, tuple[str, ...]],
-) -> tuple[Observation, Experiment | None, SelectedOxygenControl]:
-    """Drop every oxygen input the selected control does not admit.
-
-    This is the one oxygen filter. A target-derived value from the
-    experiment, a point condition or the identity never remains. When a
-    buffer or gas control is selected, another control's scalar is removed
-    with it.
-    """
-
-    selected = selected_oxygen_control(
-        observation, experiment,
-        quantity=quantity,
-        is_oxygen_field=is_oxygen_field,
-        identity_sources=identity_sources,
-    )
-    excluded = dict(selected.excluded)
-    conditions = dict(observation.point_conditions or {})
-    for field in list(conditions):
-        if not is_oxygen_field(field):
-            continue
-        if field in excluded or (
-            selected.imposed and f"point_conditions.{field}" != selected.field
-            and field != selected.field
-        ):
-            conditions.pop(field, None)
-    identity = observation.identity
-    fo2 = getattr(identity, "fO2_Pa", None)
-    clear_identity = "identity.fO2_Pa" in excluded or (
-        selected.imposed
-        and fo2 is not None
-        and fo2.is_value
-        and fo2.value is not None
-        and getattr(observation.value, "point", None) == fo2.value
-    )
-    if clear_identity and hasattr(identity, "fO2_Pa"):
-        identity = replace(identity, fO2_Pa=None)
-    if conditions != (observation.point_conditions or {}) or identity != observation.identity:
-        observation = replace(
-            observation,
-            identity=identity,
-            point_conditions=conditions or (
-                {} if observation.point_conditions is not None else None
-            ),
-        )
-    if experiment is not None and experiment.fO2_control is not None:
-        control = experiment.fO2_control
-
-        def admit(name: str, value: object) -> object:
-            field = f"experiment.fO2_control.{name}"
-            if field in excluded:
-                return None
-            if selected.imposed and field != selected.field:
-                return None
-            return value
-
-        gas = control.gas_ratio
-        if admit("gas_ratio", gas) is None:
-            gas = None
-        updated = replace(
-            control,
-            gas_ratio=gas,
-            oxygen_partial_pressure_Pa=admit(
-                "oxygen_partial_pressure_Pa", control.oxygen_partial_pressure_Pa,
-            ),
-            buffer=admit("buffer", control.buffer),
-        )
-        if updated != control:
-            experiment = replace(experiment, fO2_control=updated)
-    return observation, experiment, selected

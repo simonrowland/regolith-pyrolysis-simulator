@@ -53,9 +53,7 @@ from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     KRESS_FE2O3_WT_PCT_FIELD,
     KRESS_FEO_WT_PCT_FIELD,
-    OxygenControlRoute,
 )
-from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
     Composition,
@@ -68,6 +66,7 @@ from simulator.battery.records import (
 )
 from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
+    GapReason,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
@@ -516,16 +515,25 @@ def resolve_row_fo2(
         return closure
     if metal_saturation_activity_refusal(experiment, observation, quantity) is not None:
         return None
-    for route in routes:
-        if route.route == _VACUUM_ROUTE:
-            log = _log_point(route.value)
-            if log is not None:
-                return ResolvedFo2(log, 3, route.route, False)
-    if _is_vacuum_fO2_method(experiment):
-        proxy = _tier4(weights, temperature)
-        if proxy is not None:
-            return replace(proxy, route="fo2_vacuum_cell_proxy", borrowed=False)
-        return None
+    # An unsupported printed apparatus is a gap. A vacuum bound or the
+    # vacuum-cell proxy must not hide it; the registered ambient default
+    # below is the flagged prediction, and the absence stays on the waypoint.
+    unsupported_print = (
+        oxygen_result is not None
+        and oxygen_result.absence is not None
+        and oxygen_result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    )
+    if not unsupported_print:
+        for route in routes:
+            if route.route == _VACUUM_ROUTE:
+                log = _log_point(route.value)
+                if log is not None:
+                    return ResolvedFo2(log, 3, route.route, False)
+        if _is_vacuum_fO2_method(experiment):
+            proxy = _tier4(weights, temperature)
+            if proxy is not None:
+                return replace(proxy, route="fo2_vacuum_cell_proxy", borrowed=False)
+            return None
     resolved_quantity = quantity or (
         None if identity is None else quantity_token(identity)
     )
@@ -1022,55 +1030,6 @@ def _gas_ratio_fo2(
     if not math.isfinite(log):
         return None
     return ResolvedFo2(log, 3, "experiment_gas_ratio", False)
-
-
-def _scalar_oxygen_pressure_pa(experiment: Experiment | None) -> Decimal | None:
-    control = None if experiment is None else experiment.fO2_control
-    pressure = control.oxygen_partial_pressure_Pa if control is not None else None
-    if pressure is None or not pressure.state.is_value:
-        return None
-    point = pressure.state.value.point
-    if point is None or not point.is_finite() or point <= 0:
-        return None
-    return point
-
-
-def _buffer_oxygen_pressure_pa(
-    experiment: Experiment, bench: object | None, observation: Observation,
-) -> Decimal | None:
-    result = _oxygen_result(experiment, bench, observation, None)
-    if result is None:
-        return None
-    for item in result.routes:
-        if item.route in _BUFFER_ROUTES and isinstance(item.value, Value):
-            point = item.value.point
-            if point is not None and point.is_finite():
-                return log10_fo2_to_pa(point)
-    return None
-
-
-def imposed_oxygen_pressure_pa(
-    experiment: Experiment,
-    bench: object | None,
-    observation: Observation,
-    *,
-    route: OxygenControlRoute,
-) -> Decimal | None:
-    """Evaluate only the selected control.
-
-    A named buffer or gas control never returns a scalar pressure that
-    belongs to a different control on the same run.
-    """
-
-    if route is OxygenControlRoute.SCALAR_PRESSURE:
-        return _scalar_oxygen_pressure_pa(experiment)
-    if route is OxygenControlRoute.NAMED_BUFFER:
-        return _buffer_oxygen_pressure_pa(experiment, bench, observation)
-    if route is OxygenControlRoute.GAS_CONTROL:
-        temperature = _temperature_K(_identity(observation), None)
-        gas = _gas_ratio_fo2(experiment, temperature)
-        return None if gas is None else log10_fo2_to_pa(Decimal(str(gas.log10_fO2_bar)))
-    return None
 
 
 def _is_knudsen(experiment: Experiment | None) -> bool:
