@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -71,6 +72,11 @@ B1452_TB_0203_OBSERVATIONS = 27
 # Checked-in store count; the train refreshes it from the corrected source records.
 B1452_STORE_STORED = 15224
 # Corrected generator output drops the three entropy uncertainty-only rows.
+# Fold 10 re-count: the pre-fix generator's extra 47 stored cells were the
+# fluorphlogopite fragment AlSi3O10 (record 0003: 5, shard 0394: 42). Printed
+# formula weight 421.244 g/mol; fragment mass 271.232 g/mol. Refusing tokens
+# from inside a rejected complete expression puts those cells back into
+# refused, so these counts and the store-versus-generated gap of 3 hold.
 B1452_GENERATED_STORE_STORED = 15221
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
@@ -300,6 +306,237 @@ def test_298k_next_line_formula_is_page_grounded() -> None:
         generated, Quantity.S, temperature="298.15", formula="Quartz", row=401
     )
     assert stored == []
+
+
+FLUORPHLOGOPITE_HT = "robie-hemingway-fisher-1978-usgs-b1452-0394"
+# Printed KMg3(AlSi3O10)F2, PDF 35 folio 29 and PDF 426 folio 420.
+# The captured 298 K formula line is Kg3, which is not that mineral.
+_FLUORPHLOGOPITE_FRAGMENT_ATOMS = (("Al", "1"), ("O", "10"), ("Si", "3"))
+_PRINTED_FLUORPHLOGOPITE_FW = Decimal("421.244")
+
+
+def _atom_key(formula: str) -> tuple[tuple[str, str], ...] | None:
+    counts = generator._parse_counts(formula)
+    if not counts:
+        return None
+    return tuple(sorted((element, str(count)) for element, count in counts.items()))
+
+
+def rejected_interior_formulas(name: str) -> set[str]:
+    """Formulas the pre-fix fallback would take from inside a rejected ``$...$``.
+
+    A complete expression that parses is the formula, so it contributes none.
+    """
+
+    spans: list[tuple[int, int]] = []
+    for match in generator._LATEX_MATH_RE.finditer(name):
+        formula, latex_charge = generator._latex_to_formula(match.group(1))
+        if formula and not formula.startswith("Delta") and generator._looks_like_formula(formula):
+            return set()
+        if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
+            return set()
+        spans.append(match.span())
+    found: set[str] = set()
+    for start, end in spans:
+        chunk = name[start:end]
+        for token in chunk.replace("(", " ").replace(")", " ").split():
+            parsed, _charge = generator._plain_formula_and_charge(token)
+            if parsed:
+                found.add(parsed)
+    return found
+
+
+def interior_mining_formula_from_name(name: str) -> tuple[str | None, int | None]:
+    """Pre-fix rule: a failed complete expression still offers its interior tokens."""
+
+    charge: int | None = None
+    for chunk in generator._LATEX_MATH_RE.findall(name):
+        formula, latex_charge = generator._latex_to_formula(chunk)
+        if latex_charge is not None:
+            charge = latex_charge
+        if formula and not formula.startswith("Delta") and generator._looks_like_formula(formula):
+            return formula, charge
+        if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
+            return formula, charge
+    tokens = name.replace("(", " ").replace(")", " ").split()
+    if tokens:
+        last = tokens[-1]
+        if (
+            (any(character.isdigit() for character in last) or re.fullmatch(r"[A-Z][a-z]?", last))
+            and generator._looks_like_formula(last)
+        ):
+            return last, charge
+        hits: list[tuple[str, int | None]] = []
+        for token in tokens:
+            formula, token_charge = generator._plain_formula_and_charge(token)
+            if formula:
+                hits.append((formula, token_charge))
+        unique = {formula for formula, _token_charge in hits}
+        if len(unique) == 1:
+            formula = next(iter(unique))
+            charges = {
+                item_charge for item_formula, item_charge in hits if item_formula == formula
+            }
+            if len(charges) == 1:
+                charge = next(iter(charges))
+            return formula, charge
+    return None, charge
+
+
+def _clear_formula_indexes() -> None:
+    generator._formula_index_from_298k.cache_clear()
+    generator._formula_weight_index_from_298k.cache_clear()
+
+
+def _fluorphlogopite_rows(record: dict) -> list[tuple[int, str, generator.FormulaResolution]]:
+    rows = []
+    for index, row in enumerate(record["rows"]):
+        cells = row.get("cells") or {}
+        parsed = generator._as_published_cell(cells.get("name_and_formula"))
+        if parsed is None:
+            continue
+        name = parsed[0]
+        if "FLUORPHLOGOPITE" not in name and "AlSi_{3}O_{10}" not in name:
+            continue
+        if "FLUORPHLOGOPITE" not in name and "F_{2}" not in name:
+            continue
+        fw = generator._formula_weight_as_published(record, row_index=index)
+        rows.append(
+            (
+                index,
+                name,
+                generator._resolve_formula(record, name=name, formula_weight=fw),
+            )
+        )
+    return rows
+
+
+def _assert_fluorphlogopite_has_no_fragment() -> None:
+    record = _load(TABLE_298K)
+    rows = _fluorphlogopite_rows(record)
+    assert len(rows) == 2
+    for _index, _name, resolution in rows:
+        assert resolution.formula is None
+        assert resolution.reason is not None
+        assert resolution.reason.startswith(generator.FORMULA_UNRESOLVED_REASON_PREFIX)
+        assert resolution.formula != "AlSi_{3}O_{10}"
+    generated = _generation(TABLE_298K)
+    assert [
+        observation.identity.species.formula
+        for observation in generated.observations
+        if _atom_key(observation.identity.species.formula) == _FLUORPHLOGOPITE_FRAGMENT_ATOMS
+    ] == []
+    high_temperature = _generation(FLUORPHLOGOPITE_HT)
+    resolution = high_temperature.report["formula_resolution"]
+    assert resolution["formula"] is None
+    assert resolution["unresolved"] is True
+    assert str(resolution["reason"]).startswith(generator.FORMULA_UNRESOLVED_REASON_PREFIX)
+    assert high_temperature.observations == ()
+    fragment_mass = generator._formula_mass("AlSi_{3}O_{10}")
+    assert fragment_mass is not None
+    assert not generator._mass_matches_formula_weight(
+        "AlSi_{3}O_{10}", _PRINTED_FLUORPHLOGOPITE_FW
+    )
+    # Printed KMg3(AlSi3O10)F2 matches 421.244. The capture is Kg, and no
+    # image-verified correction supplies the printed formula, so the row
+    # stays the refusal above.
+    whole = "KMg3(AlSi3O10)F2"
+    assert _atom_key(whole) == (
+        ("Al", "1"),
+        ("F", "2"),
+        ("K", "1"),
+        ("Mg", "3"),
+        ("O", "10"),
+        ("Si", "3"),
+    )
+    assert generator._mass_matches_formula_weight(whole, _PRINTED_FLUORPHLOGOPITE_FW)
+
+
+def test_fluorphlogopite_refuses_the_rejected_expression_interior() -> None:
+    """298 K record 0003 and high-temperature shard 0394 do not emit AlSi3O10.
+
+    Printed mineral, PDF 35 folio 29 and PDF 426 folio 420: KMg3(AlSi3O10)F2,
+    421.244 g/mol. The captured ``Kg_{3}`` is not an image-verified formula,
+    so the row stays a typed missing-composition refusal.
+    """
+
+    _clear_formula_indexes()
+    _assert_fluorphlogopite_has_no_fragment()
+
+
+def test_old_interior_mining_breaks_fluorphlogopite_refusal(monkeypatch) -> None:
+    _clear_formula_indexes()
+    _assert_fluorphlogopite_has_no_fragment()
+    monkeypatch.setattr(
+        generator, "_formula_from_name", interior_mining_formula_from_name
+    )
+    _clear_formula_indexes()
+    try:
+        captured = "$Kg_{3}(AlSi_{3}O_{10})F_{2}$"
+        assert interior_mining_formula_from_name(captured)[0] == "AlSi_{3}O_{10}"
+        with pytest.raises(AssertionError):
+            _assert_fluorphlogopite_has_no_fragment()
+    finally:
+        monkeypatch.undo()
+        _clear_formula_indexes()
+
+
+def _row_name_and_weight(record: dict, index: int) -> tuple[str, str | None]:
+    row = record["rows"][index]
+    cells = row.get("cells") or {}
+    parsed = generator._as_published_cell(cells.get("name_and_formula"))
+    name = parsed[0] if parsed is not None else ""
+    return name, generator._formula_weight_as_published(record, row_index=index)
+
+
+def test_rejected_expression_interior_never_resolves() -> None:
+    """Every B1452 name resolves without a token from inside a rejected formula."""
+
+    _clear_formula_indexes()
+    record = _load(TABLE_298K)
+    interiors_by_key: dict[str, set[str]] = {}
+    offenders: list[str] = []
+    rows = record["rows"]
+    for index in range(len(rows)):
+        name, fw = _row_name_and_weight(record, index)
+        sources = [name]
+        if fw and generator._formula_from_name(name)[0] is None and index + 1 < len(rows):
+            _next_name, next_fw = _row_name_and_weight(record, index + 1)
+            if not next_fw:
+                sources.append(_next_name)
+        interiors: set[str] = set()
+        for source in sources:
+            interiors |= rejected_interior_formulas(source)
+        key = generator._name_key(name)
+        if key and interiors:
+            interiors_by_key.setdefault(key, set()).update(interiors)
+        resolution = generator._resolve_formula(record, name=name, formula_weight=fw)
+        if resolution.formula and resolution.formula in interiors:
+            offenders.append(
+                f"298k row {index} {name!r} -> {resolution.formula!r} via {resolution.source}"
+            )
+    for path in sorted(RECORDS_DIR.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if generator._table_kind(payload) != "ht_grid":
+            continue
+        label = str(payload.get("name_as_published") or "")
+        own = rejected_interior_formulas(label)
+        published = payload.get("formula_as_published")
+        if isinstance(published, str):
+            own |= rejected_interior_formulas(published)
+        title = payload.get("title_line_as_published")
+        if isinstance(title, str):
+            own |= rejected_interior_formulas(title)
+        key = generator._name_key(label)
+        if key:
+            own |= interiors_by_key.get(key, set())
+        resolution = generator._resolve_formula(payload)
+        if resolution.formula and resolution.formula in own:
+            offenders.append(
+                f"{payload.get('record_id')} {label!r} -> {resolution.formula!r} "
+                f"via {resolution.source}"
+            )
+    assert offenders == []
 
 
 def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:

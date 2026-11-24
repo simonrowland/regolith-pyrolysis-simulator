@@ -849,16 +849,32 @@ def _plain_formula_and_charge(text: str) -> tuple[str | None, int | None]:
 
 
 def _formula_from_name(name: str) -> tuple[str | None, int | None]:
+    """Complete ``$...$`` expression, or text outside every rejected one.
+
+    A complete expression that does not parse is one rejected formula.
+    Tokens inside it are not candidates. ``$Kg_{3}(AlSi_{3}O_{10})F_{2}$``
+    must not become ``AlSi_{3}O_{10}``.
+    """
+
     charge: int | None = None
-    for chunk in _LATEX_MATH_RE.findall(name):
-        formula, latex_charge = _latex_to_formula(chunk)
+    rejected: list[tuple[int, int]] = []
+    for match in _LATEX_MATH_RE.finditer(name):
+        formula, latex_charge = _latex_to_formula(match.group(1))
         if latex_charge is not None:
             charge = latex_charge
         if formula and not formula.startswith("Delta") and _looks_like_formula(formula):
             return formula, charge
         if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
             return formula, charge
-    tokens = name.replace("(", " ").replace(")", " ").split()
+        rejected.append(match.span())
+    fallback_parts: list[str] = []
+    cursor = 0
+    for start, end in rejected:
+        fallback_parts.append(name[cursor:start])
+        cursor = end
+    fallback_parts.append(name[cursor:])
+    fallback = "".join(fallback_parts)
+    tokens = fallback.replace("(", " ").replace(")", " ").split()
     if tokens:
         last = tokens[-1]
         # Last-token formulas are "Ag" or "Fe2SiO4", not words that happen to
