@@ -3435,6 +3435,7 @@ class _OpenImccBatteryBackend:
         # OpenIMCC refuses raw Fe2O3. d-180: fold ferric onto FeOt and
         # carry the owner's notices. Do not copy the fold.
         fold_notices: tuple[Mapping[str, Any], ...] = ()
+
         if composition_mol:
             folded_mol, fold_notices = self._bridge.fold_ferric_to_feot(
                 composition_mol

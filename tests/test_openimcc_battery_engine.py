@@ -414,8 +414,9 @@ def _zhang_k_case(tmp_path: Path, temperature: str):
 
 
 def _assert_zhang_rb2o_refused(residual, reference) -> None:
-    # The old pin depended on a silent Rb2O drop; follow-up t-1183 adds a
-    # flagged projection so the row predicts with a notice.
+    # These implied-alpha rows are not scored oxygen-balance requests, so
+    # their original engine refusal for Rb2O outside the supported species
+    # remains intact.
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
@@ -476,6 +477,7 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
         ),
         point_conditions={
             **(reference.point_conditions or {}),
+            "composition": F.located(supported_test_composition),
             "printed_composition": F.located(supported_test_printed_composition),
         },
     )
@@ -489,7 +491,9 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
         cell = real_equilibrate_cell(*args, **kwargs)
         raw_details = cell.melt_activity_coefficient_details or {}
         assert "KO0.5" in raw_details, (
-            "supported test fixture must produce KO0.5 details before corruption"
+            "supported test fixture must produce KO0.5 details before corruption; "
+            f"pot={getattr(args[1], 'composition_wt_pct', None)!r}, "
+            f"po2={kwargs.get('po2')!r}"
         )
         details = dict(raw_details)
         if details_mode == "absent":
@@ -2025,6 +2029,40 @@ def test_commanded_po2_grid_remains_direct_gas_evaluation(
         row.get("kind") == "fo2_oxygen_balance_effusion_solved"
         for row in result.imcc_notices
     )
+
+
+@pytest.mark.parametrize(
+    "po2_request",
+    (None, Po2Request(mode="commanded", po2_bar=1.0e-9)),
+    ids=("default-oxygen", "commanded-oxygen"),
+)
+def test_shared_openimcc_adapter_preserves_raw_nonparent_composition(
+    monkeypatch, po2_request
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    observed = []
+
+    class StopAfterCapture(Exception):
+        pass
+
+    def capture(**kwargs):
+        observed.append(kwargs)
+        raise StopAfterCapture
+
+    monkeypatch.setattr(backend._bridge, "evaluate", capture)
+    raw = {"K2O": 0.05, "SiO2": 0.90, "MnO": 0.05}
+    with pytest.raises(StopAfterCapture):
+        backend.equilibrate(
+            temperature_C=1800.0 - 273.15,
+            composition_kg=raw,
+            po2_request=po2_request,
+        )
+
+    assert observed
+    assert observed[0]["composition_kg"] is raw
+    assert "composition_mol" not in observed[0]
 
 
 def test_openimcc_battery_reports_single_cation_gamma() -> None:

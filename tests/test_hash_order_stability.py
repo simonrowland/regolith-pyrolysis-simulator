@@ -178,7 +178,7 @@ e._temperature_grid = lambda obs: [1500.0]
 e._melt_recipe_mol = lambda obs: ({'SiO2': 1.0}, 'fixture', None)
 e._engine_species_rank_metric = lambda *args: (1.0, None, {})
 e._compare_point = lambda **kwargs: NS(runtime=kwargs['runtime'])
-obs = NS(species_id='Na', observation_id='fixture')
+obs = NS(species_id='Na', observation_id='fixture', values={})
 result = e._evaluate_ordering(obs, e.ObservationEvaluation(obs),
     vp_data={'fixture': True}, pO2=1e-6)
 print(list(result.records[0].runtime['metric_by_T'][0]['metrics']))""",

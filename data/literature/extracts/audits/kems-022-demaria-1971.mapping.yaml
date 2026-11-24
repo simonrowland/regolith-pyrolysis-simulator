@@ -1,0 +1,72 @@
+source_id: kems-022-demaria-1971
+source:
+  citation: De Maria et al. (1971), Proceedings of the Second Lunar Science Conference 2, 1367-1380.
+scope: Link the printed sample 12022 initial charge composition to its vapour rows.
+target_observable:
+  engine: OpenIMCC vapour equilibrium
+  quantity: p_partial
+  row_count_before: 37 census refusals for missing condensed composition
+sample_link:
+  printed_sample: Apollo 12 specimen 12022
+  linkage_quote: >-
+    The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971).
+  linkage_locator:
+    source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+    page: 2
+    published_page: 1368
+    pdf_page_index: 1
+    line_range: '50'
+    proof: rendered physical page 2; pdftotext page 2 contains only the ADS bibcode token
+  composition_source: data/literature/extracts/audits/smales-1971-lpsc-12022.mapping.yaml
+  role: initial_charge_only
+  row_link: each linked point is explicitly sample 12022 in its table or figure series
+linked_rows:
+  count: 34
+  groups:
+    - observation_id: demaria_1971_o2_psat_table1_alkali_range
+      printed_locator: Table 1
+      count: 2
+    - observation_id: demaria_1971_mn_psat_table2_sample_12022
+      printed_locator: Table 2
+      count: 3
+    - observation_id: demaria_1971_cr_psat_table2_sample_12022
+      printed_locator: Table 2
+      count: 2
+    - observation_id: demaria_1971_mg_psat_table3_lunar_basalt
+      printed_locator: Table 3
+      count: 3
+    - observation_id: demaria_1971_al2o_psat_table4
+      printed_locator: Table 4
+      count: 9
+    - observation_id: demaria_1971_o_atomic_psat_table5
+      printed_locator: Table 5
+      count: 7
+    - observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
+      printed_locator: Figure 1
+      count: 6
+    - observation_id: demaria_1971_k_psat_figure2_digitized
+      printed_locator: Figure 2
+      count: 2
+identity_binding:
+  composition: initial-charge composition reaches identity and point_conditions through the existing migrator path
+  temperature: point T_K reaches identity and point_conditions
+  total_pressure_Pa: not printed; remains typed unknown
+  fO2_Pa: no row-specific fO2 printed; remains typed unknown
+initial_charge_context:
+  measurement_state_composition: not_published per point; authors presume no appreciable variation at selected initial points but give no point composition
+  run_order_index: not_published per row
+  depletion_evidence: unreported per-run mass loss, conversion, or fractional loss; qualitative volatile depletion is described
+  vaporization_congruence: no congruent/incongruent statement reported
+openimcc_basis:
+  supported: [SiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, TiO2, MnO]
+  coverage: all selected oxide components are covered; MnO uses the relaxed Cr/Mn oxide basis
+engine_readiness:
+  composition_ready_rows: 34
+  typed_quantity_rows: 34
+  prediction_tier: composition proxy and partial-pressure quantity are typed; engine/species callability is not claimed
+  unlinked: 3 of the 37 census refusals remain composition-unknown
+  other_sample: no 12022 charge linked to the separate 12065 Figure 1 series; pre-existing 12065 catalogue proxies elsewhere are unchanged
+numeric_values_changed: false
+verification:
+  focused_test: tests/battery/test_migrate.py::test_demaria_1971_smales_composition_links_only_12022_vapour_rows
+  isolated_migration: measured in memory after the extract fixes; store regeneration not run under owner hold

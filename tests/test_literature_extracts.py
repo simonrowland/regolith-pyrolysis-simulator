@@ -502,7 +502,7 @@ def test_kems_023_table1_crown_columns_full_cell_count_and_render_pins():
         assert Decimal(str(sample["value"])) == expected_value
         assert sample["locator"]["table"] == "1"
         assert sample["locator"]["published_page"] == 176
-        assert sample["locator"]["pdf_page_index"] == 2
+        assert sample["locator"]["pdf_page_index"] == 1
         assert vle.check_fidelity_sample_matches(doc, sample) == []
 
     mutated = copy.deepcopy(doc)
@@ -16360,3 +16360,23 @@ def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures()
             assert condition.state.is_value
             assert condition.locator is not None
             assert condition.locator.table is not None
+
+
+def test_demaria_1971_figure_2_locator_uses_physical_pdf_page_index() -> None:
+    source = EXTRACTS / "kems-022-demaria-1971.yaml"
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    experiment = next(
+        row
+        for row in extract["experiments"]
+        if row["experiment_id"] == "demaria-1971-k-figure2"
+    )
+    observation = next(
+        row
+        for row in extract["species"]["K"]["observations"]
+        if row["observation_id"] == "demaria_1971_k_psat_figure2_digitized"
+    )
+
+    assert experiment["locator"]["published_page"] == 1370
+    assert experiment["locator"]["pdf_page_index"] == 3
+    assert observation["locator"]["published_page"] == 1370
+    assert observation["locator"]["pdf_page_index"] == 3

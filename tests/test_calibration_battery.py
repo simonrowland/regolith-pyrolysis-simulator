@@ -233,7 +233,7 @@ def test_every_evidence_marker_reader_has_closed_vocabulary():
                      "standard_state_kind"}
     output_keys = {"measurement_kind", "reported_status", "observable_status",
                    "comparator_status", "provider_status", "antoine_provenance_class",
-                   "observation_system_class", "claim_kind"}
+                   "observation_system_class", "claim_kind", "default_role"}
     readers = []
     for relative in ("simulator/diagnostic_helpers/extract_reproduction.py",
                      "simulator/diagnostic_helpers/qualitative_skip.py",

@@ -213,10 +213,8 @@ from simulator.battery.uncertainty_conventions import (
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
+from simulator.battery import composition_roles
 from simulator.battery.records import (
-    INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
-    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
     Composition,
@@ -2152,55 +2150,9 @@ def _catalogue_composition_notice(reference: Observation) -> Notice | None:
 
 
 def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
-    """Predict with an initial-charge composition, then flag the residual.
+    """Return the first scoring qualification for a composition proxy."""
 
-    ``proxy_flag == initial_charge_only`` marks a printed starting charge
-    standing in for a later (depleted) state. The residual joins the existing
-    source-internally-inconsistent diagnostic stratum (b-716).
-    """
-
-    identity = reference.identity
-    if not isinstance(identity, Identity):
-        return None
-    quantity = quantity_token(identity)
-    if quantity is None:
-        return None
-    point = (reference.point_conditions or {}).get("composition")
-    states = (identity.composition, point.state if isinstance(point, Located) else None)
-    if not any(
-        state is not None
-        and state.is_value
-        and isinstance(state.value, Composition)
-        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        for state in states
-    ):
-        return None
-    existing_proxy_notice = next(
-        (
-            notice
-            for notice in reference.notices
-            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
-            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
-        ),
-        None,
-    )
-    if existing_proxy_notice is not None:
-        # The persisted notice is also the scoring flag that strips bands from
-        # this proxy-backed residual. Keep it in flagged_notices so the band
-        # policy sees it; union_notices deduplicates it in the final row.
-        return existing_proxy_notice
-    reason = (
-        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
-        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
-    )
-    return Notice(
-        kind=NoticeKind.SOURCE_DISAGREEMENT,
-        affected_quantities=(quantity,),
-        reason=reason,
-        origin=reference.observation_id,
-    )
+    return next(iter(composition_roles.resolve_composition_role(reference).notices), None)
 
 
 def _require_gate_check(check: object) -> GateCheck:
@@ -2510,11 +2462,7 @@ def _flagged_stratum_notices(
         _cell_apparatus_inference_notices(reference, experiment, bench),
         (() if (notice := _total_iron_formula_notice(reference)) is None else (notice,)),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
-        (
-            ()
-            if (notice := _initial_charge_composition_notice(reference)) is None
-            else (notice,)
-        ),
+        composition_roles.resolve_composition_role(reference).notices,
     )
 
 
@@ -2677,6 +2625,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
+        or (
+            kind == NoticeKind.SOURCE_DISAGREEMENT.value
+            and composition_roles.is_role_default_reason(reason)
+        )
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
@@ -11110,8 +11062,12 @@ def _borrow_internal_analytical_effusion(
         experiment=experiment,
         bench=bench,
     )
+    notices[:] = union_notices(tuple(notices), prediction.notices)
     bar = _solved_effusion_po2_bar(prediction)
     if bar is None or not math.isfinite(bar) or bar <= 0.0:
+        # The handoff used to drop the inner prediction. Keep it so a refused
+        # closure names the engine failure instead of only this wrapper.
+        inner = dict(prediction.refusal_detail or {})
         return _input_refusal(
             engine=engine,
             channel=channel,
@@ -11122,6 +11078,12 @@ def _borrow_internal_analytical_effusion(
             detail={
                 "reason": "internal_analytical_oxygen_balance_unavailable",
                 "engine": engine.value,
+                "inner_refusal_reason": (
+                    None
+                    if prediction.refusal_reason is None
+                    else prediction.refusal_reason.value
+                ),
+                "inner_detail": inner,
             },
             notices=tuple(notices),
         )
@@ -15580,7 +15542,6 @@ def _predict_with_engine(
     if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
-        from simulator.battery.enums import AmountBasis
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
@@ -16171,6 +16132,142 @@ def _predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+
+    if (
+        po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+        and wt is not None
+    ):
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            composition_kg_and_mol,
+        )
+        from simulator.melt_backend.openimcc_bridge import (
+            PROJECTED_BULK_CLASSIFICATION_KEY,
+            OpenImccCompositionPolicyRefusal,
+            _cleaned_melt_policy,
+        )
+
+        _bulk_kg, bulk_mol = composition_kg_and_mol(wt)
+        try:
+            projected_mol, policy = _cleaned_melt_policy(bulk_mol)
+        except OpenImccCompositionPolicyRefusal as exc:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=f"equilibrate_cell:{name}:exception",
+                ),
+                authority=Authority.REFUSED,
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                refusal_detail={
+                    "reason": exc.reason_code,
+                    "projection_code": exc.code,
+                    "engine_reason": str(exc),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        projected_composition = Composition(
+            "oxides",
+            tuple(
+                (str(oxide), Decimal(str(amount)))
+                for oxide, amount in projected_mol.items()
+            ),
+            AmountBasis.MOL_INVENTORY,
+        )
+        projected_wt = composition_wt_pct(projected_composition)
+        if projected_wt is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+                refusal_detail={"reason": "openimcc_projection_unusable"},
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        wt = projected_wt
+        classification = policy.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if isinstance(classification, Mapping):
+            projected_notice = policy.get("notice")
+            if isinstance(projected_notice, Mapping):
+                dropped = tuple(
+                    str(name)
+                    for name in classification.get("dropped_components", ())
+                )
+                dropped_wt_pct = classification.get(
+                    "dropped_component_wt_pct", {}
+                )
+                total_wt_pct = classification.get("dropped_total_wt_pct")
+                dropped_fraction = (
+                    None
+                    if total_wt_pct is None
+                    else as_decimal(str(total_wt_pct)) / Decimal("100")
+                )
+                input_notices.append(
+                    Notice(
+                        kind=NoticeKind.COMPOSITION_PROJECTED,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            str(
+                                projected_notice.get("message")
+                                or "openimcc projected the scored bulk"
+                            )
+                            + "; dropped_wt_pct="
+                            + json.dumps(
+                                dict(dropped_wt_pct)
+                                if isinstance(dropped_wt_pct, Mapping)
+                                else {},
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            )
+                        ),
+                        origin="engine:openimcc",
+                        dropped=dropped,
+                        dropped_mass_fraction=dropped_fraction,
+                    )
+                )
+        relaxed = policy.get("openimcc_projection_crmn_relaxed")
+        if isinstance(relaxed, Mapping):
+            input_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=str(
+                        relaxed.get("message")
+                        or "Cr2O3 and MnO projection use the stated relaxed gate"
+                    ),
+                    origin="engine:openimcc",
+                )
+            )
+        for key in ("fe2o3_fold", "fe_redox_notice"):
+            fold_notice = policy.get(key)
+            if isinstance(fold_notice, Mapping):
+                input_notices.append(
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "ferric folded to FeOt"
+                            if key == "fe2o3_fold"
+                            else str(
+                                fold_notice.get("message")
+                                or fold_notice.get("code")
+                                or "ferric redox projection"
+                            )
+                        ),
+                        origin="engine:openimcc",
+                    )
+                )
 
     qualification = False
     extra_notices: list[Notice] = list(input_notices)
@@ -20277,11 +20374,7 @@ def _compile_residual_with_lineage(
         and numeric.decision_band.band_basis == "row_printed"
         and evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
-        and reference.identity.composition is not None
-        and reference.identity.composition.is_value
-        and isinstance(reference.identity.composition.value, Composition)
-        and reference.identity.composition.value.proxy_flag
-        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        and composition_roles.is_initial_charge_composition(reference.identity.composition)
     )
     if initial_charge_figure_band:
         band_preserving_kinds.update(

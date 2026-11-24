@@ -1,0 +1,64 @@
+source_id: smales-1971-lpsc-12022
+source:
+  citation: Smales et al. (1971), Proceedings of the Second Lunar Science Conference 2, 1253-1258.
+scope: Table 2 composition cells used to identify the initial charge for De Maria et al. sample 12022.
+input_order:
+  machine_text:
+    mineru: text/smales-1971-lpsc-12022/mineru full-document content list
+    pdftotext: text/smales-1971-lpsc-12022/pdftotext-layout.txt
+  mineru_table_qa:
+    artifact: tools/mineru_table_qa.py
+    pdf_page: 2
+    table_index: 2
+    printed_table: '2'
+    dimensions: 12 by 16 draft cells; 10 printed oxide rows
+    numeric_cells: 56
+    digit_agreement: skipped because the source is a scan
+  mineru_table_draft:
+    artifact: tools/mineru_table_draft.py convert and compare
+    draft_table: p002-t02
+    printed_caption: Table 2. Major elements in lunar rocks expressed as % oxide
+    compare_result: data/literature/extracts/audits/smales-1971-lpsc-12022.compare.txt
+    compare_projection: >-
+      Nine numeric points project the selected 12022 component values and explicit table row and column coordinates.
+      The canonical Smales extract stores these values in a context composition map, which compare does not enumerate.
+    result: 9 matched, 0 mismatches, 0 locator errors
+  pdftotext_page_probe:
+    physical_page: 2
+    extracted_characters: 22
+    extracted_text: 1971LPSC....2.1253S
+    disposition: >-
+      The text layer does not contain the table cells. MinerU page_idx 1 in the full-document scan and the rendered page
+      establish physical PDF page 2; the printed folio is 1254.
+cell_audit:
+  render: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf physical page 2
+  printed_page: 1254
+  printed_table: '2'
+  route: b, rendered cells because the pdftotext scan layer contains no table digits
+  row_assignment: rendered Table 2 row labels and the Apollo 12 sample 12022 method columns
+  cells:
+    - {oxide: SiO2, row: 3, column: 9, method: XRF, value_wt_pct: '42.3'}
+    - {oxide: Al2O3, row: 4, column: 9, method: XRF, value_wt_pct: '8.2'}
+    - {oxide: FeO, row: 5, column: 9, method: XRF, value_wt_pct: '21.6'}
+    - {oxide: MgO, row: 6, column: 9, method: XRF, value_wt_pct: '11.9'}
+    - {oxide: CaO, row: 7, column: 9, method: XRF, value_wt_pct: '9.0'}
+    - {oxide: Na2O, row: 8, column: 10, method: INAA, value_wt_pct: '0.23'}
+    - {oxide: K2O, row: 9, column: 11, method: MSID, value_wt_pct: '0.061'}
+    - {oxide: TiO2, row: 10, column: 9, method: XRF, value_wt_pct: '4.9'}
+    - {oxide: MnO, row: 11, column: 10, method: INAA, value_wt_pct: '0.31'}
+  printed_row_count:
+    oxide_rows: 10
+    selected_nonblank_12022_cells: 9
+  selection:
+    rule: first nonblank printed method cell for each major oxide; no method values averaged
+    alternatives_not_selected:
+      Al2O3: 8.5 INAA
+      FeO: 21.7 GAA
+      CaO: 9.2 GAA
+      TiO2: 4.8 GAA
+    composition_sum_wt_pct: 98.501
+    sum_status: arithmetic sum only; no total printed
+    unresolved: Cr2O3 blank; trace components are not part of this major-oxide map
+openimcc_basis:
+  supported: [SiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, TiO2, MnO]
+  coverage: all selected oxide components are covered; MnO uses the relaxed Cr/Mn oxide basis

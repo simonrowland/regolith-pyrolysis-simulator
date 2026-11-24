@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 import yaml
 
 from simulator.battery.migrate import (
@@ -543,7 +544,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       ]
     }
   },
-  "kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2060.0:row=12022:h=24f36e6113b1": {
+  "kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2060.0:row=12022:h=1d933a218ba6": {
     "admission_status": "admitted",
     "evidence_class": {
       "tag": "value",
@@ -554,8 +555,8 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
         "tag": "value",
         "value": {
           "amount_basis": "mole_fraction",
-          "analysis_selection_rule": "use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed",
-          "basis": "sample_catalog_proxy",
+          "analysis_selection_rule": null,
+          "basis": "printed_oxides",
           "components": [
             [
               "SiO2",
@@ -594,9 +595,9 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
               "0.002712758537775149297030294361"
             ]
           ],
-          "proxy_flag": "composition_from_sample_catalog",
-          "proxy_source": "Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed.",
-          "input_provenance": null
+          "input_provenance": "printed_starting_bulk",
+          "proxy_flag": "initial_charge_only",
+          "proxy_source": null
         }
       },
       "exposure": {
@@ -694,299 +695,20 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
     },
     "point_conditions": {
       "composition": {
-        "inference": {
-          "inputs": [
-            "x_i = (w_i / M_i) / Σ_j (w_j / M_j)",
-            "original_unit=wt_pct"
-          ],
-          "output_unit": "mole_fraction",
-          "parameters": [
-            [
-              "original_SiO2_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "42.3"
-                }
-              }
-            ],
-            [
-              "M_SiO2_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "60.083"
-                }
-              }
-            ],
-            [
-              "original_Al2O3_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "8.2"
-                }
-              }
-            ],
-            [
-              "M_Al2O3_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "101.960077"
-                }
-              }
-            ],
-            [
-              "original_FeO_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "21.6"
-                }
-              }
-            ],
-            [
-              "M_FeO_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "71.844"
-                }
-              }
-            ],
-            [
-              "original_MgO_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "11.9"
-                }
-              }
-            ],
-            [
-              "M_MgO_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "40.304"
-                }
-              }
-            ],
-            [
-              "original_CaO_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "9"
-                }
-              }
-            ],
-            [
-              "M_CaO_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "56.077000000000005"
-                }
-              }
-            ],
-            [
-              "original_Na2O_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "0.23"
-                }
-              }
-            ],
-            [
-              "M_Na2O_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "61.978538560000004"
-                }
-              }
-            ],
-            [
-              "original_K2O_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "0.061"
-                }
-              }
-            ],
-            [
-              "M_K2O_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "94.1956"
-                }
-              }
-            ],
-            [
-              "original_TiO2_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "4.9"
-                }
-              }
-            ],
-            [
-              "M_TiO2_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "79.865"
-                }
-              }
-            ],
-            [
-              "original_MnO_wt_pct",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "0.31"
-                }
-              }
-            ],
-            [
-              "M_MnO_g_mol",
-              {
-                "locator": {
-                  "line_range": "284-286",
-                  "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-                  "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-                  "table": "4"
-                },
-                "state": {
-                  "tag": "value",
-                  "value": "70.937044"
-                }
-              }
-            ]
-          ],
-          "references": [],
-          "relation": "wt_pct_to_mole_fraction"
-        },
         "locator": {
-          "line_range": "284-286",
-          "paragraph": "Partial pressures of AlO and Al2O over samples 12022 and 12065",
-          "source_path": "text/kems-022-demaria-1971/mineru/source/vlm/source.md",
-          "table": "4"
+          "note": "Smales et al. Table 2, sample 12022. The listed oxide sum is 98.501 wt.% by arithmetic; no total is printed. Cr2O3 is blank and trace components are not included in this map.",
+          "page": 2,
+          "pdf_page_index": 1,
+          "published_page": 1254,
+          "source_path": "raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf",
+          "table": "2"
         },
         "state": {
           "tag": "value",
           "value": {
             "amount_basis": "mole_fraction",
-            "analysis_selection_rule": "use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed",
-            "basis": "sample_catalog_proxy",
+            "analysis_selection_rule": null,
+            "basis": "printed_oxides",
             "components": [
               [
                 "SiO2",
@@ -1025,9 +747,9 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
                 "0.002712758537775149297030294361"
               ]
             ],
-            "proxy_flag": "composition_from_sample_catalog",
-            "proxy_source": "Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed.",
-            "input_provenance": null
+            "input_provenance": "printed_starting_bulk",
+            "proxy_flag": "initial_charge_only",
+            "proxy_source": null
           }
         }
       },
@@ -1052,7 +774,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       ]
     }
   },
-  "kems-022-demaria-1971::demaria_1971_o2_psat_table1_alkali_range::T=1396.0:row=12022:h=3dd0a0a3319e": {
+  "kems-022-demaria-1971::demaria_1971_o2_psat_table1_alkali_range::T=1396.0:row=12022:h=646e912d03f0": {
     "admission_status": "admitted",
     "evidence_class": {
       "tag": "value",
@@ -1060,8 +782,53 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
     },
     "identity": {
       "composition": {
-        "reason": "no composition mapped from source",
-        "tag": "unknown"
+        "tag": "value",
+        "value": {
+          "amount_basis": "mole_fraction",
+          "analysis_selection_rule": null,
+          "basis": "printed_oxides",
+          "components": [
+            [
+              "SiO2",
+              "0.4370300404472189490300406296"
+            ],
+            [
+              "Al2O3",
+              "0.04992363851472767186779541665"
+            ],
+            [
+              "FeO",
+              "0.186631857820954309618158003"
+            ],
+            [
+              "MgO",
+              "0.1832826449540607504498940327"
+            ],
+            [
+              "CaO",
+              "0.09962773800078939244754301791"
+            ],
+            [
+              "Na2O",
+              "0.00230361043344815193559034437"
+            ],
+            [
+              "K2O",
+              "0.0004019960173842589283052064581"
+            ],
+            [
+              "TiO2",
+              "0.03808571527364136642564305475"
+            ],
+            [
+              "MnO",
+              "0.002712758537775149297030294361"
+            ]
+          ],
+          "input_provenance": "printed_starting_bulk",
+          "proxy_flag": "initial_charge_only",
+          "proxy_source": null
+        }
       },
       "exposure": {
         "tag": "not_applicable"
@@ -1156,6 +923,65 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       "table": "1"
     },
     "point_conditions": {
+      "composition": {
+        "locator": {
+          "note": "Smales et al. Table 2, sample 12022. The listed oxide sum is 98.501 wt.% by arithmetic; no total is printed. Cr2O3 is blank and trace components are not included in this map.",
+          "page": 2,
+          "pdf_page_index": 1,
+          "published_page": 1254,
+          "source_path": "raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf",
+          "table": "2"
+        },
+        "state": {
+          "tag": "value",
+          "value": {
+            "amount_basis": "mole_fraction",
+            "analysis_selection_rule": null,
+            "basis": "printed_oxides",
+            "components": [
+              [
+                "SiO2",
+                "0.4370300404472189490300406296"
+              ],
+              [
+                "Al2O3",
+                "0.04992363851472767186779541665"
+              ],
+              [
+                "FeO",
+                "0.186631857820954309618158003"
+              ],
+              [
+                "MgO",
+                "0.1832826449540607504498940327"
+              ],
+              [
+                "CaO",
+                "0.09962773800078939244754301791"
+              ],
+              [
+                "Na2O",
+                "0.00230361043344815193559034437"
+              ],
+              [
+                "K2O",
+                "0.0004019960173842589283052064581"
+              ],
+              [
+                "TiO2",
+                "0.03808571527364136642564305475"
+              ],
+              [
+                "MnO",
+                "0.002712758537775149297030294361"
+              ]
+            ],
+            "input_provenance": "printed_starting_bulk",
+            "proxy_flag": "initial_charge_only",
+            "proxy_source": null
+          }
+        }
+      },
       "temperature_K": {
         "locator": {
           "line_range": "106-108",
@@ -2341,6 +2167,51 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
 }
     ''')
     assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
+
+
+def test_storing_a_charge_conversion_derivation_breaks_the_baseline(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    """A starting-charge conversion derivation is not part of the snapshot."""
+
+    from dataclasses import replace
+
+    from simulator.battery.composition_roles import INITIAL_CHARGE_ONLY_PROXY_FLAG
+    from simulator.battery.records import Derivation, Located
+    import simulator.battery.migrate as migrate_module
+
+    sentinel = Derivation(
+        relation="mutation:charge-conversion-inference",
+        inputs=(),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+    real = migrate_module._initial_charge_only_composition_proxy
+
+    def store_charge_inference(*args, **kwargs):
+        identity, conditions, notices = real(*args, **kwargs)
+        composition = (
+            conditions.get("composition") if isinstance(conditions, dict) else None
+        )
+        if (
+            isinstance(composition, Located)
+            and composition.state.is_value
+            and getattr(composition.state.value, "proxy_flag", None)
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            and composition.inference is None
+        ):
+            conditions = dict(conditions)
+            conditions["composition"] = replace(composition, inference=sentinel)
+        return identity, conditions, notices
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_initial_charge_only_composition_proxy",
+        store_charge_inference,
+    )
+    with pytest.raises(AssertionError):
+        test_representative_migration_rows_match_literal_baseline(tmp_path)
 
 
 def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:

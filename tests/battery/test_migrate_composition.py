@@ -439,6 +439,9 @@ def test_flemetakis_starting_glass_within_mass_closure_window_converts(tmp_path)
     assert point_composition.state.is_value
     assert isinstance(point_composition.state.value, Composition)
     assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+
+    assert point_composition.state.value.input_provenance == PRINTED_STARTING_BULK
     raw_composition = source_row["values"]["composition_wt_pct"]
     # The published starting glass totals 99.37 wt%, within b-704's 95–102 interval.
     expected = wt_pct_to_mole_fraction(
@@ -452,10 +455,26 @@ def test_flemetakis_starting_glass_within_mass_closure_window_converts(tmp_path)
     assert initial.locator.section == "2.1 Starting material"
     assert isinstance(initial.state.value, Composition)
     assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    # The sample assay applies the declared role token. Provenance is stamped
+    # on the point the resolver chose, which is the assert above.
     assert initial.state.value.components == expected.components
     assert not migrate_module._initial_compositions_conflict(
         initial, point_composition
     )
+
+
+def test_omitting_starting_bulk_provenance_breaks_the_pin(monkeypatch, tmp_path):
+    from simulator.battery import composition_roles
+
+    monkeypatch.setattr(
+        composition_roles,
+        "composition_with_provenance",
+        lambda composition, _provenance: composition,
+    )
+    with pytest.raises(AssertionError):
+        test_flemetakis_starting_glass_within_mass_closure_window_converts(
+            tmp_path
+        )
 
 
 def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
@@ -3784,6 +3803,26 @@ def test_gaillard_as_printed_water_echoes_keep_live_compositions() -> None:
     )
 
 
+def test_treating_printed_charge_as_run_breaks_gaillard_composition_pin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    resolver = migrate_module.composition_roles.resolve_point_composition
+
+    def treat_printed_as_run(*args, **kwargs):
+        result = resolver(*args, **kwargs)
+        if result.source == "printed" and result.composition.is_unknown:
+            return replace(result, source="point")
+        return result
+
+    monkeypatch.setattr(
+        migrate_module.composition_roles,
+        "resolve_point_composition",
+        treat_printed_as_run,
+    )
+    with pytest.raises(AssertionError):
+        test_gaillard_as_printed_water_echoes_keep_live_compositions()
+
+
 def test_refused_high_kept_total_has_no_projection_notice() -> None:
     printed = {
         "SiO2": Decimal("40"),
@@ -6400,8 +6439,14 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                 for observation in rows:
                     composition = observation.identity.composition
                     assert composition is not None and composition.is_value
-                    # This sweep pins composition conversion; the typed initial-charge proxy is asserted by its owner test.
-                    assert replace(composition.value, proxy_flag=None) == expected, (
+                    # This sweep pins composition conversion. The charge flag and
+                    # starting-bulk provenance are the resolver's stamp; the
+                    # flemetakis owner test pins both. Components already match.
+                    assert replace(
+                        composition.value,
+                        proxy_flag=None,
+                        input_provenance=None,
+                    ) == expected, (
                         observation.observation_id
                     )
                     if label == "LPI" and "S" in raw_composition:
@@ -7685,9 +7730,8 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         f"{source_id}.yaml",
         write=False,
     )
-    # Hashimoto 1983, Table 3, p. 116. The two C3-(2) run observations at
-    # 1700 and 1800 C are the explicitly labelled run rows; the other two
-    # pins cover the remaining printed temperatures.
+    # Hashimoto 1983, Table 3, p. 116. Pin the two C3-(2) run observations,
+    # the 18C5 C5-(1) row, and the 19B2 and 20B2 rows.
     expected_by_row = {
         (
             "table3_residue_composition_series_quoted__run_17c3-2::"
@@ -7715,6 +7759,13 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
             "FeO": Decimal("29.14"),
             "MgO": Decimal("26.09"),
             "CaO": Decimal("3.29"),
+        },
+        "table3_residue_composition_series::T=2073.15:row=c5-(1):": {
+            "SiO2": Decimal("47.35"),
+            "Al2O3": Decimal("5.33"),
+            "FeO": Decimal("4.18"),
+            "MgO": Decimal("38.43"),
+            "CaO": Decimal("4.70"),
         },
         "table3_residue_composition_series::T=2273.15:row=20b2:": {
             "SiO2": Decimal("40.87"),
@@ -7874,6 +7925,8 @@ def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:
             "kems-015-hashimoto-1983.yaml",
             "table3_residue_composition_series::T=2273.15:row=20b2:",
             {
+                # Exact normalized output from the printed Table 3 residue;
+                # the source wt% cells are pinned in the test above.
                 "SiO2": Decimal("0.3704143841895679608300598825"),
                 "Al2O3": Decimal("0.02211082773740152264158571330"),
                 "FeO": Decimal("0.1550779101975305617296293917"),
@@ -8008,10 +8061,14 @@ def _internal_engine_point_for_real_extract(
         pytest.param(
             "kems-042-plante-1979.yaml",
             "plante1979_table2_s1126_r011_quoted",
-            {"K2O": 0.33331181591376485, "SiO2": 0.6666881840862351},
+            # At 1743 K the row prints 18.44 wt% K2O; its binary SiO2
+            # complement is 81.56 wt%. x_K2O=(18.44/94.1956) /
+            # ((18.44/94.1956) + (81.56/60.083)), unlike the 43.94 wt%
+            # shared starting charge.
+            {"K2O": 0.1260369192276479, "SiO2": 0.8739630807723521},
+            "calculated",
             None,
-            None,
-            id="plante-composition-remains-selected",
+            id="plante-point-datum-outranks-charge",
         ),
         pytest.param(
             "burnham-2015-europium-redox.yaml",
@@ -8134,6 +8191,8 @@ def _internal_engine_point_for_real_extract(
             "kems-015-hashimoto-1983.yaml",
             "T=2073.15:row=c5-(1)",
             {
+                # Exact float output for the printed Table 3 18C5/C5 (1)
+                # residue row; source wt% cells are pinned above.
                 "SiO2": 0.40709580956160435,
                 "Al2O3": 0.02700382669858546,
                 "FeO": 0.030054813370486367,
@@ -8161,7 +8220,17 @@ def test_m1_regression_rows_keep_green_internal_engine_point_composition(
     assert request.payload is not None
     assert request.payload["composition_mol"] == expected_composition
     assert request.payload.get("composition_method_class") == expected_method
-    assert request.payload.get("composition_notice") == expected_notice
+    if extract_name == "kems-042-plante-1979.yaml":
+        notice = request.payload.get("composition_notice")
+        assert isinstance(notice, str)
+        assert notice.startswith(
+            "calculated from printed binary oxide wt% composition; "
+            "relation=SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction; "
+        )
+        assert "18.44" in notice and "81.56" in notice
+        assert "published_page=277" in notice and "table='2'" in notice
+    else:
+        assert request.payload.get("composition_notice") == expected_notice
 
 
 def test_m1_kang_row_keeps_green_missing_evidence_gap() -> None:

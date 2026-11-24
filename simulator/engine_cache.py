@@ -509,6 +509,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v4 (b274): 2026-11-23 Markova car 2 - preserve Fe speciation consumed by residue oxygen balance.
 # internal-analytical v4 (green branch): 2026-11-23 b-1124 / d-339 Holzheid gamma regular-solution extrapolation.
 # internal-analytical v5: 2026-11-24 b-1124 Holzheid FeO continuation layered over b274 v4; new chemistry invalidates both independent v4 identities.
+# OpenIMCC fold 15 chemistry is coalesced with the engine pin car's single v4 cache invalidation.
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice

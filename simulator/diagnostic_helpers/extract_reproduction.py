@@ -27,6 +27,7 @@ import re
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -62,7 +63,16 @@ from simulator.physical_constants import (
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
 )
-from simulator.state import MOLAR_MASS
+from simulator.battery import composition_roles
+from simulator.battery import migrate as battery_migrate
+from simulator.battery.composition_roles import (
+    COMPOSITION_ROLE_FIELD,
+    AssayCandidate,
+    RoleResolution,
+    RoleStatus,
+)
+from simulator.battery.enums import Quantity
+from simulator.state_types import State
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_STATUSES,
@@ -77,7 +87,6 @@ from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
-FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
 # The generated rollup lives on its own page, linked from docs/model-limitations.md.
 MODEL_LIMITATIONS_PATH = REPO_ROOT / "docs" / "validation-battery-rollup.md"
 MOTZFELDT_TOOL_PATH = REPO_ROOT / "tools" / "motzfeldt.py"
@@ -256,6 +265,8 @@ class AdoptedObservation:
     source_doi: str | None = None
     # Preserve source spellings until the extract schema canonicalizes them.
     admission_metadata: Mapping[str, Any] = field(default_factory=dict)
+    reservoir: Mapping[str, Any] | None = None
+    extract_path: Path | None = None
 
     @property
     def case_id(self) -> str:
@@ -315,7 +326,9 @@ def load_vapor_pressure_data(
     return dict(data)
 
 
-def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
+def _refusal_marker_reason(
+    markers: Mapping[str, Any], *, ignored_tokens: frozenset[str] = frozenset()
+) -> str | None:
     for key, vocabulary in _EVIDENCE_VOCABULARY.items():
         try:
             token = _evidence_marker(markers, key)
@@ -325,14 +338,15 @@ def _refusal_marker_reason(markers: Mapping[str, Any]) -> str | None:
             return f"unknown_evidence_marker:{key}={token}"
     # Validation precedes role refusal so novel tokens cannot hide behind a known role.
     for key, vocabulary in _EVIDENCE_VOCABULARY.items():
-        reason = vocabulary.get(_evidence_marker(markers, key))
-        if reason:
+        token = _evidence_marker(markers, key)
+        reason = vocabulary.get(token)
+        if reason and token not in ignored_tokens:
             return reason
     nested = markers.get("admission_metadata")
     if nested is not None:
         if not isinstance(nested, Mapping):
             return "invalid_admission_metadata"
-        return _refusal_marker_reason(nested)
+        return _refusal_marker_reason(nested, ignored_tokens=ignored_tokens)
     return None
 
 
@@ -565,7 +579,23 @@ def observation_admission_reason(obs: AdoptedObservation) -> str | None:
     """Shared scoring/selection gate; supersession is resolved by the loader."""
     if obs.adoption_basis == "superseded":
         return "superseded"
-    return _refusal_marker_reason(obs.admission_metadata) or _refusal_marker_reason(obs.values)
+    refusal = _refusal_marker_reason(obs.admission_metadata) or _refusal_marker_reason(
+        obs.values
+    )
+    if refusal != "unsupported_observable:figure_only_not_digitized":
+        return refusal
+    if obs.obs_type != "psat_series":
+        return refusal
+    raw_points = obs.values.get("points")
+    if not isinstance(raw_points, list) or not raw_points:
+        return refusal
+    points, _skip, _drops = _literature_pressure_points(obs)
+    if not points or not any(point.get("point_index") is not None for point in points):
+        return refusal
+    ignored_tokens = frozenset({"figure_only"})
+    return _refusal_marker_reason(
+        obs.admission_metadata, ignored_tokens=ignored_tokens
+    ) or _refusal_marker_reason(obs.values, ignored_tokens=ignored_tokens)
 
 
 def load_adopted_observations(
@@ -662,12 +692,19 @@ def load_adopted_observations(
             else:
                 t_range_out = None
             dex = dex_by_key.get((str(species_id), otype, source_id))
+            raw_observation = raw_observations[
+                (source_id, str(species_id), str(obs.get("observation_id") or ""))
+            ]
             raw_form = obs.get("condensed_form")
             condensed_form: Mapping[str, Any] | None
             if isinstance(raw_form, Mapping):
                 condensed_form = dict(raw_form)
             else:
                 condensed_form = None
+            raw_reservoir = raw_observation.get("reservoir")
+            reservoir = (
+                dict(raw_reservoir) if isinstance(raw_reservoir, Mapping) else None
+            )
             adopted.append(
                 AdoptedObservation(
                     species_id=str(species_id),
@@ -705,15 +742,19 @@ def load_adopted_observations(
                     admission_metadata={
                         "review_status": _evidence_marker(obs, "review_status"),
                         **{
-                            key: value for key, value in raw_observations[
-                                (source_id, str(species_id), str(obs.get("observation_id") or ""))
-                            ].items()
+                            key: value for key, value in raw_observation.items()
                             if key in {"supersedes", "admission_metadata"}
                             or key in _EVIDENCE_VOCABULARY
                         },
                     },
                     condensed_form=condensed_form,
                     source_doi=doi_by_source.get(source_id),
+                    reservoir=reservoir,
+                    extract_path=(
+                        candidate_path
+                        if (candidate_path := directory / f"{source_id}.yaml").is_file()
+                        else None
+                    ),
                 )
             )
     adopted.sort(key=lambda row: (row.species_id, row.source_id, row.observation_id))
@@ -855,6 +896,34 @@ def _antoine_fallback_pressure_scale_pa(source_form: str) -> float | None:
     return None
 
 
+_PRINTED_POINT_COMPOSITION_KEYS = (
+    "composition_mol",
+    "melt_composition_mol",
+    "composition_wt_pct",
+    "melt_composition_wt_pct",
+    "sample_oxide_composition_wt_pct",
+    "sample_Na2O_wt_pct",
+    "sample_K2O_wt_pct",
+    "composition_source_observation_id",
+    "composition_source_gap",
+    COMPOSITION_ROLE_FIELD,
+    "point_conditions",
+    "sample",
+)
+
+
+def _with_printed_point(
+    parsed: dict[str, Any], point: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Carry one printed point's assay and role onto a parsed rate or pressure row."""
+
+    parsed["source_point"] = point
+    for key in _PRINTED_POINT_COMPOSITION_KEYS:
+        if key in point:
+            parsed[key] = point[key]
+    return parsed
+
+
 def _literature_pressure_points(
     obs: AdoptedObservation,
 ) -> tuple[list[dict[str, Any]] | None, str | None, list[dict[str, Any]]]:
@@ -972,24 +1041,7 @@ def _literature_pressure_points(
                 "point_index": idx,
                 "note": pt.get("note"),
             }
-            parsed_point.update(
-                {
-                    key: pt[key]
-                    for key in (
-                        "composition_mol",
-                        "melt_composition_mol",
-                        "composition_wt_pct",
-                        "melt_composition_wt_pct",
-                        "sample_oxide_composition_wt_pct",
-                        "sample_Na2O_wt_pct",
-                        "sample_K2O_wt_pct",
-                        "composition_source_observation_id",
-                        "composition_source_gap",
-                    )
-                    if key in pt
-                }
-            )
-            out.append(parsed_point)
+            out.append(_with_printed_point(parsed_point, pt))
         if out:
             return out, None, drops
         if drops:
@@ -1333,12 +1385,15 @@ def _literature_rate_points(
                 )
                 continue
             out.append(
-                {
-                    "T_K": T_K,
-                    "rate_mol_m2_s": rate,
-                    "point_index": idx,
-                    "source_units": "mol cm^-2 s^-1",
-                }
+                _with_printed_point(
+                    {
+                        "T_K": T_K,
+                        "rate_mol_m2_s": rate,
+                        "point_index": idx,
+                        "source_units": "mol cm^-2 s^-1",
+                    },
+                    point,
+                )
             )
         if out:
             return out, None, drops
@@ -1378,12 +1433,15 @@ def _literature_rate_points(
                 continue
             try:
                 out.append(
-                    {
-                        "T_K": float(T),
-                        "rate_mol_m2_s": float(raw) * scale,
-                        "point_index": idx,
-                        "source_units": str(obs.units or "mol m^-2 s^-1"),
-                    }
+                    _with_printed_point(
+                        {
+                            "T_K": float(T),
+                            "rate_mol_m2_s": float(raw) * scale,
+                            "point_index": idx,
+                            "source_units": str(obs.units or "mol m^-2 s^-1"),
+                        },
+                        point,
+                    )
                 )
             except (TypeError, ValueError):
                 drops.append({"point_index": idx, "reason": "rate_point_not_numeric"})
@@ -2284,10 +2342,16 @@ def _emit_point_drop_records(
 def _pressure_standard_state_kind(obs: AdoptedObservation) -> str | None:
     """Classify the literature pressure basis without crossing standard states."""
 
+    reservoir_text = (
+        " ".join(str(value) for value in obs.reservoir.values())
+        if isinstance(obs.reservoir, Mapping)
+        else ""
+    )
     text = " ".join(
         str(value)
         for value in (
             obs.standard_state,
+            reservoir_text,
             obs.phase,
             obs.values.get("standard_state"),
             obs.values.get("quantity"),
@@ -3062,13 +3126,43 @@ def _evaluate_psat(
     assert points is not None
     candidates = _engine_species_candidates(obs)
     standard_state_kind = _pressure_standard_state_kind(obs)
+    demaria_k_effusion_closure = (
+        pO2 is None
+        and standard_state_kind == "melt"
+        and obs.source_id == "kems-022-demaria-1971"
+        and obs.species_id == "K"
+        and obs.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    )
+    demaria_k_migrated_observations: list[tuple[Any, Any, Any]] = []
+    if demaria_k_effusion_closure:
+        if obs.extract_path is not None:
+            migrator = battery_migrate.Migrator(root=REPO_ROOT)
+            migrator._migrate_extract(obs.extract_path)
+            migrator.finalize()
+        else:
+            migrator = None
+        child_prefix = f"{obs.source_id}::{obs.observation_id}::T="
+        for migrated in (
+            migrator.result.observations.values() if migrator is not None else ()
+        ):
+            if not migrated.observation_id.startswith(child_prefix):
+                continue
+            experiment = migrator.result.experiments.get(migrated.experiment_id)
+            if experiment is None:
+                continue
+            bench = (
+                migrator.result.benches.get(experiment.bench_id)
+                if experiment.bench_id is not None
+                else None
+            )
+            demaria_k_migrated_observations.append((migrated, experiment, bench))
+    melt_only_assumption: str | None = None
     any_numeric = False
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
     for pt in points:
-        melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(
-            obs, point=pt
-        )
+        role, melt_recipe_source = _resolve_melt_recipe(obs, point=pt)
+        melt_recipe = role.composition.value
         T_K = float(pt["T_K"])
         expected = float(pt["P_Pa"])
         unc = resolve_uncertainty(obs, point=pt, kind_hint="psat")
@@ -3081,6 +3175,30 @@ def _evaluate_psat(
             "standard_state_kind": standard_state_kind,
             "melt_recipe_source": melt_recipe_source,
         }
+        typed_input_reason = _record_composition_role(runtime, role)
+        point_melt_only_assumption: str | None = None
+        if role.initial_charge_only and typed_input_reason is not None:
+            pairing = obs.values.get("fO2_pairing")
+            if (
+                pO2 is not None
+                and isinstance(pairing, Mapping)
+                and pairing.get("status")
+                == "unavailable_same_temperature_measured_pair"
+            ):
+                pairing_reason = str(
+                    pairing.get("reason")
+                    or "oxygen reading is not paired to the figure point temperature or run"
+                )
+                runtime["input_assumption"].update(
+                    {
+                        "pO2_bar": pO2,
+                        "pO2_reason": f"contextual: {pairing_reason}",
+                    }
+                )
+                typed_input_reason += (
+                    f"; pO2_bar={pO2:g} bar is contextual: {pairing_reason}"
+                )
+            runtime["typed_input_reason"] = typed_input_reason
         unsupported = False
         out_of_domain = False
         matched_species: str | None = None
@@ -3103,22 +3221,152 @@ def _evaluate_psat(
                 last_refusal = "missing_condition:standard_state_boundary"
                 runtime["refusal"] = last_refusal
                 continue
-            if melt_recipe is None:
-                last_refusal = melt_recipe_error or "missing_condition:melt_composition"
+            if not role.callable:
+                last_refusal = role.composition.reason
                 runtime["refusal"] = last_refusal
                 continue
+            point_pO2 = pO2
+            point_melt_recipe = melt_recipe
             if pO2 is None:
-                last_refusal = "missing_condition:pO2_boundary"
-                runtime["refusal"] = last_refusal
-                continue
-            else:
-                P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
-                    species,
-                    T_K,
-                    pO2,
-                    vp_data,
-                    account_mol=melt_recipe,
-                )
+                if demaria_k_effusion_closure:
+                    migrated_context = None
+                    for candidate, candidate_experiment, candidate_bench in (
+                        demaria_k_migrated_observations
+                    ):
+                        candidate_identity = candidate.identity
+                        candidate_temperature = candidate_identity.temperature_K
+                        candidate_composition = candidate_identity.composition
+                        if (
+                            candidate_identity.quantity.is_value
+                            and candidate_identity.quantity.value is Quantity.P_PARTIAL
+                            and candidate_identity.species is not None
+                            and candidate_identity.species.formula == obs.species_id
+                            and candidate_temperature is not None
+                            and candidate_temperature.is_value
+                            and float(candidate_temperature.value) == T_K
+                            and candidate_composition is not None
+                            and candidate_composition.is_value
+                            and {
+                                str(oxide): float(amount)
+                                for oxide, amount in candidate_composition.value.components
+                                if amount > 0
+                            }
+                            == melt_recipe
+                            and candidate.value.point is not None
+                            and math.isclose(
+                                float(candidate.value.point),
+                                expected,
+                                rel_tol=1e-12,
+                                abs_tol=1e-15,
+                            )
+                        ):
+                            migrated_context = (
+                                candidate,
+                                candidate_experiment,
+                                candidate_bench,
+                            )
+                            break
+                    if migrated_context is None:
+                        last_refusal = (
+                            "missing_condition:migrated_scorer_observation_for_identity"
+                            if obs.extract_path is not None
+                            else "missing_condition:source_extract_unavailable"
+                        )
+                        runtime["refusal"] = last_refusal
+                        continue
+                    migrated_observation, experiment, bench = migrated_context
+                    typed_composition = migrated_observation.identity.composition
+                    if not typed_composition.is_value:
+                        last_refusal = "missing_condition:migrated_scorer_composition"
+                        runtime["refusal"] = last_refusal
+                        continue
+
+                    from simulator.battery import score as battery_score
+                    from simulator.battery.enums import Engine
+
+                    closure_notices: list[Any] = []
+                    closure_engine = Engine.CATALOG_EVALUATOR
+                    po2_request = battery_score._borrow_internal_analytical_effusion(
+                        engine=closure_engine,
+                        channel=battery_score.ENGINE_CHANNELS[closure_engine],
+                        sources=battery_score.ENGINE_COEFFICIENT_SOURCES[
+                            closure_engine
+                        ],
+                        identity=migrated_observation.identity,
+                        requested=typed_composition,
+                        quantity=migrated_observation.identity.quantity.value,
+                        observation=migrated_observation,
+                        experiment=experiment,
+                        bench=bench,
+                        handles=None,
+                        isolated=None,
+                        notices=closure_notices,
+                    )
+                    closure_owner = (
+                        "simulator/battery/score.py::"
+                        "_borrow_internal_analytical_effusion"
+                    )
+                    if isinstance(po2_request, battery_score.EnginePrediction):
+                        last_refusal = (
+                            "internal_analytical_oxygen_balance_unavailable"
+                        )
+                        runtime["oxygen_closure"] = {
+                            "owner": closure_owner,
+                            "status": "refused",
+                            "refusal_detail": dict(
+                                po2_request.refusal_detail or {}
+                            ),
+                        }
+                        runtime["refusal"] = last_refusal
+                        continue
+                    point_pO2 = float(po2_request.po2_bar)
+                    point_melt_recipe = {
+                        str(oxide): float(amount)
+                        for oxide, amount in typed_composition.value.components
+                    }
+                    runtime["pO2_bar"] = point_pO2
+                    runtime["melt_recipe_source"] = (
+                        "migrated Observation.identity.composition"
+                    )
+                    runtime["oxygen_closure"] = {
+                        "owner": closure_owner,
+                        "route": "effusion_oxygen_balance",
+                        "mode": getattr(
+                            po2_request.mode, "value", str(po2_request.mode)
+                        ),
+                        "notice_reasons": [
+                            notice.reason for notice in closure_notices
+                        ],
+                    }
+                    reactive_notice = next(
+                        (
+                            notice
+                            for notice in closure_notices
+                            if notice.kind
+                            is battery_score.NoticeKind.REACTIVE_CELL_NOT_MODELLED
+                        ),
+                        None,
+                    )
+                    if reactive_notice is not None:
+                        point_melt_only_assumption = (
+                            "reactive_cell_not_modelled: melt-only oxygen balance; "
+                            + reactive_notice.reason
+                        )
+                        melt_only_assumption = point_melt_only_assumption
+                        runtime["oxygen_closure"]["melt_only_assumption"] = (
+                            point_melt_only_assumption
+                        )
+                else:
+                    last_refusal = "missing_condition:pO2_boundary"
+                    runtime["refusal"] = last_refusal
+                    continue
+            P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
+                species,
+                T_K,
+                point_pO2,
+                vp_data,
+                account_mol=point_melt_recipe,
+            )
             runtime.setdefault("melt_attempts", {})[species] = {
                 "refusal": refuse_melt,
                 **{k: melt_rt.get(k) for k in ("provider_status", "oxide", "warnings")},
@@ -3197,9 +3445,18 @@ def _evaluate_psat(
             runtime={**runtime, "uncertainty_defaulted": bool(unc.get("defaulted"))},
             unsupported_speciation=unsupported and actual is None,
             out_of_domain=out_of_domain and actual is None,
-            assumed_input=False,
+            assumed_input=(
+                bool(role.flags)
+                or point_melt_only_assumption is not None
+            )
+            and actual is not None,
         )
         evaluation.records.append(record)
+        if typed_input_reason is not None:
+            if evaluation.skip_reason is None:
+                evaluation.skip_reason = typed_input_reason
+            if typed_input_reason not in evaluation.skip_reasons:
+                evaluation.skip_reasons.append(typed_input_reason)
         if record.status == "mismatch":
             residual_dex = None
             if expected > 0 and actual is not None and actual > 0:
@@ -3218,6 +3475,20 @@ def _evaluate_psat(
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'engine_refusal_all_points'}"
         )
         evaluation.skip_reasons.append(evaluation.skip_reason)
+    if melt_only_assumption is not None:
+        melt_only_typed_reason = f"{_TYPED_SKIP_PREFIX}{melt_only_assumption}"
+        if melt_only_typed_reason not in evaluation.skip_reasons:
+            evaluation.skip_reasons.append(melt_only_typed_reason)
+        if evaluation.skip_reason is None:
+            evaluation.skip_reason = melt_only_typed_reason
+        elif "melt-only oxygen balance" not in evaluation.skip_reason:
+            evaluation.skip_reason = (
+                f"{evaluation.skip_reason}; {melt_only_typed_reason}"
+            )
+        evaluation.runtime_notes.append(
+            "flagged K diagnostic uses a melt-only oxygen balance; "
+            + melt_only_assumption
+        )
     return evaluation
 
 
@@ -3263,21 +3534,30 @@ def _evaluate_rate(
         return _rate_payload_skip(obs, evaluation, reason)
 
     candidates = _engine_species_candidates(obs)
-    melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(obs)
-    condition_gaps: list[str] = []
-    if melt_recipe is None:
-        condition_gaps.append(melt_recipe_error or "missing_condition:melt_composition")
+    observation_gaps: list[str] = []
     if pO2 is None:
-        condition_gaps.append("missing_condition:pO2_boundary")
+        observation_gaps.append("missing_condition:pO2_boundary")
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
-    if condition_gaps:
+    if observation_gaps:
         evaluation.runtime_notes.append(
             "HKL assumption diagnostic excluded from external residuals: "
-            + "; ".join(condition_gaps)
+            + "; ".join(observation_gaps)
         )
     any_numeric = False
+    role_reasons: list[str] = []
+    composition_gaps: list[str] = []
     last_refusal = "missing_capability:vapor_rail_species_or_hkl_inputs"
     for point in points:
+        role, melt_recipe_source = _resolve_melt_recipe(obs, point=point)
+        melt_recipe = role.composition.value
+        point_gaps = list(observation_gaps)
+        if melt_recipe is None:
+            composition_gap = (
+                role.composition.reason or "missing_condition:melt_composition"
+            )
+            point_gaps.append(composition_gap)
+            if composition_gap not in composition_gaps:
+                composition_gaps.append(composition_gap)
         T_K = float(point["T_K"])
         expected = float(point["rate_mol_m2_s"])
         uncertainty = resolve_uncertainty(obs, point=point, kind_hint="rate")
@@ -3291,12 +3571,15 @@ def _evaluate_rate(
             "candidates": candidates,
             "source_units": point.get("source_units"),
             "melt_recipe_source": melt_recipe_source,
-            "condition_gaps": list(condition_gaps),
+            "condition_gaps": point_gaps,
             "engine_uncertainty": (
                 "unavailable: vapor-pressure, alpha, composition, and pO2 "
                 "components are not jointly quantified"
             ),
         }
+        role_reason = _record_composition_role(runtime, role)
+        if role_reason is not None and role_reason not in role_reasons:
+            role_reasons.append(role_reason)
         for species in candidates:
             if melt_recipe is not None and pO2 is not None:
                 pressure, refusal, pressure_runtime = _engine_melt_psat_pa(
@@ -3368,7 +3651,7 @@ def _evaluate_rate(
             units="mol m^-2 s^-1",
             runtime=runtime,
             unsupported_speciation=actual is None,
-            assumed_input=bool(condition_gaps and actual is not None),
+            assumed_input=bool((point_gaps or role_reason) and actual is not None),
         )
         evaluation.records.append(record)
         if actual is not None:
@@ -3381,6 +3664,19 @@ def _evaluate_rate(
                 f"residual_dex={dex:.6g} budget={uncertainty}"
             )
 
+    condition_gaps = [*observation_gaps, *composition_gaps]
+    if any_numeric:
+        condition_gaps.extend(
+            reason for reason in role_reasons if reason not in condition_gaps
+        )
+    if composition_gaps and not any(
+        note.startswith("HKL assumption diagnostic excluded")
+        for note in evaluation.runtime_notes
+    ):
+        evaluation.runtime_notes.append(
+            "HKL assumption diagnostic excluded from external residuals: "
+            + "; ".join(composition_gaps)
+        )
     if condition_gaps:
         typed_gaps = [
             gap if gap.startswith(_TYPED_SKIP_PREFIX) else f"{_TYPED_SKIP_PREFIX}{gap}"
@@ -3613,15 +3909,148 @@ def _evaluate_alpha(
     return evaluation
 
 
+def _located_composition_is_value(point: Mapping[str, Any]) -> bool:
+    """True only for a value-tagged located composition.
+
+    An unknown or other non-value tag is not an assay. Bischof's mixed-basis
+    points carry that tag and keep the parent recipe.
+    """
+
+    conditions = point.get("point_conditions")
+    if not isinstance(conditions, Mapping):
+        return False
+    composition = conditions.get("composition")
+    state = composition.get("state") if isinstance(composition, Mapping) else None
+    return isinstance(state, Mapping) and state.get("tag") == "value"
+
+
+def _point_claims_printed_assay(point: Mapping[str, Any]) -> bool:
+    """True when the point itself printed an assay, a gap, or a value composition."""
+
+    if point.get("composition_source_gap"):
+        return True
+    for key in (
+        "composition_mol",
+        "melt_composition_mol",
+        "composition_wt_pct",
+        "melt_composition_wt_pct",
+        "sample_oxide_composition_wt_pct",
+        "sample_Na2O_wt_pct",
+        "sample_K2O_wt_pct",
+        "composition_source_observation_id",
+    ):
+        if point.get(key):
+            return True
+    if _located_composition_is_value(point):
+        return True
+    source = point.get("source_point")
+    if isinstance(source, Mapping) and source is not point:
+        return _point_claims_printed_assay(source)
+    return False
+
+
+def _assay_candidate(
+    recipe: dict[str, float] | None,
+    source: str,
+    error: str | None,
+    *,
+    origin: str,
+    terminal: bool = False,
+    inherit_parent_role: bool = True,
+) -> AssayCandidate:
+    state = (
+        State.of(recipe)
+        if recipe is not None
+        else State.unknown(error or "missing_condition:melt_composition")
+    )
+    return AssayCandidate(
+        state,
+        source=origin,
+        label=source,
+        terminal=terminal,
+        inherit_parent_role=inherit_parent_role,
+    )
+
+
+def _resolve_melt_recipe(
+    obs: AdoptedObservation,
+    *,
+    point: Mapping[str, Any] | None = None,
+) -> tuple[RoleResolution[dict[str, float]], str]:
+    parent_values = getattr(obs, "values", None)
+    if point is None:
+        recipe, source, error = _melt_recipe_mol(obs)
+        candidates = (
+            _assay_candidate(recipe, source, error, origin="parent"),
+        )
+    else:
+        # Point-local decode must not inherit the parent. The resolver chooses.
+        point_recipe, point_source, point_error = _melt_recipe_mol(
+            obs, point=point, parent_fallback=False
+        )
+        parent_recipe, parent_source, parent_error = _melt_recipe_mol(obs)
+        candidates = (
+            _assay_candidate(
+                point_recipe,
+                point_source,
+                point_error,
+                origin="point",
+                # A printed gap or a failed point assay stops the search.
+                # A point that printed no assay leaves the parent available.
+                terminal=point_recipe is None
+                and (
+                    point_source != "none"
+                    or _point_claims_printed_assay(point)
+                ),
+                # Flat columns are the run. The parent's role describes the
+                # parent. An explicit role on the point is still read.
+                inherit_parent_role=point_source != "extract flat run composition",
+            ),
+            _assay_candidate(
+                parent_recipe, parent_source, parent_error, origin="parent"
+            ),
+        )
+    role = composition_roles.resolve_point_composition(
+        point, parent_values, candidates
+    )
+    source = role.source_label or "none"
+    if role.initial_charge_only and source.startswith((
+        "extract composition_wt_pct",
+        "extract sample_oxide_composition_wt_pct",
+        "extract point_conditions.composition",
+    )):
+        label, separator, overlay = source.partition("+")
+        source = f"{label} ({role.role}){separator}{overlay}"
+    return role, source
+
+
+def _record_composition_role(
+    runtime: dict[str, Any],
+    role: RoleResolution[dict[str, float]],
+) -> str | None:
+    if not role.flags or not role.callable:
+        return None
+    flag = role.flags[0]
+    runtime["input_assumption"] = (
+        {"flag": flag, "default_role": role.role, "original_reason": role.original_reason}
+        if role.status is RoleStatus.DEFAULTED
+        else {"flag": flag, "reason": role.reason.split(": ", 1)[1]}
+    )
+    runtime["typed_input_reason"] = role.reason
+    return role.reason
+
+
 def _melt_recipe_mol(
     obs: AdoptedObservation,
     *,
     point: Mapping[str, Any] | None = None,
+    parent_fallback: bool = True,
 ) -> tuple[dict[str, float] | None, str, str | None]:
     """Resolve an extract recipe to oxide moles, refusing declared composition gaps."""
 
     values = dict(obs.values)
     if point is not None:
+        source_point = point.get("source_point", point)
         point_recipe_keys = (
             "composition_mol",
             "melt_composition_mol",
@@ -3629,17 +4058,66 @@ def _melt_recipe_mol(
             "melt_composition_wt_pct",
             "sample_oxide_composition_wt_pct",
         )
-        if any(
+        point_conditions = point.get("point_conditions")
+        point_has_located_composition = _located_composition_is_value(point)
+        point_has_named_recipe = any(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
             for key in point_recipe_keys
+        )
+        if (
+            not point_has_located_composition
+            and not point_has_named_recipe
+            and point.get("composition_source_gap")
         ):
-            # A measured row's own suite takes precedence over parent-level defaults.
+            # An explicit gap is decided before the parent-dependent flat decode.
+            return (
+                None,
+                "extract composition_source_gap",
+                "missing_condition:melt_composition",
+            )
+        if (
+            not point_has_located_composition
+            and not point_has_named_recipe
+            and battery_migrate._flat_run_composition_columns(
+                source_point, obs.values, getattr(obs, "units", None)
+            )
+        ):
+            errors: list[str] = []
+            flat = battery_migrate._oxide_map_from_mapping(
+                source_point, declared_map=True, refusal_reason=errors
+            )
+            source = "extract flat run composition"
+            if flat is None:
+                return None, source, errors[0] if errors else "missing_condition:melt_composition"
+            composition = battery_migrate.wt_pct_to_mole_fraction(flat)
+            return {oxide: float(amount) for oxide, amount in composition.components}, source, None
+        # Alkali overlays and a source-observation id are applied to the parent
+        # recipe below. Stopping here would drop that printed adjustment.
+        carries_parent_adjustment = any(
+            point.get(key) is not None
+            for key in (
+                "sample_Na2O_wt_pct",
+                "sample_K2O_wt_pct",
+                "composition_source_observation_id",
+            )
+        )
+        if (
+            not parent_fallback
+            and not point_has_located_composition
+            and not point_has_named_recipe
+            and not point.get("composition_source_gap")
+            and not carries_parent_adjustment
+        ):
+            return None, "none", "missing_condition:melt_composition"
+        if point_has_located_composition or point_has_named_recipe or point.get("composition_source_gap"):
+            # A point's own suite or explicit gap takes precedence over the parent recipe.
             for key in (
                 *point_recipe_keys,
                 "sample_Na2O_wt_pct",
                 "sample_K2O_wt_pct",
                 "composition_source_observation_id",
                 "composition_source_gap",
+                "point_conditions",
             ):
                 values.pop(key, None)
         values.update(
@@ -3655,6 +4133,8 @@ def _melt_recipe_mol(
                 if key in point
             }
         )
+        if point_has_located_composition:
+            values["point_conditions"] = point_conditions
     for key in ("composition_mol", "melt_composition_mol"):
         raw = values.get(key)
         if isinstance(raw, Mapping) and raw:
@@ -3669,38 +4149,85 @@ def _melt_recipe_mol(
         # t-383 DeMaria digitized rows carry sample-specific oxide suites.
         or values.get("sample_oxide_composition_wt_pct")
     )
+    located_composition: Mapping[str, Any] | None = None
     provenance = "extract composition_wt_pct"
     if isinstance(values.get("sample_oxide_composition_wt_pct"), Mapping) and raw_wt is values.get(
         "sample_oxide_composition_wt_pct"
     ):
         provenance = "extract sample_oxide_composition_wt_pct"
-    material = str(values.get("material") or obs.phase or "").lower()
-    if not isinstance(raw_wt, Mapping) and (
-        "apollo_12" in material or "lunar_basalt_120" in material
+    if not isinstance(raw_wt, Mapping):
+        point_conditions = values.get("point_conditions")
+        located = (
+            point_conditions.get("composition")
+            if isinstance(point_conditions, Mapping)
+            else None
+        )
+        state = located.get("state") if isinstance(located, Mapping) else None
+        composition = (
+            state.get("value")
+            if isinstance(state, Mapping) and state.get("tag") == "value"
+            else None
+        )
+        if (
+            isinstance(composition, Mapping)
+            and isinstance(composition.get("components"), (list, tuple))
+        ):
+            located_composition = composition
+            provenance = "extract point_conditions.composition"
+    if (
+        located_composition is None
+        and not isinstance(raw_wt, Mapping)
+        and values.get("composition_source_gap")
     ):
-        if values.get("composition_source_gap"):
-            return (
-                None,
-                "extract composition_source_gap",
-                "missing_condition:melt_composition",
-            )
-        feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
-        feedstock = feedstocks.get("lunar_mare_low_ti") or {}
-        raw_wt = feedstock.get("composition_wt_pct")
-        provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
+        return (
+            None,
+            "extract composition_source_gap",
+            "missing_condition:melt_composition",
+        )
     # Prefer the printed alkali overlay when an extract gives it alongside a
     # complete melt recipe.
-    if isinstance(raw_wt, Mapping) and values.get("sample_Na2O_wt_pct") is not None:
+    overlays: dict[str, Any] = {}
+    if values.get("sample_Na2O_wt_pct") is not None:
         try:
-            overlaid = dict(raw_wt)
-            overlaid["Na2O"] = float(values["sample_Na2O_wt_pct"])
+            overlays["Na2O"] = float(values["sample_Na2O_wt_pct"])
             if values.get("sample_K2O_wt_pct") is not None:
-                overlaid["K2O"] = float(values["sample_K2O_wt_pct"])
-            raw_wt = overlaid
-            provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+                overlays["K2O"] = float(values["sample_K2O_wt_pct"])
         except (TypeError, ValueError):
-            pass
-    if isinstance(raw_wt, Mapping) and raw_wt:
+            overlays = {}
+    if (
+        located_composition is not None
+        and located_composition.get("amount_basis") == "mass_percent"
+        and overlays
+    ):
+        components = located_composition.get("components")
+        if isinstance(components, list):
+            overlaid_components = []
+            replaced: set[str] = set()
+            for component in components:
+                if (
+                    isinstance(component, (list, tuple))
+                    and len(component) == 2
+                    and str(component[0]) in overlays
+                ):
+                    oxide = str(component[0])
+                    overlaid_components.append([component[0], overlays[oxide]])
+                    replaced.add(oxide)
+                else:
+                    overlaid_components.append(component)
+            overlaid_components.extend(
+                [oxide, amount]
+                for oxide, amount in overlays.items()
+                if oxide not in replaced
+            )
+            located_composition = {
+                **located_composition,
+                "components": overlaid_components,
+            }
+            provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+    elif isinstance(raw_wt, Mapping) and raw_wt and overlays:
+        raw_wt = {**raw_wt, **overlays}
+        provenance = f"{provenance}+sample_alkali_wt_pct_overlay"
+    if located_composition is not None or (isinstance(raw_wt, Mapping) and raw_wt):
         source_observation_id = values.get("composition_source_observation_id")
         if (
             source_observation_id
@@ -3708,13 +4235,27 @@ def _melt_recipe_mol(
         ):
             provenance = f"{provenance} ({source_observation_id})"
         try:
-            mol = {
-                str(oxide): float(wt) / float(MOLAR_MASS[str(oxide)])
-                for oxide, wt in raw_wt.items()
-                if float(wt) > 0.0 and str(oxide) in MOLAR_MASS
-            }
-        except (TypeError, ValueError):
-            return None, provenance, "invalid_melt_composition_wt_pct"
+            composition = (
+                battery_migrate._composition_from_plain(located_composition)
+                if located_composition is not None
+                else battery_migrate.wt_pct_to_mole_fraction(
+                    {
+                        str(oxide): Decimal(str(wt))
+                        for oxide, wt in raw_wt.items()
+                    }
+                )
+            )
+        except (ArithmeticError, TypeError, ValueError) as exc:
+            return None, provenance, (
+                str(exc)
+                if located_composition is not None
+                else "invalid_melt_composition_wt_pct"
+            )
+        mol = {
+            str(oxide): float(amount)
+            for oxide, amount in composition.components
+            if amount > 0
+        }
         if mol:
             return mol, provenance, None
     binary_mol, binary_source, binary_error = _binary_system_closure_mol(values)
@@ -4291,7 +4832,10 @@ def _evaluate_ordering(
         # Class/form gates still exclude pin-bearing credit even on a PASS.
         status_override = status
         out_of_domain = False
-        if verdict in {"pass", "fail"} and not pin_ok and axes_typed is not None:
+        assumed_input = verdict in {"pass", "fail"} and "typed_input_reason" in payload
+        if assumed_input:
+            payload["skip_reason"] = payload["typed_input_reason"]
+        elif verdict in {"pass", "fail"} and not pin_ok and axes_typed is not None:
             out_of_domain = True
             status_override = "out-of-domain"
             payload["ordering_verdict_unscored"] = verdict
@@ -4308,9 +4852,14 @@ def _evaluate_ordering(
                 units="ordering_pairs",
                 runtime=payload,
                 out_of_domain=out_of_domain,
-                status_override=status_override if not out_of_domain else None,
+                assumed_input=assumed_input,
+                status_override=status_override if not out_of_domain and not assumed_input else None,
             )
         )
+        if assumed_input:
+            evaluation.skip_reason = payload["skip_reason"]
+            evaluation.skip_reasons.append(evaluation.skip_reason)
+            return evaluation
         if verdict == "pass" and pin_ok:
             evaluation.runtime_notes.append(
                 f"ordering PASS: {claim.get('asserted') if claim else obs.observation_id}"
@@ -4409,7 +4958,9 @@ def _evaluate_ordering(
             extra={"unmapped": missing_map},
         )
 
-    melt_recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
+    role, recipe_source = _resolve_melt_recipe(obs)
+    melt_recipe = role.composition.value
+    _record_composition_role(runtime, role)
     runtime["melt_recipe_source"] = recipe_source
     # No feedstock proxy. A silicate-melt ordering that names no composition
     # refuses, the same as _melt_recipe_mol on the psat path. lunar_mare_low_ti
@@ -4417,7 +4968,7 @@ def _evaluate_ordering(
     if melt_recipe is None:
         return _emit(
             verdict="not_evaluable",
-            reason=recipe_error or "missing_condition:melt_composition",
+            reason=role.composition.reason,
         )
 
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
@@ -4512,8 +5063,10 @@ def _evaluate_relative_volatility(
             "missing_capability:relative_volatility_species_map",
         )
     pin_ok, axes_skip, axes_runtime = rail_alpha_comparability(obs)
-    melt_recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
-    if melt_recipe is None:
+    role, recipe_source = _resolve_melt_recipe(obs)
+    melt_recipe = role.composition.value
+    recipe_error = role.composition.reason
+    if not role.callable:
         evaluation.records.append(
             _compare_point(
                 obs=obs,
@@ -4555,6 +5108,7 @@ def _evaluate_relative_volatility(
         "melt_recipe_source": recipe_source,
         **axes_runtime,
     }
+    role_reason = _record_composition_role(runtime, role)
     if num_v is None or den_v is None or den_v == 0.0:
         runtime["skip_reason"] = (
             f"{_TYPED_SKIP_PREFIX}missing_capability:relative_volatility_engine_rank"
@@ -4603,9 +5157,14 @@ def _evaluate_relative_volatility(
         actual=actual,
         units="dimensionless",
         runtime=runtime,
-        out_of_domain=not pin_ok,
+        assumed_input=role_reason is not None,
+        out_of_domain=not pin_ok and role_reason is None,
     )
     evaluation.records.append(record)
+    if role_reason is not None:
+        evaluation.skip_reason = role_reason
+        evaluation.skip_reasons.append(role_reason)
+        return evaluation
     if not pin_ok and axes_skip is not None:
         typed = f"{_TYPED_SKIP_PREFIX}{axes_skip}"
         evaluation.skip_reason = typed
@@ -4746,13 +5305,17 @@ def _evaluate_activity(
         runtime["citation"] = coefficient.citation
         runtime["engine_gamma"] = actual
     else:
-        recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
+        role, recipe_source = _resolve_melt_recipe(obs)
+        recipe = role.composition.value
+        role_reason = _record_composition_role(runtime, role)
+        if role_reason is not None:
+            assumption_gaps.append(role_reason.removeprefix(_TYPED_SKIP_PREFIX))
         runtime["recipe_source"] = recipe_source
         if recipe is None:
             return _activity_skip(
                 obs,
                 evaluation,
-                recipe_error or "missing_condition:melt_composition",
+                role.composition.reason or "missing_condition:melt_composition",
                 expected=expected,
                 observable=observable_kind,
             )
