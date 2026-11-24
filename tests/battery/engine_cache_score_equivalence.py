@@ -74,9 +74,8 @@ def assert_residue_score_cache_equivalence(
         payloads = [json.loads(row) for row in rows]
         typed_missing = [
             payload
-            for payload in payloads
-            if (payload.get("refusal") or {}).get("reason")
-            == "starting_component_ppm_missing"
+            for row, payload in zip(rows, payloads, strict=True)
+            if b'"reason":"starting_component_ppm_missing"' in row
             and payload.get("reference") in context.observations
             and context.observations[payload["reference"]].identity.species is not None
             and context.observations[payload["reference"]].identity.species.formula
