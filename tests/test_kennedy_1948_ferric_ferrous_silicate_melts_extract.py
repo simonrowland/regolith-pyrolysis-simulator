@@ -31,6 +31,16 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kennedy-1948-ferric-ferrous-silicate-melts.yaml"
 
 
+def _assert_kennedy_regime_notes_match(source):
+    rows = source["species"]["Fe"]["observations"][0]["values"]["rows"]
+    regime_notes = [
+        row["point_conditions"]["regime_as_printed"]["locator"]["note"]
+        for row in rows[2:9]
+    ]
+    assert len(regime_notes) == 7
+    assert all(note.startswith("Is it apparent from the values in Table II") for note in regime_notes)
+
+
 def _migrate_extract(path: Path = EXTRACT):
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(path)
@@ -53,12 +63,7 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
     source_text = EXTRACT.read_text(encoding="utf-8")
     source = yaml.safe_load(source_text)
     assert yaml_mapping_source_issues(source_text) == []
-    assert all(
-        "Is it apparent from the values in Table II" in row["point_conditions"][
-            "regime_as_printed"
-        ]["locator"]["note"]
-        for row in source["species"]["Fe"]["observations"][2:9]
-    )
+    _assert_kennedy_regime_notes_match(source)
 
     result = _migrate_extract()
     assert len(result.observations) == 22
@@ -180,19 +185,20 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
         for index, sample in enumerate(samples)
         if sample.get("locator", {}).get("source_sha256") == "PENDING_CORPUS"
     }
-    if pending_indices:
-        assert len(pending_indices) == 41
-        assert len(validation_errors) == len(pending_indices)
-        assert all(
-            any(
-                f"fidelity_samples[{index}]" in error
-                and "locator must be a mapping" in error
-                for error in validation_errors
-            )
-            for index in pending_indices
-        ), validation_errors
-    else:
-        assert validation_errors == []
+    assert not pending_indices
+    assert validation_errors == []
+
+
+def test_kennedy_regime_note_lock_detects_restored_transcription():
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    rows = source["species"]["Fe"]["observations"][0]["values"]["rows"]
+    for row in rows[2:9]:
+        note = row["point_conditions"]["regime_as_printed"]["locator"]["note"]
+        row["point_conditions"]["regime_as_printed"]["locator"]["note"] = note.replace(
+            "Is it apparent", "It is apparent", 1
+        )
+    with pytest.raises(AssertionError):
+        _assert_kennedy_regime_notes_match(source)
 
 
 def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path):
@@ -722,11 +728,7 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
             "kennedy-1948-prose-text.txt"
         )
     ]
-    assert len(prose_pins) == 41
-    assert all(
-        sample["locator"]["source_sha256"] == "PENDING_CORPUS"
-        for sample in prose_pins
-    )
+    assert prose_pins == []
     warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
     coverage_warnings = {
         warning.kind for warning in warnings
