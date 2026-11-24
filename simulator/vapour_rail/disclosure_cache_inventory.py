@@ -293,7 +293,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 1969,
+        "line": 1968,
         "kind": 'class',
         "name": 'PT1PersistentEquilibriumStore',
         "carries_disclosure": True,
@@ -717,7 +717,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 5928,
+        "line": 5939,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,
@@ -933,7 +933,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7985,
+        "line": 8012,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -965,7 +965,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_binding_admission.py:grouped_entries': {
         "path": 'simulator/engine_binding_admission.py',
-        "line": 1646,
+        "line": 1668,
         "kind": 'store',
         "name": 'grouped_entries',
         "carries_disclosure": False,
@@ -973,7 +973,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_binding_admission.py:receipt_entries': {
         "path": 'simulator/engine_binding_admission.py',
-        "line": 1658,
+        "line": 1680,
         "kind": 'store',
         "name": 'receipt_entries',
         "carries_disclosure": False,
@@ -1061,7 +1061,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:physics_bucket_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 606,
+        "line": 605,
         "kind": 'store',
         "name": 'physics_bucket_entries',
         "carries_disclosure": False,
@@ -1317,7 +1317,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
-        "line": 5621,
+        "line": 5648,
         "kind": 'store',
         "name": 'published_cache',
         "carries_disclosure": False,
@@ -1357,7 +1357,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 605,
+        "line": 604,
         "kind": 'store',
         "name": '_entries',
         "carries_disclosure": True,
