@@ -60,6 +60,21 @@ def _bookable_ferric_o2(simulator: PyrolysisSimulator) -> float:
     return ferric_couple_o2_mol(fe2o3_mol)
 
 
+def _cleaned_melt_fe2o3_mol(simulator: PyrolysisSimulator) -> float:
+    """Fe2O3 mol on the open cleaned-melt account.
+
+    ``_apply_lot`` drops a species key whose balance is exactly 0.
+    An absent Fe2O3 key on an account that is open reads as 0 mol
+    through ``iron_oxide_values``, the same projection the ferric
+    helpers use. Indexing the account on the full balance map still
+    raises KeyError when the account itself is missing.
+    """
+
+    account = simulator.atom_ledger.mol_by_account()["process.cleaned_melt"]
+    _feo_mol, fe2o3_mol = iron_oxide_values(account)
+    return fe2o3_mol
+
+
 def _pin_tangent(
     simulator: PyrolysisSimulator,
     monkeypatch: pytest.MonkeyPatch,
@@ -108,7 +123,7 @@ def test_in_inventory_reducing_source_step_is_demand_over_capacity(
     _pin_tangent(sim, monkeypatch, fe2o3_mol=1.0)
     assert _bookable_ferric_o2(sim) > _STEP_MOL
     before_atoms = _oxygen_atoms(sim)
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
         {"redox_source:test_reducing": -_STEP_MOL},
@@ -128,7 +143,7 @@ def test_in_inventory_reducing_source_step_is_demand_over_capacity(
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skip_reason == ""
     assert sim._ferric_tangent_exhausted is False
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+    assert _cleaned_melt_fe2o3_mol(sim) == (
         pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(_STEP_MOL))
     )
     assert _oxygen_atoms(sim) == pytest.approx(before_atoms, abs=1.0e-9)
@@ -228,7 +243,7 @@ def test_minute42_reducing_step_stops_at_ferric_inventory(
     sim.melt.p_total_mbar = 13.0
     assert _bookable_ferric_o2(sim) == pytest.approx(_M42_BOOKABLE_MOL)
     before_atoms = _oxygen_atoms(sim)
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
         {"redox_source:evaporative_oxygen_loss": -_M42_DEMAND_MOL},
@@ -258,7 +273,7 @@ def test_minute42_reducing_step_stops_at_ferric_inventory(
     assert sim._ferric_exhausted_bookable_o2_mol == pytest.approx(
         _M42_BOOKABLE_MOL
     )
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+    assert _cleaned_melt_fe2o3_mol(sim) == (
         pytest.approx(
             before_fe2o3 - fe2o3_mol_for_ferric_o2(_M42_BOOKABLE_MOL),
             abs=1.0e-9,
@@ -441,7 +456,7 @@ def test_buffer_debit_lowers_fo2_and_a_buffer_credit_does_not(
     terms = sim._evaporative_redox_source_terms_from_transition(debit)
     assert terms["redox_source:evaporative_oxygen_loss"] == pytest.approx(-1.0)
 
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
         terms,
         temperature_K=_TEMPERATURE_K,
@@ -451,7 +466,7 @@ def test_buffer_debit_lowers_fo2_and_a_buffer_credit_does_not(
     assert reservoir.melt_intrinsic_fO2_log != pytest.approx(
         _BASE_LOG - 1.0 / math.log(10.0)
     )
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+    assert _cleaned_melt_fe2o3_mol(sim) == (
         pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(1.0))
     )
     assert reservoir.redox_source_terms_applied is True
@@ -525,7 +540,7 @@ def test_ferric_reappearance_reopens_the_tangent(
     assert reopened == pytest.approx(_CAPACITY_MOL_PER_LN)
 
     before = sim._current_melt_redox_fO2_log()
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     sim._reset_redox_source_diagnostics_for_hour()
     resumed = sim._apply_oxygen_reservoir_redox_source_terms(
         {"redox_source:test_reducing": -_STEP_MOL},
@@ -537,7 +552,7 @@ def test_ferric_reappearance_reopens_the_tangent(
     assert resumed.redox_source_skip_reason == ""
     assert resumed.melt_intrinsic_fO2_log == pytest.approx(published_resumed)
     assert resumed.melt_intrinsic_fO2_log != pytest.approx(euler)
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+    assert _cleaned_melt_fe2o3_mol(sim) == (
         pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(_STEP_MOL))
     )
     assert sim._ferric_tangent_exhausted is False
@@ -581,8 +596,14 @@ def test_ferric_reappearance_reopens_the_tangent(
     )
     # The exhaustion step booked the ferric. The oxidizing predictor
     # does not put it back, and it does not clear the lock.
+    # Bookable ferric O2 did not rise above the inventory frozen at
+    # the stop. d-463 and 636308c53e: the lock clears only on that
+    # rise, so this reducing demand must not apply. The applied flag
+    # is the hour aggregate, and the exhaustion and oxidizing calls
+    # already applied, so reset before reading this call.
     assert _bookable_ferric_o2(sim) < 1.0e-8
 
+    sim._reset_redox_source_diagnostics_for_hour()
     still_locked = sim._apply_oxygen_reservoir_redox_source_terms(
         {"redox_source:test_reducing": -_STEP_MOL},
         temperature_K=_TEMPERATURE_K,
@@ -787,10 +808,7 @@ def test_bubbler_o2_credit_clears_the_lock_through_the_ledger(
     assert sim._ferric_tangent_exhausted is True
     assert sim._ferric_exhausted_bookable_o2_mol == pytest.approx(0.0)
     frozen = float(sim._ferric_exhausted_bookable_o2_mol)
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    )
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     sim._reset_redox_source_diagnostics_for_hour()
     monkeypatch.setattr(
         sim,
@@ -813,10 +831,7 @@ def test_bubbler_o2_credit_clears_the_lock_through_the_ledger(
     assert float(diagnostic.get("fe_redox_absorbed_mol") or 0.0) > (
         OXYGEN_RESERVOIR_NOOP_MOL
     )
-    after_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    )
+    after_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     assert after_fe2o3 > before_fe2o3
     assert _bookable_ferric_o2(sim) > frozen + OXYGEN_RESERVOIR_NOOP_MOL
     assert sim._ferric_tangent_exhausted is False
@@ -900,7 +915,7 @@ def test_reducing_term_at_the_ceiling_lowers_fo2_and_ferric(
         lambda *_args, **_kwargs: True,
     )
     assert sim._melt_redox_fO2_upper_bound_log() == pytest.approx(ceiling)
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     assert before_fe2o3 == pytest.approx(fe2o3_mol)
     bookable = _bookable_ferric_o2(sim)
     assert bookable > OXYGEN_RESERVOIR_NOOP_MOL
@@ -910,7 +925,7 @@ def test_reducing_term_at_the_ceiling_lowers_fo2_and_ferric(
         temperature_K=_TEMPERATURE_K,
     )
 
-    after_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
+    after_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     assert reservoir.redox_source_skip_reason == ""
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.melt_intrinsic_fO2_log < ceiling - 1.0e-6
@@ -979,10 +994,7 @@ def test_oxidizing_term_at_the_ceiling_books_excess_o2(
         "O2",
         0.0,
     )
-    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    )
+    before_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     before_atoms = _oxygen_atoms(sim)
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
@@ -997,17 +1009,11 @@ def test_oxidizing_term_at_the_ceiling_books_excess_o2(
         "O2",
         0.0,
     ) == pytest.approx(before_buffer)
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    ) == pytest.approx(before_fe2o3)
+    assert _cleaned_melt_fe2o3_mol(sim) == pytest.approx(before_fe2o3)
 
     sim._settle_evaporative_redox_after_batch()
 
-    after_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    )
+    after_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     after_buffer = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
         "O2",
         0.0,
@@ -1131,10 +1137,7 @@ def test_defect_hour_equilibrium_q_books_ferric_and_minute_43_reads_the_floor(
     assert sio.melt_intrinsic_fO2_log == pytest.approx(published)
     assert sio.melt_intrinsic_fO2_log != pytest.approx(_M42_BASE)
     assert published < ceiling - 1.0
-    after_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    )
+    after_fe2o3 = _cleaned_melt_fe2o3_mol(sim)
     assert fe2o3_mol - after_fe2o3 == pytest.approx(
         fe2o3_mol_for_ferric_o2(_M42_BOOKABLE_MOL),
         abs=1.0e-9,
