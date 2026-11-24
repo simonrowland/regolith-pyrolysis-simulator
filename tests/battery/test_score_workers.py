@@ -35,6 +35,7 @@ from simulator.battery.score import (
     _score_store_to_jsonl,
     _write_headline_summary_from_accumulator_json,
     derive_store_stamp,
+    dumps_store_stamp,
 )
 from tests.battery import factories as F
 
@@ -202,12 +203,50 @@ def _score_rows_and_summary(
     assert sum(1 for _ in rows) == written
     summary_path = path.with_suffix(".summary.json")
     assert metadata.aggregate is not None
+    stamp = _full_commit_store_stamp()
     _write_headline_summary_from_accumulator_json(
         metadata.aggregate,
         summary_path,
-        store_stamp=derive_store_stamp(),
+        store_stamp=stamp,
     )
-    return partial_path.read_bytes(), summary_path.read_bytes()
+    return (
+        _rows_with_full_revision(partial_path.read_bytes(), stamp),
+        summary_path.read_bytes(),
+    )
+
+
+def _rows_with_full_revision(raw: bytes, stamp: dict[str, object]) -> bytes:
+    """Compare row files on the full commit, not git's mutable %h width.
+
+    The JSONL header is the production stamp. Two calls can abbreviate one
+    commit to different widths, so the header byte string is not the rows.
+    """
+
+    header, newline, body = raw.partition(b"\n")
+    recorded = json.loads(header)
+    recorded["revision"] = stamp["revision"]
+    return dumps_store_stamp(recorded).encode("utf-8") + newline + body
+
+
+def _full_commit_store_stamp() -> dict[str, object]:
+    """Compare summaries on the full commit, not git's mutable %h width.
+
+    Production still stamps ``%h``. Two calls can abbreviate one commit to
+    different widths. ``rev-parse`` of either abbreviation is that commit.
+    """
+
+    stamp = derive_store_stamp()
+    abbreviated = str(stamp["revision"])
+    completed = subprocess.run(
+        ["git", "rev-parse", "--verify", f"{abbreviated}^{{commit}}"],
+        cwd=Path(__file__).resolve().parents[2],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    full = completed.stdout.strip()
+    assert len(full) == 40 and full.startswith(abbreviated)
+    return {**stamp, "revision": full}
 
 
 def test_serial_scoring_fixture_has_stable_canonical_rows(tmp_path: Path) -> None:

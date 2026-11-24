@@ -15,9 +15,8 @@ from tests.battery.test_redox_extract_scoring import (
     _sossi_aithala_redox_context,
 )
 
-# Studio table, internal-analytical only, mac-studio-256-3 request
-# dadfe71b1b764b979eea781fe0af3225. sossi_2020_per_f_o2_1_xanes is the
-# unknown-frame row and carries DP-010. The other seventeen are the
+# Studio table, internal-analytical only. sossi_2020_per_f_o2_1_xanes is
+# the printed 1 bar pure-O2 end member. The other seventeen rows are the
 # unaffected numeric, provenance, and eligibility pins.
 _EXCLUSIONS = (
     "source_relation_independent_complete_ancestry",
@@ -71,8 +70,8 @@ PINS: dict[str, tuple[str, str, bool, tuple[str, ...], tuple[str, ...], str]] = 
         "ferric_fraction_uncertainty_linearization_invalid",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes": (
-        "-1.361257158696803", "mismatch", False, ("DP-010",),
-        ("total_iron_reported_as_feo", "admission_defaulted", "engine_model_caveat", "input_omitted", "assumed_fo2", "out_of_certified_band"),
+        "-0.19443092435728185", "mismatch", False, (),
+        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes": (
@@ -177,9 +176,7 @@ def test_internal_analytical_sossi_aithala_unaffected_rows():
     assert len(boundary) == 2
     assert any(reference.endswith("sossi_2020_per_f_o2_11_xanes") for reference in boundary)
     assert any(reference.endswith("sossi_2020_per_f_o2_12_xanes") for reference in boundary)
-    assert unknown == [
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
-    ]
+    assert unknown == []
     backlog = notice_backlog(residuals)
     counted = backlog.get(NoticeKind.ASSUMED_FO2.value, 0)
     assert counted == sum(

@@ -200,16 +200,12 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert args[0]["Mg"] > 0.0
     assert args[2] == "imposed"
     assert args[1] == float(observation.identity.temperature_K.value)
-    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
-
     assert float(observation.point_conditions["fO2_log"].state.value) == 0.0
-    assert kwargs["lambda_imposed"] != pytest.approx(0.0, abs=1e-12)
-    assert prediction.identity.fO2_Pa.value != Decimal("100000")
-    assert any(
-        notice.policy is not None
-        and notice.policy.id == "DP-010"
-        and _BARE_LOG_SCALE_UNKNOWN in notice.reason
-        and "printed_fO2_log=0" in notice.reason
+    assert observation.identity.fO2_Pa.value == Decimal("100000")
+    assert kwargs["lambda_imposed"] == pytest.approx(0.0, abs=1e-12)
+    assert prediction.identity.fO2_Pa.value == Decimal("100000")
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
         for notice in prediction.notices
     )
     direct = original_evaluate_redox(*args, **kwargs)
@@ -232,6 +228,43 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert not any(
         notice.reason == "uncertainty_confidence_level_assumed_1sigma"
         for notice in residuals[0].notices
+    )
+
+
+def test_internal_analytical_sossi_pure_oxygen_commands_one_bar(monkeypatch):
+    """The Kress route commands the same 1 bar pure-O2 end member."""
+
+    context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    experiment = context.experiments[observation.experiment_id]
+    assert observation.identity.fO2_Pa.value == Decimal("100000")
+    captured: list[float] = []
+    import simulator.fe_redox as fe_redox
+
+    original = fe_redox.kress91_split
+
+    def capture_split(**kwargs):
+        captured.append(kwargs["fO2_log"])
+        return original(**kwargs)
+
+    monkeypatch.setattr(fe_redox, "kress91_split", capture_split)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert captured
+    assert captured == [0.0] * len(captured)
+    assert prediction.identity is not None
+    assert prediction.identity.fO2_Pa is not None
+    assert prediction.identity.fO2_Pa.value == Decimal("100000")
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in prediction.notices
     )
 
 
@@ -305,9 +338,8 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         if residual.numeric is not None
     ]
     assert len(values) == 18
-    # The previous digest c79971dce81ac423… pinned the ungrounded log-as-bar
-    # command on OpenIMCC 66ec4a3. d-460 retires that command. Unknown-frame
-    # rows stay numeric and carry a decision-rule refusal with the default.
+    # The pure-O2 end member is a printed 1 bar frame. No row in this set
+    # is scale-unknown, so none carries DP-010. Eligibility stays false.
     unknown_rows = []
     grounded_rows = []
     for residual in values:
@@ -329,8 +361,8 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
                 notice.policy is not None and notice.policy.id == "DP-010"
                 for notice in residual.notices
             )
-    assert unknown_rows
-    assert grounded_rows
+    assert unknown_rows == []
+    assert len(grounded_rows) == 18
     # d-460 flags the unknown-frame row, and the other rows stay ineligible
     # on the same conjuncts as the internal-analytical table. An empty
     # eligible list is the pin. Requiring a score_eligible row was the
@@ -383,6 +415,81 @@ def test_openimcc_redox_without_printed_fo2_uses_the_registered_default():
         and "reference scale not printed" not in notice.reason
         for notice in prediction.notices
     )
+
+
+def test_unknown_scale_without_frame_or_atmosphere_keeps_dp010():
+    """DP-010 stays when the log has no frame and no governing atmosphere.
+
+    The pure-O2 end member is printed evidence. This control removes that
+    frame and the experiment atmosphere, and keeps the printed zero so the
+    notice stays the unknown-scale sentence rather than the absence sentence.
+    """
+
+    pytest.importorskip("openimcc")
+    from simulator.battery.migrate import (
+        _BARE_LOG_BAR_NOTICE,
+        _BARE_LOG_SCALE_UNKNOWN,
+        _bare_log_frame_decision,
+        located_unknown,
+    )
+
+    context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    refused = _bare_log_frame_decision(
+        Decimal("0.00"),
+        Decimal("2173.15"),
+        printed_atmospheres=(),
+        total_pressure_pa=Decimal("100000"),
+    )
+    assert refused.state.is_unknown
+    assert refused.state.reason == _BARE_LOG_SCALE_UNKNOWN
+    experiment = context.experiments[observation.experiment_id]
+    conditions = {
+        key: value
+        for key, value in experiment.conditions.items()
+        if "gas" not in key.casefold() and "atmosphere" not in key.casefold()
+    }
+    assert conditions
+    stripped = replace(
+        experiment,
+        conditions=conditions,
+        fO2_control=None,
+        ambient_pressure_evidence=None,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            sweep_gas=located_unknown("control has no governing atmosphere"),
+        ),
+    )
+    point_conditions = {
+        key: value
+        for key, value in (observation.point_conditions or {}).items()
+        if "gas" not in key.casefold() and "atmosphere" not in key.casefold()
+    }
+    assert "fO2_log" in point_conditions
+    control = replace(
+        observation,
+        point_conditions=point_conditions,
+        notices=tuple(
+            notice
+            for notice in observation.notices
+            if notice.kind is not NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            and notice.reason != _BARE_LOG_BAR_NOTICE
+        ),
+        identity=replace(observation.identity, fO2_Pa=refused.state),
+    )
+
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, control, experiment=stripped)
+        assert prediction.value is not None, (engine, prediction.refusal_detail)
+        assert any(
+            notice.policy is not None
+            and notice.policy.id == "DP-010"
+            and _BARE_LOG_SCALE_UNKNOWN in notice.reason
+            and "printed_fO2_log=0" in notice.reason
+            for notice in prediction.notices
+        ), engine
 
 
 def _openimcc_row_with_mass_composition(components):
@@ -455,15 +562,11 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     args, kwargs = calls[0]
     assert args[0].get("Fe", 0.0) > 0.0
     assert args[2] == "imposed"
-    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
-
     assert float(row.point_conditions["fO2_log"].state.value) == 0.0
-    assert kwargs["lambda_imposed"] != pytest.approx(0.0, abs=1e-12)
-    assert any(
-        notice.policy is not None
-        and notice.policy.id == "DP-010"
-        and _BARE_LOG_SCALE_UNKNOWN in notice.reason
-        and "printed_fO2_log=0" in notice.reason
+    assert kwargs["lambda_imposed"] == pytest.approx(0.0, abs=1e-12)
+    assert prediction.identity.fO2_Pa.value == Decimal("100000")
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
         for notice in prediction.notices
     )
 
@@ -647,9 +750,9 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     assert len(boundary_refusals) == 2
     assert any(reference.endswith("sossi_2020_per_f_o2_11_xanes") for reference in boundary_refusals)
     assert any(reference.endswith("sossi_2020_per_f_o2_12_xanes") for reference in boundary_refusals)
-    # The payload digest 0140d9de… pinned commands from before the oxygen
-    # frame was admitted. Unknown-frame rows take DP-010; grounded rows do
-    # not. Numeric, backlog, and eligibility stay on that split.
+    # Every row in this set now has a printed frame. Scale-unknown DP-010
+    # stays on the stripped control, not on these rows. Eligibility stays
+    # on the flagged stratum.
     unknown = []
     grounded = []
     for residual in residuals:
@@ -673,7 +776,8 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
             # Grounded rows are still a flagged stratum. The 18-row table
             # requires this exclusion on every row, including these.
             assert "not_flagged_stratum" in residual.exclusions
-    assert unknown and grounded
+    assert unknown == []
+    assert len(grounded) == 18
     backlog = score_module.notice_backlog(residuals)
     assert backlog.get(NoticeKind.ASSUMED_FO2.value, 0) == sum(
         1
@@ -908,7 +1012,7 @@ def _assert_unknown_redox_headline(records) -> None:
     assert row["n_score_eligible"] == 0
 
 
-def test_borisov_2018_rows_reach_redox_scoring_population():
+def test_borisov_2018_rows_reach_redox_scoring_population(monkeypatch):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     source = load_yaml(extract)
@@ -1154,6 +1258,40 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     mismatch_context = replace(
         context,
         observations={conflicting_fo2.observation_id: conflicting_fo2},
+    )
+    # The oxygen owner commands a positive identity fO2. The disagreement
+    # has to be on the prediction identity; planting it on the row is the command.
+    # Later cases reuse this observation id, so only the planted 1000 Pa is rewritten.
+    original_predict = score_module.predict_with_engine
+
+    def prediction_with_other_oxygen(engine, observation, **kwargs):
+        prediction = original_predict(engine, observation, **kwargs)
+        planted = (
+            observation.identity.fO2_Pa
+            if observation.identity is not None
+            else None
+        )
+        if (
+            planted is None
+            or not planted.is_value
+            or planted.value != Decimal("1000")
+            or prediction.identity is None
+        ):
+            return prediction
+        return replace(
+            prediction,
+            identity=replace(
+                prediction.identity, fO2_Pa=State.of(Decimal("1"))
+            ),
+            notices=tuple(
+                notice
+                for notice in prediction.notices
+                if notice.origin != "fo2_ladder"
+            ),
+        )
+
+    monkeypatch.setattr(
+        score_module, "predict_with_engine", prediction_with_other_oxygen
     )
     mismatch_residuals, _ = score_store(
         mismatch_context,
@@ -1598,6 +1736,8 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
         if observation.observation_id != reference.observation_id:
             return prediction
         identity = prediction.identity
+        if identity is None:
+            return prediction
         if axis == "temperature_K":
             conflict = replace(
                 identity,
@@ -1620,8 +1760,20 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
                 identity, total_pressure_Pa=State.of(Decimal("200000"))
             )
         else:
-            conflict = identity
-        return replace(prediction, identity=conflict)
+            # A positive identity fO2 is the command, so the row's planted
+            # 1000 Pa is not a conflict. The prediction has to disagree.
+            conflict = replace(identity, fO2_Pa=State.of(Decimal("1")))
+        updated = replace(prediction, identity=conflict)
+        if axis == "fO2_Pa":
+            updated = replace(
+                updated,
+                notices=tuple(
+                    notice
+                    for notice in updated.notices
+                    if notice.origin != "fo2_ladder"
+                ),
+            )
+        return updated
 
     monkeypatch.setattr(score_module, "predict_with_engine", prediction_with_conflicting_axis)
     residuals, _ = score_store(
