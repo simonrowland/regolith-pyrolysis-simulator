@@ -149,6 +149,10 @@ class RelativeSeriesUnavailableReason(StrEnum):
     INTERFERENCE_UNRESOLVED = "interference_unresolved"
     SOURCE_EVIDENCE_UNLOCATED = "source_evidence_unlocated"
     SOURCE_TRACE_UNAVAILABLE = "source_trace_unavailable"
+    QMS_PRODUCER_UNIMPLEMENTED = (
+        "qms_producer_unimplemented: t-1913 requires a producer, a per-run key, "
+        "and a sample-coordinate contract"
+    )
     AMBIGUOUS_RUN_IDENTITY = "ambiguous_run_identity"
     MODEL_OXYGEN_INPUTS_UNAVAILABLE = "model_oxygen_inputs_unavailable"
     CLOCK_EVENT_MISMATCH = "clock_event_mismatch"

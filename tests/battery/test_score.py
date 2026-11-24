@@ -1146,13 +1146,15 @@ def test_p_partial_without_composition_still_refuses_identity() -> None:
     (
         (
             False,
-            "calibration_not_grounded: No calibration entry has been recorded yet. "
+            "calibration_not_grounded: kems_calibration_by_source: "
+            "No calibration entry has been recorded yet. "
             "(KEMS pressure requires a recorded calibration)",
             "not_recorded",
         ),
         (
             True,
-            "calibration_not_grounded: The source record says the calibration was "
+            "calibration_not_grounded: kems_calibration_by_source: "
+            "The source record says the calibration was "
             "not printed. (KEMS pressure requires a recorded calibration)",
             "not_printed",
         ),
@@ -1195,7 +1197,8 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.passed is False
+    assert gates.passed is True
+    assert gates.reason is None
     assert pressure_check.passed is False
     assert pressure_check.detail["reason"] == (
         "incomplete printed species coverage; pressure sum is only a lower bound"
@@ -1208,6 +1211,11 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert (
         calibration_check.detail["calibration_record_status"]
         == expected_record_status
+    )
+    assert any(
+        check.name == "effusion_regime_policy"
+        and check.detail["flag"] == "effusion_regime_assumed"
+        for check in gates.checks
     )
     residual, _ = compile_residual(
         reference,
@@ -2467,9 +2475,12 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
         {row.observation_id: row}, {experiment.experiment_id: experiment}
     )
 
-    assert not gates.passed
-    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert gates.primary_check == "in_cell_partial_pressure_sum"
+    assert gates.passed
+    assert any(
+        check.name == "effusion_regime_policy"
+        and check.detail["flag"] == "effusion_regime_assumed"
+        for check in gates.checks
+    )
     assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in strata
     assert band is None
 
@@ -2503,8 +2514,8 @@ def test_unknown_composition_skips_invalid_same_point_pressure_candidate(
         point_observations=(observation,),
     )
 
-    assert gates.passed is False
-    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert gates.passed is True
+    assert gates.reason is None
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
@@ -2757,8 +2768,13 @@ def test_first_declared_composition_source_controls_pressure_candidate_matching(
         assert "skipped_composition_candidates" not in pressure_check.detail
     else:
         # An absent earlier source permits the later declared alias to match.
-        assert gates.passed is False
-        assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert gates.passed is True
+        assert gates.reason is None
+        assert any(
+            check.name == "effusion_regime_policy"
+            and check.detail["flag"] == "effusion_regime_violated"
+            for check in gates.checks
+        )
         assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
         assert pressure_check.detail["included_observation_ids"] == [
             candidate.observation_id
@@ -5474,14 +5490,9 @@ def test_calibrated_kems_pressure_needs_no_effusion_geometry(quantity: Quantity)
     check = next(c for c in gate.checks if c.name == "kems_calibration")
     assert check.detail["missing"] == ["calibration"]
     assert "calibration" in check.detail["reason"]
-    if quantity is Quantity.P_PARTIAL:
-        assert gate.passed
-        assert check.detail["flag"] == "calibration_not_grounded"
-        assert check.detail["calibration_record_status"] == "not_recorded"
-    else:
-        assert gate.passed is False
-        assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-        assert gate.primary_check == "kems_calibration"
+    assert gate.passed
+    assert check.detail["flag"] == "calibration_not_grounded"
+    assert check.detail["calibration_record_status"] == "not_recorded"
 
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_PARTIAL).passed
@@ -6408,7 +6419,13 @@ def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert gates.passed
+    assert gates.reason is None
+    assert any(
+        check.name == "effusion_regime_policy"
+        and check.detail["flag"] == "effusion_regime_violated"
+        for check in gates.checks
+    )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
@@ -6440,7 +6457,7 @@ def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.reason is not RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 @pytest.mark.parametrize(
@@ -6614,12 +6631,7 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
         assert residual.status is ResidualStatus.REFUSED
         assert residual.numeric is None
         assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        assert (
-            residual.refusal.detail["in_cell_pressure_lower_bound_Pa"]
-            == pressure_text
-        )
-        assert residual.refusal.detail["limit_Pa"] == "10"
+        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
     else:
         # SiO(g) from SiO2(l) needs pO2. Unknown fO2 is a missing identity
         # input and refuses before the apparatus flag. The gate above is what
@@ -6690,7 +6702,13 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert gates.passed
+    assert gates.reason is None
+    assert any(
+        check.name == "effusion_regime_policy"
+        and check.detail["flag"] == "effusion_regime_violated"
+        for check in gates.checks
+    )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
@@ -6716,13 +6734,10 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
         ),
         point_observations=point_observations,
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert not any(
-        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and "in_cell_partial_pressure_sum" in notice.reason
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert any(
+        notice.reason == "effusion_regime_violated"
         for notice in residual.notices
     )
 
@@ -6761,7 +6776,12 @@ def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
     pressure_check = next(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert gates.passed is False
+    assert gates.passed is True
+    assert any(
+        check.name == "effusion_regime_policy"
+        and check.detail["flag"] == "effusion_regime_violated"
+        for check in gates.checks
+    )
     assert pressure_check.passed is False
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
     assert pressure_check.detail[
@@ -6778,13 +6798,15 @@ def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
         predict=_partial_prediction,
         point_observations=(reference,),
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert any(
+        notice.reason == "effusion_regime_violated"
+        for notice in residual.notices
+    )
 
 
-def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> None:
+def test_d274_uncalibrated_kems_psat_missing_sum_scores_with_flags() -> None:
     experiment = F.kems_experiment(kn=None, calibrated=False)
     reference = F.observation(
         "d274-uncalibrated-psat-without-sum",
@@ -6805,12 +6827,18 @@ def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> 
     calibration_check = next(
         check for check in gates.checks if check.name == "kems_calibration"
     )
-    assert calibration_check.passed is False
+    assert calibration_check.passed is True
+    assert calibration_check.detail["flag"] == "calibration_not_grounded"
     assert calibration_check.detail["reason"] == (
         "KEMS pressure requires a recorded calibration"
     )
-    assert gates.passed is False
-    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert gates.passed is True
+    assert gates.reason is None
+    assert any(
+        check.name == "effusion_regime_policy"
+        and check.detail["flag"] == "effusion_regime_assumed"
+        for check in gates.checks
+    )
 
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, _ = compile_residual(
@@ -6819,11 +6847,18 @@ def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> 
         context=context,
         prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
     )
-    # d-274 does not let an in-cell notice waive the failed P_SAT calibration check.
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert any(
+        notice.reason == "effusion_regime_assumed"
+        for notice in residual.notices
+    )
+    assert any(
+        notice.reason.startswith(
+            "calibration_not_grounded: kems_calibration_by_source:"
+        )
+        for notice in residual.notices
+    )
 
 
 def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures() -> None:
@@ -21465,8 +21500,12 @@ def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
     failing_gate = effusion_regime_unverified(
         experiment, Quantity.P_PARTIAL, observation=failing
     )
-    assert failing_gate.passed is False
-    assert failing_gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert failing_gate.passed is True
+    assert any(
+        item.name == "effusion_regime_policy"
+        and item.detail["flag"] == "effusion_regime_violated"
+        for item in failing_gate.checks
+    )
 
     reduced = knudsen_effusion_pressure_from_mass_rate(
         Decimal("1e-10"),
@@ -21516,13 +21555,15 @@ def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
     assert missing == ["orifice_diameter_m"]
 
 
-def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
+def test_effusion_regime_failure_at_d_max_is_flagged() -> None:
     """Interval 0.25-0.30 mm must pass the coded p/d limit at both ends.
 
     The limit is min(10 Pa, d_m * 1000): 0.25 Pa at 0.25 mm and 0.30 Pa at
     0.30 mm. 0.28 Pa passes the loose end and fails the strict end, so the
     interval refuses. 0.25 Pa passes both ends. 1 Pa fails both. A point
-    0.30 mm row keeps the 0.30 Pa limit in the point-geometry test.
+    0.30 mm row keeps the 0.30 Pa limit in the point-geometry test. A printed
+    out-of-regime check is retained as a typed flag so the callable pressure
+    remains available in the flagged tier.
     """
 
     experiment = _printed_diameter_experiment(
@@ -21537,8 +21578,12 @@ def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
         Quantity.P_PARTIAL,
         observation=_cell_total_pressure_observation(experiment, Decimal("1")),
     )
-    assert refused.passed is False
-    assert refused.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert refused.passed is True
+    assert any(
+        item.name == "effusion_regime_policy"
+        and item.detail["flag"] == "effusion_regime_violated"
+        for item in refused.checks
+    )
     check = next(
         item for item in refused.checks if item.name == "orifice_pressure_to_diameter"
     )
@@ -21553,8 +21598,12 @@ def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
         Quantity.P_PARTIAL,
         observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
     )
-    assert borderline.passed is False
-    assert borderline.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert borderline.passed is True
+    assert any(
+        item.name == "effusion_regime_policy"
+        and item.detail["flag"] == "effusion_regime_violated"
+        for item in borderline.checks
+    )
     borderline_check = next(
         item
         for item in borderline.checks
@@ -21635,7 +21684,12 @@ def test_unprinted_diameter_interval_stays_underdetermined_apparatus() -> None:
         regime = effusion_regime_unverified(
             experiment, Quantity.P_PARTIAL, observation=observation
         )
-        assert regime.passed is False
+        assert regime.passed is True
+        assert any(
+            check.name == "effusion_regime_policy"
+            and check.detail["flag"] == "effusion_regime_assumed"
+            for check in regime.checks
+        )
         pressure = next(
             check
             for check in regime.checks

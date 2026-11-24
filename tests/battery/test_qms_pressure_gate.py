@@ -15,8 +15,11 @@ from simulator.battery.records import Located, Species, State
 from simulator.battery.score import (
     _has_ungrounded_kems_partial_pressure_calibration,
     _kems_replicate_groups,
+    _unverified_apparatus_notices,
 )
 from simulator.battery.validity import (
+    GateCheck,
+    GateOutcome,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
 )
@@ -144,6 +147,62 @@ def test_missing_locator_makes_scoped_calibration_ungrounded() -> None:
         experiment_id=experiment.experiment_id,
     )
     assert _has_ungrounded_kems_partial_pressure_calibration(row, experiment)
+
+
+def test_reduced_kems_policy_flags_are_visible_as_scoring_notices() -> None:
+    experiment = F.kems_experiment(calibrated=False, kn=None)
+    row = _pressure_row(experiment.experiment_id, "policy-flag-row")
+    calibration = GateCheck(
+        "kems_calibration",
+        True,
+        {
+            "flag": "calibration_not_grounded",
+            "calibration_notice": "No target-channel calibration is recorded.",
+            "reason": "calibration evidence is not source-attributed",
+        },
+    )
+    assumed = GateOutcome(
+        passed=True,
+        checks=(
+            GateCheck("in_cell_partial_pressure_sum", False, {"reason": "not printed"}),
+            GateCheck(
+                "effusion_regime_policy",
+                True,
+                {"flag": "effusion_regime_assumed", "reason": "no regime check"},
+            ),
+            calibration,
+        ),
+    )
+    assumption_notices = _unverified_apparatus_notices(row, experiment, assumed)
+    assert any(notice.reason == "effusion_regime_assumed" for notice in assumption_notices)
+    assert any(
+        notice.reason.startswith("calibration_not_grounded: kems_calibration_by_source:")
+        for notice in assumption_notices
+    )
+
+    violated = GateOutcome(
+        passed=True,
+        checks=(
+            GateCheck(
+                "orifice_knudsen",
+                False,
+                {"knudsen_number_orifice": "1", "threshold": "10"},
+            ),
+            GateCheck(
+                "effusion_regime_policy",
+                True,
+                {"flag": "effusion_regime_violated", "reason": "printed Kn is low"},
+            ),
+        ),
+    )
+    reported_row = replace(
+        row,
+        evidence=replace(row.evidence, original_method_class="measured_direct"),
+    )
+    violation_notices = _unverified_apparatus_notices(
+        reported_row, experiment, violated
+    )
+    assert any(notice.reason == "effusion_regime_violated" for notice in violation_notices)
 
 
 def test_current_only_observation_is_excluded_from_pressure_comparators() -> None:

@@ -2,7 +2,7 @@
 
 import ast
 from dataclasses import replace
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 import math
 from pathlib import Path
 
@@ -22,6 +22,8 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
 )
+from simulator.battery.qms_policy import QMS_POLICY_REGISTRY
+from simulator.battery import score_metrics
 from simulator.battery.score_metrics import (
     relative_channel_point_residuals,
 )
@@ -384,6 +386,7 @@ def test_qms_channel_rules_have_one_owner():
     assert scorer_calls.count("oxygen_pressure_point") == 1
     assert "printed_fo2_from_point" in scorer_calls
     assert "relative_channel_point_residuals" not in scorer_calls
+    assert "_qms_store_producer_unavailable" in scorer_calls
     assert "_has_printed_fo2" not in scorer_calls
     assert "has_printed_fo2" not in scorer_calls
     definitions = _definitions(score_tree, ladder_tree, oxygen_tree)
@@ -449,7 +452,7 @@ def test_qms_channel_rules_have_one_owner():
                 model,
                 anchor,
                 clock,
-                replace(evidence, target_isolated_or_interferences_corrected=None),
+                replace(evidence, target_isolated_or_interferences_corrected=False),
             ),
             RelativeSeriesUnavailableReason.INTERFERENCE_UNRESOLVED,
         ),
@@ -483,6 +486,41 @@ def test_unproven_relative_series_is_typed_unavailable(change, reason):
     assert result.points == ()
 
 
+@pytest.mark.parametrize(
+    ("anchor_change", "reason"),
+    (
+        (
+            lambda anchor: replace(anchor, source_coordinate=Decimal("99")),
+            RelativeSeriesUnavailableReason.SOURCE_ANCHOR_MISSING,
+        ),
+        (
+            lambda anchor: replace(anchor, model_coordinate=Decimal("99")),
+            RelativeSeriesUnavailableReason.MODEL_ANCHOR_MISSING,
+        ),
+    ),
+)
+def test_probe_explicit_clock_anchor_mismatch_stays_category_a(
+    anchor_change, reason, monkeypatch
+):
+    observed, model, anchor, clock, evidence = _inputs()
+    anchor = anchor_change(anchor)
+
+    def anchor_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is reason
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            score_metrics,
+            "_relative_series_explicit_anchor_missing_reason",
+            lambda *_args: None,
+        )
+        with pytest.raises((AssertionError, AttributeError)):
+            anchor_contract()
+
+
 def test_unmatched_observed_point_is_unavailable_without_interpolation():
     observed, model, anchor, clock, evidence = _inputs()
     observed = (*observed, _point("3", "16", observable="O2+", source=True))
@@ -496,7 +534,7 @@ def test_unmatched_observed_point_is_unavailable_without_interpolation():
     )
 
 
-def test_nonpositive_or_censored_datum_is_typed_unavailable_per_point():
+def test_non_point_source_signal_and_zero_stay_invalid():
     observed, model, anchor, clock, evidence = _inputs()
     observed = (
         observed[0],
@@ -516,6 +554,7 @@ def test_nonpositive_or_censored_datum_is_typed_unavailable_per_point():
         observed, model, anchor, clock, evidence
     )
     assert result.unavailable_reason is None
+    assert result.points[1].residual_dex is None
     assert result.points[1].unavailable_reason is (
         RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT
     )
@@ -547,3 +586,372 @@ def test_relative_channel_contract_rejects_flux_or_mixed_source_runs():
     assert mixed_runs.unavailable_reason is (
         RelativeSeriesUnavailableReason.MIXED_SOURCE_RUNS
     )
+
+
+def test_dp013_converts_clock_units_and_anchor_coordinates_exactly():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, coordinate_unit="min") for point in observed)
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    assert result.points[0].model_coordinate == Decimal("10")
+    assert result.points[1].model_coordinate == Decimal("70")
+    assert result.points[1].unavailable_reason is (
+        RelativeSeriesUnavailableReason.MODEL_POINT_MISSING
+    )
+
+
+def test_unmapped_clock_uses_first_shared_positive_sample_without_fitting():
+    observed, model, anchor, clock, evidence = _inputs()
+    model = tuple(
+        replace(
+            point,
+            coordinate=observed[index].coordinate,
+            value=(
+                Value(ValueKind.POINT, point=Decimal("0"))
+                if index == 0
+                else point.value
+            ),
+        )
+        for index, point in enumerate(model)
+    )
+    clock = replace(
+        clock,
+        mapping_supported=False,
+        source_event="clock-mapping-not-published",
+        locator=None,
+    )
+    evidence = replace(
+        evidence,
+        target_isolated_or_interferences_corrected=None,
+        background_treatment_supported=None,
+        response_proportional_over_interval=None,
+    )
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    assert tuple(point.model_coordinate for point in result.points) == (
+        Decimal("0"), Decimal("1"), Decimal("2")
+    )
+    assert result.points[0].unavailable_reason is (
+        RelativeSeriesUnavailableReason.MODEL_VALUE_NOT_POSITIVE_POINT
+    )
+    assert result.points[1].residual_dex == Decimal("0")
+    assert set(QMS_POLICY_REGISTRY) == {
+        "qms_run_group_assumed",
+        "qms_clock_anchor_assumed",
+        "qms_signal_response_assumed",
+        "qms_provenance_assumed",
+        "qms_oxygen_lineage_unverified",
+    }
+    assert all(
+        entry["status"] == "proposed" for entry in QMS_POLICY_REGISTRY.values()
+    )
+
+
+def test_located_parent_covers_missing_child_locators():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, locator=None) for point in observed)
+    clock = replace(clock, locator=None)
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    assert QMS_POLICY_REGISTRY["qms_provenance_assumed"]["status"] == "proposed"
+
+
+def test_known_boundary_mismatch_remains_category_a():
+    observed, model, anchor, clock, evidence = _inputs()
+    model = tuple(replace(point, boundary="chamber") for point in model)
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH
+    )
+
+
+def test_probe_dp013_unit_conversion_is_required(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, coordinate_unit="min") for point in observed)
+
+    def conversion_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is None
+        assert result.points[1].model_coordinate == Decimal("70")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_series_time_coordinates", lambda *args: None)
+        with pytest.raises(AssertionError):
+            conversion_contract()
+
+
+def test_probe_assumed_clock_anchor_is_required(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    clock = replace(clock, mapping_supported=None)
+    model = tuple(
+        replace(
+            point,
+            coordinate=observed[index].coordinate,
+            value=(
+                Value(ValueKind.POINT, point=Decimal("0"))
+                if index == 0
+                else point.value
+            ),
+        )
+        for index, point in enumerate(model)
+    )
+
+    def anchor_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is None
+        assert tuple(point.model_coordinate for point in result.points) == (
+            Decimal("0"), Decimal("1"), Decimal("2")
+        )
+        assert result.points[0].unavailable_reason is (
+            RelativeSeriesUnavailableReason.MODEL_VALUE_NOT_POSITIVE_POINT
+        )
+        assert result.points[1].residual_dex == Decimal("0")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_series_default_anchor", lambda *args: (None, None))
+        with pytest.raises(AssertionError):
+            anchor_contract()
+
+
+def test_probe_assumed_signal_response_is_required(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    evidence = replace(
+        evidence,
+        target_isolated_or_interferences_corrected=None,
+        background_treatment_supported=None,
+        response_proportional_over_interval=None,
+    )
+
+    def signal_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is None
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            score_metrics,
+            "_relative_series_signal_response_reason",
+            lambda _evidence: RelativeSeriesUnavailableReason.BACKGROUND_UNRESOLVED,
+        )
+        with pytest.raises(AssertionError):
+            signal_contract()
+
+
+def test_probe_located_parent_covers_missing_child_locator(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    evidence = replace(evidence, locator=F.loc(page=1))
+    observed = tuple(replace(point, locator=None) for point in observed)
+
+    def provenance_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is None
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_series_source_located", lambda _evidence: False)
+        with pytest.raises(AssertionError):
+            provenance_contract()
+
+
+def test_probe_missing_parent_locator_remains_category_a(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    evidence = replace(evidence, locator=None)
+
+    def source_location_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.SOURCE_EVIDENCE_UNLOCATED
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_series_source_located", lambda _evidence: True)
+        with pytest.raises(AssertionError):
+            source_location_contract()
+
+
+def test_probe_positive_oxygen_self_agreement_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    evidence = replace(evidence, oxygen_independent=False)
+
+    def self_agreement_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            score_metrics,
+            "_relative_series_model_oxygen_unavailable_reason",
+            lambda *_args, **_kwargs: None,
+        )
+        with pytest.raises(AssertionError):
+            self_agreement_contract()
+
+
+def test_probe_mixed_model_run_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    model = (*model[:-1], replace(model[-1], run_id="other-model-run"))
+
+    def mixed_run_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            score_metrics,
+            "_relative_series_model_oxygen_unavailable_reason",
+            lambda *_args, **_kwargs: None,
+        )
+        with pytest.raises(AssertionError):
+            mixed_run_contract()
+
+
+def test_probe_mixed_source_run_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (*observed[:-1], replace(observed[-1], run_id="other-source-run"))
+
+    def mixed_run_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.MIXED_SOURCE_RUNS
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_series_source_run_mixed", lambda _points: False)
+        with pytest.raises(AssertionError):
+            mixed_run_contract()
+
+
+def test_probe_conflicting_run_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    evidence = replace(evidence, model_run_id="another-model-run")
+
+    def run_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_untied_physical_run", lambda *_args: False)
+        with pytest.raises(AssertionError):
+            run_contract()
+
+
+def test_probe_conflicting_boundary_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    model = tuple(replace(point, boundary="chamber") for point in model)
+
+    def boundary_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_series_boundaries_match", lambda *_args: True)
+        with pytest.raises(AssertionError):
+            boundary_contract()
+
+
+def test_probe_nonpositive_anchor_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (
+        replace(observed[0], value=Value(ValueKind.POINT, point=Decimal("0"))),
+        *observed[1:],
+    )
+
+    def anchor_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.SOURCE_ANCHOR_NOT_POSITIVE
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_positive_anchor_value", lambda _point: True)
+        with pytest.raises((AssertionError, DecimalException)):
+            anchor_contract()
+
+
+def test_probe_nonpositive_model_sample_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    model = (
+        model[0],
+        replace(model[1], value=Value(ValueKind.POINT, point=Decimal("0"))),
+        model[2],
+    )
+
+    def sample_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.points[1].unavailable_reason is (
+            RelativeSeriesUnavailableReason.MODEL_VALUE_NOT_POSITIVE_POINT
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_positive_anchor_value", lambda _point: True)
+        with pytest.raises(AssertionError):
+            sample_contract()
+
+
+def test_probe_nonpositive_source_sample_guard(monkeypatch):
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (
+        observed[0],
+        replace(observed[1], value=Value(ValueKind.POINT, point=Decimal("0"))),
+        observed[2],
+    )
+
+    def sample_contract():
+        result = relative_channel_point_residuals(
+            observed, model, anchor, clock, evidence
+        )
+        assert result.points[1].unavailable_reason is (
+            RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "_relative_positive_value", lambda value: value.point)
+        patch.setattr(score_metrics, "compute_metric", lambda *_args: Decimal(0))
+        with pytest.raises(AssertionError):
+            sample_contract()

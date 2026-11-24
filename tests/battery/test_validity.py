@@ -14,6 +14,7 @@ from simulator.battery.enums import (
     Quantity,
     RefusalReason,
 )
+from simulator.battery import validity as battery_validity
 from simulator.battery.migrate import (
     experiment_from_plain,
     iter_observation_store_paths,
@@ -273,8 +274,11 @@ def test_kems_gate_treats_missing_point_conditions_as_empty() -> None:
     empty_outcome = run_validity_gates(experiment, empty)
 
     assert missing_outcome == empty_outcome
-    assert missing_outcome.passed is False
-    assert missing_outcome.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert missing_outcome.passed is True
+    policy = next(
+        check for check in missing_outcome.checks if check.name == "effusion_regime_policy"
+    )
+    assert policy.detail["flag"] == "effusion_regime_assumed"
 
 
 def test_kems_apparatus_gates_apply_to_measured_rows() -> None:
@@ -295,14 +299,15 @@ def test_kems_apparatus_gates_apply_to_measured_rows() -> None:
 
     outcome = run_validity_gates(experiment, observation)
 
-    assert outcome.passed is False
-    assert outcome.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert outcome.passed is True
     assert any(
         check.name == "in_cell_partial_pressure_sum" and not check.passed
         for check in outcome.checks
     )
     assert any(
-        check.name == "kems_calibration" and not check.passed
+        check.name == "kems_calibration"
+        and check.passed
+        and check.detail["flag"] == "calibration_not_grounded"
         for check in outcome.checks
     )
 
@@ -368,6 +373,75 @@ def test_initial_charge_proxy_cannot_verify_in_cell_pressure_sum() -> None:
     assert pressure_sum.detail["reason"] == (
         "composition is unknown; printed species coverage cannot be established"
     )
+
+
+@pytest.mark.parametrize("quantity", (Quantity.P_PARTIAL, Quantity.P_SAT))
+def test_probe_kems_calibration_assumption_is_required(quantity, monkeypatch) -> None:
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    identity = replace(F.psat_identity("Na"), quantity=quantity)
+    observation = F.observation(
+        f"uncalibrated-pressure-{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    def calibration_contract() -> None:
+        outcome = run_validity_gates(experiment, observation)
+        assert outcome.passed
+        calibration = next(
+            check for check in outcome.checks if check.name == "kems_calibration"
+        )
+        assert calibration.passed
+        assert calibration.detail["flag"] == "calibration_not_grounded"
+
+    with monkeypatch.context() as patch:
+        patch.setattr(battery_validity, "_calibration_not_grounded_detail", lambda *_args, **_kwargs: None)
+        with pytest.raises(AssertionError):
+            calibration_contract()
+
+
+@pytest.mark.parametrize("quantity", (Quantity.P_PARTIAL, Quantity.P_SAT))
+@pytest.mark.parametrize("kn", (None, Decimal("1")))
+def test_probe_effusion_regime_assumptions_and_violations_are_flagged(
+    quantity, kn: Decimal | None, monkeypatch
+) -> None:
+    experiment = F.kems_experiment(kn=kn, calibrated=False)
+    identity = replace(F.psat_identity("Na"), quantity=quantity)
+    observation = F.observation(
+        f"pressure-{quantity.value}-kn-{kn}",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    expected_flag = "effusion_regime_assumed" if kn is None else "effusion_regime_violated"
+
+    def regime_contract() -> None:
+        outcome = run_validity_gates(experiment, observation)
+        assert outcome.passed
+        policy = next(
+            check for check in outcome.checks if check.name == "effusion_regime_policy"
+        )
+        assert policy.detail["flag"] == expected_flag
+        if kn is not None:
+            check = next(item for item in outcome.checks if item.name == "orifice_knudsen")
+            assert not check.passed
+
+    def restore_old_regime_refusal(checks, _flag, *, reason):
+        del reason
+        return battery_validity.GateOutcome(
+            passed=False,
+            reason=RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            checks=tuple(checks),
+            primary_check="effusion_regime",
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(battery_validity, "_effusion_policy_outcome", restore_old_regime_refusal)
+        with pytest.raises(AssertionError):
+            regime_contract()
 
 
 def test_kems_apparatus_gates_do_not_apply_to_model_derived_rows() -> None:

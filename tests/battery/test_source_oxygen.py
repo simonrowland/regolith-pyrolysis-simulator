@@ -18,6 +18,8 @@ from simulator.battery.enums import (
     RelativeSeriesUnavailableReason,
     ValueKind,
 )
+from simulator.battery import score as battery_score
+from simulator.battery import score_metrics as battery_score_metrics
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
@@ -1676,7 +1678,9 @@ def test_comeasured_consistency_notice_reaches_printed_fo2_residual(source_conte
     )
 
 
-def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
+def test_relative_qms_oxygen_inputs_cannot_validate_themselves(
+    source_context, monkeypatch
+):
     melt_row = _row(source_context, "kems-053-stolyarova-1991")
     condition = _resolve(source_context, melt_row)
     assert isinstance(condition, SourceOxygenCondition)
@@ -1725,6 +1729,30 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
     assert result.unavailable_reason is RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
     assert result.points == ()
 
+    def self_agreement_contract():
+        mutated = _score_relative_qms_series(
+            observed,
+            model,
+            anchor,
+            clock,
+            evidence,
+            context=scoring_context,
+            reference=melt_row,
+            source_trace=trace,
+        )
+        assert mutated.unavailable_reason is (
+            RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            battery_score_metrics,
+            "_relative_series_model_oxygen_unavailable_reason",
+            lambda *_args, **_kwargs: None,
+        )
+        with pytest.raises(AssertionError):
+            self_agreement_contract()
+
     mixed_model = (model[0], replace(model[1], run_id="other-model-run"))
     mixed_run = _score_relative_qms_series(
         observed,
@@ -1737,7 +1765,7 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
         source_trace=trace,
     )
     assert mixed_run.unavailable_reason is (
-        RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert mixed_run.points == ()
 
@@ -1769,7 +1797,7 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
         source_trace=trace,
     )
     assert unresolved_inputs.unavailable_reason is (
-        RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert unresolved_inputs.points == ()
 
@@ -1816,13 +1844,13 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
         source_trace=fallback_trace,
     )
     assert fallback.unavailable_reason is (
-        RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert fallback.points == ()
 
 
 def _printed_store_comparison(context, row):
-    """Printed O2 command on one store row. The adapter must still refuse it."""
+    """Printed O2 command on one store row; the t-1913 producer is absent."""
 
     reference = replace(
         row,
@@ -1871,17 +1899,17 @@ def _printed_store_comparison(context, row):
     )
 
 
-def test_adapter_refuses_demaria_store_row(demaria_context):
+def test_adapter_reports_missing_producer_for_demaria_store_row(demaria_context):
     result = _printed_store_comparison(
         demaria_context, _demaria_o_sample(demaria_context, "12022")
     )
     assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert result.points == ()
 
 
-def test_adapter_refuses_costa_store_row(costa_context):
+def test_adapter_reports_missing_producer_for_costa_store_row(costa_context):
     row = next(
         item for item in costa_context.observations.values()
         if item.source_id == "kems-007-costa-2015"
@@ -1892,19 +1920,49 @@ def test_adapter_refuses_costa_store_row(costa_context):
     )
     result = _printed_store_comparison(costa_context, row)
     assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert result.points == ()
 
 
-def test_adapter_refuses_synthetic_single_experiment_store_row(source_context):
+def test_adapter_reports_missing_producer_for_synthetic_store_row(source_context):
     melt = _row(source_context, "kems-053-stolyarova-1991")
     alone = replace(source_context, observations={melt.observation_id: melt})
     result = _printed_store_comparison(alone, melt)
     assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert result.points == ()
+
+
+def test_probe_store_adapter_reports_capability_gap_not_run_ambiguity(
+    demaria_context, monkeypatch
+):
+    row = _demaria_o_sample(demaria_context, "12022")
+
+    def capability_contract():
+        result = _printed_store_comparison(demaria_context, row)
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
+        )
+        message = result.unavailable_reason.value
+        assert "t-1913" in message
+        assert "producer" in message
+        assert "per-run key" in message
+        assert "sample-coordinate contract" in message
+
+    producer_gap = battery_score._qms_store_producer_unavailable
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            battery_score,
+            "_qms_store_producer_unavailable",
+            lambda: replace(
+                producer_gap(),
+                unavailable_reason=RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY,
+            ),
+        )
+        with pytest.raises(AssertionError):
+            capability_contract()
 
 
 def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
@@ -1956,7 +2014,7 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
     )
 
     assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert result.points == ()
     assert reference.identity.fO2_Pa == State.of(command)
@@ -2083,7 +2141,7 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         source_trace=trace,
     )
     assert named_input.unavailable_reason is (
-        RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert named_input.points == ()
 
@@ -2105,7 +2163,7 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         source_trace=trace,
     )
     assert reduction_inputs.unavailable_reason is (
-        RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert reduction_inputs.points == ()
 
@@ -2258,7 +2316,7 @@ def test_unresolved_selected_pressure_lineage_stays_unknown(source_context):
     )
 
     assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert result.points == ()
 
@@ -2277,6 +2335,6 @@ def test_selected_pressure_not_reduced_from_the_trace_refuses(source_context):
     )
 
     assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
     )
     assert result.points == ()

@@ -2288,28 +2288,32 @@ def _unverified_apparatus_notices(
         or comparison_activity
         or calibration_flagged_activity
     )
+    checked_gates = tuple(_require_gate_check(candidate) for candidate in gates.checks)
+    regime_flags = {
+        check.detail.get("flag")
+        for check in checked_gates
+        if isinstance(check.detail, Mapping)
+        and check.name == "effusion_regime_policy"
+    }
+    policy_notices = [
+        Notice(
+            kind=NoticeKind.UNVERIFIED_APPARATUS,
+            affected_quantities=(quantity,),
+            reason=str(flag),
+            origin=reference.observation_id,
+        )
+        for flag in sorted(
+            regime_flags
+            & {"effusion_regime_assumed", "effusion_regime_violated"}
+        )
+    ]
     missing: dict[str, Mapping] = {}
-    policy_notices: list[Notice] = []
     calibration_notice = None
     calibration_reason = None
-    for candidate in gates.checks:
-        check = _require_gate_check(candidate)
+    for check in checked_gates:
         detail = check.detail
         if not isinstance(detail, Mapping):
             detail = {}
-        policy_flag = detail.get("flag")
-        if policy_flag in {
-            "effusion_regime_assumed",
-            "effusion_regime_violated",
-        }:
-            policy_notices.append(
-                Notice(
-                    kind=NoticeKind.UNVERIFIED_APPARATUS,
-                    affected_quantities=(quantity,),
-                    reason=str(policy_flag),
-                    origin=reference.observation_id,
-                )
-            )
         if check.passed:
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
@@ -2331,6 +2335,19 @@ def _unverified_apparatus_notices(
             allow_unknown_method=unknown_method_activity,
         )
         if fact is None:
+            if (
+                bool(
+                    regime_flags
+                    & {"effusion_regime_assumed", "effusion_regime_violated"}
+                )
+                and check.name
+                in {
+                    "orifice_knudsen",
+                    "orifice_pressure_to_diameter",
+                    "in_cell_partial_pressure_sum",
+                }
+            ):
+                continue
             return ()
         missing[fact] = detail
     if not missing:
@@ -2378,8 +2395,13 @@ def _unverified_apparatus_notices(
             )
             continue
         if fact == "calibration_not_grounded":
+            calibration_policy = (
+                "kems_calibration_by_source: "
+                if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL}
+                else ""
+            )
             reason = (
-                "calibration_not_grounded: kems_calibration_by_source: "
+                f"calibration_not_grounded: {calibration_policy}"
                 f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (f" ({calibration_reason})" if calibration_reason else "")
             )
@@ -17517,10 +17539,11 @@ def _score_relative_qms_series(
     reference: Observation,
     source_trace: Observation,
 ) -> RelativeSeriesComparison:
-    """Refuse every store row with AMBIGUOUS_RUN_IDENTITY.
+    """Validate circularity, then report the missing t-1913 store producer.
 
-    Trace and oxygen checks still return their own reasons. The pure
-    comparator is not called.
+    Store rows cannot yet produce per-run model samples or a shared sample
+    coordinate contract. Report this t-1913 capability gap without calling it
+    run ambiguity.
     """
 
     from simulator.battery.fo2_ladder import printed_fo2_from_point
@@ -17538,7 +17561,7 @@ def _score_relative_qms_series(
             or not isinstance(reference.identity, Identity)
             or reference.source_id is None
         ):
-            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+            return _qms_store_producer_unavailable()
         if (
             context.observations.get(source_trace.observation_id) != source_trace
             or source_trace.source_id != reference.source_id
@@ -17556,7 +17579,7 @@ def _score_relative_qms_series(
 
         experiment = context.experiments.get(reference.experiment_id)
         if experiment is None:
-            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+            return _qms_store_producer_unavailable()
         bench = _bench_for_score(experiment, context.benches)
         validation_indexes = _build_validation_indexes(
             context.works, context.observations, context.experiments
@@ -17593,13 +17616,9 @@ def _score_relative_qms_series(
             if direct_self_agreement:
                 independent = False
             elif not control_lineage.complete or control_lineage.ids is None:
-                return unavailable(
-                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-                )
+                return _qms_store_producer_unavailable()
             elif not source_lineage.complete or source_lineage.ids is None:
-                return unavailable(
-                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-                )
+                return _qms_store_producer_unavailable()
             else:
                 control_observations = control_lineage.ids.intersection(
                     context.observations
@@ -17618,7 +17637,7 @@ def _score_relative_qms_series(
         else:
             oxygen = resolve_source_oxygen(reference, rows, bench)
             if not isinstance(oxygen, SourceOxygenCondition):
-                return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+                return _qms_store_producer_unavailable()
             # used_observations stops at partial-pressure rows. Walk those
             # selected rows outward so a current named only on the pressure
             # cannot validate itself.
@@ -17633,13 +17652,9 @@ def _score_relative_qms_series(
             if direct_self_agreement:
                 independent = False
             elif not selected_lineage.complete or selected_lineage.ids is None:
-                return unavailable(
-                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-                )
+                return _qms_store_producer_unavailable()
             elif not source_lineage.complete or source_lineage.ids is None:
-                return unavailable(
-                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-                )
+                return _qms_store_producer_unavailable()
             else:
                 trace_observations = source_lineage.ids.intersection(
                     context.observations
@@ -17656,6 +17671,10 @@ def _score_relative_qms_series(
                 )
             expected_inputs = oxygen.used_observations
         evidence = replace(evidence, oxygen_independent=independent)
+        if model_inputs is not None and len(set(model_inputs)) != len(model_inputs):
+            return unavailable(
+                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+            )
         input_reason = _relative_series_model_oxygen_unavailable_reason(
             observed_series,
             model_series,
@@ -17663,17 +17682,23 @@ def _score_relative_qms_series(
             expected_input_ids=expected_inputs,
         )
         if input_reason is not None:
+            if input_reason is not RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT:
+                return _qms_store_producer_unavailable()
             return unavailable(input_reason)
         if model_inputs is not None and any(
             item not in context.observations for item in model_inputs
         ):
-            return unavailable(
-                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
-            )
+            return _qms_store_producer_unavailable()
 
-    # The store has no explicit per-run identity, so no store row is compared.
-    # t-1913 re-enables this once each physical run is stored on its own.
-    return unavailable(RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY)
+    return _qms_store_producer_unavailable()
+
+
+def _qms_store_producer_unavailable() -> RelativeSeriesComparison:
+    """Report t-1913's missing producer, per-run key, and sample-coordinate contract."""
+
+    return RelativeSeriesComparison(
+        unavailable_reason=RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
+    )
 
 
 def hk_ratio_alpha_predictor_refusal(

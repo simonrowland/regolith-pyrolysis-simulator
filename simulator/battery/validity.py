@@ -711,7 +711,6 @@ def underdetermined_apparatus(
             in {
                 Quantity.P_SAT,
                 Quantity.P_PARTIAL,
-                Quantity.P_REFERENCE,
             }
             and ungrounded_detail is not None
         )
@@ -973,6 +972,11 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
+    reduced_kems_pressure = (
+        method_state.is_value
+        and method_state.value is MethodToken.KNUDSEN_EFFUSION
+        and quantity in {Quantity.P_SAT, Quantity.P_PARTIAL}
+    )
     regime = experiment.pressure_environment.regime
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)
@@ -989,10 +993,14 @@ def effusion_regime_unverified(
             )
         )
         if not molecular:
-            return _effusion_policy_outcome(
-                checks,
-                "effusion_regime_violated",
-                reason="printed orifice Knudsen number is below the molecular limit",
+            if reduced_kems_pressure:
+                return _effusion_policy_outcome(
+                    checks,
+                    "effusion_regime_violated",
+                    reason="printed orifice Knudsen number is below the molecular limit",
+                )
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen"
             )
         return _pass(checks)
 
@@ -1031,10 +1039,16 @@ def effusion_regime_unverified(
             )
         )
         if not passed:
-            return _effusion_policy_outcome(
+            if reduced_kems_pressure:
+                return _effusion_policy_outcome(
+                    checks,
+                    "effusion_regime_violated",
+                    reason="printed cell pressure and orifice diameter fail the molecular limit",
+                )
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
                 checks,
-                "effusion_regime_violated",
-                reason="printed cell pressure and orifice diameter fail the molecular limit",
+                "orifice_pressure_to_diameter",
             )
         return _pass(checks)
 
@@ -1120,7 +1134,7 @@ def effusion_regime_unverified(
             checks.append(
                 GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
             )
-            if method_state.is_value and method_state.value is MethodToken.KNUDSEN_EFFUSION:
+            if reduced_kems_pressure:
                 return _effusion_policy_outcome(
                     checks,
                     "effusion_regime_violated",
@@ -1131,7 +1145,10 @@ def effusion_regime_unverified(
                 checks,
                 "in_cell_partial_pressure_sum",
             )
-        if method_state.is_value and method_state.value is MethodToken.KNUDSEN_EFFUSION:
+        if reduced_kems_pressure:
+            checks.append(
+                GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
+            )
             return _effusion_policy_outcome(
                 checks,
                 "effusion_regime_assumed",
@@ -1182,10 +1199,16 @@ def effusion_regime_unverified(
         GateCheck("in_cell_partial_pressure_sum", passed, gate_detail)
     )
     if not passed:
-        return _effusion_policy_outcome(
+        if reduced_kems_pressure:
+            return _effusion_policy_outcome(
+                checks,
+                "effusion_regime_violated",
+                reason="printed in-cell pressure sum exceeds the molecular limit",
+            )
+        return _fail(
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
             checks,
-            "effusion_regime_violated",
-            reason="printed in-cell pressure sum exceeds the molecular limit",
+            "in_cell_partial_pressure_sum",
         )
     return _pass(checks)
 
