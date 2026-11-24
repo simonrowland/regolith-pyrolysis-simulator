@@ -2394,7 +2394,8 @@ def _hero_scorecard_cell_text(
                 f"{kind}={count}" for kind, count in sorted(flags.items())
             ) or "flag kind unavailable"
             lines.append(
-                f"flagged absolute RMS {metric.get('rms')} {metric.get('unit')} "
+                f"flagged absolute RMS {metric.get('rms')} "
+                f"{_display_absolute_unit(metric.get('unit'))} "
                 f"(n={_compact_count(metric.get('n'))}; {flag_text})"
             )
     for key, label in (
@@ -2423,6 +2424,10 @@ def _hero_scorecard_cell_text(
                 f"{_format_dex(held_out.get('median_abs_dex'))} dex (n={held_count})"
             )
     return "\n".join(lines)
+
+
+def _display_absolute_unit(unit: object) -> object:
+    return "wt%" if unit == "mass_percent" else unit
 
 
 def _hero_scorecard_rows(data: ScorePlotData, rail: str) -> list[list[str]]:
@@ -3974,8 +3979,8 @@ def _write_collection_methods(
                 f"- Scorer revision: `{revision}`",
                 f"- OpenIMCC score pin: `{openimcc_commit}`",
                 f"- OpenIMCC default pack at the scored pin: `{default_pack}`",
-                "- Error: `log10(predicted / measured)`, in dex; closer to zero is better.",
-                "- Same-row comparisons include only observations scored once by both engines.",
+                "- Dex error is `log10(predicted / measured)`; closer to zero is better. Same-row comparisons and the dex headline use only observations scored once by both engines.",
+                "- Flagged absolute residuals are predicted minus measured in native units (wt% for oxide mass percent). They are outside the dex headline and dex scatter; Chart A shows them in its separate flagged-absolute section, and Chart E includes them in scored coverage.",
                 f"- Chart A leads with one shared-row dumbbell per partner; pairs with n<{HERO_SCORECARD_MIN_SHARED_N} are shown as text. Hollow diamonds show each engine's all-numeric RMS across its own scored rows with n; this is a coverage summary, not a like-for-like comparison.",
                 "- Progress uses stored shared-row RMS comparisons when history contains them; older history rows without comparisons use their stored all-row RMS.",
                 f"- Temperature views split at {HERO_TEMPERATURE_FLOOR_K:g} K; "
@@ -3993,7 +3998,7 @@ def _write_collection_methods(
                 "## Known caveats",
                 "",
                 "- Melt activity includes echo rows whose input is the analysed melt.",
-                "- The plotted scatter, chart A, and the headline RMS share one population; uncalibrated KEMS p_partial rows (d-139) are drawn tinted and counted, not excluded.",
+                "- The dex scatter, dex rows in chart A, and the headline RMS share one population; uncalibrated KEMS p_partial rows (d-139) are drawn tinted and counted, not excluded.",
                 "- Source-disagreement-flagged vapour rows are separated from unflagged rows in the all-rows table.",
                 "- Fingerprint cells with fewer than three scored rows are blank.",
                 "",
@@ -4088,7 +4093,8 @@ def _draw_scorecard_png(
                         f"{kind}={count}" for kind, count in sorted(flags.items())
                     ) or "flag kind unavailable"
                     flagged_rows.append(
-                        f"{engine}: RMS {absolute.get('rms')} {absolute.get('unit')} "
+                        f"{engine}: RMS {absolute.get('rms')} "
+                        f"{_display_absolute_unit(absolute.get('unit'))} "
                         f"(n={_compact_count(absolute.get('n'))}; {flag_text})"
                     )
                     flagged_engines.add(engine)
@@ -5926,7 +5932,17 @@ def _coverage_table_rows(data: ScorePlotData) -> list[dict[str, object]]:
     for rail, label in COLLECTION_OBSERVABLES:
         for engine in _ordered_hero_engines(data.engines):
             metric = _collection_metric(data, rail, engine)
-            scored = int(metric.get("n") or 0)
+            flagged_absolute = metric.get("flagged_absolute_metrics", ())
+            absolute_n = 0
+            if isinstance(flagged_absolute, Sequence) and not isinstance(
+                flagged_absolute, (str, bytes)
+            ):
+                absolute_n = sum(
+                    int(stratum.get("n") or 0)
+                    for stratum in flagged_absolute
+                    if isinstance(stratum, Mapping)
+                )
+            scored = int(metric.get("n") or 0) + absolute_n
             summary = data.summaries.get(engine, EngineSummary())
             observable_absence = int(summary.not_observable_by_rail.get(rail, 0))
             refused = int(summary.refused_by_rail.get(rail, 0))

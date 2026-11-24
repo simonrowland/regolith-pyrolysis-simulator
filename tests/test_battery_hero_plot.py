@@ -2119,6 +2119,34 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
         "rms": "3",
         "flag_kinds": {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1},
     }]
+    coverage_key = ("residue_composition", "openimcc")
+    coverage = next(
+        row for row in hero_plot._coverage_table_rows(data)
+        if (row["rail"], row["engine"]) == coverage_key
+    )
+    assert coverage["refused_n"] == 1, coverage
+    assert coverage["scored_n"] == 1 and coverage["scored_percent"] == "50", coverage
+
+    original_collection_metric = hero_plot._collection_metric
+
+    def dex_only_metric(
+        score_data: object, rail: str, engine: str,
+    ) -> Mapping[str, object]:
+        metric = original_collection_metric(score_data, rail, engine)
+        return {
+            key: value for key, value in metric.items()
+            if key != "flagged_absolute_metrics"
+        }
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(hero_plot, "_collection_metric", dex_only_metric)
+        with pytest.raises(AssertionError):
+            mutated = next(
+                row for row in hero_plot._coverage_table_rows(data)
+                if (row["rail"], row["engine"]) == coverage_key
+            )
+            assert mutated["scored_n"] == 1 and mutated["scored_percent"] == "50", mutated
+
     rendered_text: list[str] = []
     original_text = hero_plot.Axes.text
 
@@ -2200,7 +2228,7 @@ def test_collection_resolves_residue_unit_from_production_payload(
         tmp_path / "production-residue-unit.png", data, [], [],
         (("residue_composition", "Residue composition"),),
     )
-    assert any("RMS 3 mass_percent (n=1" in text for text in rendered_text)
+    assert any("RMS 3 wt% (n=1" in text for text in rendered_text)
 
 
 def test_collection_keeps_observation_only_engine_for_flagged_absolute(
