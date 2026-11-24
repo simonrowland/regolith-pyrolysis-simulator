@@ -17,6 +17,7 @@ SAVE_SCHEMA_VERSION = 2
 MEMBER_SCHEMA_VERSION = 1
 ARTIFACT_INDEX_NAME = "artifact.index.json"
 OPTIMIZER_CACHE_NAME = "cache.sqlite"
+PARETO_NAME = "pareto.json"
 TERMINAL_STUDY_STATUSES = frozenset(
     {"completed", "completed-no-feasible-winner", "aborted"}
 )
@@ -26,7 +27,7 @@ REQUIRED_MEMBERS = (
     "study.profile.yaml",
     ARTIFACT_INDEX_NAME,
     OPTIMIZER_CACHE_NAME,
-    "pareto.json",
+    PARETO_NAME,
     "leaderboard.csv",
     "job_status.json",
 )

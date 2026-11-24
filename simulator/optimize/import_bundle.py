@@ -30,6 +30,7 @@ from simulator.optimize.save_bundle import (
     ARTIFACT_INDEX_NAME,
     MEMBER_SCHEMA_VERSION,
     OPTIMIZER_CACHE_NAME,
+    PARETO_NAME,
     REQUIRED_MEMBERS,
     SAVE_SCHEMA_VERSION,
     TERMINAL_STUDY_STATUSES,
@@ -402,7 +403,7 @@ def imported_study_model(
     summary = _study_summary_for_model(raw_summary)
     overlay = _load_overlay(root)
     leaderboard = _read_leaderboard(root / "leaderboard.csv")
-    pareto = _load_json_object(root / "pareto.json")
+    pareto = _load_json_object(root / PARETO_NAME)
     runs = Path(runs_root) if runs_root is not None else root.parent.parent
     badges = _overlay_badges(overlay)
     verification = _overlay_verification(overlay)
@@ -470,12 +471,12 @@ def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:
     return True
 
 
-def is_optimizer_archive_store(path: Path | str) -> bool:
-    """Whether a result store sits beside native archive provenance markers."""
+def is_optimizer_archive_store(path: Path | str, runs_root: Path | str) -> bool:
+    """Whether a result store has import provenance or is in import quarantine."""
     directory = Path(path).resolve().parent
-    return (directory / IMPORT_OVERLAY_NAME).is_file() or (
-        directory / ARTIFACT_INDEX_NAME
-    ).is_file()
+    return (directory / IMPORT_OVERLAY_NAME).is_file() or is_imported_path(
+        directory, runs_root
+    )
 
 
 def _extract_bundle_members(

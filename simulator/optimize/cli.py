@@ -34,6 +34,7 @@ from simulator.optimize.import_bundle import (
     is_optimizer_archive_store,
 )
 from simulator.optimize.results_store import ResultStore, study_results_write_lock_path
+from simulator.optimize.save_bundle import PARETO_NAME
 
 
 JOB_STATUS_NAME = "job_status.json"
@@ -136,7 +137,7 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
         *(
             path
             for path in runs_root.rglob(OPTIMIZER_CACHE_NAME)
-            if is_optimizer_archive_store(path)
+            if is_optimizer_archive_store(path, runs_root)
         ),
     ]))
     report = {
@@ -150,7 +151,7 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
         if not path.is_file():
             raise FileNotFoundError(f"optimizer result store not found: {path}")
         real_path = Path(os.path.realpath(path))
-        if is_optimizer_archive_store(real_path):
+        if is_optimizer_archive_store(real_path, runs_root):
             report["stores"].append(
                 {"store": str(real_path), "artifact_kind": "archive", "status": "skipped"}
             )
@@ -173,9 +174,9 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
         )
     artifact_dirs = {Path(entry["store"]).parent for entry in report["stores"]}
     if not args.store:
-        artifact_dirs.update(path.parent for path in runs_root.rglob("pareto.json"))
+        artifact_dirs.update(path.parent for path in runs_root.rglob(PARETO_NAME))
     for directory in sorted(artifact_dirs):
-        pareto = directory / "pareto.json"
+        pareto = directory / PARETO_NAME
         if pareto.is_file():
             report["retained_artifacts"].append(
                 {"path": str(pareto), "artifact_kind": "warm_start", "status": "kept"}
@@ -228,7 +229,7 @@ def _parser() -> argparse.ArgumentParser:
         "--warm-start-from",
         help=(
             "prior optimizer run directory, "
-            f"{OPTIMIZER_CACHE_NAME}, or pareto.json for W1 warm-start seeds"
+            f"{OPTIMIZER_CACHE_NAME}, or {PARETO_NAME} for W1 warm-start seeds"
         ),
     )
     parser.add_argument(

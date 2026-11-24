@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import sqlite3
 import json
+import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -16,6 +17,12 @@ from simulator.optimize.results_store import (
     study_results_write_lock_path,
 )
 from simulator.optimize import results_store as results_store_module
+from simulator.optimize.import_bundle import IMPORT_OVERLAY_NAME
+from simulator.optimize.save_bundle import (
+    ARTIFACT_INDEX_NAME,
+    REQUIRED_MEMBERS,
+    export_study_bundle,
+)
 
 
 def _store_with_versions(tmp_path, *, timeout_ms=30_000):
@@ -230,7 +237,7 @@ def test_cli_discovery_matches_web_run_locations_and_runs_override(tmp_path, mon
     imported = root / "imported" / "study-a" / "cache.sqlite"
     imported.parent.mkdir(parents=True)
     imported.write_bytes(b"hash-indexed archive member")
-    (imported.parent / "import.overlay.json").write_text("{}")
+    (imported.parent / IMPORT_OVERLAY_NAME).write_text("{}")
     monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current",))
 
@@ -246,6 +253,7 @@ def test_explicit_import_archive_is_skipped_without_modification(tmp_path, capsy
     path = tmp_path / "runs" / "imported" / "study-a" / "cache.sqlite"
     path.parent.mkdir(parents=True)
     path.write_bytes(b"hash-indexed archive member")
+    (path.parent / IMPORT_OVERLAY_NAME).write_text("{}")
     before_mtime = path.stat().st_mtime_ns
 
     assert cli.main(["prune-stale-corpus", "--store", str(path), "--apply"]) == 0
@@ -264,7 +272,7 @@ def test_moved_archive_marker_is_skipped_before_store_open(tmp_path, capsys):
     archive_dir.parent.mkdir()
     original.path.parent.rename(archive_dir)
     path = archive_dir / "cache.sqlite"
-    (archive_dir / "import.overlay.json").write_text("{}")
+    (archive_dir / IMPORT_OVERLAY_NAME).write_text("{}")
     before = path.read_bytes(), path.stat().st_mtime_ns
 
     assert cli.main(["prune-stale-corpus", "--store", str(path), "--apply"]) == 0
@@ -299,7 +307,6 @@ def test_default_report_keeps_pareto_and_lists_quarantined_store(tmp_path, monke
     quarantined = root / "imported" / "study-a"
     quarantined.mkdir(parents=True)
     (quarantined / "cache.sqlite").write_bytes(b"archive")
-    (quarantined / "artifact.index.json").write_text("{}")
     monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
 
     assert cli.main(["prune-stale-corpus"]) == 0
@@ -311,3 +318,65 @@ def test_default_report_keeps_pareto_and_lists_quarantined_store(tmp_path, monke
     assert report["retained_artifacts"] == [{
         "path": str(native / "pareto.json"), "artifact_kind": "warm_start", "status": "kept"
     }]
+
+
+def test_quarantine_path_mutation_probe_rejects_marker_only_classifier(
+    tmp_path, monkeypatch, capsys
+):
+    def marker_only_classifier(path, runs_root):
+        directory = Path(path).resolve().parent
+        return (directory / IMPORT_OVERLAY_NAME).is_file() or (
+            directory / ARTIFACT_INDEX_NAME
+        ).is_file()
+
+    monkeypatch.setattr(cli, "is_optimizer_archive_store", marker_only_classifier)
+    with pytest.raises(AssertionError):
+        test_default_report_keeps_pareto_and_lists_quarantined_store(
+            tmp_path, monkeypatch, capsys
+        )
+
+
+def _assert_native_export_is_pruned(tmp_path, monkeypatch, capsys):
+    run_dir = tmp_path / "runs" / "native"
+    store = _store_with_versions(run_dir)
+    for name in REQUIRED_MEMBERS:
+        path = run_dir / name
+        if name == store.path.name:
+            continue
+        if name in {"study.manifest.json", "study.summary.json"}:
+            path.write_text('{"study_status":"completed"}')
+        elif name == "study.profile.yaml":
+            path.write_text("{}")
+        elif name == "leaderboard.csv":
+            path.write_text("cache_key\n")
+        else:
+            path.write_text("{}")
+
+    export_study_bundle(run_dir)
+    assert (run_dir / ARTIFACT_INDEX_NAME).is_file()
+    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(run_dir.parent))
+    monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
+
+    assert cli.main(["prune-stale-corpus", "--store", str(store.path), "--apply"]) == 0
+
+    assert _keys(store) == {"current", "older-compatible", "unversioned"}
+    report = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert report["stores"][0]["artifact_kind"] == "result_rows"
+
+
+def test_native_export_remains_prunable(tmp_path, monkeypatch, capsys):
+    _assert_native_export_is_pruned(tmp_path, monkeypatch, capsys)
+
+
+def test_native_export_mutation_probe_rejects_artifact_index_classifier(
+    tmp_path, monkeypatch, capsys
+):
+    def old_archive_classifier(path, runs_root):
+        directory = Path(path).resolve().parent
+        return (directory / IMPORT_OVERLAY_NAME).is_file() or (
+            directory / ARTIFACT_INDEX_NAME
+        ).is_file()
+
+    monkeypatch.setattr(cli, "is_optimizer_archive_store", old_archive_classifier)
+    with pytest.raises(AssertionError):
+        _assert_native_export_is_pruned(tmp_path, monkeypatch, capsys)

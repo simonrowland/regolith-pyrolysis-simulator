@@ -123,6 +123,7 @@ from simulator.optimize.result_scope import result_scope_json, result_scope_payl
 from simulator.optimize.save_bundle import (
     MEMBER_SCHEMA_VERSION,
     OPTIMIZER_CACHE_NAME,
+    PARETO_NAME,
     SAVE_SCHEMA_VERSION,
 )
 from simulator.optimize.results_store import (
@@ -3146,7 +3147,7 @@ def _warm_start_paths(
     path_raw = raw.get("path", raw.get("run_dir"))
     if store_raw is None and pareto_raw is None and path_raw is None:
         raise StudyError(
-            f"warm_start_from must name a prior run dir, {OPTIMIZER_CACHE_NAME}, or pareto.json"
+            f"warm_start_from must name a prior run dir, {OPTIMIZER_CACHE_NAME}, or {PARETO_NAME}"
         )
     if path_raw is not None:
         inferred_store, inferred_pareto = _infer_warm_start_paths(
@@ -3166,7 +3167,7 @@ def _warm_start_paths(
     )
     if store_path is None or pareto_path is None:
         raise StudyError(
-            f"warm_start_from mapping must resolve both {OPTIMIZER_CACHE_NAME} and pareto.json"
+            f"warm_start_from mapping must resolve both {OPTIMIZER_CACHE_NAME} and {PARETO_NAME}"
         )
     return store_path, pareto_path
 
@@ -3180,10 +3181,10 @@ def _resolve_warm_start_path(path: Path, base_dir: Path) -> Path:
 
 def _infer_warm_start_paths(path: Path) -> tuple[Path, Path]:
     if path.name == OPTIMIZER_CACHE_NAME:
-        return path, path.parent / "pareto.json"
-    if path.name == "pareto.json":
+        return path, path.parent / PARETO_NAME
+    if path.name == PARETO_NAME:
         return path.parent / OPTIMIZER_CACHE_NAME, path
-    return path / OPTIMIZER_CACHE_NAME, path / "pareto.json"
+    return path / OPTIMIZER_CACHE_NAME, path / PARETO_NAME
 
 
 def _resolve_warm_start_seeds(
@@ -5384,7 +5385,7 @@ def _write_artifacts(
     manifest_path = out / "study.manifest.json"
     summary_path = out / "study.summary.json"
     profile_path = out / "study.profile.yaml"
-    pareto_path = out / "pareto.json"
+    pareto_path = out / PARETO_NAME
     search_provenance_path = out / "search_provenance.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
@@ -6659,7 +6660,7 @@ def _write_empty_artifacts(
             + "\n",
             encoding="utf-8",
         )
-        (out / "pareto.json").write_text(
+        (out / PARETO_NAME).write_text(
             json.dumps(
                 {
                     "member_schema_version": MEMBER_SCHEMA_VERSION,
