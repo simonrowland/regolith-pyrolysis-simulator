@@ -129,6 +129,21 @@ def _query(
     )
 
 
+def test_registry_load_rechecks_yaml_after_source_mutation(tmp_path: Path) -> None:
+    registry_path = tmp_path / "melt_activity_models.yaml"
+    source = (DATA / "melt_activity_models.yaml").read_text(encoding="utf-8")
+    registry_path.write_text(source, encoding="utf-8")
+
+    MeltActivityRegistry.load(registry_path)
+    registry_path.write_text(
+        source.replace("schema_version: 1", "schema_version: 2", 1),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MeltActivityRegistryError, match="schema_version"):
+        MeltActivityRegistry.load(registry_path)
+
+
 def test_phase0_crystalline_target_self_check_passes_real_catalog_rows() -> None:
     registry = MeltActivityRegistry.load()
     check = registry.phase0_self_check(DATA / "vapor_pressures.yaml")

@@ -13,7 +13,6 @@ import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field, replace
-from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Final
@@ -682,7 +681,6 @@ class MeltActivityRegistry:
         )
 
     @classmethod
-    @lru_cache(maxsize=8)
     def load(cls, path: str | Path | None = None) -> "MeltActivityRegistry":
         source_path = (
             Path(path)
