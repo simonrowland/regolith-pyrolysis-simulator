@@ -527,6 +527,23 @@ def test_all_extract_locators_use_physical_pdf_pages() -> None:
     collect(document)
     assert locators
     assert all(item["page"] == item["pdf_page_index"] + 1 for item in locators)
+    schuessler = next(
+        row
+        for body in document["species"].values()
+        for row in body.get("observations", ())
+        if row["observation_id"] == "borisov_2013_pu3_schuessler_2008_quoted_mean"
+    )
+    experiment = next(
+        item
+        for item in document["experiments"]
+        if item["experiment_id"] == schuessler["experiment"]
+    )
+    assert schuessler["locator"] == experiment["locator"]
+    assert (
+        schuessler["locator"]["page"],
+        schuessler["locator"]["published_page"],
+        schuessler["locator"]["pdf_page_index"],
+    ) == (4, 1580, 3)
 
 
 def test_cited_table_pages_are_the_physical_pdf_pages() -> None:

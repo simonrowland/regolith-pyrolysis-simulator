@@ -158,7 +158,7 @@ def _citation_matches(
 
     row_label = locator.get("row")
     if isinstance(row_label, str) and row_label.strip():
-        row_pattern = rf"^\s*{re.escape(row_label.strip())}(?=\s|$)"
+        row_pattern = rf"^[ \t]*{re.escape(row_label.strip())}(?=\s|$)"
         row_match = re.search(row_pattern, text, re.I | re.M)
         if row_match and locator.get("table") is not None:
             table_number = str(locator["table"]).strip()
@@ -183,7 +183,7 @@ def _citation_matches(
                 return False
             captions = list(
                 re.finditer(
-                    r"^\s*table\s+([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)",
+                    r"^[ \t]*table[ \t]+([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)(?:[ \t]*\.[^\r\n]*|[ \t]*)$",
                     context,
                     re.I | re.M,
                 )
@@ -319,6 +319,22 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     table_row_text = "Table 1. Residue analyses\nFUN1-3 0 0.0161 0.0148\nTable 2. Volatiles"
     assert _citation_matches(table_row, table_row_text) is True
     assert _citation_matches({**table_row, "table": "2"}, table_row_text) is False
+    cross_reference_before_row = (
+        "Table 1. Residue analyses\n"
+        "Sample   FeO    SiO2\n"
+        "Table 2 is used for comparison in this study.\n"
+        "FUN1-3 0 0.0161 0.0148"
+    )
+    assert _citation_matches(
+        {**table_row, "line_range": "4-4", "table": "2"},
+        "FUN1-3 0 0.0161 0.0148",
+        source_context=cross_reference_before_row,
+    ) is False
+    assert _citation_matches(
+        {**table_row, "line_range": "4-4"},
+        "FUN1-3 0 0.0161 0.0148",
+        source_context="Table 1. Residue analyses\nSample FeO\n\nFUN1-3 0 0.0161 0.0148",
+    ) is True
     assert _citation_matches(
         {"row": "FUN1-3"}, "FUN1-3 0 0.0161 0.0148"
     ) is True

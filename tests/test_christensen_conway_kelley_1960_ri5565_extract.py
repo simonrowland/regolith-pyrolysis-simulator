@@ -234,7 +234,7 @@ def test_validator_and_isolated_migration() -> None:
     assert not [
         observation
         for observation in migrator.result.observations.values()
-        if observation.identity.species.phase.is_unknown
+        if not observation.identity.species.phase.is_value
     ]
     assert all(
         {notice.kind for notice in row.notices}
