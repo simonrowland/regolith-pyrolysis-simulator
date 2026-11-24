@@ -4863,7 +4863,7 @@ def test_default_policy_validation_uses_committed_graduation_history(
     monkeypatch.setattr(
         vle,
         "load_committed_fidelity_graduation_history",
-        lambda _path: ({"b"}, []),
+        lambda path=None: ({"b"}, []),
     )
     _policy, errs = vle.load_fidelity_policy()
     assert any("prior Git history" in e or "prior canonical" in e for e in errs), errs

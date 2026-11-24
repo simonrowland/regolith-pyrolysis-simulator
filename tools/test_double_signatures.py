@@ -8,9 +8,8 @@ Compatibility rules:
 4. A keyword production can pass alongside positional arguments is not bound
    to an already-filled positional slot by the double (including the
    ``*args``/``**kwargs`` collision).
-5. Descriptor signatures come from ``inspect.signature(getattr(receiver,
-   name))`` on the receiver surface being patched; receivers are never stripped
-   by hand.
+5. Receiver signatures are resolved without constructing receivers. Class
+   attributes are read statically and descriptor binding is applied explicitly.
 """
 
 from __future__ import annotations
@@ -39,6 +38,12 @@ class Census:
     resolved: int
     skipped: tuple[str, ...]
     violations: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class _Receiver:
+    value: object | ast.ClassDef
+    is_instance: bool
 
 
 def _callable_definition(
@@ -110,6 +115,27 @@ def _assigned_constructor_call(
                     value = item.value
                     if isinstance(value, ast.Call):
                         declarations.append(value)
+            if declarations:
+                return max(declarations, key=lambda item: item.lineno)
+        scope = parents.get(scope)
+    return None
+
+
+def _local_class_definition(
+    name: str,
+    at: ast.AST,
+    parents: dict[ast.AST, ast.AST],
+) -> ast.ClassDef | None:
+    scope: ast.AST | None = at
+    while scope is not None:
+        if isinstance(scope, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            declarations = [
+                item
+                for item in ast.walk(ast.Module(body=getattr(scope, "body", []), type_ignores=[]))
+                if isinstance(item, ast.ClassDef)
+                and item.name == name
+                and _within_direct_scope(item, scope, parents)
+            ]
             if declarations:
                 return max(declarations, key=lambda item: item.lineno)
         scope = parents.get(scope)
@@ -234,33 +260,27 @@ def _imported_object(
         try:
             value = importlib.import_module(".".join(parts[:split]))
             for attribute in parts[split:]:
-                value = getattr(value, attribute)
+                value = inspect.getattr_static(value, attribute)
             return value
         except Exception:
             continue
     return None
 
 
-def _constructed_receiver(
-    call: ast.Call,
+def _class_for_constructor(
+    node: ast.AST,
+    at: ast.AST,
+    parents: dict[ast.AST, ast.AST],
     modules: dict[str, str],
     objects: dict[str, str],
 ):
-    constructor = _imported_object(_dotted(call.func) or "", modules, objects)
-    if not inspect.isclass(constructor):
-        return None
-    try:
-        args = [ast.literal_eval(value) for value in call.args]
-        kwargs = {
-            keyword.arg: ast.literal_eval(keyword.value)
-            for keyword in call.keywords
-            if keyword.arg is not None
-        }
-        if len(kwargs) != len(call.keywords):
-            return None
-        return constructor(*args, **kwargs)
-    except Exception:
-        return None
+    if isinstance(node, ast.Name):
+        local_class = _local_class_definition(node.id, at, parents)
+        if local_class is not None:
+            return local_class
+    dotted = _dotted(node)
+    constructor = _imported_object(dotted, modules, objects) if dotted else None
+    return constructor if inspect.isclass(constructor) else None
 
 
 def _receiver(
@@ -269,15 +289,26 @@ def _receiver(
     parents: dict[ast.AST, ast.AST],
     modules: dict[str, str],
     objects: dict[str, str],
-):
+) -> _Receiver | None:
+    if isinstance(node, ast.Call):
+        value = _class_for_constructor(node.func, at, parents, modules, objects)
+        return _Receiver(value, True) if value is not None else None
     if isinstance(node, ast.Name):
         constructor_call = _assigned_constructor_call(node.id, at, parents)
         if constructor_call is not None:
-            receiver = _constructed_receiver(constructor_call, modules, objects)
-            if receiver is not None:
-                return receiver
+            value = _class_for_constructor(
+                constructor_call.func, constructor_call, parents, modules, objects
+            )
+            if value is not None:
+                return _Receiver(value, True)
+        local_class = _local_class_definition(node.id, at, parents)
+        if local_class is not None:
+            return _Receiver(local_class, False)
     dotted = _dotted(node)
-    return _imported_object(dotted, modules, objects) if dotted else None
+    value = _imported_object(dotted, modules, objects) if dotted else None
+    if value is None:
+        return None
+    return _Receiver(value, not inspect.isclass(value) and not inspect.ismodule(value))
 
 
 def _signature_of(value) -> inspect.Signature | None:
@@ -285,6 +316,116 @@ def _signature_of(value) -> inspect.Signature | None:
         return inspect.signature(value)
     except (TypeError, ValueError):
         return None
+
+
+def _without_first_parameter(signature: inspect.Signature) -> inspect.Signature:
+    parameters = list(signature.parameters.values())
+    if parameters and parameters[0].kind in (
+        inspect.Parameter.POSITIONAL_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+    ):
+        parameters.pop(0)
+    return signature.replace(parameters=parameters)
+
+
+def _bind_descriptor_signature(
+    signature: inspect.Signature,
+    *,
+    is_static: bool,
+    is_classmethod: bool,
+    is_instance: bool,
+) -> inspect.Signature:
+    if is_static:
+        return signature
+    if is_classmethod or is_instance:
+        return _without_first_parameter(signature)
+    return signature
+
+
+def _local_class_attribute_signature(
+    class_node: ast.ClassDef,
+    name: str,
+    is_instance: bool,
+) -> inspect.Signature | None:
+    member = next(
+        (
+            item
+            for item in class_node.body
+            if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == name
+        ),
+        None,
+    )
+    if member is None:
+        return None
+    signature = _replacement_signature(member)
+    if signature is None:
+        return None
+    decorators = {
+        _dotted(item.func if isinstance(item, ast.Call) else item)
+        for item in member.decorator_list
+    }
+    return _bind_descriptor_signature(
+        signature,
+        is_static="staticmethod" in decorators,
+        is_classmethod="classmethod" in decorators,
+        is_instance=is_instance,
+    )
+
+
+def _class_attribute_signature(
+    class_object: type,
+    name: str,
+    is_instance: bool,
+) -> inspect.Signature | None:
+    try:
+        descriptor = inspect.getattr_static(class_object, name)
+    except AttributeError:
+        return None
+    is_static = isinstance(descriptor, staticmethod)
+    is_classmethod = isinstance(descriptor, classmethod)
+    if is_static or is_classmethod:
+        descriptor = descriptor.__func__
+    is_function = inspect.isfunction(descriptor)
+    is_native_method = inspect.ismethoddescriptor(descriptor) or inspect.isbuiltin(descriptor)
+    if not (is_function or is_native_method):
+        descriptor_get = inspect.getattr_static(type(descriptor), "__get__", None)
+        if descriptor_get is not None:
+            return None
+    signature = _signature_of(descriptor)
+    if signature is None:
+        return None
+    return _bind_descriptor_signature(
+        signature,
+        is_static=is_static,
+        is_classmethod=is_classmethod,
+        is_instance=is_instance and (is_function or is_native_method),
+    )
+
+
+def _receiver_attribute_signature(
+    receiver: _Receiver,
+    name: str,
+) -> inspect.Signature | None:
+    if isinstance(receiver.value, ast.ClassDef):
+        return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)
+    if inspect.isclass(receiver.value):
+        return _class_attribute_signature(receiver.value, name, receiver.is_instance)
+    if inspect.ismodule(receiver.value):
+        try:
+            return _signature_of(inspect.getattr_static(receiver.value, name))
+        except AttributeError:
+            return None
+    try:
+        instance_attribute = inspect.getattr_static(receiver.value, name)
+    except AttributeError:
+        return None
+    try:
+        class_attribute = inspect.getattr_static(type(receiver.value), name)
+    except AttributeError:
+        class_attribute = None
+    if instance_attribute is class_attribute:
+        return _class_attribute_signature(type(receiver.value), name, True)
+    return _signature_of(instance_attribute)
 
 
 def _production_signature(
@@ -300,10 +441,7 @@ def _production_signature(
         receiver = _receiver(target.elts[0], call, parents, modules, objects)
         if receiver is None:
             return None
-        try:
-            return _signature_of(getattr(receiver, target.elts[1].value))
-        except Exception:
-            return None
+        return _receiver_attribute_signature(receiver, target.elts[1].value)
     else:
         base = _dotted(target)
         if not base:
@@ -370,14 +508,14 @@ def _keyword_accepted(signature: inspect.Signature, name: str) -> bool:
     ) or _has_vararg(signature, inspect.Parameter.VAR_KEYWORD)
 
 
-def _keyword_is_production_accepted(signature: inspect.Signature, name: str) -> bool:
-    parameter = signature.parameters.get(name)
-    if parameter is not None and parameter.kind in (
-        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-        inspect.Parameter.KEYWORD_ONLY,
-    ):
-        return True
-    return _has_vararg(signature, inspect.Parameter.VAR_KEYWORD)
+def _required_positional_only_prefix(signature: inspect.Signature) -> int:
+    count = 0
+    for parameter in signature.parameters.values():
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and parameter.default is inspect.Parameter.empty:
+            count += 1
+        elif parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):
+            break
+    return count
 
 
 def _required_parameters_compatible(
@@ -391,12 +529,7 @@ def _required_parameters_compatible(
         for parameter in production_parameters
         if parameter.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
     }
-    production_positional_only_required = 0
-    for parameter in production_parameters:
-        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and parameter.default is inspect.Parameter.empty:
-            production_positional_only_required += 1
-        elif parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):
-            break
+    production_positional_only_required = _required_positional_only_prefix(production)
 
     for index, parameter in enumerate(double_parameters):
         if parameter.default is not inspect.Parameter.empty or parameter.kind in (
@@ -417,6 +550,10 @@ def _required_parameters_compatible(
             earlier.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
             for earlier in double_parameters[:index]
         )
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY:
+            if positional_index < production_positional_only_required:
+                continue
+            return False
         if positional_index < production_positional_only_required:
             continue
         required_production = production_keyword.get(parameter.name)
@@ -435,12 +572,7 @@ def _has_positional_keyword_collision(
 ) -> bool:
     production_positional = _positional_parameters(production)
     double_positional = _positional_parameters(double)
-    production_positional_only_required = 0
-    for parameter in production.parameters.values():
-        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and parameter.default is inspect.Parameter.empty:
-            production_positional_only_required += 1
-        elif parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):
-            break
+    production_positional_only_required = _required_positional_only_prefix(production)
     has_production_varargs = _has_vararg(production, inspect.Parameter.VAR_POSITIONAL)
     maximum_positional = float("inf") if has_production_varargs else len(production_positional)
     production_keywords = {
@@ -452,7 +584,7 @@ def _has_positional_keyword_collision(
     for double_index, parameter in enumerate(double_positional):
         if parameter.kind is not inspect.Parameter.POSITIONAL_OR_KEYWORD:
             continue
-        if not _keyword_is_production_accepted(production, parameter.name):
+        if not _keyword_accepted(production, parameter.name):
             continue
         minimum_positional = max(double_index + 1, production_positional_only_required)
         if minimum_positional > maximum_positional:
@@ -499,16 +631,12 @@ def _replacement_signature_for_site(
         receiver = _receiver(node.value, site.call, parents, modules, objects)
         if receiver is None:
             return None
-        try:
-            return _signature_of(getattr(receiver, node.attr))
-        except Exception:
-            return None
+        return _receiver_attribute_signature(receiver, node.attr)
     if isinstance(node, ast.Name):
         value = _imported_object(_dotted(node) or "", modules, objects)
         return _signature_of(value) if callable(value) else None
     if isinstance(node, ast.Call):
-        value = _constructed_receiver(node, modules, objects)
-        return _signature_of(value) if callable(value) else None
+        return None
     return None
 
 
@@ -538,7 +666,26 @@ def scan_tests(root: Path) -> Census:
                 else None
             )
             if production is None or double is None:
-                skipped.append(f"{path}:{site.line}: SKIPPED-UNRESOLVABLE")
+                reasons = []
+                if production is None:
+                    if isinstance(site.target, ast.Tuple):
+                        reasons.append(
+                            "production receiver has no statically resolvable imported or local class"
+                        )
+                    else:
+                        reasons.append("production target has no statically resolvable signature")
+                if double is None:
+                    if isinstance(site.replacement, ast.Call):
+                        reasons.append("replacement call result would require execution")
+                    elif isinstance(site.replacement, ast.Attribute):
+                        reasons.append(
+                            "replacement receiver has no statically resolvable imported or local class"
+                        )
+                    else:
+                        reasons.append("replacement has no statically resolvable signature")
+                skipped.append(
+                    f"{path}:{site.line}: SKIPPED-UNRESOLVABLE: {'; '.join(reasons)}"
+                )
                 continue
             resolved += 1
             if not _compatible(production, double):

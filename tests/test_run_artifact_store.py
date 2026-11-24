@@ -921,7 +921,7 @@ def test_store_list_skips_corrupt_artifact_when_quarantine_fails(
     corrupt_path = store.runs_dir / "broken.json"
     corrupt_path.write_text("{not-json", encoding="utf-8")
 
-    def fail_quarantine(_path):
+    def fail_quarantine(path):
         raise PermissionError("read-only quarantine")
 
     monkeypatch.setattr(store, "_quarantine", fail_quarantine)
@@ -945,7 +945,7 @@ def test_store_list_skips_run_with_corrupt_meta_when_quarantine_fails(
     meta_path.parent.mkdir(parents=True, exist_ok=True)
     meta_path.write_text("{not-json", encoding="utf-8")
 
-    def fail_quarantine(_path):
+    def fail_quarantine(path):
         raise FileNotFoundError("concurrent quarantine removal")
 
     monkeypatch.setattr(store, "_quarantine", fail_quarantine)
@@ -969,7 +969,7 @@ def test_store_retention_survives_meta_quarantine_failure(
     meta_path.write_text("{not-json", encoding="utf-8")
     store.keep = 0
 
-    def fail_quarantine(_path):
+    def fail_quarantine(path):
         raise PermissionError("retention quarantine denied")
 
     monkeypatch.setattr(store, "_quarantine", fail_quarantine)

@@ -171,7 +171,7 @@ def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeyp
     monkeypatch.setattr(
         extract_merge,
         "load_extracts",
-        lambda _directory, *, require_valid=True, artifact_root=None: [
+        lambda directory=None, *, require_valid=True, artifact_root=None: [
             {"source_id": "legacy-table", "species": "K"}
         ],
     )
@@ -441,7 +441,7 @@ def test_refused_markers_never_score(monkeypatch, markers, nested) -> None:
     monkeypatch.setattr(
         extract_merge,
         "load_extracts",
-        lambda directory, *, require_valid=True, artifact_root=None: [doc],
+        lambda directory=None, *, require_valid=True, artifact_root=None: [doc],
     )
     obs, = load_adopted_observations()
     ev = evaluate_observation(obs)
@@ -478,7 +478,7 @@ def test_supersession_adopts_only_terminal_identity(monkeypatch, length, split, 
     monkeypatch.setattr(
         extract_merge,
         "load_extracts",
-        lambda directory, *, require_valid=True, artifact_root=None: [doc],
+        lambda directory=None, *, require_valid=True, artifact_root=None: [doc],
     )
     observations = load_adopted_observations()
     assert [o.observation_id for o in observations if o.adoption_basis != "superseded"] == terminal_ids
@@ -2416,7 +2416,7 @@ def test_pilot_rows_remain_context_and_are_not_scored(
     monkeypatch.setattr(
         extract_merge,
         "load_extracts",
-        lambda _directory, *, require_valid=True, artifact_root=None: [document],
+        lambda directory=None, *, require_valid=True, artifact_root=None: [document],
     )
     adopted_observations = load_adopted_observations()
     battery_evaluations = evaluate_all(

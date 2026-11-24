@@ -31,6 +31,16 @@ class _NarrowBoundFixture:
         return None
 
 
+class _SideEffectFixture:
+    output_path: Path
+
+    def __init__(self):
+        self.output_path.write_text("constructed", encoding="utf-8")
+
+    def emit(self, record):
+        return record
+
+
 def load_mutant(name: str, replacements: tuple[tuple[str, str], ...]):
     source = Path(checker.__file__).read_text(encoding="utf-8")
     for current, mutated in replacements:
@@ -104,6 +114,37 @@ def probe_required_rule() -> None:
     print("PASS mutation: a new required root parameter is detected")
 
 
+def probe_required_positional_only_double() -> None:
+    double = signature(checker, "x, /, **kwargs")
+    cases = [
+        (signature(checker, "x, **kwargs"), (), {"x": 1}),
+        (signature(checker, "*, x"), (), {"x": 1}),
+    ]
+    for production, args, kwargs in cases:
+        production.bind(*args, **kwargs)
+        try:
+            double.bind(*args, **kwargs)
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("double unexpectedly accepts keyword-only production call")
+        assert not checker._compatible(production, double)
+
+    mutant = load_mutant(
+        "positional_only_required",
+        ((
+            "        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY:\n"
+            "            if positional_index < production_positional_only_required:\n"
+            "                continue\n"
+            "            return False\n",
+            "        if False:\n"
+            "            return False\n",
+        ),),
+    )
+    assert all(mutant._compatible(production, double) for production, _, _ in cases)
+    print("PASS mutation: required positional-only doubles need production positional slots")
+
+
 def probe_collision_rule() -> None:
     production = signature(checker, "*args, **kwargs")
     double = signature(checker, "value=None, *args, **kwargs")
@@ -161,8 +202,12 @@ def probe_descriptor_rule() -> None:
     mutant = load_mutant(
         "descriptor",
         ((
-            "return _signature_of(getattr(receiver, target.elts[1].value))",
-            "return _signature_of(getattr(type(receiver), target.elts[1].value))",
+            "        return _receiver_attribute_signature(receiver, target.elts[1].value)\n",
+            "        return (\n"
+            "            _class_attribute_signature(receiver.value, target.elts[1].value, False)\n"
+            "            if inspect.isclass(receiver.value)\n"
+            "            else _receiver_attribute_signature(receiver, target.elts[1].value)\n"
+            "        )\n",
         ),),
     )
     mutated = scan_fixture(mutant, "test_descriptors.py", descriptor_fixture())
@@ -171,6 +216,121 @@ def probe_descriptor_rule() -> None:
     assert any("test_python_bound" in item for item in mutated.violations)
     assert any("test_random" in item for item in mutated.violations)
     print("PASS mutation: descriptor binding uses the patched receiver")
+
+
+def local_descriptor_fixture() -> str:
+    return """
+        from collections import UserDict
+        class LocalDouble:
+            @classmethod
+            def fromkeys(cls, iterable=(), value=None): return None
+            def emit(self, record): return record
+        def test_local_classmethod(monkeypatch):
+            receiver = UserDict()
+            replacement = LocalDouble()
+            monkeypatch.setattr(receiver, 'fromkeys', replacement.fromkeys)
+        def test_local_method(monkeypatch):
+            receiver = LocalDouble()
+            monkeypatch.setattr(receiver, 'emit', receiver.emit)
+    """
+
+
+def probe_local_class_descriptors() -> None:
+    census = scan_fixture(checker, "test_local_descriptors.py", local_descriptor_fixture())
+    assert census.scanned == census.resolved == 2
+    assert not census.skipped and not census.violations
+    mutant = load_mutant(
+        "local_descriptors",
+        ((
+            "    if isinstance(receiver.value, ast.ClassDef):\n"
+            "        return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)\n",
+            "    if isinstance(receiver.value, ast.ClassDef):\n"
+            "        return None\n",
+        ),),
+    )
+    mutated = scan_fixture(mutant, "test_local_descriptors.py", local_descriptor_fixture())
+    assert mutated.resolved == 0 and len(mutated.skipped) == 2
+    print("PASS mutation: local classmethod and method descriptors resolve from AST")
+
+
+def probe_static_constructor_inspection() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        output = root / "constructor.log"
+        _SideEffectFixture.output_path = output
+        fixture = root / "test_side_effect.py"
+        fixture.write_text(
+            "from __main__ import _SideEffectFixture\n"
+            "def test_emit(monkeypatch):\n"
+            "    receiver = _SideEffectFixture()\n"
+            "    monkeypatch.setattr(receiver, 'emit', lambda record: record)\n",
+            encoding="utf-8",
+        )
+        census = checker.scan_tests(root)
+        assert census.scanned == census.resolved == 1
+        assert not output.exists()
+
+        mutant = load_mutant(
+            "constructor_execution",
+            ((
+                "            if value is not None:\n"
+                "                return _Receiver(value, True)\n",
+                "            if value is not None:\n"
+                "                arguments = [ast.literal_eval(argument) for argument in constructor_call.args]\n"
+                "                keywords = {keyword.arg: ast.literal_eval(keyword.value) for keyword in constructor_call.keywords}\n"
+                "                return _Receiver(value(*arguments, **keywords), True)\n",
+            ),),
+        )
+        mutated = mutant.scan_tests(root)
+        assert mutated.scanned == mutated.resolved == 1
+        assert output.exists()
+    print("PASS mutation: static census leaves constructor side effects untouched")
+
+
+def probe_single_predicate_owners() -> None:
+    source = Path(checker.__file__).read_text(encoding="utf-8")
+    assert source.count("def _keyword_accepted(") == 1
+    assert "_keyword_is_production_accepted" not in source
+    assert source.count("def _required_positional_only_prefix(") == 1
+    assert source.count("_required_positional_only_prefix(production)") == 2
+
+    production = signature(checker, "value=42")
+    double = signature(checker, "value=42")
+    assert checker._compatible(production, double)
+    keyword_mutant = load_mutant(
+        "single_keyword_owner",
+        ((
+            "def _keyword_accepted(signature: inspect.Signature, name: str) -> bool:\n"
+            "    parameter = signature.parameters.get(name)\n"
+            "    return (\n"
+            "        parameter is not None\n"
+            "        and parameter.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)\n"
+            "    ) or _has_vararg(signature, inspect.Parameter.VAR_KEYWORD)\n",
+            "def _keyword_accepted(signature: inspect.Signature, name: str) -> bool:\n"
+            "    return False\n",
+        ),),
+    )
+    assert not keyword_mutant._compatible(production, double)
+
+    positional = signature(checker, "x, /, **kwargs")
+    assert checker._compatible(positional, positional)
+    prefix_mutant = load_mutant(
+        "single_prefix_owner",
+        ((
+            "def _required_positional_only_prefix(signature: inspect.Signature) -> int:\n"
+            "    count = 0\n"
+            "    for parameter in signature.parameters.values():\n"
+            "        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and parameter.default is inspect.Parameter.empty:\n"
+            "            count += 1\n"
+            "        elif parameter.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):\n"
+            "            break\n"
+            "    return count\n",
+            "def _required_positional_only_prefix(signature: inspect.Signature) -> int:\n"
+            "    return 0\n",
+        ),),
+    )
+    assert not prefix_mutant._compatible(positional, positional)
+    print("PASS mutation: keyword acceptance and positional prefix each have one owner")
 
 
 def probe_bound_method_narrowing() -> None:
@@ -245,8 +405,12 @@ if __name__ == "__main__":
     probe_positional_rule()
     probe_keyword_rule()
     probe_required_rule()
+    probe_required_positional_only_double()
     probe_collision_rule()
     probe_descriptor_rule()
+    probe_local_class_descriptors()
+    probe_static_constructor_inspection()
+    probe_single_predicate_owners()
     probe_bound_method_narrowing()
     probe_opaque_builtin_is_skipped()
     probe_importorskip_alias()

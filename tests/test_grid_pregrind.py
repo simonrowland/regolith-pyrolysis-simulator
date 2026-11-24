@@ -2003,8 +2003,8 @@ class _ImmediateContext:
     def __init__(self):
         self.pool = None
 
-    def EngineWorkerPool(self, _worker_factory, *, size):
-        self.pool = _ImmediatePool(size, _worker_factory)
+    def EngineWorkerPool(self, worker_factory, *, size):
+        self.pool = _ImmediatePool(size, worker_factory)
         return self.pool
 
 

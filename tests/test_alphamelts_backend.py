@@ -7340,7 +7340,7 @@ def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch)
     monkeypatch.setattr(
         transport,
         '_retained_solution_chemical_potentials',
-        lambda _melts, _phase, *, expected_components: dict(
+        lambda melts, phase_name, *, expected_components: dict(
             expected_components),
     )
 
@@ -8303,7 +8303,7 @@ def test_thermoengine_solution_mu_recovers_before_finite_validation(monkeypatch)
     monkeypatch.setattr(
         transport,
         '_retained_solution_chemical_potentials',
-        lambda _melts, phase, *, expected_components: {
+        lambda melts, phase_name, *, expected_components: {
             'chromite': -1_932_000.0,
             'hercynite': -2_404_000.0,
         },
@@ -8764,13 +8764,13 @@ def test_thermoengine_private_solver_imposes_absolute_fo2_with_python_fake(
     monkeypatch.setattr(
         transport,
         '_retained_solution_chemical_potentials',
-        lambda _melts, _phase, *, expected_components: dict(
+        lambda melts, phase_name, *, expected_components: dict(
             expected_components),
     )
 
-    def echo(model, _root, **_kwargs):
-        feo = model.bulk_wt['FeO'] / 71.8444
-        fe2o3 = model.bulk_wt['Fe2O3'] / 159.6882
+    def echo(melts, root, **_kwargs):
+        feo = melts.bulk_wt['FeO'] / 71.8444
+        fe2o3 = melts.bulk_wt['Fe2O3'] / 159.6882
         ferric_fraction = 2.0 * fe2o3 / (feo + 2.0 * fe2o3)
         return -10.0 + 10.0 * ferric_fraction
 
@@ -8780,7 +8780,7 @@ def test_thermoengine_private_solver_imposes_absolute_fo2_with_python_fake(
         '_activities_from_chemical_potentials',
         lambda **_kwargs: {},
     )
-    monkeypatch.setattr(transport, '_fe_redox_split', lambda _comp: {})
+    monkeypatch.setattr(transport, '_fe_redox_split', lambda liquid_comp: {})
 
     result = transport._equilibrate_in_process(
         temperature_C=1200.0,
@@ -8833,9 +8833,9 @@ def test_thermoengine_imposed_fo2_seeds_feo_only_bulk_with_positive_kress91(
             version=transport._melts_version),
     )
 
-    def echo(model, _root, **_kwargs):
-        feo = model.bulk_wt['FeO'] / 71.8444
-        fe2o3 = model.bulk_wt['Fe2O3'] / 159.6882
+    def echo(melts, root, **_kwargs):
+        feo = melts.bulk_wt['FeO'] / 71.8444
+        fe2o3 = melts.bulk_wt['Fe2O3'] / 159.6882
         fraction = 2.0 * fe2o3 / (feo + 2.0 * fe2o3)
         fractions.append(fraction)
         return -10.0 + 10.0 * fraction
@@ -9169,9 +9169,9 @@ def test_thermoengine_imposed_fo2_rejects_narrow_target_plateau(monkeypatch):
             version=transport._melts_version),
     )
 
-    def echo(model, _root, **_kwargs):
-        feo = model.bulk_wt['FeO'] / 71.8444
-        fe2o3 = model.bulk_wt['Fe2O3'] / 159.6882
+    def echo(melts, root, **_kwargs):
+        feo = melts.bulk_wt['FeO'] / 71.8444
+        fe2o3 = melts.bulk_wt['Fe2O3'] / 159.6882
         fraction = 2.0 * fe2o3 / (feo + 2.0 * fe2o3)
         if 0.49 <= fraction <= 0.51:
             return -5.0
@@ -11945,7 +11945,7 @@ def test_unconstrained_native_library_failure_is_typed(
         '_activities_from_chemical_potentials',
         lambda **_kwargs: {},
     )
-    monkeypatch.setattr(transport, '_fe_redox_split', lambda _comp: {})
+    monkeypatch.setattr(transport, '_fe_redox_split', lambda liquid_comp: {})
 
     with pytest.raises(
         ThermoEngineNotConvergedError,

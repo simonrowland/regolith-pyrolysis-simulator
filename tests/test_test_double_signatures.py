@@ -61,6 +61,8 @@ def test_patch_double_violation_allowlist_only_shrinks() -> None:
         ("a=1, **kwargs", "root=None, /, value=None, **kwargs", True),
         ("x=None, **kwargs", "y=None, **kwargs", False),
         ("x, /, *args, y", "x, y=None, *args, **kwargs", False),
+        ("x, **kwargs", "x, /, **kwargs", False),
+        ("*, x", "x, /, **kwargs", False),
     ],
 )
 def test_compatibility_covers_keyword_names_and_optional_omissions(
@@ -86,6 +88,8 @@ def test_compatibility_covers_keyword_names_and_optional_omissions(
         ("target, *args, **kwargs", "target, *args, **kwargs", (1, 2), {"other": 3}, True),
         ("a=1, **kwargs", "root=None, /, value=None, **kwargs", (1,), {"value": 2}, True),
         ("x, /, *args, **kwargs", "x, *args, **kwargs", (1, 2), {"x": 3}, False),
+        ("x, **kwargs", "x, /, **kwargs", (), {"x": 1}, False),
+        ("*, x", "x, /, **kwargs", (), {"x": 1}, False),
     ],
 )
 def test_parameter_comparison_matches_python_call_binding(
@@ -254,3 +258,36 @@ def test_scan_keeps_bound_classmethod_parameters(tmp_path: Path) -> None:
     assert census.violations[0].startswith(
         "test_bound_classmethod.py::test_bound_fromkeys::"
     )
+
+
+def test_scan_resolves_local_descriptors_without_running_constructors(tmp_path: Path) -> None:
+    side_effect = tmp_path / "constructor.log"
+    (tmp_path / "test_local_descriptors.py").write_text(
+        "from collections import UserDict\n"
+        "from pathlib import Path\n"
+        "class LocalDouble:\n"
+        "    @classmethod\n"
+        "    def fromkeys(cls, iterable=(), value=None): return None\n"
+        "    def emit(self, record): return None\n"
+        "    def __init__(self):\n"
+        f"        Path({str(side_effect)!r}).write_text('ran', encoding='utf-8')\n"
+        "def test_local_classmethod(monkeypatch):\n"
+        "    mapping = UserDict()\n"
+        "    double = LocalDouble()\n"
+        "    monkeypatch.setattr(mapping, 'fromkeys', double.fromkeys)\n"
+        "def test_local_method(monkeypatch):\n"
+        "    receiver = LocalDouble()\n"
+        "    monkeypatch.setattr(receiver, 'emit', receiver.emit)\n"
+        "def test_constructor_side_effect(monkeypatch):\n"
+        "    receiver = LocalDouble()\n"
+        "    monkeypatch.setattr(receiver, 'emit', lambda record: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 3
+    assert census.resolved == 3
+    assert not census.skipped
+    assert not census.violations
+    assert not side_effect.exists()
