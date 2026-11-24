@@ -25044,6 +25044,7 @@ class Migrator:
         self._inferred_method_evidence_by_experiment: dict[
             str, tuple[MethodToken, str, str]
         ] = {}
+        self._declared_experiment_methods: dict[str, State[MethodToken]] = {}
         self._unstated_method_original_reason_by_experiment: dict[str, str] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
@@ -25882,6 +25883,9 @@ class Migrator:
     ) -> tuple[State[MethodToken], Notice | None]:
         experiment = self.result.experiments.get(experiment_id)
         experiment_method = None if experiment is None else experiment.method
+        declared_experiment_method = self._declared_experiment_methods.get(
+            experiment_id
+        )
         method_raw = next(
             (
                 text
@@ -25904,15 +25908,16 @@ class Migrator:
         )
 
         if (
-            experiment_method is not None
+            declared_experiment_method is not None
             and method.is_unknown
             and method_raw is None
-            and experiment_method.is_value
-            and experiment_method.value is not MethodToken.UNSPECIFIED
+            and declared_experiment_method.is_value
+            and declared_experiment_method.value is not MethodToken.UNSPECIFIED
         ):
-            method = experiment_method
+            method = declared_experiment_method
 
         method_notice: Notice | None = None
+        method_inferred_from_row = False
         method_was_unspecified = (
             method.is_value and method.value is MethodToken.UNSPECIFIED
         )
@@ -25941,6 +25946,7 @@ class Migrator:
                 )
             if method_evidence is not None:
                 method_token, evidence = method_evidence
+                method_inferred_from_row = True
                 original_reason = (
                     f"source method text: {method_source_text}"
                     if method_source_text is not None
@@ -25989,7 +25995,7 @@ class Migrator:
                 origin=observation_id,
                 policy=NoticePolicy(**policy_resolution.payload["policy"]),
             )
-        elif method.is_value:
+        elif method.is_value and method_inferred_from_row:
             inferred = self._inferred_method_evidence_by_experiment.get(
                 experiment_id
             )
@@ -26499,6 +26505,13 @@ class Migrator:
                     experiment.experiment_id
                 )
             self.result.experiments[experiment.experiment_id] = experiment
+            if (
+                method_raw is not None
+                and not (isinstance(method_raw, str) and not method_raw.strip())
+            ):
+                self._declared_experiment_methods[experiment.experiment_id] = (
+                    experiment.method
+                )
             if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
                 self.result.experiments_by_work[work.work_id].append(
                     experiment.experiment_id
@@ -28813,17 +28826,33 @@ class Migrator:
             ),
             quantity=quantity_for_notice,
         )
-        if (
+        declared_experiment_method = self._declared_experiment_methods.get(
+            declared_experiment_id
+        )
+        experiment_method_is_unstated = (
+            declared_experiment_id is not None
+            and (
+                declared_experiment_method is None
+                or not declared_experiment_method.is_value
+            )
+        )
+        experiment_method_conflicts = (
             experiment_before_method_resolution is not None
             and experiment_before_method_resolution.method.is_value
             and method.is_value
             and experiment_before_method_resolution.method.value is not method.value
+        )
+        if method.is_value and (
+            experiment_method_is_unstated or experiment_method_conflicts
         ):
             # A shared experiment can group rows only while their typed method
-            # decisions agree. Keep each conflicting row on its own method ID.
-            self.result.experiments[experiment_id] = (
-                experiment_before_method_resolution
-            )
+            # decisions agree. An unstated registry method cannot take the
+            # first row's method as its experiment-wide value.
+            self._inferred_method_evidence_by_experiment.pop(experiment_id, None)
+            if experiment_before_method_resolution is not None:
+                self.result.experiments[experiment_id] = (
+                    experiment_before_method_resolution
+                )
             method_distinguisher = (
                 f"declared:{declared_experiment_id}::method:{method.value.value}"
                 if declared_experiment_id is not None
@@ -28842,11 +28871,12 @@ class Migrator:
             )
             # The method-specific row keeps the declared run context; only
             # its typed technique differs from the shared experiment.
-            self.result.experiments[experiment_id] = replace(
-                experiment_before_method_resolution,
-                experiment_id=experiment_id,
-                method=method,
-            )
+            if experiment_before_method_resolution is not None:
+                self.result.experiments[experiment_id] = replace(
+                    experiment_before_method_resolution,
+                    experiment_id=experiment_id,
+                    method=method,
+                )
         experiment = self.result.experiments.get(experiment_id)
         migration_axis_notices = tuple(
             notice
