@@ -1201,14 +1201,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Strips a printed mass-percent suffix and returns a boolean. It is string normalization, not a physics or vapour-law result.',
     },
-    'lru:simulator/battery/score.py:_catalog_score_rows': {
-        "path": 'simulator/battery/score.py',
-        "line": 13598,
-        "kind": 'lru',
-        "name": '_catalog_score_rows',
-        "carries_disclosure": False,
-        "how": 'Caches compiled species and phase/reaction annotations for scoring eligibility; it does not call evaluate() or produce pressures.',
-    },
     'lru:simulator/reference_data/janaf.py:_compiled_table_by_id': {
         "path": 'simulator/reference_data/janaf.py',
         "line": 1391,

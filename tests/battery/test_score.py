@@ -226,20 +226,9 @@ def test_engine_payload_source_precedence_and_residual_key_tokens_are_pinned() -
     assert _engine_from_payload({}) == "unknown"
 
 
-@pytest.mark.parametrize(
-    "cache_name, owner_cache",
-    (
-        ("_janaf_pure_solid_table_index", _janaf_pure_solid_table_index),
-        ("_catalog_score_rows", _catalog_score_rows),
-    ),
-)
-def test_score_lru_cache_keeps_one_wrapper_and_cached_value(
-    cache_name: str, owner_cache
-) -> None:
-    if cache_name == "_catalog_score_rows":
-        # This is the only other module that imports this cache by name.
-        importlib.import_module("tests.battery.test_catalog_evaluator_battery_engine")
-
+def test_score_janaf_index_cache_keeps_one_wrapper_and_cached_value() -> None:
+    cache_name = "_janaf_pure_solid_table_index"
+    owner_cache = _janaf_pure_solid_table_index
     bindings = {
         f"{module_name}.{cache_name}": binding
         for module_name, module in tuple(sys.modules.items())
@@ -263,7 +252,7 @@ def test_score_lru_cache_keeps_one_wrapper_and_cached_value(
     assert after_second.hits == after_first.hits + 1
 
 
-def test_catalog_public_scoring_path_uses_the_owner_cache() -> None:
+def test_catalog_public_scoring_path_uses_catalog_evaluator() -> None:
     temperature_K = Decimal("180")
     experiment = F.tabulation_experiment(
         experiment_id="catalog-cache-exp",
@@ -276,10 +265,6 @@ def test_catalog_public_scoring_path_uses_the_owner_cache() -> None:
         F.psat_identity("H2O", T_K=temperature_K, reservoir_phase=Phase.CR),
         Decimal("1"),
     )
-    owner_cache = _catalog_score_rows
-    owner_cache.cache_clear()
-    before = owner_cache.cache_info()
-
     predictions = tuple(
         predict_with_engine(
             Engine.CATALOG_EVALUATOR, observation, experiment=experiment
@@ -287,19 +272,48 @@ def test_catalog_public_scoring_path_uses_the_owner_cache() -> None:
         for _ in range(2)
     )
 
-    after = owner_cache.cache_info()
     assert all(
         prediction.engine is Engine.CATALOG_EVALUATOR for prediction in predictions
     )
-    assert after.misses == before.misses + 1
-    assert after.hits == before.hits + 1
+
+
+def test_catalog_score_rows_reload_after_source_yaml_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_path = Path(score_mod.REPO_ROOT) / "data" / "vapor_pressures.yaml"
+    catalog_root = tmp_path / "catalog"
+    data_dir = catalog_root / "data"
+    data_dir.mkdir(parents=True)
+    catalog_path = data_dir / "vapor_pressures.yaml"
+    source = source_path.read_text(encoding="utf-8")
+    catalog_path.write_text(source, encoding="utf-8")
+    monkeypatch.setattr(score_mod, "REPO_ROOT", catalog_root)
+
+    before, error = score_mod._catalog_score_rows()
+    assert error is None
+    before_na = next(row for row in before if row.species_id == "Na")
+    assert before_na.formula == "Na"
+
+    payload = yaml.safe_load(source)
+    payload["families"]["metals_na_family"]["physical_properties"]["species"][
+        "Na"
+    ]["formula"] = "Na2"
+    catalog_path.write_text(
+        yaml.safe_dump(payload, sort_keys=False), encoding="utf-8"
+    )
+
+    after, error = score_mod._catalog_score_rows()
+
+    assert error is None
+    after_na = next(row for row in after if row.species_id == "Na")
+    assert after_na.formula == "Na2"
 
 
 def test_catalog_score_rows_share_the_catalog_module_cache() -> None:
     from simulator.vapour_rail import catalog as catalog_mod
 
     compile_cache = catalog_mod._COMPILE_CACHE
-    score_mod._catalog_score_rows.cache_clear()
     rows, error = score_mod._catalog_score_rows()
 
     assert error is None
