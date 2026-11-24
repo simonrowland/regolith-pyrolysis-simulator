@@ -844,11 +844,11 @@ def _composition(proxy_flag: str | None) -> Composition:
     )
 
 
-def test_resolver_terminal_point_precedes_every_later_assay() -> None:
+def test_resolver_invalid_run_precedes_every_later_assay() -> None:
     point = composition_roles.AssayCandidate(
         State.unknown("unsupported component: XxO"),
         source="point",
-        terminal=True,
+        label="invalid-run",
     )
     declared = composition_roles.AssayCandidate(
         State.of(_composition(None)), source="declared"
@@ -870,17 +870,20 @@ def test_resolver_terminal_point_precedes_every_later_assay() -> None:
     assert resolved.composition.reason == "unsupported component: XxO"
 
 
-def test_ignoring_terminal_candidate_breaks_its_pin(monkeypatch) -> None:
-    test_resolver_terminal_point_precedes_every_later_assay()
+def test_ignoring_invalid_run_candidate_breaks_its_pin(monkeypatch) -> None:
+    test_resolver_invalid_run_precedes_every_later_assay()
 
     real = composition_roles._choose_assay
 
     def skip_terminal(candidates):
-        return real(tuple(candidate for candidate in candidates if not candidate.terminal))
+        retained = tuple(
+            candidate for candidate in candidates if candidate.label != "invalid-run"
+        )
+        return real(retained)
 
     monkeypatch.setattr(composition_roles, "_choose_assay", skip_terminal)
     with pytest.raises(AssertionError):
-        test_resolver_terminal_point_precedes_every_later_assay()
+        test_resolver_invalid_run_precedes_every_later_assay()
 
 
 def test_resolver_admits_declared_invalid_map_before_other_assays() -> None:
@@ -921,6 +924,46 @@ def test_ignoring_declared_map_admission_breaks_its_pin(monkeypatch) -> None:
     monkeypatch.setattr(composition_roles, "_choose_assay", skip_declared)
     with pytest.raises(AssertionError):
         test_resolver_admits_declared_invalid_map_before_other_assays()
+
+
+def test_resolver_requires_a_declared_role_for_role_bound_map() -> None:
+    candidate = composition_roles.AssayCandidate(
+        State.of(_composition(None)),
+        source="point",
+        requires_declared_role=True,
+    )
+    absent = composition_roles.resolve_point_composition(
+        {}, candidates=(candidate,)
+    )
+    declared = composition_roles.resolve_point_composition(
+        {"composition_role": DATUM_STATE}, candidates=(candidate,)
+    )
+
+    assert absent.composition.is_unknown
+    assert declared.composition.is_value
+    assert declared.role == DATUM_STATE
+
+
+def test_ignoring_role_bound_map_admission_breaks_its_pin(monkeypatch) -> None:
+    from dataclasses import replace
+
+    test_resolver_requires_a_declared_role_for_role_bound_map()
+    real = composition_roles._choose_assay
+
+    def ignore_role_requirement(candidates, **kwargs):
+        return real(
+            tuple(
+                replace(candidate, requires_declared_role=False)
+                for candidate in candidates
+            ),
+            **kwargs,
+        )
+
+    monkeypatch.setattr(
+        composition_roles, "_choose_assay", ignore_role_requirement
+    )
+    with pytest.raises(AssertionError):
+        test_resolver_requires_a_declared_role_for_role_bound_map()
 
 
 def test_catalogue_notice_is_specific_to_the_catalogue_token() -> None:
