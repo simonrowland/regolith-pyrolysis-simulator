@@ -38,6 +38,33 @@ from simulator.battery.score import (
 ROOT = Path(__file__).resolve().parents[2]
 EXTRACT = ROOT / "data/literature/extracts/mendybaev-2013-fun-cai-evaporation.yaml"
 RICHTER_EXTRACT = ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
+MENDYBAEV_BEAD_GROUPS = (
+    "FUN1-1",
+    "FUN1-3",
+    "FUN1-4",
+    "FUN1-5",
+    "FUN1-9",
+    "FUN1-10",
+    "FUN1-11",
+    "FUN1-12",
+    "FUN1-13",
+    "FUN1-14",
+    "FUN1-15",
+    "FUN1-16",
+    "FUN1-17",
+    "FUN1-18",
+    "FUN2-1",
+    "FUN2-2",
+    "FUN2-3",
+    "FUN2-4",
+    "FUN2-5",
+    "FUN2-6",
+    "FUN2-7",
+    "FUN2-8",
+    "FUN2-9",
+    "FUN2-10",
+)
+MENDYBAEV_ZERO_TIME_BEADS = {"FUN1-3", "FUN1-12", "FUN2-4"}
 
 
 def _mendybaev_context():
@@ -101,15 +128,44 @@ def _assert_langmuir_notices(notices):
     assert all("DP-004" not in notice.reason for notice in notices)
 
 
-def test_every_mendybaev_residue_score_is_flagged_absolute_and_scores_zero_time():
+@pytest.fixture(scope="module")
+def mendybaev_context():
     context, rows = _mendybaev_context()
-    cache = {}
     residue_rows = [
+        row
+        for row in rows.values()
+        if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    bead_groups = {
+        row.locator.note.removeprefix("row=")
+        for row in residue_rows
+        if row.locator is not None
+        and row.locator.note is not None
+        and row.locator.note.startswith("row=")
+    }
+    assert len(residue_rows) == 96
+    assert len(MENDYBAEV_BEAD_GROUPS) == len(set(MENDYBAEV_BEAD_GROUPS))
+    assert bead_groups == set(MENDYBAEV_BEAD_GROUPS)
+    return context, rows
+
+
+@pytest.mark.parametrize("bead_group", MENDYBAEV_BEAD_GROUPS)
+def test_mendybaev_residue_scores_are_flagged_by_bead_group(bead_group, mendybaev_context):
+    context, rows = mendybaev_context
+    cache = {}
+    all_residue_rows = [
         row for row in rows.values()
         if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
     ]
-    assert len(residue_rows) == 96
-    zero_time_beads = set()
+    assert len(all_residue_rows) == 96
+    residue_rows = [
+        row
+        for row in all_residue_rows
+        if row.locator is not None
+        and row.locator.note == f"row={bead_group}"
+    ]
+    assert len(residue_rows) == 4
+    has_zero_time = False
     for reference in residue_rows:
         prediction = _langmuir_residue_prediction(
             context, reference, Engine.INTERNAL_ANALYTICAL, cache
@@ -130,7 +186,7 @@ def test_every_mendybaev_residue_score_is_flagged_absolute_and_scores_zero_time(
         assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(residual.notices)
         _assert_langmuir_notices(residual.notices)
         if reference.point_conditions["time_min"].state.value == 0:
-            zero_time_beads.add(reference.locator.note.removeprefix("row="))
+            has_zero_time = True
             anchor = next(
                 row
                 for row in rows.values()
@@ -139,7 +195,7 @@ def test_every_mendybaev_residue_score_is_flagged_absolute_and_scores_zero_time(
                 and row.locator.note == reference.locator.note
             )
             assert anchor.value.point > 0
-    assert zero_time_beads == {"FUN1-3", "FUN1-12", "FUN2-4"}
+    assert has_zero_time is (bead_group in MENDYBAEV_ZERO_TIME_BEADS)
 
 
 def test_nonunit_alpha_keeps_the_shared_extent_integrator_refusal():

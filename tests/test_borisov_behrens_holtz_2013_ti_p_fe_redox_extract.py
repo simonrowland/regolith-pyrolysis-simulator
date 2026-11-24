@@ -18,7 +18,7 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, write_outputs
 from simulator.battery.records import NoticePolicy
 
 
@@ -544,6 +544,33 @@ def test_all_extract_locators_use_physical_pdf_pages() -> None:
         schuessler["locator"]["published_page"],
         schuessler["locator"]["pdf_page_index"],
     ) == (4, 1580, 3)
+
+
+def test_generated_projection_matches_fresh_isolated_migration(tmp_path: Path) -> None:
+    observation_id = f"{SOURCE_ID}::borisov_2013_pu3_schuessler_2008_quoted_mean"
+    experiment_id = (
+        f"{WORK_ID}::experiment::borisov_2013_pu3_schuessler_2008_quoted_mean"
+    )
+    result = _migrate()
+    observation = result.observations[observation_id]
+    assert observation.experiment_id == experiment_id
+    assert any(
+        notice.kind is NoticeKind.METHOD_UNSTATED
+        for notice in observation.notices
+    )
+
+    write_outputs(result, tmp_path)
+    for relative_path in (
+        Path("data/literature/extracts-v2") / f"{SOURCE_ID}.yaml",
+        Path("data/literature/works/10.1007_s00410-013-0943-9.yaml"),
+    ):
+        stored = yaml.safe_load(
+            (ROOT / relative_path).read_text(encoding="utf-8")
+        )
+        regenerated = yaml.safe_load(
+            (tmp_path / relative_path).read_text(encoding="utf-8")
+        )
+        assert stored == regenerated, relative_path
 
 
 def test_cited_table_pages_are_the_physical_pdf_pages() -> None:

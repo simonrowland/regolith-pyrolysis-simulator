@@ -181,13 +181,21 @@ def _citation_matches(
             )
             if context_row is None:
                 return False
-            captions = list(
-                re.finditer(
-                    r"^[ \t]*table[ \t]+([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)(?:[ \t]*\.[^\r\n]*|[ \t]*)$",
-                    context,
-                    re.I | re.M,
-                )
+            caption_pattern = (
+                r"^[ \t]*table[ \t]+([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)"
+                r"(?:(?P<caption_title>[ \t]*\.[^\r\n]*)|[ \t]*)$"
             )
+            captions = []
+            for caption in re.finditer(caption_pattern, context, re.I | re.M):
+                if caption.group("caption_title") is None:
+                    following_lines = context[caption.end() : context_row.start()].splitlines()
+                    first_content = next(
+                        (line.strip() for line in following_lines if line.strip()),
+                        "",
+                    )
+                    if not first_content or first_content[0].islower():
+                        continue
+                captions.append(caption)
             enclosing_caption = next(
                 (
                     caption
@@ -335,6 +343,26 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
         "FUN1-3 0 0.0161 0.0148",
         source_context="Table 1. Residue analyses\nSample FeO\n\nFUN1-3 0 0.0161 0.0148",
     ) is True
+    wrapped_prose_before_row = "\n".join(
+        (
+            "Table 1",
+            "Residue analyses",
+            "Sample FeO SiO2",
+            "Table 2",
+            "is used for comparison in this study.",
+            "FUN1-3 0 0.0161 0.0148",
+        )
+    )
+    assert _citation_matches(
+        {**table_row, "line_range": "6-6"},
+        "FUN1-3 0 0.0161 0.0148",
+        source_context=wrapped_prose_before_row,
+    ) is True
+    assert _citation_matches(
+        {**table_row, "line_range": "6-6", "table": "2"},
+        "FUN1-3 0 0.0161 0.0148",
+        source_context=wrapped_prose_before_row,
+    ) is False
     assert _citation_matches(
         {"row": "FUN1-3"}, "FUN1-3 0 0.0161 0.0148"
     ) is True
