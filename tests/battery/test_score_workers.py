@@ -209,23 +209,28 @@ def _score_rows_and_summary(
         summary_path,
         store_stamp=stamp,
     )
-    return (
-        _rows_with_full_revision(partial_path.read_bytes(), stamp),
-        summary_path.read_bytes(),
+    raw_rows = partial_path.read_bytes()
+    _assert_emitted_revision_matches(raw_rows, str(stamp["revision"]))
+    return raw_rows, summary_path.read_bytes()
+
+
+def _resolve_commit(revision: str) -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "--verify", f"{revision}^{{commit}}"],
+        cwd=Path(__file__).resolve().parents[2],
+        check=True,
+        capture_output=True,
+        text=True,
     )
+    return completed.stdout.strip()
 
 
-def _rows_with_full_revision(raw: bytes, stamp: dict[str, object]) -> bytes:
-    """Compare row files on the full commit, not git's mutable %h width.
-
-    The JSONL header is the production stamp. Two calls can abbreviate one
-    commit to different widths, so the header byte string is not the rows.
-    """
-
-    header, newline, body = raw.partition(b"\n")
-    recorded = json.loads(header)
-    recorded["revision"] = stamp["revision"]
-    return dumps_store_stamp(recorded).encode("utf-8") + newline + body
+def _assert_emitted_revision_matches(raw: bytes, expected_revision: str) -> None:
+    header = raw.partition(b"\n")[0]
+    emitted_revision = str(json.loads(header)["revision"])
+    assert _resolve_commit(emitted_revision) == _resolve_commit(expected_revision), (
+        "emitted JSONL revision resolves to a different commit than expected"
+    )
 
 
 def _full_commit_store_stamp() -> dict[str, object]:
@@ -237,14 +242,7 @@ def _full_commit_store_stamp() -> dict[str, object]:
 
     stamp = derive_store_stamp()
     abbreviated = str(stamp["revision"])
-    completed = subprocess.run(
-        ["git", "rev-parse", "--verify", f"{abbreviated}^{{commit}}"],
-        cwd=Path(__file__).resolve().parents[2],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    full = completed.stdout.strip()
+    full = _resolve_commit(abbreviated)
     assert len(full) == 40 and full.startswith(abbreviated)
     return {**stamp, "revision": full}
 
@@ -267,8 +265,41 @@ def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> Non
     parallel_rows, parallel_summary = _score_rows_and_summary(
         context, tmp_path / "parallel.jsonl", workers=3
     )
-    assert parallel_rows == serial_rows
+    assert parallel_rows.partition(b"\n")[2] == serial_rows.partition(b"\n")[2]
     assert parallel_summary == serial_summary
+
+
+def test_score_worker_parity_rejects_different_emitted_revision(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original_score_store_to_jsonl = _score_store_to_jsonl
+
+    def score_store_with_different_revision(*args, **kwargs):
+        result = original_score_store_to_jsonl(*args, **kwargs)
+        path = Path(args[1])
+        partial_path = path.with_name(path.name + ".partial")
+        raw = partial_path.read_bytes()
+        header, newline, body = raw.partition(b"\n")
+        emitted_stamp = json.loads(header)
+        emitted_commit = _resolve_commit(str(emitted_stamp["revision"]))
+        current_commit = _resolve_commit("HEAD")
+        parent_commit = _resolve_commit("HEAD^")
+        emitted_stamp["revision"] = (
+            current_commit if current_commit != emitted_commit else parent_commit
+        )
+        partial_path.write_bytes(
+            dumps_store_stamp(emitted_stamp).encode("utf-8") + newline + body
+        )
+        return result
+
+    monkeypatch.setitem(globals(), "_score_store_to_jsonl", score_store_with_different_revision)
+
+    with pytest.raises(AssertionError, match="different commit"):
+        _score_rows_and_summary(
+            _worker_fixture(experiment_count=2),
+            tmp_path / "different-revision.jsonl",
+            workers=1,
+        )
 
 
 def test_parallel_score_shards_reuse_parent_store_stamp(

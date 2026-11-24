@@ -1158,7 +1158,10 @@ def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
         _cell,
     )
     observation, _knudsen = _kems_partial(cell_material=None)
-    carrier = F.tabulation_experiment(total_P=Decimal("100000"))
+    carrier = F.tabulation_experiment(
+        experiment_id=observation.experiment_id,
+        total_P=Decimal("100000"),
+    )
     experiment = replace(
         carrier,
         pressure_environment=replace(
