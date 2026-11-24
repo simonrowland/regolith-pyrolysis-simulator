@@ -661,7 +661,7 @@ def test_evaporative_metal_loss_sum_keeps_roundoff_and_real_source(
         return sim._evaporative_redox_source_terms_from_transition(transition)
 
     near_equality = source_terms(5.089568621263579)
-    real_source = source_terms(5.089568622263581)
+    real_source = source_terms(5.089568620263581)
 
     assert near_equality == {}
     assert real_source["redox_source:evaporative_metal_loss"] > 9e-10
