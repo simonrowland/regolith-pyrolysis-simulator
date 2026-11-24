@@ -2346,6 +2346,22 @@ class EvaporationMixin:
         }
         return curve
 
+    def _matching_freeze_gate_hold(self) -> dict[str, Any] | None:
+        """Return this hour's tick-local gate curve, if one was already built.
+
+        Callers that only need the curve must use this before entering
+        ``_freeze_gate_curve_record``. A second entry would record the
+        same held curve again.
+        """
+        held = getattr(self, '_freeze_gate_held_curve_record', None)
+        if (
+            isinstance(held, Mapping)
+            and held.get('hour') == int(self.melt.hour)
+            and held.get('provider') == self._liquid_fraction_provider
+        ):
+            return copy.deepcopy(held['record'])
+        return None
+
     def _freeze_gate_curve_record(
         self,
         *,
@@ -2367,13 +2383,9 @@ class EvaporationMixin:
                 )
             return gate_curve_memo_record(curve, None, (), 'live')
 
-        held = self._freeze_gate_held_curve_record
-        if (
-            held is not None
-            and held['hour'] == int(self.melt.hour)
-            and held['provider'] == self._liquid_fraction_provider
-        ):
-            return copy.deepcopy(held['record'])
+        held_record = self._matching_freeze_gate_hold()
+        if held_record is not None:
+            return held_record
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None

@@ -5363,6 +5363,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             return None
         if curve is None:
+            # A same-hour hold is the curve. Entering the recorder again
+            # would emit a second copy of it.
+            held_record = self._matching_freeze_gate_hold()
+            if held_record is not None:
+                record = held_record
+                curve = record['curve']
+        if curve is None:
             from simulator.melt_backend.liquidus import LiquidusSampleError
 
             liquidus_provider_failures = (
