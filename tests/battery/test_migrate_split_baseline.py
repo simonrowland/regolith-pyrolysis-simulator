@@ -163,21 +163,77 @@ def _observation_rows(output: bytes) -> dict[str, dict[str, object]]:
     if not isinstance(document, dict) or not isinstance(document.get("observations"), list):
         return {}
     return {
-        str(row["observation_id"]): {
-            "identity": row.get("identity"),
-            "value": row.get("value"),
-            "point_conditions": row.get("point_conditions"),
-            "locator": row.get("locator"),
-        }
+        str(row["observation_id"]): row
         for row in document["observations"]
         if isinstance(row, dict) and row.get("observation_id") is not None
     }
 
 
+def _field_differences(path: str, stored: object, regenerated: object) -> list[str]:
+    if isinstance(stored, dict) and isinstance(regenerated, dict):
+        differences = []
+        for key in sorted(stored.keys() | regenerated.keys(), key=str):
+            if key not in stored or key not in regenerated:
+                old = stored[key] if key in stored else "<absent>"
+                new = regenerated[key] if key in regenerated else "<absent>"
+                differences.append(
+                    f"{path}.{key}: stored={json.dumps(old, sort_keys=True, default=str)}; "
+                    f"regenerated={json.dumps(new, sort_keys=True, default=str)}"
+                )
+                continue
+            differences.extend(_field_differences(
+                f"{path}.{key}", stored[key], regenerated[key],
+            ))
+        return differences
+    if isinstance(stored, list) and isinstance(regenerated, list):
+        if len(stored) != len(regenerated):
+            return [
+                f"{path}: stored={json.dumps(stored, sort_keys=True, default=str)}; "
+                f"regenerated={json.dumps(regenerated, sort_keys=True, default=str)}"
+            ]
+        differences = []
+        for index, (old, new) in enumerate(zip(stored, regenerated)):
+            differences.extend(_field_differences(f"{path}[{index}]", old, new))
+        return differences
+    if stored == regenerated:
+        return []
+    return [
+        f"{path}: stored={json.dumps(stored, sort_keys=True, default=str)}; "
+        f"regenerated={json.dumps(regenerated, sort_keys=True, default=str)}"
+    ]
+
+
+def _compact_difference_paths(differences: list[str], prefix: str) -> str:
+    fields = [difference.split(": stored=", 1)[0] for difference in differences]
+    indexed: dict[str, list[int]] = {}
+    compact = []
+    marker = f"{prefix}.experiments["
+    for field in fields:
+        if not field.startswith(marker):
+            compact.append(field.removeprefix(f"{prefix}."))
+            continue
+        closing = field.find("]", len(marker))
+        if closing == -1:
+            compact.append(field.removeprefix(f"{prefix}."))
+            continue
+        try:
+            index = int(field[len(marker):closing])
+        except ValueError:
+            compact.append(field.removeprefix(f"{prefix}."))
+            continue
+        suffix = field[closing + 1:]
+        indexed.setdefault(suffix, []).append(index)
+    compact.extend(
+        f"experiments[{','.join(map(str, sorted(indices)))}]{suffix}"
+        for suffix, indices in sorted(indexed.items())
+    )
+    return ", ".join(compact)
+
+
 def _store_difference_details(
     stored: dict[str, bytes], regenerated: dict[str, bytes], paths: list[str]
 ) -> str:
-    details = []
+    details = [f"changed_store_paths={len(paths)}"]
     for path in paths:
         stored_bytes = stored.get(path)
         regenerated_bytes = regenerated.get(path)
@@ -198,6 +254,29 @@ def _store_difference_details(
                 f"{len(regenerated_bytes)} regenerated)"
             )
             continue
+        if path.startswith("data/literature/works/"):
+            stored_work = yaml.load(stored_bytes, Loader=_FAST_SAFE_YAML_LOADER)
+            regenerated_work = yaml.load(regenerated_bytes, Loader=_FAST_SAFE_YAML_LOADER)
+            differences = _field_differences("work", stored_work, regenerated_work)
+            work = stored_work.get("work") if isinstance(stored_work, dict) else None
+            if not isinstance(work, dict) and isinstance(regenerated_work, dict):
+                work = regenerated_work.get("work")
+            source_ids = work.get("source_ids", []) if isinstance(work, dict) else []
+            work_id = work.get("work_id") if isinstance(work, dict) else None
+            source_label = (
+                ",".join(map(str, source_ids))
+                if source_ids
+                else f"work_id={work_id}"
+            )
+            details.append(
+                f"work {source_label}: "
+                + (
+                    _compact_difference_paths(differences, "work")
+                    if differences
+                    else "bytes differ without a YAML field difference"
+                )
+            )
+            continue
         stored_rows = _observation_rows(stored_bytes)
         regenerated_rows = _observation_rows(regenerated_bytes)
         changed_rows = [
@@ -207,10 +286,18 @@ def _store_difference_details(
         ]
         if changed_rows:
             for observation_id in changed_rows:
+                differences = _field_differences(
+                    "observation",
+                    stored_rows.get(observation_id),
+                    regenerated_rows.get(observation_id),
+                )
                 details.append(
-                    f"{path}::{observation_id}\n"
-                    f"  stored: {json.dumps(stored_rows.get(observation_id), sort_keys=True)}\n"
-                    f"  regenerated: {json.dumps(regenerated_rows.get(observation_id), sort_keys=True)}"
+                    f"{path}::{observation_id}: "
+                    + (
+                        _compact_difference_paths(differences, "observation")
+                        if differences
+                        else "bytes differ without a YAML field difference"
+                    )
                 )
         else:
             details.append(
@@ -524,7 +611,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
           "relation": "Torr_to_Pa"
         },
         "locator": {
-          "note": "TABLE 1. Results of 12 tests with the prototype system from 2005",
+          "note": "TABLE 1. Results of 12 tests with the prototype system from 2005; printed_cell=[\"0.23 Torr\", \"Torr\"]",
           "pdf_page_index": 3,
           "table": "1"
         },
@@ -2340,7 +2427,8 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
   }
 }
     ''')
-    assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
+    differences = _field_differences("observations", expected, actual)
+    assert not differences, "\n".join(differences)
 
 
 def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:

@@ -1,51 +1,50 @@
-"""Remote-gate probe for the fold-21 admitted-input census.
-
-The table is a warning so ``pytest -q`` keeps it. The four iron-redox
-sources have no O2 fugacity setpoint, so their lost-exemption count is
-zero and is reported, not required. A synthetic same-cell O2 row is the
-executable check that round 18's exemption is lost and the admitted
-oxygen changes.
-"""
+"""Remote-gate probe for actual pressure and oxygen engine requests."""
 
 from __future__ import annotations
 
-import sys
+import json
 import warnings
 from dataclasses import replace
 from decimal import Decimal
-from pathlib import Path
 
-from simulator.battery.enums import FO2Channel, Quantity
-from simulator.battery.records import FO2Control, Located, Locator, State, Value
+from simulator.battery.enums import AmountBasis, FO2Channel, Quantity
+from simulator.battery.records import (
+    Composition,
+    FO2Control,
+    Located,
+    Locator,
+    State,
+    Value,
+)
 from tests.battery import factories as F
 from tests.battery.census_cvpress_round18_round20 import (
-    _load_round18,
+    actual_engine_request,
     census_table,
-    round18_admitted,
-    round21_admitted,
 )
 
 
-def test_admitted_engine_input_census():
+def test_actual_engine_request_census():
+    """Compare old and current assembled requests at the backend boundary."""
+
     table = census_table()
-    assert "simulator.battery.fo2_ladder" not in sys.modules
     assert table
     for row in table:
-        warnings.warn(
-            f"{row['source']} rows={row['rows']} imposed={row['imposed']} "
-            f"lost_exemptions={row['lost_exemptions']} "
-            f"changed_engine_inputs={row['changed_engine_inputs']} "
-            f"gained_exemptions={row['gained_exemptions']}",
-            stacklevel=1,
-        )
+        warnings.warn(json.dumps(row, sort_keys=True), stacklevel=1)
         assert row["rows"] > 0, row
-        assert row["lost_exemptions"] == row["imposed"], row
-        assert row["gained_exemptions"] == 0, row
+        assert row["changed_requests"] == 0, row
+        assert row["changed_pressure_inputs"] == 0, row
+        assert row["changed_oxygen_inputs"] == 0, row
+        assert row["changed_requests"] >= row["changed_pressure_inputs"], row
+        assert row["changed_requests"] >= row["changed_oxygen_inputs"], row
+        assert row["round18_backend_calls"] + row["round18_omitted"] == row["rows"]
+        assert row["current_backend_calls"] + row["current_omitted"] == row["rows"]
 
 
-def test_synthetic_o2_same_cell_loses_the_round18_exemption():
-    root = Path(__file__).resolve().parents[2]
-    old = _load_round18(root)
+def test_backend_capture_stops_before_native_engine():
+    """The captured tuple comes from the actual backend adapter boundary."""
+
+    import simulator.battery.score as current_score
+
     location = Locator(page=3, table="2", record="run 1", note="column=pO2")
     experiment = replace(
         F.tabulation_experiment(),
@@ -58,16 +57,22 @@ def test_synthetic_o2_same_cell_loses_the_round18_exemption():
     )
     identity = replace(
         F.psat_identity("O2"),
-        quantity=State.of(Quantity.FUGACITY),
+        quantity=State.of(Quantity.P_PARTIAL),
         reservoir=None,
-        total_pressure_Pa=None,
+        composition=State.of(Composition(
+            "oxides",
+            (("FeO", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
+            AmountBasis.MOLE_FRACTION,
+        )),
+        total_pressure_Pa=State.of(Decimal("101325")),
+        fO2_Pa=State.unknown("oxygen not printed on this partial-pressure row"),
     )
     row = replace(
         F.observation("synthetic-o2", experiment.experiment_id, identity, Decimal("10")),
         locator=location,
     )
-    was_imposed, previous = round18_admitted(old, row, experiment, Quantity.FUGACITY)
-    current = round21_admitted(row, experiment, Quantity.FUGACITY)
-    assert was_imposed
-    assert previous != current
-    assert "simulator.battery.fo2_ladder" not in sys.modules
+
+    request = actual_engine_request(current_score, row, experiment, None)
+    assert request[0] == "backend_call", request
+    assert request[1] is not None
+    assert request[2] is not None

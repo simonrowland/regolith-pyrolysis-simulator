@@ -2599,14 +2599,22 @@ def test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline(column)
     assert NoticeKind.TARGET_IS_IMPOSED_CONTROL not in {notice.kind for notice in prediction.notices}
     assert "target_is_imposed_control" not in score_module.flagged_strata(prediction.notices)
     if column is None:
-        # A derivation that names the oxygen field is not a located cell.
-        # The measured command stays, and the fugacity refusal stands.
+        # A derivation reference does not make the retained scalar a target
+        # cell. With no Bench, the shared selector supplies the flagged default.
         retained = filtered.fO2_control.oxygen_partial_pressure_Pa
         assert retained is not None and retained.state.value.point == Decimal("10")
-        assert candidate is None
-        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
-        assert not any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
+        assert candidate is not None
+        assert not score_module._headline_payload_admits(
+            residual_to_plain(residual), tier="all_numeric",
+        )
+        resolved = resolve_row_fo2(filtered, None, view, quantity=Quantity.FUGACITY)
+        assert resolved is not None and resolved.po2_bar is not None
+        assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+        assert prediction.refusal_reason is None
+        assert prediction.value == (
+            Decimal(str(resolved.po2_bar)) * score_module.PA_PER_BAR_DEC
+        )
+        assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
         assert not any(
             notice.kind in {
                 NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY,
@@ -2665,7 +2673,7 @@ def test_measured_oxygen_cannot_use_setpoint_exemption(origin):
     row = replace(F.observation("measured-oxygen", run.experiment_id, identity, Decimal("10")),
                   locator=location, derivation=derivation)
 
-    _, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
+    view, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
     assert (filtered.fO2_control.oxygen_partial_pressure_Pa is None) is same_row_only
     assert any(n.kind is NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL
                for n in notices) is same_row_only
@@ -2681,7 +2689,14 @@ def test_measured_oxygen_cannot_use_setpoint_exemption(origin):
         )
         assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
     else:
-        assert prediction.refusal_reason is not None
+        resolved = resolve_row_fo2(filtered, None, view, quantity=Quantity.FUGACITY)
+        assert resolved is not None and resolved.po2_bar is not None
+        assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+        assert prediction.refusal_reason is None
+        assert prediction.value == (
+            Decimal(str(resolved.po2_bar)) * score_module.PA_PER_BAR_DEC
+        )
+        assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
 
 
 @pytest.mark.parametrize("axis", ["total_pressure_Pa", "composition"])
@@ -3028,7 +3043,7 @@ def _assert_default_not_measured(observation, experiment, measured_pa: Decimal):
     return notices
 
 
-def test_buffer_declaration_does_not_return_a_sibling_scalar():
+def test_shared_fugacity_recovery_defaults_with_a_retained_sibling_scalar():
     run = F.tabulation_experiment()
     buffer_at = Locator(page=3, table="2", record="run 1", note="column=buffer")
     scalar_at = Locator(page=3, table="2", record="run 1", note="column=pO2")
@@ -3049,7 +3064,7 @@ def test_buffer_declaration_does_not_return_a_sibling_scalar():
         ),
     )
 
-    _, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
+    view, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
     assert filtered.fO2_control.buffer is None
     assert filtered.fO2_control.oxygen_partial_pressure_Pa is not None
     assert filtered.fO2_control.oxygen_partial_pressure_Pa.state.value.point == Decimal("10")
@@ -3057,12 +3072,16 @@ def test_buffer_declaration_does_not_return_a_sibling_scalar():
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL, row, experiment=run, isolated=False,
     )
-    # The same-cell buffer is excluded. The different-cell scalar is the
-    # retained command, so the engine's fugacity refusal stands.
-    assert prediction.value != Decimal("10")
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
-    assert not any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
+    # The same-cell buffer is excluded; the no-Bench shared selector keeps
+    # the retained scalar from fencing its flagged default.
+    resolved = resolve_row_fo2(filtered, None, view, quantity=Quantity.FUGACITY)
+    assert resolved is not None and resolved.po2_bar is not None
+    assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+    assert prediction.value == (
+        Decimal(str(resolved.po2_bar)) * score_module.PA_PER_BAR_DEC
+    )
+    assert prediction.refusal_reason is None
+    assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
     assert NoticeKind.TARGET_IS_IMPOSED_CONTROL not in {notice.kind for notice in prediction.notices}
 
 
@@ -3277,7 +3296,7 @@ def test_provenance_regressions_detect_bypassing_each_consumer(consumer, monkeyp
     elif consumer == "printed-cell":
         check = partial(
             test_redox_routes_share_printed_cell_identity, borisov_redox_row,
-            "scalar-unit-bars", None, True, True, True,
+            "condition-value", "result", True, False, True,
         )
         bypass = provenance.TargetRelation.SAME_PRINTED_CELL
     elif consumer == "default-headline":
@@ -3361,9 +3380,9 @@ def borisov_redox_row():
     )
     for (comparison, equal), matches in zip((("equal", True), ("different", False)), expectations)
 ] + [
-    pytest.param("scalar-unit-bar", None, True, True, True, id="scalar-unit-bar-row-only"),
-    pytest.param("scalar-unit-bars", None, True, True, True, id="scalar-unit-bars-row-only"),
-    pytest.param("scalar-unit-MPa", None, True, True, False, id="scalar-unit-MPa-row-only"),
+    pytest.param("scalar-unit-bar", None, True, True, False, id="scalar-unit-bar-independent-cell"),
+    pytest.param("scalar-unit-bars", None, True, True, False, id="scalar-unit-bars-independent-cell"),
+    pytest.param("scalar-unit-MPa", None, True, True, False, id="scalar-unit-MPa-independent-cell"),
 ] + [
     pytest.param("interval-unit-bar", None, True, True, True, id="interval-unit-bar-row-only"),
     pytest.param("interval-unit-bars", None, True, True, True, id="interval-unit-bars-row-only"),
@@ -3402,6 +3421,7 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
         target = real
     elif route.startswith("scalar-unit-"):
         unit = route.removeprefix("scalar-unit-")
+        input_address = replace(address, note="column=run pressure")
         control = Located(State.of(Decimal("25000000")), replace(address, note="column=original pressure"))
         original_address = replace(address, note="column=result")
         original = Located(
@@ -3576,7 +3596,14 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
             assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
         else:
             assert not notices
-            assert prediction.refusal_reason is not None
+            resolved = resolve_row_fo2(run, None, view, quantity=Quantity.FUGACITY)
+            assert resolved is not None and resolved.po2_bar is not None
+            assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+            assert prediction.refusal_reason is None
+            assert prediction.value == (
+                Decimal(str(resolved.po2_bar)) * score_module.PA_PER_BAR_DEC
+            )
+            assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
     elif route == "borisov-real-oxygen":
         assert view.point_conditions["fO2_log"].state.value == Decimal("-0.68")
         assert not notices
@@ -3626,6 +3653,13 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
             assert bar == (4000.0 if unit == "MPa" else 400.0)
             assert notice is None
             expected = NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH
+        from tests.battery.census_cvpress_round18_round20 import actual_engine_request
+
+        backend_request = actual_engine_request(
+            score_module, target, experiment, None,
+        )
+        assert backend_request[0] == "backend_call", backend_request
+        assert backend_request[1] == pytest.approx(bar)
         assert [n.kind for n in notices] == [expected]
     elif route == "independent-log-oxygen":
         assert not run.conditions["fO2_log"].state.is_value

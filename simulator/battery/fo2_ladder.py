@@ -124,6 +124,7 @@ class ResolvedFo2:
     policy: NoticePolicy | None = None
     temperature_band_status: str | None = None
     temperature_band_source: str | None = None
+    original_reason: str | None = None
 
 
 _PHYSICS_RUNG_LABELS = {
@@ -195,7 +196,8 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             "DP-010 v2; "
             f"pO2={_DP010_AMBIENT_OXYGEN_ATM} atm; fO2/bar=pO2/(1 bar); "
             f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; "
-            f"original_reason=no printed ferric ratio or determining method/apparatus; {reason}"
+            "original_reason="
+            f"{resolved.original_reason or 'no printed ferric ratio or determining method/apparatus'}; {reason}"
         )
         policy = resolved.policy
         if policy is None:
@@ -407,7 +409,14 @@ def resolve_row_fo2(
                     log, 3, route.route, False,
                     physics_rung=1 if knudsen_vapour else None,
                 )
-    atmosphere = _gas_ratio_fo2(experiment, temperature)
+    gas_control = (
+        None
+        if experiment is None or experiment.fO2_control is None
+        else experiment.fO2_control.gas_ratio
+    )
+    gas_ratio_printed = gas_control is not None and gas_control.value.state.is_value
+    gas_without_bench = gas_ratio_printed and bench is None
+    atmosphere = None if gas_without_bench else _gas_ratio_fo2(experiment, temperature)
     if atmosphere is not None:
         if knudsen_vapour:
             return ResolvedFo2(
@@ -544,6 +553,17 @@ def resolve_row_fo2(
             "DP-010",
             resolved_fo2_log10_bar=math.log10(oxygen_bar),
         )
+        original_reason = None
+        if gas_without_bench:
+            original_reason = "gas_ratio_requires_bench_but_none_was_supplied"
+        elif (
+            bench is None
+            and experiment is not None
+            and experiment.fO2_control is not None
+            and experiment.fO2_control.buffer is not None
+            and experiment.fO2_control.buffer.state.is_value
+        ):
+            original_reason = "buffer_requires_bench_but_none_was_supplied"
         return ResolvedFo2(
             float(resolved.value),
             4,
@@ -551,6 +571,7 @@ def resolve_row_fo2(
             False,
             po2_bar=oxygen_bar,
             policy=NoticePolicy(**resolved.payload["policy"]),
+            original_reason=original_reason,
         )
     return None
 

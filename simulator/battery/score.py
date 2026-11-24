@@ -14864,62 +14864,14 @@ def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
     )
 
 
-def _printed_oxygen_scalar(
-    observation: Observation, experiment: Experiment | None,
-) -> bool:
-    """True when a numeric oxygen pressure remains on this view."""
-
-    identity = observation.identity
-    if isinstance(identity, Identity):
-        fo2 = identity.fO2_Pa
-        if fo2 is not None and fo2.is_value and fo2.value is not None:
-            return True
-    for field, condition in (observation.point_conditions or {}).items():
-        if condition_identity_axis(field) == "fO2_Pa" and condition.state.is_value:
-            return True
-    control = None if experiment is None else experiment.fO2_control
-    if control is None:
-        return False
-    scalar = control.oxygen_partial_pressure_Pa
-    return scalar is not None and scalar.state.is_value
-
-
-def _buffer_or_gas_without_scalar(
-    observation: Observation, experiment: Experiment | None,
-) -> bool:
-    """True when the only remaining oxygen control is a buffer or a gas ratio.
-
-    A scalar pressure is an engine input on its own. A buffer or gas route
-    needs a bench; without one the caller uses the registered default.
-    """
-
-    if _printed_oxygen_scalar(observation, experiment):
-        return False
-    control = None if experiment is None else experiment.fO2_control
-    if control is None:
-        return False
-    gas = None if control.gas_ratio is None else control.gas_ratio.value
-    buffer = control.buffer
-    return any(
-        located is not None and located.state.is_value
-        for located in (buffer, gas)
-    )
-
-
-def _lost_exemption_oxygen_prediction(
+def _recover_fugacity_from_shared_oxygen(
     prediction: EnginePrediction,
     observation: Observation,
     experiment: Experiment | None,
     bench: Bench | None,
     quantity: Quantity | None,
 ) -> EnginePrediction:
-    """Predict a fugacity row whose oxygen command cannot be an engine input.
-
-    d-460: a target-dependent oxygen value, and a buffer or gas route with no
-    bench, take the registered default and its notice. An independent
-    scalar command is left on the engine's own refusal. Partial pressure
-    stays on the ordinary cell path.
-    """
+    """Resolve an O2 fugacity result through the row's shared oxygen ladder."""
 
     if quantity is not Quantity.FUGACITY:
         return prediction
@@ -14939,27 +14891,8 @@ def _lost_exemption_oxygen_prediction(
     fo2_observation, filtered, exclusion_notices = _redox_input_view(
         observation, quantity, experiment,
     )
-    excluded = any(
-        notice.kind in {
-            NoticeKind.CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL,
-            NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH,
-            NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY,
-        }
-        for notice in exclusion_notices
-    )
-    if excluded and _printed_oxygen_scalar(fo2_observation, filtered):
-        # The excluded control left an independent scalar. The engine's
-        # fugacity refusal stands; the default must not replace that command.
-        return prediction
-    if not excluded and (
-        bench is not None or not _buffer_or_gas_without_scalar(fo2_observation, filtered)
-    ):
-        return prediction
-    ladder_experiment = filtered
-    if not excluded and filtered is not None and filtered.fO2_control is not None:
-        ladder_experiment = replace(filtered, fO2_control=None)
     resolved = resolve_row_fo2(
-        ladder_experiment, bench, fo2_observation, quantity=quantity,
+        filtered, bench, fo2_observation, quantity=quantity,
     )
     if resolved is None or resolved.closure:
         return prediction
@@ -14997,8 +14930,8 @@ def _predict_with_engine(
     """Predict one non-catalog row from the supplied inputs.
 
     Target-dependent inputs are removed where pressure and oxygen are read.
-    A fugacity row the engine cannot predict is recovered by
-    ``_lost_exemption_oxygen_prediction``.
+    A fugacity row the engine cannot predict is recovered by the shared
+    oxygen selector.
     """
 
     _require_score_engine(engine)
@@ -15017,7 +14950,7 @@ def _predict_with_engine(
         phase_siblings=phase_siblings,
         phase_sibling_refusal=phase_sibling_refusal,
     )
-    return _lost_exemption_oxygen_prediction(
+    return _recover_fugacity_from_shared_oxygen(
         prediction, observation, experiment, bench, quantity,
     )
 
@@ -15037,8 +14970,8 @@ def _predict_engine_from_supplied_inputs(
     """Dispatch one engine at the observation Identity. Isolated MELTS cells.
 
     Target-dependent inputs are removed where pressure and oxygen are read.
-    A fugacity row the engine cannot predict is recovered by
-    ``_lost_exemption_oxygen_prediction``.
+    A fugacity row the engine cannot predict is recovered by the shared
+    oxygen selector.
     """
 
     _require_score_engine(engine)

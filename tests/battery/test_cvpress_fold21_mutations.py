@@ -41,7 +41,7 @@ from simulator.battery.records import (
 from simulator.battery.score import EnginePrediction, predict_with_engine
 from simulator.battery.printed_cells import located_printed_cell
 from tests.battery import factories as F
-from tests.battery.census_cvpress_round18_round20 import admitted_engine_input
+from tests.battery.census_cvpress_round18_round20 import actual_engine_request
 
 DP010_BAR = 0.2127825
 COMMAND_FIELD = "experiment.fO2_control.oxygen_partial_pressure_Pa"
@@ -263,6 +263,15 @@ def test_unitless_operand_at_another_cell_cannot_reuse_the_target(monkeypatch):
     run = replace(run, fO2_control=FO2Control(
         State.of(FO2Channel.COMMANDED), oxygen_partial_pressure_Pa=command,
     ))
+
+    backend_request = actual_engine_request(score_module, row, run, _bench(run))
+    assert backend_request[0] == "backend_call", backend_request
+    assert backend_request[3] == pytest.approx(DP010_BAR)
+    assert any(
+        notice[0] == NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY.value
+        for notice in backend_request[5][0][3]
+    ), backend_request[5]
+
     seen = _install_spy(monkeypatch)
 
     def request():
@@ -385,6 +394,16 @@ def test_buffer_with_sibling_scalar_and_no_bench_uses_the_default(monkeypatch):
 
     assert prediction.value == Decimal("21278.25")
     assert partial_pressure == pytest.approx(DP010_BAR)
+    fugacity_default = next(
+        notice for notice in prediction.notices
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    )
+    partial_default = next(
+        notice for notice in seen["input_notices"]
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    )
+    assert "original_reason=buffer_requires_bench_but_none_was_supplied" in fugacity_default.reason
+    assert "original_reason=buffer_requires_bench_but_none_was_supplied" in partial_default.reason
     assert any(
         notice.policy is not None and notice.policy.id == "DP-010"
         for notice in prediction.notices
@@ -420,7 +439,8 @@ def test_unsourced_identity_equal_to_the_target_is_commanded(monkeypatch):
 def test_filter_bypass_restores_excluded_partial_pressure_commands(monkeypatch):
     """Ruling 3. The ordinary cell reads the filtered assembly.
 
-    Bypassing ``_redox_input_view`` puts the same-cell command back.
+    Bypassing ``_redox_input_view`` puts the same-cell command back in the
+    actual backend request.
     """
 
     attached_at = Locator(page=3, table="2", record="run 1", note="column=pO2")
@@ -438,9 +458,18 @@ def test_filter_bypass_restores_excluded_partial_pressure_commands(monkeypatch):
         },
     )
 
+    original_oxygen_input_request = score_module._oxygen_input_request
     seen = _install_spy(monkeypatch)
     assert _po2(seen, attached, run, bench) == pytest.approx(DP010_BAR)
     assert _po2(seen, detached, no_run) == pytest.approx(DP010_BAR)
+
+    with monkeypatch.context() as request_patch:
+        request_patch.setattr(
+            score_module, "_oxygen_input_request", original_oxygen_input_request,
+        )
+        backend_baseline = actual_engine_request(score_module, attached, run, bench)
+    assert backend_baseline[0] == "backend_call", backend_baseline
+    assert backend_baseline[3] == pytest.approx(DP010_BAR)
 
     def passthrough(observation, _quantity, experiment):
         return observation, experiment, ()
@@ -448,6 +477,13 @@ def test_filter_bypass_restores_excluded_partial_pressure_commands(monkeypatch):
     monkeypatch.setattr(score_module, "_redox_input_view", passthrough)
     assert _po2(seen, attached, run, bench) == pytest.approx(0.0001)
     assert _po2(seen, detached, no_run) == pytest.approx(0.00012)
+    with monkeypatch.context() as request_patch:
+        request_patch.setattr(
+            score_module, "_oxygen_input_request", original_oxygen_input_request,
+        )
+        backend_mutant = actual_engine_request(score_module, attached, run, bench)
+    assert backend_mutant[0] == "backend_call", backend_mutant
+    assert backend_mutant[3] == pytest.approx(0.0001)
 
 
 def test_missing_apparatus_stays_a_flagged_default(monkeypatch):
@@ -489,39 +525,3 @@ def test_missing_apparatus_stays_a_flagged_default(monkeypatch):
     )
     assert mutant.refusal_reason is RefusalReason.UNSUPPORTED
     assert mutant.refusal_detail["reason"] == "quantity_not_predicted"
-
-
-def test_admitted_engine_input_counts_identity_not_shadowed_fields():
-    """Ruling 5. The census key is the one oxygen the engine would read."""
-
-    identity_at = Locator(page=2, table="1", record="row", note="column=fO2")
-    point_at = Locator(page=8, table="9", record="other", note="column=pO2")
-    buffer_at = Locator(page=9, record="buffer")
-    identity = _partial_identity(fo2=Decimal("10"))
-    row = replace(
-        F.observation("shadowed", "exp-1", identity, Decimal("1")),
-        locator=identity_at,
-        point_conditions={
-            "fO2_Pa": Located(State.of(Decimal("12")), point_at),
-        },
-    )
-    run = replace(F.tabulation_experiment(), fO2_control=FO2Control(
-        State.of(FO2Channel.BUFFER),
-        buffer=Located(State.of("QFM"), buffer_at),
-    ))
-    pressure, oxygen = admitted_engine_input(row, run)
-    assert oxygen == ("identity.fO2_Pa", "10")
-    assert "12" not in oxygen
-    assert "QFM" not in oxygen
-
-    def shadow_every_field(observation, experiment):
-        point = observation.point_conditions["fO2_Pa"].state.value
-        buffer = experiment.fO2_control.buffer.state.value
-        return (
-            pressure,
-            oxygen,
-            ("point_conditions.fO2_Pa", format(point, "f")),
-            ("experiment.fO2_control.buffer", buffer),
-        )
-
-    assert shadow_every_field(row, run) != (pressure, oxygen)

@@ -1,40 +1,19 @@
-#!/usr/bin/env python3
-"""Pair round-18 exemptions with the admitted engine input. No engine calls.
-
-Round 18 is the classifier at 5ac2ecd4b5, loaded from git. Round 21 is
-``independent_redox_conditions`` in this tree. The historical module is
-registered before exec so its dataclasses resolve under the caller's
-future-annotations flag.
-
-Round 18 filtered only after ``imposed_oxygen_target`` and, when that
-filter still had a scalar, buffer or gas command, returned that command
-instead of calling the engine. Every other round-18 row kept the raw
-observation. Round 21 always filters, and never grants an imposed-control
-exemption.
-
-The admitted input is one total pressure plus the one oxygen the ordinary
-cell would read. A surviving identity fO2 outranks a point oxygen, a
-buffer and a gas ratio. Shadowed fields are not counted.
-"""
+"""Compare historical and current pressure/oxygen inputs at the engine call."""
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import types
+from collections import Counter
 from pathlib import Path
+from unittest.mock import patch
 
-from simulator.battery.enums import MethodToken, Quantity
+from simulator.battery.enums import Engine, Quantity
 from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.migrate import (
-    condition_identity_axis,
-    located_condition_identity_value,
-    located_run_pressure,
-    located_run_temperature,
-    redox_identity_sources,
-)
-from simulator.battery.records import Experiment, Located, Observation
-from simulator.battery.redox_fields import independent_redox_conditions
+from simulator.battery.records import Bench, Observation
+from simulator.diagnostic_helpers import binary_pot_battery
 from tests.battery.factories import migrate_one_extract
 
 ROUND18 = "5ac2ecd4b5"
@@ -52,170 +31,165 @@ REDOX_QUANTITIES = {
 }
 
 
-def _load_round18(root: Path):
+class _BackendBoundaryReached(BaseException):
+    pass
+
+
+class _NativeEngineOpened(BaseException):
+    pass
+
+
+def _load_revision_module(root: Path, revision: str, path: str, name: str):
     source = subprocess.check_output(
-        ["git", "show", f"{ROUND18}:simulator/battery/redox_fields.py"],
-        cwd=root,
-        text=True,
+        ["git", "show", f"{revision}:{path}"], cwd=root, text=True,
     )
-    module = types.ModuleType("redox_fields_round18")
-    module.__file__ = "<redox_fields_round18>"
-    # Dataclasses resolve annotations through sys.modules. Register first.
-    sys.modules[module.__name__] = module
+    module = types.ModuleType(name)
+    module.__file__ = f"<{name}>"
+    module.__package__ = "simulator.battery"
+    sys.modules[name] = module
     exec(compile(source, module.__file__, "exec"), module.__dict__)
     return module
 
 
-def _value_token(value) -> str | None:
-    if value is None:
-        return None
-    point = getattr(value, "point", None)
-    if point is not None:
-        return format(point, "f") if hasattr(point, "as_tuple") else str(point)
-    if hasattr(value, "as_tuple"):
-        return format(value, "f")
-    return str(value)
-
-
-def _state_token(state) -> str | None:
-    if state is None or not state.is_value or state.value is None:
-        return None
-    return _value_token(state.value)
-
-
-def _located_token(located) -> str | None:
-    if located is None:
-        return None
-    return _state_token(getattr(located, "state", None))
-
-
-def _knudsen(experiment: Experiment | None) -> bool:
-    return bool(
-        experiment is not None
-        and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+def _load_round18(root: Path):
+    fields = _load_revision_module(
+        root, ROUND18, "simulator/battery/redox_fields.py", "redox_fields_round18",
     )
-
-
-def _pressure_token(observation: Observation, experiment: Experiment | None) -> tuple:
-    """First recorded total pressure, in the ordinary cell's order."""
-
-    identity = observation.identity
-    token = _state_token(getattr(identity, "total_pressure_Pa", None))
-    if token is not None:
-        return ("identity.total_pressure_Pa", token)
-    point = (observation.point_conditions or {}).get("total_pressure_Pa")
-    if isinstance(point, Located) and point.inference is None:
-        token = _located_token(point)
-        if token is not None:
-            return ("point_conditions.total_pressure_Pa", token)
-    if experiment is not None and not _knudsen(experiment):
-        token = _located_token(experiment.pressure_environment.total_pressure_Pa)
-        if token is not None:
-            return ("experiment.pressure_environment.total_pressure_Pa", token)
-    return ("default", "DP-001")
-
-
-def _control_oxygen(experiment: Experiment | None) -> tuple | None:
-    """Scalar, then buffer, then gas. The historical imposed command order."""
-
-    control = None if experiment is None else experiment.fO2_control
-    if control is None:
-        return None
-    scalar = _located_token(control.oxygen_partial_pressure_Pa)
-    if scalar is not None:
-        return ("experiment.fO2_control.oxygen_partial_pressure_Pa", scalar)
-    buffer = _located_token(control.buffer)
-    if buffer is not None:
-        return ("experiment.fO2_control.buffer", buffer)
-    gas = control.gas_ratio
-    if gas is not None:
-        token = _located_token(gas.value)
-        if token is not None:
-            return (
-                "experiment.fO2_control.gas_ratio",
-                f"{gas.numerator_species}/{gas.denominator_species}:{token}",
+    with patch.dict(sys.modules, {"simulator.battery.redox_fields": fields}):
+        ladder = _load_revision_module(
+            root, ROUND18, "simulator/battery/fo2_ladder.py", "fo2_ladder_round18",
+        )
+        with patch.dict(sys.modules, {"simulator.battery.fo2_ladder": ladder}):
+            score = _load_revision_module(
+                root, ROUND18, "simulator/battery/score.py", "score_round18",
             )
-    return None
+    return {"simulator.battery.redox_fields": fields,
+            "simulator.battery.fo2_ladder": ladder}, score
 
 
-def _point_oxygen(observation: Observation) -> tuple | None:
-    for field, condition in sorted((observation.point_conditions or {}).items()):
-        if condition_identity_axis(field) != "fO2_Pa":
-            continue
-        token = _located_token(condition)
-        if token is not None:
-            return (f"point_conditions.{field}", token)
-    return None
+def actual_engine_request(
+    score_module,
+    observation: Observation,
+    experiment,
+    bench: Bench | None,
+    *,
+    revision_modules: dict[str, types.ModuleType] | None = None,
+) -> tuple:
+    """Stop at the production adapter boundary and return its actual inputs.
 
-
-def admitted_engine_input(observation: Observation, experiment: Experiment | None) -> tuple:
-    """One pressure and the one oxygen the ordinary cell would read.
-
-    Identity fO2 wins over a point oxygen and over every experiment
-    control. The token is that single command, not the shadowed fields.
+    The patched adapter is the last scorer/backend boundary before native
+    work. A pre-opened inert handle and a forbidden engine opener make the
+    census incapable of invoking a native engine.
     """
 
-    identity = observation.identity
-    token = _state_token(getattr(identity, "fO2_Pa", None))
-    if token is not None:
-        oxygen = ("identity.fO2_Pa", token)
-    else:
-        oxygen = (
-            _control_oxygen(experiment)
-            or _point_oxygen(observation)
-            or ("default", "DP-010")
+    requests: list[tuple] = []
+    engine = Engine.ALPHAMELTS
+    handle = binary_pot_battery.EngineHandle(
+        name=engine.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+
+    def capture(_handle, _pot, *, po2, **kwargs):
+        requests.append((
+            "backend_call",
+            kwargs.get("physical_pressure_bar"),
+            getattr(getattr(po2, "mode", None), "value", getattr(po2, "mode", None)),
+            getattr(po2, "po2_bar", None),
+            getattr(po2, "cell_material", None),
+        ))
+        raise _BackendBoundaryReached()
+
+    def forbid_native_open(*_args, **_kwargs):
+        raise _NativeEngineOpened()
+
+    oxygen_assemblies = []
+    original_oxygen_request = score_module._oxygen_input_request
+
+    def record_oxygen_request(**kwargs):
+        decision = original_oxygen_request(**kwargs)
+        notices = tuple(
+            (
+                getattr(notice.kind, "value", notice.kind),
+                notice.reason,
+                None if notice.policy is None else notice.policy.id,
+            )
+            for notice in kwargs["input_notices"]
         )
-    return (_pressure_token(observation, experiment), oxygen)
+        oxygen_assemblies.append((
+            getattr(decision, "mode", None),
+            getattr(decision, "po2_bar", None),
+            getattr(getattr(decision, "refusal_reason", None), "value", None),
+            notices,
+        ))
+        return decision
+
+    with (
+        patch.object(binary_pot_battery, "equilibrate_cell", capture),
+        patch.object(binary_pot_battery, "open_battery_engine", forbid_native_open),
+        patch.object(score_module, "_oxygen_input_request", record_oxygen_request),
+        patch.dict(sys.modules, revision_modules or {}),
+    ):
+        try:
+            prediction = score_module.predict_with_engine(
+                engine,
+                observation,
+                experiment=experiment,
+                bench=bench,
+                isolated=False,
+                handles={engine.value: handle},
+            )
+        except _BackendBoundaryReached:
+            pass
+        else:
+            if requests:
+                raise AssertionError("backend boundary was crossed more than once")
+            execution = getattr(prediction, "execution", None)
+            refusal = getattr(prediction, "refusal_reason", None)
+            requests.append((
+                "not_called",
+                None if execution is None else getattr(execution.state, "value", execution.state),
+                None if refusal is None else getattr(refusal, "value", refusal),
+                json.dumps(getattr(prediction, "refusal_detail", None), sort_keys=True, default=str),
+                None if getattr(prediction, "value", None) is None else str(prediction.value),
+            ))
+    if len(requests) != 1:
+        raise AssertionError(f"expected one backend outcome, got {requests!r}")
+    return (*requests[0], tuple(oxygen_assemblies))
 
 
-def _filter_kwargs(quantity: Quantity, experiment, identity_sources):
-    return dict(
-        quantity=quantity,
-        ferric_target=quantity is Quantity.FE3_FE2_RATIO,
-        condition_identity_axis=condition_identity_axis,
-        condition_identity_value=located_condition_identity_value,
-        temperature_selection=located_run_temperature,
-        pressure_selection=located_run_pressure,
-        identity_sources=identity_sources,
-        experiment=experiment,
-    )
+def _request_was_called(request: tuple) -> bool:
+    return request[0] == "backend_call"
 
 
-def round18_admitted(old, row: Observation, experiment, quantity: Quantity) -> tuple[bool, tuple]:
-    """Round 18's actual command, and whether the row was an imposed exemption."""
-
-    imposed = (
-        experiment is not None
-        and old.imposed_oxygen_target(
-            row, experiment, resolve_identity_sources=redox_identity_sources,
-        )
-    )
-    if not imposed:
-        return False, admitted_engine_input(row, experiment)
-    viewed, filtered, _notices = old.independent_redox_conditions(
-        row, **_filter_kwargs(quantity, experiment, redox_identity_sources(row, experiment)),
-    )
-    command = _control_oxygen(filtered)
-    if command is None:
-        # The imposed short-circuit returned nothing, so the engine ran
-        # on the unfiltered row.
-        return True, admitted_engine_input(row, experiment)
-    return True, (_pressure_token(viewed, filtered), command)
+def _pressure_input(request: tuple):
+    return request[1] if _request_was_called(request) else ("omitted",)
 
 
-def round21_admitted(row: Observation, experiment, quantity: Quantity) -> tuple:
-    viewed, filtered, _notices = independent_redox_conditions(
-        row, **_filter_kwargs(quantity, experiment, redox_identity_sources(row, experiment)),
-    )
-    return admitted_engine_input(viewed, filtered)
+def _oxygen_input(request: tuple):
+    if _request_was_called(request):
+        return request[2:5] + (request[5],)
+    return "not_called", request[5]
 
 
-def census_source(old, root: Path, source: str) -> dict:
+def census_source(
+    old_modules: dict[str, types.ModuleType],
+    old_score,
+    current_score,
+    root: Path,
+    source: str,
+) -> dict:
     path = root / "data/literature/extracts" / f"{source}.yaml"
     migrator = migrate_one_extract(root, path)
     migrator.finalize()
-    rows = imposed = lost = gained = changed = 0
+    rows = old_calls = current_calls = old_omitted = current_omitted = 0
+    changed = pressure_changed = oxygen_changed = 0
+    old_backend_modes: Counter[str] = Counter()
+    current_backend_modes: Counter[str] = Counter()
+    changed_rows = []
     for row in migrator.result.observations.values():
         if not isinstance(row.identity, Identity):
             continue
@@ -223,51 +197,57 @@ def census_source(old, root: Path, source: str) -> dict:
         if quantity not in REDOX_QUANTITIES:
             continue
         experiment = migrator.result.experiments.get(row.experiment_id)
+        if experiment is None:
+            continue
         rows += 1
-        was_imposed, previous = round18_admitted(old, row, experiment, quantity)
-        current = round21_admitted(row, experiment, quantity)
-        # Round 21 has no imposed-control relation.
-        is_imposed = False
-        imposed += int(was_imposed)
-        lost += int(was_imposed and not is_imposed)
-        gained += int(is_imposed and not was_imposed)
+        old_bench = old_score._bench_for_score(experiment, migrator.result.benches)
+        current_bench = current_score._bench_for_score(experiment, migrator.result.benches)
+        previous = actual_engine_request(
+            old_score, row, experiment, old_bench, revision_modules=old_modules,
+        )
+        current = actual_engine_request(
+            current_score, row, experiment, current_bench,
+        )
+        old_calls += int(_request_was_called(previous))
+        current_calls += int(_request_was_called(current))
+        old_omitted += int(not _request_was_called(previous))
+        current_omitted += int(not _request_was_called(current))
         changed += int(previous != current)
+        pressure_changed += int(_pressure_input(previous) != _pressure_input(current))
+        oxygen_changed += int(_oxygen_input(previous) != _oxygen_input(current))
+        if _request_was_called(previous):
+            old_backend_modes[str(previous[2])] += 1
+        if _request_was_called(current):
+            current_backend_modes[str(current[2])] += 1
+        if previous != current:
+            changed_rows.append({
+                "observation_id": row.observation_id,
+                "quantity": quantity.value,
+                "round18": previous,
+                "current": current,
+            })
     return {
         "source": source,
         "rows": rows,
-        "imposed": imposed,
-        "lost_exemptions": lost,
-        "changed_engine_inputs": changed,
-        "gained_exemptions": gained,
+        "round18_backend_calls": old_calls,
+        "current_backend_calls": current_calls,
+        "round18_omitted": old_omitted,
+        "current_omitted": current_omitted,
+        "changed_requests": changed,
+        "changed_pressure_inputs": pressure_changed,
+        "changed_oxygen_inputs": oxygen_changed,
+        "round18_backend_modes": dict(sorted(old_backend_modes.items())),
+        "current_backend_modes": dict(sorted(current_backend_modes.items())),
+        "changed_rows": changed_rows,
     }
 
 
 def census_table(root: Path | None = None) -> list[dict]:
+    from simulator.battery import score as current_score
+
     root = Path(__file__).resolve().parents[2] if root is None else root
-    old = _load_round18(root)
-    table = [census_source(old, root, source) for source in SOURCES]
-    # simulator.battery.__init__ imports the scorer. This census does not
-    # call it and does not load the oxygen ladder.
-    if "simulator.battery.fo2_ladder" in sys.modules:
-        raise RuntimeError("census loaded the oxygen ladder")
-    return table
-
-
-def main() -> int:
-    try:
-        table = census_table()
-    except RuntimeError as exc:
-        print(exc, file=sys.stderr)
-        return 1
-    for row in table:
-        print(
-            f"{row['source']} rows={row['rows']} "
-            f"lost_exemptions={row['lost_exemptions']} "
-            f"changed_engine_inputs={row['changed_engine_inputs']} "
-            f"gained_exemptions={row['gained_exemptions']}"
-        )
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+    old_modules, old_score = _load_round18(root)
+    return [
+        census_source(old_modules, old_score, current_score, root, source)
+        for source in SOURCES
+    ]

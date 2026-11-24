@@ -162,8 +162,7 @@ def classify_target_provenance(
                 and own_print is not None
                 and own_print.unit is not None
                 and cell.unit is None
-                and cell.value is not None
-                and cell.value == own_print.value
+                and same_printed_cell(cell, own_print) == "same"
             ):
                 continue
             match = _match_target_cell(targets, cell)
