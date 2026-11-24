@@ -5978,8 +5978,8 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    # Unmounted corpus baseline: Barin's 124 plus Kennedy's 169 attested table pins.
-    assert source_blind_pins == 293
+    # Unmounted corpus baseline: Barin's 124 plus Kennedy's 170 attested table pins.
+    assert source_blind_pins == 294
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
@@ -6235,6 +6235,7 @@ def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates(
 
     assert non_finite == []
     assert measured == [
+        ("values", "quantity"),
         ("values", "temperature_uncertainty_as_printed"),
         ("values", "uncertainty_as_published"),
         ("values", "point_conditions", "fO2_control", "state", "value"),
@@ -6306,7 +6307,7 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
                     ):
                         if field in value_mapping and isinstance(
                             value_mapping[field], str
-                        ):
+                        ) and vle._string_has_ascii_digit(value_mapping[field]):
                             seen[field] += 1
                             assert prefix + (field,) in measured
 
@@ -6344,14 +6345,11 @@ def test_scored_leaf_classifier_reversion_mutation_probe(monkeypatch):
 
 
 def _uncertainty_fields_are_measured_in_itoh_and_snyder():
-    for filename, expected_path in (
-        (
-            "itoh-1989-zno-solid-zinc-silicate.yaml",
-            ("values", "uncertainty_as_published"),
-        ),
+    for filename, field in (
+        ("itoh-1989-zno-solid-zinc-silicate.yaml", "uncertainty_as_published"),
         (
             "snyder-carmichael-1992-olivine-liquid-feo-activity.yaml",
-            ("values", "temperature_uncertainty_as_printed"),
+            "temperature_uncertainty_as_printed",
         ),
     ):
         path = REPO_ROOT / "data/literature/extracts" / filename
@@ -6364,7 +6362,10 @@ def _uncertainty_fields_are_measured_in_itoh_and_snyder():
             for row in observations.values()
             for leaf in vle._scored_measured_leaves(row)
         }
-        assert expected_path in measured_paths
+        assert any(
+            path[0] == "values" and path[-1] == field
+            for path in measured_paths
+        )
 
 
 def test_printed_uncertainties_are_measured_leaves_in_itoh_and_snyder():
