@@ -5,6 +5,7 @@ from decimal import Decimal
 from pathlib import Path
 import re
 import subprocess
+import sys
 from zipfile import ZipFile
 
 import pytest
@@ -293,79 +294,56 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert starting_values["H2O_wt_percent"] == "0.04"
     assert starting_values["H2O_sigma"] == "0.00"
     assert starting_values["EO_wt_percent_as_published"] == "-0.4"
-    assert (
-        _pdf_page_with_proof(
-            regolith_corpus_root()
-            / "raw"
-            / SOURCE_ID
-            / f"{SOURCE_ID}.pdf",
-            "23.54 0.59 7.94 8.36 4.58 8.10 2.03 0.17 44.46 0.00 0.00 99.76",
-        )
-        == starting_context["locator"]["page"]
-    )
-    assert (
-        _pdf_page_with_proof(
-            regolith_corpus_root()
-            / "raw"
-            / SOURCE_ID
-            / f"{SOURCE_ID}.pdf",
-            "Standard deviations (1 sd) are based on multiple analyses and are given in Italics",
-        )
-        == 3
-    )
-    assert (
-        _pdf_page_with_proof(
-            regolith_corpus_root()
-            / "raw"
-            / SOURCE_ID
-            / f"{SOURCE_ID}.pdf",
-            "EO values in experimental samples are calculated assuming all iron is trivalent",
-        )
-        == 3
-    )
-    assert (
-        _pdf_page_with_proof(
-            regolith_corpus_root()
-            / "raw"
-            / SOURCE_ID
-            / f"{SOURCE_ID}.pdf",
-            "no PtO2 is present in the samples after the experiments",
-        )
-        == 7
-    )
-    product_quench_page = _pdf_page_with_proof(
-        regolith_corpus_root()
-        / "raw"
-        / SOURCE_ID
-        / f"{SOURCE_ID}.pdf",
-        "Some EO may have degassed during the temperature quenching process",
-    )
-    assert product_quench_page == 2
-    assert (
-        _pdf_page_with_proof(
-            regolith_corpus_root()
-            / "raw"
-            / SOURCE_ID
-            / f"{SOURCE_ID}.pdf",
-            "Page 2 of 9",
-        )
-        == product_quench_page
-    )
-    first_run_proof = (
-        "23.40 0.58 7.55 8.15 4.43 8.07 2.02 0.20 43.93 0.00 0.62 98.9"
-    )
-    first_run_page = _pdf_page_with_proof(
-        regolith_corpus_root()
-        / "raw"
-        / SOURCE_ID
-        / f"{SOURCE_ID}.pdf",
-        first_run_proof,
-    )
     first_run_si = next(
         row for row in table1 if row["observation_id"] == "xu_2026_table1_lvp_1_si"
     )
-    assert first_run_page == int(first_run_si["page"]) == 3
     assert first_run_si["component_amount_as_published"] == "23.40"
+    product_quench_page = int(
+        raw_observations[table1[0]["observation_id"]]["values"][
+            "quench_statement"
+        ]["locator"]["page"]
+    )
+    source_pdf = (
+        regolith_corpus_root() / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
+    )
+    if source_pdf.is_file():
+        assert (
+            _pdf_page_with_proof(
+                source_pdf,
+                "23.54 0.59 7.94 8.36 4.58 8.10 2.03 0.17 44.46 0.00 0.00 99.76",
+            )
+            == starting_context["locator"]["page"]
+        )
+        assert (
+            _pdf_page_with_proof(
+                source_pdf,
+                "Standard deviations (1 sd) are based on multiple analyses and are given in Italics",
+            )
+            == 3
+        )
+        assert (
+            _pdf_page_with_proof(
+                source_pdf,
+                "EO values in experimental samples are calculated assuming all iron is trivalent",
+            )
+            == 3
+        )
+        assert _pdf_page_with_proof(
+            source_pdf, "no PtO2 is present in the samples after the experiments"
+        ) == 7
+        assert (
+            _pdf_page_with_proof(
+                source_pdf,
+                "Some EO may have degassed during the temperature quenching process",
+            )
+            == product_quench_page
+        )
+        assert _pdf_page_with_proof(source_pdf, "Page 2 of 9") == product_quench_page
+        first_run_proof = (
+            "23.40 0.58 7.55 8.15 4.43 8.07 2.02 0.20 43.93 0.00 0.62 98.9"
+        )
+        first_run_page = _pdf_page_with_proof(source_pdf, first_run_proof)
+        assert first_run_page == int(first_run_si["page"]) == 3
     table1_context = contexts["xu_2026_table1_run_product_context_lvp_1"]
     assert table1_context["experiment"] == "xu_2026_lvp_1"
     assert table1_context["units"] == "wt.% element"
@@ -749,6 +727,34 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         if record.get("type") == "model_results"
     )
     assert len(model["values"]["printed_rows"]) == 25
+
+
+def test_missing_xu_source_pdf_skips_pdfinfo_proof(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source_pdf = (
+        regolith_corpus_root() / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
+    )
+    original_is_file = Path.is_file
+    original_pdf_proof = _pdf_page_with_proof
+
+    def missing_source(path: Path) -> bool:
+        if path == source_pdf:
+            return False
+        return original_is_file(path)
+
+    def reject_missing_source_proof(pdf: Path, proof: str) -> int:
+        if pdf == source_pdf:
+            raise AssertionError("pdfinfo proof ran for a missing source PDF")
+        return original_pdf_proof(pdf, proof)
+
+    monkeypatch.setattr(Path, "is_file", missing_source)
+    monkeypatch.setattr(
+        sys.modules[__name__], "_pdf_page_with_proof", reject_missing_source_proof
+    )
+    test_typed_glass_components_migrate_with_exact_samples_conditions_and_points(
+        tmp_path
+    )
 
 
 def test_mutating_starting_bulk_changes_migrated_phase_identity(tmp_path: Path) -> None:

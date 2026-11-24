@@ -189,12 +189,19 @@ def _alias_unit(unit: str | None) -> str:
     return _CLOSED_UNITS.get(compact, "")
 
 
+def _is_scaled_percent_unit(unit: str | None, printed_units: str | None) -> bool:
+    return (
+        _alias_unit(unit) in _SCALED_PERCENT_CANONICAL
+        and _alias_unit(printed_units) in _PERCENT_CANONICAL
+    )
+
+
 _UNKNOWN_UNIT_TOKEN_RE = re.compile(
     r"[A-Za-zµμ°%][A-Za-z0-9µμ°%./^+−\-]*"
 )
 
 
-def _clean_unit_suffix(raw: str) -> str | None:
+def _clean_unit_suffix(raw: str | None) -> str | None:
     """Canonical unit, or one unknown unit token the converter must still see.
 
     Qualifiers are removed first. A closed unit is canonical. One leftover
@@ -204,6 +211,8 @@ def _clean_unit_suffix(raw: str) -> str | None:
     leading closed unit (``% of reading``) is canonical.
     """
 
+    if raw is None:
+        return None
     aliased = _alias_unit(raw)
     if aliased:
         return aliased
@@ -358,7 +367,11 @@ def _nested_width_selection(
     nested = mapping_uncertainty_value(value)
     if nested.value is None:
         return None
-    unit = nested.unit or ("dex" if "dex" in parent_name else None)
+    unit = (
+        nested.unit
+        or mapping_uncertainty_unit(value)
+        or ("dex" if "dex" in parent_name else None)
+    )
     return WidthSelection(nested.value, unit, nested.text, nested.shape)
 
 
@@ -422,14 +435,6 @@ def _unit_from_width_text(raw: str) -> str | None:
     if number is None:
         return None
     return _unit_bound_to_number(raw, number)
-
-
-def printed_width_token(raw: str) -> tuple[str, str | None] | None:
-    """Width number and the unit bound to that number."""
-    number = uncertainty_scalar_from_text(raw)
-    if number is None:
-        return None
-    return number, _unit_bound_to_number(raw, number)
 
 
 def printed_width_span(raw: str) -> PrintedWidthSpan | None:
@@ -539,14 +544,13 @@ def resolve_width_unit_basis(
     are a typed conflict. A percent width with no basis uses the stated
     relative default and names it.
     """
-    left = unit if _alias_unit(unit) else None
-    right = inline_unit if _alias_unit(inline_unit) else None
-    left_key = _alias_unit(left)
-    right_key = _alias_unit(right)
+    left = _alias_unit(unit) or _clean_unit_suffix(unit)
+    right = _alias_unit(inline_unit) or _clean_unit_suffix(inline_unit)
+    left_key = _alias_unit(left) or (left or "").casefold()
+    right_key = _alias_unit(right) or (right or "").casefold()
     printed_key = _alias_unit(printed_units)
     if (
-        left_key in _SCALED_PERCENT_CANONICAL
-        and printed_key in _PERCENT_CANONICAL
+        _is_scaled_percent_unit(left, printed_units)
         and right_key in {"", printed_key}
     ):
         right = None
@@ -635,11 +639,21 @@ def resolve_observed_width_basis(
         evidence.append(raw)
     if selected_text:
         evidence.append(selected_text)
+        if re.search(r"\babsolute\b", selected_text, re.IGNORECASE):
+            if declared_basis.strip().casefold() == "relative":
+                return WidthUnitBasis(
+                    None,
+                    "width basis declarations disagree: 'relative' and 'absolute'",
+                    None,
+                )
+            declared_basis = "absolute"
     if paired_value is None:
         paired_value = source_paired_value(raw)
-    if not _alias_unit(declared_unit) and not _alias_unit(inline_unit):
-        paired_unit = paired_width_unit(paired_value)
-        if paired_unit:
+    paired_unit = paired_width_unit(paired_value)
+    if paired_unit and not _clean_unit_suffix(inline_unit):
+        if _clean_unit_suffix(declared_unit):
+            inline_unit = paired_unit
+        else:
             declared_unit = paired_unit
     if declared_unit is None and not isinstance(raw, Mapping):
         declared_unit = inline_unit

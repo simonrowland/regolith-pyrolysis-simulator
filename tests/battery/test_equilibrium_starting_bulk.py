@@ -626,6 +626,40 @@ def test_missing_major_equilibrium_child_keeps_green_parent_identity(
     assert "missing major oxides: Al2O3" in child_composition.state.reason
 
 
+def test_starting_bulk_mutation_replaces_parent_initial_charge_proxy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.migrate as migrate_module
+
+    test_missing_major_equilibrium_child_keeps_green_parent_identity(
+        tmp_path / "baseline"
+    )
+    original = migrate_module._apply_equilibrium_starting_bulk
+
+    def replace_with_sample_start(experiment, ident_kwargs, point_conditions, **kwargs):
+        conditions, notices = original(
+            experiment, ident_kwargs, point_conditions, **kwargs
+        )
+        if (
+            kwargs.get("quantity", Quantity.EQUILIBRIUM_PHASE_COMPOSITION)
+            is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and experiment is not None
+            and experiment.sample.initial_composition is not None
+        ):
+            ident_kwargs["composition"] = experiment.sample.initial_composition.state
+        return conditions, notices
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_apply_equilibrium_starting_bulk",
+        replace_with_sample_start,
+    )
+    with pytest.raises(AssertionError):
+        test_missing_major_equilibrium_child_keeps_green_parent_identity(
+            tmp_path / "mutated"
+        )
+
+
 def test_ambiguous_feot_mass_loss_child_keeps_green_unknown_identity(
     tmp_path: Path,
 ) -> None:

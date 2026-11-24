@@ -206,7 +206,6 @@ from simulator.battery.uncertainty_conventions import (
     mapping_uncertainty_unit as _mapping_uncertainty_unit,
     mapping_uncertainty_value as _mapping_uncertainty_value,
     printed_uncertainty_convention,
-    printed_width_span,
     resolve_observed_width_basis,
     standard_uncertainty_width,
     uncertainty_exact_fields,
@@ -6254,11 +6253,12 @@ def _printed_uncertainty_source(
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
     printed_unit = _mapping_uncertainty_unit(raw) if isinstance(raw, Mapping) else None
-    unit = (
+    basis_unit = (
         "dex" if "dex" in basis.casefold()
         else "fraction" if basis.casefold() in {"relative", "fraction"}
-        else printed_unit
+        else None
     )
+    unit = printed_unit
     value: object | None = uncertainty.value
     inline_unit: str | None = None
     shape = "scalar"
@@ -6273,7 +6273,15 @@ def _printed_uncertainty_source(
             shape = mapped.shape
         inline_unit = mapped.unit
         selected_text = mapped.text
-        unit = printed_unit or inline_unit or unit
+        if _width_conventions._is_scaled_percent_unit(
+            printed_unit,
+            raw.get("printed_units")
+            if isinstance(raw.get("printed_units"), str)
+            else None,
+        ):
+            unit = printed_unit
+        else:
+            unit = inline_unit or printed_unit
     elif isinstance(raw, str):
         # Same span-versus-scalar choice as the mapping selector.
         selected = _selection_from_width_text(raw, "")
@@ -6283,12 +6291,13 @@ def _printed_uncertainty_source(
             selected_text = selected.text
         if selected is not None and selected.unit:
             inline_unit = selected.unit
-            if unit is None:
-                unit = selected.unit
+            unit = selected.unit
     if paired_value is None:
         # Attribute lookup, not a copied binding: the paired-value mutation
         # patches this name on the owner module.
         paired_value = _width_conventions.source_paired_value(raw)
+    if unit is None:
+        unit = _width_conventions.paired_width_unit(paired_value) or basis_unit
     resolved = resolve_observed_width_basis(
         raw,
         inline_unit=inline_unit,
@@ -6384,19 +6393,9 @@ def _uncertainty_unit(
     uncertainty: Uncertainty,
     observation: Observation | None,
     mapped_unit: str | None,
-    source_value: Decimal | tuple[Decimal, Decimal],
-    raw_text: str,
 ) -> str:
     if mapped_unit:
         return mapped_unit
-    unit_texts = [raw_text]
-    if isinstance(uncertainty.verbatim, Mapping):
-        unit_texts = [
-            str(value)
-            for key, value in uncertainty.verbatim.items()
-            if key not in {"confidence_level", "locator", "parent", "k"}
-            and isinstance(value, str)
-        ] or [raw_text]
     basis = uncertainty.basis or ""
     if basis:
         basis = basis.replace("_", " ")
@@ -6410,11 +6409,6 @@ def _uncertainty_unit(
             return unit_basis
         if basis.casefold() in {"relative", "fraction"}:
             return basis
-    if isinstance(source_value, tuple):
-        for text in unit_texts:
-            span = printed_width_span(text)
-            if span is not None and span[2]:
-                return span[2]
     if observation is not None:
         locator = observation.locator
         note = None if locator is None else locator.note
@@ -7089,7 +7083,7 @@ def _printed_uncertainty_band(
         else mapped_unit
         if resolved_basis in {"dimensionless", "relative", "dex"} and mapped_unit
         else _uncertainty_unit(
-            quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
+            quantity, uncertainty, source_observation, mapped_unit
         )
     )
     if confidence_level in {"two_sigma", "ci95"}:

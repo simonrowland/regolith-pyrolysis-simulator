@@ -9451,6 +9451,16 @@ def _apply_equilibrium_starting_bulk(
         locator=initial.locator,
         inference=initial.inference,
     )
+    existing_identity_composition = ident_kwargs.get("composition")
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and _keeps_existing_composition(existing_identity_composition)
+        and isinstance(existing_identity_composition, State)
+        and isinstance(existing_identity_composition.value, Composition)
+        and existing_identity_composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ):
+        return point_conditions, []
     ident_kwargs["composition"] = located.state
     existing_point = (point_conditions or {}).get("composition")
     if not (
@@ -15938,8 +15948,8 @@ def _uncertainty_for_value_selection(
     # Shape stays on the selection. The unit is only a closed-vocabulary unit.
     width_unit = selected.unit
     source_unit = (
-        mapping_uncertainty_unit(verbatim)
-        or width_unit
+        width_unit
+        or mapping_uncertainty_unit(verbatim)
         or paired_width_unit(printed_value)
     )
     if width is None:
@@ -30554,7 +30564,8 @@ class Migrator:
         ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
     ) -> bool:
-        raw_item = item.get("item")
+        source_item = item.get("item")
+        raw_item = source_item
         non_mapping_point = not isinstance(raw_item, Mapping)
         if non_mapping_point:
             raw_item = {}
@@ -30898,12 +30909,10 @@ class Migrator:
             )
             if coord is None and ordinal_point_id is not None:
                 point_id = ordinal_point_id
-            elif content_stable_id and not non_mapping_point:
-                point_id = _exploded_point_id(
-                    parent_id, item, coord, raw_item, row_extra
-                )
             elif content_stable_id:
-                point_id = f"{parent_id}::point:{index}"
+                point_id = _exploded_point_id(
+                    parent_id, item, coord, source_item, row_extra
+                )
             elif coord is not None:
                 point_id = series_point_id(parent_id, temperature=coord, extra=row_extra)
             else:
@@ -31014,7 +31023,9 @@ class Migrator:
                             )
         else:
             if content_stable_id:
-                point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
+                point_id = _exploded_point_id(
+                    parent_id, item, coord, source_item, None
+                )
             else:
                 point_id = f"{parent_id}::point:{index}"
 
