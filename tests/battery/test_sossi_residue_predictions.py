@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 from simulator.battery.residue import (
+    ResidueInventoryRefusal,
     _SOSSI_GEOMETRIES,
     _sossi_geometry_areas,
     _sossi_initial_inventory,
@@ -253,25 +254,22 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     assert prediction.primary_element_ppm["Ti"] > 0.0
 
 
-def test_sossi_missing_trace_rejects_restored_bare_lookup_mutation(monkeypatch) -> None:
+def test_sossi_missing_trace_rejects_restored_producer_refusal_mutation(monkeypatch) -> None:
     pytest.importorskip("openimcc")
     import simulator.battery.residue as residue
 
-    source = yaml.safe_load(SOURCE.read_text())
-    experiment = source["experiments"][0]
+    original_initial_inventory = residue._sossi_initial_inventory
 
-    def bare_lookup_mutant(_experiment, starting_trace_ppm):
-        return starting_trace_ppm["Mn"]
+    def producer_refusal_mutant(experiment, starting_trace_ppm):
+        if "Mn" not in starting_trace_ppm:
+            raise ResidueInventoryRefusal("starting_component_ppm_missing")
+        return original_initial_inventory(experiment, starting_trace_ppm)
 
-    monkeypatch.setattr(residue, "_sossi_initial_inventory", bare_lookup_mutant)
-    with pytest.raises(KeyError, match="Mn"):
-        residue._predict_sossi_residue_cohort(
-            [experiment],
-            yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
-            starting_trace_ppm_by_experiment={experiment["experiment_id"]: {"Ti": 1.0}},
-            buffered_fO2_log_by_experiment={experiment["experiment_id"]: -10.0},
-            engine="openimcc",
-        )
+    monkeypatch.setattr(
+        residue, "_sossi_initial_inventory", producer_refusal_mutant
+    )
+    with pytest.raises(AssertionError):
+        test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch)
 
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(

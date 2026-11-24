@@ -3448,11 +3448,8 @@ def _sossi_initial_inventory(
         for oxide, value in wt_pct.items()
     }
     for element, parent in _SOSSI_TRACE_PARENTS.items():
-        try:
-            ppm = float(starting_trace_ppm.get(element, math.nan))
-        except (TypeError, ValueError, OverflowError):
-            ppm = math.nan
-        if not math.isfinite(ppm) or ppm <= 0.0:
+        ppm = _sossi_positive_starting_ppm(starting_trace_ppm.get(element))
+        if ppm is None:
             continue
         _atoms, element_molar_mass = _formula_terms(element)
         element_mass_kg = ppm * 1.0e-6 * mass_kg
@@ -3462,6 +3459,15 @@ def _sossi_initial_inventory(
     return inventory, mass_kg, math.fsum(
         amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
     )
+
+
+def _sossi_positive_starting_ppm(raw: object) -> float | None:
+    """Return a finite positive starting ppm, using the cohort's validity rule."""
+    try:
+        ppm = float(raw)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return ppm if math.isfinite(ppm) and ppm > 0.0 else None
 
 
 def _sossi_element_refusal(
@@ -3823,11 +3829,7 @@ def _predict_sossi_residue_cohort(
         trace_inputs = starting_trace_ppm_by_experiment.get(experiment_id, {})
         element_refusals: dict[str, dict[str, str]] = {}
         for element in _SOSSI_TRACE_PARENTS:
-            try:
-                trace_ppm = float(trace_inputs.get(element, math.nan))
-            except (TypeError, ValueError, OverflowError):
-                trace_ppm = math.nan
-            if not math.isfinite(trace_ppm) or trace_ppm <= 0.0:
+            if _sossi_positive_starting_ppm(trace_inputs.get(element)) is None:
                 element_refusals[element] = _sossi_element_refusal(
                     "starting_component_ppm_missing",
                     element,
