@@ -6261,18 +6261,25 @@ def _printed_uncertainty_source(
     unit = printed_unit
     value: object | None = uncertainty.value
     inline_unit: str | None = None
+    nested_unit: str | None = None
     shape = "scalar"
     selected_text = None
     if isinstance(value, tuple):
         shape = getattr(value, "shape", "range")
+    selected = None
     if isinstance(raw, Mapping):
         mapped = _mapping_uncertainty_value(raw, exact_fields=exact_fields)
+        selected = mapped
+        nested_unit = mapped.declared_unit
+    elif isinstance(raw, str):
+        selected = _selection_from_width_text(raw, "")
+    if selected is not None:
         if value is None:
-            value = mapped.value
-        if mapped.shape in {"range", "pair"}:
-            shape = mapped.shape
-        inline_unit = mapped.unit
-        selected_text = mapped.text
+            value = selected.value
+        shape = selected.shape
+        inline_unit = selected.unit
+        selected_text = selected.text
+    if isinstance(raw, Mapping):
         if _width_conventions._is_scaled_percent_unit(
             printed_unit,
             raw.get("printed_units")
@@ -6282,16 +6289,8 @@ def _printed_uncertainty_source(
             unit = printed_unit
         else:
             unit = inline_unit or printed_unit
-    elif isinstance(raw, str):
-        # Same span-versus-scalar choice as the mapping selector.
-        selected = _selection_from_width_text(raw, "")
-        if value is None and selected is not None:
-            value = selected.value
-            shape = selected.shape
-            selected_text = selected.text
-        if selected is not None and selected.unit:
-            inline_unit = selected.unit
-            unit = selected.unit
+    elif inline_unit:
+        unit = inline_unit
     if paired_value is None:
         # Attribute lookup, not a copied binding: the paired-value mutation
         # patches this name on the owner module.
@@ -6304,6 +6303,7 @@ def _printed_uncertainty_source(
         uncertainty_basis=basis,
         paired_value=paired_value,
         selected_text=selected_text,
+        nested_unit=nested_unit,
     )
     if resolved.conflict is not None:
         raise UncertaintyConventionConflict(resolved.conflict)

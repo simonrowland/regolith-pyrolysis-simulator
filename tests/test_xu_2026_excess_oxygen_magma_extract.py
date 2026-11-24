@@ -576,54 +576,6 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         fe_source["derivation"]["locator"]["section"]
         == "Mössbauer spectroscopic analysis"
     )
-    supplement_pdf = _supplement_pdf(tmp_path)
-    assert (
-        _pdf_page_with_proof(
-            supplement_pdf,
-            "Starting material was a synthetic mid-ocean ridge basalt (MORB)",
-        )
-        == 3
-    )
-    assert (
-        _pdf_page_with_proof(
-            supplement_pdf,
-            "Twenty-one high pressure and temperature experiments (Table 1) were conducted",
-        )
-        == 3
-    )
-    assert _pdf_page_with_proof(supplement_pdf, "logfO2 ≈ 0") == 3
-    assert (
-        _pdf_page_with_proof(
-            supplement_pdf,
-            "The melts were quenched rapidly by immersing the bottom of Pt crucible in water",
-        )
-        == starting_glass_quench["locator"]["page"]
-    )
-    assert (
-        _pdf_page_with_proof(
-            supplement_pdf,
-            "Table S1. Hyperfine parameters derived from room temperature spectrum of synthetic MORB glass starting material",
-        )
-        == fe_source["locator"]["page"]
-    )
-    assert (
-        _pdf_page_with_proof(supplement_pdf, "area (%) 70(3)")
-        == fe_source["locator"]["page"]
-    )
-    assert (
-        _pdf_page_with_proof(
-            supplement_pdf,
-            "Fe3+/ΣFe was determined from relative areas to be 0.70",
-        )
-        == fe_source["derivation"]["locator"]["page"]
-    )
-    assert (
-        _pdf_page_with_proof(
-            supplement_pdf,
-            "Fig. S7. Room temperature Mössbauer spectrum of MORB glass starting material",
-        )
-        == fe.derivation.raw_inputs.locator.page
-    )
     assert not fe.derived_from
     assert not fe.notices
 
@@ -729,6 +681,75 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert len(model["values"]["printed_rows"]) == 25
 
 
+def test_xu_supplement_pdf_pages_match_checked_in_locators(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    fe_source = next(
+        row
+        for row in document["species"]["Fe"]["observations"]
+        if row["observation_id"] == "xu_2026_moessbauer_starting_glass_fe3_fet"
+    )
+    fe_values = fe_source["values"]
+    fe_derivation = fe_source["derivation"]
+    starting_context = next(
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row["observation_id"] == "xu_2026_table1_starting_composition_context"
+    )
+    supplement_pdf = _supplement_pdf(tmp_path)
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Starting material was a synthetic mid-ocean ridge basalt (MORB)",
+        )
+        == starting_context["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Twenty-one high pressure and temperature experiments (Table 1) were conducted",
+        )
+        == starting_context["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(supplement_pdf, "logfO2 ≈ 0")
+        == starting_context["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "The melts were quenched rapidly by immersing the bottom of Pt crucible in water",
+        )
+        == fe_values["quench_statement"]["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Table S1. Hyperfine parameters derived from room temperature spectrum of synthetic MORB glass starting material",
+        )
+        == fe_source["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(supplement_pdf, "area (%) 70(3)")
+        == fe_source["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Fe3+/ΣFe was determined from relative areas to be 0.70",
+        )
+        == fe_derivation["locator"]["page"]
+    )
+    assert (
+        _pdf_page_with_proof(
+            supplement_pdf,
+            "Fig. S7. Room temperature Mössbauer spectrum of MORB glass starting material",
+        )
+        == fe_derivation["raw_inputs"]["locator"]["page"]
+    )
+
+
 def test_missing_xu_source_pdf_skips_pdfinfo_proof(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -752,9 +773,17 @@ def test_missing_xu_source_pdf_skips_pdfinfo_proof(
     monkeypatch.setattr(
         sys.modules[__name__], "_pdf_page_with_proof", reject_missing_source_proof
     )
-    test_typed_glass_components_migrate_with_exact_samples_conditions_and_points(
-        tmp_path
-    )
+
+    def missing_supplement(_tmp_path: Path) -> Path:
+        pytest.skip("Xu supplementary PDF archive is absent")
+
+    monkeypatch.setattr(sys.modules[__name__], "_supplement_pdf", missing_supplement)
+    try:
+        test_typed_glass_components_migrate_with_exact_samples_conditions_and_points(
+            tmp_path
+        )
+    except pytest.skip.Exception as exc:
+        pytest.fail(f"checked-in regression skipped: {exc}")
 
 
 def test_mutating_starting_bulk_changes_migrated_phase_identity(tmp_path: Path) -> None:

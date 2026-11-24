@@ -252,7 +252,9 @@ def _unit_bound_to_number(raw: str, number: str) -> str | None:
         match = found[-1] if found else None
     if match is None:
         return None
-    return _clean_unit_suffix(match.group(1))
+    # A semicolon can start the next printed uncertainty clause, so it is not
+    # part of the selected number's unit (for example, ``±10%; absolute``).
+    return _clean_unit_suffix(match.group(1).split(";", maxsplit=1)[0])
 
 
 def uncertainty_scalar_from_text(raw: str) -> str | None:
@@ -283,7 +285,8 @@ class WidthSelection(tuple):
 
     ``shape`` is ``scalar``, ``range`` (bracketed or a two-list), or ``pair``
     (a printed ``to`` / dash pair). ``text`` is the field string the number
-    came from, so basis qualifiers stay attached to that field.
+    came from, so basis qualifiers stay attached to that field. ``declared_unit``
+    retains a nested field's local unit beside any unit printed with the width.
     """
 
     def __new__(
@@ -292,10 +295,12 @@ class WidthSelection(tuple):
         unit: str | None,
         text: str | None = None,
         shape: str = "scalar",
+        declared_unit: str | None = None,
     ) -> "WidthSelection":
         selected = super().__new__(cls, (value, unit))
         selected.text = text
         selected.shape = shape
+        selected.declared_unit = declared_unit
         return selected
 
     @property
@@ -338,7 +343,7 @@ def _selection_from_width_text(raw: str, name: str) -> WidthSelection | None:
         )
     if scalar is None:
         return None
-    unit = _unit_from_width_text(raw)
+    unit = _unit_bound_to_number(raw, scalar)
     if unit is None and "dex" in name:
         unit = "dex"
     return WidthSelection(scalar, unit, text=raw, shape="scalar")
@@ -367,12 +372,19 @@ def _nested_width_selection(
     nested = mapping_uncertainty_value(value)
     if nested.value is None:
         return None
+    declared_unit = mapping_uncertainty_unit(value) or nested.declared_unit
     unit = (
         nested.unit
-        or mapping_uncertainty_unit(value)
+        or declared_unit
         or ("dex" if "dex" in parent_name else None)
     )
-    return WidthSelection(nested.value, unit, nested.text, nested.shape)
+    return WidthSelection(
+        nested.value,
+        unit,
+        nested.text,
+        nested.shape,
+        declared_unit=declared_unit,
+    )
 
 
 def mapping_uncertainty_value(
@@ -428,13 +440,6 @@ def mapping_uncertainty_value(
         if selected is not None:
             return selected
     return WidthSelection(None, None)
-
-
-def _unit_from_width_text(raw: str) -> str | None:
-    number = uncertainty_scalar_from_text(raw)
-    if number is None:
-        return None
-    return _unit_bound_to_number(raw, number)
 
 
 def printed_width_span(raw: str) -> PrintedWidthSpan | None:
@@ -604,13 +609,14 @@ def resolve_observed_width_basis(
     paired_value: str | None = None,
     expected_unit: str | None = None,
     selected_text: str | None = None,
+    nested_unit: str | None = None,
 ) -> WidthUnitBasis:
     """One basis resolution for migration and scoring.
 
-    Both paths pass the same arguments: the declared unit, the unit bound to
-    the selected field, the printed paired value, and the qualifier text of
-    that field. A parenthetical percent on the paired value supplies the unit
-    only when the width itself names none.
+    Both paths pass the same arguments: the unit declared beside the selected
+    field (or at the top level), the unit bound to that width, the printed
+    paired value, and the qualifier text. A parenthetical percent on the
+    paired value supplies the unit only when the width itself names none.
     """
 
     basis = uncertainty_basis or ""
@@ -618,9 +624,9 @@ def resolve_observed_width_basis(
     declared_basis = basis
     printed_value = None
     evidence: list[str] = []
-    declared_unit = None
+    declared_unit = nested_unit
     if isinstance(raw, Mapping):
-        declared_unit = mapping_uncertainty_unit(raw)
+        declared_unit = declared_unit or mapping_uncertainty_unit(raw)
         stored_printed_units = raw.get("printed_units")
         if isinstance(stored_printed_units, str):
             printed_units = stored_printed_units

@@ -21886,6 +21886,53 @@ def test_unmapped_unit_mutation_drops_the_conflicting_token(
         test_unmapped_printed_unit_conflicts_with_declared_unit()
 
 
+@pytest.mark.parametrize(
+    ("inline_unit", "local_unit"),
+    [("furlong", "Pa"), ("Pa", "bar")],
+)
+def test_nested_inline_unit_conflict_is_typed(
+    inline_unit: str, local_unit: str
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    uncertainty = uncertainty_for(
+        {
+            "digitization": {
+                "read_uncertainty": f"3 {inline_unit}",
+                "unit": local_unit,
+            }
+        }
+    )
+    band = _printed_uncertainty_band(
+        Quantity.P_PARTIAL, uncertainty, Decimal("100000")
+    )
+    assert band.refusal is not None
+    assert band.refusal["reason"] == "uncertainty_convention_conflict"
+
+
+def test_nested_unit_conflict_mutation_drops_the_local_declaration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.uncertainty_conventions as conventions
+
+    test_nested_inline_unit_conflict_is_typed("furlong", "Pa")
+    original = conventions._nested_width_selection
+
+    def drop_declared_unit(value, parent_name):
+        selected = original(value, parent_name)
+        if selected is None:
+            return None
+        return conventions.WidthSelection(
+            selected.value, selected.unit, selected.text, selected.shape
+        )
+
+    monkeypatch.setattr(
+        conventions, "_nested_width_selection", drop_declared_unit
+    )
+    with pytest.raises(AssertionError):
+        test_nested_inline_unit_conflict_is_typed("furlong", "Pa")
+
+
 def test_inline_absolute_percent_supplies_basis_and_numeric_scale() -> None:
     from simulator.battery.score import _printed_uncertainty_band
 
@@ -21909,6 +21956,53 @@ def test_inline_absolute_percent_supplies_basis_and_numeric_scale() -> None:
     assert scored.band.value == explicit.band.value
 
 
+@pytest.mark.parametrize("decoded_value", [None, Decimal("3")])
+@pytest.mark.parametrize(
+    ("printed", "expected_basis", "declared_basis"),
+    [
+        ("3% absolute", "dimensionless", "absolute"),
+        ("3% relative", "relative", "relative"),
+    ],
+)
+def test_selected_width_text_qualifier_wins_with_decoded_value(
+    decoded_value: Decimal | None,
+    printed: str,
+    expected_basis: str,
+    declared_basis: str,
+) -> None:
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        _printed_uncertainty_source,
+    )
+
+    uncertainty = uncertainty_for(printed)
+    if decoded_value is not None:
+        uncertainty = replace(
+            uncertainty, value=decoded_value, basis="not_stated"
+        )
+    parsed = _printed_uncertainty_source(uncertainty)
+    assert parsed[:4] == (
+        decoded_value or Decimal("3"),
+        "scalar",
+        "%",
+        expected_basis,
+    )
+    assert parsed[4] is None
+    scored = _printed_uncertainty_band(
+        Quantity.ACTIVITY, uncertainty, Decimal("0.7")
+    )
+    explicit = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty_for(
+            {"sigma": "3%", "units": "%", "basis": declared_basis}
+        ),
+        Decimal("0.7"),
+    )
+    assert scored.refusal is None and scored.band is not None
+    assert explicit.refusal is None and explicit.band is not None
+    assert scored.band.value == explicit.band.value
+
+
 def test_inline_absolute_mutation_ignores_selected_width_qualifier(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -21916,6 +22010,9 @@ def test_inline_absolute_mutation_ignores_selected_width_qualifier(
     import simulator.battery.score as score_module
 
     test_inline_absolute_percent_supplies_basis_and_numeric_scale()
+    test_selected_width_text_qualifier_wins_with_decoded_value(
+        Decimal("3"), "3% absolute", "dimensionless", "absolute"
+    )
     original_migrate = migrate_module.resolve_observed_width_basis
     original_score = score_module.resolve_observed_width_basis
 
@@ -21938,6 +22035,10 @@ def test_inline_absolute_mutation_ignores_selected_width_qualifier(
     )
     with pytest.raises(AssertionError):
         test_inline_absolute_percent_supplies_basis_and_numeric_scale()
+    with pytest.raises(AssertionError):
+        test_selected_width_text_qualifier_wins_with_decoded_value(
+            Decimal("3"), "3% absolute", "dimensionless", "absolute"
+        )
 
 
 def test_selected_width_keeps_unit_binding_before_contextual_fallback() -> None:
@@ -21960,6 +22061,76 @@ def test_selected_width_keeps_unit_binding_before_contextual_fallback() -> None:
     assert parsed[2] is None
     assert _uncertainty_unit(Quantity.ACTIVITY, uncertainty, None, parsed[2]) == (
         "dimensionless"
+    )
+
+
+def test_text_unit_is_bound_to_the_selected_scalar() -> None:
+    from simulator.battery.score import _printed_uncertainty_source
+    from simulator.battery.uncertainty_conventions import mapping_uncertainty_value
+
+    raw = {"sigma": "95% CI ±0.3 dex"}
+    selected = mapping_uncertainty_value(raw)
+    parsed = _printed_uncertainty_source(uncertainty_for(raw))
+    assert (selected.value, selected.unit) == ("0.3", "dex")
+    assert parsed[:3] == (Decimal("0.3"), "scalar", "dex")
+
+
+def test_semicolon_clause_unit_stays_with_selected_scalar() -> None:
+    from simulator.battery.score import _printed_uncertainty_source
+    from simulator.battery.uncertainty_conventions import mapping_uncertainty_value
+
+    raw = "Relative ±10%; absolute ±30%; confidence level not stated."
+    selected = mapping_uncertainty_value({"sigma": raw})
+    parsed = _printed_uncertainty_source(uncertainty_for(raw))
+    assert (selected.value, selected.unit) == ("10", "%")
+    assert parsed[:3] == (Decimal("10"), "scalar", "%")
+
+
+def test_text_unit_binding_mutation_selects_a_different_number(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.uncertainty_conventions as conventions
+
+    test_text_unit_is_bound_to_the_selected_scalar()
+    test_semicolon_clause_unit_stays_with_selected_scalar()
+    original = conventions._unit_bound_to_number
+
+    def bind_first_number(raw: str, _number: str) -> str | None:
+        if raw == "95% CI ±0.3 dex":
+            return original(raw, "95")
+        if raw == "Relative ±10%; absolute ±30%; confidence level not stated.":
+            return None
+        return original(raw, _number)
+
+    monkeypatch.setattr(
+        conventions, "_unit_bound_to_number", bind_first_number
+    )
+    with pytest.raises(AssertionError):
+        test_text_unit_is_bound_to_the_selected_scalar()
+    with pytest.raises(AssertionError):
+        test_semicolon_clause_unit_stays_with_selected_scalar()
+
+
+@pytest.mark.parametrize(
+    "decoded_value",
+    [None, (Decimal("2"), Decimal("4"))],
+)
+def test_decoded_range_keeps_selected_text_shape(
+    decoded_value: tuple[Decimal, Decimal] | None,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_source
+
+    uncertainty = uncertainty_for("2 to 4 %")
+    if decoded_value is not None:
+        uncertainty = replace(
+            uncertainty, value=decoded_value, basis="not_stated"
+        )
+    parsed = _printed_uncertainty_source(uncertainty)
+    assert parsed[:4] == (
+        decoded_value or (Decimal("2"), Decimal("4")),
+        "pair",
+        "%",
+        "relative",
     )
 
 
@@ -22511,8 +22682,10 @@ def _persisted_observation_documents(
 
 def _width_census(
     *, shard: int | None = None, only_names: frozenset[str] | None = None
-) -> tuple[list[str], dict[str, object]]:
+) -> tuple[dict[str, str], dict[str, object]]:
     from simulator.battery.uncertainty_conventions import (
+        WidthSelection,
+        _selection_from_width_text,
         mapping_uncertainty_value,
         uncertainty_exact_fields,
     )
@@ -22527,7 +22700,7 @@ def _width_census(
     dex_rows = 0
     half_rows = 0
     gamma_rows = 0
-    mismatches: list[str] = []
+    mismatches: dict[str, str] = {}
     local_unit_changes: dict[str, tuple[str | None, str]] = {}
     selected_unit_changes: dict[str, tuple[str | None, str]] = {}
     for name, observations in _persisted_observation_documents(
@@ -22598,9 +22771,9 @@ def _width_census(
                 wang_value, old_shape, wang_unit = wang_width_source(
                     uncertainty_value, exact_fields=fields
                 )
-                selected = mapping_uncertainty_value(
-                    {"sigma": verbatim}, exact_fields=fields
-                )
+                selected = _selection_from_width_text(verbatim, "")
+                if selected is None:
+                    selected = WidthSelection(None, None)
             current_value = selected.value
             current_unit = selected.unit
             current_shape = selected.shape
@@ -22641,8 +22814,8 @@ def _width_census(
                     )
                 )
             ):
-                mismatches.append(
-                    f"{observation_id}: Wang={wang_key}/{old_shape}@{wang_unit!r} "
+                mismatches[observation_id] = (
+                    f"Wang={wang_key}/{old_shape}@{wang_unit!r} "
                     f"branch={current_key}/{current_shape}@{current_unit!r}"
                 )
             elif (
@@ -22742,13 +22915,28 @@ def _width_census(
 def test_persisted_width_selector_census_matches_wang_except_named_changes(
     shard: int,
 ) -> None:
-    mismatches, _counts = _width_census(shard=shard)
-    assert mismatches == [], "\n".join(mismatches[:50])
+    mismatches, counts = _width_census(shard=shard)
+    assert not mismatches, "\n".join(
+        f"{observation_id}: {message}"
+        for observation_id, message in list(mismatches.items())[:50]
+    )
+    missing_percent_units = {
+        observation_id: units
+        for observation_id, units in counts["selected_unit_changes"].items()
+        if units == ("%", None)
+    }
+    assert not missing_percent_units, (
+        "selected percent units lost by observation ID: "
+        f"{missing_percent_units}"
+    )
 
 
 def test_persisted_width_selector_pins_keep_demaria_digitization_and_shornikov() -> None:
     mismatches, counts = _width_census(only_names=_PIN_FILES)
-    assert mismatches == [], "\n".join(mismatches[:50])
+    assert not mismatches, "\n".join(
+        f"{observation_id}: {message}"
+        for observation_id, message in list(mismatches.items())[:50]
+    )
     assert counts["seen_pins"] == set(_PINNED_WIDTHS)
     assert counts["saw_demaria_point"] is True
     assert counts["demaria_rows"] == 10
@@ -22906,12 +23094,15 @@ def test_width_token_unit_mutation_drops_bound_dex(monkeypatch) -> None:
     from simulator.battery import uncertainty_conventions as conventions
 
     test_existing_printed_width_field_census_and_unit_conflict_orders()
+    original = conventions._unit_bound_to_number
 
-    def unbound(_raw: str) -> None:
-        return None
+    def unbound(raw: str, number: str) -> str | None:
+        if raw == "95% CI ±0.3 dex":
+            return None
+        return original(raw, number)
 
-    # The bound unit is read in the owner, then used by both entry points.
-    monkeypatch.setattr(conventions, "_unit_from_width_text", unbound)
+    # The unit is bound to the selected scalar in the width owner.
+    monkeypatch.setattr(conventions, "_unit_bound_to_number", unbound)
     with pytest.raises(AssertionError):
         test_existing_printed_width_field_census_and_unit_conflict_orders()
 

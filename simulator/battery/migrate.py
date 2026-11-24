@@ -15969,6 +15969,7 @@ def _uncertainty_for_value_selection(
         paired_value=printed_value,
         expected_unit="dimensionless",
         selected_text=selected.text,
+        nested_unit=selected.declared_unit,
     )
     basis = resolved.basis
     conflict = resolved.conflict
